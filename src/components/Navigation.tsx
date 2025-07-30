@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Menu, X, Heart, Plus } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const Navigation = () => {
@@ -9,30 +9,38 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Professional Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="relative">
-              {/* Main logo container with layered design */}
-              <div className="w-12 h-12 bg-gradient-to-br from-emergency via-emergency/90 to-emergency/80 rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/20 backdrop-blur-sm">
-                <div className="relative">
-                  {/* Medical cross background */}
-                  <Plus className="h-7 w-7 text-white absolute inset-0 opacity-30" strokeWidth={3} />
-                  {/* Shield protection overlay */}
-                  <Shield className="h-6 w-6 text-white relative z-10" strokeWidth={2.5} />
-                </div>
+          {/* ICE SOS Professional Logo */}
+          <div className="flex items-center space-x-4">
+            {/* Modern Geometric Logo Symbol */}
+            <div className="relative w-14 h-14">
+              {/* Outer protective ring */}
+              <div className="absolute inset-0 w-14 h-14 rounded-full bg-gradient-to-br from-emergency to-emergency/80 shadow-xl"></div>
+              
+              {/* Inner safety core */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/90 shadow-lg">
+                {/* Central pulse dot */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-sm"></div>
               </div>
-              {/* Status indicator dot */}
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-white shadow-sm">
-                <div className="w-2 h-2 bg-white rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-              </div>
+              
+              {/* Emergency signal indicators */}
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-md"></div>
+              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-white rounded-full shadow-md"></div>
+              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1/2 w-2 h-2 bg-white rounded-full shadow-md"></div>
+              <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 w-2 h-2 bg-white rounded-full shadow-md"></div>
             </div>
             
+            {/* Professional Typography */}
             <div className="flex flex-col">
-              <span className="text-xl font-bold font-poppins text-foreground leading-tight tracking-tight">
-                ICE SOS
-              </span>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider leading-none">
-                LITE
+              <div className="flex items-baseline space-x-1">
+                <span className="text-2xl font-bold font-poppins text-foreground tracking-tight">
+                  ICE
+                </span>
+                <span className="text-2xl font-bold font-poppins text-emergency tracking-tight">
+                  SOS
+                </span>
+              </div>
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.15em] -mt-1">
+                Emergency Protection
               </span>
             </div>
           </div>
