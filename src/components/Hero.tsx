@@ -4,7 +4,7 @@ import heroImage from "@/assets/hero-emergency.jpg";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
       {/* Darker Shadow Overlay for Professional Look */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30" />
       
@@ -32,35 +32,13 @@ const Hero = () => {
               professional call center access, and family connectivity — globally available.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
                 Start Free Trial
               </Button>
               <Button size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
                 Download App
               </Button>
-            </div>
-            
-            {/* Features Icons */}
-            <div className="grid grid-cols-3 gap-8 max-w-md mx-auto lg:mx-0">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-emergency/20 rounded-full flex items-center justify-center mx-auto mb-2 shadow-emergency border border-emergency/30 backdrop-blur-sm">
-                  <Heart className="h-6 w-6 text-emergency" />
-                </div>
-                <p className="text-sm text-emergency-glow font-medium">24/7 Guardian AI</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-emergency/20 rounded-full flex items-center justify-center mx-auto mb-2 shadow-emergency border border-emergency/30 backdrop-blur-sm">
-                  <MapPin className="h-6 w-6 text-emergency" />
-                </div>
-                <p className="text-sm text-emergency-glow font-medium">GPS Location</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-emergency/20 rounded-full flex items-center justify-center mx-auto mb-2 shadow-emergency border border-emergency/30 backdrop-blur-sm">
-                  <Smartphone className="h-6 w-6 text-emergency" />
-                </div>
-                <p className="text-sm text-emergency-glow font-medium">Multilingual</p>
-              </div>
             </div>
           </div>
           
