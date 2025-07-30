@@ -65,135 +65,115 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
     : userName;
 
   return (
-    <div className="bg-gradient-hero border-b border-white/10">
-      <div className="container mx-auto px-4 py-8">
-        {/* Top Status Bar */}
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
-          {/* Time and Weather Info */}
-          <div className="flex items-center gap-6 text-white/90">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              <span className="text-sm font-medium">
-                {currentTime.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}
-              </span>
-            </div>
-            <div className="hidden md:flex items-center gap-2">
-              <span className="text-lg font-semibold">
-                {currentTime.toLocaleTimeString('en-US', { 
-                  hour: '2-digit', 
-                  minute: '2-digit',
-                  hour12: true 
-                })}
-              </span>
-            </div>
-            <div className="hidden lg:flex items-center gap-2">
-              <Cloud className="h-4 w-4" />
-              <span className="text-sm">{weather.temp} • {weather.condition}</span>
-            </div>
+    <div className="bg-white border-b border-border">
+      <div className="container mx-auto px-6 py-8">
+        {/* Professional Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-light text-foreground mb-2">
+              Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 18 ? 'Afternoon' : 'Evening'}, {userName}
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              {currentTime.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })} • {currentTime.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+              })}
+            </p>
           </div>
-
-          {/* Sign Out Button */}
-          <Button
-            onClick={handleSignOut}
-            variant="outline"
-            size="sm"
-            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-right mr-6">
+              <p className="text-sm text-muted-foreground">{weather.location}</p>
+              <p className="text-lg font-medium text-foreground">{weather.temp} • {weather.condition}</p>
+            </div>
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              size="sm"
+              className="border-border"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
-        {/* Main Hero Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-          {/* Welcome Section */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
+        {/* Status and Emergency Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Protection Status */}
+          <div className="bg-card border border-border rounded-lg p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold text-white mb-2">
-                  Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 18 ? 'Afternoon' : 'Evening'}, {userName}
-                </h1>
-                <p className="text-white/80 text-lg">
-                  Welcome to your ICE SOS Emergency Protection Dashboard
+                <p className="text-sm font-medium text-muted-foreground mb-1">Protection Status</p>
+                <p className={`text-lg font-semibold ${protectionStatus.color}`}>
+                  {protectionStatus.status}
                 </p>
               </div>
-            </div>
-
-            {/* Status Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-4">
-                <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${protectionStatus.status === 'Active' ? 'bg-green-400' : 'bg-orange-400'}`}></div>
-                  <div>
-                    <p className="text-white font-medium">Emergency Protection</p>
-                    <p className={`text-sm ${protectionStatus.color}`}>
-                      {protectionStatus.status}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20 p-4">
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-4 w-4 text-white/80" />
-                  <div>
-                    <p className="text-white font-medium">Location Services</p>
-                    <p className="text-sm text-white/80">
-                      {profile?.location_sharing_enabled ? 'Enabled' : 'Disabled'}
-                    </p>
-                  </div>
-                </div>
-              </Card>
+              <div className={`w-3 h-3 rounded-full ${protectionStatus.status === 'Active' ? 'bg-green-500' : 'bg-orange-500'}`}></div>
             </div>
           </div>
 
-          {/* Emergency SOS Section */}
-          <div className="flex flex-col items-center justify-center">
-            <Card className="bg-white/5 backdrop-blur-sm border-white/20 p-8 text-center">
-              <h3 className="text-white font-semibold mb-4 text-lg">Emergency Response</h3>
-              <div className="flex flex-col items-center gap-4">
-                <Button
-                  variant="emergency"
-                  size="emergency"
-                  onClick={handleEmergency}
-                  className="relative w-24 h-24 rounded-full shadow-2xl"
-                  aria-label="Emergency SOS Button - Press for immediate help"
-                >
-                  <Phone className="h-10 w-10" />
-                </Button>
-                <div>
-                  <p className="text-white font-medium">Emergency SOS</p>
-                  <p className="text-xs text-white/70">Press for immediate assistance</p>
-                </div>
+          {/* Location Services */}
+          <div className="bg-card border border-border rounded-lg p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Location Services</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {profile?.location_sharing_enabled ? 'Enabled' : 'Disabled'}
+                </p>
               </div>
-            </Card>
+              <MapPin className="h-5 w-5 text-muted-foreground" />
+            </div>
+          </div>
+
+          {/* Profile Completion */}
+          <div className="bg-card border border-border rounded-lg p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground mb-1">Profile Complete</p>
+                <p className="text-lg font-semibold text-foreground">{profile?.profile_completion_percentage || 0}%</p>
+              </div>
+            </div>
+            <Progress 
+              value={profile?.profile_completion_percentage || 0} 
+              className="h-2"
+            />
+          </div>
+
+          {/* Emergency SOS */}
+          <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-6 text-white">
+            <div className="text-center">
+              <p className="text-sm font-medium mb-4 text-red-100">Emergency Response</p>
+              <Button
+                variant="emergency"
+                size="lg"
+                onClick={handleEmergency}
+                className="w-16 h-16 rounded-full bg-white text-red-600 hover:bg-red-50 shadow-lg mb-3"
+                aria-label="Emergency SOS Button - Press for immediate help"
+              >
+                <Phone className="h-6 w-6" />
+              </Button>
+              <p className="text-xs text-red-100">Press for immediate assistance</p>
+            </div>
           </div>
         </div>
 
-        {/* Profile Completion */}
-        {profile && (
-          <Card className="mt-6 bg-white/10 backdrop-blur-sm border-white/20 p-6">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <h3 className="text-white font-semibold">Profile Completion</h3>
-                <p className="text-white/70 text-sm">Complete your profile for full emergency protection</p>
-              </div>
-              <span className="text-2xl font-bold text-white">{profile.profile_completion_percentage || 0}%</span>
-            </div>
-            <Progress 
-              value={profile.profile_completion_percentage || 0} 
-              className="h-3 bg-white/20"
-            />
-          </Card>
-        )}
+        {/* ICE SOS Branding */}
+        <div className="flex items-center gap-3 mt-8 pt-6 border-t border-border">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <Shield className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-foreground">ICE SOS</h2>
+            <p className="text-sm text-muted-foreground">Emergency Protection Platform</p>
+          </div>
+        </div>
       </div>
     </div>
   );
