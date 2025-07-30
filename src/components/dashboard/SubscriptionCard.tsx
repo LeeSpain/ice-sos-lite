@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle, Settings, CreditCard, AlertCircle, Download, Plus, Users, FileText, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
 
 interface SubscriptionCardProps {
   subscription: any;
@@ -19,7 +18,11 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
   const [isLoadingFamily, setIsLoadingFamily] = useState(false);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteForm, setInviteForm] = useState({ email: '', name: '', relationship: '' });
-  const { toast } = useToast();
+  // Temporary simple toast function to avoid useToast dependency
+  const toast = ({ title, description, variant }: any) => {
+    console.log(`Toast: ${title} - ${description} (${variant || 'default'})`);
+    alert(`${title}: ${description}`);
+  };
 
   useEffect(() => {
     if (subscription?.subscribed) {
