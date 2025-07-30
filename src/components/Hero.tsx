@@ -37,7 +37,7 @@ const Hero = () => {
                 Start Free Trial
               </Button>
               <Button size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
-                Watch Demo
+                Download App
               </Button>
             </div>
             
