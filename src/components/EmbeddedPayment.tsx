@@ -224,6 +224,16 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, onSuccess, onB
         </CardContent>
       </Card>
       
+      {/* Testing Skip Button */}
+      <Button 
+        onClick={onSuccess} 
+        variant="secondary" 
+        className="w-full"
+        size="lg"
+      >
+        Skip Payment (Testing Only)
+      </Button>
+      
       <Button variant="outline" onClick={onBack} className="w-full">
         Back to Plans
       </Button>
