@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-emergency.jpg";
 
 const Hero = () => {
@@ -33,10 +34,10 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
-                Start Free Trial
+              <Button asChild size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
+                <Link to="/register">Join Platform</Link>
               </Button>
-              <Button size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
+              <Button size="xl" variant="outline" className="border-white/30 text-white hover:bg-white/10">
                 Download App
               </Button>
             </div>

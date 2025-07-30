@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,8 +26,8 @@ const Navigation = () => {
             <Button variant="outline" size="sm">
               Sign In
             </Button>
-            <Button size="sm" className="shadow-primary">
-              Download App
+            <Button asChild size="sm" className="shadow-primary">
+              <Link to="/register">Join Platform</Link>
             </Button>
           </div>
 
@@ -51,8 +52,8 @@ const Navigation = () => {
                 <Button variant="outline" size="sm">
                   Sign In
                 </Button>
-                <Button size="sm" className="shadow-primary">
-                  Download App
+                <Button asChild size="sm" className="shadow-primary">
+                  <Link to="/register">Join Platform</Link>
                 </Button>
               </div>
             </div>
