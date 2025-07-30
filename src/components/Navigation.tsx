@@ -1,5 +1,6 @@
+
 import { Button } from "@/components/ui/button";
-import { Shield, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const Navigation = () => {
@@ -10,11 +11,39 @@ const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <Shield className="h-5 w-5 text-white" />
+          <div className="flex items-center space-x-3">
+            <div className="relative w-10 h-10 bg-gradient-to-br from-primary to-guardian rounded-xl flex items-center justify-center shadow-primary">
+              {/* Emergency Shield Base */}
+              <div className="absolute inset-1 bg-primary/20 rounded-lg"></div>
+              
+              {/* Central Emergency Cross */}
+              <div className="relative z-10">
+                <div className="w-1 h-6 bg-emergency rounded-full absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="w-6 h-1 bg-emergency rounded-full absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+              </div>
+              
+              {/* Emergency Signal Lines */}
+              <div className="absolute -top-1 -right-1">
+                <div className="w-3 h-0.5 bg-emergency rounded-full transform rotate-45 animate-pulse"></div>
+                <div className="w-2 h-0.5 bg-emergency/70 rounded-full transform rotate-45 mt-0.5 ml-0.5"></div>
+              </div>
+              
+              <div className="absolute -bottom-1 -left-1">
+                <div className="w-3 h-0.5 bg-emergency rounded-full transform -rotate-45 animate-pulse delay-75"></div>
+                <div className="w-2 h-0.5 bg-emergency/70 rounded-full transform -rotate-45 mt-0.5 mr-0.5"></div>
+              </div>
+              
+              {/* Corner Emergency Indicators */}
+              <div className="absolute top-0.5 left-0.5 w-1 h-1 bg-emergency rounded-full animate-pulse delay-150"></div>
+              <div className="absolute top-0.5 right-0.5 w-1 h-1 bg-emergency rounded-full animate-pulse delay-300"></div>
+              <div className="absolute bottom-0.5 left-0.5 w-1 h-1 bg-emergency rounded-full animate-pulse delay-450"></div>
+              <div className="absolute bottom-0.5 right-0.5 w-1 h-1 bg-emergency rounded-full animate-pulse delay-600"></div>
             </div>
-            <span className="text-xl font-bold font-poppins text-foreground">ICE SOS Lite</span>
+            
+            <div className="flex flex-col">
+              <span className="text-xl font-bold font-poppins text-foreground leading-none">ICE SOS</span>
+              <span className="text-xs font-medium text-muted-foreground leading-none">Emergency Protection</span>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
