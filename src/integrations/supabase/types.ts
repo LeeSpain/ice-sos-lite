@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          address: string | null
+          allergies: string[] | null
+          blood_type: string | null
+          country: string | null
+          created_at: string
+          date_of_birth: string | null
+          emergency_contacts: Json | null
+          first_name: string | null
+          id: string
+          language_preference: string | null
+          last_name: string | null
+          location_sharing_enabled: boolean | null
+          medical_conditions: string[] | null
+          medications: string[] | null
+          phone: string | null
+          profile_completion_percentage: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          allergies?: string[] | null
+          blood_type?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contacts?: Json | null
+          first_name?: string | null
+          id?: string
+          language_preference?: string | null
+          last_name?: string | null
+          location_sharing_enabled?: boolean | null
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          phone?: string | null
+          profile_completion_percentage?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          allergies?: string[] | null
+          blood_type?: string | null
+          country?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          emergency_contacts?: Json | null
+          first_name?: string | null
+          id?: string
+          language_preference?: string | null
+          last_name?: string | null
+          location_sharing_enabled?: boolean | null
+          medical_conditions?: string[] | null
+          medications?: string[] | null
+          phone?: string | null
+          profile_completion_percentage?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
@@ -47,6 +110,33 @@ export type Database = {
           subscription_tier?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_activity: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
         }
         Relationships: []
       }
