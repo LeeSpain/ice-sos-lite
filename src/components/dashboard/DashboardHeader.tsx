@@ -111,75 +111,68 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           </div>
         </div>
 
-        {/* Compact Status Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+        {/* Compact Professional Status Grid */}
+        <div className="grid grid-cols-4 gap-2 mb-3">
           {/* Protection Status */}
-          <div className="bg-white/10 backdrop-blur-sm border-2 border-green-400/60 rounded-lg p-3 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-white/70 mb-0.5">Protection</p>
-                <p className={`text-sm font-semibold ${protectionStatus.status === 'Active' ? 'text-green-300' : 'text-red-300'}`}>
-                  {protectionStatus.status}
-                </p>
-              </div>
-              <div className={`w-2 h-2 rounded-full ${protectionStatus.status === 'Active' ? 'bg-green-400 shadow-glow' : 'bg-red-400'}`}></div>
+          <div className="bg-white/5 backdrop-blur-sm border border-emergency/40 rounded-md p-2">
+            <div className="text-center">
+              <div className={`w-2 h-2 rounded-full mx-auto mb-1 ${protectionStatus.status === 'Active' ? 'bg-emergency' : 'bg-primary'}`}></div>
+              <p className="text-xs font-medium text-white/90 mb-0.5">Protection</p>
+              <p className={`text-xs font-semibold ${protectionStatus.status === 'Active' ? 'text-emergency' : 'text-primary'}`}>
+                {protectionStatus.status}
+              </p>
             </div>
           </div>
 
           {/* Location Services */}
-          <div className="bg-white/10 backdrop-blur-sm border-2 border-green-400/60 rounded-lg p-3 shadow-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-white/70 mb-0.5">Location</p>
-                <p className={`text-sm font-semibold ${profile?.location_sharing_enabled ? 'text-green-300' : 'text-red-300'}`}>
-                  {profile?.location_sharing_enabled ? 'Enabled' : 'Disabled'}
-                </p>
-              </div>
-              <MapPin className={`h-3 w-3 ${profile?.location_sharing_enabled ? 'text-green-400' : 'text-red-400'}`} />
+          <div className="bg-white/5 backdrop-blur-sm border border-emergency/40 rounded-md p-2">
+            <div className="text-center">
+              <MapPin className={`w-3 h-3 mx-auto mb-1 ${profile?.location_sharing_enabled ? 'text-emergency' : 'text-primary'}`} />
+              <p className="text-xs font-medium text-white/90 mb-0.5">Location</p>
+              <p className={`text-xs font-semibold ${profile?.location_sharing_enabled ? 'text-emergency' : 'text-primary'}`}>
+                {profile?.location_sharing_enabled ? 'On' : 'Off'}
+              </p>
             </div>
           </div>
 
           {/* Profile Completion */}
-          <div className="bg-white/10 backdrop-blur-sm border-2 border-green-400/60 rounded-lg p-3 shadow-lg">
-            <div className="flex items-center justify-between mb-1.5">
-              <div>
-                <p className="text-xs font-medium text-white/70 mb-0.5">Profile</p>
-                <p className="text-sm font-semibold text-white">{profile?.profile_completion_percentage || 0}%</p>
+          <div className="bg-white/5 backdrop-blur-sm border border-emergency/40 rounded-md p-2">
+            <div className="text-center">
+              <div className="w-8 h-1 bg-white/20 rounded-full mx-auto mb-1 overflow-hidden">
+                <div 
+                  className="h-full bg-emergency rounded-full transition-all duration-300"
+                  style={{ width: `${profile?.profile_completion_percentage || 0}%` }}
+                ></div>
               </div>
+              <p className="text-xs font-medium text-white/90 mb-0.5">Profile</p>
+              <p className="text-xs font-semibold text-emergency">{profile?.profile_completion_percentage || 0}%</p>
             </div>
-            <Progress 
-              value={profile?.profile_completion_percentage || 0} 
-              className="h-1 bg-white/20"
-            />
           </div>
 
           {/* Emergency SOS */}
-          <div className="bg-gradient-to-br from-green-500/90 to-green-600/90 backdrop-blur-sm rounded-lg p-3 text-white shadow-emergency border-2 border-green-300/80">
+          <div className="bg-gradient-to-br from-emergency/20 to-emergency/30 backdrop-blur-sm border border-emergency/60 rounded-md p-2">
             <div className="text-center">
-              <p className="text-xs font-medium mb-2 text-green-100">Emergency</p>
               <Button
                 variant="emergency"
                 size="sm"
                 onClick={handleEmergency}
-                className="w-10 h-10 rounded-full bg-white text-green-600 hover:bg-green-50 shadow-lg mb-1 emergency-pulse"
-                aria-label="Emergency SOS Button - Press for immediate help"
+                className="w-6 h-6 rounded-full bg-emergency text-white hover:bg-emergency/90 shadow-md mb-1 emergency-pulse mx-auto"
+                aria-label="Emergency SOS Button"
               >
-                <Phone className="h-3 w-3" />
+                <Phone className="h-2.5 w-2.5" />
               </Button>
-              <p className="text-xs text-green-100">SOS</p>
+              <p className="text-xs font-medium text-emergency">SOS</p>
             </div>
           </div>
         </div>
 
-        {/* Compact ICE SOS Branding */}
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/20">
-          <div className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-md flex items-center justify-center">
-            <Shield className="h-4 w-4 text-white" />
+        {/* Professional ICE SOS Branding */}
+        <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-emergency/30">
+          <div className="w-5 h-5 bg-emergency/20 backdrop-blur-sm rounded flex items-center justify-center">
+            <Shield className="h-3 w-3 text-emergency" />
           </div>
-          <div>
-            <h2 className="text-lg font-semibold text-white drop-shadow-sm">ICE SOS</h2>
-            <p className="text-xs text-white/70">Emergency Protection Platform</p>
-          </div>
+          <h2 className="text-base font-semibold text-white">ICE SOS</h2>
+          <span className="text-xs text-white/60">Emergency Protection</span>
         </div>
       </div>
     </div>
