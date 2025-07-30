@@ -88,83 +88,49 @@ const Pricing = () => {
 
         {/* Free Download Hero Section */}
         <div className="mb-20">
-          <Card className="relative border-2 border-primary/20 bg-gradient-to-br from-card via-card to-secondary/50 shadow-2xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-emergency/5"></div>
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-primary/10 to-transparent rounded-full blur-3xl"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-emergency/10 to-transparent rounded-full blur-3xl"></div>
-            
+          <Card className="relative border border-border bg-card shadow-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-muted/50 via-secondary to-muted"></div>
             <CardHeader className="relative text-center py-16 px-8">
-              <div className="flex justify-center mb-6">
-                <Badge className="bg-gradient-to-r from-emergency to-emergency/80 text-white text-sm font-bold px-6 py-3 shadow-lg border border-emergency/20">
-                  <span className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                    FREE TO DOWNLOAD
-                  </span>
-                </Badge>
+              <Badge className="bg-emergency text-white w-fit mx-auto mb-6 text-sm font-semibold px-4 py-2 shadow-lg">
+                FREE TO DOWNLOAD
+              </Badge>
+              <div className="w-24 h-24 mx-auto mb-8 bg-white shadow-lg rounded-2xl flex items-center justify-center border border-border/20">
+                <Smartphone className="h-12 w-12 text-primary" />
               </div>
-              
-              <div className="w-28 h-28 mx-auto mb-8 bg-gradient-to-br from-primary to-primary/80 shadow-2xl rounded-3xl flex items-center justify-center border-4 border-white/20 backdrop-blur-sm">
-                <Smartphone className="h-14 w-14 text-white drop-shadow-lg" />
-              </div>
-              
-              <CardTitle className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground via-foreground to-foreground/70 bg-clip-text text-transparent">
+              <CardTitle className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                 Download ICE SOS Lite
               </CardTitle>
-              <CardDescription className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-medium">
+              <CardDescription className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
                 Start protecting yourself today with our professional emergency app. 
-                <span className="text-primary font-semibold"> Essential SOS features included at no cost.</span>
+                Essential SOS features included at no cost.
               </CardDescription>
             </CardHeader>
-            
             <CardContent className="relative px-8 pb-16">
-              <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-5xl mx-auto">
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                  <div className="relative text-center p-8 rounded-2xl bg-gradient-to-br from-card to-secondary border border-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
-                      <Check className="h-8 w-8 text-white" />
-                    </div>
-                    <h4 className="font-bold text-lg text-foreground mb-3">Emergency SOS</h4>
-                    <p className="text-muted-foreground leading-relaxed">One-tap emergency button with instant GPS location sharing to your contacts</p>
-                  </div>
+              <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+                <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
+                  <Check className="h-8 w-8 text-primary mx-auto mb-3" />
+                  <h4 className="font-semibold text-foreground mb-2">Emergency SOS</h4>
+                  <p className="text-sm text-muted-foreground">One-tap emergency button with GPS location sharing</p>
                 </div>
-                
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-guardian/20 to-guardian/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                  <div className="relative text-center p-8 rounded-2xl bg-gradient-to-br from-card to-secondary border border-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-guardian to-guardian/80 rounded-2xl flex items-center justify-center shadow-lg">
-                      <Check className="h-8 w-8 text-white" />
-                    </div>
-                    <h4 className="font-bold text-lg text-foreground mb-3">Global Coverage</h4>
-                    <p className="text-muted-foreground leading-relaxed">Works worldwide with full multilingual support in your local language</p>
-                  </div>
+                <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
+                  <Check className="h-8 w-8 text-primary mx-auto mb-3" />
+                  <h4 className="font-semibold text-foreground mb-2">Global Coverage</h4>
+                  <p className="text-sm text-muted-foreground">Works worldwide with full multilingual support</p>
                 </div>
-                
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-wellness/20 to-wellness/10 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                  <div className="relative text-center p-8 rounded-2xl bg-gradient-to-br from-card to-secondary border border-border shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center shadow-lg">
-                      <Check className="h-8 w-8 text-white" />
-                    </div>
-                    <h4 className="font-bold text-lg text-foreground mb-3">Instant Setup</h4>
-                    <p className="text-muted-foreground leading-relaxed">Ready to use in minutes with simple, intuitive configuration</p>
-                  </div>
+                <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
+                  <Check className="h-8 w-8 text-primary mx-auto mb-3" />
+                  <h4 className="font-semibold text-foreground mb-2">Instant Setup</h4>
+                  <p className="text-sm text-muted-foreground">Ready to use in minutes with simple configuration</p>
                 </div>
               </div>
-              
-              <div className="flex flex-col sm:flex-row gap-6 justify-center max-w-lg mx-auto">
-                <Button size="lg" className="group relative bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-primary-foreground font-bold text-lg px-10 py-5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5">
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-lg blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                  <span className="relative flex items-center gap-3">
-                    <Download className="h-5 w-5" />
-                    Download for iOS
-                  </span>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Download className="mr-2 h-5 w-5" />
+                  Download for iOS
                 </Button>
-                <Button size="lg" variant="outline" className="group relative border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold text-lg px-10 py-5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 bg-card/50 backdrop-blur-sm">
-                  <span className="relative flex items-center gap-3">
-                    <Download className="h-5 w-5" />
-                    Download for Android
-                  </span>
+                <Button size="lg" variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Download className="mr-2 h-5 w-5" />
+                  Download for Android
                 </Button>
               </div>
             </CardContent>
