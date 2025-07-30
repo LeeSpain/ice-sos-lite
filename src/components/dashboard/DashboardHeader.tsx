@@ -1,8 +1,10 @@
-import { useState, useEffect } from "react";
-import { Shield, Phone } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Shield, Phone, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface DashboardHeaderProps {
   profile: any;
@@ -10,15 +12,12 @@ interface DashboardHeaderProps {
 }
 
 const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
-  const [user, setUser] = useState<any>(null);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  const getUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setUser(user);
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
   };
 
   const handleEmergency = () => {
@@ -44,7 +43,7 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
             <Shield className="h-12 w-12 text-emergency" />
             <div>
               <h1 className="text-3xl font-bold text-white">
-                Welcome back, {profile?.first_name || user?.email?.split('@')[0] || 'Member'}
+                Welcome back, {profile?.first_name || user?.user_metadata?.first_name || user?.email?.split('@')[0] || 'Member'}
               </h1>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`text-sm font-medium ${protectionStatus.color}`}>
@@ -54,18 +53,32 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
             </div>
           </div>
 
-          {/* Emergency SOS Button */}
-          <div className="flex flex-col items-center gap-3">
+          {/* User Actions */}
+          <div className="flex items-center gap-4">
+            {/* Emergency SOS Button */}
+            <div className="flex flex-col items-center gap-3">
+              <Button
+                variant="emergency"
+                size="emergency"
+                onClick={handleEmergency}
+                className="relative"
+                aria-label="Emergency SOS Button - Press for immediate help"
+              >
+                <Phone className="h-8 w-8" />
+              </Button>
+              <span className="text-xs text-white/80">Emergency SOS</span>
+            </div>
+
+            {/* Sign Out Button */}
             <Button
-              variant="emergency"
-              size="emergency"
-              onClick={handleEmergency}
-              className="relative"
-              aria-label="Emergency SOS Button - Press for immediate help"
+              onClick={handleSignOut}
+              variant="outline"
+              size="sm"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
             >
-              <Phone className="h-8 w-8" />
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
             </Button>
-            <span className="text-xs text-white/80">Emergency SOS</span>
           </div>
         </div>
 

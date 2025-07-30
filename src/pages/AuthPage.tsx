@@ -4,13 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Mail, Lock, ArrowLeft } from "lucide-react";
+import { Shield, Mail, Lock, ArrowLeft, Phone, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -23,25 +26,57 @@ const AuthPage = () => {
     setMessage("");
 
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      if (!firstName || !lastName || !phoneNumber) {
+        setError("Please fill in all required fields including name and phone number.");
+        return;
+      }
+
+      const redirectUrl = `${window.location.origin}/dashboard`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone: phoneNumber
+          }
         }
       });
 
-      if (error) {
-        if (error.message.includes("already registered")) {
+      if (authError) {
+        if (authError.message.includes("already registered")) {
           setError("This email is already registered. Please try signing in instead.");
         } else {
-          setError(error.message);
+          setError(authError.message);
         }
-      } else {
-        setMessage("Check your email for the confirmation link!");
+        return;
       }
+
+      // Create profile record if user was created successfully
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: authData.user.id,
+            first_name: firstName,
+            last_name: lastName,
+            phone: phoneNumber,
+            emergency_contacts: [],
+            medical_conditions: [],
+            allergies: [],
+            medications: []
+          });
+
+        if (profileError) {
+          console.error('Error creating profile:', profileError);
+          // Don't show this error to user as the auth was successful
+        }
+      }
+
+      setMessage("Account created successfully! Check your email for the confirmation link.");
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -68,6 +103,7 @@ const AuthPage = () => {
           setError(error.message);
         }
       } else {
+        // Successfully signed in, redirect to dashboard
         navigate("/dashboard");
       }
     } catch (err) {
@@ -151,6 +187,38 @@ const AuthPage = () => {
               {/* Sign Up Tab */}
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-firstName">First Name</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="signup-firstName"
+                          type="text"
+                          placeholder="Enter your first name"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-lastName">Last Name</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="signup-lastName"
+                          type="text"
+                          placeholder="Enter your last name"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <div className="relative">
@@ -161,6 +229,21 @@ const AuthPage = () => {
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-phone">Phone Number</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="signup-phone"
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
                         className="pl-10"
                         required
                       />
@@ -208,6 +291,9 @@ const AuthPage = () => {
             <div className="mt-6 text-center text-sm text-muted-foreground">
               <p>
                 By signing up, you agree to our Terms of Service and Privacy Policy
+              </p>
+              <p className="mt-2 text-xs">
+                Sign up to create your account, then visit the subscription page to select your emergency protection plan.
               </p>
             </div>
           </CardContent>
