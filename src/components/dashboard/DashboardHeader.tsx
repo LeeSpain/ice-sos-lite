@@ -105,61 +105,61 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
         </div>
 
         {/* Status and Emergency Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Protection Status */}
-          <div className="bg-card border border-border rounded-lg p-6">
+          <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">Protection Status</p>
-                <p className={`text-lg font-semibold ${protectionStatus.color}`}>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Protection Status</p>
+                <p className={`text-sm font-semibold ${protectionStatus.status === 'Active' ? 'text-green-600' : 'text-red-600'}`}>
                   {protectionStatus.status}
                 </p>
               </div>
-              <div className={`w-3 h-3 rounded-full ${protectionStatus.status === 'Active' ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+              <div className={`w-2 h-2 rounded-full ${protectionStatus.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
             </div>
           </div>
 
           {/* Location Services */}
-          <div className="bg-card border border-border rounded-lg p-6">
+          <div className="bg-card border border-border rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">Location Services</p>
-                <p className="text-lg font-semibold text-foreground">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Location Services</p>
+                <p className={`text-sm font-semibold ${profile?.location_sharing_enabled ? 'text-green-600' : 'text-red-600'}`}>
                   {profile?.location_sharing_enabled ? 'Enabled' : 'Disabled'}
                 </p>
               </div>
-              <MapPin className="h-5 w-5 text-muted-foreground" />
+              <MapPin className={`h-4 w-4 ${profile?.location_sharing_enabled ? 'text-green-500' : 'text-red-500'}`} />
             </div>
           </div>
 
           {/* Profile Completion */}
-          <div className="bg-card border border-border rounded-lg p-6">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">Profile Complete</p>
-                <p className="text-lg font-semibold text-foreground">{profile?.profile_completion_percentage || 0}%</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Profile Complete</p>
+                <p className="text-sm font-semibold text-foreground">{profile?.profile_completion_percentage || 0}%</p>
               </div>
             </div>
             <Progress 
               value={profile?.profile_completion_percentage || 0} 
-              className="h-2"
+              className="h-1.5"
             />
           </div>
 
           {/* Emergency SOS */}
-          <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-lg p-6 text-white">
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-4 text-white">
             <div className="text-center">
-              <p className="text-sm font-medium mb-4 text-red-100">Emergency Response</p>
+              <p className="text-xs font-medium mb-3 text-green-100">Emergency Response</p>
               <Button
                 variant="emergency"
                 size="lg"
                 onClick={handleEmergency}
-                className="w-16 h-16 rounded-full bg-white text-red-600 hover:bg-red-50 shadow-lg mb-3"
+                className="w-12 h-12 rounded-full bg-white text-green-600 hover:bg-green-50 shadow-lg mb-2"
                 aria-label="Emergency SOS Button - Press for immediate help"
               >
-                <Phone className="h-6 w-6" />
+                <Phone className="h-4 w-4" />
               </Button>
-              <p className="text-xs text-red-100">Press for immediate assistance</p>
+              <p className="text-xs text-green-100">Press for assistance</p>
             </div>
           </div>
         </div>
