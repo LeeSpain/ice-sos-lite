@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -110,32 +110,8 @@ interface EmbeddedPaymentProps {
 const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, onSuccess, onBack }: EmbeddedPaymentProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const [paymentReady, setPaymentReady] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
-  const initializePayment = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-        body: { plans, email: userEmail, firstName, lastName }
-      });
-
-      if (error) throw error;
-
-      setClientSecret(data.client_secret);
-      setCustomerId(data.customer_id);
-      setPaymentReady(true);
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to initialize payment. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   // Calculate total for display
   const planPricing = {
@@ -150,64 +126,70 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, onSuccess, onB
     return sum + (plan?.price || 0);
   }, 0);
 
-  if (!paymentReady) {
-    return (
-      <div className="space-y-6">
-        <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-          <h4 className="font-medium">Order Summary:</h4>
-          <div className="text-sm">
-            <ul className="space-y-2">
-              {plans.map(planId => {
-                const plan = planPricing[planId as keyof typeof planPricing];
-                return (
-                  <li key={planId} className="flex justify-between p-2 bg-white rounded border">
-                    <span className="font-medium">{plan.name}</span>
-                    <span className="text-primary">€{plan.price}/month</span>
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="border-t pt-3 mt-3">
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total Monthly:</span>
-                <span className="text-primary">€{total.toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+  const initializePayment = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment-intent', {
+        body: { plans, email: userEmail, firstName, lastName }
+      });
 
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={onBack} className="flex-1">
-            Back to Plans
-          </Button>
-          <Button 
-            onClick={initializePayment} 
-            disabled={loading}
-            className="flex-1 bg-primary hover:bg-primary/90"
-            size="lg"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Preparing Payment...
-              </>
-            ) : (
-              "Proceed to Payment"
-            )}
-          </Button>
-        </div>
-      </div>
-    );
-  }
+      if (error) throw error;
+
+      setClientSecret(data.client_secret);
+      setCustomerId(data.customer_id);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to initialize payment. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initialize payment on component mount
+  useEffect(() => {
+    initializePayment();
+  }, []);
 
   return (
     <div className="space-y-6">
+      {/* Order Summary */}
+      <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+        <h4 className="font-medium">Order Summary:</h4>
+        <div className="text-sm">
+          <ul className="space-y-2">
+            {plans.map(planId => {
+              const plan = planPricing[planId as keyof typeof planPricing];
+              return (
+                <li key={planId} className="flex justify-between p-2 bg-white rounded border">
+                  <span className="font-medium">{plan.name}</span>
+                  <span className="text-primary">€{plan.price}/month</span>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="border-t pt-3 mt-3">
+            <div className="flex justify-between text-lg font-bold">
+              <span>Total Monthly:</span>
+              <span className="text-primary">€{total.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Payment Form */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-center">💳 Secure Payment</CardTitle>
+          <CardTitle className="text-center">💳 Payment Details</CardTitle>
         </CardHeader>
         <CardContent>
-          {clientSecret ? (
+          {loading ? (
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="ml-2">Loading payment form...</span>
+            </div>
+          ) : clientSecret ? (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <PaymentForm
                 clientSecret={clientSecret}
@@ -220,9 +202,11 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, onSuccess, onB
               />
             </Elements>
           ) : (
-            <div className="flex items-center justify-center p-8">
-              <Loader2 className="h-8 w-8 animate-spin" />
-              <span className="ml-2">Loading payment form...</span>
+            <div className="text-center p-4">
+              <p className="text-destructive">Failed to load payment form</p>
+              <Button onClick={initializePayment} className="mt-2">
+                Retry
+              </Button>
             </div>
           )}
         </CardContent>
