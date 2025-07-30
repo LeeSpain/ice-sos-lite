@@ -186,17 +186,9 @@ const Register = () => {
                   <RadioGroup value={formData.plan} onValueChange={(value) => setFormData({...formData, plan: value})}>
                     <div className="space-y-4">
                       <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                        <RadioGroupItem value="family" id="family" />
-                        <div className="flex-1">
-                          <Label htmlFor="family" className="font-medium">Family Sharing - €0.99/month</Label>
-                          <p className="text-sm text-muted-foreground">Perfect for families with multiple members</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
                         <RadioGroupItem value="personal" id="personal" />
                         <div className="flex-1">
-                          <Label htmlFor="personal" className="font-medium">Personal Contact - €1.99/month</Label>
+                          <Label htmlFor="personal" className="font-medium">Personal Account - €1.99/month</Label>
                           <p className="text-sm text-muted-foreground">Individual emergency contact system</p>
                         </div>
                       </div>
@@ -206,6 +198,14 @@ const Register = () => {
                         <div className="flex-1">
                           <Label htmlFor="guardian" className="font-medium">Guardian Wellness - €4.99/month</Label>
                           <p className="text-sm text-muted-foreground">Advanced health monitoring and alerts</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
+                        <RadioGroupItem value="family" id="family" />
+                        <div className="flex-1">
+                          <Label htmlFor="family" className="font-medium">Family Sharing - €0.99/month</Label>
+                          <p className="text-sm text-muted-foreground">Perfect for families with multiple members</p>
                         </div>
                       </div>
                       
@@ -244,7 +244,7 @@ const Register = () => {
                     <p className="text-sm"><strong>Email:</strong> {formData.email}</p>
                     <p className="text-sm"><strong>Plan:</strong> {
                       formData.plan === "family" ? "Family Sharing - €0.99/month" :
-                      formData.plan === "personal" ? "Personal Contact - €1.99/month" :
+                      formData.plan === "personal" ? "Personal Account - €1.99/month" :
                       formData.plan === "guardian" ? "Guardian Wellness - €4.99/month" :
                       formData.plan === "callcenter" ? "Call Centre (Spain) - €24.99/month" : ""
                     }</p>
