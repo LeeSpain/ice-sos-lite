@@ -46,9 +46,57 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
     navigate('/');
   };
 
-  const handleEmergency = () => {
-    console.log("Emergency SOS triggered!");
-    // Emergency SOS functionality would be implemented here
+  const handleEmergency = async () => {
+    console.log("🚨 EMERGENCY SOS ACTIVATED! 🚨");
+    
+    try {
+      // Get user's emergency contacts from profile
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error("No user found");
+        return;
+      }
+
+      const { data: userProfile, error } = await supabase
+        .from('profiles')
+        .select('emergency_contacts, first_name, last_name')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+        return;
+      }
+
+      if (!userProfile?.emergency_contacts || !Array.isArray(userProfile.emergency_contacts) || userProfile.emergency_contacts.length === 0) {
+        alert("⚠️ No emergency contacts found! Please add emergency contacts in your profile.");
+        return;
+      }
+
+      // Show immediate confirmation
+      alert("🚨 EMERGENCY SOS ACTIVATED!\n\nNotifying your emergency contacts now...");
+
+      // Call emergency notification function
+      const { data, error: functionError } = await supabase.functions.invoke('emergency-sos', {
+        body: {
+          userProfile,
+          location: "Dashboard", // You could get actual GPS location here
+          timestamp: new Date().toISOString()
+        }
+      });
+
+      if (functionError) {
+        console.error('Error calling emergency function:', functionError);
+        alert("Emergency contacts could not be notified. Please call emergency services directly.");
+      } else {
+        console.log("Emergency notifications sent:", data);
+        alert("✅ Emergency contacts have been notified!");
+      }
+
+    } catch (error) {
+      console.error('Emergency SOS error:', error);
+      alert("⚠️ Emergency system error. Please call emergency services directly.");
+    }
   };
 
   const getProtectionStatus = () => {
@@ -155,20 +203,27 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
             </div>
           </div>
 
-          {/* Emergency SOS */}
-          <div className="bg-emergency border border-emergency-glow/50 rounded-lg p-3 shadow-xl">
-            <div className="text-center space-y-2">
+          {/* Emergency SOS - Enhanced */}
+          <div className="bg-emergency border-2 border-red-400 rounded-lg p-3 shadow-2xl relative overflow-hidden">
+            {/* Pulsing background effect */}
+            <div className="absolute inset-0 bg-red-500/20 animate-pulse"></div>
+            <div className="text-center space-y-2 relative z-10">
               <Button
                 variant="emergency"
-                size="sm"
+                size="lg"
                 onClick={handleEmergency}
-                className="w-8 h-8 rounded-full bg-white text-emergency hover:bg-gray-50 shadow-lg emergency-pulse mx-auto border-0"
-                aria-label="Emergency SOS Button"
+                className="w-10 h-10 rounded-full bg-red-500 text-white hover:bg-red-600 shadow-2xl mx-auto border-2 border-white animate-bounce"
+                style={{
+                  animation: "bounce 1s infinite, pulse 2s infinite",
+                  boxShadow: "0 0 20px rgba(239, 68, 68, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.2)"
+                }}
+                aria-label="EMERGENCY SOS - Press for immediate help"
               >
-                <Phone className="h-3.5 w-3.5" />
+                <Phone className="h-4 w-4 animate-pulse" />
               </Button>
               <div>
-                <p className="text-xs font-bold text-white uppercase tracking-wide">SOS</p>
+                <p className="text-xs font-bold text-white uppercase tracking-wider animate-pulse">EMERGENCY</p>
+                <p className="text-xs font-medium text-red-200">Press for Help</p>
               </div>
             </div>
           </div>
