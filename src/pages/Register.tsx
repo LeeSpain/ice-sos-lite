@@ -10,6 +10,7 @@ import { Shield, Mail, User, ArrowRight, CheckCircle, Phone, CreditCard, MapPin,
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
+import EmbeddedPayment from "@/components/EmbeddedPayment";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -60,6 +61,11 @@ const Register = () => {
     }
   };
 
+  const handlePaymentSuccess = () => {
+    // Move to questionnaire step after successful payment
+    setStep(4);
+  };
+
   const handleCheckout = async () => {
     // Validate questionnaire fields
     if (!formData.emergencyContact1 || !formData.currentLocation || !formData.acceptTerms) {
@@ -73,7 +79,7 @@ const Register = () => {
 
     setLoading(true);
     try {
-      // First sign up the user
+      // Update user metadata with all collected information
       const { error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: Math.random().toString(36).slice(-8), // Temporary password
@@ -93,23 +99,19 @@ const Register = () => {
       });
 
       if (signUpError) throw signUpError;
-
-      // Create checkout session
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { plans: formData.plans }
-      });
-
-      if (error) throw error;
-
-      // Open Stripe checkout in a new tab
-      window.open(data.url, '_blank');
       
       toast({
-        title: "Redirecting to Payment",
-        description: "Complete your payment to activate your subscription.",
+        title: "Registration Complete!",
+        description: "Your account has been created successfully.",
       });
+
+      // Redirect to dashboard
+      setTimeout(() => {
+        window.location.href = '/dashboard?success=true';
+      }, 2000);
+      
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error('Registration error:', error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -269,57 +271,15 @@ const Register = () => {
                 <div className="space-y-6">
                   <div className="text-center mb-6">
                     <CreditCard className="h-16 w-16 text-primary mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Payment Overview</h3>
-                    <p className="text-muted-foreground">Review your selection and payment details</p>
+                    <h3 className="text-xl font-semibold mb-2">Secure Payment</h3>
+                    <p className="text-muted-foreground">Complete your payment securely</p>
                   </div>
 
-                  <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                    <h4 className="font-medium">Order Summary:</h4>
-                    <div className="text-sm">
-                      <ul className="space-y-2">
-                        {formData.plans.map(planId => {
-                          const planNames = {
-                            personal: { name: "Personal Account", price: 1.99 },
-                            guardian: { name: "Guardian Wellness", price: 4.99 },
-                            family: { name: "Family Sharing", price: 0.99 },
-                            callcenter: { name: "Call Centre (Spain)", price: 24.99 }
-                          };
-                          const plan = planNames[planId as keyof typeof planNames];
-                          return (
-                            <li key={planId} className="flex justify-between p-2 bg-white rounded border">
-                              <span className="font-medium">{plan.name}</span>
-                              <span className="text-primary">€{plan.price}/month</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      <div className="border-t pt-3 mt-3">
-                        <div className="flex justify-between text-lg font-bold">
-                          <span>Total Monthly:</span>
-                          <span className="text-primary">€{formData.plans.reduce((total, planId) => {
-                            const prices = { personal: 1.99, guardian: 4.99, family: 0.99, callcenter: 24.99 };
-                            return total + (prices[planId as keyof typeof prices] || 0);
-                          }, 0).toFixed(2)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h4 className="font-medium text-blue-900 mb-2">💳 Secure Payment Processing</h4>
-                    <p className="text-sm text-blue-800">
-                      Payment will be processed securely through Stripe. You'll be redirected to enter your card details safely.
-                    </p>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
-                      Back to Plans
-                    </Button>
-                    <Button onClick={handleNextStep} size="lg" className="flex-1 bg-primary hover:bg-primary/90">
-                      Continue to Details <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
+                  <EmbeddedPayment 
+                    plans={formData.plans}
+                    onSuccess={handlePaymentSuccess}
+                    onBack={() => setStep(2)}
+                  />
                 </div>
               )}
 
