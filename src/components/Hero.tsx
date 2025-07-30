@@ -27,7 +27,7 @@ const Hero = () => {
               <span className="text-emergency-glow drop-shadow-md"> Life-Saving</span> Assistant
             </h1>
             
-            <p className="text-xl md:text-2xl mb-8 text-emergency leading-relaxed font-medium drop-shadow-sm">
+            <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
               ICE SOS Lite provides multilingual emergency protection with AI Guardian, 
               professional call center access, and family connectivity — globally available.
             </p>
