@@ -17,37 +17,37 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 27%;
 
-    /* ICE SOS Brand Colors */
-    --primary: 163 100% 36%; /* Green #00B894 - Status OK */
+    /* ICE SOS Professional Brand Colors */
+    --primary: 140 100% 40%; /* Bright Green #00CC66 - Status OK, Success */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 163 100% 46%;
+    --primary-glow: 140 100% 50%;
 
-    --emergency: 348 83% 47%; /* Red #D63031 - SOS alerts */
+    --emergency: 0 100% 50%; /* Bright Red #FF0000 - SOS alerts, Critical */
     --emergency-foreground: 0 0% 100%;
-    --emergency-glow: 348 83% 57%;
+    --emergency-glow: 0 100% 60%;
 
-    --guardian: 211 100% 50%; /* Blue #0984E3 - AI Guardian */
+    --guardian: 120 100% 25%; /* Dark Green #008000 - AI Guardian, Professional */
     --guardian-foreground: 0 0% 100%;
-    --guardian-glow: 211 100% 60%;
+    --guardian-glow: 120 100% 35%;
 
-    --wellness: 42 100% 70%; /* Yellow #FDCB6E - Wellness reminders */
-    --wellness-foreground: 215 25% 27%;
+    --wellness: 25 100% 50%; /* Orange #FF8000 - Wellness reminders */
+    --wellness-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
+    --secondary: 0 0% 97%;
     --secondary-foreground: 215 25% 27%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 215 20% 50%;
 
-    --accent: 210 40% 96.1%;
+    --accent: 140 30% 95%;
     --accent-foreground: 215 25% 27%;
 
-    --destructive: 348 83% 47%;
+    --destructive: 0 100% 50%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 163 100% 36%;
+    --ring: 140 100% 40%;
 
     /* Emergency Gradients */
     --gradient-emergency: linear-gradient(135deg, hsl(var(--emergency)), hsl(var(--emergency-glow)));
@@ -87,17 +87,17 @@
     --popover: 215 25% 27%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 163 100% 36%;
+    --primary: 140 100% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --emergency: 348 83% 47%;
+    --emergency: 0 100% 50%;
     --emergency-foreground: 0 0% 100%;
 
-    --guardian: 211 100% 50%;
+    --guardian: 120 100% 25%;
     --guardian-foreground: 0 0% 100%;
 
-    --wellness: 42 100% 70%;
-    --wellness-foreground: 215 25% 27%;
+    --wellness: 25 100% 50%;
+    --wellness-foreground: 0 0% 100%;
 
     --secondary: 215 25% 35%;
     --secondary-foreground: 0 0% 98%;
@@ -108,12 +108,12 @@
     --accent: 215 25% 35%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 348 83% 47%;
+    --destructive: 0 100% 50%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 215 25% 35%;
     --input: 215 25% 35%;
-    --ring: 163 100% 36%;
+    --ring: 140 100% 40%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -132,11 +132,28 @@
   }
 
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground font-inter antialiased;
+    letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-poppins;
+    @apply font-poppins font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl leading-tight;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl leading-tight;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl leading-tight;
+  }
+
+  p {
+    @apply leading-relaxed;
   }
 }
 
