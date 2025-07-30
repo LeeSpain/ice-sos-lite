@@ -26,8 +26,8 @@ const Navigation = () => {
             <Button asChild variant="ghost" size="sm">
               <Link to="/dashboard">Dashboard</Link>
             </Button>
-            <Button variant="outline" size="sm">
-              Sign In
+            <Button asChild variant="outline" size="sm">
+              <Link to="/auth">Sign In</Link>
             </Button>
             <Button asChild size="sm" className="shadow-primary">
               <Link to="/register">Join Platform</Link>
@@ -55,8 +55,8 @@ const Navigation = () => {
                 <Link to="/dashboard">Dashboard</Link>
               </Button>
               <div className="flex flex-col space-y-2 pt-4 border-t border-border">
-                <Button variant="outline" size="sm">
-                  Sign In
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/auth">Sign In</Link>
                 </Button>
                 <Button asChild size="sm" className="shadow-primary">
                   <Link to="/register">Join Platform</Link>
