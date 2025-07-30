@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      family_invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          invite_token: string
+          invitee_email: string
+          invitee_name: string
+          inviter_email: string
+          inviter_user_id: string
+          relationship: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          invite_token?: string
+          invitee_email: string
+          invitee_name: string
+          inviter_email: string
+          inviter_user_id: string
+          relationship?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invite_token?: string
+          invitee_email?: string
+          invitee_name?: string
+          inviter_email?: string
+          inviter_user_id?: string
+          relationship?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           address: string | null
