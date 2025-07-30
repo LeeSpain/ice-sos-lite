@@ -74,17 +74,16 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:20px_20px]" />
       </div>
       
-      <div className="container mx-auto px-6 py-8 relative z-10">
+      <div className="container mx-auto px-6 py-6 relative z-10">
         {/* Professional Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-4xl font-light text-white mb-2 drop-shadow-lg">
+            <h1 className="text-3xl font-light text-white mb-1 drop-shadow-lg">
               Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 18 ? 'Afternoon' : 'Evening'}, {userName}
             </h1>
-            <p className="text-white/80 text-lg drop-shadow-sm">
+            <p className="text-white/80 text-base drop-shadow-sm">
               {currentTime.toLocaleDateString('en-US', { 
                 weekday: 'long', 
-                year: 'numeric', 
                 month: 'long', 
                 day: 'numeric' 
               })} • {currentTime.toLocaleTimeString('en-US', { 
@@ -95,10 +94,10 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
             </p>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="text-right mr-6">
-              <p className="text-sm text-white/70">{weather.location}</p>
-              <p className="text-lg font-medium text-white drop-shadow-sm">{weather.temp} • {weather.condition}</p>
+          <div className="flex items-center gap-3">
+            <div className="text-right">
+              <p className="text-sm text-white/70">{weather.temp} • {weather.condition}</p>
+              <p className="text-xs text-white/60">{weather.location}</p>
             </div>
             <Button
               onClick={handleSignOut}
@@ -106,19 +105,19 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
               size="sm"
               className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <LogOut className="h-4 w-4 mr-1" />
               Sign Out
             </Button>
           </div>
         </div>
 
-        {/* Status and Emergency Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* Compact Status Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           {/* Protection Status */}
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-white/70 mb-1">Protection Status</p>
+                <p className="text-xs font-medium text-white/70 mb-0.5">Protection</p>
                 <p className={`text-sm font-semibold ${protectionStatus.status === 'Active' ? 'text-green-300' : 'text-red-300'}`}>
                   {protectionStatus.status}
                 </p>
@@ -128,58 +127,58 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           </div>
 
           {/* Location Services */}
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-medium text-white/70 mb-1">Location Services</p>
+                <p className="text-xs font-medium text-white/70 mb-0.5">Location</p>
                 <p className={`text-sm font-semibold ${profile?.location_sharing_enabled ? 'text-green-300' : 'text-red-300'}`}>
                   {profile?.location_sharing_enabled ? 'Enabled' : 'Disabled'}
                 </p>
               </div>
-              <MapPin className={`h-4 w-4 ${profile?.location_sharing_enabled ? 'text-green-400' : 'text-red-400'}`} />
+              <MapPin className={`h-3 w-3 ${profile?.location_sharing_enabled ? 'text-green-400' : 'text-red-400'}`} />
             </div>
           </div>
 
           {/* Profile Completion */}
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 shadow-lg">
-            <div className="flex items-center justify-between mb-2">
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 shadow-lg">
+            <div className="flex items-center justify-between mb-1.5">
               <div>
-                <p className="text-xs font-medium text-white/70 mb-1">Profile Complete</p>
+                <p className="text-xs font-medium text-white/70 mb-0.5">Profile</p>
                 <p className="text-sm font-semibold text-white">{profile?.profile_completion_percentage || 0}%</p>
               </div>
             </div>
             <Progress 
               value={profile?.profile_completion_percentage || 0} 
-              className="h-1.5 bg-white/20"
+              className="h-1 bg-white/20"
             />
           </div>
 
           {/* Emergency SOS */}
-          <div className="bg-gradient-to-br from-green-500/90 to-green-600/90 backdrop-blur-sm rounded-lg p-4 text-white shadow-emergency border border-green-400/30">
+          <div className="bg-gradient-to-br from-green-500/90 to-green-600/90 backdrop-blur-sm rounded-lg p-3 text-white shadow-emergency border border-green-400/30">
             <div className="text-center">
-              <p className="text-xs font-medium mb-3 text-green-100">Emergency Response</p>
+              <p className="text-xs font-medium mb-2 text-green-100">Emergency</p>
               <Button
                 variant="emergency"
-                size="lg"
+                size="sm"
                 onClick={handleEmergency}
-                className="w-12 h-12 rounded-full bg-white text-green-600 hover:bg-green-50 shadow-lg mb-2 emergency-pulse"
+                className="w-10 h-10 rounded-full bg-white text-green-600 hover:bg-green-50 shadow-lg mb-1 emergency-pulse"
                 aria-label="Emergency SOS Button - Press for immediate help"
               >
-                <Phone className="h-4 w-4" />
+                <Phone className="h-3 w-3" />
               </Button>
-              <p className="text-xs text-green-100">Press for assistance</p>
+              <p className="text-xs text-green-100">SOS</p>
             </div>
           </div>
         </div>
 
-        {/* ICE SOS Branding */}
-        <div className="flex items-center gap-3 mt-8 pt-6 border-t border-white/20">
-          <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
-            <Shield className="h-5 w-5 text-white" />
+        {/* Compact ICE SOS Branding */}
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/20">
+          <div className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-md flex items-center justify-center">
+            <Shield className="h-4 w-4 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-white drop-shadow-sm">ICE SOS</h2>
-            <p className="text-sm text-white/70">Emergency Protection Platform</p>
+            <h2 className="text-lg font-semibold text-white drop-shadow-sm">ICE SOS</h2>
+            <p className="text-xs text-white/70">Emergency Protection Platform</p>
           </div>
         </div>
       </div>
