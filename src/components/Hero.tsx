@@ -33,10 +33,10 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-              <Button size="xl" className="bg-white text-black hover:bg-white/90 shadow-glow">
+              <Button size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
                 Start Free Trial
               </Button>
-              <Button variant="outline" size="xl" className="border-white/30 text-black bg-white/10 hover:bg-white/20">
+              <Button size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
                 Watch Demo
               </Button>
             </div>
