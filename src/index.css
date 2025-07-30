@@ -17,18 +17,18 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 27%;
 
-    /* ICE SOS Professional Brand Colors */
-    --primary: 140 100% 40%; /* Bright Green #00CC66 - Status OK, Success */
+    /* ICE SOS Professional Brand Colors - SWAPPED */
+    --primary: 0 100% 50%; /* Bright Red #FF0000 - Status OK, Success */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 140 100% 50%;
+    --primary-glow: 0 100% 60%;
 
-    --emergency: 0 100% 50%; /* Bright Red #FF0000 - SOS alerts, Critical */
+    --emergency: 140 100% 40%; /* Bright Green #00CC66 - SOS alerts, Critical */
     --emergency-foreground: 0 0% 100%;
-    --emergency-glow: 0 100% 60%;
+    --emergency-glow: 140 100% 50%;
 
-    --guardian: 120 100% 25%; /* Dark Green #008000 - AI Guardian, Professional */
+    --guardian: 0 100% 35%; /* Dark Red #B30000 - AI Guardian, Professional */
     --guardian-foreground: 0 0% 100%;
-    --guardian-glow: 120 100% 35%;
+    --guardian-glow: 0 100% 45%;
 
     --wellness: 25 100% 50%; /* Orange #FF8000 - Wellness reminders */
     --wellness-foreground: 0 0% 100%;
@@ -39,15 +39,15 @@
     --muted: 0 0% 95%;
     --muted-foreground: 215 20% 50%;
 
-    --accent: 140 30% 95%;
+    --accent: 0 30% 95%;
     --accent-foreground: 215 25% 27%;
 
-    --destructive: 0 100% 50%;
+    --destructive: 140 100% 40%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 140 100% 40%;
+    --ring: 0 100% 50%;
 
     /* Emergency Gradients */
     --gradient-emergency: linear-gradient(135deg, hsl(var(--emergency)), hsl(var(--emergency-glow)));
@@ -87,13 +87,13 @@
     --popover: 215 25% 27%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 140 100% 40%;
+    --primary: 0 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --emergency: 0 100% 50%;
+    --emergency: 140 100% 40%;
     --emergency-foreground: 0 0% 100%;
 
-    --guardian: 120 100% 25%;
+    --guardian: 0 100% 35%;
     --guardian-foreground: 0 0% 100%;
 
     --wellness: 25 100% 50%;
@@ -108,12 +108,12 @@
     --accent: 215 25% 35%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 100% 50%;
+    --destructive: 140 100% 40%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 215 25% 35%;
     --input: 215 25% 35%;
-    --ring: 140 100% 40%;
+    --ring: 0 100% 50%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
