@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
-import heroImage from "@/assets/hero-metrics-dashboard.jpg";
+import heroImage from "@/assets/hero-emergency.jpg";
 
 const Hero = () => {
   return (
@@ -47,7 +47,7 @@ const Hero = () => {
             <div className="relative z-10">
               <img 
                 src={heroImage} 
-                alt="ICE SOS Emergency Metrics Dashboard - Real-time Analytics Interface"
+                alt="ICE SOS Emergency Protection App Interface"
                 className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
               />
             </div>
