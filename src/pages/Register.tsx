@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Shield, Mail, User, ArrowRight, CheckCircle } from "lucide-react";
+import { Shield, Mail, User, ArrowRight, CheckCircle, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
@@ -16,6 +16,7 @@ const Register = () => {
     email: "",
     firstName: "",
     lastName: "",
+    phoneNumber: "",
     plan: "",
     acceptTerms: false
   });
@@ -24,7 +25,7 @@ const Register = () => {
 
   const handleNextStep = () => {
     if (step === 1) {
-      if (!formData.email || !formData.firstName || !formData.lastName) {
+      if (!formData.email || !formData.firstName || !formData.lastName || !formData.phoneNumber) {
         toast({
           title: "Missing Information",
           description: "Please fill in all required fields.",
@@ -66,6 +67,7 @@ const Register = () => {
           data: {
             first_name: formData.firstName,
             last_name: formData.lastName,
+            phone_number: formData.phoneNumber,
           }
         }
       });
@@ -170,6 +172,22 @@ const Register = () => {
                     </div>
                   </div>
 
+                  <div className="space-y-2">
+                    <Label htmlFor="phoneNumber">Phone Number</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="phoneNumber"
+                        type="tel"
+                        className="pl-10"
+                        placeholder="+44 7700 900000"
+                        value={formData.phoneNumber}
+                        onChange={(e) => setFormData({...formData, phoneNumber: e.target.value})}
+                        required
+                      />
+                    </div>
+                  </div>
+
                   <Button onClick={handleNextStep} size="lg" className="w-full bg-emergency hover:bg-emergency/90">
                     Continue <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -242,6 +260,7 @@ const Register = () => {
                     <h4 className="font-medium">Summary:</h4>
                     <p className="text-sm"><strong>Name:</strong> {formData.firstName} {formData.lastName}</p>
                     <p className="text-sm"><strong>Email:</strong> {formData.email}</p>
+                    <p className="text-sm"><strong>Phone:</strong> {formData.phoneNumber}</p>
                     <p className="text-sm"><strong>Plan:</strong> {
                       formData.plan === "family" ? "Family Sharing - €0.99/month" :
                       formData.plan === "personal" ? "Personal Account - €1.99/month" :
