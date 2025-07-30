@@ -19,7 +19,7 @@ const Hero = () => {
           <div className="text-center lg:text-left text-white">
             <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
               <Shield className="h-4 w-4 text-emergency-glow" />
-              <span className="text-sm font-medium text-emergency-glow">Device-Free Emergency Protection</span>
+              <span className="text-sm font-medium text-white">Device-Free Emergency Protection</span>
             </div>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
@@ -33,10 +33,10 @@ const Hero = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
-              <Button size="xl" className="bg-white text-guardian hover:bg-white/90 shadow-glow">
+              <Button size="xl" className="bg-white text-black hover:bg-white/90 shadow-glow">
                 Start Free Trial
               </Button>
-              <Button variant="outline" size="xl" className="border-white/30 text-white hover:bg-white/10">
+              <Button variant="outline" size="xl" className="border-white/30 text-black bg-white/10 hover:bg-white/20">
                 Watch Demo
               </Button>
             </div>
