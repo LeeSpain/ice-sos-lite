@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Shield, Mail, User, ArrowRight, CheckCircle, Phone, CreditCard, MapPin, Heart } from "lucide-react";
+import { Shield, Mail, User, ArrowRight, CheckCircle, Phone, CreditCard, MapPin, Heart, Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
@@ -23,8 +23,7 @@ const Register = () => {
     // Payment step
     paymentMethod: "",
     // Questionnaire step
-    emergencyContact1: "",
-    emergencyContact2: "",
+    emergencyContacts: [{ name: "", phone: "", relationship: "" }] as Array<{name: string, phone: string, relationship: string}>,
     medicalConditions: "",
     allergies: "",
     currentLocation: "",
@@ -67,11 +66,15 @@ const Register = () => {
   };
 
   const handleCheckout = async () => {
-    // Validate questionnaire fields
-    if (!formData.emergencyContact1 || !formData.currentLocation || !formData.acceptTerms) {
+    // Validate questionnaire fields - at least one emergency contact required
+    const hasValidEmergencyContact = formData.emergencyContacts.some(contact => 
+      contact.name.trim() && contact.phone.trim()
+    );
+    
+    if (!hasValidEmergencyContact || !formData.currentLocation || !formData.acceptTerms) {
       toast({
         title: "Missing Information",
-        description: "Please complete all required fields and accept the terms.",
+        description: "Please add at least one emergency contact, your location, and accept the terms.",
         variant: "destructive"
       });
       return;
@@ -88,8 +91,9 @@ const Register = () => {
             first_name: formData.firstName,
             last_name: formData.lastName,
             phone_number: formData.phoneNumber,
-            emergency_contact_1: formData.emergencyContact1,
-            emergency_contact_2: formData.emergencyContact2,
+            emergency_contacts: JSON.stringify(formData.emergencyContacts.filter(contact => 
+              contact.name.trim() && contact.phone.trim()
+            )),
             medical_conditions: formData.medicalConditions,
             allergies: formData.allergies,
             current_location: formData.currentLocation,
@@ -294,35 +298,117 @@ const Register = () => {
                     <p className="text-muted-foreground">Help us protect you better with these details</p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="emergencyContact1">Primary Emergency Contact *</Label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="emergencyContact1"
-                          className="pl-10"
-                          placeholder="Name and phone number"
-                          value={formData.emergencyContact1}
-                          onChange={(e) => setFormData({...formData, emergencyContact1: e.target.value})}
-                          required
-                        />
-                      </div>
+                  {/* Emergency Contacts Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-base font-medium">Emergency Contacts *</Label>
+                      <span className="text-sm text-muted-foreground">
+                        {formData.emergencyContacts.length}/5 contacts
+                      </span>
                     </div>
                     
-                    <div className="space-y-2">
-                      <Label htmlFor="emergencyContact2">Secondary Emergency Contact</Label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input
-                          id="emergencyContact2"
-                          className="pl-10"
-                          placeholder="Name and phone number"
-                          value={formData.emergencyContact2}
-                          onChange={(e) => setFormData({...formData, emergencyContact2: e.target.value})}
-                        />
+                    {formData.emergencyContacts.map((contact, index) => (
+                      <div key={index} className="p-4 border rounded-lg space-y-3 bg-muted/25">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">Contact {index + 1}</h4>
+                          {formData.emergencyContacts.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                const newContacts = formData.emergencyContacts.filter((_, i) => i !== index);
+                                setFormData({...formData, emergencyContacts: newContacts});
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="space-y-2">
+                            <Label htmlFor={`contactName${index}`}>Full Name</Label>
+                            <Input
+                              id={`contactName${index}`}
+                              placeholder="Contact's full name"
+                              value={contact.name}
+                              onChange={(e) => {
+                                const newContacts = [...formData.emergencyContacts];
+                                newContacts[index] = {...newContacts[index], name: e.target.value};
+                                setFormData({...formData, emergencyContacts: newContacts});
+                              }}
+                              required={index === 0}
+                            />
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor={`contactPhone${index}`}>Phone Number</Label>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                              <Input
+                                id={`contactPhone${index}`}
+                                className="pl-10"
+                                placeholder="+44 7700 900000"
+                                value={contact.phone}
+                                onChange={(e) => {
+                                  const newContacts = [...formData.emergencyContacts];
+                                  newContacts[index] = {...newContacts[index], phone: e.target.value};
+                                  setFormData({...formData, emergencyContacts: newContacts});
+                                }}
+                                required={index === 0}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor={`contactRelationship${index}`}>Relationship</Label>
+                          <Select 
+                            value={contact.relationship} 
+                            onValueChange={(value) => {
+                              const newContacts = [...formData.emergencyContacts];
+                              newContacts[index] = {...newContacts[index], relationship: value};
+                              setFormData({...formData, emergencyContacts: newContacts});
+                            }}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select relationship" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="spouse">Spouse/Partner</SelectItem>
+                              <SelectItem value="parent">Parent</SelectItem>
+                              <SelectItem value="child">Child</SelectItem>
+                              <SelectItem value="sibling">Sibling</SelectItem>
+                              <SelectItem value="friend">Friend</SelectItem>
+                              <SelectItem value="colleague">Colleague</SelectItem>
+                              <SelectItem value="neighbor">Neighbor</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                    </div>
+                    ))}
+                    
+                    {formData.emergencyContacts.length < 5 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setFormData({
+                            ...formData,
+                            emergencyContacts: [
+                              ...formData.emergencyContacts,
+                              { name: "", phone: "", relationship: "" }
+                            ]
+                          });
+                        }}
+                        className="w-full"
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Another Emergency Contact
+                      </Button>
+                    )}
                   </div>
 
                   <div className="space-y-2">
