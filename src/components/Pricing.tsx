@@ -88,8 +88,8 @@ const Pricing = () => {
 
         {/* Free Download Hero Section */}
         <div className="mb-20">
-          <Card className="relative border-0 bg-gradient-to-br from-background via-accent/30 to-muted shadow-2xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-emergency/5"></div>
+          <Card className="relative border border-border bg-card shadow-2xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-muted/50 via-secondary to-muted"></div>
             <CardHeader className="relative text-center py-16 px-8">
               <Badge className="bg-emergency text-white w-fit mx-auto mb-6 text-sm font-semibold px-4 py-2 shadow-lg">
                 FREE TO DOWNLOAD
