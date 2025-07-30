@@ -78,16 +78,16 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
         {/* Professional Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-light text-white mb-1 drop-shadow-lg">
+            <h1 className="text-2xl font-light text-white mb-1 drop-shadow-lg">
               Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 18 ? 'Afternoon' : 'Evening'}, {userName}
             </h1>
-            <p className="text-white/80 text-base drop-shadow-sm">
+            <p className="text-white/80 text-sm drop-shadow-sm">
               {currentTime.toLocaleDateString('en-US', { 
                 weekday: 'long', 
-                month: 'long', 
+                month: 'short', 
                 day: 'numeric' 
               })} • {currentTime.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
+                hour: 'numeric', 
                 minute: '2-digit',
                 hour12: true 
               })}
@@ -95,9 +95,9 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="text-right">
-              <p className="text-sm text-white/70">{weather.temp} • {weather.condition}</p>
-              <p className="text-xs text-white/60">{weather.location}</p>
+            <div className="text-right text-white/80">
+              <p className="text-sm font-medium">{weather.temp}</p>
+              <p className="text-xs">{weather.condition}</p>
             </div>
             <Button
               onClick={handleSignOut}
@@ -111,68 +111,83 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           </div>
         </div>
 
-        {/* Compact Professional Status Grid */}
-        <div className="grid grid-cols-4 gap-2 mb-3">
+        {/* Professional Status Grid */}
+        <div className="grid grid-cols-4 gap-3 mb-4">
           {/* Protection Status */}
-          <div className="bg-emergency/90 backdrop-blur-sm border border-emergency rounded-md p-2">
-            <div className="text-center">
-              <div className={`w-2 h-2 rounded-full mx-auto mb-1 ${protectionStatus.status === 'Active' ? 'bg-white' : 'bg-red-500'}`}></div>
-              <p className="text-xs font-medium text-white mb-0.5">Protection</p>
-              <p className={`text-xs font-semibold ${protectionStatus.status === 'Active' ? 'text-white' : 'text-red-500'}`}>
-                {protectionStatus.status}
-              </p>
+          <div className="bg-emergency backdrop-blur-sm border border-emergency-glow/30 rounded-lg p-3 shadow-lg">
+            <div className="text-center space-y-2">
+              <div className={`w-3 h-3 rounded-full mx-auto ${protectionStatus.status === 'Active' ? 'bg-white shadow-sm' : 'bg-red-400'}`}></div>
+              <div>
+                <p className="text-xs font-medium text-white/90 uppercase tracking-wide">Protection</p>
+                <p className={`text-sm font-bold ${protectionStatus.status === 'Active' ? 'text-white' : 'text-red-300'}`}>
+                  {protectionStatus.status}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Location Services */}
-          <div className="bg-emergency/90 backdrop-blur-sm border border-emergency rounded-md p-2">
-            <div className="text-center">
-              <MapPin className={`w-3 h-3 mx-auto mb-1 ${profile?.location_sharing_enabled ? 'text-white' : 'text-red-500'}`} />
-              <p className="text-xs font-medium text-white mb-0.5">Location</p>
-              <p className={`text-xs font-semibold ${profile?.location_sharing_enabled ? 'text-white' : 'text-red-500'}`}>
-                {profile?.location_sharing_enabled ? 'On' : 'Off'}
-              </p>
+          <div className="bg-emergency backdrop-blur-sm border border-emergency-glow/30 rounded-lg p-3 shadow-lg">
+            <div className="text-center space-y-2">
+              <MapPin className={`w-4 h-4 mx-auto ${profile?.location_sharing_enabled ? 'text-white' : 'text-red-300'}`} />
+              <div>
+                <p className="text-xs font-medium text-white/90 uppercase tracking-wide">Location</p>
+                <p className={`text-sm font-bold ${profile?.location_sharing_enabled ? 'text-white' : 'text-red-300'}`}>
+                  {profile?.location_sharing_enabled ? 'On' : 'Off'}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Profile Completion */}
-          <div className="bg-emergency/90 backdrop-blur-sm border border-emergency rounded-md p-2">
-            <div className="text-center">
-              <div className="w-8 h-1 bg-white/30 rounded-full mx-auto mb-1 overflow-hidden">
+          <div className="bg-emergency backdrop-blur-sm border border-emergency-glow/30 rounded-lg p-3 shadow-lg">
+            <div className="text-center space-y-2">
+              <div className="w-10 h-2 bg-white/20 rounded-full mx-auto overflow-hidden">
                 <div 
-                  className="h-full bg-white rounded-full transition-all duration-300"
+                  className="h-full bg-white rounded-full transition-all duration-500 shadow-sm"
                   style={{ width: `${profile?.profile_completion_percentage || 0}%` }}
                 ></div>
               </div>
-              <p className="text-xs font-medium text-white mb-0.5">Profile</p>
-              <p className="text-xs font-semibold text-white">{profile?.profile_completion_percentage || 0}%</p>
+              <div>
+                <p className="text-xs font-medium text-white/90 uppercase tracking-wide">Profile</p>
+                <p className="text-sm font-bold text-white">{profile?.profile_completion_percentage || 0}%</p>
+              </div>
             </div>
           </div>
 
           {/* Emergency SOS */}
-          <div className="bg-emergency backdrop-blur-sm border border-emergency rounded-md p-2">
-            <div className="text-center">
+          <div className="bg-emergency border border-emergency-glow/50 rounded-lg p-3 shadow-xl">
+            <div className="text-center space-y-2">
               <Button
                 variant="emergency"
                 size="sm"
                 onClick={handleEmergency}
-                className="w-6 h-6 rounded-full bg-white text-emergency hover:bg-gray-100 shadow-md mb-1 emergency-pulse mx-auto"
+                className="w-8 h-8 rounded-full bg-white text-emergency hover:bg-gray-50 shadow-lg emergency-pulse mx-auto border-0"
                 aria-label="Emergency SOS Button"
               >
-                <Phone className="h-2.5 w-2.5" />
+                <Phone className="h-3.5 w-3.5" />
               </Button>
-              <p className="text-xs font-medium text-white">SOS</p>
+              <div>
+                <p className="text-xs font-bold text-white uppercase tracking-wide">SOS</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Professional ICE SOS Branding */}
-        <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-emergency/30">
-          <div className="w-5 h-5 bg-emergency/20 backdrop-blur-sm rounded flex items-center justify-center">
-            <Shield className="h-3 w-3 text-emergency" />
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/20">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-white/10 backdrop-blur-sm rounded-md flex items-center justify-center">
+              <Shield className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-white">ICE SOS</h2>
+              <p className="text-xs text-white/70">Emergency Protection</p>
+            </div>
           </div>
-          <h2 className="text-base font-semibold text-white">ICE SOS</h2>
-          <span className="text-xs text-white/60">Emergency Protection</span>
+          <div className="text-right text-white/60">
+            <p className="text-xs">Professional Dashboard</p>
+          </div>
         </div>
       </div>
     </div>
