@@ -29,11 +29,7 @@ const App = () => {
               <SimpleDashboard />
             </ProtectedRoute>
           } />
-          <Route path="/full-dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
+          <Route path="/full-dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
