@@ -290,7 +290,7 @@ const AuthPage = () => {
             {/* Testing Bypass */}
             <div className="mt-4 text-center">
               <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
-                <Link to="/dashboard">Skip for testing →</Link>
+                <Link to="/test">Skip for testing →</Link>
               </Button>
             </div>
 
