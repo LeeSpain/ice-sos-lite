@@ -11,36 +11,40 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* ICE SOS Professional Logo */}
           <div className="flex items-center space-x-4">
-            {/* Emergency Communication Hub Icon */}
+            {/* Sophisticated Emergency Beacon Icon */}
             <div className="relative w-14 h-14">
-              {/* Emergency beacon base - smartphone shape */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-7 h-10 bg-gradient-to-b from-foreground to-foreground/80 rounded-lg shadow-lg">
-                {/* Screen area */}
-                <div className="absolute top-1 left-1 right-1 bottom-1 bg-gradient-to-br from-primary to-primary/90 rounded-md">
-                  {/* Emergency pulse heartbeat */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center">
-                    <div className="w-0.5 h-1 bg-white"></div>
-                    <div className="w-0.5 h-2 bg-white ml-0.5"></div>
-                    <div className="w-0.5 h-3 bg-white ml-0.5"></div>
-                    <div className="w-0.5 h-2 bg-white ml-0.5"></div>
-                    <div className="w-0.5 h-1 bg-white ml-0.5"></div>
+              {/* Outer emergency pulse rings */}
+              <div className="absolute inset-0 w-14 h-14 rounded-full border-2 border-emergency/30 animate-pulse"></div>
+              <div className="absolute inset-1 w-12 h-12 rounded-full border border-emergency/20"></div>
+              
+              {/* Main hexagonal emergency beacon */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8">
+                {/* Hexagonal base */}
+                <div className="w-8 h-8 bg-gradient-to-br from-emergency to-emergency/80 transform rotate-45 rounded-sm shadow-lg"></div>
+                
+                {/* Central protection core */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-gradient-to-br from-primary to-primary/90 rounded-full shadow-md">
+                  {/* Emergency signal cross */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <div className="w-3 h-0.5 bg-white rounded-full"></div>
+                    <div className="w-0.5 h-3 bg-white rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
                   </div>
                 </div>
               </div>
               
-              {/* Emergency signal waves emanating from device */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
-                <div className="w-8 h-4 border-2 border-emergency rounded-b-full border-t-0 opacity-60"></div>
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-6 h-3 border-2 border-emergency rounded-b-full border-t-0 opacity-80"></div>
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-2 border-2 border-emergency rounded-b-full border-t-0"></div>
+              {/* Directional signal indicators */}
+              <div className="absolute top-1 left-1/2 transform -translate-x-1/2">
+                <div className="w-1 h-2 bg-gradient-to-t from-primary to-transparent rounded-full"></div>
               </div>
-              
-              {/* Emergency alert indicators */}
-              <div className="absolute top-2 right-2 w-2 h-2 bg-emergency rounded-full animate-pulse"></div>
-              <div className="absolute bottom-2 left-2 w-1.5 h-1.5 bg-primary rounded-full"></div>
-              
-              {/* Life connection indicator */}
-              <div className="absolute bottom-1 right-1 w-2 h-2 bg-gradient-to-br from-primary to-emergency rounded-full shadow-sm"></div>
+              <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                <div className="w-1 h-2 bg-gradient-to-b from-primary to-transparent rounded-full"></div>
+              </div>
+              <div className="absolute left-1 top-1/2 transform -translate-y-1/2">
+                <div className="w-2 h-1 bg-gradient-to-l from-primary to-transparent rounded-full"></div>
+              </div>
+              <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+                <div className="w-2 h-1 bg-gradient-to-r from-primary to-transparent rounded-full"></div>
+              </div>
             </div>
             
             {/* Professional Typography */}
