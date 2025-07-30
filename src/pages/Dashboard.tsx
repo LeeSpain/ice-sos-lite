@@ -1,19 +1,34 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Download, Settings, CheckCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import EmergencyContactsCard from "@/components/dashboard/EmergencyContactsCard";
+import MedicalInfoCard from "@/components/dashboard/MedicalInfoCard";
+import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
+import MobileAppCard from "@/components/dashboard/MobileAppCard";
+import ActivityCard from "@/components/dashboard/ActivityCard";
 
 const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
-    checkSubscription();
+    loadDashboardData();
   }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      await Promise.all([
+        checkSubscription(),
+        loadProfile()
+      ]);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const checkSubscription = async () => {
     try {
@@ -22,23 +37,27 @@ const Dashboard = () => {
       setSubscription(data);
     } catch (error) {
       console.error('Error checking subscription:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleManageSubscription = async () => {
+  const loadProfile = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
-      if (error) throw error;
-      window.open(data.url, '_blank');
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      setProfile(data);
     } catch (error) {
-      console.error('Error opening customer portal:', error);
-      toast({
-        title: "Error",
-        description: "Unable to open subscription management.",
-        variant: "destructive"
-      });
+      console.error('Error loading profile:', error);
     }
   };
 
@@ -47,116 +66,82 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gradient-hero">
         <Navigation />
         <div className="container mx-auto px-4 py-24">
-          <div className="text-center">Loading...</div>
+          <div className="text-center text-white">Loading dashboard...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-to-br from-muted/20 to-muted/50">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <Shield className="h-16 w-16 text-emergency mx-auto mb-4" />
-            <h1 className="text-4xl font-bold text-white mb-4">Welcome to ICE SOS</h1>
-            <p className="text-xl text-white/80">Your emergency protection is now active</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card className="bg-white/95 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle className="h-5 w-5 text-green-500" />
-                  Subscription Status
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {subscription?.subscribed ? (
-                  <div className="space-y-2">
-                    <p className="text-green-600 font-medium">Active Subscription</p>
-                    <p className="text-sm text-muted-foreground">
-                      Plan: {subscription.subscription_tier}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Next billing: {subscription.subscription_end ? new Date(subscription.subscription_end).toLocaleDateString() : 'Unknown'}
-                    </p>
-                    <Button onClick={handleManageSubscription} variant="outline" size="sm">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Manage Subscription
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <p className="text-red-600 font-medium">No Active Subscription</p>
-                    <p className="text-sm text-muted-foreground">
-                      Complete your subscription to access all features
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/95 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Download className="h-5 w-5 text-blue-500" />
-                  Download App
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Download the ICE SOS mobile app to get started
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    <Button variant="outline" size="sm">
-                      Download for iOS
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      Download for Android
-                    </Button>
+      {/* Dashboard Header */}
+      <DashboardHeader profile={profile} subscription={subscription} />
+      
+      {/* Dashboard Content */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Main Dashboard Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column - Primary Information */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Emergency Profile Section */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <EmergencyContactsCard 
+                  profile={profile} 
+                  onProfileUpdate={loadProfile}
+                />
+                <MedicalInfoCard 
+                  profile={profile} 
+                  onProfileUpdate={loadProfile}
+                />
+              </div>
+              
+              {/* Mobile App Integration */}
+              <MobileAppCard />
+              
+              {/* Activity & Testing */}
+              <ActivityCard />
+            </div>
+            
+            {/* Right Column - Secondary Information */}
+            <div className="space-y-6">
+              {/* Subscription Management */}
+              <SubscriptionCard subscription={subscription} />
+              
+              {/* Quick Stats */}
+              <div className="grid grid-cols-1 gap-4">
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 border">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">
+                      {subscription?.subscribed ? '✓' : '!'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Protection Status</div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="bg-white/95 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle>Complete Your Profile</CardTitle>
-              <CardDescription>
-                Finish setting up your emergency information to ensure optimal protection
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  The following information will be completed in your mobile app after download:
-                </p>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center gap-2">
-                    <div className="h-2 w-2 bg-emergency rounded-full"></div>
-                    Emergency contact details
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-2 w-2 bg-emergency rounded-full"></div>
-                    Medical information and allergies
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-2 w-2 bg-emergency rounded-full"></div>
-                    Location permissions for emergency services
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <div className="h-2 w-2 bg-emergency rounded-full"></div>
-                    Notification preferences
-                  </li>
-                </ul>
+                
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 border">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {profile?.emergency_contacts ? 
+                        (Array.isArray(profile.emergency_contacts) ? profile.emergency_contacts.length : 0) : 0}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Emergency Contacts</div>
+                  </div>
+                </div>
+                
+                <div className="bg-white/95 backdrop-blur-sm rounded-lg p-4 border">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {profile?.profile_completion_percentage || 0}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">Profile Complete</div>
+                  </div>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
