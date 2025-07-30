@@ -22,12 +22,12 @@ const Hero = () => {
               <span className="text-sm font-medium text-emergency-glow">Device-Free Emergency Protection</span>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-emergency drop-shadow-lg">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
               Transform Your Phone Into a 
               <span className="text-emergency-glow drop-shadow-md"> Life-Saving</span> Assistant
             </h1>
             
-            <p className="text-xl md:text-2xl mb-8 text-white/90 leading-relaxed">
+            <p className="text-xl md:text-2xl mb-8 text-emergency leading-relaxed font-medium drop-shadow-sm">
               ICE SOS Lite provides multilingual emergency protection with AI Guardian, 
               professional call center access, and family connectivity — globally available.
             </p>
