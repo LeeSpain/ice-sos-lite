@@ -100,11 +100,14 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
 
 interface EmbeddedPaymentProps {
   plans: string[];
+  userEmail: string;
+  firstName: string;
+  lastName: string;
   onSuccess: () => void;
   onBack: () => void;
 }
 
-const EmbeddedPayment = ({ plans, onSuccess, onBack }: EmbeddedPaymentProps) => {
+const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, onSuccess, onBack }: EmbeddedPaymentProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -115,7 +118,7 @@ const EmbeddedPayment = ({ plans, onSuccess, onBack }: EmbeddedPaymentProps) => 
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-        body: { plans }
+        body: { plans, email: userEmail, firstName, lastName }
       });
 
       if (error) throw error;

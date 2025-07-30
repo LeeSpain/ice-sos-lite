@@ -277,6 +277,9 @@ const Register = () => {
 
                   <EmbeddedPayment 
                     plans={formData.plans}
+                    userEmail={formData.email}
+                    firstName={formData.firstName}
+                    lastName={formData.lastName}
                     onSuccess={handlePaymentSuccess}
                     onBack={() => setStep(2)}
                   />

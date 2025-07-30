@@ -25,14 +25,13 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { plans } = await req.json();
+    const { plans, email, firstName, lastName } = await req.json();
     
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    if (!email) {
+      throw new Error("Email is required for payment processing");
+    }
+    
+    logStep("Request data received", { email, firstName, lastName, plans });
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
@@ -40,7 +39,7 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
     // Check if customer exists
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customers = await stripe.customers.list({ email: email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
@@ -48,9 +47,8 @@ serve(async (req) => {
     } else {
       // Create customer
       const customer = await stripe.customers.create({
-        email: user.email,
-        name: `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim(),
-        phone: user.user_metadata?.phone_number,
+        email: email,
+        name: `${firstName || ''} ${lastName || ''}`.trim(),
       });
       customerId = customer.id;
       logStep("Created new customer", { customerId });
@@ -78,8 +76,7 @@ serve(async (req) => {
       currency: "eur",
       customer: customerId,
       metadata: {
-        user_id: user.id,
-        user_email: user.email,
+        email: email,
         plans: plans.join(","),
       },
       automatic_payment_methods: {
