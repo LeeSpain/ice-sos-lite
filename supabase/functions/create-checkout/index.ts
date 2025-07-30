@@ -26,7 +26,10 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
 
-    const stripe = new Stripe("sk_test_51RqcQwBBb55hy3jUbsaSsi5m9xRuwDutBPXgEXDq6cMpuuEPliMUO6ewBYAwy4uyh6XPICRLVC92pH84DhDQTPMY00dDtepcuw", { apiVersion: "2023-10-16" });
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
+
+    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
     
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
@@ -36,7 +39,7 @@ serve(async (req) => {
 
     // Plan pricing mapping
     const planPricing = {
-      "personal": { name: "Personal Contact", amount: 199 },
+      "personal": { name: "Personal Account", amount: 199 },
       "guardian": { name: "Guardian Wellness", amount: 499 },
       "family": { name: "Family Sharing", amount: 99 },
       "callcenter": { name: "Call Centre (Spain)", amount: 2499 }
