@@ -114,7 +114,7 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
         {/* Compact Status Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
           {/* Protection Status */}
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 shadow-lg">
+          <div className="bg-white/10 backdrop-blur-sm border-2 border-green-400/60 rounded-lg p-3 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-white/70 mb-0.5">Protection</p>
@@ -127,7 +127,7 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           </div>
 
           {/* Location Services */}
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 shadow-lg">
+          <div className="bg-white/10 backdrop-blur-sm border-2 border-green-400/60 rounded-lg p-3 shadow-lg">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-medium text-white/70 mb-0.5">Location</p>
@@ -140,7 +140,7 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           </div>
 
           {/* Profile Completion */}
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-3 shadow-lg">
+          <div className="bg-white/10 backdrop-blur-sm border-2 border-green-400/60 rounded-lg p-3 shadow-lg">
             <div className="flex items-center justify-between mb-1.5">
               <div>
                 <p className="text-xs font-medium text-white/70 mb-0.5">Profile</p>
@@ -154,7 +154,7 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           </div>
 
           {/* Emergency SOS */}
-          <div className="bg-gradient-to-br from-green-500/90 to-green-600/90 backdrop-blur-sm rounded-lg p-3 text-white shadow-emergency border border-green-400/30">
+          <div className="bg-gradient-to-br from-green-500/90 to-green-600/90 backdrop-blur-sm rounded-lg p-3 text-white shadow-emergency border-2 border-green-300/80">
             <div className="text-center">
               <p className="text-xs font-medium mb-2 text-green-100">Emergency</p>
               <Button
