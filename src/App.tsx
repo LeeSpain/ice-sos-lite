@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import SimpleDashboard from "./pages/SimpleDashboard";
 import NotFound from "./pages/NotFound";
 
 const App = () => {
@@ -23,6 +24,11 @@ const App = () => {
             </ProtectedRoute>
           } />
           <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <SimpleDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/full-dashboard" element={
             <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
