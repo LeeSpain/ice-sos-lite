@@ -18,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'inter': ['Inter', 'sans-serif'],
+				'poppins': ['Poppins', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -26,7 +30,22 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
+				},
+				emergency: {
+					DEFAULT: 'hsl(var(--emergency))',
+					foreground: 'hsl(var(--emergency-foreground))',
+					glow: 'hsl(var(--emergency-glow))'
+				},
+				guardian: {
+					DEFAULT: 'hsl(var(--guardian))',
+					foreground: 'hsl(var(--guardian-foreground))',
+					glow: 'hsl(var(--guardian-glow))'
+				},
+				wellness: {
+					DEFAULT: 'hsl(var(--wellness))',
+					foreground: 'hsl(var(--wellness-foreground))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -62,6 +81,22 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				}
+			},
+			backgroundImage: {
+				'gradient-emergency': 'var(--gradient-emergency)',
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-guardian': 'var(--gradient-guardian)',
+				'gradient-hero': 'var(--gradient-hero)'
+			},
+			boxShadow: {
+				'emergency': 'var(--shadow-emergency)',
+				'primary': 'var(--shadow-primary)',
+				'guardian': 'var(--shadow-guardian)',
+				'glow': 'var(--shadow-glow)'
+			},
+			transitionTimingFunction: {
+				'smooth': 'var(--transition-smooth)',
+				'emergency': 'var(--transition-emergency)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
