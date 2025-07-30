@@ -7,8 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
-// IMPORTANT: Replace this with your actual Stripe publishable key
-const stripePromise = loadStripe("pk_test_YOUR_PUBLISHABLE_KEY_HERE");
+// Use your Stripe publishable key here (this is safe to expose)
+const stripePromise = loadStripe("pk_test_51RqcQwBBb55hy3jU9L30IHx9w1sFZ4NoQngm6UwgwyiY1ZBF56QJ5DbeDxMxoHJwWEruoPbmmfrz27ClAS0qe3YO00S4yLN5Va");
 
 interface PaymentFormProps {
   clientSecret: string;
