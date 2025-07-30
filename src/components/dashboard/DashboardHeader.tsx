@@ -166,8 +166,8 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
             <div className="text-center space-y-2">
               <div className={`w-3 h-3 rounded-full mx-auto ${protectionStatus.status === 'Active' ? 'bg-white shadow-sm' : 'bg-red-400'}`}></div>
               <div>
-                <p className="text-xs font-medium text-white/90 uppercase tracking-wide">Protection</p>
-                <p className={`text-sm font-bold ${protectionStatus.status === 'Active' ? 'text-white' : 'text-red-300'}`}>
+                <p className="text-sm font-bold text-black uppercase tracking-wide">Protection</p>
+                <p className={`text-base font-bold ${protectionStatus.status === 'Active' ? 'text-black' : 'text-red-600'}`}>
                   {protectionStatus.status}
                 </p>
               </div>
@@ -177,10 +177,10 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           {/* Location Services */}
           <div className="bg-emergency backdrop-blur-sm border border-emergency-glow/30 rounded-lg p-3 shadow-lg">
             <div className="text-center space-y-2">
-              <MapPin className={`w-4 h-4 mx-auto ${profile?.location_sharing_enabled ? 'text-white' : 'text-red-300'}`} />
+              <MapPin className={`w-4 h-4 mx-auto ${profile?.location_sharing_enabled ? 'text-black' : 'text-red-600'}`} />
               <div>
-                <p className="text-xs font-medium text-white/90 uppercase tracking-wide">Location</p>
-                <p className={`text-sm font-bold ${profile?.location_sharing_enabled ? 'text-white' : 'text-red-300'}`}>
+                <p className="text-sm font-bold text-black uppercase tracking-wide">Location</p>
+                <p className={`text-base font-bold ${profile?.location_sharing_enabled ? 'text-black' : 'text-red-600'}`}>
                   {profile?.location_sharing_enabled ? 'On' : 'Off'}
                 </p>
               </div>
@@ -190,15 +190,15 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
           {/* Profile Completion */}
           <div className="bg-emergency backdrop-blur-sm border border-emergency-glow/30 rounded-lg p-3 shadow-lg">
             <div className="text-center space-y-2">
-              <div className="w-10 h-2 bg-white/20 rounded-full mx-auto overflow-hidden">
+              <div className="w-10 h-2 bg-black/20 rounded-full mx-auto overflow-hidden">
                 <div 
-                  className="h-full bg-white rounded-full transition-all duration-500 shadow-sm"
+                  className="h-full bg-black rounded-full transition-all duration-500 shadow-sm"
                   style={{ width: `${profile?.profile_completion_percentage || 0}%` }}
                 ></div>
               </div>
               <div>
-                <p className="text-xs font-medium text-white/90 uppercase tracking-wide">Profile</p>
-                <p className="text-sm font-bold text-white">{profile?.profile_completion_percentage || 0}%</p>
+                <p className="text-sm font-bold text-black uppercase tracking-wide">Profile</p>
+                <p className="text-base font-bold text-black">{profile?.profile_completion_percentage || 0}%</p>
               </div>
             </div>
           </div>
@@ -222,8 +222,8 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
                 <Phone className="h-4 w-4 animate-pulse" />
               </Button>
               <div>
-                <p className="text-xs font-bold text-white uppercase tracking-wider animate-pulse">EMERGENCY</p>
-                <p className="text-xs font-medium text-red-200">Press for Help</p>
+                <p className="text-sm font-bold text-black uppercase tracking-wider animate-pulse">EMERGENCY</p>
+                <p className="text-sm font-medium text-red-800">Press for Help</p>
               </div>
             </div>
           </div>
