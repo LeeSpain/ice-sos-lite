@@ -18,7 +18,7 @@ serve(async (req) => {
   );
 
   try {
-    const { plan } = await req.json();
+    const { plans } = await req.json();
     
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
@@ -45,23 +45,25 @@ serve(async (req) => {
       "callcenter": { name: "Call Centre (Spain)", amount: 2499 }
     };
 
-    const selectedPlan = planPricing[plan as keyof typeof planPricing];
-    if (!selectedPlan) throw new Error("Invalid plan selected");
-
+    // Create line items for each selected plan
+    const lineItems = plans.map((planId: string) => {
+      const selectedPlan = planPricing[planId as keyof typeof planPricing];
+      if (!selectedPlan) throw new Error(`Invalid plan selected: ${planId}`);
+      
+      return {
+        price_data: {
+          currency: "eur",
+          product_data: { name: selectedPlan.name },
+          unit_amount: selectedPlan.amount,
+          recurring: { interval: "month" },
+        },
+        quantity: 1,
+      };
+    });
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price_data: {
-            currency: "eur",
-            product_data: { name: selectedPlan.name },
-            unit_amount: selectedPlan.amount,
-            recurring: { interval: "month" },
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode: "subscription",
       success_url: `${req.headers.get("origin")}/dashboard?success=true`,
       cancel_url: `${req.headers.get("origin")}/register?canceled=true`,

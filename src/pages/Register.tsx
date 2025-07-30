@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Mail, User, ArrowRight, CheckCircle, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +16,7 @@ const Register = () => {
     firstName: "",
     lastName: "",
     phoneNumber: "",
-    plan: "",
+    plans: [] as string[],
     acceptTerms: false
   });
   const [loading, setLoading] = useState(false);
@@ -35,10 +34,10 @@ const Register = () => {
       }
       setStep(2);
     } else if (step === 2) {
-      if (!formData.plan) {
+      if (formData.plans.length === 0) {
         toast({
           title: "Plan Required",
-          description: "Please select a subscription plan.",
+          description: "Please select at least one subscription plan.",
           variant: "destructive"
         });
         return;
@@ -76,7 +75,7 @@ const Register = () => {
 
       // Create checkout session
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { plan: formData.plan }
+        body: { plans: formData.plans }
       });
 
       if (error) throw error;
@@ -197,45 +196,42 @@ const Register = () => {
               {step === 2 && (
                 <div className="space-y-6">
                   <div className="text-center mb-6">
-                    <h3 className="text-xl font-semibold mb-2">Choose your plan</h3>
-                    <p className="text-muted-foreground">Select the subscription that fits your needs</p>
+                    <h3 className="text-xl font-semibold mb-2">Choose your plan(s)</h3>
+                    <p className="text-muted-foreground">Select one or more subscription plans that fit your needs</p>
                   </div>
 
-                  <RadioGroup value={formData.plan} onValueChange={(value) => setFormData({...formData, plan: value})}>
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                        <RadioGroupItem value="personal" id="personal" />
+                  <div className="space-y-4">
+                    {[
+                      { id: "personal", name: "Personal Account", price: "€1.99/month", description: "Individual emergency contact system" },
+                      { id: "guardian", name: "Guardian Wellness", price: "€4.99/month", description: "Advanced health monitoring and alerts" },
+                      { id: "family", name: "Family Sharing", price: "€0.99/month", description: "Perfect for families with multiple members" },
+                      { id: "callcenter", name: "Call Centre (Spain)", price: "€24.99/month", description: "24/7 professional emergency response" }
+                    ].map((plan) => (
+                      <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
+                        <Checkbox
+                          id={plan.id}
+                          checked={formData.plans.includes(plan.id)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFormData({
+                                ...formData,
+                                plans: [...formData.plans, plan.id]
+                              });
+                            } else {
+                              setFormData({
+                                ...formData,
+                                plans: formData.plans.filter(p => p !== plan.id)
+                              });
+                            }
+                          }}
+                        />
                         <div className="flex-1">
-                          <Label htmlFor="personal" className="font-medium">Personal Account - €1.99/month</Label>
-                          <p className="text-sm text-muted-foreground">Individual emergency contact system</p>
+                          <Label htmlFor={plan.id} className="font-medium">{plan.name} - {plan.price}</Label>
+                          <p className="text-sm text-muted-foreground">{plan.description}</p>
                         </div>
                       </div>
-                      
-                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                        <RadioGroupItem value="guardian" id="guardian" />
-                        <div className="flex-1">
-                          <Label htmlFor="guardian" className="font-medium">Guardian Wellness - €4.99/month</Label>
-                          <p className="text-sm text-muted-foreground">Advanced health monitoring and alerts</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                        <RadioGroupItem value="family" id="family" />
-                        <div className="flex-1">
-                          <Label htmlFor="family" className="font-medium">Family Sharing - €0.99/month</Label>
-                          <p className="text-sm text-muted-foreground">Perfect for families with multiple members</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                        <RadioGroupItem value="callcenter" id="callcenter" />
-                        <div className="flex-1">
-                          <Label htmlFor="callcenter" className="font-medium">Call Centre (Spain) - €24.99/month</Label>
-                          <p className="text-sm text-muted-foreground">24/7 professional emergency response</p>
-                        </div>
-                      </div>
-                    </div>
-                  </RadioGroup>
+                    ))}
+                  </div>
 
                   <div className="flex gap-3">
                     <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
@@ -261,12 +257,32 @@ const Register = () => {
                     <p className="text-sm"><strong>Name:</strong> {formData.firstName} {formData.lastName}</p>
                     <p className="text-sm"><strong>Email:</strong> {formData.email}</p>
                     <p className="text-sm"><strong>Phone:</strong> {formData.phoneNumber}</p>
-                    <p className="text-sm"><strong>Plan:</strong> {
-                      formData.plan === "family" ? "Family Sharing - €0.99/month" :
-                      formData.plan === "personal" ? "Personal Account - €1.99/month" :
-                      formData.plan === "guardian" ? "Guardian Wellness - €4.99/month" :
-                      formData.plan === "callcenter" ? "Call Centre (Spain) - €24.99/month" : ""
-                    }</p>
+                    <div className="text-sm">
+                      <strong>Selected Plans:</strong>
+                      <ul className="mt-1 space-y-1">
+                        {formData.plans.map(planId => {
+                          const planNames = {
+                            personal: { name: "Personal Account", price: 1.99 },
+                            guardian: { name: "Guardian Wellness", price: 4.99 },
+                            family: { name: "Family Sharing", price: 0.99 },
+                            callcenter: { name: "Call Centre (Spain)", price: 24.99 }
+                          };
+                          const plan = planNames[planId as keyof typeof planNames];
+                          return (
+                            <li key={planId} className="flex justify-between">
+                              <span>{plan.name}</span>
+                              <span>€{plan.price}/month</span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <div className="border-t pt-2 mt-2 font-semibold">
+                        <span>Total: €{formData.plans.reduce((total, planId) => {
+                          const prices = { personal: 1.99, guardian: 4.99, family: 0.99, callcenter: 24.99 };
+                          return total + (prices[planId as keyof typeof prices] || 0);
+                        }, 0).toFixed(2)}/month</span>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex items-center space-x-2">

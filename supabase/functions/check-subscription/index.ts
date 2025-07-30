@@ -57,7 +57,7 @@ serve(async (req) => {
         subscription_end: null,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'email' });
-      return new Response(JSON.stringify({ subscribed: false }), {
+      return new Response(JSON.stringify({ subscribed: false, subscription_tiers: [] }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
@@ -69,31 +69,35 @@ serve(async (req) => {
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
-      limit: 1,
+      limit: 10,
     });
     const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionTier = null;
+    let subscriptionTiers: string[] = [];
     let subscriptionEnd = null;
 
     if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
-      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
+      // Get the earliest subscription end date
+      subscriptionEnd = new Date(Math.min(...subscriptions.data.map(sub => sub.current_period_end * 1000))).toISOString();
+      logStep("Active subscriptions found", { count: subscriptions.data.length, endDate: subscriptionEnd });
       
-      const priceId = subscription.items.data[0].price.id;
-      const price = await stripe.prices.retrieve(priceId);
-      const amount = price.unit_amount || 0;
-      
-      if (amount === 99) {
-        subscriptionTier = "Family Sharing";
-      } else if (amount === 199) {
-        subscriptionTier = "Personal Account";
-      } else if (amount === 499) {
-        subscriptionTier = "Guardian Wellness"; 
-      } else if (amount === 2499) {
-        subscriptionTier = "Call Centre";
+      // Collect all subscription tiers
+      for (const subscription of subscriptions.data) {
+        for (const item of subscription.items.data) {
+          const price = await stripe.prices.retrieve(item.price.id);
+          const amount = price.unit_amount || 0;
+          
+          if (amount === 99) {
+            subscriptionTiers.push("Family Sharing");
+          } else if (amount === 199) {
+            subscriptionTiers.push("Personal Account");
+          } else if (amount === 499) {
+            subscriptionTiers.push("Guardian Wellness"); 
+          } else if (amount === 2499) {
+            subscriptionTiers.push("Call Centre");
+          }
+        }
       }
-      logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
+      logStep("Determined subscription tiers", { tiers: subscriptionTiers });
     } else {
       logStep("No active subscription found");
     }
@@ -103,15 +107,16 @@ serve(async (req) => {
       user_id: user.id,
       stripe_customer_id: customerId,
       subscribed: hasActiveSub,
-      subscription_tier: subscriptionTier,
+      subscription_tier: subscriptionTiers.join(", "),
       subscription_end: subscriptionEnd,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'email' });
 
-    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
+    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTiers });
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
-      subscription_tier: subscriptionTier,
+      subscription_tier: subscriptionTiers.join(", "),
+      subscription_tiers: subscriptionTiers,
       subscription_end: subscriptionEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
