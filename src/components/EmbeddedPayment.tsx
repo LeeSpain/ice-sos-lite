@@ -78,8 +78,12 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement />
-      <Button 
+      <PaymentElement 
+        options={{
+          layout: "tabs"
+        }}
+      />
+      <Button
         type="submit" 
         disabled={!stripe || isProcessing} 
         className="w-full bg-emergency hover:bg-emergency/90"
