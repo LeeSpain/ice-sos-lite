@@ -204,7 +204,7 @@ const EmbeddedPayment = ({ plans, onSuccess, onBack }: EmbeddedPaymentProps) => 
           <CardTitle className="text-center">💳 Secure Payment</CardTitle>
         </CardHeader>
         <CardContent>
-          {clientSecret && (
+          {clientSecret ? (
             <Elements stripe={stripePromise} options={{ clientSecret }}>
               <PaymentForm
                 clientSecret={clientSecret}
@@ -216,6 +216,11 @@ const EmbeddedPayment = ({ plans, onSuccess, onBack }: EmbeddedPaymentProps) => 
                 }}
               />
             </Elements>
+          ) : (
+            <div className="flex items-center justify-center p-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="ml-2">Loading payment form...</span>
+            </div>
           )}
         </CardContent>
       </Card>
