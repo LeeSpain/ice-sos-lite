@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, MapPin, Brain, Users, Phone, Download, Smartphone } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Pricing = () => {
   const globalPlans = [
@@ -79,10 +80,10 @@ const Pricing = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Start Free, Upgrade When Ready
+            Choose Your Protection Plan
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Download the app for free, then choose the protection level that fits your needs.
+            Download the app and select the emergency protection level that fits your needs.
           </p>
         </div>
 
@@ -92,7 +93,7 @@ const Pricing = () => {
             <div className="absolute inset-0 bg-gradient-to-br from-muted/50 via-secondary to-muted"></div>
             <CardHeader className="relative text-center py-16 px-8">
               <Badge className="bg-emergency text-white w-fit mx-auto mb-6 text-sm font-semibold px-4 py-2 shadow-lg">
-                FREE TO DOWNLOAD
+                PROFESSIONAL APP
               </Badge>
               <div className="w-24 h-24 mx-auto mb-8 bg-white shadow-lg rounded-2xl flex items-center justify-center border border-border/20">
                 <Smartphone className="h-12 w-12 text-primary" />
@@ -101,8 +102,8 @@ const Pricing = () => {
                 Download ICE SOS Lite
               </CardTitle>
               <CardDescription className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Start protecting yourself today with our professional emergency app. 
-                Essential SOS features included at no cost.
+                Professional emergency protection platform for individuals and families. 
+                Choose your subscription plan to activate full protection features.
               </CardDescription>
             </CardHeader>
             <CardContent className="relative px-8 pb-16">
@@ -124,13 +125,15 @@ const Pricing = () => {
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Download className="mr-2 h-5 w-5" />
-                  Download for iOS
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Link to="/register">
+                    <Download className="mr-2 h-5 w-5" />
+                    Get Started Now
+                  </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
                   <Download className="mr-2 h-5 w-5" />
-                  Download for Android
+                  View Plans
                 </Button>
               </div>
             </CardContent>
@@ -177,10 +180,11 @@ const Pricing = () => {
                       ))}
                     </ul>
                     <Button 
+                      asChild
                       className="w-full" 
                       variant={index === 1 ? "default" : "outline"}
                     >
-                      Start Free Trial
+                      <Link to="/register">Subscribe Now</Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -229,10 +233,11 @@ const Pricing = () => {
                       ))}
                     </ul>
                     <Button 
+                      asChild
                       className="w-full" 
                       variant="default"
                     >
-                      Get Started
+                      <Link to="/register">Subscribe Now</Link>
                     </Button>
                   </CardContent>
                 </Card>

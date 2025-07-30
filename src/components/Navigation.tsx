@@ -30,7 +30,7 @@ const Navigation = () => {
               <Link to="/auth">Sign In</Link>
             </Button>
             <Button asChild size="sm" className="shadow-primary">
-              <Link to="/register">Join Platform</Link>
+              <Link to="/register">Subscribe Now</Link>
             </Button>
           </div>
 
@@ -59,7 +59,7 @@ const Navigation = () => {
                   <Link to="/auth">Sign In</Link>
                 </Button>
                 <Button asChild size="sm" className="shadow-primary">
-                  <Link to="/register">Join Platform</Link>
+                  <Link to="/register">Subscribe Now</Link>
                 </Button>
               </div>
             </div>

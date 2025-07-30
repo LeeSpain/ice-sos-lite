@@ -35,10 +35,10 @@ const Hero = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button asChild size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
-                <Link to="/register">Join Platform</Link>
+                <Link to="/register">Get Started Now</Link>
               </Button>
               <Button size="xl" variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                Download App
+                View Pricing Plans
               </Button>
             </div>
           </div>
