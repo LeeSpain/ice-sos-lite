@@ -4,7 +4,10 @@ import heroImage from "@/assets/hero-emergency.jpg";
 
 const Hero = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
+      {/* Darker Shadow Overlay for Professional Look */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30" />
+      
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:20px_20px]" />
@@ -14,14 +17,14 @@ const Hero = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div className="text-center lg:text-left text-white">
-            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-              <Shield className="h-4 w-4 text-primary-glow" />
-              <span className="text-sm font-medium">Device-Free Emergency Protection</span>
+            <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
+              <Shield className="h-4 w-4 text-emergency-glow" />
+              <span className="text-sm font-medium text-emergency-glow">Device-Free Emergency Protection</span>
             </div>
             
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-emergency drop-shadow-lg">
               Transform Your Phone Into a 
-              <span className="text-primary-glow"> Life-Saving</span> Assistant
+              <span className="text-emergency-glow drop-shadow-md"> Life-Saving</span> Assistant
             </h1>
             
             <p className="text-xl md:text-2xl mb-8 text-white/90 leading-relaxed">
@@ -41,22 +44,22 @@ const Hero = () => {
             {/* Features Icons */}
             <div className="grid grid-cols-3 gap-8 max-w-md mx-auto lg:mx-0">
               <div className="text-center">
-                <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Heart className="h-6 w-6 text-emergency-glow" />
+                <div className="w-12 h-12 bg-emergency/20 rounded-full flex items-center justify-center mx-auto mb-2 shadow-emergency border border-emergency/30 backdrop-blur-sm">
+                  <Heart className="h-6 w-6 text-emergency" />
                 </div>
-                <p className="text-sm text-white/80">24/7 Guardian AI</p>
+                <p className="text-sm text-emergency-glow font-medium">24/7 Guardian AI</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <MapPin className="h-6 w-6 text-primary-glow" />
+                <div className="w-12 h-12 bg-emergency/20 rounded-full flex items-center justify-center mx-auto mb-2 shadow-emergency border border-emergency/30 backdrop-blur-sm">
+                  <MapPin className="h-6 w-6 text-emergency" />
                 </div>
-                <p className="text-sm text-white/80">GPS Location</p>
+                <p className="text-sm text-emergency-glow font-medium">GPS Location</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-2">
-                  <Smartphone className="h-6 w-6 text-guardian-glow" />
+                <div className="w-12 h-12 bg-emergency/20 rounded-full flex items-center justify-center mx-auto mb-2 shadow-emergency border border-emergency/30 backdrop-blur-sm">
+                  <Smartphone className="h-6 w-6 text-emergency" />
                 </div>
-                <p className="text-sm text-white/80">Multilingual</p>
+                <p className="text-sm text-emergency-glow font-medium">Multilingual</p>
               </div>
             </div>
           </div>
