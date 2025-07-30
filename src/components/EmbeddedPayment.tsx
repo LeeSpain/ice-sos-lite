@@ -7,8 +7,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
-// Use your Stripe publishable key here (this is safe to expose)
-const stripePromise = loadStripe("pk_test_51RqcQwBBb55hy3jUdJKoKA7xHAFUBWz5Dz8tO3JKnhMGIwOFOgJ1nHb7bnhDcTFJxKqLxOJKqqEMRYx8qYOLYLUl00CiHdcYkH");
+// IMPORTANT: Replace this with your actual Stripe publishable key
+const stripePromise = loadStripe("pk_test_YOUR_PUBLISHABLE_KEY_HERE");
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -23,6 +23,9 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+
+  // Debug logging
+  console.log("PaymentForm rendered", { stripe: !!stripe, elements: !!elements, clientSecret: !!clientSecret });
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -131,16 +134,21 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, onSuccess, onB
   }, 0);
 
   const initializePayment = async () => {
+    console.log("Initializing payment...", { plans, userEmail, firstName, lastName });
     try {
       const { data, error } = await supabase.functions.invoke('create-payment-intent', {
         body: { plans, email: userEmail, firstName, lastName }
       });
 
+      console.log("Payment intent response:", { data, error });
+
       if (error) throw error;
 
+      console.log("Setting client secret:", data.client_secret);
       setClientSecret(data.client_secret);
       setCustomerId(data.customer_id);
     } catch (error) {
+      console.error("Payment initialization error:", error);
       toast({
         title: "Error",
         description: "Failed to initialize payment. Please try again.",
