@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import Navigation from "@/components/Navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import PersonalDetailsCard from "@/components/dashboard/PersonalDetailsCard";
 import EmergencyContactsCard from "@/components/dashboard/EmergencyContactsCard";
 import MedicalInfoCard from "@/components/dashboard/MedicalInfoCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
@@ -64,7 +64,6 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero">
-        <Navigation />
         <div className="container mx-auto px-4 py-24">
           <div className="text-center text-white">Loading dashboard...</div>
         </div>
@@ -74,7 +73,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-muted/20 to-muted/50">
-      <Navigation />
       
       {/* Dashboard Header */}
       <DashboardHeader profile={profile} subscription={subscription} />
@@ -86,6 +84,12 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Primary Information */}
             <div className="lg:col-span-2 space-y-6">
+              {/* Personal Details */}
+              <PersonalDetailsCard 
+                profile={profile} 
+                onProfileUpdate={loadProfile}
+              />
+              
               {/* Emergency Profile Section */}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <EmergencyContactsCard 
