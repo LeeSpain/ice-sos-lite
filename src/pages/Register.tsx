@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Shield, Mail, User, ArrowRight, CheckCircle, Phone } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Shield, Mail, User, ArrowRight, CheckCircle, Phone, CreditCard, MapPin, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
@@ -17,6 +19,15 @@ const Register = () => {
     lastName: "",
     phoneNumber: "",
     plans: [] as string[],
+    // Payment step
+    paymentMethod: "",
+    // Questionnaire step
+    emergencyContact1: "",
+    emergencyContact2: "",
+    medicalConditions: "",
+    allergies: "",
+    currentLocation: "",
+    preferredLanguage: "English",
     acceptTerms: false
   });
   const [loading, setLoading] = useState(false);
@@ -43,14 +54,18 @@ const Register = () => {
         return;
       }
       setStep(3);
+    } else if (step === 3) {
+      // Payment overview step - no validation needed, just move to questionnaire
+      setStep(4);
     }
   };
 
   const handleCheckout = async () => {
-    if (!formData.acceptTerms) {
+    // Validate questionnaire fields
+    if (!formData.emergencyContact1 || !formData.currentLocation || !formData.acceptTerms) {
       toast({
-        title: "Terms Required",
-        description: "Please accept the terms and conditions to continue.",
+        title: "Missing Information",
+        description: "Please complete all required fields and accept the terms.",
         variant: "destructive"
       });
       return;
@@ -67,6 +82,12 @@ const Register = () => {
             first_name: formData.firstName,
             last_name: formData.lastName,
             phone_number: formData.phoneNumber,
+            emergency_contact_1: formData.emergencyContact1,
+            emergency_contact_2: formData.emergencyContact2,
+            medical_conditions: formData.medicalConditions,
+            allergies: formData.allergies,
+            current_location: formData.currentLocation,
+            preferred_language: formData.preferredLanguage,
           }
         }
       });
@@ -247,19 +268,15 @@ const Register = () => {
               {step === 3 && (
                 <div className="space-y-6">
                   <div className="text-center mb-6">
-                    <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Complete your subscription</h3>
-                    <p className="text-muted-foreground">Review your selection and proceed to payment</p>
+                    <CreditCard className="h-16 w-16 text-primary mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">Payment Overview</h3>
+                    <p className="text-muted-foreground">Review your selection and payment details</p>
                   </div>
 
                   <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                    <h4 className="font-medium">Summary:</h4>
-                    <p className="text-sm"><strong>Name:</strong> {formData.firstName} {formData.lastName}</p>
-                    <p className="text-sm"><strong>Email:</strong> {formData.email}</p>
-                    <p className="text-sm"><strong>Phone:</strong> {formData.phoneNumber}</p>
+                    <h4 className="font-medium">Order Summary:</h4>
                     <div className="text-sm">
-                      <strong>Selected Plans:</strong>
-                      <ul className="mt-1 space-y-1">
+                      <ul className="space-y-2">
                         {formData.plans.map(planId => {
                           const planNames = {
                             personal: { name: "Personal Account", price: 1.99 },
@@ -269,20 +286,131 @@ const Register = () => {
                           };
                           const plan = planNames[planId as keyof typeof planNames];
                           return (
-                            <li key={planId} className="flex justify-between">
-                              <span>{plan.name}</span>
-                              <span>€{plan.price}/month</span>
+                            <li key={planId} className="flex justify-between p-2 bg-white rounded border">
+                              <span className="font-medium">{plan.name}</span>
+                              <span className="text-primary">€{plan.price}/month</span>
                             </li>
                           );
                         })}
                       </ul>
-                      <div className="border-t pt-2 mt-2 font-semibold">
-                        <span>Total: €{formData.plans.reduce((total, planId) => {
-                          const prices = { personal: 1.99, guardian: 4.99, family: 0.99, callcenter: 24.99 };
-                          return total + (prices[planId as keyof typeof prices] || 0);
-                        }, 0).toFixed(2)}/month</span>
+                      <div className="border-t pt-3 mt-3">
+                        <div className="flex justify-between text-lg font-bold">
+                          <span>Total Monthly:</span>
+                          <span className="text-primary">€{formData.plans.reduce((total, planId) => {
+                            const prices = { personal: 1.99, guardian: 4.99, family: 0.99, callcenter: 24.99 };
+                            return total + (prices[planId as keyof typeof prices] || 0);
+                          }, 0).toFixed(2)}</span>
+                        </div>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 className="font-medium text-blue-900 mb-2">💳 Secure Payment Processing</h4>
+                    <p className="text-sm text-blue-800">
+                      Payment will be processed securely through Stripe. You'll be redirected to enter your card details safely.
+                    </p>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                      Back to Plans
+                    </Button>
+                    <Button onClick={handleNextStep} size="lg" className="flex-1 bg-primary hover:bg-primary/90">
+                      Continue to Details <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="space-y-6">
+                  <div className="text-center mb-6">
+                    <Heart className="h-16 w-16 text-emergency mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">Complete Your Emergency Profile</h3>
+                    <p className="text-muted-foreground">Help us protect you better with these details</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContact1">Primary Emergency Contact *</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="emergencyContact1"
+                          className="pl-10"
+                          placeholder="Name and phone number"
+                          value={formData.emergencyContact1}
+                          onChange={(e) => setFormData({...formData, emergencyContact1: e.target.value})}
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="emergencyContact2">Secondary Emergency Contact</Label>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="emergencyContact2"
+                          className="pl-10"
+                          placeholder="Name and phone number"
+                          value={formData.emergencyContact2}
+                          onChange={(e) => setFormData({...formData, emergencyContact2: e.target.value})}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="currentLocation">Current Location/Address *</Label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="currentLocation"
+                        className="pl-10"
+                        placeholder="Your current address"
+                        value={formData.currentLocation}
+                        onChange={(e) => setFormData({...formData, currentLocation: e.target.value})}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="medicalConditions">Medical Conditions</Label>
+                    <Textarea
+                      id="medicalConditions"
+                      placeholder="Any medical conditions emergency responders should know about"
+                      value={formData.medicalConditions}
+                      onChange={(e) => setFormData({...formData, medicalConditions: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="allergies">Allergies</Label>
+                    <Textarea
+                      id="allergies"
+                      placeholder="Any allergies emergency responders should know about"
+                      value={formData.allergies}
+                      onChange={(e) => setFormData({...formData, allergies: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="preferredLanguage">Preferred Language</Label>
+                    <Select value={formData.preferredLanguage} onValueChange={(value) => setFormData({...formData, preferredLanguage: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your preferred language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="English">English</SelectItem>
+                        <SelectItem value="Spanish">Spanish</SelectItem>
+                        <SelectItem value="French">French</SelectItem>
+                        <SelectItem value="German">German</SelectItem>
+                        <SelectItem value="Italian">Italian</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -300,8 +428,8 @@ const Register = () => {
                   </div>
 
                   <div className="flex gap-3">
-                    <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
-                      Back
+                    <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
+                      Back to Payment
                     </Button>
                     <Button 
                       onClick={handleCheckout} 
@@ -309,7 +437,7 @@ const Register = () => {
                       className="flex-1 bg-emergency hover:bg-emergency/90"
                       disabled={loading}
                     >
-                      {loading ? "Processing..." : "Subscribe & Pay"}
+                      {loading ? "Processing..." : "Complete Registration & Pay"}
                     </Button>
                   </div>
                   
