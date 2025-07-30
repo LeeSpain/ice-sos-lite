@@ -114,54 +114,54 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
         {/* Compact Professional Status Grid */}
         <div className="grid grid-cols-4 gap-2 mb-3">
           {/* Protection Status */}
-          <div className="bg-white/5 backdrop-blur-sm border border-emergency/40 rounded-md p-2">
+          <div className="bg-emergency/90 backdrop-blur-sm border border-emergency rounded-md p-2">
             <div className="text-center">
-              <div className={`w-2 h-2 rounded-full mx-auto mb-1 ${protectionStatus.status === 'Active' ? 'bg-emergency' : 'bg-primary'}`}></div>
-              <p className="text-xs font-medium text-white/90 mb-0.5">Protection</p>
-              <p className={`text-xs font-semibold ${protectionStatus.status === 'Active' ? 'text-emergency' : 'text-primary'}`}>
+              <div className={`w-2 h-2 rounded-full mx-auto mb-1 ${protectionStatus.status === 'Active' ? 'bg-white' : 'bg-red-500'}`}></div>
+              <p className="text-xs font-medium text-white mb-0.5">Protection</p>
+              <p className={`text-xs font-semibold ${protectionStatus.status === 'Active' ? 'text-white' : 'text-red-500'}`}>
                 {protectionStatus.status}
               </p>
             </div>
           </div>
 
           {/* Location Services */}
-          <div className="bg-white/5 backdrop-blur-sm border border-emergency/40 rounded-md p-2">
+          <div className="bg-emergency/90 backdrop-blur-sm border border-emergency rounded-md p-2">
             <div className="text-center">
-              <MapPin className={`w-3 h-3 mx-auto mb-1 ${profile?.location_sharing_enabled ? 'text-emergency' : 'text-primary'}`} />
-              <p className="text-xs font-medium text-white/90 mb-0.5">Location</p>
-              <p className={`text-xs font-semibold ${profile?.location_sharing_enabled ? 'text-emergency' : 'text-primary'}`}>
+              <MapPin className={`w-3 h-3 mx-auto mb-1 ${profile?.location_sharing_enabled ? 'text-white' : 'text-red-500'}`} />
+              <p className="text-xs font-medium text-white mb-0.5">Location</p>
+              <p className={`text-xs font-semibold ${profile?.location_sharing_enabled ? 'text-white' : 'text-red-500'}`}>
                 {profile?.location_sharing_enabled ? 'On' : 'Off'}
               </p>
             </div>
           </div>
 
           {/* Profile Completion */}
-          <div className="bg-white/5 backdrop-blur-sm border border-emergency/40 rounded-md p-2">
+          <div className="bg-emergency/90 backdrop-blur-sm border border-emergency rounded-md p-2">
             <div className="text-center">
-              <div className="w-8 h-1 bg-white/20 rounded-full mx-auto mb-1 overflow-hidden">
+              <div className="w-8 h-1 bg-white/30 rounded-full mx-auto mb-1 overflow-hidden">
                 <div 
-                  className="h-full bg-emergency rounded-full transition-all duration-300"
+                  className="h-full bg-white rounded-full transition-all duration-300"
                   style={{ width: `${profile?.profile_completion_percentage || 0}%` }}
                 ></div>
               </div>
-              <p className="text-xs font-medium text-white/90 mb-0.5">Profile</p>
-              <p className="text-xs font-semibold text-emergency">{profile?.profile_completion_percentage || 0}%</p>
+              <p className="text-xs font-medium text-white mb-0.5">Profile</p>
+              <p className="text-xs font-semibold text-white">{profile?.profile_completion_percentage || 0}%</p>
             </div>
           </div>
 
           {/* Emergency SOS */}
-          <div className="bg-gradient-to-br from-emergency/20 to-emergency/30 backdrop-blur-sm border border-emergency/60 rounded-md p-2">
+          <div className="bg-emergency backdrop-blur-sm border border-emergency rounded-md p-2">
             <div className="text-center">
               <Button
                 variant="emergency"
                 size="sm"
                 onClick={handleEmergency}
-                className="w-6 h-6 rounded-full bg-emergency text-white hover:bg-emergency/90 shadow-md mb-1 emergency-pulse mx-auto"
+                className="w-6 h-6 rounded-full bg-white text-emergency hover:bg-gray-100 shadow-md mb-1 emergency-pulse mx-auto"
                 aria-label="Emergency SOS Button"
               >
                 <Phone className="h-2.5 w-2.5" />
               </Button>
-              <p className="text-xs font-medium text-emergency">SOS</p>
+              <p className="text-xs font-medium text-white">SOS</p>
             </div>
           </div>
         </div>
