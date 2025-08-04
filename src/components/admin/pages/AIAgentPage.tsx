@@ -104,9 +104,27 @@ Your personality: Professional yet warm, safety-focused, helpful, and empathetic
   };
 
   const handleSettingsUpdate = async () => {
-    // In a real implementation, this would save to a database
-    console.log('Updating AI settings:', aiSettings);
-    // You could save to a separate AI config table in Supabase
+    try {
+      // Test the AI connection by making a test call
+      const { data, error } = await supabase.functions.invoke('ai-chat', {
+        body: {
+          message: 'Test connection - please respond with "AI agent is working correctly"',
+          sessionId: 'admin-test-' + Date.now(),
+          userId: null
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('AI settings updated successfully:', aiSettings);
+      console.log('AI test response:', data);
+      // In a real implementation, save settings to database
+    } catch (error) {
+      console.error('Error updating AI settings:', error);
+      throw error;
+    }
   };
 
   const restartAIAgent = async () => {
@@ -363,7 +381,29 @@ Your personality: Professional yet warm, safety-focused, helpful, and empathetic
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-20 flex-col">
+            <Button 
+              variant="outline" 
+              className="h-20 flex-col"
+              onClick={async () => {
+                try {
+                  const { data, error } = await supabase.functions.invoke('ai-chat', {
+                    body: {
+                      message: 'Hello Emma, this is a test from the admin panel. Please introduce yourself and confirm you are working properly.',
+                      sessionId: 'admin-test-' + Date.now(),
+                      userId: null
+                    }
+                  });
+                  
+                  if (error) throw error;
+                  
+                  console.log('AI Test Response:', data);
+                  alert('AI Test Successful! Check console for response.');
+                } catch (error) {
+                  console.error('AI Test Error:', error);
+                  alert('AI Test Failed: ' + error.message);
+                }
+              }}
+            >
               <MessageSquare className="h-5 w-5 mb-2" />
               Test Chat
             </Button>
