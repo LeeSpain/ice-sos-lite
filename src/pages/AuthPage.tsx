@@ -290,7 +290,7 @@ const AuthPage = () => {
             {/* Testing Link */}
             <div className="mt-4 text-center">
               <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
-                <Link to="/dashboard">Members Dashboard (Testing) →</Link>
+                <Link to="/test-dashboard">Members Dashboard (Testing) →</Link>
               </Button>
             </div>
 
