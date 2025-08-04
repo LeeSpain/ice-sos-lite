@@ -6,6 +6,8 @@ import TestPage from "./pages/TestPage";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
 import Register from "./pages/Register";
+import AIRegister from "./pages/AIRegister";
+import RegistrationSuccess from "./pages/RegistrationSuccess";
 import Dashboard from "./pages/Dashboard";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import AdminDashboard from "./components/ai-chat/AdminDashboard";
@@ -19,11 +21,13 @@ const App = () => {
           <Route path="/test" element={<TestPage />} />
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/register" element={
+          <Route path="/register" element={<AIRegister />} />
+          <Route path="/register-classic" element={
             <ProtectedRoute>
               <Register />
             </ProtectedRoute>
           } />
+          <Route path="/registration-success" element={<RegistrationSuccess />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <SimpleDashboard />

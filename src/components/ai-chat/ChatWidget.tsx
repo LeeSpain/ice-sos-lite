@@ -39,7 +39,7 @@ const ChatWidget: React.FC = () => {
       setMessages([{
         id: '1',
         type: 'ai',
-        content: "Hi! I'm Emma, your personal safety advisor. I'm here to help you find the perfect protection plan for you and your family. Are you looking to protect yourself, a family member, or an elderly relative?",
+        content: "Hi! I'm Emma, your personal safety advisor at ICE SOS Lite. I'm here to help answer any questions about our emergency protection services. How can I assist you today?",
         timestamp: new Date()
       }]);
     }
