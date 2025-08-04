@@ -54,25 +54,32 @@ serve(async (req) => {
       logStep("Created new customer", { customerId });
     }
 
-    // Plan pricing mapping - updated structure
-    const planPricing = {
-      "basic": { name: "Basic Protection", amount: 199 },      // €1.99
-      "premium": { name: "Premium Protection", amount: 499 },  // €4.99
-      "family": { name: "Family Connection", amount: 199 }     // €1.99
-    };
+    // Fetch plans from database
+    const { data: dbPlans, error: planError } = await supabaseClient
+      .from('subscription_plans')
+      .select('id, name, price, currency')
+      .in('id', plans);
+
+    if (planError) throw new Error(`Error fetching plans: ${planError.message}`);
+    if (!dbPlans || dbPlans.length === 0) throw new Error("No valid plans found");
+    
+    logStep("Fetched plans from database", { dbPlans });
 
     // Calculate total amount
     const totalAmount = plans.reduce((total: number, planId: string) => {
-      const plan = planPricing[planId as keyof typeof planPricing];
-      return total + (plan?.amount || 0);
+      const plan = dbPlans.find(p => p.id === planId);
+      return total + (plan ? Math.round(parseFloat(plan.price.toString()) * 100) : 0); // Convert to cents
     }, 0);
+
+    // Use the currency from the first plan (assuming all plans use the same currency)
+    const currency = dbPlans[0]?.currency?.toLowerCase() || 'eur';
 
     logStep("Calculated total", { plans, totalAmount });
 
     // Create payment intent for the total amount
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmount,
-      currency: "eur",
+      currency: currency,
       customer: customerId,
       metadata: {
         email: email,

@@ -19,6 +19,7 @@ const Register = () => {
     firstName: "",
     lastName: "",
     phoneNumber: "",
+    password: "",
     plans: [] as string[],
     // Payment step
     paymentMethod: "",
@@ -284,6 +285,7 @@ const Register = () => {
                     userEmail={formData.email}
                     firstName={formData.firstName}
                     lastName={formData.lastName}
+                    password={formData.password || Math.random().toString(36).slice(-8)}
                     onSuccess={handlePaymentSuccess}
                     onBack={() => setStep(2)}
                   />

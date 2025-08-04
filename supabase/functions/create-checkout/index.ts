@@ -37,23 +37,25 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
-    // Plan pricing mapping - updated structure
-    const planPricing = {
-      "basic": { name: "Basic Protection", amount: 199 },      // €1.99
-      "premium": { name: "Premium Protection", amount: 499 },  // €4.99
-      "family": { name: "Family Connection", amount: 199 }     // €1.99
-    };
+    // Fetch plans from database
+    const { data: dbPlans, error: planError } = await supabaseClient
+      .from('subscription_plans')
+      .select('id, name, price, currency')
+      .in('id', plans);
+
+    if (planError) throw new Error(`Error fetching plans: ${planError.message}`);
+    if (!dbPlans || dbPlans.length === 0) throw new Error("No valid plans found");
 
     // Create line items for each selected plan
     const lineItems = plans.map((planId: string) => {
-      const selectedPlan = planPricing[planId as keyof typeof planPricing];
+      const selectedPlan = dbPlans.find(p => p.id === planId);
       if (!selectedPlan) throw new Error(`Invalid plan selected: ${planId}`);
       
       return {
         price_data: {
-          currency: "eur",
+          currency: selectedPlan.currency.toLowerCase(),
           product_data: { name: selectedPlan.name },
-          unit_amount: selectedPlan.amount,
+          unit_amount: Math.round(parseFloat(selectedPlan.price.toString()) * 100), // Convert to cents
           recurring: { interval: "month" },
         },
         quantity: 1,

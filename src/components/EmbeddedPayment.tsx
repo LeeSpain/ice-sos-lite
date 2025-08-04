@@ -110,11 +110,12 @@ interface EmbeddedPaymentProps {
   userEmail: string;
   firstName: string;
   lastName: string;
+  password: string;
   onSuccess: () => void;
   onBack: () => void;
 }
 
-const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, onSuccess, onBack }: EmbeddedPaymentProps) => {
+const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, onSuccess, onBack }: EmbeddedPaymentProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
