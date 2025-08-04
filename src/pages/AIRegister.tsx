@@ -110,6 +110,13 @@ const AIRegister = () => {
     setHasFamilyPlan(checked);
   };
 
+  // Simple validation for button disabled state (no side effects)
+  const isFormValid = () => {
+    const { firstName, lastName, email, password, phone, city, country } = personalDetails;
+    return firstName && lastName && email && password && phone && city && country && password.length >= 6;
+  };
+
+  // Validation with toast messages (only called on submit)
   const validatePersonalDetails = () => {
     const { firstName, lastName, email, password, phone, city, country } = personalDetails;
     if (!firstName || !lastName || !email || !password || !phone || !city || !country) {
@@ -479,7 +486,7 @@ const AIRegister = () => {
                       onClick={handleContinueToPayment}
                       className="w-full bg-emergency hover:bg-emergency/90"
                       size="lg"
-                      disabled={!validatePersonalDetails()}
+                      disabled={!isFormValid()}
                     >
                       <CreditCard className="mr-2 h-4 w-4" />
                       Continue to Payment
