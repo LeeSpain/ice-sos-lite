@@ -121,20 +121,47 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, onSu
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Calculate total for display - updated pricing structure
-  const planPricing = {
-    basic: { name: "Basic Protection", price: 1.99 },
-    premium: { name: "Premium Protection", price: 4.99 },
-    family: { name: "Family Connection", price: 1.99 }
-  };
+  // Fetch plan pricing from database for display
+  const [planData, setPlanData] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const fetchPlanData = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('subscription_plans')
+          .select('*')
+          .in('id', plans);
+        
+        if (error) throw error;
+        setPlanData(data || []);
+      } catch (error) {
+        console.error('Error fetching plan data:', error);
+      }
+    };
+    
+    if (plans.length > 0) {
+      fetchPlanData();
+    }
+  }, [plans]);
 
-  const total = plans.reduce((sum, planId) => {
-    const plan = planPricing[planId as keyof typeof planPricing];
-    return sum + (plan?.price || 0);
+  const total = planData.reduce((sum, plan) => {
+    return sum + parseFloat(plan.price.toString());
   }, 0);
 
   const initializePayment = async () => {
     console.log("Initializing payment...", { plans, userEmail, firstName, lastName });
+    
+    if (!plans || plans.length === 0) {
+      console.error("No plans provided to payment initialization");
+      toast({
+        title: "Error",
+        description: "No subscription plans selected. Please go back and select a plan.",
+        variant: "destructive"
+      });
+      setLoading(false);
+      return;
+    }
+    
     try {
       const { data, error } = await supabase.functions.invoke('create-payment-intent', {
         body: { plans, email: userEmail, firstName, lastName }
@@ -171,20 +198,17 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, onSu
         <h4 className="font-medium">Order Summary:</h4>
         <div className="text-sm">
           <ul className="space-y-2">
-            {plans.map(planId => {
-              const plan = planPricing[planId as keyof typeof planPricing];
-              return (
-                <li key={planId} className="flex justify-between p-2 bg-white rounded border">
-                  <span className="font-medium">{plan.name}</span>
-                  <span className="text-primary">€{plan.price}/month</span>
-                </li>
-              );
-            })}
+            {planData.map(plan => (
+              <li key={plan.id} className="flex justify-between p-2 bg-white rounded border">
+                <span className="font-medium">{plan.name}</span>
+                <span className="text-primary">{plan.currency}{parseFloat(plan.price.toString()).toFixed(2)}/{plan.billing_interval}</span>
+              </li>
+            ))}
           </ul>
           <div className="border-t pt-3 mt-3">
             <div className="flex justify-between text-lg font-bold">
               <span>Total Monthly:</span>
-              <span className="text-primary">€{total.toFixed(2)}</span>
+              <span className="text-primary">{planData[0]?.currency || 'EUR'}{total.toFixed(2)}</span>
             </div>
           </div>
         </div>
