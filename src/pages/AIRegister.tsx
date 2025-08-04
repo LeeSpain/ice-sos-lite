@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -99,6 +99,14 @@ const AIRegister = () => {
   const getMainPlans = () => dbPlans.filter(p => !p.name.includes('Family'));
   const getFamilyPlan = () => dbPlans.find(p => p.name.includes('Family'));
 
+  // Emma AI interaction handler
+  const handleEmmaClick = useCallback(() => {
+    toast({
+      title: "👋 Hi there! I'm Emma",
+      description: "I'm here to help you stay safe! Complete your registration to unlock my full AI assistance features.",
+    });
+  }, [toast]);
+
   const handlePersonalDetailsChange = (field: keyof PersonalDetails, value: string) => {
     setPersonalDetails(prev => ({
       ...prev,
@@ -180,12 +188,7 @@ const AIRegister = () => {
       
       {/* Enhanced Emma AI Assistant */}
       <div className="fixed top-20 right-4 z-50">
-        <div className="relative group cursor-pointer" onClick={() => {
-          toast({
-            title: "👋 Hi there! I'm Emma",
-            description: "I'm here to help you stay safe! Complete your registration to unlock my full AI assistance features.",
-          });
-        }}>
+        <div className="relative group cursor-pointer" onClick={handleEmmaClick}>
           {/* Floating animation wrapper */}
           <div className="animate-bounce">
             {/* Main container with gradient and glow */}
