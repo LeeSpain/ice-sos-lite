@@ -20,59 +20,39 @@ interface Product {
   status: string;
 }
 
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  billing_interval: string;
+  description: string;
+  features: string[];
+  is_active: boolean;
+  is_popular: boolean;
+  sort_order: number;
+  stripe_price_id?: string;
+}
+
 const Pricing = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
 
-  const globalPlans = [
-    {
-      name: "Personal Contact",
-      price: "€1.99",
-      period: "/month",
-      description: "Essential emergency protection",
-      badge: "Global",
-      badgeColor: "bg-primary",
-      icon: Phone,
-      features: [
-        "Up to 5 personal emergency contacts",
-        "SOS sends SMS + GPS location",
-        "Available in every country",
-        "Multilingual support",
-        "Basic emergency alerts"
-      ]
-    },
-    {
-      name: "Guardian Wellness",
-      price: "€4.99",
-      period: "/month",
-      description: "AI-powered health monitoring",
-      badge: "Global",
-      badgeColor: "bg-guardian",
-      icon: Brain,
-      features: [
-        "AI daily check-ins (voice or screen)",
-        "Missed check-in alerts",
-        "Wellness reminders (meds, hydration)",
-        "Weekly summaries to family",
-        "Available globally in local language"
-      ]
-    },
-    {
-      name: "Family Sharing",
-      price: "€0.99",
-      period: "/member/month",
-      description: "Connect your loved ones",
-      badge: "Global",
-      badgeColor: "bg-wellness",
-      icon: Users,
-      features: [
-        "Independent app download",
-        "Connect via sharing code",
-        "View alerts and SOS events",
-        "Guardian reports access",
-        "Wellness status visibility"
-      ]
-    }
-  ];
+  // Icon mapping for subscription plans
+  const getIconForPlan = (planName: string) => {
+    if (planName.toLowerCase().includes('basic') || planName.toLowerCase().includes('personal')) return Phone;
+    if (planName.toLowerCase().includes('premium') || planName.toLowerCase().includes('guardian')) return Brain;
+    if (planName.toLowerCase().includes('family')) return Users;
+    return Phone; // default
+  };
+
+  // Badge color mapping for subscription plans
+  const getBadgeColorForPlan = (planName: string) => {
+    if (planName.toLowerCase().includes('basic') || planName.toLowerCase().includes('personal')) return "bg-primary";
+    if (planName.toLowerCase().includes('premium') || planName.toLowerCase().includes('guardian')) return "bg-guardian";
+    if (planName.toLowerCase().includes('family')) return "bg-wellness";
+    return "bg-primary"; // default
+  };
 
   const regionalPlans = [
     {
@@ -95,6 +75,7 @@ const Pricing = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchSubscriptionPlans();
   }, []);
 
   const fetchProducts = async () => {
@@ -109,6 +90,53 @@ const Pricing = () => {
       setProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
+    }
+  };
+
+  const fetchSubscriptionPlans = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      
+      // Transform the data to match our interface
+      const transformedPlans = (data || []).map(plan => ({
+        ...plan,
+        features: Array.isArray(plan.features) 
+          ? plan.features.filter((f): f is string => typeof f === 'string')
+          : [],
+        description: plan.description || '',
+        sort_order: plan.sort_order || 0,
+        stripe_price_id: plan.stripe_price_id || undefined
+      }));
+      
+      setSubscriptionPlans(transformedPlans);
+    } catch (error) {
+      console.error('Error fetching subscription plans:', error);
+    }
+  };
+
+  const handleSubscriptionPurchase = async (plan: SubscriptionPlan) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          plans: [plan.id]
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error creating checkout:', error);
+      alert('Error processing subscription. Please try again.');
     }
   };
 
@@ -212,13 +240,14 @@ const Pricing = () => {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {globalPlans.map((plan, index) => {
-              const Icon = plan.icon;
+            {subscriptionPlans.map((plan, index) => {
+              const Icon = getIconForPlan(plan.name);
+              const badgeColor = getBadgeColorForPlan(plan.name);
               return (
-                <Card key={index} className="relative border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                <Card key={plan.id} className="relative border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:scale-105">
                   <CardHeader className="text-center">
-                    <Badge className={`${plan.badgeColor} text-white w-fit mx-auto mb-4`}>
-                      {plan.badge}
+                    <Badge className={`${badgeColor} text-white w-fit mx-auto mb-4`}>
+                      Global
                     </Badge>
                     <div className="w-16 h-16 mx-auto mb-4 bg-secondary rounded-full flex items-center justify-center">
                       <Icon className="h-8 w-8 text-primary" />
@@ -226,8 +255,8 @@ const Pricing = () => {
                     <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
                     <CardDescription className="text-base">{plan.description}</CardDescription>
                     <div className="mt-4">
-                      <span className="text-3xl font-bold text-primary">{plan.price}</span>
-                      <span className="text-muted-foreground">{plan.period}</span>
+                      <span className="text-3xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
+                      <span className="text-muted-foreground">/{plan.billing_interval}</span>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -240,11 +269,11 @@ const Pricing = () => {
                       ))}
                     </ul>
                     <Button 
-                      asChild
                       className="w-full" 
-                      variant={index === 1 ? "default" : "outline"}
+                      variant={plan.is_popular ? "default" : "outline"}
+                      onClick={() => handleSubscriptionPurchase(plan)}
                     >
-                      <Link to="/register">Subscribe Now</Link>
+                      Subscribe Now
                     </Button>
                   </CardContent>
                 </Card>
