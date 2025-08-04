@@ -128,8 +128,8 @@ export function DashboardSidebar() {
   const getNavCls = (path: string) => {
     const active = isActive(path);
     return active 
-      ? "bg-primary/10 text-primary border-primary/20 shadow-sm" 
-      : "hover:bg-muted/50 text-muted-foreground hover:text-foreground";
+      ? "bg-sidebar-accent/50 border border-sidebar-primary/20" 
+      : "hover:bg-sidebar-accent/30 border border-transparent";
   };
 
   return (
@@ -137,47 +137,62 @@ export function DashboardSidebar() {
       className={collapsed ? "w-16" : "w-64"}
       collapsible="icon"
     >
-      <SidebarContent className="bg-card border-r">
+      <SidebarContent className="bg-sidebar-background border-sidebar-border">
         {/* Logo/Brand */}
-        <div className="p-4 border-b">
+        <div className="p-4 border-b border-sidebar-border/50">
           {!collapsed ? (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-emergency rounded-lg flex items-center justify-center">
-                <Shield className="h-5 w-5 text-white" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-emergency rounded-xl flex items-center justify-center shadow-lg">
+                <Shield className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h2 className="font-bold text-lg">ICE SOS</h2>
-                <p className="text-xs text-muted-foreground">Member Portal</p>
+                <h2 className="font-bold text-lg text-sidebar-foreground">ICE SOS</h2>
+                <p className="text-sm text-sidebar-muted-foreground font-medium">Member Portal</p>
               </div>
             </div>
           ) : (
-            <div className="w-8 h-8 bg-gradient-emergency rounded-lg flex items-center justify-center mx-auto">
-              <Shield className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 bg-gradient-emergency rounded-xl flex items-center justify-center mx-auto shadow-lg">
+              <Shield className="h-6 w-6 text-white" />
             </div>
           )}
         </div>
 
         {/* Main Dashboard Navigation */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
+        <SidebarGroup className="px-3 py-4">
+          <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
+            Dashboard
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1">
               {dashboardItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink 
                       to={item.url} 
                       end={item.url === '/dashboard'}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${getNavCls(item.url)}`}
+                      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
                     >
-                      <item.icon className="h-4 w-4 flex-shrink-0" />
+                      <div className={`p-1.5 rounded-lg transition-colors ${
+                        isActive(item.url) 
+                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' 
+                          : 'bg-sidebar-muted text-sidebar-muted-foreground group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground'
+                      }`}>
+                        <item.icon className="h-4 w-4" />
+                      </div>
                       {!collapsed && (
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium">{item.title}</span>
-                          <p className="text-xs text-muted-foreground truncate">
+                          <span className={`text-sm font-medium block ${
+                            isActive(item.url) ? 'text-sidebar-primary' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground'
+                          }`}>
+                            {item.title}
+                          </span>
+                          <p className="text-xs text-sidebar-muted-foreground truncate mt-0.5 group-hover:text-sidebar-muted-foreground/80">
                             {item.description}
                           </p>
                         </div>
+                      )}
+                      {!collapsed && isActive(item.url) && (
+                        <div className="w-1 h-8 bg-sidebar-primary rounded-full"></div>
                       )}
                     </NavLink>
                   </SidebarMenuButton>
@@ -187,26 +202,44 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Separator */}
+        <div className="mx-4 h-px bg-sidebar-border/50"></div>
+
         {/* Settings Navigation */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+        <SidebarGroup className="px-3 py-4">
+          <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
+            Settings
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1">
               {settingsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink 
                       to={item.url}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${getNavCls(item.url)}`}
+                      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
                     >
-                      <item.icon className="h-4 w-4 flex-shrink-0" />
+                      <div className={`p-1.5 rounded-lg transition-colors ${
+                        isActive(item.url) 
+                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' 
+                          : 'bg-sidebar-muted text-sidebar-muted-foreground group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground'
+                      }`}>
+                        <item.icon className="h-4 w-4" />
+                      </div>
                       {!collapsed && (
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium">{item.title}</span>
-                          <p className="text-xs text-muted-foreground truncate">
+                          <span className={`text-sm font-medium block ${
+                            isActive(item.url) ? 'text-sidebar-primary' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground'
+                          }`}>
+                            {item.title}
+                          </span>
+                          <p className="text-xs text-sidebar-muted-foreground truncate mt-0.5 group-hover:text-sidebar-muted-foreground/80">
                             {item.description}
                           </p>
                         </div>
+                      )}
+                      {!collapsed && isActive(item.url) && (
+                        <div className="w-1 h-8 bg-sidebar-primary rounded-full"></div>
                       )}
                     </NavLink>
                   </SidebarMenuButton>
