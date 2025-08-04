@@ -265,147 +265,146 @@ const Pricing = () => {
               </p>
             </div>
 
-            <div className="flex justify-center mb-16">
-              <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl">
-                {products.map((product) => (
-                  <Card key={product.id} className="relative overflow-hidden border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-card to-card/80">
-                    <div className="absolute inset-0 bg-gradient-to-br from-muted/10 via-transparent to-secondary/10"></div>
-                    <Badge className="absolute top-4 right-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg">
-                      One-time Purchase
-                    </Badge>
-                    <CardHeader className="relative">
-                      <div className="flex items-center gap-4">
-                        <div className="p-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl shadow-md">
-                          <Package className="h-10 w-10 text-blue-600" />
-                        </div>
-                        <div className="flex-1">
-                          <CardTitle className="text-xl font-bold">{product.name}</CardTitle>
-                          <CardDescription className="text-base mt-1">{product.description}</CardDescription>
-                        </div>
+            <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
+              {products.map((product) => (
+                <Card key={product.id} className="relative overflow-hidden border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-card to-card/80 h-[420px]">
+                  <div className="absolute inset-0 bg-gradient-to-br from-muted/10 via-transparent to-secondary/10"></div>
+                  <Badge className="absolute top-3 right-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg text-xs px-2 py-1">
+                    One-time Purchase
+                  </Badge>
+                  <CardHeader className="relative pb-3">
+                    <div className="flex items-start gap-3">
+                      <div className="p-2 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg shadow-md">
+                        <Package className="h-6 w-6 text-blue-600" />
                       </div>
-                    </CardHeader>
-                    <CardContent className="relative">
-                      <div className="mb-6">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-3xl font-bold text-primary">€{product.price.toFixed(2)}</span>
-                          <span className="text-muted-foreground">one-time</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1 flex items-center gap-2">
-                          <Check className="h-4 w-4 text-green-500" />
-                          Free shipping • {product.inventory_count} units available
-                        </p>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg font-bold">{product.name}</CardTitle>
+                        <CardDescription className="text-sm mt-1">{product.description}</CardDescription>
                       </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="relative pt-0 h-full flex flex-col">
+                    <div className="mb-4">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-primary">€{product.price.toFixed(2)}</span>
+                        <span className="text-muted-foreground text-sm">one-time</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                        <Check className="h-3 w-3 text-green-500" />
+                        Free shipping • {product.inventory_count} units available
+                      </p>
+                    </div>
 
-                      <div className="mb-6">
-                        <h4 className="font-semibold mb-3 text-foreground">Key Features:</h4>
-                        <ul className="grid grid-cols-1 gap-2">
-                          {product.features.slice(0, 4).map((feature, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-muted-foreground">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    <div className="mb-4 flex-1">
+                      <h4 className="font-semibold mb-2 text-sm text-foreground">Key Features:</h4>
+                      <ul className="grid grid-cols-1 gap-1">
+                        {product.features.slice(0, 3).map((feature, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-xs text-muted-foreground">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
 
-                      <div className="mb-6">
-                        <h4 className="font-semibold mb-3 text-foreground">Compatible with:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {product.compatibility.map((plan, index) => (
-                            <Badge key={index} variant="outline" className="text-xs border-primary/20">
-                              {plan}
-                            </Badge>
-                          ))}
-                        </div>
+                    <div className="mb-4">
+                      <h4 className="font-semibold mb-2 text-sm text-foreground">Compatible with:</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {product.compatibility.slice(0, 3).map((plan, index) => (
+                          <Badge key={index} variant="outline" className="text-xs border-primary/20 px-2 py-0">
+                            {plan}
+                          </Badge>
+                        ))}
                       </div>
+                    </div>
 
-                      <div className="flex gap-3">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" className="flex-1 border-primary/20 hover:bg-primary/5">
-                              View Details
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle className="flex items-center gap-2">
-                                <Package className="h-5 w-5 text-primary" />
-                                {product.name}
-                              </DialogTitle>
-                              <DialogDescription>
-                                Complete product specifications and setup information
-                              </DialogDescription>
-                            </DialogHeader>
-                            
-                            <div className="space-y-6">
-                              <div>
-                                <h4 className="font-semibold mb-3">Technical Specifications:</h4>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div className="flex items-center gap-2">
-                                    <Bluetooth className="h-4 w-4 text-blue-500" />
-                                    <span>Bluetooth 5.0 Low Energy</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Battery className="h-4 w-4 text-green-500" />
-                                    <span>7-day battery life</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Droplets className="h-4 w-4 text-blue-500" />
-                                    <span>IP67 Waterproof</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-red-500" />
-                                    <span>100m range</span>
-                                  </div>
+                    <div className="flex gap-2 mt-auto">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="flex-1 border-primary/20 hover:bg-primary/5 text-xs">
+                            Details
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Package className="h-5 w-5 text-primary" />
+                              {product.name}
+                            </DialogTitle>
+                            <DialogDescription>
+                              Complete product specifications and setup information
+                            </DialogDescription>
+                          </DialogHeader>
+                          
+                          <div className="space-y-6">
+                            <div>
+                              <h4 className="font-semibold mb-3">Technical Specifications:</h4>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Bluetooth className="h-4 w-4 text-blue-500" />
+                                  <span>Bluetooth 5.0 Low Energy</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Battery className="h-4 w-4 text-green-500" />
+                                  <span>7-day battery life</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Droplets className="h-4 w-4 text-blue-500" />
+                                  <span>IP67 Waterproof</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="h-4 w-4 text-red-500" />
+                                  <span>100m range</span>
                                 </div>
                               </div>
-
-                              <div>
-                                <h4 className="font-semibold mb-3">All Features:</h4>
-                                <ul className="grid grid-cols-1 gap-2">
-                                  {product.features.map((feature, index) => (
-                                    <li key={index} className="flex items-start gap-2">
-                                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                      <span className="text-sm">{feature}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-
-                              <div>
-                                <h4 className="font-semibold mb-3">How It Works:</h4>
-                                <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                                  <li>Pair the pendant with your smartphone via Bluetooth</li>
-                                  <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
-                                  <li>Press the button once to activate emergency mode</li>
-                                  <li>Your emergency contacts and services are notified instantly</li>
-                                  <li>GPS location is shared automatically through your phone</li>
-                                </ol>
-                              </div>
-
-                              <div className="flex gap-3 pt-4">
-                                <Button 
-                                  className="flex-1"
-                                  onClick={() => handleProductPurchase(product)}
-                                >
-                                  Purchase Now - €{product.price.toFixed(2)}
-                                </Button>
-                              </div>
                             </div>
-                          </DialogContent>
-                        </Dialog>
-                        
-                        <Button 
-                          className="flex-1"
-                          onClick={() => handleProductPurchase(product)}
-                        >
-                          Buy Now
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-3">All Features:</h4>
+                              <ul className="grid grid-cols-1 gap-2">
+                                {product.features.map((feature, index) => (
+                                  <li key={index} className="flex items-start gap-2">
+                                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                    <span className="text-sm">{feature}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-3">How It Works:</h4>
+                              <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                                <li>Pair the pendant with your smartphone via Bluetooth</li>
+                                <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
+                                <li>Press the button once to activate emergency mode</li>
+                                <li>Your emergency contacts and services are notified instantly</li>
+                                <li>GPS location is shared automatically through your phone</li>
+                              </ol>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                              <Button 
+                                className="flex-1"
+                                onClick={() => handleProductPurchase(product)}
+                              >
+                                Purchase Now - €{product.price.toFixed(2)}
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      
+                      <Button 
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={() => handleProductPurchase(product)}
+                      >
+                        Buy Now
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </>
         )}
@@ -422,38 +421,38 @@ const Pricing = () => {
           </div>
           
           <div className="flex justify-center">
-            <div className="max-w-md">
+            <div className="max-w-sm">
               {regionalPlans.map((plan, index) => {
                 const Icon = plan.icon;
                 return (
-                  <Card key={index} className="relative border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-card to-card/80 overflow-hidden">
+                  <Card key={index} className="relative border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-card to-card/80 overflow-hidden h-[420px]">
                     <div className="absolute inset-0 bg-gradient-to-br from-emergency/5 via-transparent to-primary/5"></div>
-                    <CardHeader className="relative text-center">
-                      <Badge className={`${plan.badgeColor} text-white w-fit mx-auto mb-4 shadow-lg`}>
+                    <CardHeader className="relative text-center pb-4">
+                      <Badge className={`${plan.badgeColor} text-white w-fit mx-auto mb-3 shadow-lg text-xs`}>
                         {plan.badge}
                       </Badge>
-                      <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-secondary to-secondary/80 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Icon className="h-10 w-10 text-primary" />
+                      <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-br from-secondary to-secondary/80 rounded-xl flex items-center justify-center shadow-lg">
+                        <Icon className="h-8 w-8 text-primary" />
                       </div>
-                      <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
-                      <CardDescription className="text-base mt-2">{plan.description}</CardDescription>
-                      <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-emergency/10 rounded-xl">
-                        <span className="text-4xl font-bold text-primary">{plan.price}</span>
-                        <span className="text-muted-foreground text-lg">{plan.period}</span>
+                      <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
+                      <CardDescription className="text-sm mt-1">{plan.description}</CardDescription>
+                      <div className="mt-4 p-3 bg-gradient-to-r from-primary/10 to-emergency/10 rounded-lg">
+                        <span className="text-2xl font-bold text-primary">{plan.price}</span>
+                        <span className="text-muted-foreground text-sm">{plan.period}</span>
                       </div>
                     </CardHeader>
-                    <CardContent className="relative">
-                      <ul className="space-y-4 mb-8">
+                    <CardContent className="relative pt-0 h-full flex flex-col">
+                      <ul className="space-y-2 mb-6 flex-1">
                         {plan.features.map((feature, featureIndex) => (
-                          <li key={featureIndex} className="flex items-start space-x-3">
-                            <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground leading-relaxed">{feature}</span>
+                          <li key={featureIndex} className="flex items-start space-x-2">
+                            <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="text-xs text-muted-foreground leading-relaxed">{feature}</span>
                           </li>
                         ))}
                       </ul>
                       <Button 
                         asChild
-                        className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all duration-300" 
+                        className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white font-semibold py-2 shadow-lg hover:shadow-xl transition-all duration-300 mt-auto text-sm" 
                       >
                         <Link to="/register">Subscribe Now</Link>
                       </Button>
