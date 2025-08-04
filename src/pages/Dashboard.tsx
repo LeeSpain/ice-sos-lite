@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
@@ -24,6 +25,9 @@ const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Auto-scroll to top when navigating
+  useScrollToTop();
 
   useEffect(() => {
     loadDashboardData();

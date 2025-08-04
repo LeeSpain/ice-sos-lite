@@ -57,10 +57,17 @@ export function LocationPage() {
     <div className="container mx-auto px-4 py-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">Location Services</h1>
-          <p className="text-muted-foreground">Manage your location sharing and safe zones</p>
-        </div>
+        <Card className="bg-white/95 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-blue-500" />
+              Location Services
+            </CardTitle>
+            <CardDescription>
+              Manage your location sharing and safe zones
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
         {/* Location Settings */}
         <Card>

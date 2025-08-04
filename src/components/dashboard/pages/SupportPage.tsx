@@ -96,10 +96,17 @@ export function SupportPage() {
     <div className="container mx-auto px-4 py-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">Help & Support</h1>
-          <p className="text-muted-foreground">Get help with your account, devices, and emergency services</p>
-        </div>
+        <Card className="bg-white/95 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <HelpCircle className="h-5 w-5 text-blue-500" />
+              Help & Support
+            </CardTitle>
+            <CardDescription>
+              Get help with your account, devices, and emergency services
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

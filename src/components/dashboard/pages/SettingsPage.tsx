@@ -62,10 +62,17 @@ export function SettingsPage() {
     <div className="container mx-auto px-4 py-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">General Settings</h1>
-          <p className="text-muted-foreground">Customize your dashboard experience and preferences</p>
-        </div>
+        <Card className="bg-white/95 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-blue-500" />
+              General Settings
+            </CardTitle>
+            <CardDescription>
+              Customize your dashboard experience and preferences
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
         {/* Appearance */}
         <Card>

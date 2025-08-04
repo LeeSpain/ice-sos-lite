@@ -69,10 +69,17 @@ export function SecurityPage() {
     <div className="container mx-auto px-4 py-6">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">Security Settings</h1>
-          <p className="text-muted-foreground">Manage your account security and privacy settings</p>
-        </div>
+        <Card className="bg-white/95 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-blue-500" />
+              Security Settings
+            </CardTitle>
+            <CardDescription>
+              Manage your account security and privacy settings
+            </CardDescription>
+          </CardHeader>
+        </Card>
 
         {/* Security Score */}
         <Card>
