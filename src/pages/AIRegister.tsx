@@ -129,47 +129,48 @@ const AIRegister = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
       <Navigation />
       
-      <div className="container mx-auto px-4 py-24">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0 h-[600px] flex flex-col">
-            <CardHeader className="text-center border-b bg-gradient-to-r from-primary/5 to-emergency/5">
-              <div className="flex justify-center items-center gap-3 mb-4">
-                <div className="p-3 bg-emergency/10 rounded-full">
-                  <Shield className="h-8 w-8 text-emergency" />
+      <div className="fixed inset-0 flex items-center justify-center p-4 pt-24">
+        <div className="w-full max-w-6xl h-[80vh] flex gap-6">
+          {/* Emma Chat Section */}
+          <Card className="flex-1 bg-white/95 backdrop-blur-sm shadow-2xl border-0 flex flex-col">
+            <CardHeader className="text-center border-b bg-gradient-to-r from-primary/5 to-emergency/5 py-4">
+              <div className="flex justify-center items-center gap-3 mb-2">
+                <div className="p-2 bg-emergency/10 rounded-full">
+                  <Shield className="h-6 w-6 text-emergency" />
                 </div>
-                <Sparkles className="h-6 w-6 text-primary animate-pulse" />
+                <Sparkles className="h-5 w-5 text-primary animate-pulse" />
               </div>
-              <CardTitle className="text-3xl font-bold text-foreground">
+              <CardTitle className="text-2xl font-bold text-foreground">
                 Meet Emma, Your Safety Advisor
               </CardTitle>
-              <p className="text-muted-foreground text-lg">
-                Let's have a conversation to set up your perfect protection plan
+              <p className="text-muted-foreground">
+                Let's chat to set up your perfect protection plan
               </p>
             </CardHeader>
             
-            <CardContent className="flex-1 flex flex-col p-0">
+            <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
               {/* Chat Messages */}
-              <ScrollArea className="flex-1 p-6">
-                <div className="space-y-6">
+              <ScrollArea className="flex-1 p-4 max-h-full">
+                <div className="space-y-4">
                   {messages.map((message) => (
                     <div
                       key={message.id}
                       className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       {message.type === 'ai' && (
-                        <Avatar className="w-10 h-10 border-2 border-primary/20">
+                        <Avatar className="w-8 h-8 border-2 border-primary/20 flex-shrink-0">
                           <AvatarImage src="/emma-avatar.png" />
-                          <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                          <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
                             E
                           </AvatarFallback>
                         </Avatar>
                       )}
                       
                       <div
-                        className={`max-w-[75%] rounded-2xl px-4 py-3 ${
+                        className={`max-w-[75%] rounded-2xl px-3 py-2 ${
                           message.type === 'user'
                             ? 'bg-primary text-white ml-auto'
                             : 'bg-muted/80 text-foreground shadow-sm'
@@ -178,7 +179,7 @@ const AIRegister = () => {
                         <div className="text-sm whitespace-pre-wrap leading-relaxed">
                           {message.content}
                         </div>
-                        <div className={`text-xs mt-2 opacity-70 ${
+                        <div className={`text-xs mt-1 opacity-70 ${
                           message.type === 'user' ? 'text-white/70' : 'text-muted-foreground'
                         }`}>
                           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -186,9 +187,9 @@ const AIRegister = () => {
                       </div>
                       
                       {message.type === 'user' && (
-                        <Avatar className="w-10 h-10 border-2 border-muted">
-                          <AvatarFallback className="bg-muted text-muted-foreground font-bold">
-                            You
+                        <Avatar className="w-8 h-8 border-2 border-muted flex-shrink-0">
+                          <AvatarFallback className="bg-muted text-muted-foreground font-bold text-xs">
+                            U
                           </AvatarFallback>
                         </Avatar>
                       )}
@@ -197,13 +198,13 @@ const AIRegister = () => {
                   
                   {isLoading && (
                     <div className="flex gap-3 justify-start">
-                      <Avatar className="w-10 h-10 border-2 border-primary/20">
-                        <AvatarFallback className="bg-primary/10 text-primary font-bold">
+                      <Avatar className="w-8 h-8 border-2 border-primary/20 flex-shrink-0">
+                        <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
                           E
                         </AvatarFallback>
                       </Avatar>
-                      <div className="bg-muted/80 text-foreground rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm">
-                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                      <div className="bg-muted/80 text-foreground rounded-2xl px-3 py-2 flex items-center gap-2 shadow-sm">
+                        <Loader2 className="h-3 w-3 animate-spin text-primary" />
                         <span className="text-sm">Emma is thinking...</span>
                       </div>
                     </div>
@@ -213,8 +214,8 @@ const AIRegister = () => {
               </ScrollArea>
 
               {/* Input Area */}
-              <div className="p-6 border-t bg-gradient-to-r from-background/50 to-muted/20">
-                <div className="flex gap-3 items-end">
+              <div className="p-4 border-t bg-gradient-to-r from-background/50 to-muted/20">
+                <div className="flex gap-2 items-end">
                   <div className="flex-1">
                     <Input
                       value={inputMessage}
@@ -222,25 +223,170 @@ const AIRegister = () => {
                       onKeyPress={handleKeyPress}
                       placeholder="Type your response here..."
                       disabled={isLoading}
-                      className="text-base py-3 px-4 rounded-xl border-2 focus:border-primary/50 bg-white/80"
+                      className="text-sm py-2 px-3 rounded-xl border-2 focus:border-primary/50 bg-white/80"
                     />
                   </div>
                   <Button
                     onClick={sendMessage}
                     disabled={!inputMessage.trim() || isLoading}
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90 rounded-xl px-6 shadow-lg"
+                    size="sm"
+                    className="bg-primary hover:bg-primary/90 rounded-xl px-4 shadow-lg"
                   >
-                    <Send className="h-5 w-5" />
+                    <Send className="h-4 w-4" />
                   </Button>
                 </div>
                 
-                <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
+                <div className="flex items-center justify-center gap-2 mt-2 text-xs text-muted-foreground">
                   <Shield className="h-3 w-3" />
-                  <span>Powered by AI • Secure & Private • GDPR Compliant</span>
+                  <span>Powered by AI • Secure & Private</span>
                 </div>
               </div>
             </CardContent>
+          </Card>
+
+          {/* Registration Form Section */}
+          <Card className="flex-1 bg-white/95 backdrop-blur-sm shadow-2xl border-0 flex flex-col">
+            <CardHeader className="text-center border-b bg-gradient-to-r from-emergency/5 to-primary/5 py-4">
+              <CardTitle className="text-2xl font-bold text-foreground">
+                Your Registration Details
+              </CardTitle>
+              <p className="text-muted-foreground">
+                Fill in your information as Emma guides you
+              </p>
+            </CardHeader>
+            
+            <ScrollArea className="flex-1 p-6">
+              <div className="space-y-6">
+                {/* Personal Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">First Name</label>
+                      <Input
+                        value={registrationData.firstName || ''}
+                        placeholder="Enter your first name"
+                        className="mt-1"
+                        readOnly
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Last Name</label>
+                      <Input
+                        value={registrationData.lastName || ''}
+                        placeholder="Enter your last name"
+                        className="mt-1"
+                        readOnly
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Email</label>
+                    <Input
+                      value={registrationData.email || ''}
+                      placeholder="Enter your email"
+                      className="mt-1"
+                      readOnly
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Phone Number</label>
+                    <Input
+                      value={registrationData.phoneNumber || ''}
+                      placeholder="Enter your phone number"
+                      className="mt-1"
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                {/* Selected Plans */}
+                {registrationData.plans && registrationData.plans.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">Selected Plans</h3>
+                    <div className="space-y-2">
+                      {registrationData.plans.map((plan, index) => (
+                        <div key={index} className="p-3 bg-primary/5 rounded-lg border">
+                          <span className="font-medium text-foreground">{plan}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Emergency Contacts */}
+                {registrationData.emergencyContacts && registrationData.emergencyContacts.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">Emergency Contacts</h3>
+                    <div className="space-y-3">
+                      {registrationData.emergencyContacts.map((contact, index) => (
+                        <div key={index} className="p-3 bg-emergency/5 rounded-lg border">
+                          <div className="text-sm font-medium text-foreground">{contact.name}</div>
+                          <div className="text-xs text-muted-foreground">{contact.relationship}</div>
+                          <div className="text-xs text-muted-foreground">{contact.phone}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Medical Information */}
+                {(registrationData.medicalConditions || registrationData.allergies) && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">Medical Information</h3>
+                    {registrationData.medicalConditions && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Medical Conditions</label>
+                        <div className="mt-1 p-3 bg-muted/50 rounded-lg">
+                          <span className="text-sm text-foreground">{registrationData.medicalConditions}</span>
+                        </div>
+                      </div>
+                    )}
+                    {registrationData.allergies && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Allergies</label>
+                        <div className="mt-1 p-3 bg-muted/50 rounded-lg">
+                          <span className="text-sm text-foreground">{registrationData.allergies}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Additional Information */}
+                {(registrationData.currentLocation || registrationData.preferredLanguage) && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground">Additional Information</h3>
+                    {registrationData.currentLocation && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Location</label>
+                        <div className="mt-1 p-3 bg-muted/50 rounded-lg">
+                          <span className="text-sm text-foreground">{registrationData.currentLocation}</span>
+                        </div>
+                      </div>
+                    )}
+                    {registrationData.preferredLanguage && (
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Preferred Language</label>
+                        <div className="mt-1 p-3 bg-muted/50 rounded-lg">
+                          <span className="text-sm text-foreground">{registrationData.preferredLanguage}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Progress Indicator */}
+                <div className="mt-8 p-4 bg-gradient-to-r from-primary/10 to-emergency/10 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-sm font-medium text-foreground mb-2">Registration Progress</div>
+                    <div className="text-xs text-muted-foreground">
+                      Current Step: {currentStep.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
           </Card>
         </div>
       </div>
