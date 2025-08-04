@@ -265,18 +265,20 @@ const AIRegister = () => {
                       <label className="text-sm font-medium text-muted-foreground">First Name</label>
                       <Input
                         value={registrationData.firstName || ''}
-                        placeholder="Enter your first name"
-                        className="mt-1"
+                        placeholder="Provided through conversation with Emma"
+                        className="mt-1 bg-muted/30 cursor-not-allowed"
                         readOnly
+                        disabled
                       />
                     </div>
                     <div>
                       <label className="text-sm font-medium text-muted-foreground">Last Name</label>
                       <Input
                         value={registrationData.lastName || ''}
-                        placeholder="Enter your last name"
-                        className="mt-1"
+                        placeholder="Provided through conversation with Emma"
+                        className="mt-1 bg-muted/30 cursor-not-allowed"
                         readOnly
+                        disabled
                       />
                     </div>
                   </div>
@@ -284,18 +286,20 @@ const AIRegister = () => {
                     <label className="text-sm font-medium text-muted-foreground">Email</label>
                     <Input
                       value={registrationData.email || ''}
-                      placeholder="Enter your email"
-                      className="mt-1"
+                      placeholder="Provided through conversation with Emma"
+                      className="mt-1 bg-muted/30 cursor-not-allowed"
                       readOnly
+                      disabled
                     />
                   </div>
                   <div>
                     <label className="text-sm font-medium text-muted-foreground">Phone Number</label>
                     <Input
                       value={registrationData.phoneNumber || ''}
-                      placeholder="Enter your phone number"
-                      className="mt-1"
+                      placeholder="Provided through conversation with Emma"
+                      className="mt-1 bg-muted/30 cursor-not-allowed"
                       readOnly
+                      disabled
                     />
                   </div>
                 </div>
