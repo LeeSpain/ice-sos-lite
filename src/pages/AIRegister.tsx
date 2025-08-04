@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Shield, Sparkles, User, Phone, MapPin, CreditCard, Check, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -41,55 +42,36 @@ const AIRegister = () => {
     country: ''
   });
   const [plans, setPlans] = useState<Plan[]>([]);
-  const [selectedPlans, setSelectedPlans] = useState<string[]>([]);
+  const [selectedMainPlan, setSelectedMainPlan] = useState<'basic' | 'premium'>('basic');
+  const [hasFamilyPlan, setHasFamilyPlan] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<'details' | 'payment'>('details');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Load subscription plans
-    const loadPlans = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('subscription_plans')
-          .select('*')
-          .eq('is_active', true)
-          .eq('billing_interval', 'month')
-          .order('sort_order');
-        
-        if (error) throw error;
-        
-        // Transform the data to match our Plan interface
-        const transformedPlans: Plan[] = (data || []).map(plan => ({
-          id: plan.id,
-          name: plan.name,
-          description: plan.description || '',
-          price: plan.price,
-          currency: plan.currency,
-          billing_interval: plan.billing_interval,
-          features: Array.isArray(plan.features) ? plan.features.map(f => String(f)) : [],
-          is_popular: plan.is_popular
-        }));
-        
-        setPlans(transformedPlans);
-        
-        // Auto-select Basic Protection as included
-        const basicPlan = transformedPlans.find(plan => plan.name === 'Basic Protection');
-        if (basicPlan) {
-          setSelectedPlans([basicPlan.id]);
-        }
-      } catch (error) {
-        console.error('Error loading plans:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load protection plans",
-          variant: "destructive"
-        });
-      }
-    };
-    
-    loadPlans();
-  }, []);
+  // Static plan definitions based on new structure
+  const staticPlans = {
+    basic: {
+      id: 'basic',
+      name: 'Basic Protection',
+      description: 'Essential emergency protection with GPS tracking and emergency alerts',
+      price: 1.99,
+      features: ['24/7 Emergency Response', 'GPS Location Tracking', 'Emergency Contacts', 'Basic Medical Info']
+    },
+    premium: {
+      id: 'premium', 
+      name: 'Premium Protection',
+      description: 'Advanced protection with AI assistance and priority response',
+      price: 4.99,
+      features: ['Everything in Basic', 'AI Safety Assistant', 'Priority Response', 'Advanced Medical Records', 'Incident Reporting']
+    },
+    family: {
+      id: 'family',
+      name: 'Family Connection',
+      description: 'Connect and protect your family members',
+      price: 1.99,
+      features: ['Family Member Linking', 'Shared Emergency Contacts', 'Group Notifications', 'Family Location Sharing']
+    }
+  };
 
   const handlePersonalDetailsChange = (field: keyof PersonalDetails, value: string) => {
     setPersonalDetails(prev => ({
@@ -98,19 +80,12 @@ const AIRegister = () => {
     }));
   };
 
-  const handlePlanToggle = (planId: string) => {
-    const basicPlan = plans.find(plan => plan.name === 'Basic Protection');
-    
-    // Don't allow unchecking the basic plan
-    if (planId === basicPlan?.id) {
-      return;
-    }
-    
-    setSelectedPlans(prev => 
-      prev.includes(planId) 
-        ? prev.filter(id => id !== planId)
-        : [...prev, planId]
-    );
+  const handleMainPlanChange = (value: 'basic' | 'premium') => {
+    setSelectedMainPlan(value);
+  };
+
+  const handleFamilyPlanToggle = (checked: boolean) => {
+    setHasFamilyPlan(checked);
   };
 
   const validatePersonalDetails = () => {
@@ -142,10 +117,19 @@ const AIRegister = () => {
   };
 
   const calculateTotal = () => {
-    return selectedPlans.reduce((total, planId) => {
-      const plan = plans.find(p => p.id === planId);
-      return total + (plan ? plan.price : 0);
-    }, 0);
+    let total = staticPlans[selectedMainPlan].price;
+    if (hasFamilyPlan) {
+      total += staticPlans.family.price;
+    }
+    return total;
+  };
+
+  const getSelectedPlanIds = (): string[] => {
+    const planIds: string[] = [selectedMainPlan];
+    if (hasFamilyPlan) {
+      planIds.push('family');
+    }
+    return planIds;
   };
 
   return (
@@ -270,7 +254,7 @@ const AIRegister = () => {
                     </div>
                   </div>
 
-                  {/* Protection Plans */}
+                   {/* Protection Plans */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="p-2 bg-emergency/10 rounded-full">
@@ -279,41 +263,27 @@ const AIRegister = () => {
                       <h2 className="text-xl font-bold text-foreground">Protection Plans</h2>
                     </div>
                     
+                    {/* Main Plan Selection - Radio Buttons */}
                     <div className="space-y-4">
-                      {plans.map((plan) => {
-                        const isBasic = plan.name === 'Basic Protection';
-                        const isSelected = selectedPlans.includes(plan.id);
-                        
-                        return (
-                          <div key={plan.id} className={`p-4 border-2 rounded-lg transition-all ${
-                            isSelected ? 'border-primary bg-primary/5' : 'border-muted'
-                          } ${isBasic ? 'ring-2 ring-primary/20' : ''}`}>
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-start gap-3 flex-1">
-                                <Checkbox
-                                  checked={isSelected}
-                                  onCheckedChange={() => handlePlanToggle(plan.id)}
-                                  disabled={isBasic}
-                                  className="mt-1"
-                                />
+                      <h3 className="font-medium text-foreground">Choose your protection level:</h3>
+                      <RadioGroup value={selectedMainPlan} onValueChange={handleMainPlanChange}>
+                        <div className={`p-4 border-2 rounded-lg transition-all ${
+                          selectedMainPlan === 'basic' ? 'border-primary bg-primary/5' : 'border-muted'
+                        }`}>
+                          <div className="flex items-start gap-3">
+                            <RadioGroupItem value="basic" id="basic" className="mt-1" />
+                            <Label htmlFor="basic" className="flex-1 cursor-pointer">
+                              <div className="flex justify-between items-start">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
-                                    <h3 className="font-semibold text-lg">{plan.name}</h3>
-                                    {isBasic && (
-                                      <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-                                        Included
-                                      </span>
-                                    )}
-                                    {plan.is_popular && (
-                                      <span className="bg-emergency text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                                        <Star className="h-3 w-3" />
-                                        Popular
-                                      </span>
-                                    )}
+                                    <h3 className="font-semibold text-lg">{staticPlans.basic.name}</h3>
+                                    <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                                      Popular
+                                    </span>
                                   </div>
-                                  <p className="text-muted-foreground mb-3">{plan.description}</p>
-                                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                    {plan.features.map((feature, idx) => (
+                                  <p className="text-muted-foreground mb-3">{staticPlans.basic.description}</p>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {staticPlans.basic.features.map((feature, idx) => (
                                       <div key={idx} className="flex items-center gap-1 text-sm">
                                         <Check className="h-3 w-3 text-green-500" />
                                         <span>{feature}</span>
@@ -321,17 +291,88 @@ const AIRegister = () => {
                                     ))}
                                   </div>
                                 </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="font-bold text-lg">
-                                  {plan.currency === 'EUR' ? '€' : '$'}{plan.price}
+                                <div className="text-right ml-4">
+                                  <div className="font-bold text-lg">€{staticPlans.basic.price}</div>
+                                  <div className="text-sm text-muted-foreground">/month</div>
                                 </div>
-                                <div className="text-sm text-muted-foreground">/{plan.billing_interval}</div>
+                              </div>
+                            </Label>
+                          </div>
+                        </div>
+                        
+                        <div className={`p-4 border-2 rounded-lg transition-all ${
+                          selectedMainPlan === 'premium' ? 'border-primary bg-primary/5' : 'border-muted'
+                        }`}>
+                          <div className="flex items-start gap-3">
+                            <RadioGroupItem value="premium" id="premium" className="mt-1" />
+                            <Label htmlFor="premium" className="flex-1 cursor-pointer">
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <h3 className="font-semibold text-lg">{staticPlans.premium.name}</h3>
+                                    <span className="bg-emergency text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                                      <Star className="h-3 w-3" />
+                                      Recommended
+                                    </span>
+                                  </div>
+                                  <p className="text-muted-foreground mb-3">{staticPlans.premium.description}</p>
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {staticPlans.premium.features.map((feature, idx) => (
+                                      <div key={idx} className="flex items-center gap-1 text-sm">
+                                        <Check className="h-3 w-3 text-green-500" />
+                                        <span>{feature}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                <div className="text-right ml-4">
+                                  <div className="font-bold text-lg">€{staticPlans.premium.price}</div>
+                                  <div className="text-sm text-muted-foreground">/month</div>
+                                </div>
+                              </div>
+                            </Label>
+                          </div>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    {/* Family Plan Add-on */}
+                    <div className="space-y-4">
+                      <h3 className="font-medium text-foreground">Optional Add-on:</h3>
+                      <div className={`p-4 border-2 rounded-lg transition-all ${
+                        hasFamilyPlan ? 'border-primary bg-primary/5' : 'border-muted'
+                      }`}>
+                        <div className="flex items-start gap-3">
+                          <Checkbox
+                            id="family"
+                            checked={hasFamilyPlan}
+                            onCheckedChange={handleFamilyPlanToggle}
+                            className="mt-1"
+                          />
+                          <Label htmlFor="family" className="flex-1 cursor-pointer">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <h3 className="font-semibold text-lg">{staticPlans.family.name}</h3>
+                                </div>
+                                <p className="text-muted-foreground mb-3">{staticPlans.family.description}</p>
+                                <div className="grid grid-cols-2 gap-2">
+                                  {staticPlans.family.features.map((feature, idx) => (
+                                    <div key={idx} className="flex items-center gap-1 text-sm">
+                                      <Check className="h-3 w-3 text-green-500" />
+                                      <span>{feature}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="text-right ml-4">
+                                <div className="font-bold text-lg">€{staticPlans.family.price}</div>
+                                <div className="text-sm text-muted-foreground">/month</div>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          </Label>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Total */}
@@ -358,7 +399,7 @@ const AIRegister = () => {
                 </div>
               ) : (
                 <EmbeddedPayment
-                  plans={selectedPlans}
+                  plans={getSelectedPlanIds()}
                   userEmail={personalDetails.email}
                   firstName={personalDetails.firstName}
                   lastName={personalDetails.lastName}

@@ -54,12 +54,11 @@ serve(async (req) => {
       logStep("Created new customer", { customerId });
     }
 
-    // Plan pricing mapping
+    // Plan pricing mapping - updated structure
     const planPricing = {
-      "personal": { name: "Personal Account", amount: 199 },
-      "guardian": { name: "Guardian Wellness", amount: 499 },
-      "family": { name: "Family Sharing", amount: 99 },
-      "callcenter": { name: "Call Centre (Spain)", amount: 2499 }
+      "basic": { name: "Basic Protection", amount: 199 },      // €1.99
+      "premium": { name: "Premium Protection", amount: 499 },  // €4.99
+      "family": { name: "Family Connection", amount: 199 }     // €1.99
     };
 
     // Calculate total amount

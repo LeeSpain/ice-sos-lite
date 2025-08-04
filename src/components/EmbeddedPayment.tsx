@@ -120,12 +120,11 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, onSuccess, onB
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Calculate total for display
+  // Calculate total for display - updated pricing structure
   const planPricing = {
-    personal: { name: "Personal Account", price: 1.99 },
-    guardian: { name: "Guardian Wellness", price: 4.99 },
-    family: { name: "Family Sharing", price: 0.99 },
-    callcenter: { name: "Call Centre (Spain)", price: 24.99 }
+    basic: { name: "Basic Protection", price: 1.99 },
+    premium: { name: "Premium Protection", price: 4.99 },
+    family: { name: "Family Connection", price: 1.99 }
   };
 
   const total = plans.reduce((sum, planId) => {
