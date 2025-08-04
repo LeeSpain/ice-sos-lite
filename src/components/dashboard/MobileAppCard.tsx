@@ -2,13 +2,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Smartphone, Download, QrCode, CheckCircle, AlertCircle } from "lucide-react";
+import { useEffect, useRef } from "react";
+import QRCode from "qrcode";
 
 const MobileAppCard = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const appStatus = {
     downloaded: false,
     loggedIn: false,
     permissionsGranted: false
   };
+
+  // App store URLs
+  const APP_STORE_URL = "https://apps.apple.com/app/ice-sos";
+  const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.icesoslite";
+  const WEB_APP_URL = "https://a856a70f-639b-4212-b411-d2cdb524d754.lovableproject.com";
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      QRCode.toCanvas(canvasRef.current, WEB_APP_URL, {
+        width: 128,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      }).catch(console.error);
+    }
+  }, []);
 
   const getStatusBadge = (status: boolean) => {
     return status ? (
@@ -36,14 +57,14 @@ const MobileAppCard = () => {
         <div className="space-y-6">
           {/* QR Code Section */}
           <div className="text-center p-6 bg-muted/50 rounded-lg">
-            <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
-              <QrCode className="h-16 w-16 text-muted-foreground/50" />
+            <div className="w-32 h-32 mx-auto mb-4 bg-white rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/30 p-2">
+              <canvas ref={canvasRef} className="max-w-full max-h-full" />
             </div>
             <p className="text-sm text-muted-foreground mb-4">
-              Scan this QR code with your phone to download the ICE SOS app
+              Scan this QR code with your phone to access the ICE SOS web app
             </p>
             <div className="text-xs text-muted-foreground">
-              QR code coming soon
+              Download the native app for the best experience
             </div>
           </div>
 
@@ -86,13 +107,21 @@ const MobileAppCard = () => {
           <div className="space-y-3">
             <h4 className="font-medium">Download Links</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Button variant="outline" className="flex items-center justify-center gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center justify-center gap-2"
+                onClick={() => window.open(APP_STORE_URL, '_blank')}
+              >
                 <div className="w-6 h-6 bg-black rounded-sm flex items-center justify-center">
                   <span className="text-white text-xs font-bold">iOS</span>
                 </div>
                 Download for iPhone
               </Button>
-              <Button variant="outline" className="flex items-center justify-center gap-2">
+              <Button 
+                variant="outline" 
+                className="flex items-center justify-center gap-2"
+                onClick={() => window.open(PLAY_STORE_URL, '_blank')}
+              >
                 <div className="w-6 h-6 bg-green-500 rounded-sm flex items-center justify-center">
                   <span className="text-white text-xs font-bold">AND</span>
                 </div>

@@ -25,7 +25,8 @@ import {
   Bell,
   HelpCircle,
   Bluetooth,
-  Package
+  Package,
+  Smartphone
 } from "lucide-react";
 
 const dashboardItems = [
@@ -68,6 +69,11 @@ const dashboardItems = [
     title: "Activity",
     url: "/full-dashboard/activity",
     icon: Activity
+  },
+  {
+    title: "Mobile App",
+    url: "/full-dashboard/mobile-app",
+    icon: Smartphone
   }
 ];
 

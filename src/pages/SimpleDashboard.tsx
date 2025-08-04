@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Phone, Mail } from "lucide-react";
+import MobileAppCard from "@/components/dashboard/MobileAppCard";
 
 const SimpleDashboard = () => {
   const { user, signOut } = useAuth();
@@ -102,6 +103,11 @@ const SimpleDashboard = () => {
           </CardContent>
         </Card>
 
+        {/* Mobile App Download */}
+        <div className="mb-6">
+          <MobileAppCard />
+        </div>
+
         {/* Next Steps */}
         <Card className="bg-white/95 backdrop-blur-sm">
           <CardHeader>
@@ -111,6 +117,7 @@ const SimpleDashboard = () => {
             <div className="space-y-3">
               <p>✅ Account created successfully</p>
               <p>✅ Authentication working</p>
+              <p>📱 Download the mobile app for full protection</p>
               <p>🔄 Ready to add subscription plans</p>
               
               <div className="pt-4">

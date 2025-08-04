@@ -191,6 +191,15 @@ const Dashboard = () => {
                 </div>
               } />
 
+              {/* Mobile App Page */}
+              <Route path="/mobile-app" element={
+                <div className="container mx-auto px-4 py-6">
+                  <div className="max-w-4xl mx-auto">
+                    <MobileAppCard />
+                  </div>
+                </div>
+              } />
+
               {/* Dashboard pages with full components */}
               <Route path="/family" element={<FamilyPage />} />
               <Route path="/location" element={<LocationPage />} />
