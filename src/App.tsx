@@ -8,6 +8,7 @@ import AuthPage from "./pages/AuthPage";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import SimpleDashboard from "./pages/SimpleDashboard";
+import AdminDashboard from "./components/ai-chat/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const App = () => {
@@ -29,6 +30,7 @@ const App = () => {
               <SimpleDashboard />
             </ProtectedRoute>
           } />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/full-dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

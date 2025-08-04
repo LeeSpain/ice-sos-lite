@@ -4,6 +4,7 @@ import Features from "@/components/Features";
 import MetricPreview from "@/components/MetricPreview";
 import Pricing from "@/components/Pricing";
 import ChatWidget from "@/components/ai-chat/ChatWidget";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -13,6 +14,7 @@ const Index = () => {
       <Features />
       <MetricPreview />
       <Pricing />
+      <Footer />
       <ChatWidget />
     </div>
   );

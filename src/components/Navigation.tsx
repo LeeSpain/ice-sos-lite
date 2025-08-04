@@ -23,9 +23,6 @@ const Navigation = () => {
             <a href="#features" className="text-foreground hover:text-primary transition-colors">Features</a>
             <a href="#pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
             <a href="#support" className="text-foreground hover:text-primary transition-colors">Support</a>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/full-dashboard">Dashboard</Link>
-            </Button>
             <Button asChild variant="outline" size="sm">
               <Link to="/auth">Sign In</Link>
             </Button>
@@ -51,9 +48,6 @@ const Navigation = () => {
               <a href="#features" className="text-foreground hover:text-primary transition-colors">Features</a>
               <a href="#pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
               <a href="#support" className="text-foreground hover:text-primary transition-colors">Support</a>
-              <Button asChild variant="ghost" size="sm" className="justify-start">
-                <Link to="/full-dashboard">Dashboard</Link>
-              </Button>
               <div className="flex flex-col space-y-2 pt-4 border-t border-border">
                 <Button asChild variant="outline" size="sm">
                   <Link to="/auth">Sign In</Link>
