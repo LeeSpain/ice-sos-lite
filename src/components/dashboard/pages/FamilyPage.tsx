@@ -68,7 +68,7 @@ export function FamilyPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-500" />
-                Family Dashboard
+                Family
               </CardTitle>
               <Button onClick={() => setShowInviteForm(true)} variant="outline" size="sm" className="flex items-center gap-2">
                 <Plus className="h-4 w-4" />

@@ -100,7 +100,7 @@ export function SupportPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <HelpCircle className="h-5 w-5 text-blue-500" />
-              Help & Support
+              Support
             </CardTitle>
             <CardDescription>
               Get help with your account, devices, and emergency services

@@ -73,7 +73,7 @@ export function SecurityPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-blue-500" />
-              Security Settings
+              Security
             </CardTitle>
             <CardDescription>
               Manage your account security and privacy settings
