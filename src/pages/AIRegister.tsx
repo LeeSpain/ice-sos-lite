@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Send, Loader2, Shield, Sparkles } from 'lucide-react';
+import { Send, Loader2, Shield, Sparkles, User, Phone, Heart, MapPin, CheckCircle, MessageCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
@@ -134,7 +134,173 @@ const AIRegister = () => {
       
       <div className="fixed inset-0 flex items-center justify-center p-4 pt-24">
         <div className="w-full max-w-6xl h-[80vh] flex gap-6">
-          {/* Emma Chat Section */}
+          {/* Registration Details Section - Now on the LEFT */}
+          <Card className="flex-1 bg-white/95 backdrop-blur-sm shadow-2xl border-0 flex flex-col">
+            <CardHeader className="text-center border-b bg-gradient-to-r from-emergency/5 to-primary/5 py-4">
+              <div className="flex justify-center items-center gap-3 mb-2">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <User className="h-6 w-6 text-primary" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl font-bold text-foreground">
+                Your Registration Details
+              </CardTitle>
+              <CardDescription>
+                Your information will appear here as you chat with Emma
+              </CardDescription>
+            </CardHeader>
+            
+            <ScrollArea className="flex-1 p-6">
+              <div className="space-y-6">
+                {/* Personal Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <User className="h-4 w-4 text-primary" />
+                    <h3 className="font-semibold">Personal Information</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">First Name</label>
+                      <div className="mt-1 px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                        {registrationData.firstName || <span className="text-muted-foreground">Provided through conversation with Emma</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Last Name</label>
+                      <div className="mt-1 px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                        {registrationData.lastName || <span className="text-muted-foreground">Provided through conversation with Emma</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Email</label>
+                    <div className="mt-1 px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                      {registrationData.email || <span className="text-muted-foreground">Provided through conversation with Emma</span>}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Phone Number</label>
+                    <div className="mt-1 px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                      {registrationData.phoneNumber || <span className="text-muted-foreground">Provided through conversation with Emma</span>}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Selected Plans */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Shield className="h-4 w-4 text-primary" />
+                    <h3 className="font-semibold">Selected Protection Plans</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {registrationData.plans && registrationData.plans.length > 0 ? (
+                      registrationData.plans.map((plan, index) => (
+                        <div key={index} className="px-3 py-2 border rounded-md bg-primary/5 text-sm">
+                          {plan}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                        <span className="text-muted-foreground">Plans will be selected during conversation</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Emergency Contacts */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Phone className="h-4 w-4 text-primary" />
+                    <h3 className="font-semibold">Emergency Contacts</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {registrationData.emergencyContacts && registrationData.emergencyContacts.length > 0 ? (
+                      registrationData.emergencyContacts.map((contact, index) => (
+                        <div key={index} className="p-3 border rounded-md bg-primary/5">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+                            <div>
+                              <span className="font-medium">Name:</span> {contact.name}
+                            </div>
+                            <div>
+                              <span className="font-medium">Phone:</span> {contact.phone}
+                            </div>
+                            <div>
+                              <span className="font-medium">Relationship:</span> {contact.relationship}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                        <span className="text-muted-foreground">Emergency contacts will be added during conversation</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Medical Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Heart className="h-4 w-4 text-primary" />
+                    <h3 className="font-semibold">Medical Information</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Medical Conditions</label>
+                      <div className="mt-1 px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[60px] flex items-start pt-3">
+                        {registrationData.medicalConditions || <span className="text-muted-foreground">Medical conditions will be discussed with Emma</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Allergies</label>
+                      <div className="mt-1 px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[60px] flex items-start pt-3">
+                        {registrationData.allergies || <span className="text-muted-foreground">Allergies will be discussed with Emma</span>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Details */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="h-4 w-4 text-primary" />
+                    <h3 className="font-semibold">Additional Details</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Current Location</label>
+                      <div className="mt-1 px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                        {registrationData.currentLocation || <span className="text-muted-foreground">Location will be discussed with Emma</span>}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-muted-foreground">Preferred Language</label>
+                      <div className="mt-1 px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                        {registrationData.preferredLanguage || <span className="text-muted-foreground">Language preference will be discussed with Emma</span>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Registration Status */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle className="h-4 w-4 text-primary" />
+                    <h3 className="font-semibold">Registration Status</h3>
+                  </div>
+                  <div className="px-3 py-2 border rounded-md bg-muted/30 text-sm min-h-[40px] flex items-center">
+                    {registrationData.complete ? (
+                      <span className="text-green-600 font-medium">✓ Registration Complete</span>
+                    ) : (
+                      <span className="text-muted-foreground">In Progress - Continue chatting with Emma</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
+          </Card>
+
+          {/* Emma Chat Section - Now on the RIGHT */}
           <Card className="flex-1 bg-white/95 backdrop-blur-sm shadow-2xl border-0 flex flex-col">
             <CardHeader className="text-center border-b bg-gradient-to-r from-primary/5 to-emergency/5 py-4">
               <div className="flex justify-center items-center gap-3 mb-2">
@@ -146,9 +312,9 @@ const AIRegister = () => {
               <CardTitle className="text-2xl font-bold text-foreground">
                 Meet Emma, Your Safety Advisor
               </CardTitle>
-              <p className="text-muted-foreground">
+              <CardDescription>
                 Let's chat to set up your perfect protection plan
-              </p>
+              </CardDescription>
             </CardHeader>
             
             <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
@@ -242,155 +408,6 @@ const AIRegister = () => {
                 </div>
               </div>
             </CardContent>
-          </Card>
-
-          {/* Registration Form Section */}
-          <Card className="flex-1 bg-white/95 backdrop-blur-sm shadow-2xl border-0 flex flex-col">
-            <CardHeader className="text-center border-b bg-gradient-to-r from-emergency/5 to-primary/5 py-4">
-              <CardTitle className="text-2xl font-bold text-foreground">
-                Your Registration Details
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Fill in your information as Emma guides you
-              </p>
-            </CardHeader>
-            
-            <ScrollArea className="flex-1 p-6">
-              <div className="space-y-6">
-                {/* Personal Information */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">First Name</label>
-                      <Input
-                        value={registrationData.firstName || ''}
-                        placeholder="Provided through conversation with Emma"
-                        className="mt-1 bg-muted/30 cursor-not-allowed"
-                        readOnly
-                        disabled
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-muted-foreground">Last Name</label>
-                      <Input
-                        value={registrationData.lastName || ''}
-                        placeholder="Provided through conversation with Emma"
-                        className="mt-1 bg-muted/30 cursor-not-allowed"
-                        readOnly
-                        disabled
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Email</label>
-                    <Input
-                      value={registrationData.email || ''}
-                      placeholder="Provided through conversation with Emma"
-                      className="mt-1 bg-muted/30 cursor-not-allowed"
-                      readOnly
-                      disabled
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Phone Number</label>
-                    <Input
-                      value={registrationData.phoneNumber || ''}
-                      placeholder="Provided through conversation with Emma"
-                      className="mt-1 bg-muted/30 cursor-not-allowed"
-                      readOnly
-                      disabled
-                    />
-                  </div>
-                </div>
-
-                {/* Selected Plans */}
-                {registrationData.plans && registrationData.plans.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-foreground">Selected Plans</h3>
-                    <div className="space-y-2">
-                      {registrationData.plans.map((plan, index) => (
-                        <div key={index} className="p-3 bg-primary/5 rounded-lg border">
-                          <span className="font-medium text-foreground">{plan}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Emergency Contacts */}
-                {registrationData.emergencyContacts && registrationData.emergencyContacts.length > 0 && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-foreground">Emergency Contacts</h3>
-                    <div className="space-y-3">
-                      {registrationData.emergencyContacts.map((contact, index) => (
-                        <div key={index} className="p-3 bg-emergency/5 rounded-lg border">
-                          <div className="text-sm font-medium text-foreground">{contact.name}</div>
-                          <div className="text-xs text-muted-foreground">{contact.relationship}</div>
-                          <div className="text-xs text-muted-foreground">{contact.phone}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Medical Information */}
-                {(registrationData.medicalConditions || registrationData.allergies) && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-foreground">Medical Information</h3>
-                    {registrationData.medicalConditions && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Medical Conditions</label>
-                        <div className="mt-1 p-3 bg-muted/50 rounded-lg">
-                          <span className="text-sm text-foreground">{registrationData.medicalConditions}</span>
-                        </div>
-                      </div>
-                    )}
-                    {registrationData.allergies && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Allergies</label>
-                        <div className="mt-1 p-3 bg-muted/50 rounded-lg">
-                          <span className="text-sm text-foreground">{registrationData.allergies}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Additional Information */}
-                {(registrationData.currentLocation || registrationData.preferredLanguage) && (
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-foreground">Additional Information</h3>
-                    {registrationData.currentLocation && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Location</label>
-                        <div className="mt-1 p-3 bg-muted/50 rounded-lg">
-                          <span className="text-sm text-foreground">{registrationData.currentLocation}</span>
-                        </div>
-                      </div>
-                    )}
-                    {registrationData.preferredLanguage && (
-                      <div>
-                        <label className="text-sm font-medium text-muted-foreground">Preferred Language</label>
-                        <div className="mt-1 p-3 bg-muted/50 rounded-lg">
-                          <span className="text-sm text-foreground">{registrationData.preferredLanguage}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Progress Indicator */}
-                <div className="mt-8 p-4 bg-gradient-to-r from-primary/10 to-emergency/10 rounded-lg">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-foreground mb-2">Registration Progress</div>
-                    <div className="text-xs text-muted-foreground">
-                      Current Step: {currentStep.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </ScrollArea>
           </Card>
         </div>
       </div>
