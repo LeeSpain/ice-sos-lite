@@ -39,7 +39,7 @@ const SimpleDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-8 pt-8">
           <h1 className="text-3xl font-bold text-white">
-            ICE SOS Dashboard {isTestMode && '(Test Mode)'}
+            ICE SOS Dashboard
           </h1>
           <Button 
             onClick={isTestMode ? () => window.location.href = '/' : signOut}
