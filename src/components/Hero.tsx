@@ -3,7 +3,11 @@ import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-emergency.jpg";
 
-const Hero = () => {
+interface HeroProps {
+  onEmmaClick?: () => void;
+}
+
+const Hero = ({ onEmmaClick }: HeroProps) => {
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
       {/* Darker Shadow Overlay for Professional Look */}
@@ -35,10 +39,15 @@ const Hero = () => {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               <Button asChild size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
-                <Link to="/register">Talk to Emma - Get Started</Link>
+                <Link to="/register">Join Today</Link>
               </Button>
-              <Button size="xl" variant="outline" className="border-white/30 text-white hover:bg-white/10">
-                View Pricing Plans
+              <Button 
+                size="xl" 
+                variant="outline" 
+                className="border-white/30 text-white hover:bg-white/10"
+                onClick={onEmmaClick}
+              >
+                Talk To Emma
               </Button>
             </div>
           </div>
