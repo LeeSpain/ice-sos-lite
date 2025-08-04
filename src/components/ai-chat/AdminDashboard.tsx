@@ -9,6 +9,8 @@ import SubscriptionsPage from '@/components/admin/pages/SubscriptionsPage';
 import ActivityPage from '@/components/admin/pages/ActivityPage';
 import RevenueAnalyticsPage from '@/components/admin/pages/RevenueAnalyticsPage';
 import UserGrowthPage from '@/components/admin/pages/UserGrowthPage';
+import AIAgentPage from '@/components/admin/pages/AIAgentPage';
+import AITrainingPage from '@/components/admin/pages/AITrainingPage';
 
 const AdminDashboard: React.FC = () => {
   return (
@@ -17,6 +19,9 @@ const AdminDashboard: React.FC = () => {
         <Route index element={<DashboardOverview />} />
         <Route path="revenue" element={<RevenueAnalyticsPage />} />
         <Route path="growth" element={<UserGrowthPage />} />
+        <Route path="ai-agent" element={<AIAgentPage />} />
+        <Route path="ai-training" element={<AITrainingPage />} />
+        <Route path="ai-settings" element={<div className="p-6"><h1 className="text-3xl font-bold">AI Model Settings</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="subscriptions" element={<SubscriptionsPage />} />
         <Route path="families" element={<div className="p-6"><h1 className="text-3xl font-bold">Family Accounts</h1><p className="text-muted-foreground">Coming soon...</p></div>} />

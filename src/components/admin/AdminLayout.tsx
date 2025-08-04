@@ -26,7 +26,8 @@ import {
   TrendingUp,
   Heart,
   Shield,
-  Database
+  Database,
+  Bot
 } from 'lucide-react';
 
 const adminMenuItems = [
@@ -36,6 +37,14 @@ const adminMenuItems = [
       { title: "Dashboard", url: "/admin-dashboard", icon: BarChart3 },
       { title: "Revenue Analytics", url: "/admin-dashboard/revenue", icon: DollarSign },
       { title: "User Growth", url: "/admin-dashboard/growth", icon: TrendingUp },
+    ]
+  },
+  {
+    title: "🤖 AI Management", 
+    items: [
+      { title: "AI Agent Control", url: "/admin-dashboard/ai-agent", icon: Bot },
+      { title: "Training Data", url: "/admin-dashboard/ai-training", icon: Database },
+      { title: "Model Settings", url: "/admin-dashboard/ai-settings", icon: Settings },
     ]
   },
   {
@@ -81,19 +90,19 @@ function AdminSidebar() {
     items.some(item => isActive(item.url));
 
   return (
-    <Sidebar className={state === "collapsed" ? "w-16" : "w-64"}>
-      <SidebarContent className="bg-gradient-to-b from-background to-muted/20">
-        <div className="p-4 border-b border-border/40">
+    <Sidebar className={state === "collapsed" ? "w-16" : "w-64"} variant="sidebar">
+      <SidebarContent className="bg-sidebar border-r border-sidebar-border">
+        <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
-              <Shield className="h-6 w-6 text-white" />
+            <div className="w-10 h-10 bg-gradient-to-br from-sidebar-primary to-primary rounded-xl flex items-center justify-center shadow-lg">
+              <Shield className="h-6 w-6 text-sidebar-primary-foreground" />
             </div>
             {state !== "collapsed" && (
               <div>
-                <h2 className="font-bold text-lg bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                <h2 className="font-bold text-lg text-sidebar-foreground">
                   ICE SOS Admin
                 </h2>
-                <p className="text-xs text-muted-foreground">Management Dashboard</p>
+                <p className="text-xs text-sidebar-foreground/60">Management Dashboard</p>
               </div>
             )}
           </div>
@@ -101,13 +110,14 @@ function AdminSidebar() {
         
         {adminMenuItems.map((group, groupIndex) => (
           <SidebarGroup key={group.title} className="px-3 py-2">
-            <SidebarGroupLabel className={`${state === "collapsed" ? 'hidden' : 'block'} text-xs font-semibold text-muted-foreground/80 px-2 py-1 flex items-center gap-2`}>
-              <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${
-                groupIndex === 0 ? 'from-blue-500 to-blue-600' :
-                groupIndex === 1 ? 'from-green-500 to-green-600' :
-                groupIndex === 2 ? 'from-purple-500 to-purple-600' :
-                groupIndex === 3 ? 'from-red-500 to-red-600' :
-                'from-orange-500 to-orange-600'
+            <SidebarGroupLabel className={`${state === "collapsed" ? 'hidden' : 'block'} text-xs font-semibold text-sidebar-foreground/70 px-2 py-1 flex items-center gap-2`}>
+              <div className={`w-2 h-2 rounded-full ${
+                groupIndex === 0 ? 'bg-blue-500' :
+                groupIndex === 1 ? 'bg-purple-500' :
+                groupIndex === 2 ? 'bg-green-500' :
+                groupIndex === 3 ? 'bg-orange-500' :
+                groupIndex === 4 ? 'bg-red-500' :
+                'bg-gray-500'
               }`} />
               {group.title}
             </SidebarGroupLabel>
@@ -121,15 +131,15 @@ function AdminSidebar() {
                         className={({ isActive }) =>
                           `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                             isActive 
-                              ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]' 
-                              : 'hover:bg-muted/60 hover:scale-[1.01] text-muted-foreground hover:text-foreground'
+                              ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg scale-[1.02]' 
+                              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:scale-[1.01]'
                           }`
                         }
                       >
-                        <div className={`p-1.5 rounded-md ${
+                        <div className={`p-1.5 rounded-md transition-colors ${
                           isActive(item.url) 
                             ? 'bg-white/20' 
-                            : 'bg-muted/40 group-hover:bg-muted/60'
+                            : 'bg-sidebar-accent/50 group-hover:bg-sidebar-accent'
                         }`}>
                           <item.icon className="h-4 w-4" />
                         </div>
