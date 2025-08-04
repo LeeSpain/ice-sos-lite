@@ -30,7 +30,7 @@ const App = () => {
             </ProtectedRoute>
           } />
           <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
-          <Route path="/full-dashboard/*" element={<Dashboard />} />
+          <Route path="/full-dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
