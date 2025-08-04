@@ -30,7 +30,7 @@ const App = () => {
               <SimpleDashboard />
             </ProtectedRoute>
           } />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
           <Route path="/full-dashboard" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
