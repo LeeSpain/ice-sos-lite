@@ -107,43 +107,49 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md h-[500px] flex flex-col shadow-2xl">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-primary to-emergency text-white rounded-t-lg">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+      <Card className="w-full max-w-md h-[90vh] max-h-[600px] min-h-[400px] flex flex-col shadow-2xl border-0">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 bg-gradient-to-r from-primary to-emergency text-white rounded-t-lg flex-shrink-0">
+          <div className="flex items-center space-x-2 min-w-0">
+            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
               <MessageCircle className="h-4 w-4" />
             </div>
-            <div>
-              <CardTitle className="text-lg">Emma AI Assistant</CardTitle>
-              <p className="text-xs text-white/80">Emergency Protection Guide</p>
+            <div className="min-w-0">
+              <CardTitle className="text-lg truncate">Emma AI Assistant</CardTitle>
+              <p className="text-xs text-white/80 truncate">Emergency Protection Guide</p>
             </div>
           </div>
           <Button
             onClick={onClose}
             variant="ghost"
             size="sm"
-            className="text-white hover:bg-white/20 h-8 w-8 p-0"
+            className="text-white hover:bg-white/20 h-8 w-8 p-0 flex-shrink-0"
           >
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
         
-        <CardContent className="flex-1 flex flex-col p-0">
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
+        <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="p-4 space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
                   className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[80%] p-3 rounded-lg ${
+                    className={`max-w-[85%] p-3 rounded-lg break-words ${
                       message.isUser
-                        ? 'bg-primary text-white'
+                        ? 'bg-primary text-primary-foreground'
                         : 'bg-muted text-foreground'
                     }`}
+                    style={{ 
+                      wordWrap: 'break-word', 
+                      overflowWrap: 'break-word',
+                      wordBreak: 'break-word',
+                      hyphens: 'auto'
+                    }}
                   >
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                     <p className="text-xs mt-1 opacity-70">
                       {message.timestamp.toLocaleTimeString([], { 
                         hour: '2-digit', 
@@ -155,7 +161,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-muted p-3 rounded-lg flex items-center space-x-2">
+                  <div className="bg-muted p-3 rounded-lg flex items-center space-x-2 max-w-[85%]">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span className="text-sm">Emma is thinking...</span>
                   </div>
@@ -165,7 +171,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
             <div ref={messagesEndRef} />
           </ScrollArea>
           
-          <div className="p-4 border-t">
+          <div className="p-4 border-t bg-background flex-shrink-0">
             <div className="flex space-x-2">
               <Input
                 value={inputMessage}
@@ -173,13 +179,13 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
                 onKeyPress={handleKeyPress}
                 placeholder="Ask Emma about emergency protection..."
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 min-w-0"
               />
               <Button
                 onClick={sendMessage}
                 disabled={!inputMessage.trim() || isLoading}
                 size="sm"
-                className="px-3"
+                className="px-3 flex-shrink-0"
               >
                 <Send className="h-4 w-4" />
               </Button>

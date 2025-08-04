@@ -75,6 +75,8 @@ interface ChatRequest {
   message: string;
   sessionId?: string;
   userId?: string;
+  context?: string;
+  conversation_history?: any[];
 }
 
 serve(async (req) => {
@@ -83,7 +85,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, sessionId, userId }: ChatRequest = await req.json();
+    const { message, sessionId, userId, context }: ChatRequest = await req.json();
 
     if (!message) {
       throw new Error('Message is required');
@@ -100,14 +102,21 @@ serve(async (req) => {
       .order('created_at', { ascending: true })
       .limit(20);
 
-    // Store user message
+    // Store user message with enhanced metadata
     await supabase
       .from('conversations')
       .insert({
         user_id: userId || null,
         session_id: currentSessionId,
         message_type: 'user',
-        content: message
+        content: message,
+        metadata: {
+          context: context || 'general',
+          timestamp: new Date().toISOString(),
+          user_agent: req.headers.get('user-agent') || null,
+          source_page: context?.includes('homepage') ? 'homepage' : 
+                      context?.includes('registration') ? 'registration' : 'general'
+        }
       });
 
     // Build conversation context

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, MessageSquare, User, Bot } from 'lucide-react';
+import { Search, MessageSquare, User, Bot, Loader2 } from 'lucide-react';
 
 interface Conversation {
   id: string;
@@ -217,23 +217,31 @@ export default function ConversationsPage() {
                       }`}
                     >
                       <div
-                        className={`max-w-[80%] rounded-lg p-3 ${
+                        className={`max-w-[85%] rounded-lg p-3 break-words ${
                           message.message_type === 'user'
                             ? 'bg-primary text-primary-foreground'
                             : 'bg-muted'
                         }`}
+                        style={{
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
+                          wordBreak: 'break-word'
+                        }}
                       >
                         <div className="flex items-center gap-2 mb-1">
                           {message.message_type === 'user' ? (
-                            <User className="h-4 w-4" />
+                            <User className="h-4 w-4 flex-shrink-0" />
                           ) : (
-                            <Bot className="h-4 w-4" />
+                            <Bot className="h-4 w-4 flex-shrink-0" />
                           )}
                           <span className="text-sm font-medium capitalize">
                             {message.message_type === 'user' ? 'User' : 'AI Assistant'}
                           </span>
-                          <span className="text-xs opacity-70">
-                            {new Date(message.created_at).toLocaleTimeString()}
+                          <span className="text-xs opacity-70 ml-auto flex-shrink-0">
+                            {new Date(message.created_at).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
                           </span>
                         </div>
                         <div className="text-sm whitespace-pre-wrap">
