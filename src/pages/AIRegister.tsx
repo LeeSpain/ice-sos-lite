@@ -93,11 +93,11 @@ const AIRegister = () => {
     };
 
     fetchPlans();
-  }, [toast]);
+  }, []); // Remove toast dependency - it's not needed for the useEffect
 
-  // Get plan objects for UI display
-  const getMainPlans = () => dbPlans.filter(p => !p.name.includes('Family'));
-  const getFamilyPlan = () => dbPlans.find(p => p.name.includes('Family'));
+  // Get plan objects for UI display - memoized to prevent re-renders
+  const getMainPlans = useCallback(() => dbPlans.filter(p => !p.name.includes('Family')), [dbPlans]);
+  const getFamilyPlan = useCallback(() => dbPlans.find(p => p.name.includes('Family')), [dbPlans]);
 
   // Emma AI interaction handler
   const handleEmmaClick = useCallback(() => {
@@ -122,7 +122,7 @@ const AIRegister = () => {
     setHasFamilyPlan(checked);
   };
 
-  const validatePersonalDetails = () => {
+  const validatePersonalDetails = useCallback(() => {
     const { firstName, lastName, email, password, phone, city, country } = personalDetails;
     if (!firstName || !lastName || !email || !password || !phone || !city || !country) {
       return false;
@@ -136,7 +136,7 @@ const AIRegister = () => {
       return false;
     }
     return true;
-  };
+  }, [personalDetails, toast]);
 
   const handleContinueToPayment = () => {
     if (!validatePersonalDetails()) {
@@ -161,7 +161,7 @@ const AIRegister = () => {
     }, 2000);
   };
 
-  const calculateTotal = () => {
+  const calculateTotal = useCallback(() => {
     const selectedPlan = dbPlans.find(p => p.id === selectedMainPlan);
     let total = selectedPlan ? selectedPlan.price : 0;
     if (hasFamilyPlan) {
@@ -169,9 +169,9 @@ const AIRegister = () => {
       total += familyPlan ? familyPlan.price : 0;
     }
     return total;
-  };
+  }, [dbPlans, selectedMainPlan, hasFamilyPlan, getFamilyPlan]);
 
-  const getSelectedPlanIds = (): string[] => {
+  const getSelectedPlanIds = useCallback((): string[] => {
     const planIds: string[] = [selectedMainPlan];
     if (hasFamilyPlan) {
       const familyPlan = getFamilyPlan();
@@ -180,7 +180,7 @@ const AIRegister = () => {
       }
     }
     return planIds;
-  };
+  }, [selectedMainPlan, hasFamilyPlan, getFamilyPlan]);
 
   return (
     <div className="min-h-screen bg-gradient-hero">
