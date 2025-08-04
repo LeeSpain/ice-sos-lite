@@ -27,7 +27,8 @@ import {
   Heart,
   Shield,
   Database,
-  Bot
+  Bot,
+  Package
 } from 'lucide-react';
 
 const adminMenuItems = [
@@ -68,6 +69,12 @@ const adminMenuItems = [
     items: [
       { title: "Emergency Incidents", url: "/admin-dashboard/emergencies", icon: AlertTriangle },
       { title: "Safety Monitoring", url: "/admin-dashboard/safety", icon: Shield },
+    ]
+  },
+  {
+    title: "🛍️ Product Management",
+    items: [
+      { title: "Products", url: "/admin-dashboard/products", icon: Package },
     ]
   },
   {

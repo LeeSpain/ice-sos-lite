@@ -1,10 +1,28 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, MapPin, Brain, Users, Phone, Download, Smartphone } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Check, MapPin, Brain, Users, Phone, Download, Smartphone, Package, Bluetooth, Battery, Droplets, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  description: string;
+  features: string[];
+  sku: string;
+  inventory_count: number;
+  compatibility: string[];
+  status: string;
+}
 
 const Pricing = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+
   const globalPlans = [
     {
       name: "Personal Contact",
@@ -74,6 +92,48 @@ const Pricing = () => {
       ]
     }
   ];
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'active')
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      setProducts(data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
+  const handleProductPurchase = async (product: Product) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          productId: product.id,
+          amount: Math.round(product.price * 100), // Convert to cents
+          currency: product.currency.toLowerCase(),
+          productName: product.name
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.url) {
+        // Open Stripe checkout in a new tab
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      alert('Error processing payment. Please try again.');
+    }
+  };
 
   return (
     <section className="py-20">
@@ -192,6 +252,157 @@ const Pricing = () => {
             })}
           </div>
         </div>
+
+        {/* Safety Products Section */}
+        {products.length > 0 && (
+          <>
+            <div className="text-center mb-16">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">Safety Products</h3>
+              <p className="text-lg text-muted-foreground">
+                Enhance your safety with our Bluetooth-enabled emergency devices that work seamlessly with all subscription plans
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-16">
+              {products.map((product) => (
+                <Card key={product.id} className="relative overflow-hidden hover:shadow-lg transition-shadow">
+                  <Badge className="absolute top-4 right-4 bg-blue-500 text-white">
+                    One-time Purchase
+                  </Badge>
+                  <CardHeader>
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-blue-100 rounded-lg">
+                        <Package className="h-8 w-8 text-blue-600" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl">{product.name}</CardTitle>
+                        <CardDescription>{product.description}</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="mb-6">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-bold">€{product.price.toFixed(2)}</span>
+                        <span className="text-gray-500">one-time</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Free shipping • {product.inventory_count} units available
+                      </p>
+                    </div>
+
+                    <div className="mb-6">
+                      <h4 className="font-semibold mb-2">Key Features:</h4>
+                      <ul className="grid grid-cols-1 gap-2">
+                        {product.features.slice(0, 4).map((feature, index) => (
+                          <li key={index} className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="mb-6">
+                      <h4 className="font-semibold mb-2">Compatible with:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {product.compatibility.map((plan, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {plan}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" className="flex-1">
+                            View Details
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Package className="h-5 w-5" />
+                              {product.name}
+                            </DialogTitle>
+                            <DialogDescription>
+                              Complete product specifications and setup information
+                            </DialogDescription>
+                          </DialogHeader>
+                          
+                          <div className="space-y-6">
+                            <div>
+                              <h4 className="font-semibold mb-3">Technical Specifications:</h4>
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Bluetooth className="h-4 w-4 text-blue-500" />
+                                  <span>Bluetooth 5.0 Low Energy</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Battery className="h-4 w-4 text-green-500" />
+                                  <span>7-day battery life</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Droplets className="h-4 w-4 text-blue-500" />
+                                  <span>IP67 Waterproof</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <MapPin className="h-4 w-4 text-red-500" />
+                                  <span>100m range</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-3">All Features:</h4>
+                              <ul className="grid grid-cols-1 gap-2">
+                                {product.features.map((feature, index) => (
+                                  <li key={index} className="flex items-start gap-2">
+                                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                    <span className="text-sm">{feature}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+
+                            <div>
+                              <h4 className="font-semibold mb-3">How It Works:</h4>
+                              <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                                <li>Pair the pendant with your smartphone via Bluetooth</li>
+                                <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
+                                <li>Press the button once to activate emergency mode</li>
+                                <li>Your emergency contacts and services are notified instantly</li>
+                                <li>GPS location is shared automatically through your phone</li>
+                              </ol>
+                            </div>
+
+                            <div className="flex gap-3 pt-4">
+                              <Button 
+                                className="flex-1"
+                                onClick={() => handleProductPurchase(product)}
+                              >
+                                Purchase Now - €{product.price.toFixed(2)}
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                      
+                      <Button 
+                        className="flex-1"
+                        onClick={() => handleProductPurchase(product)}
+                      >
+                        Buy Now
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </>
+        )}
 
         {/* Regional Plans Section */}
         <div className="mb-16">
