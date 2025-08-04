@@ -31,49 +31,49 @@ import {
 const dashboardItems = [
   {
     title: "Overview",
-    url: "/dashboard",
+    url: "/full-dashboard",
     icon: LayoutDashboard,
     description: "Dashboard overview"
   },
   {
     title: "My Products",
-    url: "/dashboard/products",
+    url: "/full-dashboard/products",
     icon: Package,
     description: "Manage your devices"
   },
   {
     title: "Profile",
-    url: "/dashboard/profile",
+    url: "/full-dashboard/profile",
     icon: User,
     description: "Personal information"
   },
   {
     title: "Emergency",
-    url: "/dashboard/emergency",
+    url: "/full-dashboard/emergency",
     icon: Phone,
     description: "Emergency contacts & settings"
   },
   {
     title: "Health",
-    url: "/dashboard/health",
+    url: "/full-dashboard/health",
     icon: Heart,
     description: "Medical information"
   },
   {
     title: "Family",
-    url: "/dashboard/family",
+    url: "/full-dashboard/family",
     icon: Users,
     description: "Family members"
   },
   {
     title: "Location",
-    url: "/dashboard/location",
+    url: "/full-dashboard/location",
     icon: MapPin,
     description: "Location services"
   },
   {
     title: "Activity",
-    url: "/dashboard/activity",
+    url: "/full-dashboard/activity",
     icon: Activity,
     description: "Activity history"
   }
@@ -82,31 +82,31 @@ const dashboardItems = [
 const settingsItems = [
   {
     title: "Subscription",
-    url: "/dashboard/subscription",
+    url: "/full-dashboard/subscription",
     icon: CreditCard,
     description: "Billing & subscription"
   },
   {
     title: "Notifications",
-    url: "/dashboard/notifications",
+    url: "/full-dashboard/notifications",
     icon: Bell,
     description: "Notification preferences"
   },
   {
     title: "Security",
-    url: "/dashboard/security",
+    url: "/full-dashboard/security",
     icon: Shield,
     description: "Security settings"
   },
   {
     title: "Settings",
-    url: "/dashboard/settings",
+    url: "/full-dashboard/settings",
     icon: Settings,
     description: "General settings"
   },
   {
     title: "Support",
-    url: "/dashboard/support",
+    url: "/full-dashboard/support",
     icon: HelpCircle,
     description: "Help & support"
   }
@@ -119,8 +119,8 @@ export function DashboardSidebar() {
   const collapsed = state === "collapsed";
 
   const isActive = (path: string) => {
-    if (path === '/dashboard') {
-      return currentPath === '/dashboard';
+    if (path === '/full-dashboard') {
+      return currentPath === '/full-dashboard';
     }
     return currentPath.startsWith(path);
   };
@@ -159,47 +159,12 @@ export function DashboardSidebar() {
 
         {/* Main Dashboard Navigation */}
         <SidebarGroup className="px-3 py-4">
-          <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
+          <SidebarGroupLabel className="text-sidebar-foreground font-bold text-lg tracking-tight mb-4 flex items-center gap-3">
+            <div className="p-2 bg-gradient-emergency rounded-lg">
+              <LayoutDashboard className="h-5 w-5 text-white" />
+            </div>
             Dashboard
           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {dashboardItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end={item.url === '/dashboard'}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
-                    >
-                      <div className={`p-1.5 rounded-lg transition-colors ${
-                        isActive(item.url) 
-                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' 
-                          : 'bg-sidebar-muted text-sidebar-muted-foreground group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground'
-                      }`}>
-                        <item.icon className="h-4 w-4" />
-                      </div>
-                      {!collapsed && (
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-sm font-medium block ${
-                            isActive(item.url) ? 'text-sidebar-primary' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground'
-                          }`}>
-                            {item.title}
-                          </span>
-                          <p className="text-xs text-sidebar-muted-foreground truncate mt-0.5 group-hover:text-sidebar-muted-foreground/80">
-                            {item.description}
-                          </p>
-                        </div>
-                      )}
-                      {!collapsed && isActive(item.url) && (
-                        <div className="w-1 h-8 bg-sidebar-primary rounded-full"></div>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Separator */}
@@ -207,46 +172,12 @@ export function DashboardSidebar() {
 
         {/* Settings Navigation */}
         <SidebarGroup className="px-3 py-4">
-          <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
+          <SidebarGroupLabel className="text-sidebar-foreground font-bold text-lg tracking-tight mb-4 flex items-center gap-3">
+            <div className="p-2 bg-gradient-primary rounded-lg">
+              <Settings className="h-5 w-5 text-white" />
+            </div>
             Settings
           </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {settingsItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
-                    >
-                      <div className={`p-1.5 rounded-lg transition-colors ${
-                        isActive(item.url) 
-                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' 
-                          : 'bg-sidebar-muted text-sidebar-muted-foreground group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground'
-                      }`}>
-                        <item.icon className="h-4 w-4" />
-                      </div>
-                      {!collapsed && (
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-sm font-medium block ${
-                            isActive(item.url) ? 'text-sidebar-primary' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground'
-                          }`}>
-                            {item.title}
-                          </span>
-                          <p className="text-xs text-sidebar-muted-foreground truncate mt-0.5 group-hover:text-sidebar-muted-foreground/80">
-                            {item.description}
-                          </p>
-                        </div>
-                      )}
-                      {!collapsed && isActive(item.url) && (
-                        <div className="w-1 h-8 bg-sidebar-primary rounded-full"></div>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

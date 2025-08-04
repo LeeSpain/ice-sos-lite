@@ -133,14 +133,14 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
       title: "Update Profile",
       description: "Keep your information current",
       icon: Users,
-      action: () => window.location.href = '/dashboard/profile',
+      action: () => window.location.href = '/full-dashboard/profile',
       variant: "outline" as const
     },
     {
       title: "Add Emergency Contact",
       description: "Add a new emergency contact",
       icon: Phone,
-      action: () => window.location.href = '/dashboard/emergency',
+      action: () => window.location.href = '/full-dashboard/emergency',
       variant: "outline" as const
     }
   ];
