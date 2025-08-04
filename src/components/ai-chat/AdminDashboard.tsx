@@ -12,6 +12,7 @@ import UserGrowthPage from '@/components/admin/pages/UserGrowthPage';
 import AIAgentPage from '@/components/admin/pages/AIAgentPage';
 import AITrainingPage from '@/components/admin/pages/AITrainingPage';
 import ProductsPage from '@/components/admin/pages/ProductsPage';
+import GlobalProtectionPlansPage from '@/components/admin/pages/GlobalProtectionPlansPage';
 
 const AdminDashboard: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="ai-settings" element={<div className="p-6"><h1 className="text-3xl font-bold">AI Model Settings</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="subscriptions" element={<SubscriptionsPage />} />
+        <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />
         <Route path="families" element={<div className="p-6"><h1 className="text-3xl font-bold">Family Accounts</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="leads" element={<LeadsPage />} />
         <Route path="conversations" element={<ConversationsPage />} />

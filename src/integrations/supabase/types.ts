@@ -366,6 +366,54 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          billing_interval: string
+          created_at: string
+          currency: string
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean
+          is_popular: boolean
+          name: string
+          price: number
+          sort_order: number | null
+          stripe_price_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_interval?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          is_popular?: boolean
+          name: string
+          price: number
+          sort_order?: number | null
+          stripe_price_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_interval?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          is_popular?: boolean
+          name?: string
+          price?: number
+          sort_order?: number | null
+          stripe_price_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_activity: {
         Row: {
           activity_type: string
