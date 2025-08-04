@@ -32,50 +32,42 @@ const dashboardItems = [
   {
     title: "Overview",
     url: "/full-dashboard",
-    icon: LayoutDashboard,
-    description: "Dashboard overview"
+    icon: LayoutDashboard
   },
   {
     title: "My Products",
     url: "/full-dashboard/products",
-    icon: Package,
-    description: "Manage your devices"
+    icon: Package
   },
   {
     title: "Profile",
     url: "/full-dashboard/profile",
-    icon: User,
-    description: "Personal information"
+    icon: User
   },
   {
     title: "Emergency",
     url: "/full-dashboard/emergency",
-    icon: Phone,
-    description: "Emergency contacts & settings"
+    icon: Phone
   },
   {
     title: "Health",
     url: "/full-dashboard/health",
-    icon: Heart,
-    description: "Medical information"
+    icon: Heart
   },
   {
     title: "Family",
     url: "/full-dashboard/family",
-    icon: Users,
-    description: "Family members"
+    icon: Users
   },
   {
     title: "Location",
     url: "/full-dashboard/location",
-    icon: MapPin,
-    description: "Location services"
+    icon: MapPin
   },
   {
     title: "Activity",
     url: "/full-dashboard/activity",
-    icon: Activity,
-    description: "Activity history"
+    icon: Activity
   }
 ];
 
@@ -83,32 +75,27 @@ const settingsItems = [
   {
     title: "Subscription",
     url: "/full-dashboard/subscription",
-    icon: CreditCard,
-    description: "Billing & subscription"
+    icon: CreditCard
   },
   {
     title: "Notifications",
     url: "/full-dashboard/notifications",
-    icon: Bell,
-    description: "Notification preferences"
+    icon: Bell
   },
   {
     title: "Security",
     url: "/full-dashboard/security",
-    icon: Shield,
-    description: "Security settings"
+    icon: Shield
   },
   {
     title: "Settings",
     url: "/full-dashboard/settings",
-    icon: Settings,
-    description: "General settings"
+    icon: Settings
   },
   {
     title: "Support",
     url: "/full-dashboard/support",
-    icon: HelpCircle,
-    description: "Help & support"
+    icon: HelpCircle
   }
 ];
 

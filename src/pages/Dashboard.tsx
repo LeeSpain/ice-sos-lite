@@ -13,6 +13,12 @@ import MedicalInfoCard from "@/components/dashboard/MedicalInfoCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import MobileAppCard from "@/components/dashboard/MobileAppCard";
 import ActivityCard from "@/components/dashboard/ActivityCard";
+import { FamilyPage } from "@/components/dashboard/pages/FamilyPage";
+import { LocationPage } from "@/components/dashboard/pages/LocationPage";
+import { NotificationsPage } from "@/components/dashboard/pages/NotificationsPage";
+import { SecurityPage } from "@/components/dashboard/pages/SecurityPage";
+import { SettingsPage } from "@/components/dashboard/pages/SettingsPage";
+import { SupportPage } from "@/components/dashboard/pages/SupportPage";
 
 const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
@@ -181,72 +187,13 @@ const Dashboard = () => {
                 </div>
               } />
 
-              {/* Placeholder pages for other routes */}
-              <Route path="/family" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold mb-4">Family Dashboard</h2>
-                      <p className="text-muted-foreground">Coming soon - Manage your family members and their safety status</p>
-                    </div>
-                  </div>
-                </div>
-              } />
-
-              <Route path="/location" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold mb-4">Location Services</h2>
-                      <p className="text-muted-foreground">Coming soon - Real-time location tracking and safe zones</p>
-                    </div>
-                  </div>
-                </div>
-              } />
-
-              <Route path="/notifications" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold mb-4">Notification Settings</h2>
-                      <p className="text-muted-foreground">Coming soon - Customize your notification preferences</p>
-                    </div>
-                  </div>
-                </div>
-              } />
-
-              <Route path="/security" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold mb-4">Security Settings</h2>
-                      <p className="text-muted-foreground">Coming soon - Account security and privacy controls</p>
-                    </div>
-                  </div>
-                </div>
-              } />
-
-              <Route path="/settings" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold mb-4">General Settings</h2>
-                      <p className="text-muted-foreground">Coming soon - Customize your dashboard experience</p>
-                    </div>
-                  </div>
-                </div>
-              } />
-
-              <Route path="/support" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <div className="text-center py-12">
-                      <h2 className="text-2xl font-bold mb-4">Help & Support</h2>
-                      <p className="text-muted-foreground">Coming soon - 24/7 support and knowledge base</p>
-                    </div>
-                  </div>
-                </div>
-              } />
+              {/* Dashboard pages with full components */}
+              <Route path="/family" element={<FamilyPage />} />
+              <Route path="/location" element={<LocationPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/security" element={<SecurityPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/support" element={<SupportPage />} />
             </Routes>
           </div>
         </div>
