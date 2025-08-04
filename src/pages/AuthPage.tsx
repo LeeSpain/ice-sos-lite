@@ -287,6 +287,13 @@ const AuthPage = () => {
               </div>
             )}
 
+            {/* Testing Link */}
+            <div className="mt-4 text-center">
+              <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+                <Link to="/dashboard">Members Dashboard (Testing) →</Link>
+              </Button>
+            </div>
+
 
             {/* Additional Info */}
             <div className="mt-6 text-center text-sm text-muted-foreground">
