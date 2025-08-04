@@ -37,14 +37,17 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
               professional call center access, and family connectivity — globally available.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button asChild size="xl" className="bg-emergency text-black hover:bg-emergency/90 shadow-glow">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+              <Button 
+                asChild 
+                size="xl" 
+                className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
+              >
                 <Link to="/register">Join Today</Link>
               </Button>
               <Button 
                 size="xl" 
-                variant="outline" 
-                className="border-white/30 text-white hover:bg-white/10"
+                className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
                 onClick={onEmmaClick}
               >
                 Talk To Emma
