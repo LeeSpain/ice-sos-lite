@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import MetricPreview from "@/components/MetricPreview";
 import Pricing from "@/components/Pricing";
+import ChatWidget from "@/components/ai-chat/ChatWidget";
 
 const Index = () => {
   return (
@@ -12,6 +13,7 @@ const Index = () => {
       <Features />
       <MetricPreview />
       <Pricing />
+      <ChatWidget />
     </div>
   );
 };

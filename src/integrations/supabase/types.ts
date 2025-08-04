@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      conversations: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          message_type: string
+          metadata: Json | null
+          session_id: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          message_type: string
+          metadata?: Json | null
+          session_id?: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          message_type?: string
+          metadata?: Json | null
+          session_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       family_invites: {
         Row: {
           accepted_at: string | null
@@ -56,6 +86,51 @@ export type Database = {
           relationship?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          conversation_summary: string | null
+          created_at: string
+          email: string | null
+          id: string
+          interest_level: number | null
+          metadata: Json | null
+          phone: string | null
+          recommended_plan: string | null
+          session_id: string
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          conversation_summary?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          interest_level?: number | null
+          metadata?: Json | null
+          phone?: string | null
+          recommended_plan?: string | null
+          session_id: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          conversation_summary?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          interest_level?: number | null
+          metadata?: Json | null
+          phone?: string | null
+          recommended_plan?: string | null
+          session_id?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
