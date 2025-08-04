@@ -85,7 +85,7 @@ export default function DashboardOverview() {
           conversionRate: leadsData.length > 0 ? (conversions / leadsData.length) * 100 : 0,
           totalCustomers: customersData?.length || 0,
           activeSubscriptions: subscribersData?.length || 0,
-          monthlyRevenue: (subscribersData?.length || 0) * 7.99, // Basic calculation
+          monthlyRevenue: (subscribersData?.length || 0) * 7.99, // €7.99 per subscription
           emergencyIncidents: 0 // Placeholder for future implementation
         });
       }
@@ -135,8 +135,8 @@ export default function DashboardOverview() {
             <div className="flex items-center space-x-2">
               <DollarSign className="h-8 w-8 text-green-500" />
               <div>
-                <p className="text-2xl font-bold">${stats.monthlyRevenue.toFixed(0)}</p>
-                <p className="text-sm text-muted-foreground">Monthly Revenue</p>
+                <p className="text-2xl font-bold">€{stats.monthlyRevenue.toFixed(0)}</p>
+                <p className="text-sm text-muted-foreground">Monthly Revenue (EUR)</p>
               </div>
             </div>
           </CardContent>

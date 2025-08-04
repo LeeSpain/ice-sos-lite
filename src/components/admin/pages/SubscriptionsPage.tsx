@@ -234,8 +234,8 @@ export default function SubscriptionsPage() {
             <div className="flex items-center space-x-2">
               <DollarSign className="h-6 w-6 text-green-500" />
               <div>
-                <p className="text-xl font-bold">${stats.monthlyRevenue.toFixed(0)}</p>
-                <p className="text-sm text-muted-foreground">Monthly Revenue</p>
+                <p className="text-xl font-bold">€{stats.monthlyRevenue.toFixed(0)}</p>
+                <p className="text-sm text-muted-foreground">Monthly Revenue (EUR)</p>
               </div>
             </div>
           </CardContent>
@@ -322,7 +322,7 @@ export default function SubscriptionsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="font-medium">
-                        ${calculateRevenue(subscription.subscription_tier).toFixed(2)}/month
+                        €{calculateRevenue(subscription.subscription_tier).toFixed(2)}/month
                       </div>
                     </TableCell>
                     <TableCell>

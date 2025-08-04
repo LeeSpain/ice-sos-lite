@@ -7,14 +7,16 @@ import LeadsPage from '@/components/admin/pages/LeadsPage';
 import ConversationsPage from '@/components/admin/pages/ConversationsPage';
 import SubscriptionsPage from '@/components/admin/pages/SubscriptionsPage';
 import ActivityPage from '@/components/admin/pages/ActivityPage';
+import RevenueAnalyticsPage from '@/components/admin/pages/RevenueAnalyticsPage';
+import UserGrowthPage from '@/components/admin/pages/UserGrowthPage';
 
 const AdminDashboard: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<AdminLayout />}>
         <Route index element={<DashboardOverview />} />
-        <Route path="revenue" element={<div className="p-6"><h1 className="text-3xl font-bold">Revenue Analytics</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
-        <Route path="growth" element={<div className="p-6"><h1 className="text-3xl font-bold">User Growth</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
+        <Route path="revenue" element={<RevenueAnalyticsPage />} />
+        <Route path="growth" element={<UserGrowthPage />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="subscriptions" element={<SubscriptionsPage />} />
         <Route path="families" element={<div className="p-6"><h1 className="text-3xl font-bold">Family Accounts</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
