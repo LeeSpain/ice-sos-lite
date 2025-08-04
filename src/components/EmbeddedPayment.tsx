@@ -111,11 +111,14 @@ interface EmbeddedPaymentProps {
   firstName: string;
   lastName: string;
   password: string;
+  phone?: string;
+  city?: string;
+  country?: string;
   onSuccess: () => void;
   onBack: () => void;
 }
 
-const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, onSuccess, onBack }: EmbeddedPaymentProps) => {
+const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, phone, city, country, onSuccess, onBack }: EmbeddedPaymentProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -193,6 +196,29 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, onSu
 
   return (
     <div className="space-y-6">
+      {/* Customer Information */}
+      <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+        <h4 className="font-medium">Customer Information:</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="font-medium">Name:</span> {firstName} {lastName}
+          </div>
+          <div>
+            <span className="font-medium">Email:</span> {userEmail}
+          </div>
+          {phone && (
+            <div>
+              <span className="font-medium">Phone:</span> {phone}
+            </div>
+          )}
+          {city && country && (
+            <div>
+              <span className="font-medium">Location:</span> {city}, {country}
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Order Summary */}
       <div className="bg-muted/50 p-4 rounded-lg space-y-2">
         <h4 className="font-medium">Order Summary:</h4>

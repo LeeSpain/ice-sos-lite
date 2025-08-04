@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Mail, Lock, ArrowLeft, Phone, User } from "lucide-react";
+import { Shield, Mail, Lock, ArrowLeft, Phone, User, Smartphone, QrCode } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
+import QRCode from 'qrcode';
 
 const AuthPage = () => {
   const [email, setEmail] = useState("");
@@ -17,7 +18,36 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [iosQr, setIosQr] = useState("");
+  const [androidQr, setAndroidQr] = useState("");
   const navigate = useNavigate();
+
+  // App store URLs
+  const iosUrl = "https://apps.apple.com/app/ice-sos-lite/id123456789";
+  const androidUrl = "https://play.google.com/store/apps/details?id=com.icesos.lite";
+
+  // Generate QR codes
+  useEffect(() => {
+    const generateQRCodes = async () => {
+      try {
+        const iosQrCode = await QRCode.toDataURL(iosUrl, {
+          width: 150,
+          margin: 2,
+          color: { dark: '#000000', light: '#FFFFFF' }
+        });
+        const androidQrCode = await QRCode.toDataURL(androidUrl, {
+          width: 150,
+          margin: 2,
+          color: { dark: '#000000', light: '#FFFFFF' }
+        });
+        setIosQr(iosQrCode);
+        setAndroidQr(androidQrCode);
+      } catch (error) {
+        console.error('Error generating QR codes:', error);
+      }
+    };
+    generateQRCodes();
+  }, []);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -303,6 +333,69 @@ const AuthPage = () => {
               <p className="mt-2 text-xs">
                 Sign up to create your account, then visit the subscription page to select your emergency protection plan.
               </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Mobile App Download Section */}
+        <Card className="bg-white/95 backdrop-blur-sm shadow-xl mt-6">
+          <CardHeader className="text-center">
+            <div className="flex justify-center items-center gap-2 mb-2">
+              <Smartphone className="h-6 w-6 text-primary" />
+              <CardTitle className="text-xl">Get the Mobile App</CardTitle>
+            </div>
+            <CardDescription>
+              Download ICE SOS Lite for instant emergency access on your mobile device
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* QR Codes Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="text-center space-y-3">
+                <div className="flex justify-center items-center gap-2">
+                  <QrCode className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="font-medium">iOS App Store</h3>
+                </div>
+                {iosQr && (
+                  <div className="flex justify-center">
+                    <img src={iosQr} alt="iOS QR Code" className="border-2 border-gray-200 rounded-lg" />
+                  </div>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(iosUrl, '_blank')}
+                  className="w-full"
+                >
+                  Download for iOS
+                </Button>
+              </div>
+              
+              <div className="text-center space-y-3">
+                <div className="flex justify-center items-center gap-2">
+                  <QrCode className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="font-medium">Google Play Store</h3>
+                </div>
+                {androidQr && (
+                  <div className="flex justify-center">
+                    <img src={androidQr} alt="Android QR Code" className="border-2 border-gray-200 rounded-lg" />
+                  </div>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(androidUrl, '_blank')}
+                  className="w-full"
+                >
+                  Download for Android
+                </Button>
+              </div>
+            </div>
+
+            {/* Benefits */}
+            <div className="text-center text-sm text-muted-foreground">
+              <p className="mb-2">📱 Quick emergency access • 🔔 Push notifications • 📍 GPS location sharing</p>
+              <p className="text-xs">Scan the QR code with your phone's camera or download directly from the app stores</p>
             </div>
           </CardContent>
         </Card>

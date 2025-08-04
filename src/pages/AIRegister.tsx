@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import EmbeddedPayment from '@/components/EmbeddedPayment';
+import ChatWidget from '@/components/ai-chat/ChatWidget';
 
 interface Plan {
   id: string;
@@ -31,6 +32,7 @@ interface PersonalDetails {
   phone: string;
   city: string;
   country: string;
+  address?: string;
 }
 
 const AIRegister = () => {
@@ -145,24 +147,96 @@ const AIRegister = () => {
     setCurrentStep('payment');
   };
 
-  const handlePaymentSuccess = () => {
-    toast({
-      title: "Registration Complete!",
-      description: "Welcome to ICE SOS Lite. You can now add additional information in your dashboard.",
-    });
-    // Redirect to dashboard or next step
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 2000);
+  const handlePaymentSuccess = async () => {
+    try {
+      // Create Supabase user account
+      const redirectUrl = `${window.location.origin}/dashboard`;
+      
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: personalDetails.email,
+        password: personalDetails.password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            first_name: personalDetails.firstName,
+            last_name: personalDetails.lastName,
+            phone: personalDetails.phone
+          }
+        }
+      });
+
+      if (authError) {
+        if (authError.message.includes("already registered")) {
+          // User exists, try to sign them in
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: personalDetails.email,
+            password: personalDetails.password,
+          });
+          
+          if (signInError) {
+            toast({
+              title: "Account Creation Failed",
+              description: "Email already exists but password doesn't match. Please use a different email or sign in with existing credentials.",
+              variant: "destructive"
+            });
+            return;
+          }
+        } else {
+          throw authError;
+        }
+      }
+
+      // Create or update profile record
+      if (authData?.user || !authError) {
+        const userId = authData?.user?.id;
+        if (userId) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert({
+              user_id: userId,
+              first_name: personalDetails.firstName,
+              last_name: personalDetails.lastName,
+              phone: personalDetails.phone,
+              address: `${personalDetails.city}, ${personalDetails.country}`,
+              country: personalDetails.country,
+              emergency_contacts: [],
+              medical_conditions: [],
+              allergies: [],
+              medications: []
+            });
+
+          if (profileError) {
+            console.error('Error creating profile:', profileError);
+          }
+        }
+      }
+
+      toast({
+        title: "Registration Complete!",
+        description: "Welcome to ICE SOS Lite. You can now access your dashboard.",
+      });
+      
+      // Redirect to dashboard
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration Error",
+        description: "Failed to create your account. Please try again or contact support.",
+        variant: "destructive"
+      });
+    }
   };
+
+  // Emma AI chat state
+  const [isEmmaOpen, setIsEmmaOpen] = useState(false);
 
   // Emma AI interaction handler
   const handleEmmaClick = useCallback(() => {
-    toast({
-      title: "👋 Hi there! I'm Emma",
-      description: "I'm here to help you stay safe! Complete your registration to unlock my full AI assistance features.",
-    });
-  }, [toast]);
+    setIsEmmaOpen(true);
+  }, []);
 
   // Simplified helper functions to avoid circular dependencies
   const mainPlans = dbPlans.filter(p => !p.name.includes('Family'));
@@ -500,6 +574,9 @@ const AIRegister = () => {
                   firstName={personalDetails.firstName}
                   lastName={personalDetails.lastName}
                   password={personalDetails.password}
+                  phone={personalDetails.phone}
+                  city={personalDetails.city}
+                  country={personalDetails.country}
                   onSuccess={handlePaymentSuccess}
                   onBack={() => setCurrentStep('details')}
                 />
@@ -508,6 +585,14 @@ const AIRegister = () => {
           </Card>
         </div>
       </div>
+      
+      {/* Chat Widget */}
+      <ChatWidget
+        isOpen={isEmmaOpen}
+        onClose={() => setIsEmmaOpen(false)}
+        userName={personalDetails.firstName || "User"}
+        context="emergency_protection_registration"
+      />
     </div>
   );
 };
