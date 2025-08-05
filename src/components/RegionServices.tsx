@@ -84,67 +84,69 @@ const RegionServices = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {regionalPlans.map((plan) => (
-            <Card 
-              key={plan.id} 
-              className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 ${
-                plan.is_popular ? 'ring-2 ring-primary shadow-lg' : ''
-              }`}
-            >
-              {plan.is_popular && (
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium">
-                  <Star className="h-3 w-3 inline mr-1" />
-                  Popular
-                </div>
-              )}
-              
-              <CardHeader className="text-center">
-                <CardTitle className="text-xl font-bold text-foreground">
-                  {plan.name}
-                </CardTitle>
-                <CardDescription className="text-muted-foreground">
-                  {plan.description}
-                </CardDescription>
-                <div className="mt-4">
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-3xl font-bold text-primary">
-                      {plan.price}
-                    </span>
-                    <span className="text-lg text-muted-foreground">
-                      {plan.currency}
-                    </span>
-                    <span className="text-sm text-muted-foreground">/month</span>
+        <div className="flex justify-center">
+          <div className="w-full max-w-md">
+            {regionalPlans.map((plan) => (
+              <Card 
+                key={plan.id} 
+                className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105 ${
+                  plan.is_popular ? 'ring-2 ring-primary shadow-lg' : ''
+                }`}
+              >
+                {plan.is_popular && (
+                  <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium">
+                    <Star className="h-3 w-3 inline mr-1" />
+                    Popular
                   </div>
-                  <Badge variant="outline" className="mt-2">
-                    <MapPin className="h-3 w-3 mr-1" />
-                    {plan.region}
-                  </Badge>
-                </div>
-              </CardHeader>
-              
-              <CardContent>
-                <ul className="space-y-3">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-3">
-                      <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
-                      <span className="text-sm text-foreground">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-              
-              <CardFooter className="pt-0">
-                <Button 
-                  className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium"
-                  onClick={() => trackRegionServiceClick(plan.id, plan.name)}
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  Contact Regional Center
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+                )}
+                
+                <CardHeader className="text-center">
+                  <CardTitle className="text-xl font-bold text-foreground">
+                    {plan.name}
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    {plan.description}
+                  </CardDescription>
+                  <div className="mt-4">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-3xl font-bold text-primary">
+                        {plan.price}
+                      </span>
+                      <span className="text-lg text-muted-foreground">
+                        {plan.currency}
+                      </span>
+                      <span className="text-sm text-muted-foreground">/month</span>
+                    </div>
+                    <Badge variant="outline" className="mt-2">
+                      <MapPin className="h-3 w-3 mr-1" />
+                      {plan.region}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                
+                <CardContent>
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                        <span className="text-sm text-foreground">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+                
+                <CardFooter className="pt-0">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium"
+                    onClick={() => trackRegionServiceClick(plan.id, plan.name)}
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Contact Regional Center
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
         </div>
 
         <div className="text-center mt-16">
