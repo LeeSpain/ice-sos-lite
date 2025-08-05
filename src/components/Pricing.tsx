@@ -32,6 +32,7 @@ interface SubscriptionPlan {
   is_popular: boolean;
   sort_order: number;
   stripe_price_id?: string;
+  region?: string;
 }
 
 const Pricing = () => {
@@ -54,24 +55,9 @@ const Pricing = () => {
     return "bg-primary"; // default
   };
 
-  const regionalPlans = [
-    {
-      name: "Call Centre",
-      price: "€24.99",
-      period: "/month",
-      description: "Professional emergency response",
-      badge: "Spain Only",
-      badgeColor: "bg-emergency",
-      icon: MapPin,
-      features: [
-        "24/7 access to ICE Alarm support team",
-        "Staff speak English and Spanish",
-        "Direct escalation to call center",
-        "Professional emergency response",
-        "Geofenced to Spain region"
-      ]
-    }
-  ];
+  // Filter global and regional plans
+  const globalPlans = subscriptionPlans.filter(plan => !plan.region || plan.region === 'global');
+  const regionalPlans = subscriptionPlans.filter(plan => plan.region && plan.region !== 'global');
 
   useEffect(() => {
     fetchProducts();
@@ -240,7 +226,7 @@ const Pricing = () => {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {subscriptionPlans.map((plan, index) => {
+            {globalPlans.map((plan, index) => {
               const Icon = getIconForPlan(plan.name);
               const badgeColor = getBadgeColorForPlan(plan.name);
               return (
@@ -423,62 +409,65 @@ const Pricing = () => {
         )}
 
         {/* Regional Services Section */}
-        <div className="mb-16">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              Regional Services
-            </h3>
-            <p className="text-lg text-muted-foreground">
-              Premium call center services available in select regions
-            </p>
-          </div>
-          
-          <div className="flex justify-center mb-16">
-            <div className={`w-full max-w-md ${regionalPlans.length > 1 ? 'grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl' : ''}`}>
-              {regionalPlans.map((plan, index) => {
-                const Icon = plan.icon;
-                return (
-                  <Card key={index} className="relative overflow-hidden border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-card to-card/80 h-[420px]">
-                    <div className="absolute inset-0 bg-gradient-to-br from-muted/10 via-transparent to-secondary/10"></div>
-                    <Badge className={`absolute top-4 right-4 ${plan.badgeColor} text-white shadow-lg text-xs px-3 py-1`}>
-                      {plan.badge}
-                    </Badge>
-                    <CardHeader className="relative pb-4 text-center">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-md">
-                        <Icon className="h-8 w-8 text-blue-600" />
-                      </div>
-                      <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
-                      <CardDescription className="text-base mt-2">{plan.description}</CardDescription>
-                      <div className="mt-4">
-                        <span className="text-3xl font-bold text-primary">{plan.price}</span>
-                        <span className="text-muted-foreground">{plan.period}</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="relative pt-0 h-full flex flex-col">
-                      <div className="mb-4 flex-1">
-                        <ul className="space-y-2">
-                          {plan.features.map((feature, featureIndex) => (
-                            <li key={featureIndex} className="flex items-start gap-2">
-                              <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-muted-foreground">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <Button 
-                        asChild
-                        className="w-full mt-auto" 
-                        variant="default"
-                      >
-                        <Link to="/register">Subscribe Now</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+        {regionalPlans.length > 0 && (
+          <div className="mb-16">
+            <div className="text-center mb-12">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                Regional Services
+              </h3>
+              <p className="text-lg text-muted-foreground">
+                Premium call center services available in select regions
+              </p>
+            </div>
+            
+            <div className="flex justify-center mb-16">
+              <div className={`w-full max-w-md ${regionalPlans.length > 1 ? 'grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl' : ''}`}>
+                {regionalPlans.map((plan, index) => {
+                  const Icon = getIconForPlan(plan.name);
+                  const regionName = plan.region === 'spain' ? 'Spain Only' : plan.region?.toUpperCase();
+                  return (
+                    <Card key={plan.id} className="relative overflow-hidden border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-card to-card/80 h-[420px]">
+                      <div className="absolute inset-0 bg-gradient-to-br from-muted/10 via-transparent to-secondary/10"></div>
+                      <Badge className="absolute top-4 right-4 bg-emergency text-white shadow-lg text-xs px-3 py-1">
+                        {regionName}
+                      </Badge>
+                      <CardHeader className="relative pb-4 text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-md">
+                          <Icon className="h-8 w-8 text-blue-600" />
+                        </div>
+                        <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
+                        <CardDescription className="text-base mt-2">{plan.description}</CardDescription>
+                        <div className="mt-4">
+                          <span className="text-3xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
+                          <span className="text-muted-foreground">/{plan.billing_interval}</span>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="relative pt-0 h-full flex flex-col">
+                        <div className="mb-4 flex-1">
+                          <ul className="space-y-2">
+                            {plan.features.map((feature, featureIndex) => (
+                              <li key={featureIndex} className="flex items-start gap-2">
+                                <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                <span className="text-sm text-muted-foreground">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <Button 
+                          className="w-full mt-auto" 
+                          variant="default"
+                          onClick={() => handleSubscriptionPurchase(plan)}
+                        >
+                          Subscribe Now
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Additional Information */}
         <div className="text-center max-w-4xl mx-auto">
