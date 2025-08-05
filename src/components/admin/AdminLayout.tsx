@@ -28,7 +28,8 @@ import {
   Shield,
   Database,
   Bot,
-  Package
+  Package,
+  MapPin
 } from 'lucide-react';
 
 const adminMenuItems = [
@@ -73,9 +74,10 @@ const adminMenuItems = [
     ]
   },
   {
-    title: "🛍️ Product Management",
+    title: "🛍️ Product & Services",
     items: [
       { title: "Products", url: "/admin-dashboard/products", icon: Package },
+      { title: "Regional Services", url: "/admin-dashboard/regional-services", icon: MapPin },
     ]
   },
   {

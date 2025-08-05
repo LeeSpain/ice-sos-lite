@@ -12,6 +12,7 @@ import UserGrowthPage from '@/components/admin/pages/UserGrowthPage';
 import AIAgentPage from '@/components/admin/pages/AIAgentPage';
 import AITrainingPage from '@/components/admin/pages/AITrainingPage';
 import ProductsPage from '@/components/admin/pages/ProductsPage';
+import RegionalServicesPage from '@/components/admin/pages/RegionalServicesPage';
 import GlobalProtectionPlansPage from '@/components/admin/pages/GlobalProtectionPlansPage';
 
 const AdminDashboard: React.FC = () => {
@@ -34,6 +35,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="emergencies" element={<div className="p-6"><h1 className="text-3xl font-bold">Emergency Incidents</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="safety" element={<div className="p-6"><h1 className="text-3xl font-bold">Safety Monitoring</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="products" element={<ProductsPage />} />
+        <Route path="regional-services" element={<RegionalServicesPage />} />
         <Route path="activity" element={<ActivityPage />} />
         <Route path="settings" element={<div className="p-6"><h1 className="text-3xl font-bold">System Settings</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="reports" element={<div className="p-6"><h1 className="text-3xl font-bold">Reports</h1><p className="text-muted-foreground">Coming soon...</p></div>} />

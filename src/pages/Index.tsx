@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import MetricPreview from "@/components/MetricPreview";
 import Pricing from "@/components/Pricing";
+import RegionServices from "@/components/RegionServices";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ai-chat/ChatWidget";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -95,6 +96,7 @@ const Index = () => {
       <Features />
       <MetricPreview />
       <Pricing />
+      <RegionServices />
       <Footer />
       
       {/* Emma Chat Widget */}
