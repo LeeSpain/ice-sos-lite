@@ -80,6 +80,51 @@ export type Database = {
         }
         Relationships: []
       }
+      email_automation_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          email_template: string
+          id: string
+          is_enabled: boolean
+          last_run_at: string | null
+          name: string
+          next_run_at: string | null
+          recipient_filter: string
+          trigger_config: Json
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          email_template: string
+          id?: string
+          is_enabled?: boolean
+          last_run_at?: string | null
+          name: string
+          next_run_at?: string | null
+          recipient_filter?: string
+          trigger_config?: Json
+          trigger_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          email_template?: string
+          id?: string
+          is_enabled?: boolean
+          last_run_at?: string | null
+          name?: string
+          next_run_at?: string | null
+          recipient_filter?: string
+          trigger_config?: Json
+          trigger_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_campaigns: {
         Row: {
           click_count: number | null
@@ -187,6 +232,72 @@ export type Database = {
           },
         ]
       }
+      email_queue: {
+        Row: {
+          automation_id: string | null
+          body: string
+          campaign_id: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          priority: number
+          recipient_email: string
+          recipient_user_id: string | null
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          automation_id?: string | null
+          body: string
+          campaign_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          priority?: number
+          recipient_email: string
+          recipient_user_id?: string | null
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          automation_id?: string | null
+          body?: string
+          campaign_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          priority?: number
+          recipient_email?: string
+          recipient_user_id?: string | null
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_queue_automation_id_fkey"
+            columns: ["automation_id"]
+            isOneToOne: false
+            referencedRelation: "email_automation_settings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_queue_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_invites: {
         Row: {
           accepted_at: string | null
@@ -229,6 +340,42 @@ export type Database = {
           relationship?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      gmail_tokens: {
+        Row: {
+          access_token: string
+          created_at: string
+          email_address: string | null
+          expires_at: string
+          id: string
+          refresh_token: string
+          scope: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          created_at?: string
+          email_address?: string | null
+          expires_at: string
+          id?: string
+          refresh_token: string
+          scope?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          email_address?: string | null
+          expires_at?: string
+          id?: string
+          refresh_token?: string
+          scope?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

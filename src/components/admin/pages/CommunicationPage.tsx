@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   Mail, 
   MessageSquare, 
@@ -20,7 +21,10 @@ import {
   AtSign,
   Clock,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Settings,
+  Play,
+  Pause
 } from 'lucide-react';
 
 interface EmailData {
@@ -36,17 +40,31 @@ interface EmailData {
 interface GmailAuthData {
   accessToken: string;
   refreshToken: string;
-  expiresAt: number;
+  expiresAt: string;
+  email: string;
+}
+
+interface AutomationSetting {
+  id: string;
+  name: string;
+  description: string;
+  is_enabled: boolean;
+  trigger_type: string;
+  email_template: string;
+  last_run_at?: string;
 }
 
 export default function CommunicationPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [emails, setEmails] = useState<EmailData[]>([]);
   const [loading, setLoading] = useState(false);
   const [gmailAuth, setGmailAuth] = useState<GmailAuthData | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [selectedEmail, setSelectedEmail] = useState<EmailData | null>(null);
   const [showReplyModal, setShowReplyModal] = useState(false);
+  const [automationSettings, setAutomationSettings] = useState<AutomationSetting[]>([]);
+  const [emailQueue, setEmailQueue] = useState<any[]>([]);
 
   // Manual email compose state
   const [composeEmail, setComposeEmail] = useState({
@@ -56,26 +74,138 @@ export default function CommunicationPage() {
   });
 
   useEffect(() => {
-    // Check if user has authorized Gmail
-    const authData = localStorage.getItem('gmail_auth');
-    if (authData) {
-      setGmailAuth(JSON.parse(authData));
+    loadGmailAuth();
+    loadAutomationSettings();
+    loadEmailQueue();
+  }, [user]);
+
+  const loadGmailAuth = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('gmail_tokens')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+
+      if (data) {
+        // Check if token is expired
+        const expiresAt = new Date(data.expires_at);
+        const now = new Date();
+        
+        if (expiresAt <= now) {
+          // Token expired, try to refresh
+          await refreshGmailToken(data.refresh_token);
+        } else {
+          setGmailAuth({
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            expiresAt: data.expires_at,
+            email: data.email_address || ''
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading Gmail auth:', error);
     }
-  }, []);
+  };
 
-  const authorizeGmail = () => {
-    const clientId = 'your-gmail-client-id'; // This would come from environment
-    const redirectUri = `${window.location.origin}/admin-dashboard/communication`;
-    const scope = 'https://www.googleapis.com/auth/gmail.modify';
-    
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-      `client_id=${clientId}&` +
-      `redirect_uri=${encodeURIComponent(redirectUri)}&` +
-      `response_type=code&` +
-      `scope=${encodeURIComponent(scope)}&` +
-      `access_type=offline`;
+  const loadAutomationSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('email_automation_settings')
+        .select('*')
+        .order('name');
 
-    window.location.href = authUrl;
+      if (error) throw error;
+      setAutomationSettings(data || []);
+    } catch (error) {
+      console.error('Error loading automation settings:', error);
+    }
+  };
+
+  const loadEmailQueue = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('email_queue')
+        .select('*')
+        .in('status', ['pending', 'processing'])
+        .order('scheduled_at')
+        .limit(20);
+
+      if (error) throw error;
+      setEmailQueue(data || []);
+    } catch (error) {
+      console.error('Error loading email queue:', error);
+    }
+  };
+
+  const authorizeGmail = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('gmail-oauth', {
+        body: { action: 'authorize' }
+      });
+
+      if (error) throw error;
+
+      // Open OAuth in new window
+      const popup = window.open(
+        data.authUrl, 
+        'gmail-auth', 
+        'width=500,height=600,scrollbars=yes,resizable=yes'
+      );
+
+      // Poll for completion
+      const checkClosed = setInterval(() => {
+        if (popup?.closed) {
+          clearInterval(checkClosed);
+          // Reload auth data after OAuth completion
+          setTimeout(() => loadGmailAuth(), 1000);
+        }
+      }, 1000);
+
+    } catch (error) {
+      console.error('Error authorizing Gmail:', error);
+      toast({
+        title: "Authorization Error",
+        description: "Failed to initiate Gmail authorization",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const refreshGmailToken = async (refreshToken: string) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('gmail-oauth', {
+        body: { 
+          action: 'refresh',
+          refreshToken,
+          userId: user.id
+        }
+      });
+
+      if (error) throw error;
+
+      setGmailAuth(prev => prev ? {
+        ...prev,
+        accessToken: data.accessToken,
+        expiresAt: data.expiresAt
+      } : null);
+
+    } catch (error) {
+      console.error('Error refreshing Gmail token:', error);
+      // Clear invalid auth
+      setGmailAuth(null);
+    }
   };
 
   const fetchEmails = async () => {
@@ -90,6 +220,15 @@ export default function CommunicationPage() {
 
     setLoading(true);
     try {
+      // Check if token needs refresh
+      const expiresAt = new Date(gmailAuth.expiresAt);
+      const now = new Date();
+      
+      if (expiresAt <= now) {
+        await refreshGmailToken(gmailAuth.refreshToken);
+        return; // Will retry after refresh completes
+      }
+
       const { data, error } = await supabase.functions.invoke('gmail-integration', {
         body: {
           action: 'fetch',
@@ -217,6 +356,63 @@ export default function CommunicationPage() {
       toast({
         title: "Error",
         description: "Failed to generate AI reply",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const toggleAutomation = async (automationId: string, enabled: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('email_automation_settings')
+        .update({ is_enabled: enabled })
+        .eq('id', automationId);
+
+      if (error) throw error;
+
+      setAutomationSettings(prev => 
+        prev.map(automation => 
+          automation.id === automationId 
+            ? { ...automation, is_enabled: enabled }
+            : automation
+        )
+      );
+
+      toast({
+        title: "Automation Updated",
+        description: `Automation ${enabled ? 'enabled' : 'disabled'} successfully`,
+      });
+
+    } catch (error) {
+      console.error('Error toggling automation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update automation",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const processEmailQueue = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('email-automation', {
+        body: { action: 'process_queue' }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Queue Processed",
+        description: `Sent ${data.emailsSent || 0} emails, ${data.emailsFailed || 0} failed`,
+      });
+
+      loadEmailQueue(); // Refresh queue display
+
+    } catch (error) {
+      console.error('Error processing queue:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process email queue",
         variant: "destructive",
       });
     }
@@ -361,55 +557,120 @@ export default function CommunicationPage() {
         </TabsContent>
 
         <TabsContent value="automation" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Automation Settings</CardTitle>
+                  <Button size="sm" onClick={processEmailQueue}>
+                    <Play className="h-4 w-4 mr-2" />
+                    Process Queue
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {automationSettings.map((automation) => (
+                  <div key={automation.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        {automation.is_enabled ? (
+                          <CheckCircle className="h-5 w-5 text-green-500" />
+                        ) : (
+                          <Pause className="h-5 w-5 text-gray-500" />
+                        )}
+                        <h3 className="font-semibold">{automation.name}</h3>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={automation.is_enabled ? "outline" : "default"}
+                        onClick={() => toggleAutomation(automation.id, !automation.is_enabled)}
+                      >
+                        {automation.is_enabled ? 'Disable' : 'Enable'}
+                      </Button>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      {automation.description}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Badge className={automation.is_enabled ? "bg-green-500" : "bg-gray-500"}>
+                        {automation.is_enabled ? 'Active' : 'Disabled'}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        Trigger: {automation.trigger_type}
+                      </span>
+                    </div>
+                    {automation.last_run_at && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Last run: {new Date(automation.last_run_at).toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Email Queue Status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-64">
+                  <div className="space-y-3">
+                    {emailQueue.map((email) => (
+                      <div key={email.id} className="border rounded-lg p-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <Badge variant={email.status === 'pending' ? 'default' : 'secondary'}>
+                            {email.status}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            Priority: {email.priority}
+                          </span>
+                        </div>
+                        <p className="font-medium text-sm">{email.subject}</p>
+                        <p className="text-xs text-muted-foreground">To: {email.recipient_email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Scheduled: {new Date(email.scheduled_at).toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
+                    
+                    {emailQueue.length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No emails in queue
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle>Email Automation Settings</CardTitle>
+              <CardTitle>Gmail Integration Status</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <h3 className="font-semibold">Welcome Emails</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Automatically send welcome emails to new users
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">
+                    Status: {gmailAuth ? 'Connected' : 'Not Connected'}
                   </p>
-                  <Badge className="bg-green-500">Active</Badge>
+                  {gmailAuth && (
+                    <p className="text-sm text-muted-foreground">
+                      Connected as: {gmailAuth.email}
+                    </p>
+                  )}
                 </div>
-
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="h-5 w-5 text-yellow-500" />
-                    <h3 className="font-semibold">AI Auto-Reply</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    AI responds to common customer inquiries
-                  </p>
-                  <Badge className="bg-yellow-500">Pending Setup</Badge>
-                </div>
-
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <MessageSquare className="h-5 w-5 text-blue-500" />
-                    <h3 className="font-semibold">Follow-up Sequences</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Automated follow-up for incomplete profiles
-                  </p>
-                  <Badge className="bg-blue-500">Coming Soon</Badge>
-                </div>
-
-                <div className="border rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <AlertCircle className="h-5 w-5 text-orange-500" />
-                    <h3 className="font-semibold">Emergency Alerts</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Critical emergency notification system
-                  </p>
-                  <Badge className="bg-orange-500">In Development</Badge>
-                </div>
+                {gmailAuth ? (
+                  <Button variant="outline" onClick={() => setGmailAuth(null)}>
+                    Disconnect
+                  </Button>
+                ) : (
+                  <Button onClick={authorizeGmail}>
+                    <AtSign className="h-4 w-4 mr-2" />
+                    Connect Gmail
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
