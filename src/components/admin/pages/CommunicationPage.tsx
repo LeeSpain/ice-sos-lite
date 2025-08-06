@@ -24,7 +24,11 @@ import {
   AlertCircle,
   Settings,
   Play,
-  Pause
+  Pause,
+  Plus,
+  Edit,
+  Trash2,
+  Eye
 } from 'lucide-react';
 
 interface EmailData {
@@ -418,6 +422,413 @@ export default function CommunicationPage() {
     }
   };
 
+  // Template Management Component
+  const TemplateManagement = () => {
+    const [templates, setTemplates] = useState<any[]>([]);
+    const [showCreateTemplate, setShowCreateTemplate] = useState(false);
+    const [editingTemplate, setEditingTemplate] = useState<any>(null);
+    const [newTemplate, setNewTemplate] = useState({
+      name: '',
+      description: '',
+      subject_template: '',
+      body_template: '',
+      template_type: 'workflow',
+      variables: []
+    });
+
+    useEffect(() => {
+      loadTemplates();
+    }, []);
+
+    const loadTemplates = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('email_templates')
+          .select('*')
+          .order('name');
+
+        if (error) throw error;
+        setTemplates(data || []);
+      } catch (error) {
+        console.error('Error loading templates:', error);
+      }
+    };
+
+    const createTemplate = async () => {
+      try {
+        const { error } = await supabase
+          .from('email_templates')
+          .insert([newTemplate]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Template Created",
+          description: "Email template created successfully",
+        });
+
+        setShowCreateTemplate(false);
+        setNewTemplate({
+          name: '',
+          description: '',
+          subject_template: '',
+          body_template: '',
+          template_type: 'workflow',
+          variables: []
+        });
+        loadTemplates();
+      } catch (error) {
+        console.error('Error creating template:', error);
+        toast({
+          title: "Error",
+          description: "Failed to create template",
+          variant: "destructive",
+        });
+      }
+    };
+
+    return (
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Email Templates</CardTitle>
+              <Button onClick={() => setShowCreateTemplate(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Template
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {templates.map((template) => (
+                <div key={template.id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold">{template.name}</h3>
+                      <Badge variant="outline">{template.template_type}</Badge>
+                      <Badge variant={template.is_active ? "default" : "secondary"}>
+                        {template.is_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline">
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {template.description}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Subject: {template.subject_template}
+                  </p>
+                  <div className="flex gap-1 mt-2">
+                    {Array.isArray(template.variables) && template.variables.map((variable: string) => (
+                      <Badge key={variable} variant="outline" className="text-xs">
+                        {`{{${variable}}}`}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Create Template Dialog */}
+        <Dialog open={showCreateTemplate} onOpenChange={setShowCreateTemplate}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Create Email Template</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Template Name</label>
+                  <Input
+                    value={newTemplate.name}
+                    onChange={(e) => setNewTemplate(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Template name"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Type</label>
+                  <select 
+                    className="w-full p-2 border rounded"
+                    value={newTemplate.template_type}
+                    onChange={(e) => setNewTemplate(prev => ({ ...prev, template_type: e.target.value }))}
+                  >
+                    <option value="workflow">Workflow</option>
+                    <option value="auto_reply">Auto Reply</option>
+                    <option value="campaign">Campaign</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Description</label>
+                <Input
+                  value={newTemplate.description}
+                  onChange={(e) => setNewTemplate(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Template description"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Subject Template</label>
+                <Input
+                  value={newTemplate.subject_template}
+                  onChange={(e) => setNewTemplate(prev => ({ ...prev, subject_template: e.target.value }))}
+                  placeholder="Welcome {{first_name}}!"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Body Template</label>
+                <Textarea
+                  value={newTemplate.body_template}
+                  onChange={(e) => setNewTemplate(prev => ({ ...prev, body_template: e.target.value }))}
+                  placeholder="Hello {{first_name}}, welcome to our service..."
+                  rows={6}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowCreateTemplate(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={createTemplate}>
+                  Create Template
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  };
+
+  // Auto-Reply Management Component
+  const AutoReplyManagement = () => {
+    const [autoReplies, setAutoReplies] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
+
+    useEffect(() => {
+      loadAutoReplies();
+      loadCategories();
+    }, []);
+
+    const loadAutoReplies = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('auto_reply_queue')
+          .select(`
+            *,
+            conversation_categories(name),
+            email_templates(name)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (error) throw error;
+        setAutoReplies(data || []);
+      } catch (error) {
+        console.error('Error loading auto replies:', error);
+      }
+    };
+
+    const loadCategories = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('conversation_categories')
+          .select('*')
+          .eq('is_active', true)
+          .order('name');
+
+        if (error) throw error;
+        setCategories(data || []);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    };
+
+    const approveReply = async (replyId: string) => {
+      try {
+        const { error } = await supabase
+          .from('auto_reply_queue')
+          .update({
+            status: 'approved',
+            reviewed_by: user?.id,
+            reviewed_at: new Date().toISOString()
+          })
+          .eq('id', replyId);
+
+        if (error) throw error;
+
+        toast({
+          title: "Reply Approved",
+          description: "Auto-reply has been approved and will be sent",
+        });
+
+        loadAutoReplies();
+      } catch (error) {
+        console.error('Error approving reply:', error);
+        toast({
+          title: "Error",
+          description: "Failed to approve reply",
+          variant: "destructive",
+        });
+      }
+    };
+
+    const rejectReply = async (replyId: string, notes: string) => {
+      try {
+        const { error } = await supabase
+          .from('auto_reply_queue')
+          .update({
+            status: 'rejected',
+            reviewed_by: user?.id,
+            reviewed_at: new Date().toISOString(),
+            review_notes: notes
+          })
+          .eq('id', replyId);
+
+        if (error) throw error;
+
+        toast({
+          title: "Reply Rejected",
+          description: "Auto-reply has been rejected",
+        });
+
+        loadAutoReplies();
+      } catch (error) {
+        console.error('Error rejecting reply:', error);
+        toast({
+          title: "Error",
+          description: "Failed to reject reply",
+          variant: "destructive",
+        });
+      }
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Auto-Replies</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-96">
+                <div className="space-y-4">
+                  {autoReplies.filter(reply => reply.status === 'pending').map((reply) => (
+                    <div key={reply.id} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <Badge variant="outline">
+                          Confidence: {Math.round(reply.confidence_score * 100)}%
+                        </Badge>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => approveReply(reply.id)}
+                          >
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Approve
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => rejectReply(reply.id, 'Manual rejection')}
+                          >
+                            <AlertCircle className="h-3 w-3 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="text-sm space-y-2">
+                        <p><strong>Category:</strong> {reply.conversation_categories?.name || 'Uncategorized'}</p>
+                        <p><strong>Template:</strong> {reply.email_templates?.name || 'AI Generated'}</p>
+                        <div className="bg-muted p-2 rounded text-xs">
+                          {reply.generated_reply}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {autoReplies.filter(reply => reply.status === 'pending').length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No pending auto-replies
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Conversation Categories</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {categories.map((category) => (
+                  <div key={category.id} className="border rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold">{category.name}</h3>
+                      <Badge variant="outline">
+                        Priority: {category.priority_level}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {category.description}
+                    </p>
+                    <div className="flex gap-1 flex-wrap">
+                      {category.keywords?.map((keyword: string) => (
+                        <Badge key={keyword} variant="secondary" className="text-xs">
+                          {keyword}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Auto-Reply Activity</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {autoReplies.slice(0, 10).map((reply) => (
+                <div key={reply.id} className="flex items-center justify-between border-b pb-2">
+                  <div>
+                    <Badge variant={
+                      reply.status === 'approved' ? 'default' :
+                      reply.status === 'rejected' ? 'destructive' :
+                      reply.status === 'sent' ? 'secondary' : 'outline'
+                    }>
+                      {reply.status}
+                    </Badge>
+                    <span className="text-sm ml-2">
+                      {reply.conversation_categories?.name || 'Uncategorized'}
+                    </span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(reply.created_at).toLocaleString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -426,7 +837,7 @@ export default function CommunicationPage() {
       </div>
 
       <Tabs defaultValue="inbox" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="inbox">
             <Mail className="h-4 w-4 mr-2" />
             Inbox
@@ -438,6 +849,14 @@ export default function CommunicationPage() {
           <TabsTrigger value="automation">
             <Bot className="h-4 w-4 mr-2" />
             Automation
+          </TabsTrigger>
+          <TabsTrigger value="templates">
+            <Settings className="h-4 w-4 mr-2" />
+            Templates
+          </TabsTrigger>
+          <TabsTrigger value="auto-replies">
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Auto-Replies
           </TabsTrigger>
         </TabsList>
 
@@ -674,6 +1093,14 @@ export default function CommunicationPage() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="templates" className="space-y-4">
+          <TemplateManagement />
+        </TabsContent>
+
+        <TabsContent value="auto-replies" className="space-y-4">
+          <AutoReplyManagement />
         </TabsContent>
       </Tabs>
 

@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      auto_reply_queue: {
+        Row: {
+          category_id: string | null
+          confidence_score: number
+          conversation_id: string
+          created_at: string
+          generated_reply: string
+          id: string
+          original_message_id: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          scheduled_send_at: string | null
+          sent_at: string | null
+          status: string
+          template_used: string | null
+          updated_at: string
+        }
+        Insert: {
+          category_id?: string | null
+          confidence_score?: number
+          conversation_id: string
+          created_at?: string
+          generated_reply: string
+          id?: string
+          original_message_id?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          scheduled_send_at?: string | null
+          sent_at?: string | null
+          status?: string
+          template_used?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string | null
+          confidence_score?: number
+          conversation_id?: string
+          created_at?: string
+          generated_reply?: string
+          id?: string
+          original_message_id?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          scheduled_send_at?: string | null
+          sent_at?: string | null
+          status?: string
+          template_used?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       communication_preferences: {
         Row: {
           created_at: string
@@ -47,6 +101,48 @@ export type Database = {
           updated_at?: string
           user_id?: string
           whatsapp_notifications?: boolean | null
+        }
+        Relationships: []
+      }
+      conversation_categories: {
+        Row: {
+          ai_confidence_threshold: number | null
+          auto_assign_to_user: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          keywords: string[] | null
+          name: string
+          priority_level: number | null
+          response_template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_confidence_threshold?: number | null
+          auto_assign_to_user?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          keywords?: string[] | null
+          name: string
+          priority_level?: number | null
+          response_template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_confidence_threshold?: number | null
+          auto_assign_to_user?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          keywords?: string[] | null
+          name?: string
+          priority_level?: number | null
+          response_template_id?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -297,6 +393,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_templates: {
+        Row: {
+          body_template: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          subject_template: string
+          template_type: string
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          body_template: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          subject_template: string
+          template_type?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          body_template?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          subject_template?: string
+          template_type?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Relationships: []
       }
       family_invites: {
         Row: {
@@ -705,6 +843,45 @@ export type Database = {
         }
         Relationships: []
       }
+      routing_rules: {
+        Row: {
+          action_config: Json
+          action_type: string
+          conditions: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          priority: number | null
+          updated_at: string
+        }
+        Insert: {
+          action_config?: Json
+          action_type: string
+          conditions?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          priority?: number | null
+          updated_at?: string
+        }
+        Update: {
+          action_config?: Json
+          action_type?: string
+          conditions?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          priority?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_product_compatibility: {
         Row: {
           compatibility_notes: string | null
@@ -1028,6 +1205,87 @@ export type Database = {
           is_encrypted?: boolean
           setting_key?: string
           setting_value?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      workflow_executions: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          email_template_id: string
+          error_message: string | null
+          executed_at: string | null
+          id: string
+          status: string
+          user_id: string | null
+          variables_used: Json | null
+          workflow_trigger_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          email_template_id: string
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          status?: string
+          user_id?: string | null
+          variables_used?: Json | null
+          workflow_trigger_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          email_template_id?: string
+          error_message?: string | null
+          executed_at?: string | null
+          id?: string
+          status?: string
+          user_id?: string | null
+          variables_used?: Json | null
+          workflow_trigger_id?: string
+        }
+        Relationships: []
+      }
+      workflow_triggers: {
+        Row: {
+          created_at: string
+          delay_minutes: number | null
+          description: string | null
+          email_template_id: string
+          id: string
+          is_active: boolean
+          name: string
+          priority: number | null
+          trigger_conditions: Json
+          trigger_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          delay_minutes?: number | null
+          description?: string | null
+          email_template_id: string
+          id?: string
+          is_active?: boolean
+          name: string
+          priority?: number | null
+          trigger_conditions?: Json
+          trigger_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          delay_minutes?: number | null
+          description?: string | null
+          email_template_id?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          priority?: number | null
+          trigger_conditions?: Json
+          trigger_type?: string
           updated_at?: string
         }
         Relationships: []
