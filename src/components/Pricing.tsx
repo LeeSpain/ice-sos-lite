@@ -189,7 +189,7 @@ const Pricing = () => {
     <section className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
             Your Protection Plan
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -253,8 +253,8 @@ const Pricing = () => {
           </div>
 
           {/* Family & Carer Access Information */}
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black">
+          <div className="text-center mb-8 mt-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
               Family & Carer Access
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -318,8 +318,8 @@ const Pricing = () => {
         {/* Safety Products Section */}
         {products.length > 0 && (
           <>
-            <div className="text-center mb-8 mt-8">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <div className="text-center mb-8 mt-16">
+              <h3 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
                 Safety Products
               </h3>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -483,8 +483,8 @@ const Pricing = () => {
         {/* Regional Services */}
         {regionalServices.length > 0 && (
           <>
-            <div className="text-center mb-8 mt-8">
-              <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <div className="text-center mb-8 mt-16">
+              <h3 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
                 Regional Services
               </h3>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
