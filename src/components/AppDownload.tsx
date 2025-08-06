@@ -6,54 +6,74 @@ import { Link } from "react-router-dom";
 
 const AppDownload = () => {
   return (
-    <section className="py-20">
+    <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/10 to-primary/5">
       <div className="container mx-auto px-4">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
+            Professional Mobile App
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Download ICE SOS Lite - Your complete emergency protection platform
+          </p>
+        </div>
+
         {/* Enhanced App Download Section */}
-        <Card className="relative border border-border bg-card shadow-2xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-muted/50 via-secondary to-muted/30"></div>
-          <CardHeader className="relative text-center py-14 px-8">
-            <Badge className="bg-emergency text-white w-fit mx-auto mb-6 text-sm font-semibold px-4 py-2 shadow-lg">
-              PROFESSIONAL APP
+        <Card className="relative border-2 border-primary/20 bg-white shadow-2xl overflow-hidden max-w-5xl mx-auto">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/5"></div>
+          <CardHeader className="relative text-center py-12 px-8">
+            <Badge className="bg-emergency text-white w-fit mx-auto mb-6 text-sm font-semibold px-6 py-3 shadow-lg rounded-full">
+              ⚡ PROFESSIONAL PLATFORM
             </Badge>
-            <div className="w-20 h-20 mx-auto mb-8 bg-white shadow-xl rounded-2xl flex items-center justify-center border border-border/20">
-              <Smartphone className="h-10 w-10 text-primary" />
+            <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-primary to-secondary shadow-2xl rounded-3xl flex items-center justify-center border-4 border-white">
+              <Smartphone className="h-12 w-12 text-white" />
             </div>
-            <CardTitle className="text-3xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
-              Download ICE SOS Lite
+            <CardTitle className="text-4xl md:text-6xl font-bold mb-6 text-black">
+              ICE SOS Lite
             </CardTitle>
-            <CardDescription className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <CardDescription className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               Professional emergency protection platform for individuals and families. 
-              Download free, then activate your premium protection features.
+              <br className="hidden md:block" />
+              <strong className="text-foreground">Download free</strong>, then activate your premium protection features.
             </CardDescription>
           </CardHeader>
-          <CardContent className="relative px-8 pb-14">
-            <div className="grid md:grid-cols-3 gap-6 mb-10 max-w-4xl mx-auto">
-              <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
-                <Check className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h4 className="font-semibold text-foreground mb-2">Emergency SOS</h4>
-                <p className="text-sm text-muted-foreground">One-tap emergency button with GPS location sharing</p>
+          <CardContent className="relative px-8 pb-16">
+            {/* Key Features Grid */}
+            <div className="grid md:grid-cols-3 gap-8 mb-12 max-w-5xl mx-auto">
+              <div className="text-center p-8 rounded-2xl bg-white border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                  <Check className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="font-bold text-lg text-foreground mb-3">Emergency SOS</h4>
+                <p className="text-muted-foreground">One-tap emergency button with GPS location sharing and instant alerts</p>
               </div>
-              <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
-                <Check className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h4 className="font-semibold text-foreground mb-2">Global Coverage</h4>
-                <p className="text-sm text-muted-foreground">Works worldwide with full multilingual support</p>
+              <div className="text-center p-8 rounded-2xl bg-white border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                  <Check className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="font-bold text-lg text-foreground mb-3">Global Coverage</h4>
+                <p className="text-muted-foreground">Works worldwide with full multilingual support and 24/7 monitoring</p>
               </div>
-              <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
-                <Check className="h-8 w-8 text-primary mx-auto mb-3" />
-                <h4 className="font-semibold text-foreground mb-2">Instant Setup</h4>
-                <p className="text-sm text-muted-foreground">Ready to use in minutes with simple configuration</p>
+              <div className="text-center p-8 rounded-2xl bg-white border-2 border-primary/10 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                  <Check className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="font-bold text-lg text-foreground mb-3">Instant Setup</h4>
+                <p className="text-muted-foreground">Ready to use in minutes with simple configuration and onboarding</p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            
+            {/* Call to Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-6 justify-center max-w-lg mx-auto">
+              <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold text-lg px-10 py-5 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl">
                 <Link to="/register">
-                  <Download className="mr-2 h-5 w-5" />
-                  Get Started Now
+                  <Download className="mr-3 h-6 w-6" />
+                  Get Started Free
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
-                <Download className="mr-2 h-5 w-5" />
-                View Plans
+              <Button size="lg" variant="outline" className="border-3 border-primary text-primary hover:bg-primary hover:text-white font-bold text-lg px-10 py-5 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl">
+                <Download className="mr-3 h-6 w-6" />
+                View All Plans
               </Button>
             </div>
           </CardContent>
