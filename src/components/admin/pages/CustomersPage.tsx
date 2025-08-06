@@ -44,15 +44,16 @@ export default function CustomersPage() {
     try {
       setLoading(true);
       
-      // Load profiles with subscription data
+      // Load profiles with subscription data (LEFT JOIN to include customers without subscriptions)
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select(`
           *,
-          subscribers!inner(
+          subscribers(
             subscribed,
             subscription_tier,
-            subscription_end
+            subscription_end,
+            email
           )
         `)
         .order('created_at', { ascending: false });
@@ -62,9 +63,12 @@ export default function CustomersPage() {
         return;
       }
 
-      // Transform data to include subscription info
+      // Transform data to include subscription info and email
       const transformedCustomers = profilesData?.map(profile => ({
         ...profile,
+        email: Array.isArray(profile.subscribers) && profile.subscribers.length > 0 
+          ? profile.subscribers[0].email 
+          : null,
         subscription: Array.isArray(profile.subscribers) && profile.subscribers.length > 0 
           ? profile.subscribers[0] 
           : { subscribed: false }
@@ -90,6 +94,7 @@ export default function CustomersPage() {
         customer.first_name?.toLowerCase().includes(searchLower) ||
         customer.last_name?.toLowerCase().includes(searchLower) ||
         customer.phone?.includes(searchTerm) ||
+        customer.email?.toLowerCase().includes(searchLower) ||
         customer.country?.toLowerCase().includes(searchLower)
       );
     });
@@ -146,7 +151,7 @@ export default function CustomersPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by name, phone, or country..."
+                placeholder="Search by name, email, phone, or country..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -196,6 +201,12 @@ export default function CustomersPage() {
                     </TableCell>
                     <TableCell>
                       <div className="space-y-1">
+                        {customer.email && (
+                          <div className="flex items-center gap-1 text-sm">
+                            <Mail className="h-3 w-3" />
+                            {customer.email}
+                          </div>
+                        )}
                         {customer.phone && (
                           <div className="flex items-center gap-1 text-sm">
                             <Phone className="h-3 w-3" />

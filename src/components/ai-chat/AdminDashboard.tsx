@@ -19,6 +19,7 @@ import RegionalServicesPage from '@/components/admin/pages/RegionalServicesPage'
 import GlobalProtectionPlansPage from '@/components/admin/pages/GlobalProtectionPlansPage';
 import CommunicationPage from '@/components/admin/pages/CommunicationPage';
 import EmailCampaignsPage from '@/components/admin/pages/EmailCampaignsPage';
+import FamilyAccountsPage from '@/components/admin/pages/FamilyAccountsPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -38,7 +39,7 @@ const AdminDashboard: React.FC = () => {
           <Route path="customers" element={<CustomersPage />} />
           <Route path="subscriptions" element={<SubscriptionsPage />} />
           <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />
-          <Route path="families" element={<div className="p-6"><h1 className="text-3xl font-bold">Family Accounts</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
+          <Route path="families" element={<FamilyAccountsPage />} />
           <Route path="leads" element={<LeadsPage />} />
           <Route path="conversations" element={<ConversationsPage />} />
           <Route path="ai-metrics" element={<div className="p-6"><h1 className="text-3xl font-bold">AI Performance</h1><p className="text-muted-foreground">Coming soon...</p></div>} />

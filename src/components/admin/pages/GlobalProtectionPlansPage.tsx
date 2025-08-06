@@ -56,7 +56,7 @@ const GlobalProtectionPlansPage = () => {
     name: '',
     description: '',
     price: '',
-    currency: 'USD',
+    currency: 'EUR',
     billing_interval: 'month',
     stripe_price_id: '',
     features: '',
@@ -98,7 +98,7 @@ const GlobalProtectionPlansPage = () => {
       name: '',
       description: '',
       price: '',
-      currency: 'USD',
+      currency: 'EUR',
       billing_interval: 'month',
       stripe_price_id: '',
       features: '',
@@ -293,8 +293,8 @@ const GlobalProtectionPlansPage = () => {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="USD">USD</SelectItem>
               <SelectItem value="EUR">EUR</SelectItem>
+              <SelectItem value="USD">USD</SelectItem>
               <SelectItem value="GBP">GBP</SelectItem>
             </SelectContent>
           </Select>
