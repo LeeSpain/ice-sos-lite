@@ -94,10 +94,10 @@ const Index = () => {
         </div>
       </div>
 
-      <Pricing />
       <Hero onEmmaClick={handleEmmaClick} />
       <Features />
       <MetricPreview />
+      <Pricing />
       <RegionServices />
       <Footer />
       
