@@ -280,130 +280,139 @@ const Pricing = () => {
               </p>
             </div>
 
-            <div className="flex justify-center mb-16">
-              <div className={`w-full max-w-md ${products.length > 1 ? 'grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl' : ''}`}>
-                {products.map((product) => (
-                  <Card key={product.id} className="relative overflow-hidden border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-card to-card/80 h-[420px]">
-                    <div className="absolute inset-0 bg-gradient-to-br from-muted/10 via-transparent to-secondary/10"></div>
-                    <Badge className="absolute top-4 right-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg text-xs px-3 py-1">
-                      One-time Purchase
-                    </Badge>
-                    <CardHeader className="relative pb-4 text-center">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-md">
-                        <Package className="h-8 w-8 text-blue-600" />
-                      </div>
-                      <CardTitle className="text-xl font-bold">{product.name}</CardTitle>
-                      <CardDescription className="text-base mt-2">{product.description}</CardDescription>
-                      <div className="mt-4">
-                        <span className="text-3xl font-bold text-primary">€{product.price.toFixed(2)}</span>
-                        <span className="text-muted-foreground"> one-time</span>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="relative pt-0 h-full flex flex-col">
-                      <p className="text-sm text-muted-foreground mb-4 flex items-center justify-center gap-1">
-                        <Check className="h-4 w-4 text-green-500" />
-                        Free shipping • {product.inventory_count} units available
-                      </p>
-
-                      <div className="mb-4 flex-1">
-                        <ul className="space-y-2">
-                          {product.features.slice(0, 4).map((feature, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-muted-foreground">{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="flex gap-2 mt-auto">
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" className="flex-1 border-primary/20 hover:bg-primary/5">
-                              Details
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                              <DialogTitle className="flex items-center gap-2">
-                                <Package className="h-5 w-5 text-primary" />
-                                {product.name}
-                              </DialogTitle>
-                              <DialogDescription>
-                                Complete product specifications and setup information
-                              </DialogDescription>
-                            </DialogHeader>
-                            
-                            <div className="space-y-6">
-                              <div>
-                                <h4 className="font-semibold mb-3">Technical Specifications:</h4>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                  <div className="flex items-center gap-2">
-                                    <Bluetooth className="h-4 w-4 text-blue-500" />
-                                    <span>Bluetooth 5.0 Low Energy</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Battery className="h-4 w-4 text-green-500" />
-                                    <span>7-day battery life</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Droplets className="h-4 w-4 text-blue-500" />
-                                    <span>IP67 Waterproof</span>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 text-red-500" />
-                                    <span>100m range</span>
+            <div className="max-w-4xl mx-auto">
+              {products.map((product) => (
+                <Card key={product.id} className="relative border-2 border-secondary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10"></div>
+                  <Badge className="absolute top-6 right-6 bg-secondary text-white text-sm px-4 py-2 shadow-lg">
+                    ONE-TIME PURCHASE
+                  </Badge>
+                  
+                  <div className="relative p-8">
+                    <div className="grid lg:grid-cols-3 gap-8 items-center">
+                      {/* Product Info */}
+                      <div className="text-center lg:text-left">
+                        <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-secondary to-secondary/80 rounded-2xl flex items-center justify-center shadow-lg">
+                          <Package className="h-8 w-8 text-white" />
+                        </div>
+                        <CardTitle className="text-3xl font-bold mb-3">{product.name}</CardTitle>
+                        <CardDescription className="text-lg text-muted-foreground mb-4">
+                          {product.description}
+                        </CardDescription>
+                        <div className="mb-6">
+                          <span className="text-4xl font-bold text-secondary">€{product.price.toFixed(2)}</span>
+                          <span className="text-muted-foreground text-lg"> one-time</span>
+                        </div>
+                        <div className="flex gap-3">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button 
+                                variant="outline" 
+                                size="lg"
+                                className="px-6 py-3 border-secondary/20 hover:bg-secondary/5 font-semibold"
+                              >
+                                Details
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                  <Package className="h-5 w-5 text-secondary" />
+                                  {product.name}
+                                </DialogTitle>
+                                <DialogDescription>
+                                  Complete product specifications and setup information
+                                </DialogDescription>
+                              </DialogHeader>
+                              
+                              <div className="space-y-6">
+                                <div>
+                                  <h4 className="font-semibold mb-3">Technical Specifications:</h4>
+                                  <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <Bluetooth className="h-4 w-4 text-blue-500" />
+                                      <span>Bluetooth 5.0 Low Energy</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Battery className="h-4 w-4 text-green-500" />
+                                      <span>7-day battery life</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Droplets className="h-4 w-4 text-blue-500" />
+                                      <span>IP67 Waterproof</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <MapPin className="h-4 w-4 text-red-500" />
+                                      <span>100m range</span>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
 
-                              <div>
-                                <h4 className="font-semibold mb-3">All Features:</h4>
-                                <ul className="grid grid-cols-1 gap-2">
-                                  {product.features.map((feature, index) => (
-                                    <li key={index} className="flex items-start gap-2">
-                                      <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                      <span className="text-sm">{feature}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
+                                <div>
+                                  <h4 className="font-semibold mb-3">All Features:</h4>
+                                  <ul className="grid grid-cols-1 gap-2">
+                                    {product.features.map((feature, index) => (
+                                      <li key={index} className="flex items-start gap-2">
+                                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                        <span className="text-sm">{feature}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
 
-                              <div>
-                                <h4 className="font-semibold mb-3">How It Works:</h4>
-                                <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                                  <li>Pair the pendant with your smartphone via Bluetooth</li>
-                                  <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
-                                  <li>Press the button once to activate emergency mode</li>
-                                  <li>Your emergency contacts and services are notified instantly</li>
-                                  <li>GPS location is shared automatically through your phone</li>
-                                </ol>
-                              </div>
+                                <div>
+                                  <h4 className="font-semibold mb-3">How It Works:</h4>
+                                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                                    <li>Pair the pendant with your smartphone via Bluetooth</li>
+                                    <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
+                                    <li>Press the button once to activate emergency mode</li>
+                                    <li>Your emergency contacts and services are notified instantly</li>
+                                    <li>GPS location is shared automatically through your phone</li>
+                                  </ol>
+                                </div>
 
-                              <div className="flex gap-3 pt-4">
-                                <Button 
-                                  className="flex-1"
-                                  onClick={() => handleProductPurchase(product)}
-                                >
-                                  Purchase Now - €{product.price.toFixed(2)}
-                                </Button>
+                                <div className="flex gap-3 pt-4">
+                                  <Button 
+                                    className="flex-1"
+                                    onClick={() => handleProductPurchase(product)}
+                                  >
+                                    Purchase Now - €{product.price.toFixed(2)}
+                                  </Button>
+                                </div>
                               </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                        
-                        <Button 
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => handleProductPurchase(product)}
-                        >
-                          Buy Now
-                        </Button>
+                            </DialogContent>
+                          </Dialog>
+                          
+                          <Button 
+                            size="lg"
+                            className="bg-secondary hover:bg-secondary/90 text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                            onClick={() => handleProductPurchase(product)}
+                          >
+                            Buy Now
+                          </Button>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                      
+                      {/* Features */}
+                      <div className="lg:col-span-2">
+                        <h4 className="text-xl font-semibold mb-4">Product Features:</h4>
+                        <div className="grid md:grid-cols-2 gap-4 mb-6">
+                          {product.features.slice(0, 6).map((feature, index) => (
+                            <div key={index} className="flex items-start space-x-3">
+                              <Check className="h-5 w-5 text-secondary mt-0.5 flex-shrink-0" />
+                              <span className="text-sm text-muted-foreground">{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Check className="h-4 w-4 text-green-500" />
+                          <span>Free shipping • {product.inventory_count} units available</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
             </div>
           </>
         )}
@@ -420,51 +429,58 @@ const Pricing = () => {
               </p>
             </div>
             
-            <div className="flex justify-center mb-16">
-              <div className={`w-full max-w-md ${regionalPlans.length > 1 ? 'grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl' : ''}`}>
-                {regionalPlans.map((plan, index) => {
-                  const Icon = getIconForPlan(plan.name);
-                  const regionName = plan.region === 'spain' ? 'Spain Only' : plan.region?.toUpperCase();
-                  return (
-                    <Card key={plan.id} className="relative overflow-hidden border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-gradient-to-br from-card to-card/80 h-[420px]">
-                      <div className="absolute inset-0 bg-gradient-to-br from-muted/10 via-transparent to-secondary/10"></div>
-                      <Badge className="absolute top-4 right-4 bg-emergency text-white shadow-lg text-xs px-3 py-1">
-                        {regionName}
-                      </Badge>
-                      <CardHeader className="relative pb-4 text-center">
-                        <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-md">
-                          <Icon className="h-8 w-8 text-blue-600" />
+            <div className="max-w-4xl mx-auto">
+              {regionalPlans.map((plan, index) => {
+                const Icon = getIconForPlan(plan.name);
+                const regionName = plan.region === 'spain' ? 'Spain Only' : plan.region?.toUpperCase();
+                return (
+                  <Card key={plan.id} className="relative border-2 border-emergency/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emergency/5 via-transparent to-emergency/10"></div>
+                    <Badge className="absolute top-6 right-6 bg-emergency text-white text-sm px-4 py-2 shadow-lg">
+                      {regionName}
+                    </Badge>
+                    
+                    <div className="relative p-8">
+                      <div className="grid lg:grid-cols-3 gap-8 items-center">
+                        {/* Plan Info */}
+                        <div className="text-center lg:text-left">
+                          <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-emergency to-emergency/80 rounded-2xl flex items-center justify-center shadow-lg">
+                            <Icon className="h-8 w-8 text-white" />
+                          </div>
+                          <CardTitle className="text-3xl font-bold mb-3">{plan.name}</CardTitle>
+                          <CardDescription className="text-lg text-muted-foreground mb-4">
+                            {plan.description}
+                          </CardDescription>
+                          <div className="mb-6">
+                            <span className="text-4xl font-bold text-emergency">€{plan.price.toFixed(2)}</span>
+                            <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
+                          </div>
+                          <Button 
+                            size="lg"
+                            className="bg-emergency hover:bg-emergency/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                            onClick={() => handleSubscriptionPurchase(plan)}
+                          >
+                            Subscribe Now
+                          </Button>
                         </div>
-                        <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
-                        <CardDescription className="text-base mt-2">{plan.description}</CardDescription>
-                        <div className="mt-4">
-                          <span className="text-3xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
-                          <span className="text-muted-foreground">/{plan.billing_interval}</span>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="relative pt-0 h-full flex flex-col">
-                        <div className="mb-4 flex-1">
-                          <ul className="space-y-2">
+                        
+                        {/* Features */}
+                        <div className="lg:col-span-2">
+                          <h4 className="text-xl font-semibold mb-4">Regional Features:</h4>
+                          <div className="grid md:grid-cols-2 gap-4">
                             {plan.features.map((feature, featureIndex) => (
-                              <li key={featureIndex} className="flex items-start gap-2">
-                                <Check className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                              <div key={featureIndex} className="flex items-start space-x-3">
+                                <Check className="h-5 w-5 text-emergency mt-0.5 flex-shrink-0" />
                                 <span className="text-sm text-muted-foreground">{feature}</span>
-                              </li>
+                              </div>
                             ))}
-                          </ul>
+                          </div>
                         </div>
-                        <Button 
-                          className="w-full mt-auto" 
-                          variant="default"
-                          onClick={() => handleSubscriptionPurchase(plan)}
-                        >
-                          Subscribe Now
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
+                      </div>
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         )}
