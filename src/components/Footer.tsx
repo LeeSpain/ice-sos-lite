@@ -13,19 +13,27 @@ const Footer = () => {
     
     console.log('Dashboard click:', { user: !!user, isAdmin, loading, roleLoading, dashboardType });
     
-    if (loading || roleLoading) {
-      console.log('Still loading auth state...');
+    // If still loading auth state, wait
+    if (loading) {
+      console.log('Auth still loading, waiting...');
       return;
     }
 
+    // If no user, redirect to auth
     if (!user) {
       console.log('No user, redirecting to auth');
       navigate('/auth');
       return;
     }
 
+    // User is authenticated, navigate to appropriate dashboard
+    // If role is still loading, default to member dashboard for member clicks
+    // and allow admin dashboard access for admin clicks (will be protected by route)
     if (dashboardType === 'admin') {
-      if (isAdmin) {
+      if (roleLoading) {
+        console.log('Role loading, going to admin dashboard (route will handle protection)');
+        navigate('/admin-dashboard');
+      } else if (isAdmin) {
         console.log('Admin user, going to admin dashboard');
         navigate('/admin-dashboard');
       } else {
