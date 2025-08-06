@@ -19,19 +19,20 @@ const AdminSetup = () => {
 
   const checkAdminSetup = async () => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('role', 'admin')
-        .limit(1);
+      // Use secure edge function to check admin setup status
+      const { data, error } = await supabase.functions.invoke('secure-admin-setup', {
+        method: 'GET'
+      });
 
       if (error) {
         console.error('Error checking admin setup:', error);
+        setIsSetup(true); // Default to setup complete on error
       } else {
-        setIsSetup(data && data.length > 0);
+        setIsSetup(data?.hasExistingAdmin || false);
       }
     } catch (error) {
       console.error('Error checking admin setup:', error);
+      setIsSetup(true); // Default to setup complete on error
     } finally {
       setCheckingSetup(false);
     }
@@ -42,13 +43,17 @@ const AdminSetup = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: 'admin' })
-        .eq('user_id', user.id);
+      // Use secure edge function instead of direct database update
+      const { data, error } = await supabase.functions.invoke('secure-admin-setup', {
+        method: 'POST'
+      });
 
       if (error) {
         throw error;
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
       }
 
       toast.success('Admin role assigned successfully!');
@@ -60,7 +65,7 @@ const AdminSetup = () => {
       }, 2000);
     } catch (error) {
       console.error('Error setting up admin:', error);
-      toast.error('Failed to assign admin role. Please try again.');
+      toast.error(error instanceof Error ? error.message : 'Failed to assign admin role. Please try again.');
     } finally {
       setIsLoading(false);
     }

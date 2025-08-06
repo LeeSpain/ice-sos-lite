@@ -1673,6 +1673,10 @@ export type Database = {
       }
     }
     Functions: {
+      assign_admin_role: {
+        Args: { target_user_id: string }
+        Returns: boolean
+      }
       get_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
