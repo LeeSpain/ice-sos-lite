@@ -89,6 +89,36 @@ export type Database = {
         }
         Relationships: []
       }
+      homepage_analytics: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          page_context: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          page_context?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          page_context?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           conversation_summary: string | null
@@ -298,6 +328,51 @@ export type Database = {
         }
         Relationships: []
       }
+      regional_services: {
+        Row: {
+          created_at: string
+          currency: string
+          description: string | null
+          features: string[] | null
+          id: string
+          is_active: boolean
+          is_popular: boolean
+          name: string
+          price: number
+          region: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          features?: string[] | null
+          id?: string
+          is_active?: boolean
+          is_popular?: boolean
+          name: string
+          price?: number
+          region: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          description?: string | null
+          features?: string[] | null
+          id?: string
+          is_active?: boolean
+          is_popular?: boolean
+          name?: string
+          price?: number
+          region?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       service_product_compatibility: {
         Row: {
           compatibility_notes: string | null
@@ -378,6 +453,7 @@ export type Database = {
           is_popular: boolean
           name: string
           price: number
+          region: string | null
           sort_order: number | null
           stripe_price_id: string | null
           updated_at: string
@@ -393,6 +469,7 @@ export type Database = {
           is_popular?: boolean
           name: string
           price: number
+          region?: string | null
           sort_order?: number | null
           stripe_price_id?: string | null
           updated_at?: string
@@ -408,6 +485,7 @@ export type Database = {
           is_popular?: boolean
           name?: string
           price?: number
+          region?: string | null
           sort_order?: number | null
           stripe_price_id?: string | null
           updated_at?: string

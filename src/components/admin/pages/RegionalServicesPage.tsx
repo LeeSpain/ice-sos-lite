@@ -48,22 +48,14 @@ const RegionalServicesPage = () => {
 
   const fetchPlans = async () => {
     try {
-      // Sample data for now until types are fixed
-      const samplePlans: RegionalPlan[] = [
-        {
-          id: '1',
-          name: 'Call Centre Spain',
-          description: 'Specialized emergency response for Spain',
-          price: 9.99,
-          currency: 'EUR',
-          region: 'Spain',
-          features: ['24/7 Spanish Call Center', 'Local Emergency Response'],
-          is_popular: true,
-          is_active: true,
-          sort_order: 1
-        }
-      ];
-      setPlans(samplePlans);
+      const { data, error } = await supabase
+        .from('regional_services')
+        .select('*')
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      
+      setPlans(data || []);
     } catch (error) {
       console.error('Error fetching regional plans:', error);
       toast.error('Failed to load regional services');
@@ -77,7 +69,7 @@ const RegionalServicesPage = () => {
       if (planData.id) {
         // Update existing plan
         const { error } = await supabase
-          .from('subscription_plans')
+          .from('regional_services')
           .update({
             name: planData.name,
             description: planData.description,
@@ -87,8 +79,7 @@ const RegionalServicesPage = () => {
             features: planData.features,
             is_popular: planData.is_popular,
             is_active: planData.is_active,
-            sort_order: planData.sort_order,
-            updated_at: new Date().toISOString()
+            sort_order: planData.sort_order
           })
           .eq('id', planData.id);
 
@@ -97,13 +88,12 @@ const RegionalServicesPage = () => {
       } else {
         // Create new plan
         const { error } = await supabase
-          .from('subscription_plans')
+          .from('regional_services')
           .insert({
             name: planData.name,
             description: planData.description,
             price: planData.price,
             currency: planData.currency,
-            billing_interval: 'month',
             region: planData.region,
             features: planData.features,
             is_popular: planData.is_popular,
@@ -129,7 +119,7 @@ const RegionalServicesPage = () => {
 
     try {
       const { error } = await supabase
-        .from('subscription_plans')
+        .from('regional_services')
         .delete()
         .eq('id', planId);
 

@@ -23,20 +23,15 @@ const RegionServices = () => {
   useEffect(() => {
     const fetchRegionalPlans = async () => {
       try {
-        // For now, create sample regional plans until type issues are resolved
-        const samplePlans: RegionalPlan[] = [
-          {
-            id: '1',
-            name: 'Call Centre Spain',
-            description: 'Specialized emergency response for Spain with local language support',
-            price: 9.99,
-            currency: 'EUR',
-            region: 'Spain',
-            features: ['24/7 Spanish Call Center', 'Local Emergency Response', 'Spanish Language Support'],
-            is_popular: true
-          }
-        ];
-        setRegionalPlans(samplePlans);
+        const { data, error } = await supabase
+          .from('regional_services')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true });
+
+        if (error) throw error;
+        
+        setRegionalPlans(data || []);
       } catch (error) {
         console.error('Error fetching regional plans:', error);
       } finally {
