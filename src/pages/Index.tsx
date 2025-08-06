@@ -5,6 +5,7 @@ import Features from "@/components/Features";
 import MetricPreview from "@/components/MetricPreview";
 import Pricing from "@/components/Pricing";
 import RegionServices from "@/components/RegionServices";
+import ImportantInformation from "@/components/ImportantInformation";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ai-chat/ChatWidget";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -97,8 +98,9 @@ const Index = () => {
       <Hero onEmmaClick={handleEmmaClick} />
       <Features />
       <MetricPreview />
-      <Pricing />
       <RegionServices />
+      <Pricing />
+      <ImportantInformation />
       <Footer />
       
       {/* Emma Chat Widget */}
