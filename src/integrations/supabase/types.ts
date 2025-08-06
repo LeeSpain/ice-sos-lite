@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      communication_preferences: {
+        Row: {
+          created_at: string
+          email_notifications: boolean | null
+          id: string
+          marketing_emails: boolean | null
+          phone_number: string | null
+          preferred_channel: string | null
+          updated_at: string
+          user_id: string
+          whatsapp_notifications: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          marketing_emails?: boolean | null
+          phone_number?: string | null
+          preferred_channel?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp_notifications?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          marketing_emails?: boolean | null
+          phone_number?: string | null
+          preferred_channel?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp_notifications?: boolean | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           content: string
@@ -43,6 +79,113 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      email_campaigns: {
+        Row: {
+          click_count: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          open_count: number | null
+          recipient_count: number | null
+          scheduled_at: string | null
+          sent_at: string | null
+          sent_count: number | null
+          status: string
+          subject: string
+          template_name: string
+          updated_at: string
+        }
+        Insert: {
+          click_count?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          open_count?: number | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          subject: string
+          template_name: string
+          updated_at?: string
+        }
+        Update: {
+          click_count?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          open_count?: number | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string
+          subject?: string
+          template_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      email_logs: {
+        Row: {
+          campaign_id: string | null
+          clicked_at: string | null
+          created_at: string
+          email_type: string
+          error_message: string | null
+          id: string
+          opened_at: string | null
+          provider_message_id: string | null
+          recipient_email: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string
+          email_type: string
+          error_message?: string | null
+          id?: string
+          opened_at?: string | null
+          provider_message_id?: string | null
+          recipient_email: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string
+          email_type?: string
+          error_message?: string | null
+          id?: string
+          opened_at?: string | null
+          provider_message_id?: string | null
+          recipient_email?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_logs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       family_invites: {
         Row: {
