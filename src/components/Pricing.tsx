@@ -469,12 +469,6 @@ const Pricing = () => {
           </>
         )}
 
-        {/* DEBUG: Regional Services state */}
-        <div className="text-center mb-4 bg-yellow-100 p-4 rounded">
-          <p>Regional Services Debug: {regionalServices.length} services found</p>
-          <p>Data: {JSON.stringify(regionalServices.map(s => s.name))}</p>
-        </div>
-
         {/* Regional Services */}
         {regionalServices.length > 0 && (
           <>
