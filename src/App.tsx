@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import TestPage from "./pages/TestPage";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
@@ -14,6 +15,7 @@ import AdminDashboard from "./components/ai-chat/AdminDashboard";
 import AdminSetup from "./components/AdminSetup";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import NotFound from "./pages/NotFound";
+import DashboardRedirect from "./components/DashboardRedirect";
 
 const App = () => {
   return (
@@ -31,6 +33,11 @@ const App = () => {
           } />
           <Route path="/registration-success" element={<RegistrationSuccess />} />
           <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardRedirect />
+            </ProtectedRoute>
+          } />
+          <Route path="/member-dashboard" element={
             <ProtectedRoute>
               <SimpleDashboard />
             </ProtectedRoute>

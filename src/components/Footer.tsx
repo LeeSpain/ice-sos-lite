@@ -38,11 +38,11 @@ const Footer = () => {
         navigate('/admin-dashboard');
       } else {
         console.log('Non-admin user, redirecting to member dashboard');
-        navigate('/dashboard');
+        navigate('/member-dashboard');
       }
     } else {
       console.log('Going to member dashboard');
-      navigate('/dashboard');
+      navigate('/member-dashboard');
     }
   };
 
