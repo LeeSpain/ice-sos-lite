@@ -195,21 +195,22 @@ export default function EmailCampaignsPage() {
 
   const sendCampaign = async (campaignId: string) => {
     try {
-      // Update campaign status to sending
-      await supabase
-        .from('email_campaigns')
-        .update({ status: 'sending', sent_at: new Date().toISOString() })
-        .eq('id', campaignId);
+      // Call the email campaigns edge function to send
+      const { data, error } = await supabase.functions.invoke('email-campaigns', {
+        body: {
+          action: 'send_campaign',
+          campaign_id: campaignId
+        }
+      });
+
+      if (error) throw error;
 
       toast({
-        title: "Campaign Started",
-        description: "Email campaign is being sent to recipients",
+        title: "Campaign Sent",
+        description: `Successfully sent to ${data.sent} recipients, ${data.failed} failed`,
       });
 
       loadCampaigns();
-
-      // Here you would typically trigger the actual email sending process
-      // This would be handled by a separate background process or edge function
 
     } catch (error) {
       console.error('Error sending campaign:', error);
