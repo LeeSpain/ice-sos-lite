@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroImage from "@/assets/hero-emergency.jpg";
+const heroImage = "/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png";
 
 interface HeroProps {
   onEmmaClick?: () => void;
