@@ -77,10 +77,14 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
       alert("🚨 EMERGENCY SOS ACTIVATED!\n\nNotifying your emergency contacts now...");
 
       // Call emergency notification function
-      const { data, error: functionError } = await supabase.functions.invoke('emergency-sos', {
+      const { data, error: functionError } = await supabase.functions.invoke('emergency-sos-enhanced', {
         body: {
-          userProfile,
-          location: "Dashboard", // You could get actual GPS location here
+          userProfile: {
+            first_name: userProfile.first_name,
+            last_name: userProfile.last_name,
+            emergency_contacts: userProfile.emergency_contacts
+          },
+          location: 'Dashboard Emergency Button',
           timestamp: new Date().toISOString()
         }
       });

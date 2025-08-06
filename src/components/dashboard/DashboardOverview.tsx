@@ -57,11 +57,15 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
   const handleEmergencyTest = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('emergency-sos', {
-        body: { 
-          test: true,
-          location: { lat: 40.7128, lng: -74.0060 }, // Mock location
-          message: "Emergency system test from dashboard"
+      const { data, error } = await supabase.functions.invoke('emergency-sos-enhanced', {
+        body: {
+          userProfile: {
+            first_name: 'Test',
+            last_name: 'User',
+            emergency_contacts: [{ name: 'Test Contact', phone: '+1234567890', relationship: 'Emergency', email: 'test@example.com' }]
+          },
+          location: 'Dashboard Test',
+          timestamp: new Date().toISOString()
         }
       });
 
