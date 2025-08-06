@@ -104,12 +104,13 @@ const Footer = () => {
               >
                 {loading ? 'Loading...' : 'Members Dashboard'}
               </a>
-              <Link 
-                to="/admin-dashboard"
-                className="block text-sm text-muted-foreground hover:text-primary transition-colors"
+              <a 
+                href="#" 
+                onClick={(e) => handleDashboardClick(e, 'admin')}
+                className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
               >
                 {loading ? 'Loading...' : 'Admin Dashboard'}
-              </Link>
+              </a>
             </div>
           </div>
 
