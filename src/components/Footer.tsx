@@ -1,7 +1,34 @@
 import { Shield, Github, Twitter, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const Footer = () => {
+  const { user } = useAuth();
+  const { isAdmin } = useUserRole();
+
+  const handleDashboardClick = (e: React.MouseEvent, dashboardType: 'member' | 'admin') => {
+    e.preventDefault();
+    
+    if (!user) {
+      // Not authenticated, go to auth page
+      window.location.href = '/auth';
+      return;
+    }
+
+    if (dashboardType === 'admin') {
+      if (isAdmin) {
+        window.location.href = '/admin-dashboard';
+      } else {
+        // User is authenticated but not admin, redirect to member dashboard
+        window.location.href = '/dashboard';
+      }
+    } else {
+      // Member dashboard
+      window.location.href = '/dashboard';
+    }
+  };
+
   return (
     <footer className="bg-background border-t border-border">
       <div className="container mx-auto px-4 py-8">
@@ -39,18 +66,34 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">Account</h3>
             <div className="space-y-2">
-              <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Sign In
-              </Link>
-              <Link to="/register" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Subscribe
-              </Link>
-              <Link to="/dashboard" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              {!user ? (
+                <>
+                  <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                    Sign In
+                  </Link>
+                  <Link to="/register" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                    Subscribe
+                  </Link>
+                </>
+              ) : (
+                <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                  Sign Out
+                </Link>
+              )}
+              <a 
+                href="#" 
+                onClick={(e) => handleDashboardClick(e, 'member')}
+                className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Members Dashboard
-              </Link>
-              <Link to="/admin-dashboard" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              </a>
+              <a 
+                href="#" 
+                onClick={(e) => handleDashboardClick(e, 'admin')}
+                className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              >
                 Admin Dashboard
-              </Link>
+              </a>
             </div>
           </div>
 
