@@ -4,7 +4,7 @@ import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import MetricPreview from "@/components/MetricPreview";
 import Pricing from "@/components/Pricing";
-import RegionServices from "@/components/RegionServices";
+
 import AppDownload from "@/components/AppDownload";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ai-chat/ChatWidget";
@@ -99,7 +99,7 @@ const Index = () => {
       <Features />
       <MetricPreview />
       <Pricing />
-      <RegionServices />
+      
       <AppDownload />
       <Footer />
       
