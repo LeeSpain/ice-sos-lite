@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const AppDownload = () => {
   return (
-    <section className="py-16">
+    <section className="py-20">
       <div className="container mx-auto px-4">
         {/* Enhanced App Download Section */}
         <Card className="relative border border-border bg-card shadow-2xl overflow-hidden">
