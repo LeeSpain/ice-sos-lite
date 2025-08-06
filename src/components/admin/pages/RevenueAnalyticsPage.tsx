@@ -42,10 +42,12 @@ export default function RevenueAnalyticsPage() {
         .eq('subscribed', true);
 
       if (subscribersData) {
-        const basicCount = subscribersData.filter(s => s.subscription_tier === 'Basic').length;
+        // Count subscribers by tier - default to 'Basic' if no tier specified
+        const basicCount = subscribersData.filter(s => (s.subscription_tier || 'Basic') === 'Basic').length;
         const premiumCount = subscribersData.filter(s => s.subscription_tier === 'Premium').length;
         const enterpriseCount = subscribersData.filter(s => s.subscription_tier === 'Enterprise').length;
         
+        // Calculate revenue in euros
         const monthlyRevenue = (basicCount * 7.99) + (premiumCount * 19.99) + (enterpriseCount * 49.99);
         const yearlyRevenue = monthlyRevenue * 12;
         const averageRevenuePerUser = subscribersData.length > 0 ? monthlyRevenue / subscribersData.length : 0;

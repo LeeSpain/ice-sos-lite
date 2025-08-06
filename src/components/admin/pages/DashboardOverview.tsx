@@ -29,6 +29,27 @@ interface Lead {
   updated_at: string;
 }
 
+// Helper function to calculate monthly revenue based on subscription tiers
+const calculateMonthlyRevenue = (subscribers: any[]) => {
+  let totalRevenue = 0;
+  subscribers.forEach(subscriber => {
+    switch (subscriber.subscription_tier) {
+      case 'Basic':
+        totalRevenue += 7.99;
+        break;
+      case 'Premium':
+        totalRevenue += 19.99;
+        break;
+      case 'Enterprise':
+        totalRevenue += 49.99;
+        break;
+      default:
+        totalRevenue += 7.99; // Default to Basic if tier not specified
+    }
+  });
+  return totalRevenue;
+}
+
 export default function DashboardOverview() {
   const [stats, setStats] = useState<DashboardStats>({
     totalLeads: 0,
@@ -85,7 +106,7 @@ export default function DashboardOverview() {
           conversionRate: leadsData.length > 0 ? (conversions / leadsData.length) * 100 : 0,
           totalCustomers: customersData?.length || 0,
           activeSubscriptions: subscribersData?.length || 0,
-          monthlyRevenue: (subscribersData?.length || 0) * 7.99, // €7.99 per subscription
+          monthlyRevenue: calculateMonthlyRevenue(subscribersData || []),
           emergencyIncidents: 0 // Placeholder for future implementation
         });
       }

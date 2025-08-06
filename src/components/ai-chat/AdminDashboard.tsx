@@ -22,14 +22,8 @@ import EmailCampaignsPage from '@/components/admin/pages/EmailCampaignsPage';
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
   
-  console.log('🔥 AdminDashboard component is loading!');
-  
   return (
     <AdminProtectedRoute>
-      <div>
-        <div style={{position: 'fixed', top: 0, right: 0, zIndex: 9999, background: 'red', color: 'white', padding: '10px'}}>
-          ADMIN DASHBOARD LOADED ✅
-        </div>
       <Routes>
         <Route path="/" element={<AdminLayout />}>
           <Route index element={<DashboardOverview />} />
@@ -58,7 +52,6 @@ const AdminDashboard: React.FC = () => {
           <Route path="*" element={<Navigate to="/admin-dashboard" replace />} />
         </Route>
         </Routes>
-      </div>
     </AdminProtectedRoute>
   );
 };
