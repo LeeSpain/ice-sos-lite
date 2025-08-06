@@ -282,8 +282,8 @@ const Pricing = () => {
 
             <div className="max-w-4xl mx-auto">
               {products.map((product) => (
-                <Card key={product.id} className="relative border-2 border-secondary/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10"></div>
+                <Card key={product.id} className="relative border-2 border-secondary/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-secondary/10 to-secondary/5 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 via-secondary/10 to-secondary/5"></div>
                   <Badge className="absolute top-6 right-6 bg-secondary text-white text-sm px-4 py-2 shadow-lg">
                     ONE-TIME PURCHASE
                   </Badge>
