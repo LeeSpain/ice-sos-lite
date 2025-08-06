@@ -560,30 +560,6 @@ const Pricing = () => {
           </>
         )}
 
-        {/* Additional Information */}
-        <div className="text-center max-w-4xl mx-auto">
-          <div className="bg-muted/50 rounded-lg p-8">
-            <h3 className="text-xl font-semibold mb-4">Important Information</h3>
-            <div className="grid md:grid-cols-2 gap-6 text-left">
-              <div>
-                <h4 className="font-semibold text-primary mb-2">Plan Features:</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• No setup fees or hidden costs</li>
-                  <li>• Cancel anytime with 30 days notice</li>
-                  <li>• Hardware devices sold separately</li>
-                  <li>• Full customer support included</li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-semibold text-primary mb-2">Cancellation Policy:</h4>
-                <p className="text-sm text-muted-foreground">
-                  You can cancel your subscription at any time. Your access will continue until the end of your current billing period. 
-                  Hardware purchases are non-refundable but carry a 1-year warranty.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
   );
