@@ -20,6 +20,8 @@ import GlobalProtectionPlansPage from '@/components/admin/pages/GlobalProtection
 import CommunicationPage from '@/components/admin/pages/CommunicationPage';
 import EmailCampaignsPage from '@/components/admin/pages/EmailCampaignsPage';
 import FamilyAccountsPage from '@/components/admin/pages/FamilyAccountsPage';
+import SystemSettingsPage from '@/components/admin/pages/SystemSettingsPage';
+import ReportsPage from '@/components/admin/pages/ReportsPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -51,8 +53,8 @@ const AdminDashboard: React.FC = () => {
           <Route path="products" element={<ProductsPage />} />
           <Route path="regional-services" element={<RegionalServicesPage />} />
           <Route path="activity" element={<ActivityPage />} />
-          <Route path="settings" element={<div className="p-6"><h1 className="text-3xl font-bold">System Settings</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
-          <Route path="reports" element={<div className="p-6"><h1 className="text-3xl font-bold">Reports</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
+          <Route path="settings" element={<SystemSettingsPage />} />
+          <Route path="reports" element={<ReportsPage />} />
           <Route path="*" element={<Navigate to="/admin-dashboard" replace />} />
         </Route>
         </Routes>
