@@ -164,14 +164,6 @@ const Pricing = () => {
 
         {/* Emergency Protection Plan Section */}
         <div className="mb-12">
-          <div className="text-center mb-10">
-            <h3 className="text-2xl md:text-3xl font-bold mb-3">
-              Emergency Protection Plan
-            </h3>
-            <p className="text-base text-muted-foreground">
-              Professional protection with worldwide 24/7 call center and multilingual support
-            </p>
-          </div>
           
           {/* Premium Protection Plan - 3/4 width */}
           <div className="max-w-4xl mx-auto">
