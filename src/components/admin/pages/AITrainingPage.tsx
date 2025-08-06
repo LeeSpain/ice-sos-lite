@@ -27,9 +27,13 @@ interface TrainingData {
   question: string;
   answer: string;
   category: string;
-  status: 'active' | 'pending' | 'disabled';
+  status: string;
   created_at: string;
   updated_at: string;
+  confidence_score?: number;
+  usage_count?: number;
+  last_used_at?: string;
+  created_by?: string;
 }
 
 export default function AITrainingPage() {
@@ -39,54 +43,7 @@ export default function AITrainingPage() {
   const [newCategory, setNewCategory] = useState('general');
   const [loading, setLoading] = useState(true);
 
-  // Mock training data since we don't have a training_data table yet
-  const mockTrainingData: TrainingData[] = [
-    {
-      id: '1',
-      question: 'What is ICE SOS Lite?',
-      answer: 'ICE SOS Lite is a personal safety and emergency response app that provides 24/7 monitoring, SOS alerts, family notifications, and GPS tracking.',
-      category: 'product',
-      status: 'active',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: '2',
-      question: 'How much does the Basic plan cost?',
-      answer: 'The Basic plan costs €7.99 per month and includes essential safety features like SOS alerts and basic family notifications.',
-      category: 'pricing',
-      status: 'active',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: '3',
-      question: 'What features are included in the Premium plan?',
-      answer: 'The Premium plan (€19.99/month) includes all Basic features plus advanced GPS tracking, medical information storage, emergency contact management, and priority response.',
-      category: 'pricing',
-      status: 'active',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: '4',
-      question: 'How does the SOS feature work?',
-      answer: 'The SOS feature allows you to send an immediate emergency alert to your designated contacts and emergency services with your exact GPS location by pressing the SOS button or using voice activation.',
-      category: 'features',
-      status: 'active',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    },
-    {
-      id: '5',
-      question: 'Can family members track my location?',
-      answer: 'Yes, with your permission, family members added to your emergency contacts can see your location during emergencies or when you share your location with them.',
-      category: 'features',
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-  ];
+  // Now using real database operations with training_data table
 
   useEffect(() => {
     loadTrainingData();
@@ -95,8 +52,15 @@ export default function AITrainingPage() {
   const loadTrainingData = async () => {
     try {
       setLoading(true);
-      // For now, use mock data. In a real implementation, you'd load from a training_data table
-      setTrainingData(mockTrainingData);
+      
+      const { data, error } = await supabase
+        .from('training_data')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setTrainingData(data || []);
     } catch (error) {
       console.error('Error loading training data:', error);
     } finally {
@@ -104,27 +68,45 @@ export default function AITrainingPage() {
     }
   };
 
-  const addTrainingData = () => {
+  const addTrainingData = async () => {
     if (!newQuestion || !newAnswer) return;
 
-    const newData: TrainingData = {
-      id: Date.now().toString(),
-      question: newQuestion,
-      answer: newAnswer,
-      category: newCategory,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+    try {
+      const { data, error } = await supabase
+        .from('training_data')
+        .insert({
+          question: newQuestion,
+          answer: newAnswer,
+          category: newCategory,
+          status: 'pending'
+        })
+        .select()
+        .single();
 
-    setTrainingData([newData, ...trainingData]);
-    setNewQuestion('');
-    setNewAnswer('');
-    setNewCategory('general');
+      if (error) throw error;
+
+      setTrainingData([data, ...trainingData]);
+      setNewQuestion('');
+      setNewAnswer('');
+      setNewCategory('general');
+    } catch (error) {
+      console.error('Error adding training data:', error);
+    }
   };
 
-  const deleteTrainingData = (id: string) => {
-    setTrainingData(trainingData.filter(item => item.id !== id));
+  const deleteTrainingData = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('training_data')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setTrainingData(trainingData.filter(item => item.id !== id));
+    } catch (error) {
+      console.error('Error deleting training data:', error);
+    }
   };
 
   const getStatusIcon = (status: string) => {
@@ -289,10 +271,10 @@ export default function AITrainingPage() {
                 />
               </div>
               
-              <Button onClick={addTrainingData} className="w-full">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Training Example
-              </Button>
+                <Button onClick={addTrainingData} className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Training Example
+                </Button>
             </div>
           </div>
         </CardContent>

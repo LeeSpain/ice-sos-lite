@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_model_settings: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       auto_reply_queue: {
         Row: {
           category_id: string | null
@@ -1271,6 +1301,48 @@ export type Database = {
           sort_order?: number | null
           stripe_price_id?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      training_data: {
+        Row: {
+          answer: string
+          category: string
+          confidence_score: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          last_used_at: string | null
+          question: string
+          status: string
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          answer: string
+          category?: string
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_used_at?: string | null
+          question: string
+          status?: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          answer?: string
+          category?: string
+          confidence_score?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_used_at?: string | null
+          question?: string
+          status?: string
+          updated_at?: string
+          usage_count?: number | null
         }
         Relationships: []
       }
