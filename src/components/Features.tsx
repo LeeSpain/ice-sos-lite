@@ -5,38 +5,38 @@ const Features = () => {
   const features = [
     {
       icon: Phone,
-      title: "Emergency SOS System",
-      description: "Tap-to-send SOS, voice trigger ('Help' x3), smart speaker integration with failsafe escalation.",
+      title: "24/7 Emergency Response",
+      description: "One-tap SOS activation with instant GPS location sharing to emergency contacts and professional call center.",
       color: "emergency"
     },
     {
       icon: Brain,
-      title: "Guardian AI Assistant",
-      description: "24/7 multilingual AI responding in local language, handling check-ins and smart escalation.",
+      title: "AI Health Monitoring",
+      description: "Intelligent wellness tracking with Premium Protection plan including AI-powered health insights.",
       color: "guardian"
     },
     {
       icon: Shield,
-      title: "Smart Protection",
-      description: "Real-time wellness tracking, medication reminders, and appointment notifications.",
+      title: "Global Call Center Access",
+      description: "Professional emergency response coordination available 24/7 with multilingual support worldwide.",
       color: "primary"
     },
     {
       icon: Users,
-      title: "Family Connectivity",
-      description: "Connect family via sharing codes, receive SOS alerts, and access shared health notes.",
+      title: "Family Emergency Alerts",
+      description: "Instant SOS notifications to up to 5 emergency contacts with Family Connection and Premium plans.",
       color: "wellness"
     },
     {
       icon: MapPin,
-      title: "GPS Location Sharing",
-      description: "Instant location sharing to call center or emergency contacts during SOS events.",
+      title: "GPS Location Tracking",
+      description: "Real-time location sharing during emergencies with precise coordinates sent to responders.",
       color: "primary"
     },
     {
       icon: MessageCircle,
-      title: "Voice Interaction",
-      description: "Voice-to-text input, smart speaker support, and direct video calls to contacts.",
+      title: "Bluetooth Device Support",
+      description: "Compatible with ICE SOS Bluetooth Pendant for hands-free emergency activation up to 100m range.",
       color: "guardian"
     }
   ];
@@ -67,8 +67,8 @@ const Features = () => {
             Complete Emergency Protection Suite
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Advanced safety features designed for seniors, caregivers, and solo users 
-            with multilingual support and global availability.
+            Professional emergency protection with global call center access, Bluetooth device support, 
+            and AI monitoring — starting from €1.99/month with worldwide coverage.
           </p>
         </div>
         

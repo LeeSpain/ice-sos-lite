@@ -150,64 +150,42 @@ const Pricing = () => {
   };
 
   return (
-    <section className="py-20">
+    <section className="py-16">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Choose Your Protection Plan
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Download the app and select the emergency protection level that fits your needs.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Professional emergency protection starting from €1.99/month. Download the app and activate your plan instantly.
           </p>
         </div>
 
-        {/* Free Download Hero Section */}
-        <div className="mb-20">
-          <Card className="relative border border-border bg-card shadow-2xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-muted/50 via-secondary to-muted"></div>
-            <CardHeader className="relative text-center py-16 px-8">
-              <Badge className="bg-emergency text-white w-fit mx-auto mb-6 text-sm font-semibold px-4 py-2 shadow-lg">
+        {/* Streamlined App Download Section */}
+        <div className="mb-16">
+          <Card className="relative border border-border bg-card shadow-xl overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-muted/30 via-secondary/20 to-muted/30"></div>
+            <CardHeader className="relative text-center py-12 px-6">
+              <Badge className="bg-emergency text-white w-fit mx-auto mb-4 text-sm font-semibold px-3 py-1 shadow-lg">
                 PROFESSIONAL APP
               </Badge>
-              <div className="w-24 h-24 mx-auto mb-8 bg-white shadow-lg rounded-2xl flex items-center justify-center border border-border/20">
-                <Smartphone className="h-12 w-12 text-primary" />
+              <div className="w-16 h-16 mx-auto mb-6 bg-white shadow-lg rounded-xl flex items-center justify-center border border-border/20">
+                <Smartphone className="h-8 w-8 text-primary" />
               </div>
-              <CardTitle className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+              <CardTitle className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
                 Download ICE SOS Lite
               </CardTitle>
-              <CardDescription className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                Professional emergency protection platform for individuals and families. 
-                Choose your subscription plan to activate full protection features.
+              <CardDescription className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Professional emergency protection platform. Download free, then choose your subscription plan to activate full protection.
               </CardDescription>
             </CardHeader>
-            <CardContent className="relative px-8 pb-16">
-              <div className="grid md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
-                <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
-                  <Check className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <h4 className="font-semibold text-foreground mb-2">Emergency SOS</h4>
-                  <p className="text-sm text-muted-foreground">One-tap emergency button with GPS location sharing</p>
-                </div>
-                <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
-                  <Check className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <h4 className="font-semibold text-foreground mb-2">Global Coverage</h4>
-                  <p className="text-sm text-muted-foreground">Works worldwide with full multilingual support</p>
-                </div>
-                <div className="text-center p-6 rounded-xl bg-white/50 border border-border/20 shadow-sm">
-                  <Check className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <h4 className="font-semibold text-foreground mb-2">Instant Setup</h4>
-                  <p className="text-sm text-muted-foreground">Ready to use in minutes with simple configuration</p>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
+            <CardContent className="relative px-6 pb-12">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-sm mx-auto">
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300">
                   <Link to="/register">
                     <Download className="mr-2 h-5 w-5" />
-                    Get Started Now
+                    Get Started
                   </Link>
-                </Button>
-                <Button size="lg" variant="outline" className="border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold text-lg px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300">
-                  <Download className="mr-2 h-5 w-5" />
-                  View Plans
                 </Button>
               </div>
             </CardContent>
@@ -215,42 +193,44 @@ const Pricing = () => {
         </div>
 
         {/* Global Plans Section */}
-        <div className="mb-16">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl md:text-3xl font-bold mb-4">
-              Global Protection Plans
+        <div className="mb-12">
+          <div className="text-center mb-10">
+            <h3 className="text-2xl md:text-3xl font-bold mb-3">
+              Emergency Protection Plans
             </h3>
-            <p className="text-lg text-muted-foreground">
-              Available worldwide with full multilingual support
+            <p className="text-base text-muted-foreground">
+              Available worldwide with 24/7 call center and multilingual support
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {globalPlans.map((plan, index) => {
               const Icon = getIconForPlan(plan.name);
               const badgeColor = getBadgeColorForPlan(plan.name);
               return (
-                <Card key={plan.id} className="relative border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:scale-105">
-                  <CardHeader className="text-center">
-                    <Badge className={`${badgeColor} text-white w-fit mx-auto mb-4`}>
-                      Global
-                    </Badge>
-                    <div className="w-16 h-16 mx-auto mb-4 bg-secondary rounded-full flex items-center justify-center">
-                      <Icon className="h-8 w-8 text-primary" />
+                <Card key={plan.id} className={`relative border-2 hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:scale-105 ${plan.is_popular ? 'ring-2 ring-primary/20' : ''}`}>
+                  <CardHeader className="text-center pb-4">
+                    {plan.is_popular && (
+                      <Badge className="bg-primary text-white w-fit mx-auto mb-3 text-xs px-2 py-1">
+                        MOST POPULAR
+                      </Badge>
+                    )}
+                    <div className="w-12 h-12 mx-auto mb-3 bg-secondary rounded-full flex items-center justify-center">
+                      <Icon className="h-6 w-6 text-primary" />
                     </div>
-                    <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
-                    <CardDescription className="text-base">{plan.description}</CardDescription>
-                    <div className="mt-4">
-                      <span className="text-3xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
-                      <span className="text-muted-foreground">/{plan.billing_interval}</span>
+                    <CardTitle className="text-xl font-bold">{plan.name}</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">{plan.description}</CardDescription>
+                    <div className="mt-3">
+                      <span className="text-2xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
+                      <span className="text-muted-foreground text-sm">/{plan.billing_interval}</span>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-3 mb-6">
+                  <CardContent className="pt-0">
+                    <ul className="space-y-2 mb-4">
                       {plan.features.map((feature, featureIndex) => (
                         <li key={featureIndex} className="flex items-start space-x-2">
-                          <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground">{feature}</span>
+                          <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                          <span className="text-xs text-muted-foreground">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -258,6 +238,7 @@ const Pricing = () => {
                       className="w-full" 
                       variant={plan.is_popular ? "default" : "outline"}
                       onClick={() => handleSubscriptionPurchase(plan)}
+                      size="sm"
                     >
                       Subscribe Now
                     </Button>
