@@ -1,31 +1,40 @@
 import { Shield, Github, Twitter, Mail } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 
 const Footer = () => {
-  const { user } = useAuth();
-  const { isAdmin } = useUserRole();
+  const { user, loading } = useAuth();
+  const { isAdmin, loading: roleLoading } = useUserRole();
+  const navigate = useNavigate();
 
   const handleDashboardClick = (e: React.MouseEvent, dashboardType: 'member' | 'admin') => {
     e.preventDefault();
     
+    console.log('Dashboard click:', { user: !!user, isAdmin, loading, roleLoading, dashboardType });
+    
+    if (loading || roleLoading) {
+      console.log('Still loading auth state...');
+      return;
+    }
+
     if (!user) {
-      // Not authenticated, go to auth page
-      window.location.href = '/auth';
+      console.log('No user, redirecting to auth');
+      navigate('/auth');
       return;
     }
 
     if (dashboardType === 'admin') {
       if (isAdmin) {
-        window.location.href = '/admin-dashboard';
+        console.log('Admin user, going to admin dashboard');
+        navigate('/admin-dashboard');
       } else {
-        // User is authenticated but not admin, redirect to member dashboard
-        window.location.href = '/dashboard';
+        console.log('Non-admin user, redirecting to member dashboard');
+        navigate('/dashboard');
       }
     } else {
-      // Member dashboard
-      window.location.href = '/dashboard';
+      console.log('Going to member dashboard');
+      navigate('/dashboard');
     }
   };
 
@@ -85,14 +94,14 @@ const Footer = () => {
                 onClick={(e) => handleDashboardClick(e, 'member')}
                 className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
               >
-                Members Dashboard
+                {loading ? 'Loading...' : 'Members Dashboard'}
               </a>
               <a 
                 href="#" 
                 onClick={(e) => handleDashboardClick(e, 'admin')}
                 className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
               >
-                Admin Dashboard
+                {loading ? 'Loading...' : 'Admin Dashboard'}
               </a>
             </div>
           </div>
