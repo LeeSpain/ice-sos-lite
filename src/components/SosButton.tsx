@@ -1,27 +1,95 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Phone } from "lucide-react";
+import { Phone, Mic, MicOff } from "lucide-react";
+import { useVoiceActivation } from "@/hooks/useVoiceActivation";
+import { useEmergencySOS } from "@/hooks/useEmergencySOS";
+import { useToast } from "@/hooks/use-toast";
 
 const SosButton = () => {
-  const handleEmergency = () => {
-    // Emergency SOS functionality would be implemented here
-    console.log("SOS Emergency triggered!");
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
+  const { toast } = useToast();
+
+  const handleEmergencyTrigger = async () => {
+    try {
+      await triggerEmergencySOS();
+    } catch (error) {
+      console.error('Emergency SOS failed:', error);
+    }
   };
+
+  const { isListening, hasPermission } = useVoiceActivation({
+    triggerPhrase: "help help help",
+    onActivation: handleEmergencyTrigger,
+    isEnabled: voiceEnabled
+  });
+
+  const toggleVoiceActivation = () => {
+    if (!hasPermission && !voiceEnabled) {
+      toast({
+        title: "Microphone Permission Required",
+        description: "Please allow microphone access to enable voice activation for emergency calls.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setVoiceEnabled(!voiceEnabled);
+  };
+
+  useEffect(() => {
+    if (voiceEnabled && isListening) {
+      toast({
+        title: "🎤 Voice Activation Enabled",
+        description: "Say 'Help Help Help' to trigger emergency SOS",
+        duration: 3000
+      });
+    }
+  }, [voiceEnabled, isListening, toast]);
 
   return (
     <div className="flex flex-col items-center space-y-4">
+      {/* Voice Activation Toggle */}
+      <div className="flex items-center gap-2 mb-2">
+        <Button
+          variant={voiceEnabled ? "wellness" : "outline"}
+          size="sm"
+          onClick={toggleVoiceActivation}
+          className="text-xs"
+        >
+          {isListening ? <Mic className="h-3 w-3" /> : <MicOff className="h-3 w-3" />}
+          Voice {voiceEnabled ? 'ON' : 'OFF'}
+        </Button>
+        {voiceEnabled && (
+          <span className="text-xs text-muted-foreground">
+            Say: "Help Help Help"
+          </span>
+        )}
+      </div>
+
+      {/* Main Emergency Button */}
       <Button
         variant="emergency"
         size="emergency"
-        onClick={handleEmergency}
+        onClick={handleEmergencyTrigger}
+        disabled={isTriggering}
         className="relative"
         aria-label="Emergency SOS Button - Press for immediate help"
       >
         <Phone className="h-8 w-8" />
         <span className="sr-only">Emergency SOS</span>
+        {isTriggering && (
+          <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse" />
+        )}
       </Button>
+      
       <div className="text-center">
-        <p className="text-sm font-medium text-emergency">Emergency SOS</p>
-        <p className="text-xs text-muted-foreground">Tap for immediate help</p>
+        <p className="text-sm font-medium text-emergency">
+          {isTriggering ? "Activating Emergency..." : "Emergency SOS"}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Tap for immediate help
+          {voiceEnabled && <span className="block">or say "Help Help Help"</span>}
+        </p>
       </div>
     </div>
   );

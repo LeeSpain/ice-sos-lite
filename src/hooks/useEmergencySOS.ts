@@ -1,0 +1,141 @@
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+
+interface EmergencyContact {
+  name: string;
+  phone: string;
+  email?: string;
+  relationship: string;
+}
+
+interface EmergencySOSData {
+  userProfile: {
+    first_name: string;
+    last_name: string;
+    emergency_contacts: EmergencyContact[];
+  };
+  location: string;
+  timestamp: string;
+}
+
+export const useEmergencySOS = () => {
+  const [isTriggering, setIsTriggering] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const getCurrentLocation = (): Promise<string> => {
+    return new Promise((resolve) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            resolve(`Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`);
+          },
+          (error) => {
+            console.error('Location error:', error);
+            resolve('Location unavailable');
+          },
+          { timeout: 10000, enableHighAccuracy: true }
+        );
+      } else {
+        resolve('Geolocation not supported');
+      }
+    });
+  };
+
+  const getUserProfile = async (): Promise<{
+    first_name: string;
+    last_name: string;
+    emergency_contacts: EmergencyContact[];
+  }> => {
+    if (!user) throw new Error('User not authenticated');
+
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('first_name, last_name, emergency_contacts')
+      .eq('user_id', user.id)
+      .single();
+
+    if (error) throw error;
+    if (!profile) throw new Error('Profile not found');
+
+    // Ensure emergency_contacts is an array and properly typed
+    const emergencyContacts: EmergencyContact[] = Array.isArray(profile.emergency_contacts) 
+      ? (profile.emergency_contacts as any[]).map(contact => ({
+          name: contact.name || '',
+          phone: contact.phone || '',
+          email: contact.email || '',
+          relationship: contact.relationship || ''
+        }))
+      : [];
+
+    return {
+      first_name: profile.first_name || '',
+      last_name: profile.last_name || '',
+      emergency_contacts: emergencyContacts
+    };
+  };
+
+  const triggerEmergencySOS = async () => {
+    if (isTriggering) return;
+
+    setIsTriggering(true);
+    
+    try {
+      console.log('🚨 Triggering Emergency SOS...');
+      
+      // Get user profile and location
+      const [profile, location] = await Promise.all([
+        getUserProfile(),
+        getCurrentLocation()
+      ]);
+
+      if (!profile.emergency_contacts || profile.emergency_contacts.length === 0) {
+        throw new Error('No emergency contacts configured. Please add emergency contacts in your profile settings.');
+      }
+
+      const emergencyData: EmergencySOSData = {
+        userProfile: profile,
+        location,
+        timestamp: new Date().toISOString()
+      };
+
+      // Call enhanced emergency SOS function
+      const { data, error } = await supabase.functions.invoke('emergency-sos-enhanced', {
+        body: emergencyData
+      });
+
+      if (error) throw error;
+
+      console.log('✅ Emergency SOS triggered successfully:', data);
+      
+      toast({
+        title: "🚨 Emergency SOS Activated",
+        description: `Emergency notifications sent to ${data.summary?.emails_sent || 0} contacts. ${data.summary?.calls_initiated || 0} calls initiated.`,
+        variant: "destructive"
+      });
+
+      return data;
+
+    } catch (error: any) {
+      console.error('❌ Emergency SOS failed:', error);
+      
+      toast({
+        title: "Emergency SOS Failed", 
+        description: error.message || 'Failed to trigger emergency SOS. Please try again or call emergency services directly.',
+        variant: "destructive"
+      });
+      
+      throw error;
+    } finally {
+      setIsTriggering(false);
+    }
+  };
+
+  return {
+    triggerEmergencySOS,
+    isTriggering
+  };
+};
