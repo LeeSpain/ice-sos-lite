@@ -28,9 +28,9 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect to dashboard if not admin
+  // Redirect to member dashboard if not admin
   if (!isAdmin) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/member-dashboard" replace />;
   }
 
   return <>{children}</>;
