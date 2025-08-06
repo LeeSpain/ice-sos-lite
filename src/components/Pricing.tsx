@@ -219,30 +219,30 @@ const Pricing = () => {
           {/* Family Connection Card - Connected below */}
           <div className="max-w-4xl mx-auto mt-6">
             {globalPlans.filter(plan => plan.name === 'Family Connection').map((plan) => (
-              <Card key={plan.id} className="relative border-2 border-wellness/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
+              <Card key={plan.id} className="relative border-2 border-wellness/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-wellness/5 via-transparent to-wellness/10"></div>
                 <Badge className="absolute top-6 right-6 bg-wellness text-white text-sm px-4 py-2 shadow-lg">
                   ADD-ON
                 </Badge>
                 
-                <div className="relative p-6">
-                  <div className="grid lg:grid-cols-3 gap-6 items-center">
+                <div className="relative p-8">
+                  <div className="grid lg:grid-cols-3 gap-8 items-center">
                     {/* Plan Info */}
                     <div className="text-center lg:text-left">
-                      <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Users className="h-7 w-7 text-white" />
+                      <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Users className="h-8 w-8 text-white" />
                       </div>
-                      <CardTitle className="text-2xl font-bold mb-3">{plan.name}</CardTitle>
-                      <CardDescription className="text-base text-muted-foreground mb-4">
+                      <CardTitle className="text-3xl font-bold mb-3">{plan.name}</CardTitle>
+                      <CardDescription className="text-lg text-muted-foreground mb-4">
                         {plan.description}
                       </CardDescription>
                       <div className="mb-6">
-                        <span className="text-3xl font-bold text-wellness">€{plan.price.toFixed(2)}</span>
-                        <span className="text-muted-foreground text-base">/{plan.billing_interval}</span>
+                        <span className="text-4xl font-bold text-wellness">€{plan.price.toFixed(2)}</span>
+                        <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
                       </div>
                       <Button 
                         size="lg"
-                        className="bg-wellness hover:bg-wellness/90 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="bg-wellness hover:bg-wellness/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                         onClick={() => handleSubscriptionPurchase(plan)}
                       >
                         Add Family Plan
@@ -251,11 +251,11 @@ const Pricing = () => {
                     
                     {/* Features */}
                     <div className="lg:col-span-2">
-                      <h4 className="text-lg font-semibold mb-4">Family Features:</h4>
-                      <div className="grid md:grid-cols-2 gap-3">
+                      <h4 className="text-xl font-semibold mb-4">Family Features:</h4>
+                      <div className="grid md:grid-cols-2 gap-4">
                         {plan.features.map((feature, featureIndex) => (
                           <div key={featureIndex} className="flex items-start space-x-3">
-                            <Check className="h-4 w-4 text-wellness mt-0.5 flex-shrink-0" />
+                            <Check className="h-5 w-5 text-wellness mt-0.5 flex-shrink-0" />
                             <span className="text-sm text-muted-foreground">{feature}</span>
                           </div>
                         ))}
@@ -282,26 +282,26 @@ const Pricing = () => {
 
             <div className="max-w-4xl mx-auto">
               {products.map((product) => (
-                <Card key={product.id} className="relative border-2 border-blue/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-blue/10 to-blue/5 overflow-hidden">
+                <Card key={product.id} className="relative border-2 border-blue/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-blue/10 to-blue/5 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue/20 via-blue/10 to-blue/5"></div>
                   <Badge className="absolute top-6 right-6 bg-blue text-white text-sm px-4 py-2 shadow-lg">
                     ONE-TIME PURCHASE
                   </Badge>
                   
-                  <div className="relative p-6">
-                    <div className="grid lg:grid-cols-3 gap-6 items-center">
+                  <div className="relative p-8">
+                    <div className="grid lg:grid-cols-3 gap-8 items-center">
                       {/* Product Info */}
                       <div className="text-center lg:text-left">
-                        <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue to-blue/80 rounded-2xl flex items-center justify-center shadow-lg">
-                          <Package className="h-7 w-7 text-white" />
+                        <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue to-blue/80 rounded-2xl flex items-center justify-center shadow-lg">
+                          <Package className="h-8 w-8 text-white" />
                         </div>
-                        <CardTitle className="text-2xl font-bold mb-3">{product.name}</CardTitle>
-                        <CardDescription className="text-base text-muted-foreground mb-4">
+                        <CardTitle className="text-3xl font-bold mb-3">{product.name}</CardTitle>
+                        <CardDescription className="text-lg text-muted-foreground mb-4">
                           {product.description}
                         </CardDescription>
                         <div className="mb-6">
-                          <span className="text-3xl font-bold text-blue">€{product.price.toFixed(2)}</span>
-                          <span className="text-muted-foreground text-base"> one-time</span>
+                          <span className="text-4xl font-bold text-blue">€{product.price.toFixed(2)}</span>
+                          <span className="text-muted-foreground text-lg"> one-time</span>
                         </div>
                         <div className="flex gap-3">
                           <Dialog>
@@ -309,7 +309,7 @@ const Pricing = () => {
                               <Button 
                                 variant="outline" 
                                 size="lg"
-                                className="px-6 py-3 border-secondary/20 hover:bg-secondary/5 font-semibold"
+                                className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                               >
                                 Details
                               </Button>
@@ -385,10 +385,10 @@ const Pricing = () => {
                           
                           <Button 
                             size="lg"
-                            className="bg-secondary hover:bg-secondary/90 text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="bg-secondary hover:bg-secondary/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                             onClick={() => handleProductPurchase(product)}
                           >
-                            Buy Now
+                            Purchase Now
                           </Button>
                         </div>
                       </div>
@@ -434,30 +434,30 @@ const Pricing = () => {
                 const Icon = getIconForPlan(plan.name);
                 const regionName = plan.region === 'spain' ? 'Spain Only' : plan.region?.toUpperCase();
                 return (
-                  <Card key={plan.id} className="relative border-2 border-green/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-green/10 to-green/5 overflow-hidden">
+                  <Card key={plan.id} className="relative border-2 border-green/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-green/10 to-green/5 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-green/20 via-green/10 to-green/5"></div>
                     <Badge className="absolute top-6 right-6 bg-green text-white text-sm px-4 py-2 shadow-lg">
                       {regionName}
                     </Badge>
                     
-                    <div className="relative p-6">
-                      <div className="grid lg:grid-cols-3 gap-6 items-center">
+                    <div className="relative p-8">
+                      <div className="grid lg:grid-cols-3 gap-8 items-center">
                         {/* Plan Info */}
                         <div className="text-center lg:text-left">
-                          <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-green to-green/80 rounded-2xl flex items-center justify-center shadow-lg">
-                            <Icon className="h-7 w-7 text-white" />
+                          <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-green to-green/80 rounded-2xl flex items-center justify-center shadow-lg">
+                            <Icon className="h-8 w-8 text-white" />
                           </div>
-                          <CardTitle className="text-2xl font-bold mb-3">{plan.name}</CardTitle>
-                          <CardDescription className="text-base text-muted-foreground mb-4">
+                          <CardTitle className="text-3xl font-bold mb-3">{plan.name}</CardTitle>
+                          <CardDescription className="text-lg text-muted-foreground mb-4">
                             {plan.description}
                           </CardDescription>
                           <div className="mb-6">
-                            <span className="text-3xl font-bold text-green">€{plan.price.toFixed(2)}</span>
-                            <span className="text-muted-foreground text-base">/{plan.billing_interval}</span>
+                            <span className="text-4xl font-bold text-green">€{plan.price.toFixed(2)}</span>
+                            <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
                           </div>
                           <Button 
                             size="lg"
-                            className="bg-green hover:bg-green/90 text-green-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="bg-green hover:bg-green/90 text-green-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                             onClick={() => handleSubscriptionPurchase(plan)}
                           >
                             Subscribe Now
@@ -466,11 +466,11 @@ const Pricing = () => {
                         
                         {/* Features */}
                         <div className="lg:col-span-2">
-                          <h4 className="text-lg font-semibold mb-4">Regional Features:</h4>
-                          <div className="grid md:grid-cols-2 gap-3">
+                          <h4 className="text-xl font-semibold mb-4">Regional Features:</h4>
+                          <div className="grid md:grid-cols-2 gap-4">
                             {plan.features.map((feature, featureIndex) => (
                               <div key={featureIndex} className="flex items-start space-x-3">
-                                <Check className="h-4 w-4 text-green mt-0.5 flex-shrink-0" />
+                                <Check className="h-5 w-5 text-green mt-0.5 flex-shrink-0" />
                                 <span className="text-sm text-muted-foreground">{feature}</span>
                               </div>
                             ))}
