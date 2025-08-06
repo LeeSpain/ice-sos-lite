@@ -282,9 +282,9 @@ const Pricing = () => {
 
             <div className="max-w-4xl mx-auto">
               {products.map((product) => (
-                <Card key={product.id} className="relative border-2 border-secondary/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-secondary/10 to-secondary/5 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 via-secondary/10 to-secondary/5"></div>
-                  <Badge className="absolute top-6 right-6 bg-secondary text-white text-sm px-4 py-2 shadow-lg">
+                <Card key={product.id} className="relative border-2 border-blue/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-blue/10 to-blue/5 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue/20 via-blue/10 to-blue/5"></div>
+                  <Badge className="absolute top-6 right-6 bg-blue text-white text-sm px-4 py-2 shadow-lg">
                     ONE-TIME PURCHASE
                   </Badge>
                   
@@ -292,7 +292,7 @@ const Pricing = () => {
                     <div className="grid lg:grid-cols-3 gap-6 items-center">
                       {/* Product Info */}
                       <div className="text-center lg:text-left">
-                        <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-secondary to-secondary/80 rounded-2xl flex items-center justify-center shadow-lg">
+                        <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue to-blue/80 rounded-2xl flex items-center justify-center shadow-lg">
                           <Package className="h-7 w-7 text-white" />
                         </div>
                         <CardTitle className="text-2xl font-bold mb-3">{product.name}</CardTitle>
@@ -300,7 +300,7 @@ const Pricing = () => {
                           {product.description}
                         </CardDescription>
                         <div className="mb-6">
-                          <span className="text-3xl font-bold text-secondary">€{product.price.toFixed(2)}</span>
+                          <span className="text-3xl font-bold text-blue">€{product.price.toFixed(2)}</span>
                           <span className="text-muted-foreground text-base"> one-time</span>
                         </div>
                         <div className="flex gap-3">
