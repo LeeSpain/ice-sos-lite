@@ -70,9 +70,7 @@ const Pricing = () => {
   };
 
   // Filter global and regional plans
-  const globalPlans = subscriptionPlans.filter(plan => !plan.region || plan.region === 'global');
-  const regionalPlans = subscriptionPlans.filter(plan => plan.region && plan.region !== 'global');
-
+  const globalPlans = subscriptionPlans.filter(plan => plan.region === 'global' || !plan.region);
   useEffect(() => {
     fetchProducts();
     fetchSubscriptionPlans();
@@ -123,24 +121,19 @@ const Pricing = () => {
 
   const fetchRegionalServices = async () => {
     try {
-      console.log('Fetching regional services...');
       const { data, error } = await supabase
         .from('regional_services')
         .select('*')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching regional services:', error);
-        throw error;
-      }
-      
-      console.log('Regional services data:', data);
+      if (error) throw error;
       setRegionalServices(data || []);
     } catch (error) {
       console.error('Error fetching regional services:', error);
     }
   };
+
 
   const handleSubscriptionPurchase = async (plan: SubscriptionPlan) => {
     try {
