@@ -199,7 +199,7 @@ const Pricing = () => {
 
 
         {/* Emergency Protection Plan Section */}
-        <div className="mb-12">
+        <div className="mb-8">
           
           {/* Premium Protection Plan - 3/4 width */}
           <div className="max-w-4xl mx-auto">
@@ -250,6 +250,17 @@ const Pricing = () => {
                 </div>
               </Card>
             ))}
+          </div>
+
+          {/* Family & Carer Access Information */}
+          <div className="max-w-4xl mx-auto mt-8 text-center">
+            <div className="bg-wellness/10 rounded-lg p-6 border border-wellness/20">
+              <h3 className="text-xl font-semibold text-wellness mb-3">Family & Carer Access</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Grant trusted family members and carers secure access to your emergency profile and protection status. 
+                They can monitor your safety, receive alerts, and coordinate emergency response when needed.
+              </p>
+            </div>
           </div>
 
           {/* Family Connection Card - Connected below */}
@@ -307,7 +318,7 @@ const Pricing = () => {
         {/* Safety Products Section */}
         {products.length > 0 && (
           <>
-            <div className="text-center mb-16">
+            <div className="text-center mb-8 mt-8">
               <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Safety Products
               </h3>
@@ -472,7 +483,7 @@ const Pricing = () => {
         {/* Regional Services */}
         {regionalServices.length > 0 && (
           <>
-            <div className="text-center mb-16">
+            <div className="text-center mb-8 mt-8">
               <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Regional Services
               </h3>
