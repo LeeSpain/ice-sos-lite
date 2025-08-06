@@ -68,6 +68,161 @@ export type Database = {
         }
         Relationships: []
       }
+      bulk_campaigns: {
+        Row: {
+          channel: string
+          completed_at: string | null
+          content_template: string
+          created_at: string
+          created_by: string | null
+          delivered_count: number | null
+          description: string | null
+          failed_count: number | null
+          id: string
+          name: string
+          scheduled_at: string | null
+          sent_count: number | null
+          started_at: string | null
+          status: string
+          subject_template: string | null
+          target_criteria: Json
+          template_id: string | null
+          total_recipients: number | null
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          channel: string
+          completed_at?: string | null
+          content_template: string
+          created_at?: string
+          created_by?: string | null
+          delivered_count?: number | null
+          description?: string | null
+          failed_count?: number | null
+          id?: string
+          name: string
+          scheduled_at?: string | null
+          sent_count?: number | null
+          started_at?: string | null
+          status?: string
+          subject_template?: string | null
+          target_criteria?: Json
+          template_id?: string | null
+          total_recipients?: number | null
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          channel?: string
+          completed_at?: string | null
+          content_template?: string
+          created_at?: string
+          created_by?: string | null
+          delivered_count?: number | null
+          description?: string | null
+          failed_count?: number | null
+          id?: string
+          name?: string
+          scheduled_at?: string | null
+          sent_count?: number | null
+          started_at?: string | null
+          status?: string
+          subject_template?: string | null
+          target_criteria?: Json
+          template_id?: string | null
+          total_recipients?: number | null
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: []
+      }
+      campaign_recipients: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          delivered_at: string | null
+          email: string | null
+          error_message: string | null
+          id: string
+          name: string | null
+          phone: string | null
+          sent_at: string | null
+          status: string
+          user_id: string | null
+          variables_used: Json | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          delivered_at?: string | null
+          email?: string | null
+          error_message?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          sent_at?: string | null
+          status?: string
+          user_id?: string | null
+          variables_used?: Json | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          delivered_at?: string | null
+          email?: string | null
+          error_message?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          sent_at?: string | null
+          status?: string
+          user_id?: string | null
+          variables_used?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "bulk_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      communication_analytics: {
+        Row: {
+          category_breakdown: Json | null
+          channel: string
+          created_at: string
+          date: string
+          id: string
+          metric_type: string
+          metric_value: number
+          user_breakdown: Json | null
+        }
+        Insert: {
+          category_breakdown?: Json | null
+          channel: string
+          created_at?: string
+          date: string
+          id?: string
+          metric_type: string
+          metric_value: number
+          user_breakdown?: Json | null
+        }
+        Update: {
+          category_breakdown?: Json | null
+          channel?: string
+          created_at?: string
+          date?: string
+          id?: string
+          metric_type?: string
+          metric_value?: number
+          user_breakdown?: Json | null
+        }
+        Relationships: []
+      }
       communication_preferences: {
         Row: {
           created_at: string
@@ -103,6 +258,47 @@ export type Database = {
           whatsapp_notifications?: boolean | null
         }
         Relationships: []
+      }
+      conversation_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          conversation_id: string
+          id: string
+          is_active: boolean | null
+          role: string
+          unassigned_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          conversation_id: string
+          id?: string
+          is_active?: boolean | null
+          role?: string
+          unassigned_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          conversation_id?: string
+          id?: string
+          is_active?: boolean | null
+          role?: string
+          unassigned_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_assignments_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "unified_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversation_categories: {
         Row: {
@@ -145,6 +341,50 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      conversation_handovers: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          from_user_id: string | null
+          handover_type: string
+          id: string
+          initiated_by: string | null
+          notes: string | null
+          reason: string | null
+          to_user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          from_user_id?: string | null
+          handover_type: string
+          id?: string
+          initiated_by?: string | null
+          notes?: string | null
+          reason?: string | null
+          to_user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          from_user_id?: string | null
+          handover_type?: string
+          id?: string
+          initiated_by?: string | null
+          notes?: string | null
+          reason?: string | null
+          to_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_handovers_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "unified_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversations: {
         Row: {
@@ -1001,6 +1241,131 @@ export type Database = {
         }
         Relationships: []
       }
+      unified_conversations: {
+        Row: {
+          assigned_to: string | null
+          category_id: string | null
+          channel: string
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          external_id: string | null
+          id: string
+          last_activity_at: string | null
+          last_message_at: string | null
+          metadata: Json | null
+          priority: number | null
+          response_due_at: string | null
+          status: string
+          subject: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category_id?: string | null
+          channel: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          last_activity_at?: string | null
+          last_message_at?: string | null
+          metadata?: Json | null
+          priority?: number | null
+          response_due_at?: string | null
+          status?: string
+          subject?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category_id?: string | null
+          channel?: string
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          external_id?: string | null
+          id?: string
+          last_activity_at?: string | null
+          last_message_at?: string | null
+          metadata?: Json | null
+          priority?: number | null
+          response_due_at?: string | null
+          status?: string
+          subject?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      unified_messages: {
+        Row: {
+          ai_confidence_score: number | null
+          attachments: Json | null
+          content: string
+          content_type: string | null
+          conversation_id: string
+          created_at: string
+          direction: string
+          external_message_id: string | null
+          id: string
+          is_ai_generated: boolean | null
+          metadata: Json | null
+          sender_email: string | null
+          sender_name: string | null
+          sender_phone: string | null
+          status: string | null
+        }
+        Insert: {
+          ai_confidence_score?: number | null
+          attachments?: Json | null
+          content: string
+          content_type?: string | null
+          conversation_id: string
+          created_at?: string
+          direction: string
+          external_message_id?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          metadata?: Json | null
+          sender_email?: string | null
+          sender_name?: string | null
+          sender_phone?: string | null
+          status?: string | null
+        }
+        Update: {
+          ai_confidence_score?: number | null
+          attachments?: Json | null
+          content?: string
+          content_type?: string | null
+          conversation_id?: string
+          created_at?: string
+          direction?: string
+          external_message_id?: string | null
+          id?: string
+          is_ai_generated?: boolean | null
+          metadata?: Json | null
+          sender_email?: string | null
+          sender_name?: string | null
+          sender_phone?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unified_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "unified_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_activity: {
         Row: {
           activity_type: string
@@ -1292,7 +1657,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      communication_metrics_summary: {
+        Row: {
+          avg_resolution_time: number | null
+          avg_response_time: number | null
+          channel: string | null
+          date: string | null
+          total_conversations: number | null
+          total_messages: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
