@@ -123,14 +123,19 @@ const Pricing = () => {
 
   const fetchRegionalServices = async () => {
     try {
+      console.log('Fetching regional services...');
       const { data, error } = await supabase
         .from('regional_services')
         .select('*')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching regional services:', error);
+        throw error;
+      }
       
+      console.log('Regional services data:', data);
       setRegionalServices(data || []);
     } catch (error) {
       console.error('Error fetching regional services:', error);
@@ -463,6 +468,12 @@ const Pricing = () => {
             </div>
           </>
         )}
+
+        {/* DEBUG: Regional Services state */}
+        <div className="text-center mb-4 bg-yellow-100 p-4 rounded">
+          <p>Regional Services Debug: {regionalServices.length} services found</p>
+          <p>Data: {JSON.stringify(regionalServices.map(s => s.name))}</p>
+        </div>
 
         {/* Regional Services */}
         {regionalServices.length > 0 && (
