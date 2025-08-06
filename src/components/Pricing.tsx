@@ -162,7 +162,7 @@ const Pricing = () => {
         </div>
 
 
-        {/* Premium Protection Plan Section */}
+        {/* Emergency Protection Plan Section */}
         <div className="mb-12">
           <div className="text-center mb-10">
             <h3 className="text-2xl md:text-3xl font-bold mb-3">
@@ -173,70 +173,107 @@ const Pricing = () => {
             </p>
           </div>
           
-          {/* Premium Protection Long Box */}
-          {globalPlans.filter(plan => plan.name === 'Premium Protection').map((plan) => (
-            <Card key={plan.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-              <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
-                MOST POPULAR
-              </Badge>
-              
-              <div className="relative p-8">
-                <div className="grid lg:grid-cols-3 gap-8 items-center">
-                  {/* Plan Info */}
-                  <div className="text-center lg:text-left">
-                    <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
-                      <Brain className="h-8 w-8 text-white" />
+          {/* Premium Protection Plan - 3/4 width */}
+          <div className="max-w-6xl mx-auto">
+            {globalPlans.filter(plan => plan.name === 'Premium Protection').map((plan) => (
+              <Card key={plan.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
+                <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
+                  MOST POPULAR
+                </Badge>
+                
+                <div className="relative p-8">
+                  <div className="grid lg:grid-cols-3 gap-8 items-center">
+                    {/* Plan Info */}
+                    <div className="text-center lg:text-left">
+                      <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
+                        <Brain className="h-8 w-8 text-white" />
+                      </div>
+                      <CardTitle className="text-3xl font-bold mb-3">{plan.name}</CardTitle>
+                      <CardDescription className="text-lg text-muted-foreground mb-4">
+                        {plan.description}
+                      </CardDescription>
+                      <div className="mb-6">
+                        <span className="text-4xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
+                        <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
+                      </div>
+                      <Button 
+                        size="lg"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                        onClick={() => handleSubscriptionPurchase(plan)}
+                      >
+                        Subscribe Now
+                      </Button>
                     </div>
-                    <CardTitle className="text-3xl font-bold mb-3">{plan.name}</CardTitle>
-                    <CardDescription className="text-lg text-muted-foreground mb-4">
-                      {plan.description}
-                    </CardDescription>
-                    <div className="mb-6">
-                      <span className="text-4xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
-                      <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
-                    </div>
-                    <Button 
-                      size="lg"
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                      onClick={() => handleSubscriptionPurchase(plan)}
-                    >
-                      Subscribe Now
-                    </Button>
-                  </div>
-                  
-                  {/* Features */}
-                  <div className="lg:col-span-2">
-                    <h4 className="text-xl font-semibold mb-4">Everything Included:</h4>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {plan.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-start space-x-3">
-                          <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground">{feature}</span>
-                        </div>
-                      ))}
-                      
-                      {/* Family Connection Add-on */}
-                      <div className="md:col-span-2 mt-6 p-4 bg-secondary/20 rounded-lg border border-border/20">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-start space-x-3">
-                            <Users className="h-5 w-5 text-wellness mt-0.5" />
-                            <div>
-                              <h5 className="font-semibold text-foreground">Family Connection Add-on</h5>
-                              <p className="text-sm text-muted-foreground">Connect unlimited family members to receive emergency alerts and share health information</p>
-                            </div>
+                    
+                    {/* Features */}
+                    <div className="lg:col-span-2">
+                      <h4 className="text-xl font-semibold mb-4">Everything Included:</h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {plan.features.map((feature, featureIndex) => (
+                          <div key={featureIndex} className="flex items-start space-x-3">
+                            <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground">{feature}</span>
                           </div>
-                          <Badge variant="outline" className="text-wellness border-wellness/40">
-                            Available
-                          </Badge>
-                        </div>
+                        ))}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            ))}
+          </div>
+
+          {/* Family Connection Card - Connected below */}
+          <div className="max-w-6xl mx-auto mt-6">
+            {globalPlans.filter(plan => plan.name === 'Family Connection').map((plan) => (
+              <Card key={plan.id} className="relative border-2 border-wellness/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-wellness/5 via-transparent to-wellness/10"></div>
+                <Badge className="absolute top-6 right-6 bg-wellness text-white text-sm px-4 py-2 shadow-lg">
+                  ADD-ON
+                </Badge>
+                
+                <div className="relative p-6">
+                  <div className="grid lg:grid-cols-3 gap-6 items-center">
+                    {/* Plan Info */}
+                    <div className="text-center lg:text-left">
+                      <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Users className="h-7 w-7 text-white" />
+                      </div>
+                      <CardTitle className="text-2xl font-bold mb-3">{plan.name}</CardTitle>
+                      <CardDescription className="text-base text-muted-foreground mb-4">
+                        {plan.description}
+                      </CardDescription>
+                      <div className="mb-6">
+                        <span className="text-3xl font-bold text-wellness">€{plan.price.toFixed(2)}</span>
+                        <span className="text-muted-foreground text-base">/{plan.billing_interval}</span>
+                      </div>
+                      <Button 
+                        size="lg"
+                        className="bg-wellness hover:bg-wellness/90 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                        onClick={() => handleSubscriptionPurchase(plan)}
+                      >
+                        Add Family Plan
+                      </Button>
+                    </div>
+                    
+                    {/* Features */}
+                    <div className="lg:col-span-2">
+                      <h4 className="text-lg font-semibold mb-4">Family Features:</h4>
+                      <div className="grid md:grid-cols-2 gap-3">
+                        {plan.features.map((feature, featureIndex) => (
+                          <div key={featureIndex} className="flex items-start space-x-3">
+                            <Check className="h-4 w-4 text-wellness mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* Safety Products Section */}
