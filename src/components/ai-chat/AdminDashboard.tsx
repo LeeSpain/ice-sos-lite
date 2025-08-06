@@ -22,6 +22,7 @@ import EmailCampaignsPage from '@/components/admin/pages/EmailCampaignsPage';
 import FamilyAccountsPage from '@/components/admin/pages/FamilyAccountsPage';
 import SystemSettingsPage from '@/components/admin/pages/SystemSettingsPage';
 import ReportsPage from '@/components/admin/pages/ReportsPage';
+import SubscriptionPlansPage from '@/components/admin/pages/SubscriptionPlansPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -40,7 +41,7 @@ const AdminDashboard: React.FC = () => {
           <Route path="ai-settings" element={<AIModelSettingsPage />} />
           <Route path="customers" element={<CustomersPage />} />
           <Route path="subscriptions" element={<SubscriptionsPage />} />
-          <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />
+          <Route path="protection-plans" element={<SubscriptionPlansPage />} />
           <Route path="families" element={<FamilyAccountsPage />} />
           <Route path="leads" element={<LeadsPage />} />
           <Route path="conversations" element={<ConversationsPage />} />
