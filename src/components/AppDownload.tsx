@@ -22,7 +22,7 @@ const AppDownload = () => {
         <Card className="relative border-2 border-primary/20 bg-white shadow-2xl overflow-hidden max-w-5xl mx-auto">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-primary/5"></div>
           <CardHeader className="relative text-center py-12 px-8">
-            <Badge className="bg-emergency text-white w-fit mx-auto mb-6 text-sm font-semibold px-6 py-3 shadow-lg rounded-full">
+            <Badge className="bg-green-600 text-white w-fit mx-auto mb-6 text-sm font-semibold px-6 py-3 shadow-lg rounded-full">
               ⚡ PROFESSIONAL PLATFORM
             </Badge>
             <div className="w-24 h-24 mx-auto mb-8 bg-gradient-to-br from-primary to-secondary shadow-2xl rounded-3xl flex items-center justify-center border-4 border-white">
@@ -63,17 +63,13 @@ const AppDownload = () => {
               </div>
             </div>
             
-            {/* Call to Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-6 justify-center max-w-lg mx-auto">
-              <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold text-lg px-10 py-5 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl">
+            {/* Call to Action Button */}
+            <div className="flex justify-center">
+              <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold text-lg px-12 py-6 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl">
                 <Link to="/register">
                   <Download className="mr-3 h-6 w-6" />
                   Get Started Free
                 </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="border-3 border-primary text-primary hover:bg-primary hover:text-white font-bold text-lg px-10 py-5 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl">
-                <Download className="mr-3 h-6 w-6" />
-                View All Plans
               </Button>
             </div>
           </CardContent>
