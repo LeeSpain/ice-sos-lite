@@ -1125,6 +1125,36 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       service_product_compatibility: {
         Row: {
           compatibility_notes: string | null
@@ -1675,6 +1705,10 @@ export type Database = {
     Functions: {
       assign_admin_role: {
         Args: { target_user_id: string }
+        Returns: boolean
+      }
+      check_admin_setup_allowed: {
+        Args: Record<PropertyKey, never>
         Returns: boolean
       }
       get_user_role: {
