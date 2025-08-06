@@ -253,14 +253,14 @@ const Pricing = () => {
           </div>
 
           {/* Family & Carer Access Information */}
-          <div className="max-w-4xl mx-auto mt-8 text-center">
-            <div className="bg-wellness/10 rounded-lg p-6 border border-wellness/20">
-              <h3 className="text-xl font-semibold text-wellness mb-3">Family & Carer Access</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Grant trusted family members and carers secure access to your emergency profile and protection status. 
-                They can monitor your safety, receive alerts, and coordinate emergency response when needed.
-              </p>
-            </div>
+          <div className="text-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black">
+              Family & Carer Access
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Grant trusted family members and carers secure access to your emergency profile and protection status. 
+              They can monitor your safety, receive alerts, and coordinate emergency response when needed.
+            </p>
           </div>
 
           {/* Family Connection Card - Connected below */}
