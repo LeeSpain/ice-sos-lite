@@ -22,6 +22,8 @@ import EmailCampaignsPage from '@/components/admin/pages/EmailCampaignsPage';
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
   
+  console.log('🚀 AdminDashboard component is rendering at:', window.location.pathname);
+  
   return (
     <AdminProtectedRoute>
       <Routes>

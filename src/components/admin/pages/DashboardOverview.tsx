@@ -51,6 +51,8 @@ const calculateMonthlyRevenue = (subscribers: any[]) => {
 }
 
 export default function DashboardOverview() {
+  console.log('📊 DashboardOverview component is rendering');
+  
   const [stats, setStats] = useState<DashboardStats>({
     totalLeads: 0,
     totalConversations: 0,

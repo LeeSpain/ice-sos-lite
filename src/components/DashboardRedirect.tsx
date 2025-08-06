@@ -7,6 +7,15 @@ const DashboardRedirect = () => {
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading, isAdmin } = useUserRole();
 
+  console.log('🔄 DashboardRedirect Debug:', {
+    user: user?.id || 'none',
+    role,
+    isAdmin,
+    authLoading,
+    roleLoading,
+    currentPath: window.location.pathname
+  });
+
   // Show loading while checking authentication and role
   if (authLoading || roleLoading) {
     return (
