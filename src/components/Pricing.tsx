@@ -35,9 +35,23 @@ interface SubscriptionPlan {
   region?: string;
 }
 
+interface RegionalService {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  description: string;
+  region: string;
+  features: string[];
+  is_active: boolean;
+  is_popular: boolean;
+  sort_order: number;
+}
+
 const Pricing = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
+  const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
   // Icon mapping for subscription plans
   const getIconForPlan = (planName: string) => {
@@ -62,6 +76,7 @@ const Pricing = () => {
   useEffect(() => {
     fetchProducts();
     fetchSubscriptionPlans();
+    fetchRegionalServices();
   }, []);
 
   const fetchProducts = async () => {
@@ -103,6 +118,22 @@ const Pricing = () => {
       setSubscriptionPlans(transformedPlans);
     } catch (error) {
       console.error('Error fetching subscription plans:', error);
+    }
+  };
+
+  const fetchRegionalServices = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('regional_services')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error) throw error;
+      
+      setRegionalServices(data || []);
+    } catch (error) {
+      console.error('Error fetching regional services:', error);
     }
   };
 
@@ -290,9 +321,13 @@ const Pricing = () => {
                   
                   <div className="relative p-8">
                     <div className="grid lg:grid-cols-3 gap-8 items-center">
-                      {/* Product Info */}
+                       {/* Product Info */}
                       <div className="text-center lg:text-left">
-                        <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
+                        <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 ${
+                          product.name === 'ICE SOS Bluetooth Pendant' 
+                            ? 'bg-gradient-to-br from-blue-500 to-blue-600' 
+                            : 'bg-gradient-to-br from-primary to-guardian'
+                        } rounded-2xl flex items-center justify-center shadow-lg`}>
                           <Package className="h-8 w-8 text-white" />
                         </div>
                         <CardTitle className="text-3xl font-bold mb-3">{product.name}</CardTitle>
@@ -300,7 +335,11 @@ const Pricing = () => {
                           {product.description}
                         </CardDescription>
                         <div className="mb-6">
-                          <span className="text-4xl font-bold text-primary">€{product.price.toFixed(2)}</span>
+                          <span className={`text-4xl font-bold ${
+                            product.name === 'ICE SOS Bluetooth Pendant' 
+                              ? 'text-blue-600' 
+                              : 'text-primary'
+                          }`}>€{product.price.toFixed(2)}</span>
                           <span className="text-muted-foreground text-lg"> one-time</span>
                         </div>
                         <div className="flex gap-3">
@@ -371,25 +410,33 @@ const Pricing = () => {
                                   </ol>
                                 </div>
 
-                                <div className="flex gap-3 pt-4">
-                                  <Button 
-                                    className="flex-1"
-                                    onClick={() => handleProductPurchase(product)}
-                                  >
-                                    Purchase Now - €{product.price.toFixed(2)}
-                                  </Button>
-                                </div>
+                                 <div className="flex gap-3 pt-4">
+                                   <Button 
+                                     className={`flex-1 ${
+                                       product.name === 'ICE SOS Bluetooth Pendant'
+                                         ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                         : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                     }`}
+                                     onClick={() => handleProductPurchase(product)}
+                                   >
+                                     Purchase Device
+                                   </Button>
+                                 </div>
                               </div>
                             </DialogContent>
                           </Dialog>
                           
-                          <Button 
-                            size="lg"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                            onClick={() => handleProductPurchase(product)}
-                          >
-                            Purchase Now
-                          </Button>
+                        <Button 
+                          size="lg"
+                          className={`font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                            product.name === 'ICE SOS Bluetooth Pendant'
+                              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                              : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                          }`}
+                          onClick={() => handleProductPurchase(product)}
+                        >
+                          Purchase Now
+                        </Button>
                         </div>
                       </div>
                       
@@ -417,72 +464,95 @@ const Pricing = () => {
           </>
         )}
 
-        {/* Regional Services Section */}
-        {regionalPlans.length > 0 && (
-          <div className="mb-16">
-            <div className="text-center mb-12">
+        {/* Regional Services */}
+        {regionalServices.length > 0 && (
+          <>
+            <div className="text-center mb-16">
               <h3 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Regional Services
               </h3>
-              <p className="text-lg text-muted-foreground">
-                Premium call center services available in select regions
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Specialized coverage in your local area with dedicated emergency response teams
               </p>
             </div>
-            
+
             <div className="max-w-4xl mx-auto">
-              {regionalPlans.map((plan, index) => {
-                const Icon = getIconForPlan(plan.name);
-                const regionName = plan.region === 'spain' ? 'Spain Only' : plan.region?.toUpperCase();
-                return (
-                  <Card key={plan.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-                    <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
-                      {regionName}
-                    </Badge>
-                    
-                    <div className="relative p-8">
-                      <div className="grid lg:grid-cols-3 gap-8 items-center">
-                        {/* Plan Info */}
-                        <div className="text-center lg:text-left">
-                          <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
-                            <Icon className="h-8 w-8 text-white" />
-                          </div>
-                          <CardTitle className="text-3xl font-bold mb-3">{plan.name}</CardTitle>
-                          <CardDescription className="text-lg text-muted-foreground mb-4">
-                            {plan.description}
-                          </CardDescription>
-                          <div className="mb-6">
-                            <span className="text-4xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
-                            <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
-                          </div>
-                          <Button 
-                            size="lg"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                            onClick={() => handleSubscriptionPurchase(plan)}
-                          >
-                            Subscribe Now
-                          </Button>
+              {regionalServices.map((service) => (
+                <Card key={service.id} className={`relative border-2 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden ${
+                  service.name === 'Call Centre Spain' 
+                    ? 'border-green-500/40' 
+                    : 'border-secondary/40'
+                }`}>
+                  <div className={`absolute inset-0 ${
+                    service.name === 'Call Centre Spain'
+                      ? 'bg-gradient-to-br from-green-500/5 via-transparent to-green-500/10'
+                      : 'bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10'
+                  }`}></div>
+                  <Badge className={`absolute top-6 right-6 text-white text-sm px-4 py-2 shadow-lg ${
+                    service.name === 'Call Centre Spain'
+                      ? 'bg-green-600'
+                      : 'bg-secondary'
+                  }`}>
+                    {service.region?.toUpperCase()}
+                  </Badge>
+                  
+                  <div className="relative p-8">
+                    <div className="grid lg:grid-cols-3 gap-8 items-center">
+                      {/* Service Info */}
+                      <div className="text-center lg:text-left">
+                        <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
+                          service.name === 'Call Centre Spain'
+                            ? 'bg-gradient-to-br from-green-500 to-green-600'
+                            : 'bg-gradient-to-br from-secondary to-secondary/80'
+                        }`}>
+                          <MapPin className="h-8 w-8 text-white" />
                         </div>
-                        
-                        {/* Features */}
-                        <div className="lg:col-span-2">
-                          <h4 className="text-xl font-semibold mb-4">Regional Features:</h4>
-                          <div className="grid md:grid-cols-2 gap-4">
-                            {plan.features.map((feature, featureIndex) => (
-                              <div key={featureIndex} className="flex items-start space-x-3">
-                                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                                <span className="text-sm text-muted-foreground">{feature}</span>
-                              </div>
-                            ))}
-                          </div>
+                        <CardTitle className="text-3xl font-bold mb-3">{service.name}</CardTitle>
+                        <CardDescription className="text-lg text-muted-foreground mb-4">
+                          {service.description}
+                        </CardDescription>
+                        <div className="mb-6">
+                          <span className={`text-4xl font-bold ${
+                            service.name === 'Call Centre Spain'
+                              ? 'text-green-600'
+                              : 'text-secondary'
+                          }`}>€{service.price.toFixed(2)}</span>
+                          <span className="text-muted-foreground text-lg">/month</span>
+                        </div>
+                        <Button 
+                          size="lg"
+                          className={`font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                            service.name === 'Call Centre Spain'
+                              ? 'bg-green-600 hover:bg-green-700 text-white'
+                              : 'bg-secondary hover:bg-secondary/90 text-white'
+                          }`}
+                        >
+                          Contact Regional Center
+                        </Button>
+                      </div>
+                      
+                      {/* Features */}
+                      <div className="lg:col-span-2">
+                        <h4 className="text-xl font-semibold mb-4">Regional Features:</h4>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          {service.features.map((feature, featureIndex) => (
+                            <div key={featureIndex} className="flex items-start space-x-3">
+                              <Check className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                                service.name === 'Call Centre Spain'
+                                  ? 'text-green-600'
+                                  : 'text-secondary'
+                              }`} />
+                              <span className="text-sm text-muted-foreground">{feature}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
-                  </Card>
-                );
-              })}
+                  </div>
+                </Card>
+              ))}
             </div>
-          </div>
+          </>
         )}
 
         {/* Additional Information */}
