@@ -157,7 +157,7 @@ const Pricing = () => {
             Choose Your Protection Plan
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Professional emergency protection starting from €1.99/month. Download the app and activate your plan instantly.
+            Professional emergency protection at €4.99/month. Download the app and activate your plan instantly.
           </p>
         </div>
 
@@ -174,7 +174,7 @@ const Pricing = () => {
           </div>
           
           {/* Premium Protection Plan - 3/4 width */}
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             {globalPlans.filter(plan => plan.name === 'Premium Protection').map((plan) => (
               <Card key={plan.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
@@ -225,7 +225,7 @@ const Pricing = () => {
           </div>
 
           {/* Family Connection Card - Connected below */}
-          <div className="max-w-6xl mx-auto mt-6">
+          <div className="max-w-4xl mx-auto mt-6">
             {globalPlans.filter(plan => plan.name === 'Family Connection').map((plan) => (
               <Card key={plan.id} className="relative border-2 border-wellness/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-wellness/5 via-transparent to-wellness/10"></div>
