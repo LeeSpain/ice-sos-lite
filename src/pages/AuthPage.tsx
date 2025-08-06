@@ -8,8 +8,10 @@ import { Shield, Mail, Lock, ArrowLeft, Phone, User, Smartphone, QrCode } from "
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
 import QRCode from 'qrcode';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 const AuthPage = () => {
+  useScrollToTop();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -325,6 +327,10 @@ const AuthPage = () => {
               <br />
               <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
                 <Link to="/admin-dashboard">Admin Dashboard (Testing) →</Link>
+              </Button>
+              <br />
+              <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
+                <Link to="/admin-setup">Admin Setup (Create Test Account) →</Link>
               </Button>
             </div>
 

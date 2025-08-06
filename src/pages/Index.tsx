@@ -9,8 +9,10 @@ import Footer from "@/components/Footer";
 import ChatWidget from "@/components/ai-chat/ChatWidget";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sparkles } from 'lucide-react';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 const Index = () => {
+  useScrollToTop();
   const [isEmmaOpen, setIsEmmaOpen] = useState(false);
 
   const handleEmmaClick = useCallback(() => {

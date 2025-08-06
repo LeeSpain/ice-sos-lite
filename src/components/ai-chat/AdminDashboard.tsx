@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import AdminProtectedRoute from '@/components/AdminProtectedRoute';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 import DashboardOverview from '@/components/admin/pages/DashboardOverview';
 import CustomersPage from '@/components/admin/pages/CustomersPage';
 import LeadsPage from '@/components/admin/pages/LeadsPage';
@@ -19,6 +20,7 @@ import CommunicationPage from '@/components/admin/pages/CommunicationPage';
 import EmailCampaignsPage from '@/components/admin/pages/EmailCampaignsPage';
 
 const AdminDashboard: React.FC = () => {
+  useScrollToTop();
   return (
     <AdminProtectedRoute>
       <Routes>

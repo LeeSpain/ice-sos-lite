@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Phone, Mail } from "lucide-react";
 import MobileAppCard from "@/components/dashboard/MobileAppCard";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 const SimpleDashboard = () => {
+  useScrollToTop();
   const { user, signOut } = useAuth();
   const location = useLocation();
   const isTestMode = location.pathname === '/test-dashboard';

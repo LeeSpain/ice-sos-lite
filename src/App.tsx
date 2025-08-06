@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import AdminDashboard from "./components/ai-chat/AdminDashboard";
 import AdminSetup from "./components/AdminSetup";
+import AdminSetupPage from "./pages/AdminSetupPage";
 import NotFound from "./pages/NotFound";
 
 const App = () => {
@@ -34,11 +35,7 @@ const App = () => {
               <SimpleDashboard />
             </ProtectedRoute>
           } />
-          <Route path="/admin-setup" element={
-            <ProtectedRoute>
-              <AdminSetup />
-            </ProtectedRoute>
-          } />
+          <Route path="/admin-setup" element={<AdminSetupPage />} />
           <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
           <Route path="/full-dashboard/*" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
