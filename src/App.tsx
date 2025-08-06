@@ -11,6 +11,7 @@ import RegistrationSuccess from "./pages/RegistrationSuccess";
 import Dashboard from "./pages/Dashboard";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import AdminDashboard from "./components/ai-chat/AdminDashboard";
+import AdminSetup from "./components/AdminSetup";
 import NotFound from "./pages/NotFound";
 
 const App = () => {
@@ -31,6 +32,11 @@ const App = () => {
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <SimpleDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin-setup" element={
+            <ProtectedRoute>
+              <AdminSetup />
             </ProtectedRoute>
           } />
           <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
