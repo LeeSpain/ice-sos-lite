@@ -434,9 +434,9 @@ const Pricing = () => {
                 const Icon = getIconForPlan(plan.name);
                 const regionName = plan.region === 'spain' ? 'Spain Only' : plan.region?.toUpperCase();
                 return (
-                  <Card key={plan.id} className="relative border-2 border-primary/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10"></div>
-                    <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
+                  <Card key={plan.id} className="relative border-2 border-green/40 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-green/10 to-green/5 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-green/20 via-green/10 to-green/5"></div>
+                    <Badge className="absolute top-6 right-6 bg-green text-white text-sm px-4 py-2 shadow-lg">
                       {regionName}
                     </Badge>
                     
@@ -444,7 +444,7 @@ const Pricing = () => {
                       <div className="grid lg:grid-cols-3 gap-6 items-center">
                         {/* Plan Info */}
                         <div className="text-center lg:text-left">
-                          <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg">
+                          <div className="w-14 h-14 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-green to-green/80 rounded-2xl flex items-center justify-center shadow-lg">
                             <Icon className="h-7 w-7 text-white" />
                           </div>
                           <CardTitle className="text-2xl font-bold mb-3">{plan.name}</CardTitle>
@@ -452,12 +452,12 @@ const Pricing = () => {
                             {plan.description}
                           </CardDescription>
                           <div className="mb-6">
-                            <span className="text-3xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
+                            <span className="text-3xl font-bold text-green">€{plan.price.toFixed(2)}</span>
                             <span className="text-muted-foreground text-base">/{plan.billing_interval}</span>
                           </div>
                           <Button 
                             size="lg"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="bg-green hover:bg-green/90 text-green-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                             onClick={() => handleSubscriptionPurchase(plan)}
                           >
                             Subscribe Now
@@ -470,7 +470,7 @@ const Pricing = () => {
                           <div className="grid md:grid-cols-2 gap-3">
                             {plan.features.map((feature, featureIndex) => (
                               <div key={featureIndex} className="flex items-start space-x-3">
-                                <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                                <Check className="h-4 w-4 text-green mt-0.5 flex-shrink-0" />
                                 <span className="text-sm text-muted-foreground">{feature}</span>
                               </div>
                             ))}
