@@ -86,6 +86,7 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
 
   useEffect(() => {
     loadAIData();
+    loadAISettings();
   }, []);
 
   const loadAIData = async () => {
@@ -118,9 +119,57 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
     }
   };
 
+  const loadAISettings = async () => {
+    try {
+      const { data: settings } = await supabase
+        .from('ai_model_settings')
+        .select('setting_key, setting_value');
+
+      if (settings) {
+        const settingsMap = settings.reduce((acc, setting) => {
+          acc[setting.setting_key] = setting.setting_value;
+          return acc;
+        }, {} as any);
+
+        setAiSettings(prev => ({
+          ...prev,
+          temperature: settingsMap.temperature || prev.temperature,
+          maxTokens: settingsMap.max_tokens || prev.maxTokens,
+          systemPrompt: settingsMap.system_prompt || prev.systemPrompt,
+          enableLogging: settingsMap.enable_logging !== undefined ? settingsMap.enable_logging : prev.enableLogging,
+          autoLearnEnabled: settingsMap.auto_learn_enabled !== undefined ? settingsMap.auto_learn_enabled : prev.autoLearnEnabled,
+          responseDelay: settingsMap.response_delay || prev.responseDelay
+        }));
+      }
+    } catch (error) {
+      console.error('Error loading AI settings:', error);
+    }
+  };
+
   const handleSettingsUpdate = async () => {
     try {
       // Test the AI connection by making a test call
+      // Save AI settings to database
+      const settingsToSave = [
+        { setting_key: 'temperature', setting_value: aiSettings.temperature },
+        { setting_key: 'max_tokens', setting_value: aiSettings.maxTokens },
+        { setting_key: 'system_prompt', setting_value: aiSettings.systemPrompt },
+        { setting_key: 'enable_logging', setting_value: aiSettings.enableLogging },
+        { setting_key: 'auto_learn_enabled', setting_value: aiSettings.autoLearnEnabled },
+        { setting_key: 'response_delay', setting_value: aiSettings.responseDelay }
+      ];
+
+      for (const setting of settingsToSave) {
+        await supabase
+          .from('ai_model_settings')
+          .upsert({
+            setting_key: setting.setting_key,
+            setting_value: setting.setting_value,
+            description: `AI configuration setting: ${setting.setting_key}`
+          }, { onConflict: 'setting_key' });
+      }
+
+      // Test the AI connection
       const { data, error } = await supabase.functions.invoke('ai-chat', {
         body: {
           message: 'Test connection - please respond with "AI agent is working correctly"',

@@ -61,6 +61,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
       const { data, error } = await supabase.functions.invoke('ai-chat', {
         body: {
           message: inputMessage,
+          sessionId: `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          userId: null,
           context: `${context} - User: ${userName}`,
           conversation_history: messages.slice(-5) // Send last 5 messages for context
         }
