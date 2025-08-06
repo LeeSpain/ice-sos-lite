@@ -29,7 +29,8 @@ import {
   Database,
   Bot,
   Package,
-  MapPin
+  MapPin,
+  Mail
 } from 'lucide-react';
 
 const adminMenuItems = [
@@ -64,6 +65,14 @@ const adminMenuItems = [
       { title: "Lead Management", url: "/admin-dashboard/leads", icon: MessageSquare },
       { title: "Conversations", url: "/admin-dashboard/conversations", icon: MessageSquare },
       { title: "AI Performance", url: "/admin-dashboard/ai-metrics", icon: BarChart3 },
+    ]
+  },
+  {
+    title: "📧 Communication",
+    items: [
+      { title: "Email Campaigns", url: "/admin-dashboard/email-campaigns", icon: Mail },
+      { title: "Communication Center", url: "/admin-dashboard/communication", icon: MessageSquare },
+      { title: "WhatsApp Integration", url: "/admin-dashboard/whatsapp", icon: MessageSquare },
     ]
   },
   {
