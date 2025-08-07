@@ -394,7 +394,23 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
       
       {/* Testing Skip Button */}
       <Button 
-        onClick={onSuccess} 
+        onClick={() => {
+          // Store welcome data for testing, same as payment success
+          const welcomeData = {
+            firstName,
+            lastName,
+            email: userEmail,
+            subscriptionPlans: planData,
+            products: productData,
+            regionalServices: serviceData,
+            totalAmount: grandTotal
+          };
+          
+          sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
+          
+          // Navigate to welcome page
+          window.location.href = '/welcome';
+        }} 
         variant="secondary" 
         className="w-full"
         size="lg"
