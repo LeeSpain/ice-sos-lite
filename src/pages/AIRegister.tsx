@@ -613,8 +613,15 @@ const AIRegister = () => {
                               </div>
                             </div>
                             <div className="text-right ml-4">
-                              <div className="font-bold text-lg">{premiumPlan.currency}{premiumPlan.price}</div>
-                              <div className="text-sm text-muted-foreground">/{premiumPlan.billing_interval}</div>
+                              <div className="space-y-1">
+                                <div className="text-sm text-muted-foreground">
+                                  Net: {premiumPlan.currency} {premiumPlan.price.toFixed(2)}
+                                </div>
+                                <div className="font-bold text-lg text-primary">
+                                  {premiumPlan.currency} {premiumPlan.price.toFixed(2)}
+                                </div>
+                                <div className="text-sm text-muted-foreground">per {premiumPlan.billing_interval}</div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -659,8 +666,15 @@ const AIRegister = () => {
                                   )}
                                 </div>
                                 <div className="text-right ml-4">
-                                  <div className="font-bold text-base">{familyPlan.currency}{familyPlan.price.toFixed(2)}</div>
-                                  <div className="text-xs text-muted-foreground">/{familyPlan.billing_interval}</div>
+                                  <div className="space-y-1">
+                                    <div className="text-xs text-muted-foreground">
+                                      Net: {familyPlan.currency} {familyPlan.price.toFixed(2)}
+                                    </div>
+                                    <div className="font-bold text-base text-primary">
+                                      {familyPlan.currency} {familyPlan.price.toFixed(2)}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">per {familyPlan.billing_interval}</div>
+                                  </div>
                                 </div>
                               </div>
                             </Label>
@@ -702,14 +716,17 @@ const AIRegister = () => {
                                         )}
                                       </div>
                                       <div className="text-right ml-4">
-                                        <div className="text-xs text-muted-foreground line-through">
-                                          {product.currency}{product.price.toFixed(2)}
-                                        </div>
-                                        <div className="font-bold text-base">
-                                          {product.currency}{priceWithIva.toFixed(2)}
-                                        </div>
-                                        <div className="text-xs text-muted-foreground">
-                                          +21% IVA
+                                        <div className="space-y-1">
+                                          <div className="text-xs text-muted-foreground">
+                                            Net: {product.currency} {product.price.toFixed(2)}
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">
+                                            + 21% IVA: {product.currency} {(product.price * PRODUCT_IVA_RATE).toFixed(2)}
+                                          </div>
+                                          <div className="font-bold text-base text-primary border-t border-border pt-1">
+                                            {product.currency} {priceWithIva.toFixed(2)}
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">one-time</div>
                                         </div>
                                       </div>
                                     </div>
@@ -760,14 +777,17 @@ const AIRegister = () => {
                                         )}
                                       </div>
                                       <div className="text-right ml-4">
-                                        <div className="text-xs text-muted-foreground line-through">
-                                          {service.currency}{service.price.toFixed(2)}
-                                        </div>
-                                        <div className="font-bold text-base">
-                                          {service.currency}{priceWithIva.toFixed(2)}
-                                        </div>
-                                        <div className="text-xs text-muted-foreground">
-                                          +10% IVA /month
+                                        <div className="space-y-1">
+                                          <div className="text-xs text-muted-foreground">
+                                            Net: {service.currency} {service.price.toFixed(2)}
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">
+                                            + 10% IVA: {service.currency} {(service.price * SERVICE_IVA_RATE).toFixed(2)}
+                                          </div>
+                                          <div className="font-bold text-base text-primary border-t border-border pt-1">
+                                            {service.currency} {priceWithIva.toFixed(2)}
+                                          </div>
+                                          <div className="text-xs text-muted-foreground">per month</div>
                                         </div>
                                       </div>
                                     </div>
