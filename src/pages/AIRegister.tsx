@@ -615,10 +615,10 @@ const AIRegister = () => {
                             <div className="text-right ml-4">
                               <div className="space-y-1">
                                 <div className="text-sm text-muted-foreground">
-                                  Net: {premiumPlan.currency} {premiumPlan.price.toFixed(2)}
+                                  Net: €{premiumPlan.price.toFixed(2)}
                                 </div>
                                 <div className="font-bold text-lg text-primary">
-                                  {premiumPlan.currency} {premiumPlan.price.toFixed(2)}
+                                  €{premiumPlan.price.toFixed(2)}
                                 </div>
                                 <div className="text-sm text-muted-foreground">per {premiumPlan.billing_interval}</div>
                               </div>
@@ -670,12 +670,12 @@ const AIRegister = () => {
                                     <div className="space-y-2">
                                       <div className="flex justify-between items-center text-sm">
                                         <span className="text-muted-foreground">Net Price:</span>
-                                        <span className="font-medium">{familyPlan.currency} {familyPlan.price.toFixed(2)}</span>
+                                        <span className="font-medium">€{familyPlan.price.toFixed(2)}</span>
                                       </div>
                                       <div className="border-t border-border pt-2">
                                         <div className="flex justify-between items-center">
                                           <span className="font-semibold text-foreground">Total:</span>
-                                          <span className="font-bold text-lg text-primary">{familyPlan.currency} {familyPlan.price.toFixed(2)}</span>
+                                          <span className="font-bold text-lg text-primary">€{familyPlan.price.toFixed(2)}</span>
                                         </div>
                                         <div className="text-center mt-1">
                                           <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
@@ -730,16 +730,16 @@ const AIRegister = () => {
                                           <div className="space-y-2">
                                             <div className="flex justify-between items-center text-sm">
                                               <span className="text-muted-foreground">Net Price:</span>
-                                              <span className="font-medium">{product.currency} {product.price.toFixed(2)}</span>
+                                              <span className="font-medium">€{product.price.toFixed(2)}</span>
                                             </div>
                                             <div className="flex justify-between items-center text-xs">
                                               <span className="text-muted-foreground">IVA (21%):</span>
-                                              <span className="font-medium">+ {product.currency} {(product.price * PRODUCT_IVA_RATE).toFixed(2)}</span>
+                                              <span className="font-medium">+ €{(product.price * PRODUCT_IVA_RATE).toFixed(2)}</span>
                                             </div>
                                             <div className="border-t border-border pt-2">
                                               <div className="flex justify-between items-center">
                                                 <span className="font-semibold text-foreground">Total:</span>
-                                                <span className="font-bold text-lg text-primary">{product.currency} {priceWithIva.toFixed(2)}</span>
+                                                <span className="font-bold text-lg text-primary">€{priceWithIva.toFixed(2)}</span>
                                               </div>
                                               <div className="text-center mt-1">
                                                 <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
@@ -802,16 +802,16 @@ const AIRegister = () => {
                                           <div className="space-y-2">
                                             <div className="flex justify-between items-center text-sm">
                                               <span className="text-muted-foreground">Net Price:</span>
-                                              <span className="font-medium">{service.currency} {service.price.toFixed(2)}</span>
+                                              <span className="font-medium">€{service.price.toFixed(2)}</span>
                                             </div>
                                             <div className="flex justify-between items-center text-sm">
                                               <span className="text-muted-foreground">IVA (10%):</span>
-                                              <span className="font-medium">+ {service.currency} {(service.price * SERVICE_IVA_RATE).toFixed(2)}</span>
+                                              <span className="font-medium">+ €{(service.price * SERVICE_IVA_RATE).toFixed(2)}</span>
                                             </div>
                                             <div className="border-t border-border pt-2">
                                               <div className="flex justify-between items-center">
                                                 <span className="font-semibold text-foreground">Total:</span>
-                                                <span className="font-bold text-lg text-primary">{service.currency} {priceWithIva.toFixed(2)}</span>
+                                                <span className="font-bold text-lg text-primary">€{priceWithIva.toFixed(2)}</span>
                                               </div>
                                               <div className="text-center mt-1">
                                                 <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
@@ -853,7 +853,7 @@ const AIRegister = () => {
                               <div className="text-xs text-muted-foreground">Standard emergency protection</div>
                             </div>
                             <div className="text-right">
-                              <div className="font-bold text-primary">{premiumPlan?.currency || 'EUR'} {(premiumPlan?.price || 0).toFixed(2)}</div>
+                              <div className="font-bold text-primary">€{(premiumPlan?.price || 0).toFixed(2)}</div>
                               <div className="text-xs text-muted-foreground">per month</div>
                             </div>
                           </div>
@@ -866,7 +866,7 @@ const AIRegister = () => {
                                 <div className="text-xs text-muted-foreground">Family protection add-on</div>
                               </div>
                               <div className="text-right">
-                                <div className="font-bold text-primary">{familyPlan.currency} {familyPlan.price.toFixed(2)}</div>
+                                <div className="font-bold text-primary">€{familyPlan.price.toFixed(2)}</div>
                                 <div className="text-xs text-muted-foreground">per month</div>
                               </div>
                             </div>
@@ -889,9 +889,9 @@ const AIRegister = () => {
                                   <div className="text-right ml-4">
                                     <div className="space-y-1">
                                       <div className="text-xs text-muted-foreground">
-                                        Net: {service.currency} {netPrice.toFixed(2)} + IVA: {service.currency} {ivaAmount.toFixed(2)}
+                                        Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}
                                       </div>
-                                      <div className="font-bold text-primary">{service.currency} {totalPrice.toFixed(2)}</div>
+                                      <div className="font-bold text-primary">€{totalPrice.toFixed(2)}</div>
                                       <div className="text-xs text-muted-foreground">per month</div>
                                     </div>
                                   </div>
@@ -923,9 +923,9 @@ const AIRegister = () => {
                                   <div className="text-right ml-4">
                                     <div className="space-y-1">
                                       <div className="text-xs text-muted-foreground">
-                                        Net: {product.currency} {netPrice.toFixed(2)} + IVA: {product.currency} {ivaAmount.toFixed(2)}
+                                        Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}
                                       </div>
-                                      <div className="font-bold text-primary">{product.currency} {totalPrice.toFixed(2)}</div>
+                                      <div className="font-bold text-primary">€{totalPrice.toFixed(2)}</div>
                                       <div className="text-xs text-muted-foreground">one-time</div>
                                     </div>
                                   </div>
@@ -938,7 +938,7 @@ const AIRegister = () => {
                           <div className="border-t border-border pt-3 mt-3">
                             <div className="flex justify-between items-center">
                               <span className="font-bold text-foreground">One-time Subtotal:</span>
-                              <span className="font-bold text-lg text-primary">{premiumPlan?.currency || 'EUR'} {calculateProductTotal().toFixed(2)}</span>
+                              <span className="font-bold text-lg text-primary">€{calculateProductTotal().toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
@@ -955,11 +955,11 @@ const AIRegister = () => {
                           </div>
                           <div className="text-right">
                             <span className="text-2xl font-bold text-primary">
-                              {premiumPlan?.currency || 'EUR'} {calculateGrandTotal().toFixed(2)}
+                              €{calculateGrandTotal().toFixed(2)}
                             </span>
                             <div className="text-sm text-muted-foreground">
                               {calculateProductTotal() > 0 && (
-                                <>Monthly: {premiumPlan?.currency || 'EUR'} {calculateSubscriptionTotal().toFixed(2)}</>
+                                <>Monthly: €{calculateSubscriptionTotal().toFixed(2)}</>
                               )}
                             </div>
                           </div>
