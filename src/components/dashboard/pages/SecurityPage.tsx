@@ -141,7 +141,7 @@ export function SecurityPage() {
                     {securityScore >= 80 ? 'Excellent' : securityScore >= 60 ? 'Good' : 'Needs Improvement'}
                   </Badge>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Your security score is calculated based on password strength, two-factor authentication, and other security features.
                 </p>
               </div>
@@ -163,7 +163,7 @@ export function SecurityPage() {
           <CardContent className="space-y-6">
             {/* Change Password */}
             <div className="space-y-4">
-              <h3 className="font-semibold">Change Password</h3>
+              <h3 className="text-sm font-semibold">Change Password</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="current-password">Current Password</Label>
@@ -211,8 +211,8 @@ export function SecurityPage() {
             <div className="border-t pt-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-semibold">Two-Factor Authentication</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="text-sm font-semibold">Two-Factor Authentication</h3>
+                  <p className="text-xs text-muted-foreground">
                     Add an extra layer of security to your account
                   </p>
                 </div>
@@ -226,9 +226,9 @@ export function SecurityPage() {
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-yellow-600" />
-                    <span className="font-medium text-yellow-800">Recommended</span>
+                    <span className="text-sm font-medium text-yellow-800">Recommended</span>
                   </div>
-                  <p className="text-sm text-yellow-700 mt-1">
+                  <p className="text-xs text-yellow-700 mt-1">
                     Enable two-factor authentication to significantly improve your account security.
                   </p>
                 </div>
@@ -239,8 +239,8 @@ export function SecurityPage() {
             <div className="border-t pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold">Biometric Authentication</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className="text-sm font-semibold">Biometric Authentication</h3>
+                  <p className="text-xs text-muted-foreground">
                     Use fingerprint or face recognition for quick access
                   </p>
                 </div>
@@ -273,7 +273,7 @@ export function SecurityPage() {
                       <Smartphone className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold flex items-center gap-2">
+                      <h3 className="text-sm font-semibold flex items-center gap-2">
                         {session.device}
                         {session.isCurrent && (
                           <Badge variant="outline" className="text-xs">
@@ -281,7 +281,7 @@ export function SecurityPage() {
                           </Badge>
                         )}
                       </h3>
-                      <p className="text-sm text-muted-foreground">{session.location}</p>
+                      <p className="text-xs text-muted-foreground">{session.location}</p>
                       <p className="text-xs text-muted-foreground">{session.lastActive}</p>
                     </div>
                   </div>
@@ -311,8 +311,8 @@ export function SecurityPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Data Collection</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Data Collection</h3>
+                <p className="text-xs text-muted-foreground">
                   Allow collection of usage data to improve the app
                 </p>
               </div>
@@ -321,8 +321,8 @@ export function SecurityPage() {
             
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Location History</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Location History</h3>
+                <p className="text-xs text-muted-foreground">
                   Store location history for better emergency response
                 </p>
               </div>
@@ -331,8 +331,8 @@ export function SecurityPage() {
             
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Third-party Sharing</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Third-party Sharing</h3>
+                <p className="text-xs text-muted-foreground">
                   Share data with emergency services when needed
                 </p>
               </div>
