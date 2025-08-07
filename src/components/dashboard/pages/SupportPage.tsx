@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import ChatWidget from "@/components/ai-chat/ChatWidget";
 import { 
   HelpCircle, 
   MessageSquare, 
@@ -32,8 +31,17 @@ import { supabase } from "@/integrations/supabase/client";
 export function SupportPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [isChatOpen, setIsChatOpen] = useState(true); // Open by default
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [messages, setMessages] = useState([
+    {
+      id: '1',
+      content: `👋 Hi ${user?.user_metadata?.first_name || user?.email?.split('@')[0] || "there"}! I'm Emma, your AI assistant. I'm here to help you with your emergency protection questions. How can I assist you today?`,
+      isUser: false,
+      timestamp: new Date()
+    }
+  ]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isChatLoading, setIsChatLoading] = useState(false);
   const [ticketForm, setTicketForm] = useState({
     subject: "",
     category: "",
@@ -41,6 +49,69 @@ export function SupportPage() {
     message: ""
   });
   const [searchQuery, setSearchQuery] = useState("");
+
+  const sendMessage = async () => {
+    if (!inputMessage.trim() || isChatLoading) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      content: inputMessage,
+      isUser: true,
+      timestamp: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    const currentMessage = inputMessage;
+    setInputMessage('');
+    setIsChatLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-chat', {
+        body: {
+          message: currentMessage,
+          sessionId: `support-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          userId: user?.id || null,
+          context: `dashboard-support - User: ${userName}`,
+          conversation_history: messages.slice(-5)
+        }
+      });
+
+      if (error) throw error;
+
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        content: data.response || "I'm sorry, I couldn't process that request. Please try again.",
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Connection Error",
+        description: "Unable to connect to Emma. Please try again.",
+        variant: "destructive"
+      });
+      
+      const errorMessage = {
+        id: (Date.now() + 1).toString(),
+        content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsChatLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
 
   const handleSubmitTicket = async () => {
     if (!ticketForm.subject || !ticketForm.category || !ticketForm.message) {
@@ -228,7 +299,7 @@ export function SupportPage() {
         <p className="text-muted-foreground">Get help with your account, devices, and emergency services</p>
       </div>
 
-      {/* Emma AI Assistant - Featured */}
+      {/* Emma AI Assistant - Embedded Chat */}
       <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-emergency/5">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -239,26 +310,66 @@ export function SupportPage() {
             Get instant help from Emma, our AI assistant specialized in emergency protection and account support
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <MessageSquare className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Emma is here to help</h3>
-                <p className="text-sm text-muted-foreground">
-                  Available 24/7 • Instant responses • Emergency procedures
-                </p>
-              </div>
+        <CardContent className="space-y-4">
+          {/* Chat Messages */}
+          <div className="border border-border rounded-lg bg-background">
+            <div className="h-80 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[85%] p-3 rounded-lg break-words ${
+                      message.isUser
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-foreground'
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-xs mt-1 opacity-70">
+                      {message.timestamp.toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              {isChatLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-muted p-3 rounded-lg flex items-center space-x-2 max-w-[85%]">
+                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-sm">Emma is thinking...</span>
+                  </div>
+                </div>
+              )}
             </div>
-            <Button 
-              onClick={() => setIsChatOpen(true)}
-              className="bg-primary hover:bg-primary/90"
-            >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Start Chat
-            </Button>
+            
+            {/* Chat Input */}
+            <div className="p-4 border-t border-border bg-background">
+              <div className="flex space-x-2">
+                <Input
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Ask Emma about emergency protection, account settings, or any questions..."
+                  disabled={isChatLoading}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={sendMessage}
+                  disabled={!inputMessage.trim() || isChatLoading}
+                  size="sm"
+                  className="px-3 bg-primary hover:bg-primary/90"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2 text-center">
+                Emma can help with emergency procedures, account management, device setup, and more
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -514,14 +625,6 @@ export function SupportPage() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Emma AI Chat Widget */}
-      <ChatWidget
-        isOpen={isChatOpen}
-        onClose={() => setIsChatOpen(false)}
-        userName={userName}
-        context="dashboard-support"
-      />
     </div>
   );
 }
