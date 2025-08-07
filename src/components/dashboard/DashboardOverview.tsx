@@ -178,7 +178,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
             <div className="hidden sm:block">
               <Badge 
                 variant={protectionActive ? "default" : "destructive"}
-                className={protectionActive ? "bg-emergency text-white" : ""}
+                className={protectionActive ? "bg-emergency text-black" : ""}
               >
                 {protectionActive ? "Protected" : "Inactive"}
               </Badge>

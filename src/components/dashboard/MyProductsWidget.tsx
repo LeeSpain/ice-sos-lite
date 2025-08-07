@@ -2,26 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
 import { 
-  Bluetooth, 
-  Battery, 
-  Wifi, 
-  MapPin, 
-  Settings,
-  CheckCircle,
-  AlertCircle,
   Package,
-  Plus,
-  Smartphone,
-  Crown,
-  Calendar,
   CreditCard,
   ShoppingCart,
-  Zap,
-  Shield,
-  ExternalLink
+  CheckCircle,
+  AlertCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -45,22 +31,13 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
   const loadUserData = async () => {
     setLoading(true);
     try {
-      // Load subscription data first
-      await loadSubscription();
-      
-      // Load user's purchased products
-      await loadUserProducts();
-      
-      // Load available products from admin-managed catalog
-      await loadAvailableProducts();
-      
+      await Promise.all([
+        loadSubscription(),
+        loadUserProducts(),
+        loadAvailableProducts()
+      ]);
     } catch (error) {
       console.error('Error loading user data:', error);
-      toast({
-        title: "Loading Error",
-        description: "Unable to load your products. Please refresh the page.",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
@@ -71,32 +48,20 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Get user's purchased products from orders table
       const { data: ordersData } = await supabase
         .from('orders')
-        .select(`
-          *,
-          product:products(*)
-        `)
+        .select(`*, product:products(*)`)
         .eq('user_id', user.id)
         .eq('status', 'paid')
         .order('created_at', { ascending: false });
 
-      // Transform orders into user products with mock device status for display
       const userProductsList = ordersData?.map(order => ({
         id: `user-product-${order.id}`,
-        order_id: order.id,
         name: order.product?.name || 'Unknown Product',
-        type: 'purchased_device',
-        status: 'connected', // Mock status - in real app this would come from device API
-        battery_level: Math.floor(Math.random() * 40) + 60, // Mock battery 60-100%
-        last_sync: new Date().toISOString(),
-        firmware_version: '1.2.3',
-        setup_completed: true,
+        status: 'connected',
         purchase_date: order.created_at,
         price: order.unit_price,
-        currency: order.currency,
-        product_details: order.product
+        currency: order.currency
       })) || [];
 
       setUserProducts(userProductsList);
@@ -107,7 +72,6 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
 
   const loadAvailableProducts = async () => {
     try {
-      // Load all active products from admin-managed catalog
       const { data: productsData } = await supabase
         .from('products')
         .select('*')
@@ -120,70 +84,21 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     }
   };
 
-  // Reconcile Stripe data if needed
-  const reconcileStripeData = async () => {
-    try {
-      setLoading(true);
-      toast({
-        title: "Syncing your subscription data...",
-        description: "Please wait while we verify your payment information.",
-      });
-
-      const { data, error } = await supabase.functions.invoke('reconcile-stripe-data');
-      
-      if (error) {
-        console.error('Error reconciling data:', error);
-        toast({
-          title: "Sync failed",
-          description: "Unable to sync your subscription data. Please contact support.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      console.log('Reconciliation result:', data);
-      
-      // Refresh data after reconciliation
-      await loadUserData();
-      
-      toast({
-        title: "Data synced successfully",
-        description: "Your subscription and product information has been updated.",
-      });
-    } catch (error) {
-      console.error('Error reconciling data:', error);
-      toast({
-        title: "Sync failed",
-        description: "Unable to sync your subscription data. Please contact support.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const loadSubscription = async () => {
     try {
-      // Use the check-subscription function to get the latest subscription status
       const { data: subscriptionData, error } = await supabase.functions.invoke('check-subscription');
       
       if (error) {
-        console.error('Error checking subscription:', error);
-        setSubscription({ 
-          error: true, 
-          errorMessage: 'Unable to check subscription status. Please contact support.' 
-        });
+        setSubscription({ error: true });
         return;
       }
 
       if (subscriptionData?.subscribed && subscriptionData.subscription_tiers?.length > 0) {
-        // Get all active plans to match with user's subscriptions
         const { data: allPlans } = await supabase
           .from('subscription_plans')
           .select('*')
           .eq('is_active', true);
         
-        // Find the user's subscribed plans
         const userPlans = allPlans?.filter(plan => 
           subscriptionData.subscription_tiers.includes(plan.name)
         ) || [];
@@ -191,48 +106,14 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
         setSubscription({
           ...subscriptionData,
           plans: userPlans,
-          subscribed: true,
-          subscription_tier: subscriptionData.subscription_tier,
-          subscription_end: subscriptionData.subscription_end
+          subscribed: true
         });
-      } else if (subscriptionData?.subscribed === false) {
-        // Check if user has registration data but incomplete payment
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: registrationData } = await supabase
-            .from('registration_selections')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle();
-            
-          const { data: subscriberData } = await supabase
-            .from('subscribers')
-            .select('*')
-            .eq('user_id', user.id)
-            .maybeSingle();
-            
-          setSubscription({
-            subscribed: false,
-            hasRegistration: !!registrationData,
-            hasStripeCustomer: !!subscriberData?.stripe_customer_id,
-            needsSupport: !!(subscriberData?.stripe_customer_id && !subscriptionData.subscribed),
-            subscriberData,
-            registrationData
-          });
-        } else {
-          setSubscription({ subscribed: false });
-        }
       } else {
         setSubscription({ subscribed: false });
       }
     } catch (error) {
       console.error('Error loading subscription:', error);
-      setSubscription({ 
-        error: true, 
-        errorMessage: 'Connection error. Please try refreshing the page.' 
-      });
+      setSubscription({ error: true });
     }
   };
 
@@ -243,7 +124,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
           productId: product.id,
-          amount: Math.round(product.price * 100), // Convert to cents
+          amount: Math.round(product.price * 100),
           currency: product.currency.toLowerCase(),
           productName: product.name
         }
@@ -270,33 +151,6 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     }
   };
 
-  const handleUpgradeSubscription = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          plans: ['Family Protection'] // Upgrade to family plan
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.url) {
-        window.open(data.url, '_blank');
-        toast({
-          title: "Redirecting to upgrade",
-          description: "Complete your subscription upgrade in the new tab.",
-        });
-      }
-    } catch (error) {
-      console.error('Error upgrading subscription:', error);
-      toast({
-        title: "Upgrade Error", 
-        description: "Unable to process upgrade. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleManageSubscription = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
@@ -316,56 +170,13 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'connected': return 'text-emergency';
-      case 'disconnected': return 'text-destructive';
-      case 'low_battery': return 'text-orange-500';
-      default: return 'text-muted-foreground';
-    }
-  };
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'connected': return <Badge className="bg-emergency/10 text-emergency">Connected</Badge>;
       case 'disconnected': return <Badge variant="destructive">Disconnected</Badge>;
-      case 'low_battery': return <Badge className="bg-orange-100 text-orange-700">Low Battery</Badge>;
       default: return <Badge variant="secondary">Unknown</Badge>;
     }
   };
-
-  const getBatteryColor = (level: number) => {
-    if (level > 50) return 'text-emergency';
-    if (level > 20) return 'text-orange-500';
-    return 'text-destructive';
-  };
-
-  const productFeatures = [
-    {
-      name: "Emergency SOS",
-      status: "active",
-      icon: CheckCircle,
-      description: "One-touch emergency alert"
-    },
-    {
-      name: "GPS Tracking",
-      status: "active", 
-      icon: MapPin,
-      description: "Real-time location sharing"
-    },
-    {
-      name: "Fall Detection",
-      status: "active",
-      icon: CheckCircle,
-      description: "Automatic fall detection"
-    },
-    {
-      name: "Waterproof",
-      status: "active",
-      icon: CheckCircle,
-      description: "IP67 water resistance"
-    }
-  ];
 
   if (loading) {
     return (
@@ -380,354 +191,125 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Package className="h-5 w-5" />
-            My Products & Subscription
-          </CardTitle>
-        </CardHeader>
-      </Card>
-
-      {/* Subscription Status */}
-      {subscription?.subscribed ? (
-        <Card className="border-2 border-emergency/20">
-          <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-2xl">
-              <Crown className="h-8 w-8 text-amber-500" />
-              Your Current Plan
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {subscription.plans?.length > 0 ? (
-              <div className="space-y-4">
-                {subscription.plans.map((plan: any, index: number) => (
-                  <div key={plan.id} className="flex items-center justify-between p-4 bg-emergency/5 rounded-lg">
-                    <div>
-                      <h3 className="font-bold text-2xl text-primary mb-2">{plan.name}</h3>
-                      <p className="text-xl text-muted-foreground">
-                        €{plan.price} per {plan.billing_interval}
-                      </p>
-                    </div>
-                    <Badge className="bg-emergency text-white text-lg px-4 py-2">
-                      ✓ Active
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-bold text-2xl text-primary mb-2">{subscription.subscription_tier}</h3>
-                  <p className="text-xl text-muted-foreground">Active subscription</p>
-                </div>
-                <Badge className="bg-emergency text-white text-lg px-4 py-2">
-                  ✓ Active
-                </Badge>
-              </div>
-            )}
-            
-            {subscription.subscription_end && (
-              <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-                <Calendar className="h-6 w-6 text-muted-foreground" />
-                <span className="text-lg text-muted-foreground">
-                  Next billing date: {new Date(subscription.subscription_end).toLocaleDateString()}
-                </span>
-              </div>
-            )}
-
-            {/* Plan Features */}
-            {subscription.plans?.[0]?.features && (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Package className="h-5 w-5" />
+          My Products & Subscription
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Subscription Overview */}
+        {subscription?.subscribed ? (
+          <div className="p-4 bg-emergency/5 rounded-lg border border-emergency/20">
+            <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-xl font-semibold mb-3 text-primary">Your Plan Includes:</h4>
-                <div className="grid grid-cols-1 gap-3">
-                  {subscription.plans[0].features.slice(0, 5).map((feature: string, index: number) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 text-emergency flex-shrink-0" />
-                      <span className="text-lg text-foreground">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-3 pt-4 border-t">
-              <Button variant="outline" size="lg" onClick={handleUpgradeSubscription} className="text-lg px-6 py-3">
-                <Crown className="h-5 w-5 mr-2" />
-                Upgrade Plan
-              </Button>
-              <Button variant="outline" size="lg" onClick={handleManageSubscription} className="text-lg px-6 py-3">
-                <CreditCard className="h-5 w-5 mr-2" />
-                Manage Billing
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ) : subscription?.error ? (
-        <Card className="border-2 border-destructive/20 bg-destructive/5">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-6" />
-              <h3 className="text-2xl font-semibold mb-3 text-destructive">Subscription Status Error</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                {subscription.errorMessage}
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Button size="lg" onClick={loadSubscription} className="text-lg px-8 py-3">
-                  Try Again
-                </Button>
-                <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-                  Contact Support
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ) : subscription?.needsSupport ? (
-        <Card className="border-2 border-orange-300 bg-orange-50">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <AlertCircle className="h-16 w-16 text-orange-500 mx-auto mb-6" />
-              <h3 className="text-2xl font-semibold mb-3 text-orange-700">Checking Your Subscription</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                We're verifying your subscription and product purchases. If you recently completed payment, 
-                your information might need to be synchronized with our system.
-              </p>
-              <div className="flex gap-3 justify-center">
-                <Button size="lg" onClick={reconcileStripeData} className="text-lg px-8 py-3">
-                  <Zap className="h-5 w-5 mr-2" />
-                  Sync My Data
-                </Button>
-                <Button variant="outline" size="lg" onClick={loadSubscription} className="text-lg px-8 py-3">
-                  Check Again
-                </Button>
-                <Button variant="outline" size="lg" onClick={() => window.location.href = "mailto:support@icesosapp.com"} className="text-lg px-8 py-3">
-                  Contact Support
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card className="border-2 border-dashed border-muted">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <Crown className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
-              <h3 className="text-2xl font-semibold mb-3">No Active Subscription</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                Choose a protection plan to get started with 24/7 emergency monitoring
-              </p>
-              <Button size="lg" className="text-lg px-8 py-3" onClick={handleUpgradeSubscription}>
-                <Crown className="h-5 w-5 mr-2" />
-                Choose a Plan
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* My Devices Section - Purchased Products */}
-      {userProducts.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold flex items-center gap-3 text-primary">
-            <Bluetooth className="h-6 w-6" />
-            My Devices
-          </h3>
-          {userProducts.map((product) => (
-            <Card key={product.id} className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-emergency rounded-lg flex items-center justify-center">
-                      <Bluetooth className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">{product.name}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Purchased: {new Date(product.purchase_date).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  {getStatusBadge(product.status)}
-                </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-4">
-                {/* Device Status */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2">
-                    <Battery className={`h-4 w-4 ${getBatteryColor(product.battery_level)}`} />
-                    <span className="text-sm">Battery: {product.battery_level}%</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Wifi className="h-4 w-4 text-emergency" />
-                    <span className="text-sm">Signal: Strong</span>
-                  </div>
-                </div>
-
-                {/* Battery Level */}
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium">Battery Level</span>
-                    <span className="text-sm text-muted-foreground">{product.battery_level}%</span>
-                  </div>
-                  <Progress 
-                    value={product.battery_level} 
-                    className="h-2"
-                  />
-                </div>
-
-                {/* Product Features */}
-                <div>
-                  <h4 className="text-sm font-medium mb-2">Active Features</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {productFeatures.map((feature, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <feature.icon className="h-3 w-3 text-emergency" />
-                        <span className="text-xs text-muted-foreground">{feature.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Quick Actions */}
-                <div className="flex gap-2 pt-2 border-t">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Smartphone className="h-4 w-4 mr-2" />
-                    Test Alert
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      {/* Available Products Section */}
-      <div className="space-y-4">
-        <h3 className="text-xl font-semibold flex items-center gap-3 text-primary">
-          <ShoppingCart className="h-6 w-6" />
-          Available Products
-        </h3>
-        
-        {availableProducts.length > 0 ? (
-          availableProducts.map((product) => (
-            <Card key={product.id} className="hover:shadow-lg transition-shadow border-2">
-              <CardContent className="p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-6">
-                    <div className="w-20 h-20 bg-gradient-emergency rounded-xl flex items-center justify-center">
-                      <Shield className="h-10 w-10 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-2xl text-primary mb-2">{product.name}</h3>
-                      <p className="text-lg text-muted-foreground mb-3">{product.description}</p>
-                      <div className="flex items-center gap-3">
-                        <span className="text-3xl font-bold text-emergency">
-                          €{product.price}
-                        </span>
-                        <Badge variant="secondary" className="text-lg px-3 py-1">
-                          {product.inventory_count > 0 ? 'In Stock' : 'Out of Stock'}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Product Features */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold mb-3 text-primary">Key Features</h4>
-                  <div className="grid grid-cols-1 gap-2">
-                    {product.features?.slice(0, 6).map((feature: string, index: number) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <CheckCircle className="h-4 w-4 text-emergency flex-shrink-0" />
-                        <span className="text-base text-foreground">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Compatibility */}
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold mb-3 text-primary">Works With</h4>
-                  <div className="flex gap-2 flex-wrap">
-                    {product.compatibility?.map((plan: string, index: number) => (
-                      <Badge key={index} variant="outline" className="text-base px-3 py-1">
-                        {plan}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                <Separator className="my-6" />
-
-                <div className="flex items-center justify-between">
-                  <div className="text-lg text-muted-foreground">
-                    ✅ Works with all subscription plans
-                  </div>
-                  <Button 
-                    onClick={() => handlePurchaseProduct(product)}
-                    disabled={purchaseLoading === product.id || product.inventory_count === 0}
-                    className="bg-emergency hover:bg-emergency/90 text-lg px-8 py-3 h-auto"
-                    size="lg"
-                  >
-                    {purchaseLoading === product.id ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                    ) : (
-                      <ShoppingCart className="h-5 w-5 mr-3" />
-                    )}
-                    {purchaseLoading === product.id ? 'Processing...' : `Buy for €${product.price}`}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <Card>
-            <CardContent className="p-8">
-              <div className="text-center">
-                <Package className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
-                <h3 className="text-xl font-semibold mb-3">No Products Available</h3>
-                <p className="text-lg text-muted-foreground">
-                  Check back later for new ICE SOS products
+                <h3 className="font-semibold text-lg">
+                  {subscription.plans?.[0]?.name || subscription.subscription_tier || 'Active Plan'}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {subscription.plans?.[0]?.price ? `€${subscription.plans[0].price} per ${subscription.plans[0].billing_interval}` : 'Active subscription'}
                 </p>
               </div>
-            </CardContent>
-          </Card>
+              <Badge className="bg-emergency text-black">
+                ✓ Active
+              </Badge>
+            </div>
+          </div>
+        ) : (
+          <div className="p-4 bg-muted/50 rounded-lg border">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-lg">No Active Subscription</h3>
+                <p className="text-sm text-muted-foreground">Subscribe to activate emergency protection</p>
+              </div>
+              <Button 
+                size="sm" 
+                onClick={() => window.location.href = '/dashboard/subscription'}
+                className="bg-emergency text-black hover:bg-emergency/90"
+              >
+                Subscribe
+              </Button>
+            </div>
+          </div>
         )}
-      </div>
 
-      {/* No Devices Message */}
-      {userProducts.length === 0 && (
-        <Card className="border-2 border-dashed border-muted">
-          <CardContent className="p-8">
-            <div className="text-center">
-              <Bluetooth className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
-              <h3 className="text-xl font-semibold mb-3">No Devices Connected</h3>
-              <p className="text-lg text-muted-foreground mb-6">
-                Purchase an ICE SOS device to get started with 24/7 emergency protection
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Button variant="outline" size="lg" className="text-lg px-6 py-3">
-                  <Plus className="h-5 w-5 mr-2" />
-                  Add Existing Device
-                </Button>
-                <Button size="lg" className="text-lg px-6 py-3">
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  Shop Products
+        {/* Products Overview */}
+        {userProducts.length > 0 ? (
+          <div className="space-y-3">
+            <h4 className="font-medium">Your Products</h4>
+            {userProducts.map((product, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Package className="h-4 w-4 text-primary" />
+                  <div>
+                    <p className="font-medium text-sm">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Purchased {new Date(product.purchase_date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                {getStatusBadge(product.status)}
+              </div>
+            ))}
+          </div>
+        ) : availableProducts.length > 0 ? (
+          <div className="space-y-3">
+            <h4 className="font-medium">Available Products</h4>
+            <div className="p-3 bg-muted/30 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Package className="h-4 w-4 text-primary" />
+                  <div>
+                    <p className="font-medium text-sm">{availableProducts[0].name}</p>
+                    <p className="text-xs text-muted-foreground">€{availableProducts[0].price}</p>
+                  </div>
+                </div>
+                <Button 
+                  size="sm" 
+                  onClick={() => handlePurchaseProduct(availableProducts[0])}
+                  disabled={purchaseLoading === availableProducts[0].id}
+                  className="bg-primary text-white hover:bg-primary/90"
+                >
+                  {purchaseLoading === availableProducts[0].id ? 'Processing...' : 'Buy Now'}
                 </Button>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+          </div>
+        ) : (
+          <div className="text-center py-4">
+            <Package className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No products available</p>
+          </div>
+        )}
+
+        {/* Quick Actions */}
+        <div className="flex gap-2 pt-2 border-t">
+          {subscription?.subscribed && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleManageSubscription}
+              className="flex-1"
+            >
+              <CreditCard className="h-4 w-4 mr-1" />
+              Manage
+            </Button>
+          )}
+          {availableProducts.length > 0 && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => window.location.href = '/dashboard/products'}
+              className="flex-1"
+            >
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Shop
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
