@@ -19,7 +19,8 @@ import {
   Plus, 
   Trash2, 
   AlertTriangle,
-  UserPlus
+  UserPlus,
+  X
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -51,6 +52,7 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
     emergencyMedicalInfo: ""
   });
   const [familyMembers, setFamilyMembers] = useState([]);
+  const [editingContact, setEditingContact] = useState<number | null>(null);
 
   const { toast } = useToast();
 
@@ -119,6 +121,17 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Save personal details + health info + emergency contacts
+      const updateData = {
+        ...formData,
+        emergency_contacts: emergencyContacts,
+        blood_type: healthInfo.bloodType,
+        allergies: healthInfo.allergies,
+        medications: healthInfo.medications,
+        medical_conditions: healthInfo.medicalConditions,
+        emergency_medical_info: healthInfo.emergencyMedicalInfo
+      };
+
       // Check if profile exists, if not create one
       const { data: existingProfile } = await supabase
         .from('profiles')
@@ -132,7 +145,7 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
           .from('profiles')
           .insert({
             user_id: user.id,
-            ...formData
+            ...updateData
           });
 
         if (insertError) throw insertError;
@@ -140,7 +153,7 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
         // Update existing profile
         const { error: updateError } = await supabase
           .from('profiles')
-          .update(formData)
+          .update(updateData)
           .eq('user_id', user.id);
 
         if (updateError) throw updateError;
@@ -150,15 +163,133 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
       setIsEditing(false);
       toast({
         title: "Success",
-        description: "Personal details updated successfully."
+        description: "Profile updated successfully."
       });
     } catch (error) {
-      console.error('Error updating personal details:', error);
+      console.error('Error updating profile:', error);
       toast({
         title: "Error",
-        description: "Failed to update personal details.",
+        description: "Failed to update profile.",
         variant: "destructive"
       });
+    }
+  };
+
+  // Emergency Contact Functions
+  const addEmergencyContact = () => {
+    const newContact = {
+      name: "",
+      phone: "",
+      email: "",
+      relationship: ""
+    };
+    setEmergencyContacts([...emergencyContacts, newContact]);
+    setEditingContact(emergencyContacts.length);
+  };
+
+  const updateEmergencyContact = (index: number, field: string, value: string) => {
+    const updatedContacts = [...emergencyContacts];
+    updatedContacts[index] = { ...updatedContacts[index], [field]: value };
+    setEmergencyContacts(updatedContacts);
+  };
+
+  const saveEmergencyContact = (index: number) => {
+    setEditingContact(null);
+    // Auto-save when editing is complete
+    if (emergencyContacts[index].name && emergencyContacts[index].phone) {
+      savePersonalDetails();
+    }
+  };
+
+  const removeEmergencyContact = (index: number) => {
+    if (confirm("Are you sure you want to remove this contact?")) {
+      const updatedContacts = emergencyContacts.filter((_, i) => i !== index);
+      setEmergencyContacts(updatedContacts);
+      setTimeout(() => savePersonalDetails(), 100);
+    }
+  };
+
+  // Health Information Functions
+  const addHealthItem = (type: 'allergies' | 'medications' | 'medicalConditions') => {
+    const item = prompt(`Add ${type.slice(0, -1)}:`);
+    if (item && item.trim()) {
+      setHealthInfo(prev => ({
+        ...prev,
+        [type]: [...prev[type], item.trim()]
+      }));
+    }
+  };
+
+  const removeHealthItem = (type: 'allergies' | 'medications' | 'medicalConditions', index: number) => {
+    setHealthInfo(prev => ({
+      ...prev,
+      [type]: prev[type].filter((_, i) => i !== index)
+    }));
+  };
+
+  // Family Functions
+  const inviteFamily = async () => {
+    const name = prompt("Enter family member name:");
+    const email = prompt("Enter family member email:");
+    const relationship = prompt("Enter relationship:");
+    
+    if (name && email && relationship) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { error } = await supabase
+          .from('family_invites')
+          .insert({
+            inviter_user_id: user.id,
+            inviter_email: user.email || '',
+            invitee_name: name,
+            invitee_email: email,
+            relationship: relationship,
+            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
+          });
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Family invitation sent successfully."
+        });
+        loadFamilyMembers();
+      } catch (error) {
+        console.error('Error inviting family:', error);
+        toast({
+          title: "Error",
+          description: "Failed to send family invitation.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const removeFamilyMember = async (memberId: string) => {
+    if (confirm("Are you sure you want to remove this family member?")) {
+      try {
+        const { error } = await supabase
+          .from('family_invites')
+          .delete()
+          .eq('id', memberId);
+
+        if (error) throw error;
+
+        setFamilyMembers(familyMembers.filter(member => member.id !== memberId));
+        toast({
+          title: "Success",
+          description: "Family member removed successfully."
+        });
+      } catch (error) {
+        console.error('Error removing family member:', error);
+        toast({
+          title: "Error",
+          description: "Failed to remove family member.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -375,7 +506,11 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                 <Phone className="h-5 w-5 text-red-500" />
                 Emergency Contacts
               </h3>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={addEmergencyContact}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Contact
               </Button>
@@ -388,33 +523,91 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = '/dashboard/emergency'}
+                    onClick={addEmergencyContact}
                     className="mt-4"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Contact
+                    Add First Contact
                   </Button>
                 </div>
               ) : (
                 emergencyContacts.map((contact, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
-                        <Phone className="h-6 w-6 text-red-500" />
+                  <div key={index} className="p-4 border rounded-lg bg-muted/20">
+                    {editingContact === index ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium">Contact {index + 1}</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => saveEmergencyContact(index)}
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setEditingContact(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <Input
+                            placeholder="Name"
+                            value={contact.name}
+                            onChange={(e) => updateEmergencyContact(index, 'name', e.target.value)}
+                          />
+                          <Input
+                            placeholder="Phone"
+                            value={contact.phone}
+                            onChange={(e) => updateEmergencyContact(index, 'phone', e.target.value)}
+                          />
+                          <Input
+                            placeholder="Email"
+                            value={contact.email}
+                            onChange={(e) => updateEmergencyContact(index, 'email', e.target.value)}
+                          />
+                          <Input
+                            placeholder="Relationship"
+                            value={contact.relationship}
+                            onChange={(e) => updateEmergencyContact(index, 'relationship', e.target.value)}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-semibold text-base">{contact.name}</h4>
-                        <p className="text-sm text-muted-foreground">{contact.relationship}</p>
-                        <p className="text-sm text-muted-foreground">{contact.phone}</p>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+                            <Phone className="h-6 w-6 text-red-500" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-base">{contact.name || 'Unnamed Contact'}</h4>
+                            <p className="text-sm text-muted-foreground">{contact.relationship}</p>
+                            <p className="text-sm text-muted-foreground">{contact.phone}</p>
+                            {contact.email && <p className="text-sm text-muted-foreground">{contact.email}</p>}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setEditingContact(index)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => removeEmergencyContact(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => window.location.href = '/dashboard/emergency'}
-                    >
-                      Edit
-                    </Button>
+                    )}
                   </div>
                 ))
               )}
@@ -433,9 +626,27 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label className="text-sm font-medium">Blood Type</Label>
-                <p className="px-3 py-2 text-sm bg-muted/50 rounded-md mt-1">
-                  {healthInfo.bloodType}
-                </p>
+                {isEditing ? (
+                  <select
+                    value={healthInfo.bloodType}
+                    onChange={(e) => setHealthInfo(prev => ({...prev, bloodType: e.target.value}))}
+                    className="w-full px-3 py-2 border border-input rounded-md bg-background mt-1"
+                  >
+                    <option value="">Select blood type</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                ) : (
+                  <p className="px-3 py-2 text-sm bg-muted/50 rounded-md mt-1">
+                    {healthInfo.bloodType || "Not specified"}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -446,20 +657,28 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                   <p className="text-sm text-muted-foreground">No allergies recorded</p>
                 ) : (
                   healthInfo.allergies.map((allergy, index) => (
-                    <Badge key={index} variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
-                      <AlertTriangle className="h-3 w-3 mr-1" />
+                    <Badge key={index} variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200 flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" />
                       {allergy}
+                      {isEditing && (
+                        <X
+                          className="h-3 w-3 cursor-pointer hover:text-red-600"
+                          onClick={() => removeHealthItem('allergies', index)}
+                        />
+                      )}
                     </Badge>
                   ))
                 )}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-6 px-2"
-                  onClick={() => window.location.href = '/dashboard/health'}
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
+                {isEditing && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 px-2"
+                    onClick={() => addHealthItem('allergies')}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -470,19 +689,27 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                   <p className="text-sm text-muted-foreground">No medications recorded</p>
                 ) : (
                   healthInfo.medications.map((medication, index) => (
-                    <Badge key={index} variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                    <Badge key={index} variant="outline" className="bg-blue-50 text-blue-800 border-blue-200 flex items-center gap-1">
                       {medication}
+                      {isEditing && (
+                        <X
+                          className="h-3 w-3 cursor-pointer hover:text-red-600"
+                          onClick={() => removeHealthItem('medications', index)}
+                        />
+                      )}
                     </Badge>
                   ))
                 )}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-6 px-2"
-                  onClick={() => window.location.href = '/dashboard/health'}
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
+                {isEditing && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 px-2"
+                    onClick={() => addHealthItem('medications')}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -493,19 +720,27 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                   <p className="text-sm text-muted-foreground">No medical conditions recorded</p>
                 ) : (
                   healthInfo.medicalConditions.map((condition, index) => (
-                    <Badge key={index} variant="outline" className="bg-purple-50 text-purple-800 border-purple-200">
+                    <Badge key={index} variant="outline" className="bg-purple-50 text-purple-800 border-purple-200 flex items-center gap-1">
                       {condition}
+                      {isEditing && (
+                        <X
+                          className="h-3 w-3 cursor-pointer hover:text-red-600"
+                          onClick={() => removeHealthItem('medicalConditions', index)}
+                        />
+                      )}
                     </Badge>
                   ))
                 )}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-6 px-2"
-                  onClick={() => window.location.href = '/dashboard/health'}
-                >
-                  <Plus className="h-3 w-3" />
-                </Button>
+                {isEditing && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-6 px-2"
+                    onClick={() => addHealthItem('medicalConditions')}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -513,7 +748,9 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
               <Label className="text-sm font-medium">Emergency Medical Information</Label>
               <Textarea
                 value={healthInfo.emergencyMedicalInfo}
+                onChange={(e) => setHealthInfo(prev => ({...prev, emergencyMedicalInfo: e.target.value}))}
                 readOnly={!isEditing}
+                placeholder="Additional medical information for emergency responders..."
                 className="mt-1 bg-muted/50"
                 rows={3}
               />
@@ -529,7 +766,11 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                 <Users className="h-5 w-5 text-blue-500" />
                 Family Connections
               </h3>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={inviteFamily}
+              >
                 <UserPlus className="h-4 w-4 mr-2" />
                 Invite Family
               </Button>
@@ -542,7 +783,7 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.location.href = '/dashboard/family'}
+                    onClick={inviteFamily}
                     className="mt-4"
                   >
                     <UserPlus className="h-4 w-4 mr-2" />
@@ -562,12 +803,24 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                         <p className="text-sm text-muted-foreground">{member.email}</p>
                       </div>
                     </div>
-                    <Badge 
-                      variant={member.status === 'Connected' ? 'default' : 'secondary'}
-                      className={member.status === 'Connected' ? 'bg-emergency text-black' : ''}
-                    >
-                      {member.status}
-                    </Badge>
+                    <div className="flex gap-2">
+                      <Badge 
+                        variant={member.status === 'Connected' ? 'default' : 'secondary'}
+                        className={member.status === 'Connected' ? 'bg-emergency text-black' : ''}
+                      >
+                        {member.status}
+                      </Badge>
+                      {member.status !== 'Connected' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => removeFamilyMember(member.id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 ))
               )}
