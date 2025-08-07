@@ -200,12 +200,30 @@ const Dashboard = () => {
                 </div>
               } />
 
-              {/* Dashboard pages with full components */}
+              {/* Dashboard pages with proper container spacing */}
               <Route path="/family" element={<FamilyPage />} />
               <Route path="/location" element={<LocationPage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/security" element={<SecurityPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/notifications" element={
+                <div className="container mx-auto px-4 py-6">
+                  <div className="max-w-4xl mx-auto">
+                    <NotificationsPage />
+                  </div>
+                </div>
+              } />
+              <Route path="/security" element={
+                <div className="container mx-auto px-4 py-6">
+                  <div className="max-w-4xl mx-auto">
+                    <SecurityPage />
+                  </div>
+                </div>
+              } />
+              <Route path="/settings" element={
+                <div className="container mx-auto px-4 py-6">
+                  <div className="max-w-4xl mx-auto">
+                    <SettingsPage />
+                  </div>
+                </div>
+              } />
               <Route path="/support" element={<SupportPage />} />
             </Routes>
           </div>
