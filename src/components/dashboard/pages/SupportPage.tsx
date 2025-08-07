@@ -326,7 +326,7 @@ export function SupportPage() {
                         : 'bg-muted text-foreground'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <p className="text-xs whitespace-pre-wrap">{message.content}</p>
                     <p className="text-xs mt-1 opacity-70">
                       {message.timestamp.toLocaleTimeString([], { 
                         hour: '2-digit', 
@@ -340,7 +340,7 @@ export function SupportPage() {
                 <div className="flex justify-start">
                   <div className="bg-muted p-3 rounded-lg flex items-center space-x-2 max-w-[85%]">
                     <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-sm">Emma is thinking...</span>
+                    <span className="text-xs">Emma is thinking...</span>
                   </div>
                 </div>
               )}
@@ -388,7 +388,7 @@ export function SupportPage() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Subject *</label>
+              <label className="text-xs font-medium mb-2 block">Subject *</label>
               <Input
                 placeholder="Brief description of your issue"
                 value={ticketForm.subject}
@@ -397,7 +397,7 @@ export function SupportPage() {
             </div>
             
             <div>
-              <label className="text-sm font-medium mb-2 block">Category *</label>
+              <label className="text-xs font-medium mb-2 block">Category *</label>
               <Select
                 value={ticketForm.category}
                 onValueChange={(value) => setTicketForm({...ticketForm, category: value})}
@@ -417,7 +417,7 @@ export function SupportPage() {
           </div>
 
           <div className="md:w-1/2">
-            <label className="text-sm font-medium mb-2 block">Priority</label>
+            <label className="text-xs font-medium mb-2 block">Priority</label>
             <Select
               value={ticketForm.priority}
               onValueChange={(value) => setTicketForm({...ticketForm, priority: value})}
@@ -436,7 +436,7 @@ export function SupportPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium mb-2 block">Message *</label>
+            <label className="text-xs font-medium mb-2 block">Message *</label>
             <Textarea
               placeholder="Describe your issue in detail..."
               rows={5}
@@ -479,8 +479,8 @@ export function SupportPage() {
               {supportTickets.map((ticket) => (
                 <div key={ticket.id} className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-accent/50 transition-colors">
                   <div>
-                    <h3 className="font-semibold">{ticket.subject}</h3>
-                    <p className="text-sm text-muted-foreground">Ticket {ticket.id}</p>
+                    <h3 className="text-sm font-semibold">{ticket.subject}</h3>
+                    <p className="text-xs text-muted-foreground">Ticket {ticket.id}</p>
                     <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                       <span>Created: {ticket.created}</span>
                       <span>Last update: {ticket.lastUpdate}</span>
@@ -543,8 +543,8 @@ export function SupportPage() {
           {filteredFAQ.length === 0 && (
             <div className="text-center py-8">
               <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No results found</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-sm font-semibold mb-2">No results found</h3>
+              <p className="text-xs text-muted-foreground">
                 Try adjusting your search terms or browse all questions above
               </p>
             </div>
@@ -575,10 +575,10 @@ export function SupportPage() {
                     {article.icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-base mb-1 group-hover:text-primary transition-colors">
+                    <h3 className="text-sm font-semibold mb-1 group-hover:text-primary transition-colors">
                       {article.title}
                     </h3>
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="text-xs text-muted-foreground mb-2">
                       {article.description}
                     </p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -606,8 +606,8 @@ export function SupportPage() {
                 <Phone className="h-6 w-6 text-emergency" />
               </div>
               <div>
-                <h3 className="font-semibold text-emergency">Emergency Line</h3>
-                <p className="text-sm text-muted-foreground">1-800-ICE-HELP</p>
+                <h3 className="text-sm font-semibold text-emergency">Emergency Line</h3>
+                <p className="text-xs text-muted-foreground">1-800-ICE-HELP</p>
                 <p className="text-xs text-muted-foreground">Available 24/7 for emergencies</p>
               </div>
             </div>
@@ -617,8 +617,8 @@ export function SupportPage() {
                 <Mail className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold">Email Support</h3>
-                <p className="text-sm text-muted-foreground">support@icesurvival.com</p>
+                <h3 className="text-sm font-semibold">Email Support</h3>
+                <p className="text-xs text-muted-foreground">support@icesurvival.com</p>
                 <p className="text-xs text-muted-foreground">Response within 24 hours</p>
               </div>
             </div>
