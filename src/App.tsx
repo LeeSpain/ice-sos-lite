@@ -17,6 +17,7 @@ import AdminSetup from "./components/AdminSetup";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import NotFound from "./pages/NotFound";
 import DashboardRedirect from "./components/DashboardRedirect";
+import WelcomeQuestionnaire from "./components/WelcomeQuestionnaire";
 
 const App = () => {
   return (
@@ -52,6 +53,11 @@ const App = () => {
           <Route path="/admin-setup" element={<AdminSetupPage />} />
           <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
           <Route path="/full-dashboard/*" element={<Dashboard />} />
+          <Route path="/welcome-questionnaire" element={
+            <ProtectedRoute>
+              <WelcomeQuestionnaire />
+            </ProtectedRoute>
+          } />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

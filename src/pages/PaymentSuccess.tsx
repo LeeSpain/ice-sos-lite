@@ -86,7 +86,7 @@ const PaymentSuccess = () => {
   const grandTotal = subscriptionTotal + productTotal;
 
   const handleDashboardAccess = () => {
-    navigate('/dashboard');
+    navigate('/welcome-questionnaire');
   };
 
   const handleDirectDownload = (url: string) => {
