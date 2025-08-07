@@ -33,7 +33,10 @@ const WelcomeQuestionnaire = () => {
     last_name: '',
     phone: '',
     date_of_birth: '',
-    address: '',
+    street_address: '',
+    city: '',
+    state_province: '',
+    postal_code: '',
     country: '',
     language_preference: 'en',
     blood_type: '',
@@ -83,7 +86,10 @@ const WelcomeQuestionnaire = () => {
         last_name: profile?.last_name || '',
         phone: profile?.phone || '',
         date_of_birth: profile?.date_of_birth || '',
-        address: profile?.address || '',
+        street_address: '',
+        city: '',
+        state_province: '',
+        postal_code: '',
         country: profile?.country || '',
         language_preference: profile?.language_preference || 'en',
         blood_type: profile?.blood_type || '',
@@ -92,6 +98,11 @@ const WelcomeQuestionnaire = () => {
         medications: profile?.medications || [],
         emergency_contacts: (profile?.emergency_contacts as unknown as EmergencyContact[]) || []
       };
+
+      // Parse existing address if available
+      if (profile?.address) {
+        updatedFormData.street_address = profile.address;
+      }
 
       // If profile is empty or incomplete, try to get data from user metadata (registration)
       if (user?.user_metadata) {
@@ -102,8 +113,8 @@ const WelcomeQuestionnaire = () => {
           ...updatedFormData,
           first_name: updatedFormData.first_name || metadata.first_name || '',
           last_name: updatedFormData.last_name || metadata.last_name || '',
-          phone: updatedFormData.phone || metadata.phone_number || '',
-          address: updatedFormData.address || metadata.current_location || '',
+          phone: updatedFormData.phone || metadata.phone || metadata.phone_number || '',
+          street_address: updatedFormData.street_address || metadata.current_location || '',
           language_preference: updatedFormData.language_preference || 
             (metadata.preferred_language === 'English' ? 'en' : metadata.preferred_language?.toLowerCase()) || 'en',
           medical_conditions: updatedFormData.medical_conditions.length > 0 ? 
@@ -173,7 +184,7 @@ const WelcomeQuestionnaire = () => {
       formData.last_name,
       formData.phone,
       formData.date_of_birth,
-      formData.address,
+      formData.street_address,
       formData.country,
       formData.language_preference,
       formData.blood_type,
@@ -201,7 +212,7 @@ const WelcomeQuestionnaire = () => {
           last_name: formData.last_name,
           phone: formData.phone,
           date_of_birth: formData.date_of_birth,
-          address: formData.address,
+          address: `${formData.street_address}${formData.city ? ', ' + formData.city : ''}${formData.state_province ? ', ' + formData.state_province : ''}${formData.postal_code ? ' ' + formData.postal_code : ''}`.trim(),
           country: formData.country,
           language_preference: formData.language_preference,
           blood_type: formData.blood_type,
@@ -315,30 +326,62 @@ const WelcomeQuestionnaire = () => {
             </div>
 
             <div>
-              <Label htmlFor="address" className="flex items-center gap-2">
-                Address
-                {formData.address && user?.user_metadata?.current_location && (
+              <Label htmlFor="street_address" className="flex items-center gap-2">
+                Street Address
+                {formData.street_address && user?.user_metadata?.current_location && (
                   <Badge variant="secondary" className="text-xs">From registration</Badge>
                 )}
               </Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                placeholder="Enter your full address"
-                rows={3}
+              <Input
+                id="street_address"
+                value={formData.street_address}
+                onChange={(e) => setFormData(prev => ({ ...prev, street_address: e.target.value }))}
+                placeholder="Enter your street address"
               />
             </div>
 
-            <div>
-              <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                value={formData.country}
-                onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
-                placeholder="Enter your country"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                  placeholder="Enter your city"
+                />
+              </div>
+              <div>
+                <Label htmlFor="state_province">State/Province</Label>
+                <Input
+                  id="state_province"
+                  value={formData.state_province}
+                  onChange={(e) => setFormData(prev => ({ ...prev, state_province: e.target.value }))}
+                  placeholder="Enter state or province"
+                />
+              </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="postal_code">Postal/Zip Code</Label>
+                <Input
+                  id="postal_code"
+                  value={formData.postal_code}
+                  onChange={(e) => setFormData(prev => ({ ...prev, postal_code: e.target.value }))}
+                  placeholder="Enter postal or zip code"
+                />
+              </div>
+              <div>
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  value={formData.country}
+                  onChange={(e) => setFormData(prev => ({ ...prev, country: e.target.value }))}
+                  placeholder="Enter your country"
+                />
+              </div>
+            </div>
+
 
             <div>
               <Label htmlFor="language" className="flex items-center gap-2">
@@ -608,7 +651,7 @@ const WelcomeQuestionnaire = () => {
           { key: 'last_name', label: 'Last Name', value: formData.last_name },
           { key: 'phone', label: 'Phone Number', value: formData.phone },
           { key: 'date_of_birth', label: 'Date of Birth', value: formData.date_of_birth },
-          { key: 'address', label: 'Address', value: formData.address },
+          { key: 'street_address', label: 'Street Address', value: formData.street_address },
           { key: 'country', label: 'Country', value: formData.country },
           { key: 'blood_type', label: 'Blood Type', value: formData.blood_type },
           { key: 'emergency_contacts', label: 'Emergency Contacts', value: formData.emergency_contacts.length > 0 ? 'Yes' : '' }
