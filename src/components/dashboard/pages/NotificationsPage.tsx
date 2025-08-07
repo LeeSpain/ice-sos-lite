@@ -190,7 +190,7 @@ export function NotificationsPage() {
                       <type.icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{type.title}</h3>
+                      <h3 className="text-sm font-semibold">{type.title}</h3>
                       <p className="text-sm text-muted-foreground">{type.description}</p>
                     </div>
                   </div>
@@ -239,7 +239,7 @@ export function NotificationsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Enable Quiet Hours</h3>
+                <h3 className="text-sm font-semibold">Enable Quiet Hours</h3>
                 <p className="text-sm text-muted-foreground">
                   Emergency alerts will still come through during quiet hours
                 </p>
@@ -315,7 +315,7 @@ export function NotificationsPage() {
                   <Smartphone className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold">Push Notifications</h3>
+                  <h3 className="text-sm font-semibold">Push Notifications</h3>
                   <p className="text-sm text-muted-foreground">Mobile app alerts</p>
                 </div>
               </div>
@@ -325,7 +325,7 @@ export function NotificationsPage() {
                   <Mail className="h-6 w-6 text-accent" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold">Email</h3>
+                  <h3 className="text-sm font-semibold">Email</h3>
                   <p className="text-sm text-muted-foreground">Email notifications</p>
                 </div>
               </div>
@@ -335,7 +335,7 @@ export function NotificationsPage() {
                   <MessageSquare className="h-6 w-6 text-secondary-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold">SMS</h3>
+                  <h3 className="text-sm font-semibold">SMS</h3>
                   <p className="text-sm text-muted-foreground">Text messages</p>
                 </div>
               </div>
@@ -354,7 +354,7 @@ export function NotificationsPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Promotional Emails</h3>
+                <h3 className="text-sm font-semibold">Promotional Emails</h3>
                 <p className="text-sm text-muted-foreground">
                   Receive updates about new features, tips, and special offers
                 </p>
