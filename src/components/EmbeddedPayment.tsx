@@ -173,14 +173,22 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
     fetchData();
   }, [plans, products, regionalServices]);
 
+  // Tax rates to match the registration form
+  const PRODUCT_IVA_RATE = 0.21; // 21% for products
+  const SERVICE_IVA_RATE = 0.10; // 10% for regional services
+
   const subscriptionTotal = planData.reduce((sum, plan) => {
     return sum + parseFloat(plan.price.toString());
   }, 0) + serviceData.reduce((sum, service) => {
-    return sum + parseFloat(service.price.toString());
+    // Add IVA tax for regional services
+    const servicePrice = parseFloat(service.price.toString());
+    return sum + (servicePrice * (1 + SERVICE_IVA_RATE));
   }, 0);
 
   const productTotal = productData.reduce((sum, product) => {
-    return sum + parseFloat(product.price.toString());
+    // Add IVA tax for products
+    const productPrice = parseFloat(product.price.toString());
+    return sum + (productPrice * (1 + PRODUCT_IVA_RATE));
   }, 0);
 
   const grandTotal = subscriptionTotal + productTotal;
@@ -284,12 +292,22 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           <div>
             <h5 className="text-sm font-medium text-muted-foreground mb-2">Regional Services:</h5>
             <ul className="space-y-2">
-              {serviceData.map(service => (
-                <li key={service.id} className="flex justify-between p-2 bg-white rounded border">
-                  <span className="font-medium">{service.name} ({service.region})</span>
-                  <span className="text-foreground">€{parseFloat(service.price.toString()).toFixed(2)}/month</span>
-                </li>
-              ))}
+              {serviceData.map(service => {
+                const netPrice = parseFloat(service.price.toString());
+                const ivaAmount = netPrice * SERVICE_IVA_RATE;
+                const totalPrice = netPrice * (1 + SERVICE_IVA_RATE);
+                return (
+                  <li key={service.id} className="p-2 bg-white rounded border">
+                    <div className="flex justify-between items-start">
+                      <span className="font-medium">{service.name} ({service.region})</span>
+                      <div className="text-right text-sm">
+                        <div className="text-muted-foreground">Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}</div>
+                        <div className="font-bold text-foreground">€{totalPrice.toFixed(2)}/month</div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -299,12 +317,22 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           <div>
             <h5 className="text-sm font-medium text-muted-foreground mb-2">Safety Products (One-time):</h5>
             <ul className="space-y-2">
-              {productData.map(product => (
-                <li key={product.id} className="flex justify-between p-2 bg-white rounded border">
-                  <span className="font-medium">{product.name}</span>
-                  <span className="text-foreground">€{parseFloat(product.price.toString()).toFixed(2)}</span>
-                </li>
-              ))}
+              {productData.map(product => {
+                const netPrice = parseFloat(product.price.toString());
+                const ivaAmount = netPrice * PRODUCT_IVA_RATE;
+                const totalPrice = netPrice * (1 + PRODUCT_IVA_RATE);
+                return (
+                  <li key={product.id} className="p-2 bg-white rounded border">
+                    <div className="flex justify-between items-start">
+                      <span className="font-medium">{product.name}</span>
+                      <div className="text-right text-sm">
+                        <div className="text-muted-foreground">Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}</div>
+                        <div className="font-bold text-foreground">€{totalPrice.toFixed(2)}</div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
