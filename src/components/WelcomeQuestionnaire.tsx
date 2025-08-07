@@ -229,8 +229,8 @@ const WelcomeQuestionnaire = () => {
         description: `Profile updated with ${completionPercentage}% completion. Welcome to your dashboard!`,
       });
 
-      // Redirect to dashboard
-      navigate('/dashboard');
+      // Redirect to member dashboard
+      navigate('/member-dashboard');
       
     } catch (error) {
       console.error('Error updating profile:', error);

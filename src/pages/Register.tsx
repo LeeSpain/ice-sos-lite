@@ -92,6 +92,7 @@ const Register = () => {
             first_name: formData.firstName,
             last_name: formData.lastName,
             phone_number: formData.phoneNumber,
+            phone: formData.phoneNumber, // Add both formats for consistency
             emergency_contacts: JSON.stringify(formData.emergencyContacts.filter(contact => 
               contact.name.trim() && contact.phone.trim()
             )),
