@@ -79,7 +79,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
           product:products(*)
         `)
         .eq('user_id', user.id)
-        .eq('status', 'completed')
+        .eq('status', 'paid')
         .order('created_at', { ascending: false });
 
       // Transform orders into user products with mock device status for display
@@ -127,30 +127,70 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       
       if (error) {
         console.error('Error checking subscription:', error);
+        setSubscription({ 
+          error: true, 
+          errorMessage: 'Unable to check subscription status. Please contact support.' 
+        });
         return;
       }
 
-      if (subscriptionData?.subscribed) {
-        // Get the plan details for the subscription tier
-        const { data: planData } = await supabase
+      if (subscriptionData?.subscribed && subscriptionData.subscription_tiers?.length > 0) {
+        // Get all active plans to match with user's subscriptions
+        const { data: allPlans } = await supabase
           .from('subscription_plans')
           .select('*')
-          .eq('name', subscriptionData.subscription_tier)
-          .single();
+          .eq('is_active', true);
+        
+        // Find the user's subscribed plans
+        const userPlans = allPlans?.filter(plan => 
+          subscriptionData.subscription_tiers.includes(plan.name)
+        ) || [];
         
         setSubscription({
           ...subscriptionData,
-          plan: planData,
-          subscribed: subscriptionData.subscribed,
+          plans: userPlans,
+          subscribed: true,
           subscription_tier: subscriptionData.subscription_tier,
           subscription_end: subscriptionData.subscription_end
         });
+      } else if (subscriptionData?.subscribed === false) {
+        // Check if user has registration data but incomplete payment
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: registrationData } = await supabase
+            .from('registration_selections')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+            
+          const { data: subscriberData } = await supabase
+            .from('subscribers')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle();
+            
+          setSubscription({
+            subscribed: false,
+            hasRegistration: !!registrationData,
+            hasStripeCustomer: !!subscriberData?.stripe_customer_id,
+            needsSupport: !!(subscriberData?.stripe_customer_id && !subscriptionData.subscribed),
+            subscriberData,
+            registrationData
+          });
+        } else {
+          setSubscription({ subscribed: false });
+        }
       } else {
-        // No active subscription
-        setSubscription(null);
+        setSubscription({ subscribed: false });
       }
     } catch (error) {
       console.error('Error loading subscription:', error);
+      setSubscription({ 
+        error: true, 
+        errorMessage: 'Connection error. Please try refreshing the page.' 
+      });
     }
   };
 
@@ -310,30 +350,46 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       </Card>
 
       {/* Subscription Status */}
-      {subscription ? (
+      {subscription?.subscribed ? (
         <Card className="border-2 border-emergency/20">
           <CardHeader className="pb-4">
-            <CardTitle className="flex items-center gap-3 text-xl">
-              <Crown className="h-6 w-6 text-amber-500" />
+            <CardTitle className="flex items-center gap-3 text-2xl">
+              <Crown className="h-8 w-8 text-amber-500" />
               Your Current Plan
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-2xl text-primary mb-2">{subscription.plan?.name || subscription.subscription_tier}</h3>
-                <p className="text-xl text-muted-foreground">
-                  €{subscription.plan?.price || '0'} per {subscription.plan?.billing_interval || 'month'}
-                </p>
+            {subscription.plans?.length > 0 ? (
+              <div className="space-y-4">
+                {subscription.plans.map((plan: any, index: number) => (
+                  <div key={plan.id} className="flex items-center justify-between p-4 bg-emergency/5 rounded-lg">
+                    <div>
+                      <h3 className="font-bold text-2xl text-primary mb-2">{plan.name}</h3>
+                      <p className="text-xl text-muted-foreground">
+                        €{plan.price} per {plan.billing_interval}
+                      </p>
+                    </div>
+                    <Badge className="bg-emergency text-white text-lg px-4 py-2">
+                      ✓ Active
+                    </Badge>
+                  </div>
+                ))}
               </div>
-              <Badge className="bg-emergency text-white text-lg px-4 py-2">
-                {subscription.subscribed ? '✓ Active' : 'Inactive'}
-              </Badge>
-            </div>
+            ) : (
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-2xl text-primary mb-2">{subscription.subscription_tier}</h3>
+                  <p className="text-xl text-muted-foreground">Active subscription</p>
+                </div>
+                <Badge className="bg-emergency text-white text-lg px-4 py-2">
+                  ✓ Active
+                </Badge>
+              </div>
+            )}
             
             {subscription.subscription_end && (
               <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-                <Calendar className="h-5 w-5 text-muted-foreground" />
+                <Calendar className="h-6 w-6 text-muted-foreground" />
                 <span className="text-lg text-muted-foreground">
                   Next billing date: {new Date(subscription.subscription_end).toLocaleDateString()}
                 </span>
@@ -341,14 +397,14 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
             )}
 
             {/* Plan Features */}
-            {subscription.plan?.features && (
+            {subscription.plans?.[0]?.features && (
               <div>
-                <h4 className="text-lg font-semibold mb-3 text-primary">Your Plan Includes:</h4>
-                <div className="grid grid-cols-1 gap-2">
-                  {subscription.plan.features.slice(0, 5).map((feature: string, index: number) => (
+                <h4 className="text-xl font-semibold mb-3 text-primary">Your Plan Includes:</h4>
+                <div className="grid grid-cols-1 gap-3">
+                  {subscription.plans[0].features.slice(0, 5).map((feature: string, index: number) => (
                     <div key={index} className="flex items-center gap-3">
-                      <CheckCircle className="h-4 w-4 text-emergency flex-shrink-0" />
-                      <span className="text-base text-foreground">{feature}</span>
+                      <CheckCircle className="h-5 w-5 text-emergency flex-shrink-0" />
+                      <span className="text-lg text-foreground">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -367,12 +423,57 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
             </div>
           </CardContent>
         </Card>
+      ) : subscription?.error ? (
+        <Card className="border-2 border-destructive/20 bg-destructive/5">
+          <CardContent className="p-8">
+            <div className="text-center">
+              <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold mb-3 text-destructive">Subscription Status Error</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                {subscription.errorMessage}
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Button size="lg" onClick={loadSubscription} className="text-lg px-8 py-3">
+                  Try Again
+                </Button>
+                <Button variant="outline" size="lg" className="text-lg px-8 py-3">
+                  Contact Support
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : subscription?.needsSupport ? (
+        <Card className="border-2 border-orange-300 bg-orange-50">
+          <CardContent className="p-8">
+            <div className="text-center">
+              <AlertCircle className="h-16 w-16 text-orange-500 mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold mb-3 text-orange-700">Subscription Setup Incomplete</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                We found your account but your subscription isn't active yet. This might happen if:
+              </p>
+              <div className="text-left max-w-md mx-auto mb-6 space-y-2">
+                <p className="text-base">• Payment didn't complete successfully</p>
+                <p className="text-base">• Registration process was interrupted</p>
+                <p className="text-base">• There was a technical issue during setup</p>
+              </div>
+              <div className="flex gap-3 justify-center">
+                <Button size="lg" onClick={handleUpgradeSubscription} className="text-lg px-8 py-3">
+                  Complete Setup
+                </Button>
+                <Button variant="outline" size="lg" className="text-lg px-8 py-3">
+                  Contact Support
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       ) : (
         <Card className="border-2 border-dashed border-muted">
           <CardContent className="p-8">
             <div className="text-center">
               <Crown className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
-              <h3 className="text-xl font-semibold mb-3">No Active Subscription</h3>
+              <h3 className="text-2xl font-semibold mb-3">No Active Subscription</h3>
               <p className="text-lg text-muted-foreground mb-6">
                 Choose a protection plan to get started with 24/7 emergency monitoring
               </p>
