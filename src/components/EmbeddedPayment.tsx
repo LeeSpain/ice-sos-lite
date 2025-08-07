@@ -48,12 +48,11 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
       }
 
       if (paymentIntent?.status === "succeeded") {
-        // Create subscriptions after successful payment
-        const { data, error } = await supabase.functions.invoke('create-subscriptions', {
+        // Process mixed payment (subscriptions + products)
+        const { data, error } = await supabase.functions.invoke('process-mixed-payment', {
           body: {
             payment_intent_id: paymentIntent.id,
-            customer_id: customerId,
-            plans: plans
+            customer_id: customerId
           }
         });
 
@@ -61,7 +60,7 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
 
         toast({
           title: "Payment Successful!",
-          description: "Your subscription is now active.",
+          description: "Your subscription and orders are now active.",
         });
         
         onSuccess();
@@ -107,6 +106,8 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
 
 interface EmbeddedPaymentProps {
   plans: string[];
+  products?: string[];
+  regionalServices?: string[];
   userEmail: string;
   firstName: string;
   lastName: string;
@@ -118,47 +119,80 @@ interface EmbeddedPaymentProps {
   onBack: () => void;
 }
 
-const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, phone, city, country, onSuccess, onBack }: EmbeddedPaymentProps) => {
+const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmail, firstName, lastName, password, phone, city, country, onSuccess, onBack }: EmbeddedPaymentProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Fetch plan pricing from database for display
+  // Fetch data from database for display
   const [planData, setPlanData] = useState<any[]>([]);
+  const [productData, setProductData] = useState<any[]>([]);
+  const [serviceData, setServiceData] = useState<any[]>([]);
   
   useEffect(() => {
-    const fetchPlanData = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
-          .from('subscription_plans')
-          .select('*')
-          .in('id', plans);
-        
-        if (error) throw error;
-        setPlanData(data || []);
+        // Fetch subscription plans
+        if (plans.length > 0) {
+          const { data, error } = await supabase
+            .from('subscription_plans')
+            .select('*')
+            .in('id', plans);
+          
+          if (error) throw error;
+          setPlanData(data || []);
+        }
+
+        // Fetch products
+        if (products.length > 0) {
+          const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .in('id', products);
+          
+          if (error) throw error;
+          setProductData(data || []);
+        }
+
+        // Fetch regional services
+        if (regionalServices.length > 0) {
+          const { data, error } = await supabase
+            .from('regional_services')
+            .select('*')
+            .in('id', regionalServices);
+          
+          if (error) throw error;
+          setServiceData(data || []);
+        }
       } catch (error) {
-        console.error('Error fetching plan data:', error);
+        console.error('Error fetching data:', error);
       }
     };
     
-    if (plans.length > 0) {
-      fetchPlanData();
-    }
-  }, [plans]);
+    fetchData();
+  }, [plans, products, regionalServices]);
 
-  const total = planData.reduce((sum, plan) => {
+  const subscriptionTotal = planData.reduce((sum, plan) => {
     return sum + parseFloat(plan.price.toString());
+  }, 0) + serviceData.reduce((sum, service) => {
+    return sum + parseFloat(service.price.toString());
   }, 0);
 
+  const productTotal = productData.reduce((sum, product) => {
+    return sum + parseFloat(product.price.toString());
+  }, 0);
+
+  const grandTotal = subscriptionTotal + productTotal;
+
   const initializePayment = async () => {
-    console.log("Initializing payment...", { plans, userEmail, firstName, lastName });
+    console.log("Initializing payment...", { plans, products, regionalServices, userEmail, firstName, lastName });
     
-    if (!plans || plans.length === 0) {
-      console.error("No plans provided to payment initialization");
+    if ((!plans || plans.length === 0) && (!products || products.length === 0) && (!regionalServices || regionalServices.length === 0)) {
+      console.error("No items provided to payment initialization");
       toast({
         title: "Error",
-        description: "No subscription plans selected. Please go back and select a plan.",
+        description: "No items selected for payment. Please go back and select items.",
         variant: "destructive"
       });
       setLoading(false);
@@ -166,8 +200,15 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, phon
     }
     
     try {
-      const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-        body: { plans, email: userEmail, firstName, lastName }
+      const { data, error } = await supabase.functions.invoke('create-mixed-payment', {
+        body: { 
+          subscriptionPlans: plans, 
+          products, 
+          regionalServices,
+          email: userEmail, 
+          firstName, 
+          lastName 
+        }
       });
 
       console.log("Payment intent response:", { data, error });
@@ -220,22 +261,71 @@ const EmbeddedPayment = ({ plans, userEmail, firstName, lastName, password, phon
       </div>
 
       {/* Order Summary */}
-      <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+      <div className="bg-muted/50 p-4 rounded-lg space-y-4">
         <h4 className="font-medium">Order Summary:</h4>
-        <div className="text-sm">
-          <ul className="space-y-2">
-            {planData.map(plan => (
-              <li key={plan.id} className="flex justify-between p-2 bg-white rounded border">
-                <span className="font-medium">{plan.name}</span>
-                <span className="text-primary">{plan.currency}{parseFloat(plan.price.toString()).toFixed(2)}/{plan.billing_interval}</span>
-              </li>
-            ))}
-          </ul>
-          <div className="border-t pt-3 mt-3">
-            <div className="flex justify-between text-lg font-bold">
-              <span>Total Monthly:</span>
-              <span className="text-primary">{planData[0]?.currency || 'EUR'}{total.toFixed(2)}</span>
+        
+        {/* Subscription Plans */}
+        {planData.length > 0 && (
+          <div>
+            <h5 className="text-sm font-medium text-muted-foreground mb-2">Monthly Subscriptions:</h5>
+            <ul className="space-y-2">
+              {planData.map(plan => (
+                <li key={plan.id} className="flex justify-between p-2 bg-white rounded border">
+                  <span className="font-medium">{plan.name}</span>
+                  <span className="text-primary">{plan.currency}{parseFloat(plan.price.toString()).toFixed(2)}/month</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Regional Services */}
+        {serviceData.length > 0 && (
+          <div>
+            <h5 className="text-sm font-medium text-muted-foreground mb-2">Regional Services:</h5>
+            <ul className="space-y-2">
+              {serviceData.map(service => (
+                <li key={service.id} className="flex justify-between p-2 bg-white rounded border">
+                  <span className="font-medium">{service.name} ({service.region})</span>
+                  <span className="text-primary">{service.currency}{parseFloat(service.price.toString()).toFixed(2)}/month</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Products */}
+        {productData.length > 0 && (
+          <div>
+            <h5 className="text-sm font-medium text-muted-foreground mb-2">Safety Products (One-time):</h5>
+            <ul className="space-y-2">
+              {productData.map(product => (
+                <li key={product.id} className="flex justify-between p-2 bg-white rounded border">
+                  <span className="font-medium">{product.name}</span>
+                  <span className="text-primary">{product.currency}{parseFloat(product.price.toString()).toFixed(2)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Totals */}
+        <div className="border-t pt-3 space-y-2">
+          {subscriptionTotal > 0 && (
+            <div className="flex justify-between text-base">
+              <span>Monthly Subscription:</span>
+              <span className="text-primary">{planData[0]?.currency || serviceData[0]?.currency || 'EUR'}{subscriptionTotal.toFixed(2)}/month</span>
             </div>
+          )}
+          {productTotal > 0 && (
+            <div className="flex justify-between text-base">
+              <span>One-time Products:</span>
+              <span className="text-primary">{productData[0]?.currency || 'EUR'}{productTotal.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="flex justify-between text-lg font-bold border-t pt-2">
+            <span>Total Payment:</span>
+            <span className="text-primary">{planData[0]?.currency || serviceData[0]?.currency || productData[0]?.currency || 'EUR'}{grandTotal.toFixed(2)}</span>
           </div>
         </div>
       </div>

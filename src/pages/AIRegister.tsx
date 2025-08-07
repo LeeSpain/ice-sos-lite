@@ -24,6 +24,26 @@ interface Plan {
   is_popular: boolean;
 }
 
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  features: string[];
+  images: any[];
+}
+
+interface RegionalService {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  region: string;
+  features: string[];
+}
+
 interface PersonalDetails {
   firstName: string;
   lastName: string;
@@ -46,27 +66,31 @@ const AIRegister = () => {
     country: ''
   });
   const [dbPlans, setDbPlans] = useState<Plan[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
   const [selectedMainPlan, setSelectedMainPlan] = useState<string>('');
   const [hasFamilyPlan, setHasFamilyPlan] = useState<boolean>(false);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedRegionalServices, setSelectedRegionalServices] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState<'details' | 'payment'>('details');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  // Fetch plans from database
+  // Fetch plans, products, and regional services from database
   useEffect(() => {
-    const fetchPlans = async () => {
+    const fetchData = async () => {
       try {
-        const { data, error } = await supabase
+        // Fetch subscription plans
+        const { data: plansData, error: plansError } = await supabase
           .from('subscription_plans')
           .select('*')
           .eq('is_active', true)
           .eq('billing_interval', 'month')
-          .in('name', ['Basic Protection', 'Premium Protection', 'Family Connection'])
           .order('sort_order');
 
-        if (error) throw error;
+        if (plansError) throw plansError;
 
-        const formattedPlans = data.map(plan => ({
+        const formattedPlans = plansData.map(plan => ({
           id: plan.id,
           name: plan.name,
           description: plan.description || '',
@@ -79,22 +103,65 @@ const AIRegister = () => {
 
         setDbPlans(formattedPlans);
         
-        // Set default selection to first non-family plan
-        const basicPlan = formattedPlans.find(p => p.name.includes('Basic'));
-        if (basicPlan) {
-          setSelectedMainPlan(basicPlan.id);
+        // Set Premium Protection as default (fixed standard plan)
+        const premiumPlan = formattedPlans.find(p => p.name === 'Premium Protection');
+        if (premiumPlan) {
+          setSelectedMainPlan(premiumPlan.id);
         }
+
+        // Fetch products
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .eq('status', 'active')
+          .order('sort_order');
+
+        if (productsError) throw productsError;
+
+        const formattedProducts = productsData.map(product => ({
+          id: product.id,
+          name: product.name,
+          description: product.description || '',
+          price: parseFloat(product.price.toString()),
+          currency: product.currency,
+          features: Array.isArray(product.features) ? product.features.map(f => String(f)) : [],
+          images: Array.isArray(product.images) ? product.images : []
+        }));
+
+        setProducts(formattedProducts);
+
+        // Fetch regional services
+        const { data: servicesData, error: servicesError } = await supabase
+          .from('regional_services')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order');
+
+        if (servicesError) throw servicesError;
+
+        const formattedServices = servicesData.map(service => ({
+          id: service.id,
+          name: service.name,
+          description: service.description || '',
+          price: parseFloat(service.price.toString()),
+          currency: service.currency,
+          region: service.region,
+          features: Array.isArray(service.features) ? service.features.map(f => String(f)) : []
+        }));
+
+        setRegionalServices(formattedServices);
+
       } catch (error) {
-        console.error('Error fetching plans:', error);
+        console.error('Error fetching data:', error);
         toast({
-          title: "Error loading plans",
-          description: "Failed to load subscription plans. Please refresh the page.",
+          title: "Error loading data",
+          description: "Failed to load subscription options. Please refresh the page.",
           variant: "destructive"
         });
       }
     };
 
-    fetchPlans();
+    fetchData();
   }, []);
 
   const handlePersonalDetailsChange = (field: keyof PersonalDetails, value: string) => {
@@ -110,6 +177,22 @@ const AIRegister = () => {
 
   const handleFamilyPlanToggle = (checked: boolean) => {
     setHasFamilyPlan(checked);
+  };
+
+  const handleProductToggle = (productId: string, checked: boolean) => {
+    setSelectedProducts(prev => 
+      checked 
+        ? [...prev, productId]
+        : prev.filter(id => id !== productId)
+    );
+  };
+
+  const handleRegionalServiceToggle = (serviceId: string, checked: boolean) => {
+    setSelectedRegionalServices(prev => 
+      checked 
+        ? [...prev, serviceId]
+        : prev.filter(id => id !== serviceId)
+    );
   };
 
   // Simple validation for button disabled state (no side effects)
@@ -238,25 +321,51 @@ const AIRegister = () => {
     setIsEmmaOpen(true);
   }, []);
 
-  // Simplified helper functions to avoid circular dependencies
-  const mainPlans = dbPlans.filter(p => !p.name.includes('Family'));
+  // Helper functions
+  const premiumPlan = dbPlans.find(p => p.name === 'Premium Protection');
   const familyPlan = dbPlans.find(p => p.name.includes('Family'));
 
-  const calculateTotal = () => {
-    const selectedPlan = dbPlans.find(p => p.id === selectedMainPlan);
-    let total = selectedPlan ? selectedPlan.price : 0;
+  const calculateSubscriptionTotal = () => {
+    let total = premiumPlan ? premiumPlan.price : 0;
     if (hasFamilyPlan && familyPlan) {
       total += familyPlan.price;
     }
+    // Add regional services (subscription-based)
+    selectedRegionalServices.forEach(serviceId => {
+      const service = regionalServices.find(s => s.id === serviceId);
+      if (service) total += service.price;
+    });
     return total;
   };
 
-  const getSelectedPlanIds = (): string[] => {
-    const planIds: string[] = [selectedMainPlan];
-    if (hasFamilyPlan && familyPlan) {
-      planIds.push(familyPlan.id);
-    }
+  const calculateProductTotal = () => {
+    let total = 0;
+    selectedProducts.forEach(productId => {
+      const product = products.find(p => p.id === productId);
+      if (product) total += product.price;
+    });
+    return total;
+  };
+
+  const calculateGrandTotal = () => {
+    return calculateSubscriptionTotal() + calculateProductTotal();
+  };
+
+  const getSelectedSubscriptionPlans = (): string[] => {
+    const planIds: string[] = [];
+    if (premiumPlan) planIds.push(premiumPlan.id);
+    if (hasFamilyPlan && familyPlan) planIds.push(familyPlan.id);
+    // Add selected regional services as they are subscription-based
+    planIds.push(...selectedRegionalServices);
     return planIds;
+  };
+
+  const getAllSelections = () => {
+    return {
+      subscriptionPlans: getSelectedSubscriptionPlans(),
+      products: selectedProducts,
+      regionalServices: selectedRegionalServices
+    };
   };
 
   return (
@@ -451,63 +560,50 @@ const AIRegister = () => {
                       <h2 className="text-xl font-bold text-foreground">Protection Plans</h2>
                     </div>
                     
-                    {/* Main Plan Selection - Radio Buttons */}
+                    {/* Premium Protection Plan - Fixed Standard */}
                     <div className="space-y-4">
-                      <h3 className="font-medium text-foreground">Choose your protection level:</h3>
-                      {mainPlans.length > 0 ? (
-                        <RadioGroup value={selectedMainPlan} onValueChange={handleMainPlanChange}>
-                          {mainPlans.map((plan) => (
-                            <div key={plan.id} className={`p-4 border-2 rounded-lg transition-all ${
-                              selectedMainPlan === plan.id ? 'border-primary bg-primary/5' : 'border-muted'
-                            }`}>
-                              <div className="flex items-start gap-3">
-                                <RadioGroupItem value={plan.id} id={plan.id} className="mt-1" />
-                                <Label htmlFor={plan.id} className="flex-1 cursor-pointer">
-                                  <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <h3 className="font-semibold text-lg">{plan.name}</h3>
-                                        {plan.is_popular && (
-                                          <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-                                            Popular
-                                          </span>
-                                        )}
-                                        {plan.name.includes('Premium') && (
-                                          <span className="bg-emergency text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                                            <Star className="h-3 w-3" />
-                                            Recommended
-                                          </span>
-                                        )}
-                                      </div>
-                                      <p className="text-muted-foreground mb-3">{plan.description}</p>
-                                      <div className="grid grid-cols-2 gap-2">
-                                        {plan.features.map((feature, idx) => (
-                                          <div key={idx} className="flex items-center gap-1 text-sm">
-                                            <Check className="h-3 w-3 text-green-500" />
-                                            <span>{feature}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                    <div className="text-right ml-4">
-                                      <div className="font-bold text-lg">{plan.currency}{plan.price}</div>
-                                      <div className="text-sm text-muted-foreground">/{plan.billing_interval}</div>
-                                    </div>
+                      <h3 className="font-medium text-foreground">Standard Protection Plan:</h3>
+                      {premiumPlan && (
+                        <div className="p-4 border-2 border-primary bg-primary/5 rounded-lg">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Shield className="h-5 w-5 text-primary" />
+                                <h3 className="font-semibold text-lg">{premiumPlan.name}</h3>
+                                <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                                  Standard
+                                </span>
+                              </div>
+                              <p className="text-muted-foreground mb-3">{premiumPlan.description}</p>
+                              <div className="grid grid-cols-2 gap-2">
+                                {premiumPlan.features.map((feature, idx) => (
+                                  <div key={idx} className="flex items-center gap-1 text-sm">
+                                    <Check className="h-3 w-3 text-green-500" />
+                                    <span>{feature}</span>
                                   </div>
-                                </Label>
+                                ))}
                               </div>
                             </div>
-                          ))}
-                        </RadioGroup>
-                      ) : (
-                        <div className="text-center text-muted-foreground">Loading plans...</div>
+                            <div className="text-right ml-4">
+                              <div className="font-bold text-lg">{premiumPlan.currency}{premiumPlan.price}</div>
+                              <div className="text-sm text-muted-foreground">/{premiumPlan.billing_interval}</div>
+                            </div>
+                          </div>
+                        </div>
                       )}
                     </div>
 
-                    {/* Family Plan Add-on */}
-                    {familyPlan && (
-                      <div className="space-y-4">
-                        <h3 className="font-medium text-foreground">Optional Add-on:</h3>
+                    {/* Optional Add-ons Section */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-secondary/10 rounded-full">
+                          <Star className="h-5 w-5 text-secondary" />
+                        </div>
+                        <h3 className="text-lg font-bold text-foreground">Optional Add-ons</h3>
+                      </div>
+
+                      {/* Family Plan Add-on */}
+                      {familyPlan && (
                         <div className={`p-4 border-2 rounded-lg transition-all ${
                           hasFamilyPlan ? 'border-primary bg-primary/5' : 'border-muted'
                         }`}>
@@ -522,7 +618,7 @@ const AIRegister = () => {
                               <div className="flex justify-between items-start">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-2">
-                                    <h3 className="font-semibold text-lg">{familyPlan.name}</h3>
+                                    <h4 className="font-semibold">{familyPlan.name}</h4>
                                   </div>
                                   <p className="text-muted-foreground mb-3">{familyPlan.description}</p>
                                   <div className="grid grid-cols-2 gap-2">
@@ -535,21 +631,129 @@ const AIRegister = () => {
                                   </div>
                                 </div>
                                 <div className="text-right ml-4">
-                                  <div className="font-bold text-lg">{familyPlan.currency}{familyPlan.price}</div>
+                                  <div className="font-bold">{familyPlan.currency}{familyPlan.price}</div>
                                   <div className="text-sm text-muted-foreground">/{familyPlan.billing_interval}</div>
                                 </div>
                               </div>
                             </Label>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Total */}
-                    <div className="border-t pt-4">
-                      <div className="flex justify-between items-center text-xl font-bold">
-                        <span>Total Monthly:</span>
-                        <span className="text-primary">{dbPlans.find(p => p.id === selectedMainPlan)?.currency || 'EUR'}{calculateTotal().toFixed(2)}</span>
+                      {/* Safety Products Section */}
+                      {products.length > 0 && (
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-foreground">Safety Products (One-time purchase):</h4>
+                          {products.map((product) => (
+                            <div key={product.id} className={`p-4 border-2 rounded-lg transition-all ${
+                              selectedProducts.includes(product.id) ? 'border-primary bg-primary/5' : 'border-muted'
+                            }`}>
+                              <div className="flex items-start gap-3">
+                                <Checkbox
+                                  id={product.id}
+                                  checked={selectedProducts.includes(product.id)}
+                                  onCheckedChange={(checked) => handleProductToggle(product.id, checked as boolean)}
+                                  className="mt-1"
+                                />
+                                <Label htmlFor={product.id} className="flex-1 cursor-pointer">
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <h4 className="font-semibold mb-2">{product.name}</h4>
+                                      <p className="text-muted-foreground mb-3">{product.description}</p>
+                                      {product.features.length > 0 && (
+                                        <div className="grid grid-cols-2 gap-2">
+                                          {product.features.map((feature, idx) => (
+                                            <div key={idx} className="flex items-center gap-1 text-sm">
+                                              <Check className="h-3 w-3 text-green-500" />
+                                              <span>{feature}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="text-right ml-4">
+                                      <div className="font-bold">{product.currency}{product.price}</div>
+                                      <div className="text-sm text-muted-foreground">One-time</div>
+                                    </div>
+                                  </div>
+                                </Label>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Regional Services Section */}
+                      {regionalServices.length > 0 && (
+                        <div className="space-y-4">
+                          <h4 className="font-medium text-foreground">Regional Services (Monthly subscription):</h4>
+                          {regionalServices.map((service) => (
+                            <div key={service.id} className={`p-4 border-2 rounded-lg transition-all ${
+                              selectedRegionalServices.includes(service.id) ? 'border-primary bg-primary/5' : 'border-muted'
+                            }`}>
+                              <div className="flex items-start gap-3">
+                                <Checkbox
+                                  id={service.id}
+                                  checked={selectedRegionalServices.includes(service.id)}
+                                  onCheckedChange={(checked) => handleRegionalServiceToggle(service.id, checked as boolean)}
+                                  className="mt-1"
+                                />
+                                <Label htmlFor={service.id} className="flex-1 cursor-pointer">
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <h4 className="font-semibold">{service.name}</h4>
+                                        <span className="bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-full">
+                                          {service.region}
+                                        </span>
+                                      </div>
+                                      <p className="text-muted-foreground mb-3">{service.description}</p>
+                                      {service.features.length > 0 && (
+                                        <div className="grid grid-cols-2 gap-2">
+                                          {service.features.map((feature, idx) => (
+                                            <div key={idx} className="flex items-center gap-1 text-sm">
+                                              <Check className="h-3 w-3 text-green-500" />
+                                              <span>{feature}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                    <div className="text-right ml-4">
+                                      <div className="font-bold">{service.currency}{service.price}</div>
+                                      <div className="text-sm text-muted-foreground">/month</div>
+                                    </div>
+                                  </div>
+                                </Label>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Total Summary */}
+                    <div className="border-t pt-6 space-y-3">
+                      <div className="flex justify-between text-base">
+                        <span>Monthly Subscription:</span>
+                        <span>{premiumPlan?.currency || 'EUR'}{calculateSubscriptionTotal().toFixed(2)}/month</span>
+                      </div>
+                      {calculateProductTotal() > 0 && (
+                        <div className="flex justify-between text-base">
+                          <span>One-time Products:</span>
+                          <span>{premiumPlan?.currency || 'EUR'}{calculateProductTotal().toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center text-xl font-bold border-t pt-3">
+                        <span>Total:</span>
+                        <span className="text-primary">
+                          {premiumPlan?.currency || 'EUR'}{calculateGrandTotal().toFixed(2)}
+                          {calculateProductTotal() > 0 && (
+                            <span className="text-sm font-normal text-muted-foreground ml-1">
+                              ({calculateSubscriptionTotal().toFixed(2)}/month + {calculateProductTotal().toFixed(2)} one-time)
+                            </span>
+                          )}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -569,7 +773,9 @@ const AIRegister = () => {
                 </div>
               ) : (
                 <EmbeddedPayment
-                  plans={getSelectedPlanIds()}
+                  plans={getSelectedSubscriptionPlans()}
+                  products={selectedProducts}
+                  regionalServices={selectedRegionalServices}
                   userEmail={personalDetails.email}
                   firstName={personalDetails.firstName}
                   lastName={personalDetails.lastName}
