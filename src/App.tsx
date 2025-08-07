@@ -26,6 +26,7 @@ const App = () => {
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/register" element={<AIRegister />} />
+          <Route path="/ai-register" element={<AIRegister />} />
           <Route path="/register-classic" element={
             <ProtectedRoute>
               <Register />
