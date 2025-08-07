@@ -31,7 +31,7 @@ interface MyProductsWidgetProps {
 }
 
 const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
-  const [products, setProducts] = useState<any[]>([]);
+  const [userProducts, setUserProducts] = useState<any[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -45,10 +45,69 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
   const loadUserData = async () => {
     setLoading(true);
     try {
-      // Load subscription data
+      // Load subscription data first
       await loadSubscription();
       
-      // Load available products
+      // Load user's purchased products
+      await loadUserProducts();
+      
+      // Load available products from admin-managed catalog
+      await loadAvailableProducts();
+      
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      toast({
+        title: "Loading Error",
+        description: "Unable to load your products. Please refresh the page.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadUserProducts = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get user's purchased products from orders table
+      const { data: ordersData } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          product:products(*)
+        `)
+        .eq('user_id', user.id)
+        .eq('status', 'completed')
+        .order('created_at', { ascending: false });
+
+      // Transform orders into user products with mock device status for display
+      const userProductsList = ordersData?.map(order => ({
+        id: `user-product-${order.id}`,
+        order_id: order.id,
+        name: order.product?.name || 'Unknown Product',
+        type: 'purchased_device',
+        status: 'connected', // Mock status - in real app this would come from device API
+        battery_level: Math.floor(Math.random() * 40) + 60, // Mock battery 60-100%
+        last_sync: new Date().toISOString(),
+        firmware_version: '1.2.3',
+        setup_completed: true,
+        purchase_date: order.created_at,
+        price: order.unit_price,
+        currency: order.currency,
+        product_details: order.product
+      })) || [];
+
+      setUserProducts(userProductsList);
+    } catch (error) {
+      console.error('Error loading user products:', error);
+    }
+  };
+
+  const loadAvailableProducts = async () => {
+    try {
+      // Load all active products from admin-managed catalog
       const { data: productsData } = await supabase
         .from('products')
         .select('*')
@@ -56,52 +115,39 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
         .order('sort_order');
       
       setAvailableProducts(productsData || []);
-      
-      // Mock user products for now
-      const mockProducts = [
-        {
-          id: 'bluetooth-pendant-1',
-          name: 'ICE SOS Emergency Pendant',
-          type: 'bluetooth_pendant',
-          status: 'connected',
-          battery_level: 85,
-          last_sync: new Date().toISOString(),
-          firmware_version: '1.2.3',
-          setup_completed: true,
-          purchase_date: '2024-01-15'
-        }
-      ];
-      
-      setProducts(mockProducts);
     } catch (error) {
-      console.error('Error loading user data:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error loading available products:', error);
     }
   };
 
   const loadSubscription = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data: subData } = await supabase
-        .from('subscribers')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+      // Use the check-subscription function to get the latest subscription status
+      const { data: subscriptionData, error } = await supabase.functions.invoke('check-subscription');
       
-      if (subData) {
+      if (error) {
+        console.error('Error checking subscription:', error);
+        return;
+      }
+
+      if (subscriptionData?.subscribed) {
+        // Get the plan details for the subscription tier
         const { data: planData } = await supabase
           .from('subscription_plans')
           .select('*')
-          .eq('name', subData.subscription_tier || 'Basic Protection')
+          .eq('name', subscriptionData.subscription_tier)
           .single();
         
         setSubscription({
-          ...subData,
-          plan: planData
+          ...subscriptionData,
+          plan: planData,
+          subscribed: subscriptionData.subscribed,
+          subscription_tier: subscriptionData.subscription_tier,
+          subscription_end: subscriptionData.subscription_end
         });
+      } else {
+        // No active subscription
+        setSubscription(null);
       }
     } catch (error) {
       console.error('Error loading subscription:', error);
@@ -264,58 +310,89 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       </Card>
 
       {/* Subscription Status */}
-      {subscription && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Crown className="h-5 w-5 text-amber-500" />
-              Current Subscription
+      {subscription ? (
+        <Card className="border-2 border-emergency/20">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-xl">
+              <Crown className="h-6 w-6 text-amber-500" />
+              Your Current Plan
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between mb-4">
+          <CardContent className="space-y-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-lg">{subscription.plan?.name || subscription.subscription_tier}</h3>
-                <p className="text-muted-foreground">
-                  €{subscription.plan?.price}/{subscription.plan?.billing_interval}
+                <h3 className="font-bold text-2xl text-primary mb-2">{subscription.plan?.name || subscription.subscription_tier}</h3>
+                <p className="text-xl text-muted-foreground">
+                  €{subscription.plan?.price || '0'} per {subscription.plan?.billing_interval || 'month'}
                 </p>
               </div>
-              <Badge className="bg-emergency/10 text-emergency">
-                {subscription.subscribed ? 'Active' : 'Inactive'}
+              <Badge className="bg-emergency text-white text-lg px-4 py-2">
+                {subscription.subscribed ? '✓ Active' : 'Inactive'}
               </Badge>
             </div>
             
             {subscription.subscription_end && (
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">
-                  Next billing: {new Date(subscription.subscription_end).toLocaleDateString()}
+              <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
+                <Calendar className="h-5 w-5 text-muted-foreground" />
+                <span className="text-lg text-muted-foreground">
+                  Next billing date: {new Date(subscription.subscription_end).toLocaleDateString()}
                 </span>
               </div>
             )}
 
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleUpgradeSubscription}>
-                <Crown className="h-4 w-4 mr-2" />
+            {/* Plan Features */}
+            {subscription.plan?.features && (
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-primary">Your Plan Includes:</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {subscription.plan.features.slice(0, 5).map((feature: string, index: number) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <CheckCircle className="h-4 w-4 text-emergency flex-shrink-0" />
+                      <span className="text-base text-foreground">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-4 border-t">
+              <Button variant="outline" size="lg" onClick={handleUpgradeSubscription} className="text-lg px-6 py-3">
+                <Crown className="h-5 w-5 mr-2" />
                 Upgrade Plan
               </Button>
-              <Button variant="outline" size="sm" onClick={handleManageSubscription}>
-                <CreditCard className="h-4 w-4 mr-2" />
+              <Button variant="outline" size="lg" onClick={handleManageSubscription} className="text-lg px-6 py-3">
+                <CreditCard className="h-5 w-5 mr-2" />
                 Manage Billing
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-2 border-dashed border-muted">
+          <CardContent className="p-8">
+            <div className="text-center">
+              <Crown className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
+              <h3 className="text-xl font-semibold mb-3">No Active Subscription</h3>
+              <p className="text-lg text-muted-foreground mb-6">
+                Choose a protection plan to get started with 24/7 emergency monitoring
+              </p>
+              <Button size="lg" className="text-lg px-8 py-3" onClick={handleUpgradeSubscription}>
+                <Crown className="h-5 w-5 mr-2" />
+                Choose a Plan
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* My Devices Section */}
-      {products.length > 0 && (
+      {/* My Devices Section - Purchased Products */}
+      {userProducts.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Bluetooth className="h-5 w-5" />
+          <h3 className="text-xl font-semibold flex items-center gap-3 text-primary">
+            <Bluetooth className="h-6 w-6" />
             My Devices
           </h3>
-          {products.map((product) => (
+          {userProducts.map((product) => (
             <Card key={product.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -391,28 +468,28 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
 
       {/* Available Products Section */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <ShoppingCart className="h-5 w-5" />
+        <h3 className="text-xl font-semibold flex items-center gap-3 text-primary">
+          <ShoppingCart className="h-6 w-6" />
           Available Products
         </h3>
         
         {availableProducts.length > 0 ? (
           availableProducts.map((product) => (
-            <Card key={product.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-gradient-emergency rounded-xl flex items-center justify-center">
-                      <Shield className="h-8 w-8 text-white" />
+            <Card key={product.id} className="hover:shadow-lg transition-shadow border-2">
+              <CardContent className="p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-6">
+                    <div className="w-20 h-20 bg-gradient-emergency rounded-xl flex items-center justify-center">
+                      <Shield className="h-10 w-10 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg">{product.name}</h3>
-                      <p className="text-muted-foreground">{product.description}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-2xl font-bold text-emergency">
+                      <h3 className="font-bold text-2xl text-primary mb-2">{product.name}</h3>
+                      <p className="text-lg text-muted-foreground mb-3">{product.description}</p>
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl font-bold text-emergency">
                           €{product.price}
                         </span>
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="text-lg px-3 py-1">
                           {product.inventory_count > 0 ? 'In Stock' : 'Out of Stock'}
                         </Badge>
                       </div>
@@ -421,45 +498,46 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                 </div>
 
                 {/* Product Features */}
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-2">Key Features</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-3 text-primary">Key Features</h4>
+                  <div className="grid grid-cols-1 gap-2">
                     {product.features?.slice(0, 6).map((feature: string, index: number) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <CheckCircle className="h-3 w-3 text-emergency" />
-                        <span className="text-xs text-muted-foreground">{feature}</span>
+                      <div key={index} className="flex items-center gap-3">
+                        <CheckCircle className="h-4 w-4 text-emergency flex-shrink-0" />
+                        <span className="text-base text-foreground">{feature}</span>
                       </div>
                     ))}
                   </div>
                 </div>
 
                 {/* Compatibility */}
-                <div className="mb-4">
-                  <h4 className="text-sm font-medium mb-2">Subscription Compatibility</h4>
-                  <div className="flex gap-1 flex-wrap">
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-3 text-primary">Works With</h4>
+                  <div className="flex gap-2 flex-wrap">
                     {product.compatibility?.map((plan: string, index: number) => (
-                      <Badge key={index} variant="outline" className="text-xs">
+                      <Badge key={index} variant="outline" className="text-base px-3 py-1">
                         {plan}
                       </Badge>
                     ))}
                   </div>
                 </div>
 
-                <Separator className="my-4" />
+                <Separator className="my-6" />
 
                 <div className="flex items-center justify-between">
-                  <div className="text-sm text-muted-foreground">
-                    Works with all subscription plans
+                  <div className="text-lg text-muted-foreground">
+                    ✅ Works with all subscription plans
                   </div>
                   <Button 
                     onClick={() => handlePurchaseProduct(product)}
                     disabled={purchaseLoading === product.id || product.inventory_count === 0}
-                    className="bg-emergency hover:bg-emergency/90"
+                    className="bg-emergency hover:bg-emergency/90 text-lg px-8 py-3 h-auto"
+                    size="lg"
                   >
                     {purchaseLoading === product.id ? (
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
                     ) : (
-                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      <ShoppingCart className="h-5 w-5 mr-3" />
                     )}
                     {purchaseLoading === product.id ? 'Processing...' : `Buy for €${product.price}`}
                   </Button>
@@ -469,11 +547,11 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
           ))
         ) : (
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-8">
               <div className="text-center">
-                <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">No Products Available</h3>
-                <p className="text-sm text-muted-foreground">
+                <Package className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
+                <h3 className="text-xl font-semibold mb-3">No Products Available</h3>
+                <p className="text-lg text-muted-foreground">
                   Check back later for new ICE SOS products
                 </p>
               </div>
@@ -483,22 +561,22 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       </div>
 
       {/* No Devices Message */}
-      {products.length === 0 && (
-        <Card>
-          <CardContent className="p-6">
+      {userProducts.length === 0 && (
+        <Card className="border-2 border-dashed border-muted">
+          <CardContent className="p-8">
             <div className="text-center">
-              <Bluetooth className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">No Devices Connected</h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <Bluetooth className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
+              <h3 className="text-xl font-semibold mb-3">No Devices Connected</h3>
+              <p className="text-lg text-muted-foreground mb-6">
                 Purchase an ICE SOS device to get started with 24/7 emergency protection
               </p>
-              <div className="flex gap-2 justify-center">
-                <Button variant="outline">
-                  <Plus className="h-4 w-4 mr-2" />
+              <div className="flex gap-4 justify-center">
+                <Button variant="outline" size="lg" className="text-lg px-6 py-3">
+                  <Plus className="h-5 w-5 mr-2" />
                   Add Existing Device
                 </Button>
-                <Button>
-                  <ShoppingCart className="h-4 w-4 mr-2" />
+                <Button size="lg" className="text-lg px-6 py-3">
+                  <ShoppingCart className="h-5 w-5 mr-2" />
                   Shop Products
                 </Button>
               </div>
