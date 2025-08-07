@@ -1,10 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bell, Smartphone, Mail, MessageSquare, AlertTriangle, Users, MapPin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Bell, Smartphone, Mail, MessageSquare, AlertTriangle, Users, MapPin, Save, CheckCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export function NotificationsPage() {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [settings, setSettings] = useState({
     emergencyAlerts: true,
     familyUpdates: true,
@@ -21,9 +27,76 @@ export function NotificationsPage() {
     quietStart: "22:00",
     quietEnd: "07:00"
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Load user preferences from database
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (!user) return;
+      
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('communication_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (data) {
+          setSettings(prev => ({
+            ...prev,
+            marketingEmails: data.marketing_emails || false,
+            emergencyMethod: data.preferred_channel || "all"
+          }));
+        }
+      } catch (error) {
+        console.error('Error loading preferences:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPreferences();
+  }, [user]);
 
   const updateSetting = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const savePreferences = async () => {
+    if (!user) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from('communication_preferences')
+        .upsert({
+          user_id: user.id,
+          email_notifications: settings.emergencyAlerts || settings.familyUpdates || settings.locationAlerts || settings.systemUpdates,
+          marketing_emails: settings.marketingEmails,
+          preferred_channel: settings.emergencyMethod,
+          whatsapp_notifications: settings.emergencyMethod === "all" || settings.emergencyMethod === "sms"
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Preferences saved",
+        description: "Your notification preferences have been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      toast({
+        title: "Error saving preferences",
+        description: "There was an error updating your preferences. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const notificationTypes = [
@@ -34,7 +107,7 @@ export function NotificationsPage() {
       icon: AlertTriangle,
       setting: "emergencyAlerts",
       methodSetting: "emergencyMethod",
-      color: "text-red-600"
+      color: "text-emergency"
     },
     {
       id: "family",
@@ -43,7 +116,7 @@ export function NotificationsPage() {
       icon: Users,
       setting: "familyUpdates",
       methodSetting: "familyMethod",
-      color: "text-blue-600"
+      color: "text-primary"
     },
     {
       id: "location",
@@ -52,7 +125,7 @@ export function NotificationsPage() {
       icon: MapPin,
       setting: "locationAlerts",
       methodSetting: "locationMethod",
-      color: "text-green-600"
+      color: "text-accent"
     },
     {
       id: "system",
@@ -61,7 +134,7 @@ export function NotificationsPage() {
       icon: Bell,
       setting: "systemUpdates",
       methodSetting: "systemMethod",
-      color: "text-purple-600"
+      color: "text-muted-foreground"
     }
   ];
 
@@ -74,20 +147,31 @@ export function NotificationsPage() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <Card className="bg-white/95 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5 text-blue-500" />
-              Notifications
-            </CardTitle>
-            <CardDescription>
-              Customize how and when you receive notifications
-            </CardDescription>
-          </CardHeader>
-        </Card>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
+          <p className="text-muted-foreground">Customize how and when you receive notifications</p>
+        </div>
+        <Button 
+          onClick={savePreferences} 
+          disabled={isSaving || isLoading}
+          className="bg-primary hover:bg-primary/90"
+        >
+          {isSaving ? (
+            <>
+              <CheckCircle className="h-4 w-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Save Preferences
+            </>
+          )}
+        </Button>
+      </div>
 
         {/* Notification Types */}
         <Card>
@@ -226,26 +310,32 @@ export function NotificationsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3 p-4 border rounded-lg">
-                <Smartphone className="h-8 w-8 text-blue-600" />
+              <div className="flex items-center gap-3 p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Smartphone className="h-6 w-6 text-primary" />
+                </div>
                 <div>
-                  <h3 className="font-semibold">Push Notifications</h3>
+                  <h3 className="text-base font-semibold">Push Notifications</h3>
                   <p className="text-sm text-muted-foreground">Mobile app alerts</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 p-4 border rounded-lg">
-                <Mail className="h-8 w-8 text-green-600" />
+              <div className="flex items-center gap-3 p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+                <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+                  <Mail className="h-6 w-6 text-accent" />
+                </div>
                 <div>
-                  <h3 className="font-semibold">Email</h3>
+                  <h3 className="text-base font-semibold">Email</h3>
                   <p className="text-sm text-muted-foreground">Email notifications</p>
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 p-4 border rounded-lg">
-                <MessageSquare className="h-8 w-8 text-purple-600" />
+              <div className="flex items-center gap-3 p-4 border border-border rounded-lg bg-card hover:bg-accent/50 transition-colors">
+                <div className="w-12 h-12 rounded-lg bg-secondary/10 flex items-center justify-center">
+                  <MessageSquare className="h-6 w-6 text-secondary-foreground" />
+                </div>
                 <div>
-                  <h3 className="font-semibold">SMS</h3>
+                  <h3 className="text-base font-semibold">SMS</h3>
                   <p className="text-sm text-muted-foreground">Text messages</p>
                 </div>
               </div>
@@ -276,7 +366,6 @@ export function NotificationsPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }
