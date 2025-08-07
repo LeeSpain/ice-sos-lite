@@ -325,15 +325,22 @@ const AIRegister = () => {
   const premiumPlan = dbPlans.find(p => p.name === 'Premium Protection');
   const familyPlan = dbPlans.find(p => p.name.includes('Family'));
 
+  // Tax rates
+  const PRODUCT_IVA_RATE = 0.21; // 21% for products
+  const SERVICE_IVA_RATE = 0.10; // 10% for regional services
+
   const calculateSubscriptionTotal = () => {
     let total = premiumPlan ? premiumPlan.price : 0;
     if (hasFamilyPlan && familyPlan) {
       total += familyPlan.price;
     }
-    // Add regional services (subscription-based)
+    // Add regional services (subscription-based) with IVA
     selectedRegionalServices.forEach(serviceId => {
       const service = regionalServices.find(s => s.id === serviceId);
-      if (service) total += service.price;
+      if (service) {
+        const priceWithIva = service.price * (1 + SERVICE_IVA_RATE);
+        total += priceWithIva;
+      }
     });
     return total;
   };
@@ -342,7 +349,28 @@ const AIRegister = () => {
     let total = 0;
     selectedProducts.forEach(productId => {
       const product = products.find(p => p.id === productId);
+      if (product) {
+        const priceWithIva = product.price * (1 + PRODUCT_IVA_RATE);
+        total += priceWithIva;
+      }
+    });
+    return total;
+  };
+
+  const calculateProductsSubtotal = () => {
+    let total = 0;
+    selectedProducts.forEach(productId => {
+      const product = products.find(p => p.id === productId);
       if (product) total += product.price;
+    });
+    return total;
+  };
+
+  const calculateServicesSubtotal = () => {
+    let total = 0;
+    selectedRegionalServices.forEach(serviceId => {
+      const service = regionalServices.find(s => s.id === serviceId);
+      if (service) total += service.price;
     });
     return total;
   };
@@ -604,8 +632,8 @@ const AIRegister = () => {
 
                       {/* Family Plan Add-on */}
                       {familyPlan && (
-                        <div className={`p-4 border-2 rounded-lg transition-all ${
-                          hasFamilyPlan ? 'border-primary bg-primary/5' : 'border-muted'
+                        <div className={`p-3 border rounded-lg transition-all ${
+                          hasFamilyPlan ? 'border-primary bg-primary/5' : 'border-border'
                         }`}>
                           <div className="flex items-start gap-3">
                             <Checkbox
@@ -617,22 +645,22 @@ const AIRegister = () => {
                             <Label htmlFor="family" className="flex-1 cursor-pointer">
                               <div className="flex justify-between items-start">
                                 <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <h4 className="font-semibold">{familyPlan.name}</h4>
-                                  </div>
-                                  <p className="text-muted-foreground mb-3">{familyPlan.description}</p>
-                                  <div className="grid grid-cols-2 gap-2">
-                                    {familyPlan.features.map((feature, idx) => (
-                                      <div key={idx} className="flex items-center gap-1 text-sm">
-                                        <Check className="h-3 w-3 text-green-500" />
-                                        <span>{feature}</span>
-                                      </div>
-                                    ))}
-                                  </div>
+                                  <h4 className="font-semibold text-base mb-1">{familyPlan.name}</h4>
+                                  <p className="text-muted-foreground text-sm mb-2">{familyPlan.description}</p>
+                                  {familyPlan.features.length > 0 && (
+                                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                      {familyPlan.features.slice(0, 3).map((feature, idx) => (
+                                        <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
+                                          <Check className="h-3 w-3 text-green-500" />
+                                          <span>{feature}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                                 <div className="text-right ml-4">
-                                  <div className="font-bold">{familyPlan.currency}{familyPlan.price}</div>
-                                  <div className="text-sm text-muted-foreground">/{familyPlan.billing_interval}</div>
+                                  <div className="font-bold text-base">{familyPlan.currency}{familyPlan.price.toFixed(2)}</div>
+                                  <div className="text-xs text-muted-foreground">/{familyPlan.billing_interval}</div>
                                 </div>
                               </div>
                             </Label>
@@ -642,118 +670,195 @@ const AIRegister = () => {
 
                       {/* Safety Products Section */}
                       {products.length > 0 && (
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                           <h4 className="font-medium text-foreground">Safety Products (One-time purchase):</h4>
-                          {products.map((product) => (
-                            <div key={product.id} className={`p-4 border-2 rounded-lg transition-all ${
-                              selectedProducts.includes(product.id) ? 'border-primary bg-primary/5' : 'border-muted'
-                            }`}>
-                              <div className="flex items-start gap-3">
-                                <Checkbox
-                                  id={product.id}
-                                  checked={selectedProducts.includes(product.id)}
-                                  onCheckedChange={(checked) => handleProductToggle(product.id, checked as boolean)}
-                                  className="mt-1"
-                                />
-                                <Label htmlFor={product.id} className="flex-1 cursor-pointer">
-                                  <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                      <h4 className="font-semibold mb-2">{product.name}</h4>
-                                      <p className="text-muted-foreground mb-3">{product.description}</p>
-                                      {product.features.length > 0 && (
-                                        <div className="grid grid-cols-2 gap-2">
-                                          {product.features.map((feature, idx) => (
-                                            <div key={idx} className="flex items-center gap-1 text-sm">
-                                              <Check className="h-3 w-3 text-green-500" />
-                                              <span>{feature}</span>
-                                            </div>
-                                          ))}
+                          {products.map((product) => {
+                            const priceWithIva = product.price * (1 + PRODUCT_IVA_RATE);
+                            return (
+                              <div key={product.id} className={`p-3 border rounded-lg transition-all ${
+                                selectedProducts.includes(product.id) ? 'border-primary bg-primary/5' : 'border-border'
+                              }`}>
+                                <div className="flex items-start gap-3">
+                                  <Checkbox
+                                    id={product.id}
+                                    checked={selectedProducts.includes(product.id)}
+                                    onCheckedChange={(checked) => handleProductToggle(product.id, checked as boolean)}
+                                    className="mt-1"
+                                  />
+                                  <Label htmlFor={product.id} className="flex-1 cursor-pointer">
+                                    <div className="flex justify-between items-start">
+                                      <div className="flex-1">
+                                        <h4 className="font-semibold text-base mb-1">{product.name}</h4>
+                                        <p className="text-muted-foreground text-sm mb-2">{product.description}</p>
+                                        {product.features.length > 0 && (
+                                          <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                            {product.features.slice(0, 3).map((feature, idx) => (
+                                              <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <Check className="h-3 w-3 text-green-500" />
+                                                <span>{feature}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="text-right ml-4">
+                                        <div className="text-xs text-muted-foreground line-through">
+                                          {product.currency}{product.price.toFixed(2)}
                                         </div>
-                                      )}
+                                        <div className="font-bold text-base">
+                                          {product.currency}{priceWithIva.toFixed(2)}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                          +21% IVA
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className="text-right ml-4">
-                                      <div className="font-bold">{product.currency}{product.price}</div>
-                                      <div className="text-sm text-muted-foreground">One-time</div>
-                                    </div>
-                                  </div>
-                                </Label>
+                                  </Label>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
 
                       {/* Regional Services Section */}
                       {regionalServices.length > 0 && (
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                           <h4 className="font-medium text-foreground">Regional Services (Monthly subscription):</h4>
-                          {regionalServices.map((service) => (
-                            <div key={service.id} className={`p-4 border-2 rounded-lg transition-all ${
-                              selectedRegionalServices.includes(service.id) ? 'border-primary bg-primary/5' : 'border-muted'
-                            }`}>
-                              <div className="flex items-start gap-3">
-                                <Checkbox
-                                  id={service.id}
-                                  checked={selectedRegionalServices.includes(service.id)}
-                                  onCheckedChange={(checked) => handleRegionalServiceToggle(service.id, checked as boolean)}
-                                  className="mt-1"
-                                />
-                                <Label htmlFor={service.id} className="flex-1 cursor-pointer">
-                                  <div className="flex justify-between items-start">
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2 mb-2">
-                                        <h4 className="font-semibold">{service.name}</h4>
-                                        <span className="bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-full">
-                                          {service.region}
-                                        </span>
-                                      </div>
-                                      <p className="text-muted-foreground mb-3">{service.description}</p>
-                                      {service.features.length > 0 && (
-                                        <div className="grid grid-cols-2 gap-2">
-                                          {service.features.map((feature, idx) => (
-                                            <div key={idx} className="flex items-center gap-1 text-sm">
-                                              <Check className="h-3 w-3 text-green-500" />
-                                              <span>{feature}</span>
-                                            </div>
-                                          ))}
+                          {regionalServices.map((service) => {
+                            const priceWithIva = service.price * (1 + SERVICE_IVA_RATE);
+                            return (
+                              <div key={service.id} className={`p-3 border rounded-lg transition-all ${
+                                selectedRegionalServices.includes(service.id) ? 'border-primary bg-primary/5' : 'border-border'
+                              }`}>
+                                <div className="flex items-start gap-3">
+                                  <Checkbox
+                                    id={service.id}
+                                    checked={selectedRegionalServices.includes(service.id)}
+                                    onCheckedChange={(checked) => handleRegionalServiceToggle(service.id, checked as boolean)}
+                                    className="mt-1"
+                                  />
+                                  <Label htmlFor={service.id} className="flex-1 cursor-pointer">
+                                    <div className="flex justify-between items-start">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <h4 className="font-semibold text-base">{service.name}</h4>
+                                          <span className="bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-full">
+                                            {service.region}
+                                          </span>
                                         </div>
-                                      )}
+                                        <p className="text-muted-foreground text-sm mb-2">{service.description}</p>
+                                        {service.features.length > 0 && (
+                                          <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                            {service.features.slice(0, 3).map((feature, idx) => (
+                                              <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <Check className="h-3 w-3 text-green-500" />
+                                                <span>{feature}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="text-right ml-4">
+                                        <div className="text-xs text-muted-foreground line-through">
+                                          {service.currency}{service.price.toFixed(2)}
+                                        </div>
+                                        <div className="font-bold text-base">
+                                          {service.currency}{priceWithIva.toFixed(2)}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                          +10% IVA /month
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className="text-right ml-4">
-                                      <div className="font-bold">{service.currency}{service.price}</div>
-                                      <div className="text-sm text-muted-foreground">/month</div>
-                                    </div>
-                                  </div>
-                                </Label>
+                                  </Label>
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
 
                     {/* Total Summary */}
-                    <div className="border-t pt-6 space-y-3">
-                      <div className="flex justify-between text-base">
-                        <span>Monthly Subscription:</span>
-                        <span>{premiumPlan?.currency || 'EUR'}{calculateSubscriptionTotal().toFixed(2)}/month</span>
+                    <div className="border-t pt-6 space-y-3 bg-muted/30 -mx-8 px-8 pb-6 mt-8">
+                      <h4 className="font-semibold text-foreground mb-3">Order Summary</h4>
+                      
+                      {/* Base subscription */}
+                      <div className="flex justify-between text-sm">
+                        <span>Premium Protection Plan:</span>
+                        <span>{premiumPlan?.currency || 'EUR'}{(premiumPlan?.price || 0).toFixed(2)}/month</span>
                       </div>
-                      {calculateProductTotal() > 0 && (
-                        <div className="flex justify-between text-base">
-                          <span>One-time Products:</span>
-                          <span>{premiumPlan?.currency || 'EUR'}{calculateProductTotal().toFixed(2)}</span>
+                      
+                      {/* Family Plan */}
+                      {hasFamilyPlan && familyPlan && (
+                        <div className="flex justify-between text-sm">
+                          <span>{familyPlan.name}:</span>
+                          <span>{familyPlan.currency}{familyPlan.price.toFixed(2)}/month</span>
                         </div>
                       )}
-                      <div className="flex justify-between items-center text-xl font-bold border-t pt-3">
-                        <span>Total:</span>
+                      
+                      {/* Regional Services */}
+                      {selectedRegionalServices.length > 0 && (
+                        <>
+                          <div className="text-sm font-medium mt-3 mb-2">Regional Services:</div>
+                          {selectedRegionalServices.map(serviceId => {
+                            const service = regionalServices.find(s => s.id === serviceId);
+                            if (!service) return null;
+                            const priceWithIva = service.price * (1 + SERVICE_IVA_RATE);
+                            return (
+                              <div key={serviceId} className="flex justify-between text-sm pl-4">
+                                <span>{service.name} (+10% IVA):</span>
+                                <span>{service.currency}{priceWithIva.toFixed(2)}/month</span>
+                              </div>
+                            );
+                          })}
+                        </>
+                      )}
+                      
+                      {/* Products */}
+                      {selectedProducts.length > 0 && (
+                        <>
+                          <div className="text-sm font-medium mt-3 mb-2">Safety Products:</div>
+                          {selectedProducts.map(productId => {
+                            const product = products.find(p => p.id === productId);
+                            if (!product) return null;
+                            const priceWithIva = product.price * (1 + PRODUCT_IVA_RATE);
+                            return (
+                              <div key={productId} className="flex justify-between text-sm pl-4">
+                                <span>{product.name} (+21% IVA):</span>
+                                <span>{product.currency}{priceWithIva.toFixed(2)}</span>
+                              </div>
+                            );
+                          })}
+                        </>
+                      )}
+                      
+                      {/* Monthly Total */}
+                      <div className="flex justify-between font-semibold text-base border-t pt-3 mt-3">
+                        <span>Monthly Total:</span>
+                        <span className="text-primary">{premiumPlan?.currency || 'EUR'}{calculateSubscriptionTotal().toFixed(2)}/month</span>
+                      </div>
+                      
+                      {/* One-time Total */}
+                      {calculateProductTotal() > 0 && (
+                        <div className="flex justify-between font-semibold text-base">
+                          <span>One-time Total:</span>
+                          <span className="text-primary">{premiumPlan?.currency || 'EUR'}{calculateProductTotal().toFixed(2)}</span>
+                        </div>
+                      )}
+                      
+                      {/* Grand Total */}
+                      <div className="flex justify-between items-center text-lg font-bold border-t pt-3 mt-3">
+                        <span>Today's Payment:</span>
                         <span className="text-primary">
                           {premiumPlan?.currency || 'EUR'}{calculateGrandTotal().toFixed(2)}
-                          {calculateProductTotal() > 0 && (
-                            <span className="text-sm font-normal text-muted-foreground ml-1">
-                              ({calculateSubscriptionTotal().toFixed(2)}/month + {calculateProductTotal().toFixed(2)} one-time)
-                            </span>
-                          )}
                         </span>
+                      </div>
+                      
+                      {/* Tax Notice */}
+                      <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted rounded">
+                        <strong>Tax Information:</strong> Products include 21% IVA, Regional Services include 10% IVA. All prices shown include applicable taxes.
                       </div>
                     </div>
                   </div>
