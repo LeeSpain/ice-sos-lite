@@ -59,11 +59,11 @@ export function LocationPage() {
         {/* Header */}
         <Card className="bg-white/95 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-blue-500" />
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <MapPin className="h-6 w-6 text-primary" />
               Location Services
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-base">
               Manage your location sharing and safe zones
             </CardDescription>
           </CardHeader>
@@ -72,18 +72,18 @@ export function LocationPage() {
         {/* Location Settings */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-xl">
               <Shield className="h-5 w-5" />
               Privacy & Sharing Settings
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Control how your location is shared with family members and emergency services
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Share Location with Family</h3>
+                <h3 className="font-medium text-base">Share Location with Family</h3>
                 <p className="text-sm text-muted-foreground">
                   Allow family members to see your current location
                 </p>
@@ -96,7 +96,7 @@ export function LocationPage() {
             
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Emergency Location Sharing</h3>
+                <h3 className="font-medium text-base">Emergency Location Sharing</h3>
                 <p className="text-sm text-muted-foreground">
                   Automatically share location during emergency situations
                 </p>
@@ -112,7 +112,7 @@ export function LocationPage() {
         {/* Current Location */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-xl">
               <MapPin className="h-5 w-5" />
               Current Location
             </CardTitle>
@@ -123,7 +123,7 @@ export function LocationPage() {
                 <Navigation className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold">{currentLocation.address}</h3>
+                <h3 className="font-semibold text-base">{currentLocation.address}</h3>
                 <p className="text-sm text-muted-foreground">
                   Coordinates: {currentLocation.latitude}, {currentLocation.longitude}
                 </p>
@@ -146,11 +146,11 @@ export function LocationPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-xl">
                   <Home className="h-5 w-5" />
                   Safe Zones
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-sm">
                   Designated areas where family members receive arrival/departure notifications
                 </CardDescription>
               </div>
@@ -169,7 +169,7 @@ export function LocationPage() {
                       <zone.icon className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">{zone.name}</h3>
+                      <h3 className="font-semibold text-base">{zone.name}</h3>
                       <p className="text-sm text-muted-foreground">{zone.address}</p>
                       <p className="text-xs text-muted-foreground mt-1">Radius: {zone.radius}</p>
                     </div>
@@ -190,11 +190,11 @@ export function LocationPage() {
         {/* Location History */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-xl">
               <Clock className="h-5 w-5" />
               Recent Location History
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-sm">
               Your recent location visits and duration
             </CardDescription>
           </CardHeader>
@@ -205,7 +205,7 @@ export function LocationPage() {
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
                     <div>
-                      <h4 className="font-medium">{entry.location}</h4>
+                      <h4 className="font-medium text-base">{entry.location}</h4>
                       <p className="text-sm text-muted-foreground">{entry.address}</p>
                     </div>
                   </div>
