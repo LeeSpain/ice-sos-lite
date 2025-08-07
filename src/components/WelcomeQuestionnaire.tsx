@@ -77,22 +77,53 @@ const WelcomeQuestionnaire = () => {
 
       if (error) throw error;
 
-      if (profile) {
-        setFormData({
-          first_name: profile.first_name || '',
-          last_name: profile.last_name || '',
-          phone: profile.phone || '',
-          date_of_birth: profile.date_of_birth || '',
-          address: profile.address || '',
-          country: profile.country || '',
-          language_preference: profile.language_preference || 'en',
-          blood_type: profile.blood_type || '',
-          medical_conditions: profile.medical_conditions || [],
-          allergies: profile.allergies || [],
-          medications: profile.medications || [],
-          emergency_contacts: (profile.emergency_contacts as unknown as EmergencyContact[]) || []
-        });
+      // Pre-populate with existing profile data
+      let updatedFormData = {
+        first_name: profile?.first_name || '',
+        last_name: profile?.last_name || '',
+        phone: profile?.phone || '',
+        date_of_birth: profile?.date_of_birth || '',
+        address: profile?.address || '',
+        country: profile?.country || '',
+        language_preference: profile?.language_preference || 'en',
+        blood_type: profile?.blood_type || '',
+        medical_conditions: profile?.medical_conditions || [],
+        allergies: profile?.allergies || [],
+        medications: profile?.medications || [],
+        emergency_contacts: (profile?.emergency_contacts as unknown as EmergencyContact[]) || []
+      };
+
+      // If profile is empty or incomplete, try to get data from user metadata (registration)
+      if (user?.user_metadata) {
+        const metadata = user.user_metadata;
+        
+        // Pre-populate with registration data if profile fields are empty
+        updatedFormData = {
+          ...updatedFormData,
+          first_name: updatedFormData.first_name || metadata.first_name || '',
+          last_name: updatedFormData.last_name || metadata.last_name || '',
+          phone: updatedFormData.phone || metadata.phone_number || '',
+          address: updatedFormData.address || metadata.current_location || '',
+          language_preference: updatedFormData.language_preference || 
+            (metadata.preferred_language === 'English' ? 'en' : metadata.preferred_language?.toLowerCase()) || 'en',
+          medical_conditions: updatedFormData.medical_conditions.length > 0 ? 
+            updatedFormData.medical_conditions : 
+            (metadata.medical_conditions ? metadata.medical_conditions.split(',').map((s: string) => s.trim()).filter(Boolean) : []),
+          allergies: updatedFormData.allergies.length > 0 ? 
+            updatedFormData.allergies : 
+            (metadata.allergies ? metadata.allergies.split(',').map((s: string) => s.trim()).filter(Boolean) : []),
+          emergency_contacts: updatedFormData.emergency_contacts.length > 0 ? 
+            updatedFormData.emergency_contacts : 
+            (metadata.emergency_contacts ? JSON.parse(metadata.emergency_contacts) : [])
+        };
       }
+
+      setFormData(updatedFormData);
+      
+      // Debug logging
+      console.log('User metadata:', user?.user_metadata);
+      console.log('Profile data:', profile);
+      console.log('Final form data:', updatedFormData);
     } catch (error) {
       console.error('Error loading profile:', error);
     }
@@ -217,7 +248,12 @@ const WelcomeQuestionnaire = () => {
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="first_name">First Name</Label>
+                <Label htmlFor="first_name" className="flex items-center gap-2">
+                  First Name
+                  {formData.first_name && user?.user_metadata?.first_name && (
+                    <Badge variant="secondary" className="text-xs">From registration</Badge>
+                  )}
+                </Label>
                 <Input
                   id="first_name"
                   value={formData.first_name}
@@ -226,7 +262,12 @@ const WelcomeQuestionnaire = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="last_name">Last Name</Label>
+                <Label htmlFor="last_name" className="flex items-center gap-2">
+                  Last Name
+                  {formData.last_name && user?.user_metadata?.last_name && (
+                    <Badge variant="secondary" className="text-xs">From registration</Badge>
+                  )}
+                </Label>
                 <Input
                   id="last_name"
                   value={formData.last_name}
@@ -237,7 +278,12 @@ const WelcomeQuestionnaire = () => {
             </div>
 
             <div>
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone" className="flex items-center gap-2">
+                Phone Number
+                {formData.phone && user?.user_metadata?.phone_number && (
+                  <Badge variant="secondary" className="text-xs">From registration</Badge>
+                )}
+              </Label>
               <Input
                 id="phone"
                 type="tel"
@@ -269,7 +315,12 @@ const WelcomeQuestionnaire = () => {
             </div>
 
             <div>
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address" className="flex items-center gap-2">
+                Address
+                {formData.address && user?.user_metadata?.current_location && (
+                  <Badge variant="secondary" className="text-xs">From registration</Badge>
+                )}
+              </Label>
               <Textarea
                 id="address"
                 value={formData.address}
@@ -290,7 +341,12 @@ const WelcomeQuestionnaire = () => {
             </div>
 
             <div>
-              <Label htmlFor="language">Preferred Language</Label>
+              <Label htmlFor="language" className="flex items-center gap-2">
+                Preferred Language
+                {formData.language_preference && user?.user_metadata?.preferred_language && (
+                  <Badge variant="secondary" className="text-xs">From registration</Badge>
+                )}
+              </Label>
               <Select value={formData.language_preference} onValueChange={(value) => setFormData(prev => ({ ...prev, language_preference: value }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select language" />
@@ -337,7 +393,12 @@ const WelcomeQuestionnaire = () => {
             </div>
 
             <div>
-              <Label>Medical Conditions</Label>
+              <Label className="flex items-center gap-2">
+                Medical Conditions
+                {formData.medical_conditions.length > 0 && user?.user_metadata?.medical_conditions && (
+                  <Badge variant="secondary" className="text-xs">From registration</Badge>
+                )}
+              </Label>
               <div className="flex gap-2 mb-2">
                 <Input
                   value={newMedicalCondition}
@@ -367,7 +428,12 @@ const WelcomeQuestionnaire = () => {
             </div>
 
             <div>
-              <Label>Allergies</Label>
+              <Label className="flex items-center gap-2">
+                Allergies
+                {formData.allergies.length > 0 && user?.user_metadata?.allergies && (
+                  <Badge variant="secondary" className="text-xs">From registration</Badge>
+                )}
+              </Label>
               <div className="flex gap-2 mb-2">
                 <Input
                   value={newAllergy}
@@ -439,7 +505,12 @@ const WelcomeQuestionnaire = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Add Emergency Contact</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  Add Emergency Contact
+                  {formData.emergency_contacts.length > 0 && user?.user_metadata?.emergency_contacts && (
+                    <Badge variant="secondary" className="text-xs">Some from registration</Badge>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -527,6 +598,30 @@ const WelcomeQuestionnaire = () => {
 
       case 5:
         const completionPercentage = calculateCompletionPercentage();
+        
+        // Check which fields are missing
+        const missingFields = [];
+        const completedFields = [];
+        
+        const fieldChecks = [
+          { key: 'first_name', label: 'First Name', value: formData.first_name },
+          { key: 'last_name', label: 'Last Name', value: formData.last_name },
+          { key: 'phone', label: 'Phone Number', value: formData.phone },
+          { key: 'date_of_birth', label: 'Date of Birth', value: formData.date_of_birth },
+          { key: 'address', label: 'Address', value: formData.address },
+          { key: 'country', label: 'Country', value: formData.country },
+          { key: 'blood_type', label: 'Blood Type', value: formData.blood_type },
+          { key: 'emergency_contacts', label: 'Emergency Contacts', value: formData.emergency_contacts.length > 0 ? 'Yes' : '' }
+        ];
+        
+        fieldChecks.forEach(field => {
+          if (field.value && field.value.toString().trim() !== '') {
+            completedFields.push(field);
+          } else {
+            missingFields.push(field);
+          }
+        });
+        
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
@@ -546,19 +641,85 @@ const WelcomeQuestionnaire = () => {
                     <span className="font-semibold">{completionPercentage}%</span>
                   </div>
                   <Progress value={completionPercentage} className="w-full" />
+                  
+                  {missingFields.length > 0 && (
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <h5 className="font-medium text-amber-800 mb-2">Missing Information:</h5>
+                      <ul className="text-sm text-amber-700 space-y-1">
+                        {missingFields.map(field => (
+                          <li key={field.key} className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-amber-400 rounded-full"></div>
+                            {field.label}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
-            <div className="bg-muted p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Summary</h4>
-              <div className="text-sm space-y-1">
-                <p><strong>Name:</strong> {formData.first_name} {formData.last_name}</p>
-                <p><strong>Phone:</strong> {formData.phone}</p>
-                <p><strong>Location:</strong> {formData.country}</p>
-                <p><strong>Blood Type:</strong> {formData.blood_type}</p>
-                <p><strong>Emergency Contacts:</strong> {formData.emergency_contacts.length}</p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Completed Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg text-green-600">✓ Information Provided</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm space-y-2">
+                    {completedFields.map(field => (
+                      <div key={field.key} className="flex items-center gap-2 text-green-700">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="font-medium">{field.label}:</span>
+                        <span>{field.key === 'emergency_contacts' ? `${formData.emergency_contacts.length} contact(s)` : field.value}</span>
+                      </div>
+                    ))}
+                    {formData.medical_conditions.length > 0 && (
+                      <div className="flex items-center gap-2 text-green-700">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="font-medium">Medical Conditions:</span>
+                        <span>{formData.medical_conditions.length} condition(s)</span>
+                      </div>
+                    )}
+                    {formData.allergies.length > 0 && (
+                      <div className="flex items-center gap-2 text-green-700">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="font-medium">Allergies:</span>
+                        <span>{formData.allergies.length} allergy(ies)</span>
+                      </div>
+                    )}
+                    {formData.medications.length > 0 && (
+                      <div className="flex items-center gap-2 text-green-700">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="font-medium">Medications:</span>
+                        <span>{formData.medications.length} medication(s)</span>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Missing Information */}
+              {missingFields.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg text-amber-600">⚠ Still Needed</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm space-y-2">
+                      {missingFields.map(field => (
+                        <div key={field.key} className="flex items-center gap-2 text-amber-700">
+                          <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                          <span>{field.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-amber-600 mt-3">
+                      You can complete these fields in your dashboard after setup.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         );
