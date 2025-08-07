@@ -195,8 +195,8 @@ export function SettingsPage() {
           <CardContent className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Auto-sync Data</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Auto-sync Data</h3>
+                <p className="text-xs text-muted-foreground">
                   Automatically sync your data across devices
                 </p>
               </div>
@@ -208,8 +208,8 @@ export function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Sound Effects</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Sound Effects</h3>
+                <p className="text-xs text-muted-foreground">
                   Play sounds for notifications and interactions
                 </p>
               </div>
@@ -221,8 +221,8 @@ export function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Haptic Feedback</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Haptic Feedback</h3>
+                <p className="text-xs text-muted-foreground">
                   Vibrate for notifications and interactions on mobile
                 </p>
               </div>
@@ -234,8 +234,8 @@ export function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Automatic Updates</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Automatic Updates</h3>
+                <p className="text-xs text-muted-foreground">
                   Install app updates automatically when available
                 </p>
               </div>
@@ -247,8 +247,8 @@ export function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Data Saver Mode</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Data Saver Mode</h3>
+                <p className="text-xs text-muted-foreground">
                   Reduce data usage by limiting background sync
                 </p>
               </div>
@@ -274,8 +274,8 @@ export function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Export My Data</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Export My Data</h3>
+                <p className="text-xs text-muted-foreground">
                   Download a copy of all your data in JSON format
                 </p>
               </div>
@@ -289,8 +289,8 @@ export function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Clear App Cache</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-sm font-medium">Clear App Cache</h3>
+                <p className="text-xs text-muted-foreground">
                   Clear temporary files to free up storage space
                 </p>
               </div>
@@ -305,8 +305,8 @@ export function SettingsPage() {
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-medium text-red-800">Delete Account</h3>
-                  <p className="text-sm text-red-600">
+                  <h3 className="text-sm font-medium text-red-800">Delete Account</h3>
+                  <p className="text-xs text-red-600">
                     Permanently delete your account and all associated data
                   </p>
                 </div>
