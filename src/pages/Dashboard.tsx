@@ -110,18 +110,21 @@ const Dashboard = () => {
                   <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                       {/* Main Content */}
-                      <div className="xl:col-span-3">
+                      <div className="xl:col-span-3 space-y-6">
                         <DashboardOverview 
                           profile={profile} 
                           subscription={subscription}
                           onProfileUpdate={loadProfile}
                         />
+                        {/* Products moved to bottom */}
+                        <div className="mt-8">
+                          <MyProductsWidget profile={profile} />
+                        </div>
                       </div>
                       
                       {/* Sidebar Widgets */}
                       <div className="space-y-6">
                         <EmergencyActionsWidget profile={profile} subscription={subscription} />
-                        <MyProductsWidget profile={profile} />
                       </div>
                     </div>
                   </div>

@@ -35,10 +35,10 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
     });
   }
   
-  if (emergencyContactsCount < 3) {
+  if (emergencyContactsCount < 5) {
     nextSteps.push({
       title: "Add Emergency Contacts",
-      description: `Add ${3 - emergencyContactsCount} more contacts`,
+      description: `Add ${5 - emergencyContactsCount} more contacts`,
       icon: Phone,
       action: () => window.location.href = '/dashboard/emergency',
       priority: "medium"
@@ -160,12 +160,12 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
           <div className="flex items-center justify-between">
             <span className="text-sm">Contacts</span>
             <div className="flex items-center gap-1">
-              {emergencyContactsCount >= 3 ? (
+              {emergencyContactsCount >= 5 ? (
                 <CheckCircle className="h-3 w-3 text-emergency" />
               ) : (
                 <AlertTriangle className="h-3 w-3 text-orange-500" />
               )}
-              <span className="text-xs text-muted-foreground">{emergencyContactsCount}/3</span>
+              <span className="text-xs text-muted-foreground">{emergencyContactsCount}/5</span>
             </div>
           </div>
           <div className="flex items-center justify-between">

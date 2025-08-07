@@ -145,10 +145,10 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
   const statusCards = [
     {
       title: "Emergency Readiness",
-      value: `${emergencyContactsCount}/3 contacts`,
-      status: emergencyContactsCount >= 3 && protectionActive ? "success" : "warning",
+      value: `${emergencyContactsCount}/5 contacts`,
+      status: emergencyContactsCount >= 5 && protectionActive ? "success" : "warning",
       icon: Shield,
-      description: protectionActive && emergencyContactsCount >= 3 ? "Fully prepared for emergencies" : 
+      description: protectionActive && emergencyContactsCount >= 5 ? "Fully prepared for emergencies" : 
                    !protectionActive ? "Activate protection plan" : "Add more emergency contacts"
     },
     {
@@ -265,7 +265,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
                 <span className="text-sm">Personal Details</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className={`h-4 w-4 ${emergencyContactsCount > 0 ? 'text-emergency' : 'text-muted-foreground'}`} />
+                <CheckCircle className={`h-4 w-4 ${emergencyContactsCount >= 5 ? 'text-emergency' : 'text-muted-foreground'}`} />
                 <span className="text-sm">Emergency Contacts</span>
               </div>
               <div className="flex items-center gap-2">
