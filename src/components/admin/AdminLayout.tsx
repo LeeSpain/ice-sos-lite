@@ -55,7 +55,6 @@ const adminMenuItems = [
     items: [
       { title: "All Customers", url: "/admin-dashboard/customers", icon: Users },
       { title: "Subscriptions", url: "/admin-dashboard/subscriptions", icon: Database },
-      { title: "Subscription Plans", url: "/admin-dashboard/protection-plans", icon: Shield },
       { title: "Family Accounts", url: "/admin-dashboard/families", icon: Heart },
     ]
   },
@@ -87,6 +86,7 @@ const adminMenuItems = [
     items: [
       { title: "Products", url: "/admin-dashboard/products", icon: Package },
       { title: "Regional Services", url: "/admin-dashboard/regional-services", icon: MapPin },
+      { title: "Subscription Plans", url: "/admin-dashboard/protection-plans", icon: Shield },
     ]
   },
   {
