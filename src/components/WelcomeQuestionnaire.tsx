@@ -179,23 +179,20 @@ const WelcomeQuestionnaire = () => {
   };
 
   const calculateCompletionPercentage = () => {
-    const fields = [
+    // Only count essential/required fields that are actually displayed as required to users
+    const requiredFields = [
       formData.first_name,
       formData.last_name,
       formData.phone,
       formData.date_of_birth,
       formData.street_address,
       formData.country,
-      formData.language_preference,
       formData.blood_type,
-      formData.medical_conditions.length > 0 ? 'has_conditions' : '',
-      formData.allergies.length > 0 ? 'has_allergies' : '',
-      formData.medications.length > 0 ? 'has_medications' : '',
       formData.emergency_contacts.length > 0 ? 'has_contacts' : ''
     ];
     
-    const completedFields = fields.filter(field => field && field.toString().trim() !== '').length;
-    return Math.round((completedFields / fields.length) * 100);
+    const completedFields = requiredFields.filter(field => field && field.toString().trim() !== '').length;
+    return Math.round((completedFields / requiredFields.length) * 100);
   };
 
   const handleSubmit = async () => {
@@ -204,10 +201,10 @@ const WelcomeQuestionnaire = () => {
     try {
       const completionPercentage = calculateCompletionPercentage();
       
+      // Use update instead of upsert since we know the profile exists
       const { error } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user?.id,
+        .update({
           first_name: formData.first_name,
           last_name: formData.last_name,
           phone: formData.phone,
@@ -222,17 +219,18 @@ const WelcomeQuestionnaire = () => {
           emergency_contacts: formData.emergency_contacts as any,
           profile_completion_percentage: completionPercentage,
           updated_at: new Date().toISOString()
-        });
+        })
+        .eq('user_id', user?.id);
 
       if (error) throw error;
 
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been successfully updated!",
+        title: "Profile Complete!",
+        description: `Profile updated with ${completionPercentage}% completion. Welcome to your dashboard!`,
       });
 
-      // Redirect to member dashboard
-      navigate('/full-dashboard');
+      // Redirect to dashboard
+      navigate('/dashboard');
       
     } catch (error) {
       console.error('Error updating profile:', error);
