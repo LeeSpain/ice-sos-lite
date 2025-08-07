@@ -224,7 +224,13 @@ const Dashboard = () => {
                   </div>
                 </div>
               } />
-              <Route path="/support" element={<SupportPage />} />
+              <Route path="/support" element={
+                <div className="container mx-auto px-4 py-6">
+                  <div className="max-w-4xl mx-auto">
+                    <SupportPage />
+                  </div>
+                </div>
+              } />
             </Routes>
           </div>
         </div>

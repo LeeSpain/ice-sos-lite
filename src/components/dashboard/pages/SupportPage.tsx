@@ -32,7 +32,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function SupportPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(true); // Open by default
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [ticketForm, setTicketForm] = useState({
     subject: "",
