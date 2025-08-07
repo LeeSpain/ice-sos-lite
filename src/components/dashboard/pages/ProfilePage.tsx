@@ -21,7 +21,8 @@ import {
   Trash2,
   AlertTriangle,
   UserPlus,
-  Activity
+  Activity,
+  X
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -139,6 +140,7 @@ export default function ProfilePage() {
         title: "Success",
         description: "Profile updated successfully."
       });
+      loadProfileData(); // Reload data after update
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -146,6 +148,133 @@ export default function ProfilePage() {
         description: "Failed to update profile.",
         variant: "destructive"
       });
+    }
+  };
+
+  // Emergency Contact Functions
+  const addEmergencyContact = () => {
+    const newContact = {
+      name: "",
+      phone: "",
+      email: "",
+      relationship: ""
+    };
+    setEmergencyContacts([...emergencyContacts, newContact]);
+  };
+
+  const editEmergencyContact = (index: number) => {
+    const contact = emergencyContacts[index];
+    const name = prompt("Enter name:", contact.name);
+    const phone = prompt("Enter phone:", contact.phone);
+    const email = prompt("Enter email:", contact.email);
+    const relationship = prompt("Enter relationship:", contact.relationship);
+    
+    if (name !== null && phone !== null && email !== null && relationship !== null) {
+      const updatedContacts = [...emergencyContacts];
+      updatedContacts[index] = { name, phone, email, relationship };
+      setEmergencyContacts(updatedContacts);
+      updateProfile();
+    }
+  };
+
+  const removeEmergencyContact = (index: number) => {
+    if (confirm("Are you sure you want to remove this emergency contact?")) {
+      const updatedContacts = emergencyContacts.filter((_, i) => i !== index);
+      setEmergencyContacts(updatedContacts);
+      updateProfile();
+    }
+  };
+
+  // Health Information Functions
+  const addAllergy = () => {
+    const allergy = prompt("Enter allergy:");
+    if (allergy && allergy.trim()) {
+      setHealthInfo(prev => ({
+        ...prev,
+        allergies: [...prev.allergies, allergy.trim()]
+      }));
+    }
+  };
+
+  const removeAllergy = (index: number) => {
+    setHealthInfo(prev => ({
+      ...prev,
+      allergies: prev.allergies.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addMedication = () => {
+    const medication = prompt("Enter medication:");
+    if (medication && medication.trim()) {
+      setHealthInfo(prev => ({
+        ...prev,
+        medications: [...prev.medications, medication.trim()]
+      }));
+    }
+  };
+
+  const removeMedication = (index: number) => {
+    setHealthInfo(prev => ({
+      ...prev,
+      medications: prev.medications.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addMedicalCondition = () => {
+    const condition = prompt("Enter medical condition:");
+    if (condition && condition.trim()) {
+      setHealthInfo(prev => ({
+        ...prev,
+        medicalConditions: [...prev.medicalConditions, condition.trim()]
+      }));
+    }
+  };
+
+  const removeMedicalCondition = (index: number) => {
+    setHealthInfo(prev => ({
+      ...prev,
+      medicalConditions: prev.medicalConditions.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Family Functions
+  const inviteFamily = () => {
+    const name = prompt("Enter family member name:");
+    const email = prompt("Enter family member email:");
+    const relationship = prompt("Enter relationship:");
+    
+    if (name && email && relationship) {
+      // Here you would typically call a family invite function
+      toast({
+        title: "Family Invite",
+        description: "Family invitation functionality will be implemented soon."
+      });
+    }
+  };
+
+  const removeFamilyMember = async (memberId: string) => {
+    if (confirm("Are you sure you want to remove this family member?")) {
+      try {
+        const { error } = await supabase
+          .from('family_invites')
+          .delete()
+          .eq('id', memberId);
+
+        if (error) throw error;
+
+        setFamilyMembers(familyMembers.filter(member => member.id !== memberId));
+        toast({
+          title: "Success",
+          description: "Family member removed successfully."
+        });
+      } catch (error) {
+        console.error('Error removing family member:', error);
+        toast({
+          title: "Error",
+          description: "Failed to remove family member.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -270,7 +399,11 @@ export default function ProfilePage() {
                   People to contact in case of emergency
                 </CardDescription>
               </div>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => addEmergencyContact()}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Contact
               </Button>
@@ -278,33 +411,56 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {emergencyContacts.map((contact) => (
-                <div key={contact.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
-                      <Phone className="h-6 w-6 text-red-500" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-base">{contact.name}</h3>
-                        {contact.primary && (
-                          <Badge className="bg-red-100 text-red-800 text-xs">Primary</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{contact.relationship}</p>
-                      <p className="text-sm text-muted-foreground">{contact.phone}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+              {emergencyContacts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Phone className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <p>No emergency contacts added yet</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addEmergencyContact()}
+                    className="mt-4"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add First Contact
+                  </Button>
                 </div>
-              ))}
+              ) : (
+                emergencyContacts.map((contact, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+                        <Phone className="h-6 w-6 text-red-500" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-base">{contact.name}</h3>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{contact.relationship}</p>
+                        <p className="text-sm text-muted-foreground">{contact.phone}</p>
+                        {contact.email && <p className="text-sm text-muted-foreground">{contact.email}</p>}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => editEmergencyContact(index)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => removeEmergencyContact(index)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </CardContent>
         </Card>
@@ -346,12 +502,21 @@ export default function ProfilePage() {
               <Label className="text-sm font-medium">Allergies</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {healthInfo.allergies.map((allergy, index) => (
-                  <Badge key={index} variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
-                    <AlertTriangle className="h-3 w-3 mr-1" />
+                  <Badge key={index} variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
                     {allergy}
+                    <X
+                      className="h-3 w-3 cursor-pointer hover:text-red-600"
+                      onClick={() => removeAllergy(index)}
+                    />
                   </Badge>
                 ))}
-                <Button variant="ghost" size="sm" className="h-6 px-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2"
+                  onClick={() => addAllergy()}
+                >
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
@@ -361,11 +526,20 @@ export default function ProfilePage() {
               <Label className="text-sm font-medium">Current Medications</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {healthInfo.medications.map((medication, index) => (
-                  <Badge key={index} variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                  <Badge key={index} variant="outline" className="bg-blue-50 text-blue-800 border-blue-200 flex items-center gap-1">
                     {medication}
+                    <X
+                      className="h-3 w-3 cursor-pointer hover:text-red-600"
+                      onClick={() => removeMedication(index)}
+                    />
                   </Badge>
                 ))}
-                <Button variant="ghost" size="sm" className="h-6 px-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2"
+                  onClick={() => addMedication()}
+                >
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
@@ -375,11 +549,20 @@ export default function ProfilePage() {
               <Label className="text-sm font-medium">Medical Conditions</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {healthInfo.medicalConditions.map((condition, index) => (
-                  <Badge key={index} variant="outline" className="bg-purple-50 text-purple-800 border-purple-200">
+                  <Badge key={index} variant="outline" className="bg-purple-50 text-purple-800 border-purple-200 flex items-center gap-1">
                     {condition}
+                    <X
+                      className="h-3 w-3 cursor-pointer hover:text-red-600"
+                      onClick={() => removeMedicalCondition(index)}
+                    />
                   </Badge>
                 ))}
-                <Button variant="ghost" size="sm" className="h-6 px-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2"
+                  onClick={() => addMedicalCondition()}
+                >
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
@@ -397,7 +580,10 @@ export default function ProfilePage() {
               />
             </div>
 
-            <Button className="w-full md:w-auto">
+            <Button 
+              className="w-full md:w-auto"
+              onClick={updateProfile}
+            >
               <Heart className="h-4 w-4 mr-2" />
               Update Health Information
             </Button>
@@ -417,7 +603,11 @@ export default function ProfilePage() {
                   Connected family members who can access your location and emergency information
                 </CardDescription>
               </div>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => inviteFamily()}
+              >
                 <UserPlus className="h-4 w-4 mr-2" />
                 Invite Family
               </Button>
@@ -445,14 +635,16 @@ export default function ProfilePage() {
                       <p className="text-sm text-muted-foreground">{member.invitee_email}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => removeFamilyMember(member.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                 </div>
               )) : (
                 <div className="text-center py-6 text-muted-foreground">
