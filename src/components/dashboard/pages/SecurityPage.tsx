@@ -5,9 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Key, Smartphone, Eye, EyeOff, AlertTriangle, CheckCircle } from "lucide-react";
+import { Shield, Key, Smartphone, Eye, EyeOff, AlertTriangle, CheckCircle, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function SecurityPage() {
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [biometricEnabled, setBiometricEnabled] = useState(true);
@@ -65,21 +68,52 @@ export function SecurityPage() {
     return "destructive";
   };
 
+  const saveSecuritySettings = async () => {
+    setIsSaving(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast({
+        title: "Security settings saved",
+        description: "Your security preferences have been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving settings",
+        description: "There was an error updating your security settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <Card className="bg-white/95 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-blue-500" />
-              Security
-            </CardTitle>
-            <CardDescription>
-              Manage your account security and privacy settings
-            </CardDescription>
-          </CardHeader>
-        </Card>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Security</h1>
+          <p className="text-muted-foreground">Manage your account security and privacy settings</p>
+        </div>
+        <Button 
+          onClick={saveSecuritySettings} 
+          disabled={isSaving}
+          className="bg-primary hover:bg-primary/90"
+        >
+          {isSaving ? (
+            <>
+              <CheckCircle className="h-4 w-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Save Settings
+            </>
+          )}
+        </Button>
+      </div>
 
         {/* Security Score */}
         <Card>
@@ -306,7 +340,6 @@ export function SecurityPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }

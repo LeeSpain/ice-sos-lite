@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Settings, Palette, Globe, Clock, Download, Trash2, RefreshCw } from "lucide-react";
+import { Settings, Palette, Globe, Clock, Download, Trash2, RefreshCw, Save, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export function SettingsPage() {
+  const { toast } = useToast();
+  const [isSaving, setIsSaving] = useState(false);
   const [settings, setSettings] = useState({
     theme: "system",
     language: "en",
@@ -58,21 +61,52 @@ export function SettingsPage() {
     { value: "UTC", label: "UTC" }
   ];
 
+  const saveSettings = async () => {
+    setIsSaving(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast({
+        title: "Settings saved",
+        description: "Your preferences have been updated successfully.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error saving settings",
+        description: "There was an error updating your settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <Card className="bg-white/95 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-blue-500" />
-              Settings
-            </CardTitle>
-            <CardDescription>
-              Customize your dashboard experience and preferences
-            </CardDescription>
-          </CardHeader>
-        </Card>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Settings</h1>
+          <p className="text-muted-foreground">Customize your dashboard experience and preferences</p>
+        </div>
+        <Button 
+          onClick={saveSettings} 
+          disabled={isSaving}
+          className="bg-primary hover:bg-primary/90"
+        >
+          {isSaving ? (
+            <>
+              <CheckCircle className="h-4 w-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Save Settings
+            </>
+          )}
+        </Button>
+      </div>
 
         {/* Appearance */}
         <Card>
@@ -314,7 +348,6 @@ export function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }
