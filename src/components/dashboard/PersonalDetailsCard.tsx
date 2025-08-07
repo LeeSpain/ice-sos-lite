@@ -42,51 +42,15 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
     language_preference: 'en'
   });
 
-  const [emergencyContacts, setEmergencyContacts] = useState([
-    {
-      id: 1,
-      name: "Jane Doe",
-      relationship: "Spouse",
-      phone: "+1 (555) 123-4568",
-      email: "jane.doe@email.com",
-      primary: true
-    },
-    {
-      id: 2,
-      name: "Dr. Smith",
-      relationship: "Doctor",
-      phone: "+1 (555) 987-6543",
-      email: "dr.smith@clinic.com",
-      primary: false
-    }
-  ]);
-
+  const [emergencyContacts, setEmergencyContacts] = useState([]);
   const [healthInfo, setHealthInfo] = useState({
-    bloodType: "O+",
-    allergies: ["Penicillin", "Peanuts"],
-    medications: ["Lisinopril 10mg", "Metformin 500mg"],
-    medicalConditions: ["Hypertension", "Type 2 Diabetes"],
-    emergencyMedicalInfo: "Diabetic - carries glucose tablets"
+    bloodType: "",
+    allergies: [],
+    medications: [],
+    medicalConditions: [],
+    emergencyMedicalInfo: ""
   });
-
-  const [familyMembers, setFamilyMembers] = useState([
-    {
-      id: 1,
-      name: "Jane Doe",
-      relationship: "Spouse",
-      phone: "+1 (555) 123-4568",
-      email: "jane.doe@email.com",
-      status: "Connected"
-    },
-    {
-      id: 2,
-      name: "Mike Doe",
-      relationship: "Son",
-      phone: "+1 (555) 456-7890",
-      email: "mike.doe@email.com",
-      status: "Pending"
-    }
-  ]);
+  const [familyMembers, setFamilyMembers] = useState([]);
 
   const { toast } = useToast();
 
@@ -101,8 +65,50 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
         country: profile.country || '',
         language_preference: profile.language_preference || 'en'
       });
+
+      // Load real emergency contacts from profile
+      setEmergencyContacts(profile.emergency_contacts || []);
+
+      // Load real health info from profile
+      setHealthInfo({
+        bloodType: profile.blood_type || "",
+        allergies: profile.allergies || [],
+        medications: profile.medications || [],
+        medicalConditions: profile.medical_conditions || [],
+        emergencyMedicalInfo: profile.emergency_medical_info || ""
+      });
+
+      // Load family invites from database
+      loadFamilyMembers();
     }
   }, [profile]);
+
+  const loadFamilyMembers = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: invites, error } = await supabase
+        .from('family_invites')
+        .select('*')
+        .eq('inviter_user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setFamilyMembers(invites?.map(invite => ({
+        id: invite.id,
+        name: invite.invitee_name,
+        relationship: invite.relationship,
+        phone: '', // Not stored in invites
+        email: invite.invitee_email,
+        status: invite.status === 'accepted' ? 'Connected' : 
+               invite.status === 'pending' ? 'Pending' : 'Expired'
+      })) || []);
+    } catch (error) {
+      console.error('Error loading family members:', error);
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -375,28 +381,43 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
               </Button>
             </div>
             <div className="space-y-3">
-              {emergencyContacts.map((contact) => (
-                <div key={contact.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
-                      <Phone className="h-6 w-6 text-red-500" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-base">{contact.name}</h4>
-                        {contact.primary && (
-                          <Badge className="bg-red-100 text-red-800 text-xs">Primary</Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{contact.relationship}</p>
-                      <p className="text-sm text-muted-foreground">{contact.phone}</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    <Trash2 className="h-4 w-4" />
+              {emergencyContacts.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Phone className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <p>No emergency contacts added yet</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.location.href = '/dashboard/emergency'}
+                    className="mt-4"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Contact
                   </Button>
                 </div>
-              ))}
+              ) : (
+                emergencyContacts.map((contact, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+                        <Phone className="h-6 w-6 text-red-500" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-base">{contact.name}</h4>
+                        <p className="text-sm text-muted-foreground">{contact.relationship}</p>
+                        <p className="text-sm text-muted-foreground">{contact.phone}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => window.location.href = '/dashboard/emergency'}
+                    >
+                      Edit
+                    </Button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
@@ -421,13 +442,22 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
             <div>
               <Label className="text-sm font-medium">Allergies</Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {healthInfo.allergies.map((allergy, index) => (
-                  <Badge key={index} variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    {allergy}
-                  </Badge>
-                ))}
-                <Button variant="ghost" size="sm" className="h-6 px-2">
+                {healthInfo.allergies.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No allergies recorded</p>
+                ) : (
+                  healthInfo.allergies.map((allergy, index) => (
+                    <Badge key={index} variant="outline" className="bg-yellow-50 text-yellow-800 border-yellow-200">
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      {allergy}
+                    </Badge>
+                  ))
+                )}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2"
+                  onClick={() => window.location.href = '/dashboard/health'}
+                >
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
@@ -436,12 +466,21 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
             <div>
               <Label className="text-sm font-medium">Current Medications</Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {healthInfo.medications.map((medication, index) => (
-                  <Badge key={index} variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
-                    {medication}
-                  </Badge>
-                ))}
-                <Button variant="ghost" size="sm" className="h-6 px-2">
+                {healthInfo.medications.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No medications recorded</p>
+                ) : (
+                  healthInfo.medications.map((medication, index) => (
+                    <Badge key={index} variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                      {medication}
+                    </Badge>
+                  ))
+                )}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2"
+                  onClick={() => window.location.href = '/dashboard/health'}
+                >
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
@@ -450,12 +489,21 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
             <div>
               <Label className="text-sm font-medium">Medical Conditions</Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {healthInfo.medicalConditions.map((condition, index) => (
-                  <Badge key={index} variant="outline" className="bg-purple-50 text-purple-800 border-purple-200">
-                    {condition}
-                  </Badge>
-                ))}
-                <Button variant="ghost" size="sm" className="h-6 px-2">
+                {healthInfo.medicalConditions.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No medical conditions recorded</p>
+                ) : (
+                  healthInfo.medicalConditions.map((condition, index) => (
+                    <Badge key={index} variant="outline" className="bg-purple-50 text-purple-800 border-purple-200">
+                      {condition}
+                    </Badge>
+                  ))
+                )}
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2"
+                  onClick={() => window.location.href = '/dashboard/health'}
+                >
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
@@ -487,31 +535,42 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
               </Button>
             </div>
             <div className="space-y-3">
-              {familyMembers.map((member) => (
-                <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                      <Users className="h-6 w-6 text-blue-500" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-base">{member.name}</h4>
-                        <Badge 
-                          variant={member.status === 'Connected' ? 'default' : 'secondary'}
-                          className={member.status === 'Connected' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}
-                        >
-                          {member.status}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{member.relationship}</p>
-                      <p className="text-sm text-muted-foreground">{member.phone}</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm">
-                    <Trash2 className="h-4 w-4" />
+              {familyMembers.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <p>No family members connected yet</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.location.href = '/dashboard/family'}
+                    className="mt-4"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Invite Family
                   </Button>
                 </div>
-              ))}
+              ) : (
+                familyMembers.map((member) => (
+                  <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/20">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <Users className="h-6 w-6 text-blue-500" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-base">{member.name}</h4>
+                        <p className="text-sm text-muted-foreground">{member.relationship}</p>
+                        <p className="text-sm text-muted-foreground">{member.email}</p>
+                      </div>
+                    </div>
+                    <Badge 
+                      variant={member.status === 'Connected' ? 'default' : 'secondary'}
+                      className={member.status === 'Connected' ? 'bg-emergency text-black' : ''}
+                    >
+                      {member.status}
+                    </Badge>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}
