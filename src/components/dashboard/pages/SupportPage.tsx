@@ -527,7 +527,7 @@ export function SupportPage() {
               <AccordionItem key={index} value={`item-${index}`}>
                 <AccordionTrigger className="text-left">
                   <div className="flex flex-col items-start gap-1">
-                    <span className="text-sm font-medium">{item.question}</span>
+                    <span className="text-sm font-bold">{item.question}</span>
                     <Badge variant="outline" className="text-xs">
                       {item.category}
                     </Badge>
