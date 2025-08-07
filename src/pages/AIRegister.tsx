@@ -901,13 +901,6 @@ const AIRegister = () => {
                           })}
                         </div>
                         
-                        {/* Monthly Subtotal */}
-                        <div className="border-t border-border pt-3 mt-3">
-                          <div className="flex justify-between items-center">
-                            <span className="font-bold text-foreground">Monthly Subtotal:</span>
-                            <span className="font-bold text-lg text-primary">{premiumPlan?.currency || 'EUR'} {calculateSubscriptionTotal().toFixed(2)}</span>
-                          </div>
-                        </div>
                       </div>
                       
                       {/* One-time Products Section */}
