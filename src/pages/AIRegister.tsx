@@ -732,7 +732,7 @@ const AIRegister = () => {
                                               <span className="text-muted-foreground">Net Price:</span>
                                               <span className="font-medium">{product.currency} {product.price.toFixed(2)}</span>
                                             </div>
-                                            <div className="flex justify-between items-center text-sm">
+                                            <div className="flex justify-between items-center text-xs">
                                               <span className="text-muted-foreground">IVA (21%):</span>
                                               <span className="font-medium">+ {product.currency} {(product.price * PRODUCT_IVA_RATE).toFixed(2)}</span>
                                             </div>
