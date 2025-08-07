@@ -934,13 +934,6 @@ const AIRegister = () => {
                             })}
                           </div>
                           
-                          {/* One-time Subtotal */}
-                          <div className="border-t border-border pt-3 mt-3">
-                            <div className="flex justify-between items-center">
-                              <span className="font-bold text-foreground">One-time Subtotal:</span>
-                              <span className="font-bold text-lg text-primary">€{calculateProductTotal().toFixed(2)}</span>
-                            </div>
-                          </div>
                         </div>
                       )}
                       
