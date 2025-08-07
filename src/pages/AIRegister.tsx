@@ -716,17 +716,28 @@ const AIRegister = () => {
                                         )}
                                       </div>
                                       <div className="text-right ml-4">
-                                        <div className="space-y-1">
-                                          <div className="text-xs text-muted-foreground">
-                                            Net: {product.currency} {product.price.toFixed(2)}
+                                        <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                          <div className="space-y-2">
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-muted-foreground">Net Price:</span>
+                                              <span className="font-medium">{product.currency} {product.price.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-muted-foreground">IVA (21%):</span>
+                                              <span className="font-medium">+ {product.currency} {(product.price * PRODUCT_IVA_RATE).toFixed(2)}</span>
+                                            </div>
+                                            <div className="border-t border-border pt-2">
+                                              <div className="flex justify-between items-center">
+                                                <span className="font-semibold text-foreground">Total:</span>
+                                                <span className="font-bold text-lg text-primary">{product.currency} {priceWithIva.toFixed(2)}</span>
+                                              </div>
+                                              <div className="text-center mt-1">
+                                                <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                                                  One-time purchase
+                                                </span>
+                                              </div>
+                                            </div>
                                           </div>
-                                          <div className="text-xs text-muted-foreground">
-                                            + 21% IVA: {product.currency} {(product.price * PRODUCT_IVA_RATE).toFixed(2)}
-                                          </div>
-                                          <div className="font-bold text-base text-primary border-t border-border pt-1">
-                                            {product.currency} {priceWithIva.toFixed(2)}
-                                          </div>
-                                          <div className="text-xs text-muted-foreground">one-time</div>
                                         </div>
                                       </div>
                                     </div>
@@ -777,17 +788,28 @@ const AIRegister = () => {
                                         )}
                                       </div>
                                       <div className="text-right ml-4">
-                                        <div className="space-y-1">
-                                          <div className="text-xs text-muted-foreground">
-                                            Net: {service.currency} {service.price.toFixed(2)}
+                                        <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                          <div className="space-y-2">
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-muted-foreground">Net Price:</span>
+                                              <span className="font-medium">{service.currency} {service.price.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-muted-foreground">IVA (10%):</span>
+                                              <span className="font-medium">+ {service.currency} {(service.price * SERVICE_IVA_RATE).toFixed(2)}</span>
+                                            </div>
+                                            <div className="border-t border-border pt-2">
+                                              <div className="flex justify-between items-center">
+                                                <span className="font-semibold text-foreground">Total:</span>
+                                                <span className="font-bold text-lg text-primary">{service.currency} {priceWithIva.toFixed(2)}</span>
+                                              </div>
+                                              <div className="text-center mt-1">
+                                                <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                                                  Monthly subscription
+                                                </span>
+                                              </div>
+                                            </div>
                                           </div>
-                                          <div className="text-xs text-muted-foreground">
-                                            + 10% IVA: {service.currency} {(service.price * SERVICE_IVA_RATE).toFixed(2)}
-                                          </div>
-                                          <div className="font-bold text-base text-primary border-t border-border pt-1">
-                                            {service.currency} {priceWithIva.toFixed(2)}
-                                          </div>
-                                          <div className="text-xs text-muted-foreground">per month</div>
                                         </div>
                                       </div>
                                     </div>
