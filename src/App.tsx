@@ -9,6 +9,7 @@ import AuthPage from "./pages/AuthPage";
 import Register from "./pages/Register";
 import AIRegister from "./pages/AIRegister";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import Dashboard from "./pages/Dashboard";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import AdminDashboard from "./components/ai-chat/AdminDashboard";
@@ -33,6 +34,11 @@ const App = () => {
             </ProtectedRoute>
           } />
           <Route path="/registration-success" element={<RegistrationSuccess />} />
+          <Route path="/welcome" element={
+            <ProtectedRoute>
+              <PaymentSuccess />
+            </ProtectedRoute>
+          } />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <DashboardRedirect />

@@ -294,14 +294,27 @@ const AIRegister = () => {
         }
       }
 
+      // Store welcome data for the PaymentSuccess page
+      const welcomeData = {
+        firstName: personalDetails.firstName,
+        lastName: personalDetails.lastName,
+        email: personalDetails.email,
+        subscriptionPlans: getSelectedSubscriptionPlans(),
+        products: selectedProducts,
+        regionalServices: selectedRegionalServices,
+        totalAmount: calculateGrandTotal()
+      };
+      
+      sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
+
       toast({
         title: "Registration Complete!",
         description: "Welcome to ICE SOS Lite. You can now access your dashboard.",
       });
       
-      // Redirect to dashboard
+      // Redirect to welcome page instead of dashboard
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = '/welcome';
       }, 2000);
     } catch (error) {
       console.error('Registration error:', error);
