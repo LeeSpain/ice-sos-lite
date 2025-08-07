@@ -5,7 +5,9 @@ import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Download, Shield, Smartphone, UserCircle } from 'lucide-react';
+import { CheckCircle, Download, Shield, Smartphone, UserCircle, Settings } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { calculateProfileCompletion } from '@/lib/profileUtils';
 import QRCode from 'qrcode';
 
 interface WelcomeData {
@@ -24,25 +26,48 @@ const PaymentSuccess = () => {
   const [welcomeData, setWelcomeData] = useState<WelcomeData | null>(null);
   const [iosQRCode, setIosQRCode] = useState<string>('');
   const [androidQRCode, setAndroidQRCode] = useState<string>('');
+  const [profileCompletion, setProfileCompletion] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
 
   const iosAppStoreUrl = 'https://apps.apple.com/app/your-app-id';
   const androidPlayStoreUrl = 'https://play.google.com/store/apps/details?id=your.app.id';
 
   useEffect(() => {
-    // Get welcome data from sessionStorage
-    const storedData = sessionStorage.getItem('welcomeData');
-    if (storedData) {
-      const data = JSON.parse(storedData);
-      setWelcomeData(data);
-      // Clear the data so it only shows once
-      sessionStorage.removeItem('welcomeData');
-    } else {
-      // If no welcome data, redirect to dashboard
-      navigate('/dashboard');
-    }
+    const initializeWelcomePage = async () => {
+      // Get welcome data from sessionStorage
+      const storedData = sessionStorage.getItem('welcomeData');
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        setWelcomeData(data);
+        // Clear the data so it only shows once
+        sessionStorage.removeItem('welcomeData');
+      } else {
+        // If no welcome data, redirect to dashboard
+        navigate('/member-dashboard');
+        return;
+      }
 
-    // Generate QR codes
-    const generateQRCodes = async () => {
+      // Check profile completion if user is logged in
+      if (user) {
+        try {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (error) {
+            console.error('Error fetching profile:', error);
+          } else if (profile) {
+            const completion = calculateProfileCompletion(profile);
+            setProfileCompletion(completion);
+          }
+        } catch (error) {
+          console.error('Error checking profile completion:', error);
+        }
+      }
+
+      // Generate QR codes
       try {
         const iosQR = await QRCode.toDataURL(iosAppStoreUrl);
         const androidQR = await QRCode.toDataURL(androidPlayStoreUrl);
@@ -51,12 +76,14 @@ const PaymentSuccess = () => {
       } catch (error) {
         console.error('Error generating QR codes:', error);
       }
+
+      setLoading(false);
     };
 
-    generateQRCodes();
-  }, [navigate]);
+    initializeWelcomePage();
+  }, [navigate, user]);
 
-  if (!welcomeData || !user) {
+  if (!welcomeData || !user || loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
         <div className="text-white text-center">
@@ -86,7 +113,15 @@ const PaymentSuccess = () => {
   const grandTotal = subscriptionTotal + productTotal;
 
   const handleDashboardAccess = () => {
-    navigate('/dashboard');
+    if (profileCompletion < 80) {
+      navigate('/complete-profile');
+    } else {
+      navigate('/member-dashboard');
+    }
+  };
+
+  const handleCompleteProfile = () => {
+    navigate('/complete-profile');
   };
 
   const handleDirectDownload = (url: string) => {
@@ -235,19 +270,52 @@ const PaymentSuccess = () => {
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">1</div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Access Your Dashboard</h4>
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-foreground">
+                        {profileCompletion < 80 ? 'Complete Your Profile' : 'Access Your Dashboard'}
+                      </h4>
                       <p className="text-sm text-muted-foreground mb-3">
-                        Complete your profile and configure your emergency settings
+                        {profileCompletion < 80 
+                          ? 'Complete your profile to unlock all emergency features' 
+                          : 'Your profile is complete! Access your dashboard to configure emergency settings'
+                        }
                       </p>
-                      <Button 
-                        onClick={handleDashboardAccess}
-                        className="w-full bg-primary hover:bg-primary/90 text-white"
-                        size="lg"
-                      >
-                        <UserCircle className="w-5 h-5 mr-2" />
-                        Open Your Dashboard
-                      </Button>
+                      
+                      {profileCompletion < 80 ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Profile Completion</span>
+                            <Badge variant={profileCompletion < 50 ? "destructive" : profileCompletion < 80 ? "secondary" : "default"}>
+                              {profileCompletion}%
+                            </Badge>
+                          </div>
+                          <Button 
+                            onClick={handleCompleteProfile}
+                            className="w-full bg-emergency hover:bg-emergency/90 text-white"
+                            size="lg"
+                          >
+                            <Settings className="w-5 h-5 mr-2" />
+                            Complete Profile Setup
+                          </Button>
+                          <Button 
+                            onClick={() => navigate('/member-dashboard')}
+                            variant="outline"
+                            className="w-full"
+                            size="sm"
+                          >
+                            Skip for Now
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          onClick={handleDashboardAccess}
+                          className="w-full bg-primary hover:bg-primary/90 text-white"
+                          size="lg"
+                        >
+                          <UserCircle className="w-5 h-5 mr-2" />
+                          Open Your Dashboard
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
