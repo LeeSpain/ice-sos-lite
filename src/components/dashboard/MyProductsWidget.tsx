@@ -120,6 +120,48 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     }
   };
 
+  // Reconcile Stripe data if needed
+  const reconcileStripeData = async () => {
+    try {
+      setLoading(true);
+      toast({
+        title: "Syncing your subscription data...",
+        description: "Please wait while we verify your payment information.",
+      });
+
+      const { data, error } = await supabase.functions.invoke('reconcile-stripe-data');
+      
+      if (error) {
+        console.error('Error reconciling data:', error);
+        toast({
+          title: "Sync failed",
+          description: "Unable to sync your subscription data. Please contact support.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('Reconciliation result:', data);
+      
+      // Refresh data after reconciliation
+      await loadUserData();
+      
+      toast({
+        title: "Data synced successfully",
+        description: "Your subscription and product information has been updated.",
+      });
+    } catch (error) {
+      console.error('Error reconciling data:', error);
+      toast({
+        title: "Sync failed",
+        description: "Unable to sync your subscription data. Please contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadSubscription = async () => {
     try {
       // Use the check-subscription function to get the latest subscription status
@@ -448,20 +490,20 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
           <CardContent className="p-8">
             <div className="text-center">
               <AlertCircle className="h-16 w-16 text-orange-500 mx-auto mb-6" />
-              <h3 className="text-2xl font-semibold mb-3 text-orange-700">Subscription Setup Incomplete</h3>
+              <h3 className="text-2xl font-semibold mb-3 text-orange-700">Checking Your Subscription</h3>
               <p className="text-lg text-muted-foreground mb-6">
-                We found your account but your subscription isn't active yet. This might happen if:
+                We're verifying your subscription and product purchases. If you recently completed payment, 
+                your information might need to be synchronized with our system.
               </p>
-              <div className="text-left max-w-md mx-auto mb-6 space-y-2">
-                <p className="text-base">• Payment didn't complete successfully</p>
-                <p className="text-base">• Registration process was interrupted</p>
-                <p className="text-base">• There was a technical issue during setup</p>
-              </div>
               <div className="flex gap-3 justify-center">
-                <Button size="lg" onClick={handleUpgradeSubscription} className="text-lg px-8 py-3">
-                  Complete Setup
+                <Button size="lg" onClick={reconcileStripeData} className="text-lg px-8 py-3">
+                  <Zap className="h-5 w-5 mr-2" />
+                  Sync My Data
                 </Button>
-                <Button variant="outline" size="lg" className="text-lg px-8 py-3">
+                <Button variant="outline" size="lg" onClick={loadSubscription} className="text-lg px-8 py-3">
+                  Check Again
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => window.location.href = "mailto:support@icesosapp.com"} className="text-lg px-8 py-3">
                   Contact Support
                 </Button>
               </div>
