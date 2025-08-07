@@ -272,7 +272,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
               {planData.map(plan => (
                 <li key={plan.id} className="flex justify-between p-2 bg-white rounded border">
                   <span className="font-medium">{plan.name}</span>
-                  <span className="text-primary">{plan.currency}{parseFloat(plan.price.toString()).toFixed(2)}/month</span>
+                  <span className="text-foreground">€{parseFloat(plan.price.toString()).toFixed(2)}/month</span>
                 </li>
               ))}
             </ul>
@@ -287,7 +287,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
               {serviceData.map(service => (
                 <li key={service.id} className="flex justify-between p-2 bg-white rounded border">
                   <span className="font-medium">{service.name} ({service.region})</span>
-                  <span className="text-primary">{service.currency}{parseFloat(service.price.toString()).toFixed(2)}/month</span>
+                  <span className="text-foreground">€{parseFloat(service.price.toString()).toFixed(2)}/month</span>
                 </li>
               ))}
             </ul>
@@ -302,7 +302,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
               {productData.map(product => (
                 <li key={product.id} className="flex justify-between p-2 bg-white rounded border">
                   <span className="font-medium">{product.name}</span>
-                  <span className="text-primary">{product.currency}{parseFloat(product.price.toString()).toFixed(2)}</span>
+                  <span className="text-foreground">€{parseFloat(product.price.toString()).toFixed(2)}</span>
                 </li>
               ))}
             </ul>
@@ -314,18 +314,18 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           {subscriptionTotal > 0 && (
             <div className="flex justify-between text-base">
               <span>Monthly Subscription:</span>
-              <span className="text-primary">{planData[0]?.currency || serviceData[0]?.currency || 'EUR'}{subscriptionTotal.toFixed(2)}/month</span>
+              <span className="text-foreground">€{subscriptionTotal.toFixed(2)}/month</span>
             </div>
           )}
           {productTotal > 0 && (
             <div className="flex justify-between text-base">
               <span>One-time Products:</span>
-              <span className="text-primary">{productData[0]?.currency || 'EUR'}{productTotal.toFixed(2)}</span>
+              <span className="text-foreground">€{productTotal.toFixed(2)}</span>
             </div>
           )}
           <div className="flex justify-between text-lg font-bold border-t pt-2">
             <span>Total Payment:</span>
-            <span className="text-primary">{planData[0]?.currency || serviceData[0]?.currency || productData[0]?.currency || 'EUR'}{grandTotal.toFixed(2)}</span>
+            <span className="text-foreground">€{grandTotal.toFixed(2)}</span>
           </div>
         </div>
       </div>
