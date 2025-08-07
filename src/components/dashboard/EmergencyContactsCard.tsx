@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 interface EmergencyContact {
   name: string;
   phone: string;
+  email: string;
   relationship: string;
 }
 
@@ -58,7 +59,7 @@ const EmergencyContactsCard = ({ profile, onProfileUpdate }: EmergencyContactsCa
 
   const addContact = () => {
     if (contacts.length < 5) {
-      const newContacts = [...contacts, { name: "", phone: "", relationship: "" }];
+      const newContacts = [...contacts, { name: "", phone: "", email: "", relationship: "" }];
       updateContacts(newContacts);
     }
   };
@@ -131,7 +132,7 @@ const EmergencyContactsCard = ({ profile, onProfileUpdate }: EmergencyContactsCa
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                         <input
                           type="text"
                           placeholder="Name"
@@ -144,6 +145,13 @@ const EmergencyContactsCard = ({ profile, onProfileUpdate }: EmergencyContactsCa
                           placeholder="Phone"
                           value={contact.phone}
                           onChange={(e) => updateContact(index, 'phone', e.target.value)}
+                          className="px-3 py-2 border rounded-md"
+                        />
+                        <input
+                          type="email"
+                          placeholder="Email"
+                          value={contact.email}
+                          onChange={(e) => updateContact(index, 'email', e.target.value)}
                           className="px-3 py-2 border rounded-md"
                         />
                         <input
@@ -160,6 +168,7 @@ const EmergencyContactsCard = ({ profile, onProfileUpdate }: EmergencyContactsCa
                       <div>
                         <p className="font-medium">{contact.name}</p>
                         <p className="text-sm text-muted-foreground">{contact.phone}</p>
+                        {contact.email && <p className="text-sm text-muted-foreground">{contact.email}</p>}
                       </div>
                       <Badge variant="secondary">{contact.relationship}</Badge>
                     </div>

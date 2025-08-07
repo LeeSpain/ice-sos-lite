@@ -17,7 +17,7 @@ interface EmergencyContact {
   name: string;
   relationship: string;
   phone: string;
-  email?: string;
+  email: string;
 }
 
 const WelcomeQuestionnaire = () => {
@@ -162,7 +162,7 @@ const WelcomeQuestionnaire = () => {
   };
 
   const addEmergencyContact = () => {
-    if (newContact.name && newContact.phone) {
+    if (newContact.name && newContact.phone && newContact.email) {
       setFormData(prev => ({
         ...prev,
         emergency_contacts: [...prev.emergency_contacts, { ...newContact }]
@@ -585,16 +585,17 @@ const WelcomeQuestionnaire = () => {
                       placeholder="+1 (555) 123-4567"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="contact_email">Email (Optional)</Label>
-                    <Input
-                      id="contact_email"
-                      type="email"
-                      value={newContact.email}
-                      onChange={(e) => setNewContact(prev => ({ ...prev, email: e.target.value }))}
-                      placeholder="email@example.com"
-                    />
-                  </div>
+                   <div>
+                     <Label htmlFor="contact_email">Email</Label>
+                     <Input
+                       id="contact_email"
+                       type="email"
+                       value={newContact.email}
+                       onChange={(e) => setNewContact(prev => ({ ...prev, email: e.target.value }))}
+                       placeholder="email@example.com"
+                       required
+                     />
+                   </div>
                 </div>
                 <Button
                   type="button"

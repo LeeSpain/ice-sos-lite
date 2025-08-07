@@ -6,7 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 interface EmergencyContact {
   name: string;
   phone: string;
-  email?: string;
+  email: string;
   relationship: string;
 }
 
