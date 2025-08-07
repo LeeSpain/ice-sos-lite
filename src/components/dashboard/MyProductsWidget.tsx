@@ -20,6 +20,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
+  const [regionalServices, setRegionalServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [purchaseLoading, setPurchaseLoading] = useState<string | null>(null);
   const { toast } = useToast();
@@ -34,7 +35,8 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       await Promise.all([
         loadSubscription(),
         loadUserProducts(),
-        loadAvailableProducts()
+        loadAvailableProducts(),
+        loadRegionalServices()
       ]);
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -81,6 +83,20 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       setAvailableProducts(productsData || []);
     } catch (error) {
       console.error('Error loading available products:', error);
+    }
+  };
+
+  const loadRegionalServices = async () => {
+    try {
+      const { data: servicesData } = await supabase
+        .from('regional_services')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+      
+      setRegionalServices(servicesData || []);
+    } catch (error) {
+      console.error('Error loading regional services:', error);
     }
   };
 
@@ -253,33 +269,89 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
               </div>
             ))}
           </div>
-        ) : availableProducts.length > 0 ? (
-          <div className="space-y-3">
-            <h4 className="font-medium">Available Products</h4>
-            <div className="p-3 bg-muted/30 rounded-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Package className="h-4 w-4 text-primary" />
-                  <div>
-                    <p className="font-medium text-sm">{availableProducts[0].name}</p>
-                    <p className="text-xs text-muted-foreground">€{availableProducts[0].price}</p>
-                  </div>
-                </div>
-                <Button 
-                  size="sm" 
-                  onClick={() => handlePurchaseProduct(availableProducts[0])}
-                  disabled={purchaseLoading === availableProducts[0].id}
-                  className="bg-primary text-white hover:bg-primary/90"
-                >
-                  {purchaseLoading === availableProducts[0].id ? 'Processing...' : 'Buy Now'}
-                </Button>
-              </div>
-            </div>
-          </div>
         ) : (
-          <div className="text-center py-4">
-            <Package className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">No products available</p>
+          <div className="space-y-4">
+            {/* Available Products */}
+            {availableProducts.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Available Products</h4>
+                {availableProducts.slice(0, 2).map((product) => (
+                  <div key={product.id} className="p-4 bg-muted/30 rounded-lg border">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <Package className="h-5 w-5 text-primary mt-1" />
+                        <div className="flex-1">
+                          <h5 className="font-medium text-sm mb-1">{product.name}</h5>
+                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                            {product.description || "Premium emergency device for enhanced personal safety and protection."}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="font-semibold text-primary">€{product.price}</span>
+                            {product.features && (
+                              <span>• {Array.isArray(product.features) ? product.features.slice(0, 2).join(' • ') : 'Advanced Features'}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        onClick={() => handlePurchaseProduct(product)}
+                        disabled={purchaseLoading === product.id}
+                        className="bg-primary text-white hover:bg-primary/90 ml-3"
+                      >
+                        {purchaseLoading === product.id ? 'Processing...' : 'Buy Now'}
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Regional Services */}
+            {regionalServices.length > 0 && (
+              <div className="space-y-3">
+                <h4 className="font-medium">Regional Services</h4>
+                {regionalServices.slice(0, 2).map((service) => (
+                  <div key={service.id} className="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center mt-1">
+                          <CheckCircle className="h-3 w-3 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h5 className="font-medium text-sm mb-1">{service.name}</h5>
+                          <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                            {service.description || "24/7 emergency response and monitoring service for your region with local emergency coordination."}
+                          </p>
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="font-semibold text-green-600">€{service.price}/month</span>
+                            <span>• {service.region || 'Regional Coverage'}</span>
+                            {service.features && Array.isArray(service.features) && (
+                              <span>• {service.features.slice(0, 1).join(', ')}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => window.location.href = '/dashboard/subscription'}
+                        className="ml-3 border-green-500 text-green-600 hover:bg-green-50"
+                      >
+                        Subscribe
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {availableProducts.length === 0 && regionalServices.length === 0 && (
+              <div className="text-center py-4">
+                <Package className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No products or services available</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -296,7 +368,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
               Manage
             </Button>
           )}
-          {availableProducts.length > 0 && (
+          {(availableProducts.length > 0 || regionalServices.length > 0) && (
             <Button 
               variant="outline" 
               size="sm" 
@@ -304,7 +376,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
               className="flex-1"
             >
               <ShoppingCart className="h-4 w-4 mr-1" />
-              Shop
+              View All
             </Button>
           )}
         </div>
