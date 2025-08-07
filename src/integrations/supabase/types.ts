@@ -862,6 +862,56 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          product_id: string | null
+          quantity: number
+          status: string
+          stripe_payment_intent_id: string | null
+          total_price: number
+          unit_price: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          product_id?: string | null
+          quantity?: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          total_price: number
+          unit_price: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          product_id?: string | null
+          quantity?: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          total_price?: number
+          unit_price?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       phone_verifications: {
         Row: {
           attempts: number
@@ -1113,6 +1163,51 @@ export type Database = {
           region?: string
           sort_order?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      registration_selections: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          registration_completed: boolean | null
+          selected_products: Json | null
+          selected_regional_services: Json | null
+          session_id: string
+          subscription_plans: Json | null
+          total_product_amount: number | null
+          total_subscription_amount: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          registration_completed?: boolean | null
+          selected_products?: Json | null
+          selected_regional_services?: Json | null
+          session_id: string
+          subscription_plans?: Json | null
+          total_product_amount?: number | null
+          total_subscription_amount?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          registration_completed?: boolean | null
+          selected_products?: Json | null
+          selected_regional_services?: Json | null
+          session_id?: string
+          subscription_plans?: Json | null
+          total_product_amount?: number | null
+          total_subscription_amount?: number | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
