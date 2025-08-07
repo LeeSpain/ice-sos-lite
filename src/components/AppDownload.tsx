@@ -66,7 +66,7 @@ const AppDownload = () => {
             {/* Call to Action Button */}
             <div className="flex justify-center">
               <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold text-lg px-12 py-6 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl">
-                <Link to="/register">
+                <Link to="/ai-register">
                   <Download className="mr-3 h-6 w-6" />
                   Get Started Free
                 </Link>

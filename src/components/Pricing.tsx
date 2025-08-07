@@ -221,9 +221,9 @@ const Pricing = () => {
                       <Button 
                         size="lg"
                         className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                        onClick={() => handleSubscriptionPurchase(plan)}
+                        asChild
                       >
-                        Subscribe Now
+                        <Link to="/ai-register">Subscribe Now</Link>
                       </Button>
                     </div>
                     
@@ -283,9 +283,9 @@ const Pricing = () => {
                       <Button 
                         size="lg"
                         className="bg-wellness hover:bg-wellness/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                        onClick={() => handleSubscriptionPurchase(plan)}
+                        asChild
                       >
-                        Add Family Plan
+                        <Link to="/ai-register">Add Family Plan</Link>
                       </Button>
                     </div>
                     
@@ -426,9 +426,9 @@ const Pricing = () => {
                                          ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                          : 'bg-primary hover:bg-primary/90 text-primary-foreground'
                                      }`}
-                                     onClick={() => handleProductPurchase(product)}
+                                     asChild
                                    >
-                                     Purchase Device
+                                     <Link to="/ai-register">Purchase Device</Link>
                                    </Button>
                                  </div>
                               </div>
@@ -442,9 +442,9 @@ const Pricing = () => {
                               ? 'bg-blue-600 hover:bg-blue-700 text-white'
                               : 'bg-primary hover:bg-primary/90 text-primary-foreground'
                           }`}
-                          onClick={() => handleProductPurchase(product)}
+                          asChild
                         >
-                          Purchase Now
+                          <Link to="/ai-register">Purchase Now</Link>
                         </Button>
                         </div>
                       </div>
@@ -535,8 +535,9 @@ const Pricing = () => {
                               ? 'bg-green-600 hover:bg-green-700 text-white'
                               : 'bg-secondary hover:bg-secondary/90 text-white'
                           }`}
+                          asChild
                         >
-                          Contact Regional Center
+                          <Link to="/ai-register">Contact Regional Center</Link>
                         </Button>
                       </div>
                       
