@@ -12,31 +12,46 @@ import RegistrationSuccess from "./pages/RegistrationSuccess";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Dashboard from "./pages/Dashboard";
 import SimpleDashboard from "./pages/SimpleDashboard";
-import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./components/ai-chat/AdminDashboard";
+import AdminSetup from "./components/AdminSetup";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import NotFound from "./pages/NotFound";
 import DashboardRedirect from "./components/DashboardRedirect";
-import WelcomeQuestionnaire from "./components/WelcomeQuestionnaire";
 
 const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/test" element={<TestPage />} />
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<AuthPage />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/register" element={<AIRegister />} />
           <Route path="/ai-register" element={<AIRegister />} />
+          <Route path="/register-classic" element={
+            <ProtectedRoute>
+              <Register />
+            </ProtectedRoute>
+          } />
           <Route path="/registration-success" element={<RegistrationSuccess />} />
-          <Route path="/welcome" element={<PaymentSuccess />} />
-          <Route path="/complete-profile" element={<ProtectedRoute><WelcomeQuestionnaire /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<DashboardRedirect />} />
-          <Route path="/simple-dashboard" element={<SimpleDashboard />} />
-          <Route path="/full-dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/member-dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/admin-dashboard/*" element={<AdminProtectedRoute><AdminLayout /></AdminProtectedRoute>} />
+          <Route path="/welcome" element={
+            <ProtectedRoute>
+              <PaymentSuccess />
+            </ProtectedRoute>
+          } />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardRedirect />
+            </ProtectedRoute>
+          } />
+          <Route path="/member-dashboard" element={
+            <ProtectedRoute>
+              <SimpleDashboard />
+            </ProtectedRoute>
+          } />
           <Route path="/admin-setup" element={<AdminSetupPage />} />
-          <Route path="/test" element={<TestPage />} />
+          <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
+          <Route path="/full-dashboard/*" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
