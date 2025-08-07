@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,64 +23,131 @@ import {
   UserPlus,
   Activity
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProfilePage() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [profile, setProfile] = useState({
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@email.com",
-    phone: "+1 (555) 123-4567",
-    dateOfBirth: "1975-06-15",
-    address: "123 Main St, New York, NY 10001",
-    country: "United States",
+    firstName: "",
+    lastName: "",
+    email: user?.email || "",
+    phone: "",
+    dateOfBirth: "",
+    address: "",
+    country: "",
     language: "English"
   });
 
-  const [emergencyContacts, setEmergencyContacts] = useState([
-    {
-      id: 1,
-      name: "Jane Doe",
-      relationship: "Spouse",
-      phone: "+1 (555) 123-4568",
-      email: "jane.doe@email.com",
-      primary: true
-    },
-    {
-      id: 2,
-      name: "Dr. Smith",
-      relationship: "Doctor",
-      phone: "+1 (555) 987-6543",
-      email: "dr.smith@clinic.com",
-      primary: false
-    }
-  ]);
-
+  const [emergencyContacts, setEmergencyContacts] = useState<any[]>([]);
   const [healthInfo, setHealthInfo] = useState({
-    bloodType: "O+",
-    allergies: ["Penicillin", "Peanuts"],
-    medications: ["Lisinopril 10mg", "Metformin 500mg"],
-    medicalConditions: ["Hypertension", "Type 2 Diabetes"],
-    emergencyMedicalInfo: "Diabetic - carries glucose tablets"
+    bloodType: "",
+    allergies: [],
+    medications: [],
+    medicalConditions: [],
+    emergencyMedicalInfo: ""
   });
+  const [familyMembers, setFamilyMembers] = useState<any[]>([]);
 
-  const [familyMembers, setFamilyMembers] = useState([
-    {
-      id: 1,
-      name: "Jane Doe",
-      relationship: "Spouse",
-      phone: "+1 (555) 123-4568",
-      email: "jane.doe@email.com",
-      status: "Connected"
-    },
-    {
-      id: 2,
-      name: "Mike Doe",
-      relationship: "Son",
-      phone: "+1 (555) 456-7890",
-      email: "mike.doe@email.com",
-      status: "Pending"
+  useEffect(() => {
+    loadProfileData();
+  }, [user]);
+
+  const loadProfileData = async () => {
+    if (!user) return;
+
+    try {
+      const { data: profileData, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+
+      if (profileData) {
+        setProfile({
+          firstName: profileData.first_name || "",
+          lastName: profileData.last_name || "",
+          email: user.email || "",
+          phone: profileData.phone || "",
+          dateOfBirth: profileData.date_of_birth || "",
+          address: profileData.address || "",
+          country: profileData.country || "",
+          language: profileData.language_preference || "English"
+        });
+
+        setEmergencyContacts(Array.isArray(profileData.emergency_contacts) ? profileData.emergency_contacts : []);
+        setHealthInfo({
+          bloodType: profileData.blood_type || "",
+          allergies: Array.isArray(profileData.allergies) ? profileData.allergies : [],
+          medications: Array.isArray(profileData.medications) ? profileData.medications : [],
+          medicalConditions: Array.isArray(profileData.medical_conditions) ? profileData.medical_conditions : [],
+          emergencyMedicalInfo: "" // Will be added to database schema if needed
+        });
+      }
+
+      // Load family members
+      const { data: familyData } = await supabase
+        .from('family_invites')
+        .select('*')
+        .eq('inviter_user_id', user.id);
+
+      setFamilyMembers(familyData || []);
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load profile data.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
-  ]);
+  };
+
+  const updateProfile = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: user.id,
+          first_name: profile.firstName,
+          last_name: profile.lastName,
+          phone: profile.phone,
+          date_of_birth: profile.dateOfBirth || null,
+          address: profile.address,
+          country: profile.country,
+          language_preference: profile.language,
+          emergency_contacts: emergencyContacts,
+          blood_type: healthInfo.bloodType,
+          allergies: healthInfo.allergies,
+          medications: healthInfo.medications,
+          medical_conditions: healthInfo.medicalConditions,
+          emergency_medical_info: healthInfo.emergencyMedicalInfo,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Profile updated successfully."
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update profile.",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -183,7 +250,7 @@ export default function ProfilePage() {
                 rows={2}
               />
             </div>
-            <Button className="w-full md:w-auto">
+            <Button onClick={updateProfile} className="w-full md:w-auto">
               <Edit className="h-4 w-4 mr-2" />
               Update Profile
             </Button>
@@ -358,7 +425,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {familyMembers.map((member) => (
+              {familyMembers.length > 0 ? familyMembers.map((member) => (
                 <div key={member.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
@@ -366,16 +433,16 @@ export default function ProfilePage() {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-base">{member.name}</h3>
+                        <h3 className="font-semibold text-base">{member.invitee_name}</h3>
                         <Badge 
-                          variant={member.status === 'Connected' ? 'default' : 'secondary'}
-                          className={member.status === 'Connected' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}
+                          variant={member.status === 'accepted' ? 'default' : 'secondary'}
+                          className={member.status === 'accepted' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}
                         >
-                          {member.status}
+                          {member.status === 'accepted' ? 'Connected' : 'Pending'}
                         </Badge>
                       </div>
                       <p className="text-sm text-muted-foreground">{member.relationship}</p>
-                      <p className="text-sm text-muted-foreground">{member.phone}</p>
+                      <p className="text-sm text-muted-foreground">{member.invitee_email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -387,7 +454,13 @@ export default function ProfilePage() {
                     </Button>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-6 text-muted-foreground">
+                  <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <p>No family members yet</p>
+                  <p className="text-sm">Use the Family page to invite family members</p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

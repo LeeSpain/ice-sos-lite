@@ -20,25 +20,26 @@ export function SecurityPage() {
     confirm: ""
   });
 
-  // Mock security data
   const loginSessions = [
     {
       id: 1,
-      device: "iPhone 13 Pro",
-      location: "New York, NY",
+      device: "Current Browser Session",
+      location: "Location unavailable",
       lastActive: "Current session",
       isCurrent: true
-    },
-    {
-      id: 2,
-      device: "Chrome on MacBook",
-      location: "New York, NY",
-      lastActive: "2 hours ago",
-      isCurrent: false
     }
   ];
 
-  const securityScore = 85;
+  // Calculate security score based on settings
+  const calculateSecurityScore = () => {
+    let score = 50; // Base score
+    if (twoFactorEnabled) score += 25;
+    if (biometricEnabled) score += 15;
+    if (passwordForm.current || passwordForm.new) score += 10; // If password is being managed
+    return Math.min(score, 100);
+  };
+
+  const securityScore = calculateSecurityScore();
 
   const handlePasswordChange = () => {
     // TODO: Implement password change

@@ -163,24 +163,8 @@ export function SupportPage() {
     { value: "urgent", label: "Urgent", color: "text-red-600" }
   ];
 
-  const supportTickets = [
-    {
-      id: "#12345",
-      subject: "Device connection issues",
-      status: "In Progress",
-      created: "2 days ago",
-      lastUpdate: "1 day ago",
-      priority: "high"
-    },
-    {
-      id: "#12344",
-      subject: "Billing question about family plan",
-      status: "Resolved",
-      created: "1 week ago",
-      lastUpdate: "5 days ago",
-      priority: "medium"
-    }
-  ];
+  // No support tickets - this will be replaced with real data from database in the future
+  const supportTickets: any[] = [];
 
   const faqItems = [
     {

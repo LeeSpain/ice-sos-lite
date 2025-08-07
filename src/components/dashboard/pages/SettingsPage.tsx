@@ -13,7 +13,7 @@ export function SettingsPage() {
   const [settings, setSettings] = useState({
     theme: "system",
     language: "en",
-    timezone: "America/New_York",
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
     autoSync: true,
     soundEffects: true,
     hapticFeedback: true,
