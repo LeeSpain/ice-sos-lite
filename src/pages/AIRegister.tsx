@@ -841,33 +841,37 @@ const AIRegister = () => {
                         <h4 className="font-bold text-lg text-foreground">Order Summary</h4>
                       </div>
                       
-                      {/* Subscription Plans Section */}
-                      <div className="bg-white/50 rounded-lg p-4 border border-border/30">
-                        <h5 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wide">Monthly Subscriptions</h5>
+                      {/* Monthly Subscriptions Section */}
+                      <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 border border-border/30 shadow-sm">
+                        <h5 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wide">Monthly Subscriptions</h5>
                         
-                        {/* Base subscription */}
-                        <div className="space-y-3">
-                          <div className="flex justify-between items-center">
+                        {/* Premium Protection Plan */}
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-start">
                             <div className="flex-1">
-                              <span className="font-medium text-foreground">Premium Protection Plan</span>
-                              <div className="text-xs text-muted-foreground">Standard emergency protection</div>
+                              <div className="font-medium text-foreground text-base">Premium Protection Plan</div>
+                              <div className="text-sm text-muted-foreground mt-1">Standard emergency protection • Monthly subscription</div>
                             </div>
-                            <div className="text-right">
-                              <div className="font-bold text-primary">€{(premiumPlan?.price || 0).toFixed(2)}</div>
-                              <div className="text-xs text-muted-foreground">per month</div>
+                            <div className="text-right ml-6">
+                              <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                <div className="font-bold text-lg text-primary">€{(premiumPlan?.price || 0).toFixed(2)}</div>
+                                <div className="text-xs text-muted-foreground mt-1">per month</div>
+                              </div>
                             </div>
                           </div>
                           
                           {/* Family Plan */}
                           {hasFamilyPlan && familyPlan && (
-                            <div className="flex justify-between items-center border-t border-border/30 pt-3">
+                            <div className="flex justify-between items-start border-t border-border/30 pt-4">
                               <div className="flex-1">
-                                <span className="font-medium text-foreground">{familyPlan.name}</span>
-                                <div className="text-xs text-muted-foreground">Family protection add-on</div>
+                                <div className="font-medium text-foreground text-base">{familyPlan.name}</div>
+                                <div className="text-sm text-muted-foreground mt-1">Family protection add-on • Monthly subscription</div>
                               </div>
-                              <div className="text-right">
-                                <div className="font-bold text-primary">€{familyPlan.price.toFixed(2)}</div>
-                                <div className="text-xs text-muted-foreground">per month</div>
+                              <div className="text-right ml-6">
+                                <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                  <div className="font-bold text-lg text-primary">€{familyPlan.price.toFixed(2)}</div>
+                                  <div className="text-xs text-muted-foreground mt-1">per month</div>
+                                </div>
                               </div>
                             </div>
                           )}
@@ -880,19 +884,35 @@ const AIRegister = () => {
                             const ivaAmount = service.price * SERVICE_IVA_RATE;
                             const totalPrice = service.price * (1 + SERVICE_IVA_RATE);
                             return (
-                              <div key={serviceId} className="border-t border-border/30 pt-3">
+                              <div key={serviceId} className="border-t border-border/30 pt-4">
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
-                                    <span className="font-medium text-foreground">{service.name}</span>
-                                    <div className="text-xs text-muted-foreground">{service.region} • Regional service</div>
+                                    <div className="font-medium text-foreground text-base">{service.name}</div>
+                                    <div className="text-sm text-muted-foreground mt-1">{service.region} • Regional service • Monthly subscription</div>
                                   </div>
-                                  <div className="text-right ml-4">
-                                    <div className="space-y-1">
-                                      <div className="text-xs text-muted-foreground">
-                                        Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}
+                                  <div className="text-right ml-6">
+                                    <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-sm">
+                                          <span className="text-muted-foreground">Net Price:</span>
+                                          <span className="font-medium">€{netPrice.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs">
+                                          <span className="text-muted-foreground">IVA (10%):</span>
+                                          <span className="font-medium">+ €{ivaAmount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="border-t border-border pt-2">
+                                          <div className="flex justify-between items-center">
+                                            <span className="font-semibold text-foreground">Total:</span>
+                                            <span className="font-bold text-lg text-primary">€{totalPrice.toFixed(2)}</span>
+                                          </div>
+                                          <div className="text-center mt-1">
+                                            <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                                              Monthly subscription
+                                            </span>
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div className="font-bold text-primary">€{totalPrice.toFixed(2)}</div>
-                                      <div className="text-xs text-muted-foreground">per month</div>
                                     </div>
                                   </div>
                                 </div>
@@ -900,14 +920,13 @@ const AIRegister = () => {
                             );
                           })}
                         </div>
-                        
                       </div>
                       
                       {/* One-time Products Section */}
                       {selectedProducts.length > 0 && (
-                        <div className="bg-white/50 rounded-lg p-4 border border-border/30">
-                          <h5 className="font-semibold text-foreground mb-3 text-sm uppercase tracking-wide">One-time Purchases</h5>
-                          <div className="space-y-3">
+                        <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 border border-border/30 shadow-sm">
+                          <h5 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wide">Safety Products (One-time purchase)</h5>
+                          <div className="space-y-4">
                             {selectedProducts.map(productId => {
                               const product = products.find(p => p.id === productId);
                               if (!product) return null;
@@ -917,50 +936,79 @@ const AIRegister = () => {
                               return (
                                 <div key={productId} className="flex justify-between items-start">
                                   <div className="flex-1">
-                                    <span className="font-medium text-foreground">{product.name}</span>
-                                    <div className="text-xs text-muted-foreground">Safety equipment • One-time purchase</div>
+                                    <div className="font-medium text-foreground text-base">{product.name}</div>
+                                    <div className="text-sm text-muted-foreground mt-1">Safety equipment • One-time purchase</div>
                                   </div>
-                                  <div className="text-right ml-4">
-                                    <div className="space-y-1">
-                                      <div className="text-xs text-muted-foreground">
-                                        Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}
+                                  <div className="text-right ml-6">
+                                    <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-sm">
+                                          <span className="text-muted-foreground">Net Price:</span>
+                                          <span className="font-medium">€{netPrice.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs">
+                                          <span className="text-muted-foreground">IVA (21%):</span>
+                                          <span className="font-medium">+ €{ivaAmount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="border-t border-border pt-2">
+                                          <div className="flex justify-between items-center">
+                                            <span className="font-semibold text-foreground">Total:</span>
+                                            <span className="font-bold text-lg text-primary">€{totalPrice.toFixed(2)}</span>
+                                          </div>
+                                          <div className="text-center mt-1">
+                                            <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                                              One-time purchase
+                                            </span>
+                                          </div>
+                                        </div>
                                       </div>
-                                      <div className="font-bold text-primary">€{totalPrice.toFixed(2)}</div>
-                                      <div className="text-xs text-muted-foreground">one-time</div>
                                     </div>
                                   </div>
                                 </div>
                               );
                             })}
                           </div>
-                          
                         </div>
                       )}
                       
-                      {/* Grand Total */}
-                      <div className="bg-gradient-to-r from-primary/10 to-emergency/10 rounded-lg p-4 border-2 border-primary/20">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span className="text-lg font-bold text-foreground">Today's Payment</span>
-                            <div className="text-sm text-muted-foreground">
-                              {calculateProductTotal() > 0 ? 'Monthly + one-time charges' : 'Monthly subscription charge'}
+                      {/* Payment Summary */}
+                      <div className="bg-gradient-to-r from-primary/10 to-emergency/10 rounded-lg p-6 border-2 border-primary/20 shadow-lg">
+                        <div className="space-y-3">
+                          {/* Monthly Subscription Total */}
+                          <div className="flex justify-between items-center pb-2 border-b border-border/30">
+                            <div>
+                              <span className="font-semibold text-foreground">Monthly Subscription:</span>
+                              <div className="text-sm text-muted-foreground">Recurring monthly charge</div>
                             </div>
+                            <span className="font-bold text-lg text-primary">€{calculateSubscriptionTotal().toFixed(2)}/month</span>
                           </div>
-                          <div className="text-right">
-                            <span className="text-2xl font-bold text-primary">
-                              €{calculateGrandTotal().toFixed(2)}
-                            </span>
-                            <div className="text-sm text-muted-foreground">
-                              {calculateProductTotal() > 0 && (
-                                <>Monthly: €{calculateSubscriptionTotal().toFixed(2)}</>
-                              )}
+                          
+                          {/* One-time Products Total */}
+                          {calculateProductTotal() > 0 && (
+                            <div className="flex justify-between items-center pb-2 border-b border-border/30">
+                              <div>
+                                <span className="font-semibold text-foreground">One-time Products:</span>
+                                <div className="text-sm text-muted-foreground">Today only charge</div>
+                              </div>
+                              <span className="font-bold text-lg text-primary">€{calculateProductTotal().toFixed(2)}</span>
                             </div>
+                          )}
+                          
+                          {/* Total Payment Today */}
+                          <div className="flex justify-between items-center pt-2">
+                            <div>
+                              <span className="text-xl font-bold text-foreground">Total Payment Today:</span>
+                              <div className="text-sm text-muted-foreground">
+                                {calculateProductTotal() > 0 ? 'Monthly + one-time charges' : 'Monthly subscription charge'}
+                              </div>
+                            </div>
+                            <span className="text-3xl font-bold text-primary">€{calculateGrandTotal().toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
                       
                       {/* Tax Notice */}
-                      <div className="text-xs text-muted-foreground mt-2 p-2 bg-muted rounded">
+                      <div className="text-xs text-muted-foreground p-3 bg-muted/50 rounded-lg border border-border/30">
                         <strong>Tax Information:</strong> Products include 21% IVA, Regional Services include 10% IVA. All prices shown include applicable taxes.
                       </div>
                     </div>
