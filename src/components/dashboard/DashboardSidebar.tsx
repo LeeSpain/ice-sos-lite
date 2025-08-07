@@ -36,6 +36,11 @@ const dashboardItems = [
     icon: LayoutDashboard
   },
   {
+    title: "Profile",
+    url: "/full-dashboard/profile",
+    icon: User
+  },
+  {
     title: "My Products",
     url: "/full-dashboard/products",
     icon: Package
@@ -54,29 +59,6 @@ const dashboardItems = [
     title: "Mobile App",
     url: "/full-dashboard/mobile-app",
     icon: Smartphone
-  }
-];
-
-const profileItems = [
-  {
-    title: "Profile",
-    url: "/full-dashboard/profile",
-    icon: User
-  },
-  {
-    title: "Emergency",
-    url: "/full-dashboard/emergency",
-    icon: Phone
-  },
-  {
-    title: "Health",
-    url: "/full-dashboard/health",
-    icon: Heart
-  },
-  {
-    title: "Family",
-    url: "/full-dashboard/family",
-    icon: Users
   }
 ];
 
@@ -166,50 +148,6 @@ export function DashboardSidebar() {
                     <NavLink 
                        to={item.url} 
                        end={item.url === '/full-dashboard'}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
-                    >
-                      <div className={`p-1.5 rounded-lg transition-colors ${
-                        isActive(item.url) 
-                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' 
-                          : 'bg-sidebar-muted text-sidebar-muted-foreground group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground'
-                      }`}>
-                        <item.icon className="h-4 w-4" />
-                      </div>
-                       {!collapsed && (
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-sm font-medium block ${
-                            isActive(item.url) ? 'text-sidebar-primary' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground'
-                          }`}>
-                            {item.title}
-                          </span>
-                        </div>
-                       )}
-                      {!collapsed && isActive(item.url) && (
-                        <div className="w-1 h-8 bg-sidebar-primary rounded-full"></div>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Separator */}
-        <div className="mx-4 h-px bg-sidebar-border/50"></div>
-
-        {/* Profile Navigation */}
-        <SidebarGroup className="px-3 py-4">
-          <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
-            Profile
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {profileItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url}
                       className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
                     >
                       <div className={`p-1.5 rounded-lg transition-colors ${

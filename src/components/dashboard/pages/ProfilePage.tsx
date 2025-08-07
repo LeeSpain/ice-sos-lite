@@ -90,7 +90,7 @@ export default function ProfilePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <User className="h-6 w-6 text-primary" />
-              My Profile
+              Profile, Emergency, Health & Family
             </CardTitle>
             <CardDescription className="text-base">
               Manage your personal information, emergency contacts, health details, and family connections
