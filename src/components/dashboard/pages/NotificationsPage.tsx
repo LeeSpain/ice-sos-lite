@@ -151,7 +151,7 @@ export function NotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
+          <h1 className="text-xl font-semibold tracking-tight">Notifications</h1>
           <p className="text-muted-foreground">Customize how and when you receive notifications</p>
         </div>
         <Button 
@@ -176,7 +176,7 @@ export function NotificationsPage() {
         {/* Notification Types */}
         <Card>
           <CardHeader>
-            <CardTitle>Notification Categories</CardTitle>
+            <CardTitle className="text-sm font-semibold">Notification Categories</CardTitle>
             <CardDescription>
               Choose which types of notifications you want to receive and how you want to receive them
             </CardDescription>
@@ -228,7 +228,7 @@ export function NotificationsPage() {
         {/* Quiet Hours */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
               <Bell className="h-5 w-5" />
               Quiet Hours
             </CardTitle>
@@ -303,7 +303,7 @@ export function NotificationsPage() {
         {/* Delivery Channels */}
         <Card>
           <CardHeader>
-            <CardTitle>Delivery Channels</CardTitle>
+            <CardTitle className="text-sm font-semibold">Delivery Channels</CardTitle>
             <CardDescription>
               Manage your notification delivery preferences across different channels
             </CardDescription>
@@ -346,7 +346,7 @@ export function NotificationsPage() {
         {/* Marketing Preferences */}
         <Card>
           <CardHeader>
-            <CardTitle>Marketing Communications</CardTitle>
+            <CardTitle className="text-sm font-semibold">Marketing Communications</CardTitle>
             <CardDescription>
               Control promotional and marketing communications
             </CardDescription>
