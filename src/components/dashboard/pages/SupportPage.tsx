@@ -541,13 +541,13 @@ export function SupportPage() {
           </Accordion>
 
           {filteredFAQ.length === 0 && (
-            <div className="text-center py-8">
-              <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-sm font-semibold mb-2">No results found</h3>
-              <p className="text-xs text-muted-foreground">
-                Try adjusting your search terms or browse all questions above
-              </p>
-            </div>
+          <div className="text-center py-8">
+            <Search className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-sm font-semibold mb-2">No results found</h3>
+            <p className="text-xs text-muted-foreground">
+              Try adjusting your search terms or browse all questions above
+            </p>
+          </div>
           )}
         </CardContent>
       </Card>
