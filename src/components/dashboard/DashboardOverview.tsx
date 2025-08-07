@@ -134,49 +134,30 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
       variant: "emergency" as const
     },
     {
-      title: "Update Profile",
-      description: "Keep your information current",
+      title: "Complete Setup",
+      description: profileCompletion < 100 ? "Finish your profile setup" : "Review and update profile",
       icon: Users,
       action: () => window.location.href = '/dashboard/profile',
-      variant: "outline" as const
-    },
-    {
-      title: "Add Emergency Contact",
-      description: "Add a new emergency contact",
-      icon: Phone,
-      action: () => window.location.href = '/dashboard/emergency',
       variant: "outline" as const
     }
   ];
 
   const statusCards = [
     {
-      title: "Protection Status",
-      value: protectionActive ? "Active" : "Inactive",
-      status: protectionActive ? "success" : "warning",
+      title: "Emergency Readiness",
+      value: `${emergencyContactsCount}/3 contacts`,
+      status: emergencyContactsCount >= 3 && protectionActive ? "success" : "warning",
       icon: Shield,
-      description: protectionActive ? "You are protected 24/7" : "Activate your subscription"
+      description: protectionActive && emergencyContactsCount >= 3 ? "Fully prepared for emergencies" : 
+                   !protectionActive ? "Activate protection plan" : "Add more emergency contacts"
     },
     {
-      title: "Emergency Contacts",
-      value: emergencyContactsCount,
-      status: emergencyContactsCount >= 3 ? "success" : "warning",
-      icon: Users,
-      description: emergencyContactsCount >= 3 ? "Well prepared" : "Add more contacts"
-    },
-    {
-      title: "Profile Completion",
-      value: `${profileCompletion}%`,
-      status: profileCompletion >= 80 ? "success" : "warning",
+      title: "Account Health", 
+      value: `${profileCompletion}% complete`,
+      status: profileCompletion >= 80 && profile?.location_sharing_enabled ? "success" : "warning",
       icon: TrendingUp,
-      description: profileCompletion >= 80 ? "Profile complete" : "Complete your profile"
-    },
-    {
-      title: "Location Services",
-      value: profile?.location_sharing_enabled ? "Enabled" : "Disabled",
-      status: profile?.location_sharing_enabled ? "success" : "warning",
-      icon: MapPin,
-      description: profile?.location_sharing_enabled ? "Location shared" : "Enable location sharing"
+      description: profileCompletion >= 80 && profile?.location_sharing_enabled ? "Account setup complete" :
+                   profileCompletion < 80 ? "Complete your profile" : "Enable location sharing"
     }
   ];
 
@@ -207,7 +188,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
       </Card>
 
       {/* Status Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {statusCards.map((card, index) => (
           <Card key={index} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
@@ -240,7 +221,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {quickActions.map((action, index) => (
               <Button
                 key={index}
@@ -248,6 +229,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
                 onClick={action.action}
                 disabled={action.loading}
                 className="h-auto p-4 flex flex-col items-start gap-2"
+                {...(action.title === "Test Emergency System" ? { "data-test": "emergency-test" } : {})}
               >
                 <div className="flex items-center gap-2 w-full">
                   <action.icon className="h-5 w-5" />

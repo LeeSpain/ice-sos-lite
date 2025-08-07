@@ -6,7 +6,7 @@ import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
-import QuickStatsWidget from "@/components/dashboard/QuickStatsWidget";
+import EmergencyActionsWidget from "@/components/dashboard/EmergencyActionsWidget";
 import MyProductsWidget from "@/components/dashboard/MyProductsWidget";
 import PersonalDetailsCard from "@/components/dashboard/PersonalDetailsCard";
 import EmergencyContactsCard from "@/components/dashboard/EmergencyContactsCard";
@@ -120,7 +120,7 @@ const Dashboard = () => {
                       
                       {/* Sidebar Widgets */}
                       <div className="space-y-6">
-                        <QuickStatsWidget profile={profile} subscription={subscription} />
+                        <EmergencyActionsWidget profile={profile} subscription={subscription} />
                         <MyProductsWidget profile={profile} />
                       </div>
                     </div>
