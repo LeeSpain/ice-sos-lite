@@ -13,6 +13,7 @@ type Props = {
 
 const AppPreviewPhone: React.FC<Props> = ({ config, className, simulateRealtime }) => {
   const mainColor = config.sosColor ? config.sosColor : "hsl(var(--primary))";
+  const brandColor = config.primaryColor ? config.primaryColor : "hsl(var(--primary))";
 
   // Realtime simulation state
   const [heart, setHeart] = React.useState(72);
@@ -76,7 +77,7 @@ const AppPreviewPhone: React.FC<Props> = ({ config, className, simulateRealtime 
             {/* Header */}
             <div className="text-center">
               <div className="text-sm text-muted-foreground">Preview</div>
-              <h3 className="mt-1 text-xl font-semibold">{config.appName}</h3>
+              <h3 className="mt-1 text-xl font-semibold" style={{ color: brandColor }}>{config.appName}</h3>
               <p className="text-xs text-muted-foreground">{config.tagline}</p>
             </div>
 

@@ -11,6 +11,7 @@ import { useSiteContent } from "@/hooks/useSiteContent";
 import { AppPreviewConfig, AppPreviewCard, getDefaultAppPreview } from "@/types/appPreview";
 import { useToast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
+import ColorPicker from "@/components/admin/ColorPicker";
 
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
@@ -130,14 +131,18 @@ const AppTestingPage: React.FC = () => {
                   <Label htmlFor="voiceLabel">Voice Label</Label>
                   <Input id="voiceLabel" value={draft.voiceLabel} onChange={(e) => handleField("voiceLabel", e.target.value)} />
                 </div>
-                <div>
-                  <Label htmlFor="primaryColor">Primary Color</Label>
-                  <Input id="primaryColor" type="text" placeholder="#ef4444" value={draft.primaryColor ?? ""} onChange={(e) => handleField("primaryColor", e.target.value)} />
-                </div>
-                <div>
-                  <Label htmlFor="sosColor">SOS Button Color</Label>
-                  <Input id="sosColor" type="text" placeholder="#22c55e" value={draft.sosColor ?? ""} onChange={(e) => handleField("sosColor", e.target.value)} />
-                </div>
+                <ColorPicker
+                  id="primaryColor"
+                  label="Primary Color"
+                  value={draft.primaryColor}
+                  onChange={(val) => handleField("primaryColor", val)}
+                />
+                <ColorPicker
+                  id="sosColor"
+                  label="SOS Button Color"
+                  value={draft.sosColor}
+                  onChange={(val) => handleField("sosColor", val)}
+                />
               </div>
 
               <Separator />
