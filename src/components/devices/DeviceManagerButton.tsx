@@ -9,9 +9,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Bluetooth, Cog, HeartPulse, PlugZap, PowerOff } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Bluetooth, Cog, HeartPulse, PlugZap, PowerOff, Mic, Megaphone } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 // Minimal typings to avoid TS issues on browsers without Web Bluetooth types
 declare global {
@@ -43,6 +44,7 @@ const DeviceManagerButton: React.FC = () => {
   const [heartRate, setHeartRate] = useState<number | null>(null);
   const [batteryPct, setBatteryPct] = useState<number | null>(null);
   const [useSimulator, setUseSimulator] = useState<boolean>(true);
+  const { toast } = useToast();
 
   const deviceRef = useRef<any>(null);
   const serverRef = useRef<any>(null);
@@ -153,6 +155,9 @@ const DeviceManagerButton: React.FC = () => {
     }
   };
 
+  const connectAlexa = () => toast({ title: "Alexa linking", description: "Coming soon" });
+  const connectGoogle = () => toast({ title: "Google Home linking", description: "Coming soon" });
+
   const StatusBadge = useMemo(() => (
     connected ? (
       <Badge variant="secondary" className="gap-1"> <PlugZap className="h-3 w-3" /> Connected </Badge>
@@ -175,59 +180,59 @@ const DeviceManagerButton: React.FC = () => {
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Devices & Sensors</DialogTitle>
-            <DialogDescription>Connect Bluetooth devices or use the simulator for live preview data.</DialogDescription>
+            <DialogTitle>Device Connections</DialogTitle>
+            <DialogDescription>Connect your Bluetooth pendant and link smart speakers.</DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">Status</div>
-              {StatusBadge}
-            </div>
-
-            <Card className="p-3">
-              <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="space-y-5">
+            {/* Bluetooth Pendant */}
+            <div className="rounded-md border border-border bg-muted/20 p-3">
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-muted-foreground">Device</div>
-                  <div className="font-medium">{deviceName || (useSimulator ? "Simulator" : "—")}</div>
+                  <div className="text-sm font-medium">Bluetooth Pendant</div>
+                  <div className="text-xs text-muted-foreground">{deviceName || (useSimulator ? "Simulator" : "Not connected")}</div>
                 </div>
-                <div>
-                  <div className="text-muted-foreground">Heart Rate</div>
-                  <div className="font-medium">{heartRate ? `${heartRate} bpm` : "—"}</div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground">Battery</div>
-                  <div className="font-medium">{batteryPct !== null ? `${batteryPct}%` : "—"}</div>
-                </div>
-                <div>
-                  <div className="text-muted-foreground">Support</div>
-                  <div className="font-medium">{supported ? "Web Bluetooth" : "Use Capacitor on mobile"}</div>
-                </div>
+                {StatusBadge}
               </div>
-            </Card>
-          </div>
 
-          <DialogFooter className="flex items-center justify-between gap-2 sm:justify-between">
-            <div className="flex items-center gap-2">
-              <Button variant={useSimulator ? "default" : "outline"} size="sm" onClick={() => setUseSimulator(true)}>
-                <HeartPulse className="mr-2 h-4 w-4" /> Use Simulator
-              </Button>
-              <Button variant={useSimulator ? "outline" : "secondary"} size="sm" onClick={() => setUseSimulator(false)} disabled={!supported}>
-                <Bluetooth className="mr-2 h-4 w-4" /> Use Bluetooth
-              </Button>
-            </div>
-            <div className="flex items-center gap-2">
-              {!connected ? (
-                <Button onClick={connect} disabled={connecting || (!supported && !useSimulator)}>
-                  <PlugZap className="mr-2 h-4 w-4" /> {connecting ? "Connecting..." : "Scan & Connect"}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                {!connected ? (
+                  <Button onClick={connect} disabled={connecting || (!supported && !useSimulator)}>
+                    <PlugZap className="mr-2 h-4 w-4" /> {connecting ? "Connecting..." : "Scan & Connect"}
+                  </Button>
+                ) : (
+                  <Button variant="destructive" onClick={disconnect}>
+                    <PowerOff className="mr-2 h-4 w-4" /> Disconnect
+                  </Button>
+                )}
+
+                <Button variant={useSimulator ? "default" : "outline"} size="sm" onClick={() => setUseSimulator(true)}>
+                  <HeartPulse className="mr-2 h-4 w-4" /> Simulator
                 </Button>
-              ) : (
-                <Button variant="destructive" onClick={disconnect}>
-                  <PowerOff className="mr-2 h-4 w-4" /> Disconnect
+                <Button variant={useSimulator ? "outline" : "secondary"} size="sm" onClick={() => setUseSimulator(false)} disabled={!supported}>
+                  <Bluetooth className="mr-2 h-4 w-4" /> Bluetooth
                 </Button>
-              )}
+              </div>
             </div>
-          </DialogFooter>
+
+            <Separator />
+
+            {/* Smart Speakers */}
+            <div className="rounded-md border border-border bg-muted/20 p-3">
+              <div className="mb-2 text-sm font-medium">Smart Speakers</div>
+              <p className="text-xs text-muted-foreground mb-3">
+                Link your preferred assistant to enable voice SOS commands.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={connectAlexa}>
+                  <Mic className="mr-2 h-4 w-4" /> Connect Alexa
+                </Button>
+                <Button variant="outline" onClick={connectGoogle}>
+                  <Megaphone className="mr-2 h-4 w-4" /> Connect Google Home
+                </Button>
+              </div>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
