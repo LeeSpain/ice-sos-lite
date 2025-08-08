@@ -21,6 +21,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
   const [subscription, setSubscription] = useState<any>(null);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
   const [regionalServices, setRegionalServices] = useState<any[]>([]);
+  const [familyPlan, setFamilyPlan] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
   const [purchaseLoading, setPurchaseLoading] = useState<string | null>(null);
   const { toast } = useToast();
@@ -36,7 +37,8 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
         loadSubscription(),
         loadUserProducts(),
         loadAvailableProducts(),
-        loadRegionalServices()
+        loadRegionalServices(),
+        loadFamilyPlan()
       ]);
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -97,6 +99,20 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       setRegionalServices(servicesData || []);
     } catch (error) {
       console.error('Error loading regional services:', error);
+    }
+  };
+
+  const loadFamilyPlan = async () => {
+    try {
+      const { data: plans } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('is_active', true)
+        .eq('name', 'Family Connection')
+        .limit(1);
+      setFamilyPlan(plans && plans.length > 0 ? plans[0] : null);
+    } catch (error) {
+      console.error('Error loading family plan:', error);
     }
   };
 
@@ -194,6 +210,12 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     }
   };
 
+  const hasFamilyActive = Boolean(
+    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.some((p: any) => p?.name === 'Family Connection')) ||
+    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.includes('Family Connection')) ||
+    subscription?.subscription_tier === 'Family Connection'
+  );
+
   if (loading) {
     return (
       <Card>
@@ -245,6 +267,37 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                 className="bg-emergency text-black hover:bg-emergency/90"
               >
                 Subscribe
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Family Connection Add-on */}
+        {familyPlan && !hasFamilyActive && (
+          <div className="p-4 bg-muted/30 rounded-lg border">
+            <div className="flex items-start justify-between">
+              <div className="flex items-start gap-3 flex-1">
+                <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center mt-1">
+                  <CheckCircle className="h-3 w-3 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h5 className="font-medium text-sm mb-1">Family Connection</h5>
+                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                    Add a family member for alerts and monitoring.
+                  </p>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <span className="font-semibold text-primary">€{familyPlan.price}/month</span>
+                    <span>• Add-on</span>
+                  </div>
+                </div>
+              </div>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => window.location.href = '/dashboard/subscription'}
+                className="ml-3"
+              >
+                Add Family Member
               </Button>
             </div>
           </div>
