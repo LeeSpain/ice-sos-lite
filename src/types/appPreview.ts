@@ -15,6 +15,12 @@ export interface AppPreviewConfig {
   sosLabel: string;
   sosSubLabel: string;
   cards: AppPreviewCard[];
+  // Realtime card toggles
+  showSettingsIcon?: boolean;
+  enableBatteryCard?: boolean;
+  enableHeartRateCard?: boolean;
+  enableAiCard?: boolean;
+  enableRemindersCard?: boolean;
 }
 
 export const getDefaultAppPreview = (): AppPreviewConfig => ({
@@ -26,8 +32,11 @@ export const getDefaultAppPreview = (): AppPreviewConfig => ({
   sosLabel: "Emergency SOS",
   sosSubLabel: "Tap for immediate help",
   cards: [
-    { icon: "heart", title: "Health Status", status: "Normal", description: "All vitals within normal range" },
-    { icon: "bell", title: "Reminders", status: "2 Today", description: "Morning medication due in 30 min" },
-    { icon: "activity", title: "Guardian AI", status: "Active", description: "\"How are you feeling today?\"" },
+    { icon: "battery", title: "Device Battery", status: "88%", description: "Bluetooth device status" },
   ],
+  showSettingsIcon: true,
+  enableBatteryCard: true,
+  enableHeartRateCard: false,
+  enableAiCard: false,
+  enableRemindersCard: false,
 });

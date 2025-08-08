@@ -10,6 +10,7 @@ import AppPreviewPhone from "@/components/app-preview/AppPreviewPhone";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { AppPreviewConfig, AppPreviewCard, getDefaultAppPreview } from "@/types/appPreview";
 import { useToast } from "@/components/ui/use-toast";
+import { Switch } from "@/components/ui/switch";
 
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
@@ -26,6 +27,9 @@ const AppTestingPage: React.FC = () => {
   }, [value]);
 
   const handleField = (field: keyof AppPreviewConfig, val: string) => {
+    setDraft((d) => ({ ...d, [field]: val }));
+  };
+  const handleToggle = (field: keyof AppPreviewConfig, val: boolean) => {
     setDraft((d) => ({ ...d, [field]: val }));
   };
 
@@ -147,6 +151,29 @@ const AppTestingPage: React.FC = () => {
                 <p className="text-sm text-muted-foreground">
                   Card content is now real-time and reflects device and app state. Use the live preview to see updates. No manual card editing is required.
                 </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center justify-between">
+                  <Label>Show settings icon</Label>
+                  <Switch checked={draft.showSettingsIcon ?? true} onCheckedChange={(v) => handleToggle("showSettingsIcon", v)} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label>Device Battery card</Label>
+                  <Switch checked={draft.enableBatteryCard ?? true} onCheckedChange={(v) => handleToggle("enableBatteryCard", v)} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label>Heart Rate card</Label>
+                  <Switch checked={draft.enableHeartRateCard ?? false} onCheckedChange={(v) => handleToggle("enableHeartRateCard", v)} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label>Guardian AI card</Label>
+                  <Switch checked={draft.enableAiCard ?? false} onCheckedChange={(v) => handleToggle("enableAiCard", v)} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <Label>Reminders card</Label>
+                  <Switch checked={draft.enableRemindersCard ?? false} onCheckedChange={(v) => handleToggle("enableRemindersCard", v)} />
+                </div>
               </div>
 
               <div className="flex gap-3 pt-2">

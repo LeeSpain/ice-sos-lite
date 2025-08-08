@@ -32,12 +32,22 @@ const AppPreviewPhone: React.FC<Props> = ({ config, className, simulateRealtime 
   }, [simulateRealtime]);
 
   const cardsToShow = simulateRealtime
-    ? [
-        { icon: "heart", title: "Health Status", status: `${Math.round(heart)} bpm`, description: "Live heart rate via device" },
-        { icon: "battery", title: "Device Battery", status: `${Math.round(battery)}%`, description: "Bluetooth device status" },
-        { icon: "activity", title: "Guardian AI", status: aiActive ? "Active" : "Idle", description: aiActive ? '"How are you feeling today?"' : "Standing by" },
-        { icon: "bell", title: "Reminders", status: `${reminders} Today`, description: reminders > 0 ? "Next in 30 min" : "All done" },
-      ]
+    ? (() => {
+        const includeBattery = config.enableBatteryCard ?? true;
+        const includeHR = config.enableHeartRateCard ?? false;
+        const includeAI = config.enableAiCard ?? false;
+        const includeRem = config.enableRemindersCard ?? false;
+        const list: { icon: string; title: string; status: string; description: string }[] = [];
+        if (includeBattery)
+          list.push({ icon: "battery", title: "Device Battery", status: `${Math.round(battery)}%`, description: "Bluetooth device status" });
+        if (includeHR)
+          list.push({ icon: "heart", title: "Health Status", status: `${Math.round(heart)} bpm`, description: "Live heart rate via device" });
+        if (includeAI)
+          list.push({ icon: "activity", title: "Guardian AI", status: aiActive ? "Active" : "Idle", description: aiActive ? '"How are you feeling today?"' : "Standing by" });
+        if (includeRem)
+          list.push({ icon: "bell", title: "Reminders", status: `${reminders} Today`, description: reminders > 0 ? "Next in 30 min" : "All done" });
+        return list;
+      })()
     : (config.cards ?? []);
 
   return (
@@ -48,7 +58,21 @@ const AppPreviewPhone: React.FC<Props> = ({ config, className, simulateRealtime 
           <div className="pointer-events-none absolute left-1/2 top-0 z-10 h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-foreground/10" />
 
           {/* Screen */}
-          <div className="rounded-[1.75rem] border border-border bg-background p-4">
+          <div className="relative rounded-[1.75rem] border border-border bg-background p-4">
+            {/* Settings icon (top-right) */}
+            {config.showSettingsIcon !== false && (
+              <button
+                className="absolute right-3 top-3 rounded-md p-2 hover:bg-muted/60"
+                aria-label="Open settings"
+                onClick={() => window.dispatchEvent(new Event("open-device-settings"))}
+              >
+                {/* Using three-line menu icon via css to avoid extra deps */}
+                <span className="block h-0.5 w-4 bg-foreground mb-1" />
+                <span className="block h-0.5 w-4 bg-foreground mb-1" />
+                <span className="block h-0.5 w-4 bg-foreground" />
+              </button>
+            )}
+
             {/* Header */}
             <div className="text-center">
               <div className="text-sm text-muted-foreground">Preview</div>

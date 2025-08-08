@@ -51,6 +51,12 @@ const DeviceManagerButton: React.FC = () => {
 
   useEffect(() => {
     setSupported(Boolean(navigator.bluetooth));
+
+    const handler = () => setOpen(true);
+    window.addEventListener("open-device-settings", handler);
+    return () => {
+      window.removeEventListener("open-device-settings", handler);
+    };
   }, []);
 
   useEffect(() => {
