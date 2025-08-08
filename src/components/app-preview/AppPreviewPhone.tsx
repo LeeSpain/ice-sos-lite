@@ -8,10 +8,38 @@ import { AppPreviewConfig } from "@/types/appPreview";
 type Props = {
   config: AppPreviewConfig;
   className?: string;
+  simulateRealtime?: boolean;
 };
 
-const AppPreviewPhone: React.FC<Props> = ({ config, className }) => {
+const AppPreviewPhone: React.FC<Props> = ({ config, className, simulateRealtime }) => {
   const mainColor = config.sosColor ? config.sosColor : "hsl(var(--primary))";
+
+  // Realtime simulation state
+  const [heart, setHeart] = React.useState(72);
+  const [battery, setBattery] = React.useState(85);
+  const [aiActive, setAiActive] = React.useState(true);
+  const [reminders, setReminders] = React.useState(2);
+
+  React.useEffect(() => {
+    if (!simulateRealtime) return;
+    const iv = setInterval(() => {
+      setHeart((h) => Math.max(58, Math.min(110, h + (Math.random() * 8 - 4))));
+      setBattery((b) => Math.max(1, b - (Math.random() < 0.1 ? 1 : 0)));
+      setAiActive((a) => (Math.random() < 0.02 ? !a : a));
+      setReminders((r) => (Math.random() < 0.05 ? Math.max(0, r - 1) : r));
+    }, 1200);
+    return () => clearInterval(iv);
+  }, [simulateRealtime]);
+
+  const cardsToShow = simulateRealtime
+    ? [
+        { icon: "heart", title: "Health Status", status: `${Math.round(heart)} bpm`, description: "Live heart rate via device" },
+        { icon: "battery", title: "Device Battery", status: `${Math.round(battery)}%`, description: "Bluetooth device status" },
+        { icon: "activity", title: "Guardian AI", status: aiActive ? "Active" : "Idle", description: aiActive ? '"How are you feeling today?"' : "Standing by" },
+        { icon: "bell", title: "Reminders", status: `${reminders} Today`, description: reminders > 0 ? "Next in 30 min" : "All done" },
+      ]
+    : (config.cards ?? []);
+
   return (
     <div className={className}>
       <div className="mx-auto w-full max-w-sm">
@@ -61,7 +89,7 @@ const AppPreviewPhone: React.FC<Props> = ({ config, className }) => {
 
             {/* Cards */}
             <div className="grid grid-cols-1 gap-3">
-              {config.cards?.map((c, idx) => (
+              {cardsToShow.map((c, idx) => (
                 <div key={idx} className="rounded-xl border border-border bg-card p-3">
                   <div className="flex items-center justify-between">
                     <div className="text-sm font-medium">{c.title}</div>

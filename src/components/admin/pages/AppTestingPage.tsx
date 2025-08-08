@@ -93,7 +93,7 @@ const AppTestingPage: React.FC = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <AppPreviewPhone config={draft} />
+              <AppPreviewPhone config={draft} simulateRealtime />
             </CardContent>
           </Card>
         </div>
@@ -139,41 +139,14 @@ const AppTestingPage: React.FC = () => {
               <Separator />
 
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium">Cards</h4>
-                <Button size="sm" variant="secondary" onClick={addCard}>
-                  <Plus className="mr-2 h-4 w-4" /> Add Card
-                </Button>
+                <h4 className="text-sm font-medium">Real‑time Cards</h4>
+                <span className="text-xs text-muted-foreground">Auto-updates from device/simulator</span>
               </div>
 
-              <div className="space-y-3">
-                {(draft.cards ?? []).map((card, idx) => (
-                  <div key={idx} className="rounded-lg border border-border p-3">
-                    <div className="mb-2 flex items-center justify-between">
-                      <div className="text-sm font-medium">Card {idx + 1}</div>
-                      <Button variant="ghost" size="icon" onClick={() => removeCard(idx)} aria-label="Remove card">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                      <div>
-                        <Label>Title</Label>
-                        <Input value={card.title} onChange={(e) => updateCard(idx, { title: e.target.value })} />
-                      </div>
-                      <div>
-                        <Label>Status</Label>
-                        <Input value={card.status} onChange={(e) => updateCard(idx, { status: e.target.value })} />
-                      </div>
-                      <div className="md:col-span-2">
-                        <Label>Description</Label>
-                        <Input value={card.description} onChange={(e) => updateCard(idx, { description: e.target.value })} />
-                      </div>
-                      <div className="md:col-span-2">
-                        <Label>Icon (text)</Label>
-                        <Input value={card.icon} onChange={(e) => updateCard(idx, { icon: e.target.value })} />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="space-y-3 rounded-md border border-dashed border-border p-4 bg-muted/30">
+                <p className="text-sm text-muted-foreground">
+                  Card content is now real-time and reflects device and app state. Use the live preview to see updates. No manual card editing is required.
+                </p>
               </div>
 
               <div className="flex gap-3 pt-2">

@@ -1,12 +1,19 @@
+import React from "react";
 import { Shield, Github, Twitter, Mail } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
+
+const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const Footer = () => {
   const { user, loading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
+  const defaults = React.useMemo(() => getDefaultAppPreview(), []);
+  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
 
   const handleDashboardClick = (e: React.MouseEvent, dashboardType: 'member' | 'admin') => {
     e.preventDefault();
@@ -56,7 +63,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <Shield className="h-5 w-5 text-white" />
               </div>
-              <span className="text-lg font-bold font-poppins text-foreground">ICE SOS Lite</span>
+              <span className="text-lg font-bold font-poppins text-foreground">{(value ?? defaults).appName}</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Emergency response and family safety platform providing peace of mind through advanced protection services.
@@ -149,7 +156,7 @@ const Footer = () => {
         <div className="mt-8 pt-6 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-muted-foreground">
-              © 2024 ICE SOS Lite. All rights reserved.
+              © 2024 {(value ?? defaults).appName}. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">

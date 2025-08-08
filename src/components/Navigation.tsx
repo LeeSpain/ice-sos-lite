@@ -2,9 +2,15 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Shield, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
+
+const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const defaults = React.useMemo(() => getDefaultAppPreview(), []);
+  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
@@ -15,7 +21,7 @@ const Navigation = () => {
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold font-poppins text-foreground">ICE SOS Lite</span>
+            <span className="text-xl font-bold font-poppins text-foreground">{(value ?? defaults).appName}</span>
           </div>
 
           {/* Desktop Navigation */}

@@ -25,7 +25,7 @@ const AppPreviewSection: React.FC = () => {
             {isLoading && !value ? (
               <div className="text-muted-foreground">Loading preview...</div>
             ) : (
-              <AppPreviewPhone config={value ?? defaults} />
+              <AppPreviewPhone config={value ?? defaults} simulateRealtime />
             )}
           </div>
           <p className="mt-4 text-center text-xs text-muted-foreground">

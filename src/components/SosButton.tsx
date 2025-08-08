@@ -4,11 +4,17 @@ import { Phone, Mic, MicOff } from "lucide-react";
 import { useVoiceActivation } from "@/hooks/useVoiceActivation";
 import { useEmergencySOS } from "@/hooks/useEmergencySOS";
 import { useToast } from "@/hooks/use-toast";
+import { useSiteContent } from "@/hooks/useSiteContent";
+import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
+
+const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const SosButton = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
   const { toast } = useToast();
+  const defaults = getDefaultAppPreview();
+  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
 
   const handleEmergencyTrigger = async () => {
     try {
@@ -73,10 +79,10 @@ const SosButton = () => {
         onClick={handleEmergencyTrigger}
         disabled={isTriggering}
         className="relative"
-        aria-label="Emergency SOS Button - Press for immediate help"
+        aria-label={`Emergency Button - ${((value ?? defaults).sosLabel)}`}
       >
         <Phone className="h-8 w-8" />
-        <span className="sr-only">Emergency SOS</span>
+        <span className="sr-only">{(value ?? defaults).sosLabel}</span>
         {isTriggering && (
           <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse" />
         )}
@@ -84,10 +90,10 @@ const SosButton = () => {
       
       <div className="text-center">
         <p className="text-sm font-medium text-emergency">
-          {isTriggering ? "Activating Emergency..." : "Emergency SOS"}
+          {isTriggering ? "Activating Emergency..." : (value ?? defaults).sosLabel}
         </p>
         <p className="text-xs text-muted-foreground">
-          Tap for immediate help
+          {(value ?? defaults).sosSubLabel}
           {voiceEnabled && <span className="block">or say "Help Help Help"</span>}
         </p>
       </div>
