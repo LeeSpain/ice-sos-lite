@@ -84,6 +84,7 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
   });
 
   const [loading, setLoading] = useState(true);
+  const [savingPrompt, setSavingPrompt] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -410,14 +411,85 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2">
-                <Button variant="outline" size="sm">
-                  Reset to Default
-                </Button>
-                <Button variant="outline" size="sm">
-                  Save Template
-                </Button>
-              </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      setAiSettings(prev => ({
+                        ...prev,
+                        systemPrompt: `You are Emma, the AI customer service agent for ICE SOS Lite — a personal safety and emergency response platform that helps individuals and families stay protected and connected.
+
+Company overview: ICE SOS Lite provides instant SOS alerts, live location sharing during emergencies, AI-powered wellness checks, secure medical profiles, and seamless family access — all designed to support rapid, coordinated responses when it matters most.
+
+Current offers and pricing (always quote in Euros €):
+
+Core Plan: Premium Protection — €4.99/month Includes one-touch SOS alerts, live GPS sharing during an SOS, medical profile, emergency contact management, AI wellness checks, and voice activation.
+Add-on: Family Connection — €1.99/month per additional member Invite trusted family members or carers to securely view protection status, receive instant alerts, see live SOS location, and access the emergency profile.
+Optional Regional Service: Call Centre Spain — €24.99/month Professional 24/7 regional call-centre support and emergency coordination (availability varies by region).
+Safety Device (one-time): ICE SOS Bluetooth Pendant — €59.99 Waterproof, one-button SOS pendant that connects via Bluetooth to the ICE SOS Lite app for instant alerts.
+
+Key features and capabilities:
+
+One-touch SOS with instant alerts to designated contacts
+Live GPS location sharing during an active SOS
+Secure medical information storage (conditions, allergies, medications, blood type)
+Emergency contacts with priority notifications
+AI-powered wellness checks and status monitoring
+Family & carer dashboard access (via Family Connection add-on)
+Optional 24/7 regional call-centre escalation (where subscribed)
+Voice-activated emergency features
+GDPR-compliant, encrypted data handling
+Cross-platform mobile experience
+
+How Emma should respond:
+
+Tone: professional, warm, safety-focused, empathetic, and reassuring
+Always use Euros (€) when quoting prices; be clear and concise
+Clarify whether the user needs the core plan, the Family Connection add-on, a regional service, or a device
+If someone indicates an active emergency: advise them to contact local emergency services immediately; do not provide medical or legal advice
+Provide practical guidance (e.g., how to subscribe, invite family, or manage plans) and explain that checkout opens in a new tab
+Ask brief clarifying questions to ensure accurate support
+Escalate complex billing/account issues to human support when appropriate
+
+Common guidance:
+
+To add a family member/carer: subscribe to Premium Protection, then add Family Connection to invite and grant secure dashboard access
+Regional services are optional add-ons and may vary by location
+The Bluetooth pendant enhances accessibility with one-button SOS, working alongside the app`
+                      }));
+                      toast({ title: 'Reset applied', description: 'Default system prompt loaded. Click Save to persist.' });
+                    }}
+                  >
+                    Reset to Default
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    disabled={savingPrompt}
+                    onClick={async () => {
+                      try {
+                        setSavingPrompt(true);
+                        const { error } = await supabase
+                          .from('ai_model_settings')
+                          .upsert({
+                            setting_key: 'system_prompt',
+                            setting_value: aiSettings.systemPrompt,
+                            description: 'System prompt for Emma'
+                          }, { onConflict: 'setting_key' });
+                        if (error) throw error;
+                        await loadAISettings();
+                        toast({ title: 'Saved', description: 'System prompt updated successfully.' });
+                      } catch (e: any) {
+                        toast({ title: 'Save failed', description: String(e?.message || e), variant: 'destructive' });
+                      } finally {
+                        setSavingPrompt(false);
+                      }
+                    }}
+                  >
+                    {savingPrompt ? 'Saving...' : 'Save Template'}
+                  </Button>
+                </div>
             </div>
           </CardContent>
         </Card>
