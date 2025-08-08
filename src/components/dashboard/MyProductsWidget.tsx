@@ -299,12 +299,15 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                 </div>
                 <div className="flex-1">
                   <h5 className="font-medium text-sm mb-1">Family Connection</h5>
-                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                    Add a family member for alerts and monitoring.
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Invite a trusted family member or carer to your dashboard for secure monitoring and support.
                   </p>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="font-semibold text-primary">€{Number(familyPlan.price || 1.99).toFixed(2)}/month</span>
                     <span>• Add-on</span>
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    • Secure dashboard access • Instant SOS alerts • Live protection status • View emergency profile
                   </div>
                 </div>
               </div>
