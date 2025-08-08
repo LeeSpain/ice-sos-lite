@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
@@ -11,6 +12,7 @@ import ChatWidget from "@/components/ai-chat/ChatWidget";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sparkles } from 'lucide-react';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import AppPreviewSection from '@/components/AppPreviewSection';
 
 const Index = () => {
   useScrollToTop();
@@ -98,6 +100,10 @@ const Index = () => {
       <Hero onEmmaClick={handleEmmaClick} />
       <Features />
       <MetricPreview />
+
+      {/* Live App Preview Section (reflects admin "App Testing" settings) */}
+      <AppPreviewSection />
+
       <Pricing />
       
       <AppDownload />

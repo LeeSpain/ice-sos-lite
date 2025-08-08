@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -23,6 +24,7 @@ import FamilyAccountsPage from '@/components/admin/pages/FamilyAccountsPage';
 import SystemSettingsPage from '@/components/admin/pages/SystemSettingsPage';
 import ReportsPage from '@/components/admin/pages/ReportsPage';
 import SubscriptionPlansPage from '@/components/admin/pages/SubscriptionPlansPage';
+import AppTestingPage from '@/components/admin/pages/AppTestingPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -56,6 +58,7 @@ const AdminDashboard: React.FC = () => {
           <Route path="activity" element={<ActivityPage />} />
           <Route path="settings" element={<SystemSettingsPage />} />
           <Route path="reports" element={<ReportsPage />} />
+          <Route path="app-testing" element={<AppTestingPage />} />
           <Route path="*" element={<Navigate to="/admin-dashboard" replace />} />
         </Route>
         </Routes>

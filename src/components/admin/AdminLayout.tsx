@@ -30,7 +30,8 @@ import {
   Bot,
   Package,
   MapPin,
-  Mail
+  Mail,
+  Smartphone
 } from 'lucide-react';
 
 const adminMenuItems = [
@@ -95,6 +96,7 @@ const adminMenuItems = [
       { title: "User Activity", url: "/admin-dashboard/activity", icon: Activity },
       { title: "System Settings", url: "/admin-dashboard/settings", icon: Settings },
       { title: "Reports", url: "/admin-dashboard/reports", icon: FileText },
+      { title: "App Testing", url: "/admin-dashboard/app-testing", icon: Smartphone },
     ]
   }
 ];
