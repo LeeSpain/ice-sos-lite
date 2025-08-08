@@ -168,18 +168,22 @@ const DeviceIceSosPendant = () => {
               reducing response times when it matters most.
             </p>
             <div className="mt-6 flex justify-center">
-              <div className="relative w-64 md:w-80 aspect-[9/19] bg-muted rounded-[2.5rem] p-3 shadow-inner border border-border">
-                <div className="absolute inset-x-10 top-2 h-1.5 rounded bg-muted/80" />
-                <div className="h-full rounded-[2rem] bg-background p-3">
-                  <ChartContainer className="h-full w-full" config={{ alerts: { color: "hsl(var(--emergency))" } }}>
-                    <AreaChart data={alertData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="time" hide />
-                      <YAxis hide />
-                      <Area type="monotone" dataKey="alerts" stroke="var(--color-alerts)" fill="var(--color-alerts)" fillOpacity={0.2} />
+              <div className="relative w-80 md:w-96 aspect-[4/3] bg-muted/20 rounded-2xl p-4 shadow-lg border border-border">
+                <div className="h-full rounded-xl bg-background p-4 shadow-inner">
+                  <div className="mb-3 text-center">
+                    <p className="text-xs text-muted-foreground">Emergency Response Times</p>
+                    <p className="text-sm font-medium">Daily Alert Volume</p>
+                  </div>
+                  <ChartContainer className="h-32 w-full" config={{ alerts: { color: "hsl(var(--emergency))" } }}>
+                    <AreaChart data={alertData} margin={{ left: 5, right: 5, top: 5, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis dataKey="time" tick={{ fontSize: 10 }} />
+                      <YAxis tick={{ fontSize: 10 }} />
+                      <Area type="monotone" dataKey="alerts" stroke="var(--color-alerts)" fill="var(--color-alerts)" fillOpacity={0.2} strokeWidth={2} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                     </AreaChart>
                   </ChartContainer>
+                  <p className="mt-2 text-xs text-center text-muted-foreground">Real-time monitoring active</p>
                 </div>
               </div>
             </div>
