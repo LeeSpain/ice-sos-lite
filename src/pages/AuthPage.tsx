@@ -63,7 +63,7 @@ const AuthPage = () => {
         return;
       }
 
-      const redirectUrl = `${window.location.origin}/dashboard`;
+      const redirectUrl = `${window.location.origin}/sos`;
       
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
@@ -136,7 +136,7 @@ const AuthPage = () => {
         }
       } else {
         // Successfully signed in, redirect to dashboard
-        navigate("/dashboard");
+        navigate("/sos");
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");

@@ -18,6 +18,7 @@ import AdminSetupPage from "./pages/AdminSetupPage";
 import NotFound from "./pages/NotFound";
 import DashboardRedirect from "./components/DashboardRedirect";
 import WelcomeQuestionnaire from "./components/WelcomeQuestionnaire";
+import SOSHome from "./pages/SOSHome";
 
 const App = () => {
   return (
@@ -48,6 +49,11 @@ const App = () => {
           <Route path="/member-dashboard" element={
             <ProtectedRoute>
               <SimpleDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/sos" element={
+            <ProtectedRoute>
+              <SOSHome />
             </ProtectedRoute>
           } />
           <Route path="/admin-setup" element={<AdminSetupPage />} />
