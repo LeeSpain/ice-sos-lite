@@ -72,9 +72,16 @@ const Pricing = () => {
   // Filter global and regional plans
   const globalPlans = subscriptionPlans.filter(plan => plan.region === 'global' || !plan.region);
   useEffect(() => {
-    fetchProducts();
-    fetchSubscriptionPlans();
-    fetchRegionalServices();
+    // Use setTimeout to defer non-critical data loading
+    const timer = setTimeout(() => {
+      Promise.all([
+        fetchSubscriptionPlans(),
+        fetchProducts(),
+        fetchRegionalServices()
+      ]);
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchProducts = async () => {

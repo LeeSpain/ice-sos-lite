@@ -39,7 +39,9 @@ const RegionServices = () => {
       }
     };
 
-    fetchRegionalPlans();
+    // Defer loading to improve initial page performance
+    const timer = setTimeout(fetchRegionalPlans, 200);
+    return () => clearTimeout(timer);
   }, []);
 
   const trackRegionServiceClick = async (planId: string, planName: string) => {
