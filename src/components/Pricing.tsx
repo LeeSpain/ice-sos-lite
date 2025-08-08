@@ -258,8 +258,9 @@ const Pricing = () => {
               Family & Carer Access
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Grant trusted family members and carers secure access to your emergency profile and protection status. 
-              They can monitor your safety, receive alerts, and coordinate emergency response when needed.
+              After you join, you can invite trusted family members or carers to your dashboard. They’ll have secure access to your
+              emergency profile and protection status, receive instant alerts, view GPS location during an SOS, and help coordinate
+              a rapid response.
             </p>
           </div>
 
