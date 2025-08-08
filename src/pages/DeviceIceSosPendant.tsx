@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall } from "lucide-react";
+import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall, CheckCircle2, Smartphone } from "lucide-react";
 import heroImg from "@/assets/hero-emergency.jpg";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -127,12 +127,12 @@ const DeviceIceSosPendant = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-start">
             <div>
-              <h2 className="text-2xl md:text-3xl font-semibold">How it works</h2>
+              <h2 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">How it works</h2>
               <ol className="mt-4 space-y-3 text-muted-foreground">
-                <li>1. Pair the pendant with your phone via Bluetooth in the ICE SOS Lite app.</li>
-                <li>2. Wear it like a pendant, clip, or keyring for easy access.</li>
-                <li>3. Press once to trigger SOS. Your emergency contacts are alerted instantly.</li>
-                <li>4. Your phone securely shares GPS location and critical info with responders.</li>
+                <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>1. Pair the pendant with your phone via Bluetooth in the ICE SOS Lite app.</span></li>
+                <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>2. Wear it like a pendant, clip, or keyring for easy access.</span></li>
+                <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>3. Press once to trigger SOS. Your emergency contacts are alerted instantly.</span></li>
+                <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>4. Your phone securely shares GPS location and critical info with responders.</span></li>
               </ol>
               <div className="mt-6">
                 <Button asChild>
@@ -189,32 +189,74 @@ const DeviceIceSosPendant = () => {
 
       <section className="py-16 bg-secondary/30">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-semibold">Tech specs</h2>
-          <div className="mt-6 grid md:grid-cols-3 gap-6 text-sm text-muted-foreground">
-            <div>
-              <p className="font-medium text-foreground">Connectivity</p>
-              <p>Bluetooth 5.0 LE, quick pairing</p>
-            </div>
-            <div>
-              <p className="font-medium text-foreground">Battery</p>
-              <p>Rechargeable, up to 7 days typical use</p>
-            </div>
-            <div>
-              <p className="font-medium text-foreground">Durability</p>
-              <p>IP67 water and dust resistance</p>
-            </div>
-            <div>
-              <p className="font-medium text-foreground">Range</p>
-              <p>Up to 100 meters from paired phone</p>
-            </div>
-            <div>
-              <p className="font-medium text-foreground">Compatibility</p>
-              <p>Works with ICE SOS Lite app on iOS and Android</p>
-            </div>
-            <div>
-              <p className="font-medium text-foreground">What’s included</p>
-              <p>Pendant, charging cable, quick start guide</p>
-            </div>
+          <h2 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">Tech specs</h2>
+          <div className="mt-6 grid md:grid-cols-3 gap-6">
+            <Card className="shadow-md border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <Bluetooth className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground">Connectivity</p>
+                    <p className="text-sm text-muted-foreground">Bluetooth 5.0 LE, quick pairing</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-md border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <Battery className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground">Battery</p>
+                    <p className="text-sm text-muted-foreground">Rechargeable, up to 7 days typical use</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-md border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <Droplets className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground">Durability</p>
+                    <p className="text-sm text-muted-foreground">IP67 water and dust resistance</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-md border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground">Range</p>
+                    <p className="text-sm text-muted-foreground">Up to 100 meters from paired phone</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-md border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <Smartphone className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground">Compatibility</p>
+                    <p className="text-sm text-muted-foreground">Works with ICE SOS Lite app on iOS and Android</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="shadow-md border-border">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <p className="font-medium text-foreground">What’s included</p>
+                    <p className="text-sm text-muted-foreground">Pendant, charging cable, quick start guide</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -296,10 +338,10 @@ const DeviceIceSosPendant = () => {
               </p>
             </div>
             <div className="flex gap-3">
-              <Button asChild>
+              <Button asChild className="shadow-glow">
                 <Link to="/ai-register">Buy now</Link>
               </Button>
-              <Button variant="outline" asChild>
+              <Button variant="outline" asChild className="shadow-md">
                 <Link to="/">Back to home</Link>
               </Button>
             </div>
