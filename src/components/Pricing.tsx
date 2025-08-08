@@ -287,13 +287,6 @@ const Pricing = () => {
                         <span className="text-4xl font-bold text-wellness">€{plan.price.toFixed(2)}</span>
                         <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
                       </div>
-                      <Button 
-                        size="lg"
-                        className="bg-wellness hover:bg-wellness/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                        asChild
-                      >
-                        <Link to="/ai-register">Add Family Plan</Link>
-                      </Button>
                     </div>
                     
                     {/* Features */}

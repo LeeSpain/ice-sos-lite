@@ -650,60 +650,6 @@ const AIRegister = () => {
                         <h3 className="text-lg font-bold text-foreground">Optional Add-ons</h3>
                       </div>
 
-                      {/* Family Plan Add-on */}
-                      {familyPlan && (
-                        <div className={`p-3 border rounded-lg transition-all ${
-                          hasFamilyPlan ? 'border-primary bg-primary/5' : 'border-border'
-                        }`}>
-                          <div className="flex items-start gap-3">
-                            <Checkbox
-                              id="family"
-                              checked={hasFamilyPlan}
-                              onCheckedChange={handleFamilyPlanToggle}
-                              className="mt-1"
-                            />
-                            <Label htmlFor="family" className="flex-1 cursor-pointer">
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <h4 className="font-semibold text-base mb-1">{familyPlan.name}</h4>
-                                  <p className="text-muted-foreground text-sm mb-2">{familyPlan.description}</p>
-                                  {familyPlan.features.length > 0 && (
-                                    <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                      {familyPlan.features.slice(0, 3).map((feature, idx) => (
-                                        <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
-                                          <Check className="h-3 w-3 text-green-500" />
-                                          <span>{feature}</span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="text-right ml-4">
-                                  <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                    <div className="space-y-2">
-                                      <div className="flex justify-between items-center text-sm">
-                                        <span className="text-muted-foreground">Net Price:</span>
-                                        <span className="font-medium">€{familyPlan.price.toFixed(2)}</span>
-                                      </div>
-                                      <div className="border-t border-border pt-2">
-                                        <div className="flex justify-between items-center">
-                                          <span className="font-semibold text-foreground">Total:</span>
-                                          <span className="font-bold text-lg text-primary">€{familyPlan.price.toFixed(2)}</span>
-                                        </div>
-                                        <div className="text-center mt-1">
-                                          <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
-                                            Monthly subscription
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </Label>
-                          </div>
-                        </div>
-                      )}
 
                       {/* Safety Products Section */}
                       {products.length > 0 && (
