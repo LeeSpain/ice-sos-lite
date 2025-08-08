@@ -11,6 +11,7 @@ type Props = {
 };
 
 const AppPreviewPhone: React.FC<Props> = ({ config, className }) => {
+  const mainColor = config.sosColor ? config.sosColor : "hsl(var(--primary))";
   return (
     <div className={className}>
       <div className="mx-auto w-full max-w-sm">
@@ -31,21 +32,25 @@ const AppPreviewPhone: React.FC<Props> = ({ config, className }) => {
 
             {/* SOS button */}
             <div className="flex flex-col items-center gap-2 py-6">
-              <Button
-                type="button"
-                disabled
-                className="h-24 w-24 rounded-full text-foreground shadow-lg"
-                style={{
-                  background:
-                    config.sosColor
-                      ? config.sosColor
-                      : "hsl(var(--primary))",
-                }}
-              >
-                <span className="text-center text-sm font-bold leading-tight">
-                  {config.sosLabel}
-                </span>
-              </Button>
+              <div className="relative flex h-28 w-28 items-center justify-center">
+                <span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full opacity-40 blur-md pulse"
+                  style={{
+                    background: `radial-gradient(circle, ${mainColor} 0%, transparent 60%)`,
+                  }}
+                />
+                <Button
+                  type="button"
+                  disabled
+                  className="relative h-24 w-24 rounded-full text-foreground shadow-xl hover-scale"
+                  style={{ background: mainColor }}
+                >
+                  <span className="text-center text-sm font-bold leading-tight">
+                    {config.sosLabel}
+                  </span>
+                </Button>
+              </div>
               <div className="text-xs text-muted-foreground">{config.sosSubLabel}</div>
               <div className="mt-1 rounded-full bg-muted px-3 py-1 text-[10px] text-muted-foreground">
                 {config.voiceLabel}
