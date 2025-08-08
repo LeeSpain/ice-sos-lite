@@ -108,7 +108,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
         .from('subscription_plans')
         .select('*')
         .eq('is_active', true)
-        .eq('name', 'Family Connection')
+        .ilike('name', '%Family%')
         .limit(1);
       setFamilyPlan(plans && plans.length > 0 ? plans[0] : null);
     } catch (error) {
@@ -183,6 +183,23 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     }
   };
 
+  const handleAddFamilyPlan = async () => {
+    if (!familyPlan) return;
+    try {
+      setPurchaseLoading('family-plan');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { plans: [familyPlan.id] }
+      });
+      if (error) throw error;
+      if (data?.url) window.open(data.url, '_blank');
+      toast({ title: 'Redirecting to checkout', description: 'Complete your add-on purchase in the new tab.' });
+    } catch (error) {
+      console.error('Error starting checkout:', error);
+      toast({ title: 'Checkout Error', description: 'Unable to start checkout. Please try again.', variant: 'destructive' });
+    } finally {
+      setPurchaseLoading(null);
+    }
+  };
   const handleManageSubscription = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
@@ -286,7 +303,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                     Add a family member for alerts and monitoring.
                   </p>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="font-semibold text-primary">€{familyPlan.price}/month</span>
+                    <span className="font-semibold text-primary">€{Number(familyPlan.price || 1.99).toFixed(2)}/month</span>
                     <span>• Add-on</span>
                   </div>
                 </div>
@@ -294,10 +311,11 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
               <Button 
                 size="sm" 
                 variant="outline"
-                onClick={() => window.location.href = '/dashboard/subscription'}
+                onClick={handleAddFamilyPlan}
+                disabled={purchaseLoading === 'family-plan'}
                 className="ml-3"
               >
-                Add Family Member
+                {purchaseLoading === 'family-plan' ? 'Processing...' : 'Add Family Member'}
               </Button>
             </div>
           </div>
