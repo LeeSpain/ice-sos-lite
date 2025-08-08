@@ -190,10 +190,10 @@ const Pricing = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-            Your Protection Plan
+            Your Core Protection Subscription
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Professional emergency protection at €4.99/month. Download the app and activate your plan instantly.
+            One simple subscription that unlocks professional emergency protection. Add optional extras — Family Access, Regional Call Centers, and Safety Devices — anytime. €4.99/month. Activate instantly in the app.
           </p>
         </div>
 
@@ -207,7 +207,7 @@ const Pricing = () => {
               <Card key={plan.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
                 <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
-                  MOST POPULAR
+                  CORE PLAN
                 </Badge>
                 
                 <div className="relative p-8">
