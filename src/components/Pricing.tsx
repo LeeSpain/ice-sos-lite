@@ -353,88 +353,100 @@ const Pricing = () => {
                           <span className="text-muted-foreground text-lg"> one-time</span>
                         </div>
                         <div className="flex gap-3">
-                          <Dialog>
-                            <DialogTrigger asChild>
+{product.name === 'ICE SOS Bluetooth Pendant' ? (
                               <Button 
                                 variant="outline" 
                                 size="lg"
                                 className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
+                                asChild
                               >
-                                Details
+                                <Link to="/devices/ice-sos-pendant">Details</Link>
                               </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-2xl">
-                              <DialogHeader>
-                                <DialogTitle className="flex items-center gap-2">
-                                  <Package className="h-5 w-5 text-secondary" />
-                                  {product.name}
-                                </DialogTitle>
-                                <DialogDescription>
-                                  Complete product specifications and setup information
-                                </DialogDescription>
-                              </DialogHeader>
-                              
-                              <div className="space-y-6">
-                                <div>
-                                  <h4 className="font-semibold mb-3">Technical Specifications:</h4>
-                                  <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div className="flex items-center gap-2">
-                                      <Bluetooth className="h-4 w-4 text-blue-500" />
-                                      <span>Bluetooth 5.0 Low Energy</span>
+                            ) : (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button 
+                                    variant="outline" 
+                                    size="lg"
+                                    className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
+                                  >
+                                    Details
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-2xl">
+                                  <DialogHeader>
+                                    <DialogTitle className="flex items-center gap-2">
+                                      <Package className="h-5 w-5 text-secondary" />
+                                      {product.name}
+                                    </DialogTitle>
+                                    <DialogDescription>
+                                      Complete product specifications and setup information
+                                    </DialogDescription>
+                                  </DialogHeader>
+                                  
+                                  <div className="space-y-6">
+                                    <div>
+                                      <h4 className="font-semibold mb-3">Technical Specifications:</h4>
+                                      <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div className="flex items-center gap-2">
+                                          <Bluetooth className="h-4 w-4 text-blue-500" />
+                                          <span>Bluetooth 5.0 Low Energy</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Battery className="h-4 w-4 text-green-500" />
+                                          <span>7-day battery life</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <Droplets className="h-4 w-4 text-blue-500" />
+                                          <span>IP67 Waterproof</span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                          <MapPin className="h-4 w-4 text-red-500" />
+                                          <span>100m range</span>
+                                        </div>
+                                      </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                      <Battery className="h-4 w-4 text-green-500" />
-                                      <span>7-day battery life</span>
+
+                                    <div>
+                                      <h4 className="font-semibold mb-3">All Features:</h4>
+                                      <ul className="grid grid-cols-1 gap-2">
+                                        {product.features.map((feature, index) => (
+                                          <li key={index} className="flex items-start gap-2">
+                                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                            <span className="text-sm">{feature}</span>
+                                          </li>
+                                        ))}
+                                      </ul>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                      <Droplets className="h-4 w-4 text-blue-500" />
-                                      <span>IP67 Waterproof</span>
+
+                                    <div>
+                                      <h4 className="font-semibold mb-3">How It Works:</h4>
+                                      <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
+                                        <li>Pair the pendant with your smartphone via Bluetooth</li>
+                                        <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
+                                        <li>Press the button once to activate emergency mode</li>
+                                        <li>Your emergency contacts and services are notified instantly</li>
+                                        <li>GPS location is shared automatically through your phone</li>
+                                      </ol>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                      <MapPin className="h-4 w-4 text-red-500" />
-                                      <span>100m range</span>
-                                    </div>
+
+                                     <div className="flex gap-3 pt-4">
+                                       <Button 
+                                         className={`flex-1 ${
+                                           product.name === 'ICE SOS Bluetooth Pendant'
+                                             ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                             : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                         }`}
+                                         asChild
+                                       >
+                                         <Link to="/ai-register">Purchase Device</Link>
+                                       </Button>
+                                     </div>
                                   </div>
-                                </div>
+                                </DialogContent>
+                              </Dialog>
+                            )}
 
-                                <div>
-                                  <h4 className="font-semibold mb-3">All Features:</h4>
-                                  <ul className="grid grid-cols-1 gap-2">
-                                    {product.features.map((feature, index) => (
-                                      <li key={index} className="flex items-start gap-2">
-                                        <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                        <span className="text-sm">{feature}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-
-                                <div>
-                                  <h4 className="font-semibold mb-3">How It Works:</h4>
-                                  <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                                    <li>Pair the pendant with your smartphone via Bluetooth</li>
-                                    <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
-                                    <li>Press the button once to activate emergency mode</li>
-                                    <li>Your emergency contacts and services are notified instantly</li>
-                                    <li>GPS location is shared automatically through your phone</li>
-                                  </ol>
-                                </div>
-
-                                 <div className="flex gap-3 pt-4">
-                                   <Button 
-                                     className={`flex-1 ${
-                                       product.name === 'ICE SOS Bluetooth Pendant'
-                                         ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                         : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                                     }`}
-                                     asChild
-                                   >
-                                     <Link to="/ai-register">Purchase Device</Link>
-                                   </Button>
-                                 </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
                           
                         <Button 
                           size="lg"

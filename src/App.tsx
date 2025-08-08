@@ -22,6 +22,7 @@ import SOSHome from "./pages/SOSHome";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Support from "./pages/Support";
+import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 
 const App = () => {
@@ -71,6 +72,7 @@ const App = () => {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/devices/ice-sos-pendant" element={<DeviceIceSosPendant />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         {/* Global floating device/settings button */}
