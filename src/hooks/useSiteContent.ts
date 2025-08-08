@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +7,9 @@ type SiteContentValue<T> = {
   key: string;
   value: T;
 };
+
+// Local Json type compatible with Supabase expectations
+type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 
 export function useSiteContent<T>(key: string, defaults?: T) {
   const queryClient = useQueryClient();
@@ -18,13 +22,19 @@ export function useSiteContent<T>(key: string, defaults?: T) {
         .from("site_content")
         .select("key, value")
         .eq("key", key)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.warn("[useSiteContent] fetch error", error);
-        // If row not found, return defaults if provided
+        // If row not found or any error, return defaults if provided
         return (defaults ? { key, value: defaults } : null) as SiteContentValue<T> | null;
       }
+
+      if (!data) {
+        // No row exists yet; return defaults if provided
+        return (defaults ? { key, value: defaults } : null) as SiteContentValue<T> | null;
+      }
+
       return data as SiteContentValue<T>;
     },
   });
@@ -32,9 +42,10 @@ export function useSiteContent<T>(key: string, defaults?: T) {
   const saveMutation = useMutation({
     mutationFn: async (value: T) => {
       console.log("[useSiteContent] saving", key, value);
+      const payload = { key, value: (value as unknown) as Json };
       const { error } = await supabase
         .from("site_content")
-        .upsert({ key, value });
+        .upsert(payload, { onConflict: "key" });
       if (error) throw error;
       return value;
     },
@@ -89,3 +100,4 @@ export function useSiteContent<T>(key: string, defaults?: T) {
     isSaving: saveMutation.isPending,
   };
 }
+
