@@ -59,15 +59,23 @@ const DeviceIceSosPendant = () => {
         <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
       </Helmet>
 
-      <header className="relative bg-gradient-to-b from-muted/20 via-background to-background">
-        <div className="container mx-auto px-4 py-16 md:py-24">
+      <header className="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
+        {/* Dark overlay for contrast */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30" />
+
+        {/* Subtle pattern like homepage */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:20px_20px]" />
+        </div>
+
+        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div>
+            <div className="text-white">
               <Badge variant="secondary" className="mb-3">ICE SOS Lite Device</Badge>
               <h1 className="text-3xl md:text-5xl font-bold leading-tight animate-fade-in">
                 ICE SOS Bluetooth Pendant
               </h1>
-              <p className="mt-4 text-lg text-muted-foreground max-w-prose">
+              <p className="mt-4 text-lg text-white/90 max-w-prose">
                 A discreet, one-button pendant that instantly activates your emergency plan via the ICE SOS Lite app. Designed for
                 reliability, comfort, and peace of mind.
               </p>
@@ -79,23 +87,25 @@ const DeviceIceSosPendant = () => {
                   <Link to="#how-it-works">How it works</Link>
                 </Button>
               </div>
-              <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Works with any ICE SOS subscription</li>
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> One‑tap SOS activation from a wearable</li>
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Quick pairing, secure connection</li>
+              <ul className="mt-6 space-y-2 text-sm text-white/80">
+                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> Works with any ICE SOS subscription</li>
+                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> One‑tap SOS activation from a wearable</li>
+                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> Quick pairing, secure connection</li>
               </ul>
-              <div className="mt-6 flex flex-wrap gap-4 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-2"><Shield className="h-4 w-4 text-primary" />IP67 Waterproof</span>
-                <span className="inline-flex items-center gap-2"><PhoneCall className="h-4 w-4 text-primary" />App-assisted response</span>
+              <div className="mt-6 flex flex-wrap gap-4 text-xs text-white/80">
+                <span className="inline-flex items-center gap-2"><Shield className="h-4 w-4 text-emergency" />IP67 Waterproof</span>
+                <span className="inline-flex items-center gap-2"><PhoneCall className="h-4 w-4 text-emergency" />App-assisted response</span>
               </div>
             </div>
-            <div>
+            <div className="relative">
               <img
                 src={heroImg}
-                alt="ICE SOS Bluetooth Pendant with smartphone showing emergency activation"
-                className="w-full rounded-xl shadow-md hover-scale"
+                alt="ICE SOS Lite Bluetooth Pendant with smartphone showing emergency activation"
+                className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl hover-scale"
                 loading="lazy"
               />
+              <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-pulse" />
+              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-guardian/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
           </div>
         </div>
