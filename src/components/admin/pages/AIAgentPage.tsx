@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Bot, 
   Brain, 
@@ -83,6 +84,7 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
   });
 
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     loadAIData();
@@ -131,14 +133,16 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
           return acc;
         }, {} as any);
 
+        const unwrap = (v: any, fb: any) => (v && typeof v === 'object' && 'value' in v ? (v as any).value : (v ?? fb));
+
         setAiSettings(prev => ({
           ...prev,
-          temperature: settingsMap.temperature || prev.temperature,
-          maxTokens: settingsMap.max_tokens || prev.maxTokens,
-          systemPrompt: settingsMap.system_prompt || prev.systemPrompt,
-          enableLogging: settingsMap.enable_logging !== undefined ? settingsMap.enable_logging : prev.enableLogging,
-          autoLearnEnabled: settingsMap.auto_learn_enabled !== undefined ? settingsMap.auto_learn_enabled : prev.autoLearnEnabled,
-          responseDelay: settingsMap.response_delay || prev.responseDelay
+          temperature: Number(unwrap(settingsMap.temperature, prev.temperature)),
+          maxTokens: Number(unwrap(settingsMap.max_tokens, prev.maxTokens)),
+          systemPrompt: String(unwrap(settingsMap.system_prompt, prev.systemPrompt)),
+          enableLogging: unwrap(settingsMap.enable_logging, prev.enableLogging),
+          autoLearnEnabled: unwrap(settingsMap.auto_learn_enabled, prev.autoLearnEnabled),
+          responseDelay: Number(unwrap(settingsMap.response_delay, prev.responseDelay))
         }));
       }
     } catch (error) {
@@ -168,6 +172,8 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
             description: `AI configuration setting: ${setting.setting_key}`
           }, { onConflict: 'setting_key' });
       }
+
+      toast({ title: 'System prompt saved', description: 'Emma’s instructions updated.' });
 
       // Test the AI connection
       const { data, error } = await supabase.functions.invoke('ai-chat', {
@@ -369,9 +375,9 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
               onClick={async () => {
                 try {
                   await handleSettingsUpdate();
-                  alert('AI settings updated and tested successfully!');
-                } catch (error) {
-                  alert('Error: ' + error.message);
+                  toast({ title: 'AI settings updated', description: 'Connection test triggered.' });
+                } catch (error: any) {
+                  toast({ title: 'Update failed', description: String(error?.message || error), variant: 'destructive' });
                 }
               }} 
               className="w-full"
