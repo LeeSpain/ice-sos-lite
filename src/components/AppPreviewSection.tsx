@@ -15,8 +15,8 @@ const AppPreviewSection: React.FC = () => {
     <section className="container mx-auto px-4 py-12">
       <Card className="border-0 shadow-none bg-transparent">
         <CardHeader className="items-center text-center">
-          <CardTitle>See how the app looks</CardTitle>
-          <CardDescription className="mt-2 max-w-2xl mx-auto">
+          <CardTitle className="text-3xl md:text-4xl font-bold">See how the app looks</CardTitle>
+          <CardDescription className="mt-2 max-w-2xl mx-auto text-lg">
             Explore a live preview of our mobile app. It updates automatically when admins save changes and connects with smart devices for real-time wellness and safety data.
           </CardDescription>
         </CardHeader>
