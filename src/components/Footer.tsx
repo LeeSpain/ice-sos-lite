@@ -80,6 +80,9 @@ const Footer = () => {
               <a href="#pricing" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Pricing
               </a>
+              <Link to="/devices/ice-sos-pendant" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Devices
+              </Link>
               <Link to="/support" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Support
               </Link>

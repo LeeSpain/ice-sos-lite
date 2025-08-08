@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall } from "lucide-react";
 import heroImg from "@/assets/hero-emergency.jpg";
 
@@ -40,7 +41,9 @@ const DeviceIceSosPendant = () => {
   ];
 
   return (
-    <main>
+    <div className="min-h-screen">
+      <Navigation />
+      <main className="pt-16 md:pt-20">
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -187,6 +190,8 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
     </main>
+      <Footer />
+    </div>
   );
 };
 
