@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PushNotifications, PermissionStatus } from "@capacitor/push-notifications";
+import type { PluginListenerHandle } from "@capacitor/core";
 import { useToast } from "@/hooks/use-toast";
 
 export const usePushNotifications = () => {
@@ -9,7 +10,11 @@ export const usePushNotifications = () => {
   const tokenRef = useRef<string | null>(null);
 
   useEffect(() => {
-    const init = async () => {
+    let regListener: PluginListenerHandle | undefined;
+    let regErrorListener: PluginListenerHandle | undefined;
+    let receivedListener: PluginListenerHandle | undefined;
+
+    const setup = async () => {
       try {
         const perm = await PushNotifications.checkPermissions();
         setPermission(perm.receive);
@@ -17,29 +22,34 @@ export const usePushNotifications = () => {
         // probably running on web without native support
         setPermission("denied");
       }
+
+      try {
+        regListener = await PushNotifications.addListener("registration", (token) => {
+          tokenRef.current = token.value;
+          setIsRegistered(true);
+          toast({ title: "Push enabled", description: "Notifications are active." });
+          console.log("Push token", token.value);
+        });
+
+        regErrorListener = await PushNotifications.addListener("registrationError", (err) => {
+          setIsRegistered(false);
+          toast({ title: "Push registration failed", description: String(err), variant: "destructive" });
+        });
+
+        receivedListener = await PushNotifications.addListener("pushNotificationReceived", (notification) => {
+          toast({ title: notification.title ?? "Notification", description: notification.body ?? "" });
+        });
+      } catch (e) {
+        // listeners likely unsupported on web
+      }
     };
-    init();
 
-    const regListener = PushNotifications.addListener("registration", (token) => {
-      tokenRef.current = token.value;
-      setIsRegistered(true);
-      toast({ title: "Push enabled", description: "Notifications are active." });
-      console.log("Push token", token.value);
-    });
-
-    const regErrorListener = PushNotifications.addListener("registrationError", (err) => {
-      setIsRegistered(false);
-      toast({ title: "Push registration failed", description: String(err), variant: "destructive" });
-    });
-
-    const receivedListener = PushNotifications.addListener("pushNotificationReceived", (notification) => {
-      toast({ title: notification.title ?? "Notification", description: notification.body ?? "" });
-    });
+    setup();
 
     return () => {
-      regListener.remove();
-      regErrorListener.remove();
-      receivedListener.remove();
+      regListener?.remove();
+      regErrorListener?.remove();
+      receivedListener?.remove();
     };
   }, [toast]);
 
