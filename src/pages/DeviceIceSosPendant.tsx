@@ -3,7 +3,9 @@ import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Check, Bluetooth, Battery, Droplets, MapPin } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall } from "lucide-react";
 import heroImg from "@/assets/hero-emergency.jpg";
 
 const DeviceIceSosPendant = () => {
@@ -43,14 +45,23 @@ const DeviceIceSosPendant = () => {
         <title>{title}</title>
         <meta name="description" content={description} />
         <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="product" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={typeof window !== "undefined" ? `${window.location.origin}/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png` : ""} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
         <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
       </Helmet>
 
-      <header className="bg-gradient-to-b from-background to-background/60">
+      <header className="relative bg-gradient-to-b from-muted/20 via-background to-background">
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
-              <h1 className="text-3xl md:text-5xl font-bold leading-tight">
+              <Badge variant="secondary" className="mb-3">ICE SOS Lite Device</Badge>
+              <h1 className="text-3xl md:text-5xl font-bold leading-tight animate-fade-in">
                 ICE SOS Bluetooth Pendant
               </h1>
               <p className="mt-4 text-lg text-muted-foreground max-w-prose">
@@ -67,15 +78,19 @@ const DeviceIceSosPendant = () => {
               </div>
               <ul className="mt-6 space-y-2 text-sm text-muted-foreground">
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Works with any ICE SOS subscription</li>
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> One-tap SOS activation from a wearable</li>
+                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> One‑tap SOS activation from a wearable</li>
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-primary" /> Quick pairing, secure connection</li>
               </ul>
+              <div className="mt-6 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-2"><Shield className="h-4 w-4 text-primary" />IP67 Waterproof</span>
+                <span className="inline-flex items-center gap-2"><PhoneCall className="h-4 w-4 text-primary" />App-assisted response</span>
+              </div>
             </div>
             <div>
               <img
                 src={heroImg}
                 alt="ICE SOS Bluetooth Pendant with smartphone showing emergency activation"
-                className="w-full rounded-xl shadow-md"
+                className="w-full rounded-xl shadow-md hover-scale"
                 loading="lazy"
               />
             </div>
