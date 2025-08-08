@@ -82,8 +82,15 @@ const AppTestingPage: React.FC = () => {
         {/* Left: Live preview */}
         <div className="w-full lg:w-5/12">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex items-center justify-between">
               <CardTitle>App Visual Preview</CardTitle>
+              <div className="flex items-center gap-2">
+                <span className="relative inline-flex">
+                  <span className="h-3.5 w-3.5 rounded-full bg-[hsl(var(--emergency))] shadow-[0_0_12px_hsl(var(--emergency)/0.8)]"></span>
+                  <span className="absolute inset-0 rounded-full emergency-pulse"></span>
+                </span>
+                <span className="text-xs font-medium text-muted-foreground">Live</span>
+              </div>
             </CardHeader>
             <CardContent>
               <AppPreviewPhone config={draft} />
@@ -118,6 +125,10 @@ const AppTestingPage: React.FC = () => {
                 <div>
                   <Label htmlFor="voiceLabel">Voice Label</Label>
                   <Input id="voiceLabel" value={draft.voiceLabel} onChange={(e) => handleField("voiceLabel", e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="primaryColor">Primary Color</Label>
+                  <Input id="primaryColor" type="text" placeholder="#ef4444" value={draft.primaryColor ?? ""} onChange={(e) => handleField("primaryColor", e.target.value)} />
                 </div>
                 <div>
                   <Label htmlFor="sosColor">SOS Button Color</Label>
