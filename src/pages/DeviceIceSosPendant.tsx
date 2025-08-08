@@ -8,6 +8,8 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall } from "lucide-react";
 import heroImg from "@/assets/hero-emergency.jpg";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 const DeviceIceSosPendant = () => {
   const title = "ICE SOS Bluetooth Pendant – ICE SOS Lite";
@@ -38,6 +40,16 @@ const DeviceIceSosPendant = () => {
     { icon: Droplets, text: "IP67 waterproof for everyday wear" },
     { icon: Battery, text: "Up to 7 days battery life per charge" },
     { icon: MapPin, text: "100m range from your phone for flexible movement" }
+  ];
+
+  const alertData = [
+    { time: "09:00", alerts: 2 },
+    { time: "10:00", alerts: 4 },
+    { time: "11:00", alerts: 3 },
+    { time: "12:00", alerts: 6 },
+    { time: "13:00", alerts: 5 },
+    { time: "14:00", alerts: 7 },
+    { time: "15:00", alerts: 4 },
   ];
 
   return (
@@ -145,6 +157,36 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
+      {/* Instant Alerts card with phone analytics */}
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-3xl bg-background rounded-3xl shadow-xl border border-border p-8 text-center">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Every Second Counts</p>
+            <h2 className="mt-2 text-2xl md:text-3xl font-semibold">Instant Alerts for Faster Emergency Response</h2>
+            <p className="mt-3 text-muted-foreground">
+              ICE SOS Lite sends instant alerts to your trusted contacts and responders with location and essential health info,
+              reducing response times when it matters most.
+            </p>
+            <div className="mt-6 flex justify-center">
+              <div className="relative w-64 md:w-80 aspect-[9/19] bg-muted rounded-[2.5rem] p-3 shadow-inner border border-border">
+                <div className="absolute inset-x-10 top-2 h-1.5 rounded bg-muted/80" />
+                <div className="h-full rounded-[2rem] bg-background p-3">
+                  <ChartContainer className="h-full w-full" config={{ alerts: { color: "hsl(var(--emergency))" } }}>
+                    <AreaChart data={alertData} margin={{ left: 0, right: 0, top: 10, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="time" hide />
+                      <YAxis hide />
+                      <Area type="monotone" dataKey="alerts" stroke="var(--color-alerts)" fill="var(--color-alerts)" fillOpacity={0.2} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </AreaChart>
+                  </ChartContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="py-16 bg-secondary/30">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-semibold">Tech specs</h2>
@@ -173,6 +215,71 @@ const DeviceIceSosPendant = () => {
               <p className="font-medium text-foreground">What’s included</p>
               <p>Pendant, charging cable, quick start guide</p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Feature ring visuals */}
+      <section className="py-16 bg-secondary/30">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-semibold text-center">ICE SOS Lite pendant — built for all needs</h2>
+          <p className="mt-2 text-center text-muted-foreground max-w-2xl mx-auto">
+            Durable design with flexible wearing options and low‑energy connectivity for reliable, instant activation.
+          </p>
+
+          <div className="relative mx-auto mt-10 max-w-3xl">
+            <div className="relative grid place-items-center">
+              {/* Concentric rings */}
+              <div className="w-72 h-72 md:w-80 md:h-80 rounded-full border border-border/60 bg-background shadow-inner" />
+              <div className="absolute w-40 h-40 md:w-48 md:h-48 rounded-full border border-border/50 bg-muted/40" />
+
+              {/* Center token */}
+              <div className="absolute w-24 h-24 md:w-28 md:h-28 rounded-full bg-white border border-border shadow-md grid place-items-center">
+                <span className="text-xs font-semibold">ICE SOS</span>
+              </div>
+
+              {/* Badges around */}
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
+                <span className="inline-flex items-center gap-2"><Battery className="h-3.5 w-3.5 text-primary" />7‑day battery</span>
+              </div>
+              <div className="absolute top-1/2 -right-3 -translate-y-1/2 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
+                <span className="inline-flex items-center gap-2"><Shield className="h-3.5 w-3.5 text-primary" />Secure fit</span>
+              </div>
+              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
+                <span className="inline-flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-primary" />Accurate location</span>
+              </div>
+              <div className="absolute top-1/2 -left-3 -translate-y-1/2 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
+                <span className="inline-flex items-center gap-2"><Bluetooth className="h-3.5 w-3.5 text-primary" />BLE connectivity</span>
+              </div>
+              <div className="absolute top-6 left-6 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
+                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-primary" />Reliable & fast</span>
+              </div>
+              <div className="absolute top-6 right-6 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
+                <span className="inline-flex items-center gap-2"><Droplets className="h-3.5 w-3.5 text-primary" />IP67 waterproof</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Accessory cards */}
+          <div className="mt-10 grid md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-5">
+                <p className="font-medium">Wristband</p>
+                <p className="text-sm text-muted-foreground">Comfortable everyday wear</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-5">
+                <p className="font-medium">Clip</p>
+                <p className="text-sm text-muted-foreground">Attach to clothing or belts</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-5">
+                <p className="font-medium">Keyring</p>
+                <p className="text-sm text-muted-foreground">Keep it with your keys</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
