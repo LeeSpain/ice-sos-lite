@@ -80,9 +80,9 @@ const Footer = () => {
               <a href="#pricing" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Pricing
               </a>
-              <a href="#support" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/support" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Support
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -159,15 +159,15 @@ const Footer = () => {
               © 2024 {(value ?? defaults).appName}. All rights reserved.
             </p>
             <div className="flex space-x-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              </Link>
+              <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
                 Terms of Service
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Cookie Policy
-              </a>
+              </Link>
+              <Link to="/support" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                Support
+              </Link>
             </div>
           </div>
         </div>
