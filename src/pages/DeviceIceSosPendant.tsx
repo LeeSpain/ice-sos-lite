@@ -326,6 +326,21 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
+      {/* Brand strip - only our logo */}
+      <section className="py-10">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-xl text-center">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Brand</p>
+            <img
+              src="/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png"
+              alt="ICE SOS Lite brand logo"
+              className="mx-auto h-12 md:h-14 object-contain"
+              loading="lazy"
+            />
+          </div>
+        </div>
+      </section>
+
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
