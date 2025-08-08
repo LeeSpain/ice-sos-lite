@@ -14,7 +14,7 @@ const AppPreviewPhone: React.FC<Props> = ({ config, className }) => {
   return (
     <div className={className}>
       <div className="mx-auto w-full max-w-sm">
-        <Card className="relative mx-auto w-full rounded-[2.25rem] border-border bg-card p-4 shadow-xl">
+        <Card className="relative mx-auto w-full rounded-[2.25rem] border-8 border-black bg-card p-4 shadow-xl">
           {/* Notch */}
           <div className="pointer-events-none absolute left-1/2 top-0 z-10 h-6 w-32 -translate-x-1/2 rounded-b-2xl bg-foreground/10" />
 

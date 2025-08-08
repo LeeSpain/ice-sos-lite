@@ -3,7 +3,7 @@ import React, { useState, useCallback } from 'react';
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
-import MetricPreview from "@/components/MetricPreview";
+// import MetricPreview from "@/components/MetricPreview";
 import Pricing from "@/components/Pricing";
 
 import AppDownload from "@/components/AppDownload";
@@ -99,7 +99,7 @@ const Index = () => {
 
       <Hero onEmmaClick={handleEmmaClick} />
       <Features />
-      <MetricPreview />
+      {/* <MetricPreview /> */}
 
       {/* Live App Preview Section (reflects admin "App Testing" settings) */}
       <AppPreviewSection />
