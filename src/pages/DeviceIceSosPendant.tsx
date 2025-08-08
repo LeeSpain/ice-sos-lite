@@ -266,64 +266,104 @@ const DeviceIceSosPendant = () => {
       </section>
 
       {/* Feature ring visuals */}
-      <section className="py-20 bg-secondary/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-semibold text-center">ICE SOS Lite pendant — built for all needs</h2>
-          <p className="mt-2 text-center text-muted-foreground max-w-2xl mx-auto">
-            Durable design with flexible wearing options and low‑energy connectivity for reliable, instant activation.
-          </p>
+      <section className="py-20 bg-gradient-to-br from-secondary/10 via-background to-primary/5 relative overflow-hidden">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(var(--primary-rgb),0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(var(--emergency-rgb),0.1),transparent_50%)]" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-emergency to-guardian bg-clip-text text-transparent mb-4">
+              ICE SOS Lite pendant — built for all needs
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Durable design with flexible wearing options and low‑energy connectivity for reliable, instant activation.
+            </p>
+          </div>
 
-          <div className="relative mx-auto mt-10 max-w-3xl">
+          <div className="relative mx-auto mt-12 max-w-4xl">
             <div className="relative grid place-items-center">
-              {/* Concentric rings */}
-              <div className="w-72 h-72 md:w-80 md:h-80 rounded-full border border-border/60 bg-background shadow-inner" />
-              <div className="absolute w-40 h-40 md:w-48 md:h-48 rounded-full border border-border/50 bg-muted/40" />
+              {/* Enhanced concentric rings with gradients */}
+              <div className="w-80 h-80 md:w-96 md:h-96 rounded-full border-2 border-gradient-to-r from-primary/30 to-emergency/30 bg-gradient-to-br from-background via-muted/20 to-background shadow-2xl animate-pulse" style={{animationDuration: '4s'}} />
+              <div className="absolute w-52 h-52 md:w-64 md:h-64 rounded-full border border-primary/40 bg-gradient-to-br from-muted/30 to-background shadow-inner" />
 
-              {/* Center token */}
-              <div className="absolute w-24 h-24 md:w-28 md:h-28 rounded-full bg-white border border-border shadow-md grid place-items-center">
-                <span className="text-xs font-semibold">ICE SOS</span>
+              {/* Enhanced center token */}
+              <div className="absolute w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-white via-muted/50 to-white border-2 border-primary/30 shadow-2xl grid place-items-center group hover:scale-105 transition-transform duration-300">
+                <div className="text-center">
+                  <Shield className="h-6 w-6 md:h-8 md:w-8 text-primary mx-auto mb-1" />
+                  <span className="text-xs md:text-sm font-bold text-foreground">ICE SOS</span>
+                </div>
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-emergency/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
               </div>
 
-              {/* Badges around */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
-                <span className="inline-flex items-center gap-2"><Battery className="h-3.5 w-3.5 text-primary" />7‑day battery</span>
+              {/* Enhanced floating badges with improved colors and effects */}
+              <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emergency to-emergency-glow text-white rounded-2xl border border-emergency/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <Battery className="h-4 w-4" />7‑day battery
+                </span>
               </div>
-              <div className="absolute top-1/2 -right-3 -translate-y-1/2 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
-                <span className="inline-flex items-center gap-2"><Shield className="h-3.5 w-3.5 text-primary" />Secure fit</span>
+              
+              <div className="absolute top-1/2 -right-6 -translate-y-1/2 bg-gradient-to-r from-primary to-primary-glow text-white rounded-2xl border border-primary/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <Shield className="h-4 w-4" />Secure fit
+                </span>
               </div>
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
-                <span className="inline-flex items-center gap-2"><MapPin className="h-3.5 w-3.5 text-primary" />Accurate location</span>
+              
+              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-guardian to-guardian-glow text-white rounded-2xl border border-guardian/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <MapPin className="h-4 w-4" />Accurate location
+                </span>
               </div>
-              <div className="absolute top-1/2 -left-3 -translate-y-1/2 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
-                <span className="inline-flex items-center gap-2"><Bluetooth className="h-3.5 w-3.5 text-primary" />BLE connectivity</span>
+              
+              <div className="absolute top-1/2 -left-6 -translate-y-1/2 bg-gradient-to-r from-wellness to-wellness-glow text-white rounded-2xl border border-wellness/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <Bluetooth className="h-4 w-4" />BLE connectivity
+                </span>
               </div>
-              <div className="absolute top-6 left-6 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
-                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-primary" />Reliable & fast</span>
+              
+              <div className="absolute top-8 left-8 bg-gradient-to-r from-blue to-blue-glow text-white rounded-2xl border border-blue/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <Check className="h-4 w-4" />Reliable & fast
+                </span>
               </div>
-              <div className="absolute top-6 right-6 bg-background rounded-full border border-border px-3 py-1 text-xs shadow">
-                <span className="inline-flex items-center gap-2"><Droplets className="h-3.5 w-3.5 text-primary" />IP67 waterproof</span>
+              
+              <div className="absolute top-8 right-8 bg-gradient-to-r from-green to-green-glow text-white rounded-2xl border border-green/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <span className="inline-flex items-center gap-2 font-semibold">
+                  <Droplets className="h-4 w-4" />IP67 waterproof
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Accessory cards */}
-          <div className="mt-10 grid md:grid-cols-3 gap-4">
-            <Card>
-              <CardContent className="p-5">
-                <p className="font-medium">Wristband</p>
-                <p className="text-sm text-muted-foreground">Comfortable everyday wear</p>
+          {/* Enhanced accessory cards with colorful gradients */}
+          <div className="mt-16 grid md:grid-cols-3 gap-6">
+            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:border-primary/40 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-glow rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Shield className="h-6 w-6 text-white" />
+                </div>
+                <p className="font-semibold text-lg text-foreground">Wristband</p>
+                <p className="text-sm text-muted-foreground mt-1">Comfortable everyday wear</p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-5">
-                <p className="font-medium">Clip</p>
-                <p className="text-sm text-muted-foreground">Attach to clothing or belts</p>
+            
+            <Card className="bg-gradient-to-br from-emergency/5 to-emergency/10 border-emergency/20 hover:border-emergency/40 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-emergency to-emergency-glow rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Check className="h-6 w-6 text-white" />
+                </div>
+                <p className="font-semibold text-lg text-foreground">Clip</p>
+                <p className="text-sm text-muted-foreground mt-1">Attach to clothing or belts</p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="p-5">
-                <p className="font-medium">Keyring</p>
-                <p className="text-sm text-muted-foreground">Keep it with your keys</p>
+            
+            <Card className="bg-gradient-to-br from-guardian/5 to-guardian/10 border-guardian/20 hover:border-guardian/40 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 bg-gradient-to-br from-guardian to-guardian-glow rounded-full flex items-center justify-center mx-auto mb-3">
+                  <MapPin className="h-6 w-6 text-white" />
+                </div>
+                <p className="font-semibold text-lg text-foreground">Keyring</p>
+                <p className="text-sm text-muted-foreground mt-1">Keep it with your keys</p>
               </CardContent>
             </Card>
           </div>
