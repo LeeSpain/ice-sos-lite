@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import DashboardRedirect from "./components/DashboardRedirect";
 import WelcomeQuestionnaire from "./components/WelcomeQuestionnaire";
 import SOSHome from "./pages/SOSHome";
+import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 
 const App = () => {
   return (
@@ -66,6 +67,8 @@ const App = () => {
           } />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        {/* Global floating device/settings button */}
+        <DeviceManagerButton />
       </BrowserRouter>
     </AuthProvider>
   );
