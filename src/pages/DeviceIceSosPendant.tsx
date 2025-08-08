@@ -80,26 +80,26 @@ const DeviceIceSosPendant = () => {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:20px_20px]" />
         </div>
 
-        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="text-white">
-              <Badge variant="secondary" className="mb-3">ICE SOS Lite Device</Badge>
-              <h1 className="text-3xl md:text-5xl font-bold leading-tight animate-fade-in">
+        <div className="container mx-auto px-4 py-20 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left text-white">
+              <Badge variant="secondary" className="mb-6">ICE SOS Lite Device</Badge>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
                 ICE SOS Bluetooth Pendant
               </h1>
-              <p className="mt-4 text-lg text-white/90 max-w-prose">
+              <p className="text-xl md:text-2xl mb-8 text-white/90 leading-relaxed font-medium drop-shadow-sm">
                 A discreet, one-button pendant that instantly activates your emergency plan via the ICE SOS Lite app. Designed for
                 reliability, comfort, and peace of mind.
               </p>
-              <div className="mt-6 flex gap-3">
-                <Button className="px-6" asChild>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                <Button className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
                   <Link to="/ai-register">Buy now</Link>
                 </Button>
-                <Button variant="outline" className="px-6" asChild>
+                <Button variant="outline" className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
                   <Link to="#how-it-works">How it works</Link>
                 </Button>
               </div>
-              <ul className="mt-6 space-y-2 text-sm text-white/80">
+              <ul className="mt-8 space-y-3 text-white/80">
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> Works with any ICE SOS subscription</li>
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> One‑tap SOS activation from a wearable</li>
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> Quick pairing, secure connection</li>
@@ -123,7 +123,7 @@ const DeviceIceSosPendant = () => {
         </div>
       </header>
 
-      <section id="how-it-works" className="py-16">
+      <section id="how-it-works" className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-start">
             <div>
@@ -158,7 +158,7 @@ const DeviceIceSosPendant = () => {
       </section>
 
       {/* Instant Alerts card with phone analytics */}
-      <section className="py-12">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl bg-background rounded-3xl shadow-xl border border-border p-8 text-center">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Every Second Counts</p>
@@ -191,7 +191,7 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
-      <section className="py-16 bg-secondary/30">
+      <section className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">Tech specs</h2>
           <div className="mt-6 grid md:grid-cols-3 gap-6">
@@ -266,7 +266,7 @@ const DeviceIceSosPendant = () => {
       </section>
 
       {/* Feature ring visuals */}
-      <section className="py-16 bg-secondary/30">
+      <section className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-semibold text-center">ICE SOS Lite pendant — built for all needs</h2>
           <p className="mt-2 text-center text-muted-foreground max-w-2xl mx-auto">
@@ -345,7 +345,7 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
-      <section className="py-16">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
