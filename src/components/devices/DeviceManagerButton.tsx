@@ -13,16 +13,18 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Bluetooth, Cog, HeartPulse, PlugZap, PowerOff, Mic, Megaphone } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { Capacitor } from "@capacitor/core";
+import { BleClient } from "@capacitor-community/bluetooth-le";
 
-// Minimal typings to avoid TS issues on browsers without Web Bluetooth types
-declare global {
-  interface Navigator {
-    bluetooth?: any;
-  }
-}
+// Web Bluetooth types are provided by DOM lib; fallback casts are used where needed.
 
 const hrService = "heart_rate";
 const hrCharacteristic = "heart_rate_measurement";
+// BLE UUIDs for mobile (Capacitor)
+const HR_SERVICE_UUID = "0000180D-0000-1000-8000-00805F9B34FB";
+const HR_MEASUREMENT_UUID = "00002A37-0000-1000-8000-00805F9B34FB";
+const BATT_SERVICE_UUID = "0000180F-0000-1000-8000-00805F9B34FB";
+const BATT_LEVEL_UUID = "00002A19-0000-1000-8000-00805F9B34FB";
 
 const parseHeartRate = (event: any): number => {
   try {
@@ -49,10 +51,11 @@ const DeviceManagerButton: React.FC = () => {
   const deviceRef = useRef<any>(null);
   const serverRef = useRef<any>(null);
   const hrCharRef = useRef<any>(null);
+  const deviceIdRef = useRef<string | null>(null);
   const simIntervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-    setSupported(Boolean(navigator.bluetooth));
+    setSupported(Boolean(navigator.bluetooth) || Capacitor.isNativePlatform());
 
     const handler = () => setOpen(true);
     window.addEventListener("open-device-settings", handler);
@@ -93,42 +96,63 @@ const DeviceManagerButton: React.FC = () => {
 
   const connect = async () => {
     try {
-      if (!navigator.bluetooth) {
+      setConnecting(true);
+      if (Capacitor.isNativePlatform()) {
+        await BleClient.initialize();
+        setUseSimulator(false);
+        const device = await BleClient.requestDevice({ services: [HR_SERVICE_UUID] });
+        deviceIdRef.current = device.deviceId;
+        setDeviceName(device.name ?? "BLE device");
+        await BleClient.connect(device.deviceId, () => {
+          setConnected(false);
+          setDeviceName("");
+          deviceIdRef.current = null;
+        });
+        setConnected(true);
+
+        await BleClient.startNotifications(device.deviceId, HR_SERVICE_UUID, HR_MEASUREMENT_UUID, (value: DataView) => {
+          const hr = parseHeartRate({ target: { value } } as any);
+          if (hr) setHeartRate(hr);
+        });
+
+        try {
+          const batt: DataView = await BleClient.read(device.deviceId, BATT_SERVICE_UUID, BATT_LEVEL_UUID);
+          setBatteryPct(batt.getUint8(0));
+        } catch {}
+      } else if (navigator.bluetooth) {
+        setUseSimulator(false);
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ services: [hrService] }],
+          optionalServices: ["battery_service"],
+        });
+        deviceRef.current = device;
+        setDeviceName(device?.name || "Unknown device");
+
+        const server = await device.gatt.connect();
+        serverRef.current = server;
+        setConnected(true);
+
+        // Heart Rate notifications
+        const service = await server.getPrimaryService(hrService);
+        const characteristic = await service.getCharacteristic(hrCharacteristic);
+        hrCharRef.current = characteristic;
+        await characteristic.startNotifications();
+        characteristic.addEventListener("characteristicvaluechanged", (event: any) => {
+          const hr = parseHeartRate(event);
+          if (hr) setHeartRate(hr);
+        });
+
+        // Battery (best-effort)
+        try {
+          const battSvc = await server.getPrimaryService("battery_service");
+          const battChar = await battSvc.getCharacteristic("battery_level");
+          const value: DataView = await battChar.readValue();
+          setBatteryPct(value.getUint8(0));
+        } catch {}
+      } else {
         setUseSimulator(true);
         setOpen(true);
         return;
-      }
-      setConnecting(true);
-      setUseSimulator(false);
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [{ services: [hrService] }],
-        optionalServices: ["battery_service"],
-      });
-      deviceRef.current = device;
-      setDeviceName(device?.name || "Unknown device");
-
-      const server = await device.gatt.connect();
-      serverRef.current = server;
-      setConnected(true);
-
-      // Heart Rate notifications
-      const service = await server.getPrimaryService(hrService);
-      const characteristic = await service.getCharacteristic(hrCharacteristic);
-      hrCharRef.current = characteristic;
-      await characteristic.startNotifications();
-      characteristic.addEventListener("characteristicvaluechanged", (event: any) => {
-        const hr = parseHeartRate(event);
-        if (hr) setHeartRate(hr);
-      });
-
-      // Battery (best-effort)
-      try {
-        const battSvc = await server.getPrimaryService("battery_service");
-        const battChar = await battSvc.getCharacteristic("battery_level");
-        const value: DataView = await battChar.readValue();
-        setBatteryPct(value.getUint8(0));
-      } catch {
-        // ignore if not available
       }
     } catch (e) {
       console.warn("Bluetooth connect error", e);
@@ -148,6 +172,10 @@ const DeviceManagerButton: React.FC = () => {
       }
       if (deviceRef.current?.gatt?.connected) {
         deviceRef.current.gatt.disconnect();
+      }
+      if (deviceIdRef.current) {
+        try { await BleClient.disconnect(deviceIdRef.current); } catch {}
+        deviceIdRef.current = null;
       }
     } finally {
       setConnected(false);
