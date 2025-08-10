@@ -5,7 +5,8 @@
     "support": "Soporte",
     "devices": "Dispositivos",
     "signIn": "Iniciar sesión",
-    "subscribeNow": "Suscríbete"
+    "subscribeNow": "Suscríbete",
+    "regionalCenter": "Contactar Centro Regional"
   },
   "footer": {
     "quickLinks": "Enlaces rápidos",
@@ -39,5 +40,36 @@
     "corePlan": "PLAN PRINCIPAL",
     "addOn": "COMPLEMENTO",
     "oneTime": "COMPRA ÚNICA"
+  },
+  "regionalCenterES": {
+    "h1": "Centro de Llamadas Regional de España",
+    "intro": "Soporte de emergencia bilingüe 24/7 para residentes y visitantes en España.",
+    "heroDescription": "Nuestros agentes hablan inglés y español y pueden coordinar servicios de emergencia, proporcionar traducción en vivo y ayudar con el seguimiento.",
+    "ctaSOS": "Abrir SOS",
+    "ctaSupport": "Ir a Soporte",
+    "whatWeDoTitle": "Qué hacemos",
+    "whatWeDo": [
+      "Gestión y triaje de llamadas de emergencia",
+      "Traducción en vivo entre inglés y español durante llamadas de emergencia",
+      "Coordinación con servicios de emergencia y primeros respondedores locales",
+      "Contacto con tus personas de emergencia designadas",
+      "Asistencia con información médica y de viaje",
+      "Seguimiento y actualizaciones del caso hasta su resolución"
+    ],
+    "whenToContactTitle": "Cuándo contactarnos",
+    "whenToContact": [
+      "Necesitas ayuda para comunicarte con los servicios de emergencia en España",
+      "Prefieres hablar en inglés o español durante una situación urgente",
+      "Estás viajando en España y necesitas asistencia",
+      "Necesitas ayuda para coordinarte con familiares o cuidadores",
+      "Tienes un problema urgente con el dispositivo o la suscripción que afecta tu seguridad"
+    ],
+    "coverageTitle": "Cobertura y horario",
+    "coverageHours": "24/7, 365 días",
+    "coverageLanguages": "Idiomas: inglés y español",
+    "coverageRegion": "Región: España (ES)",
+    "confidentialityTitle": "Confidencialidad y seguridad",
+    "confidentialityDesc": "Todas las llamadas se graban por seguridad y formación. Los datos personales se tratan según nuestra Política de Privacidad.",
+    "noEmergency": "Si estás en peligro inmediato, llama al 112 (número de emergencia de España)."
   }
 }

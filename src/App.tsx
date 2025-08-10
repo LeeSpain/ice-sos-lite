@@ -24,6 +24,7 @@ import Terms from "./pages/Terms";
 import Support from "./pages/Support";
 import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
+import RegionalCenterSpain from "./pages/RegionalCenterSpain";
 
 const App = () => {
   return (
@@ -73,6 +74,7 @@ const App = () => {
           <Route path="/terms" element={<Terms />} />
           <Route path="/support" element={<Support />} />
           <Route path="/devices/ice-sos-pendant" element={<DeviceIceSosPendant />} />
+          <Route path="/regional-center/spain" element={<RegionalCenterSpain />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         {/* Global floating device/settings button */}

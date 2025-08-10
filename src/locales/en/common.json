@@ -5,7 +5,8 @@
     "support": "Support",
     "devices": "Devices",
     "signIn": "Sign In",
-    "subscribeNow": "Subscribe Now"
+    "subscribeNow": "Subscribe Now",
+    "regionalCenter": "Contact Regional Center"
   },
   "footer": {
     "quickLinks": "Quick Links",
@@ -39,5 +40,36 @@
     "corePlan": "CORE PLAN",
     "addOn": "ADD-ON",
     "oneTime": "ONE-TIME PURCHASE"
+  },
+  "regionalCenterES": {
+    "h1": "Spain Regional Call Centre",
+    "intro": "24/7 bilingual emergency support for residents and visitors in Spain.",
+    "heroDescription": "Our trained agents speak English and Spanish and can coordinate emergency services, provide live translation, and assist with follow-up.",
+    "ctaSOS": "Open SOS",
+    "ctaSupport": "Visit Support",
+    "whatWeDoTitle": "What we do",
+    "whatWeDo": [
+      "Emergency call handling and triage",
+      "Live translation between English and Spanish during emergency calls",
+      "Coordination with local emergency services and first responders",
+      "Contacting your designated emergency contacts",
+      "Medical and travel information assistance",
+      "Follow-up and case updates until resolution"
+    ],
+    "whenToContactTitle": "When to contact us",
+    "whenToContact": [
+      "You need help communicating with emergency services in Spain",
+      "You prefer to speak in English or Spanish during an urgent situation",
+      "You are traveling in Spain and need assistance",
+      "You need help coordinating with family or caregivers",
+      "You have an urgent device or subscription issue impacting your safety"
+    ],
+    "coverageTitle": "Coverage & hours",
+    "coverageHours": "24/7, 365 days",
+    "coverageLanguages": "Languages: English and Spanish",
+    "coverageRegion": "Region: Spain (ES)",
+    "confidentialityTitle": "Confidentiality & safety",
+    "confidentialityDesc": "All calls are recorded for safety and training. Personal data is handled according to our Privacy Policy.",
+    "noEmergency": "If you are in immediate danger, call 112 (Spain’s emergency number)."
   }
 }
