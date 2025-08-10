@@ -33,6 +33,7 @@ import {
   Mail,
   Smartphone
 } from 'lucide-react';
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 
 const adminMenuItems = [
   {
