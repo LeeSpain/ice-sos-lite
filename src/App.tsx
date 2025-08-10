@@ -4,6 +4,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import RouteChangeTracker from "@/components/RouteChangeTracker";
+import ScrollToTop from "@/components/ScrollToTop";
+
 
 import TestPage from "./pages/TestPage";
 import Index from "./pages/Index";
@@ -33,6 +35,7 @@ const App = () => {
     <AuthProvider>
       <BrowserRouter>
         <RouteChangeTracker />
+        <ScrollToTop />
         <Routes>
           <Route path="/test" element={<TestPage />} />
           <Route path="/" element={<Index />} />
