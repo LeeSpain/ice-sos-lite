@@ -515,7 +515,6 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
             </p>
           </div>
 
-          {regionalServices.length > 0 ? (
             <div className="max-w-4xl mx-auto">
               {regionalServices.map((service) => (
                 <Card key={service.id} className={`relative border-2 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden ${
@@ -547,9 +546,15 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                         }`}>
                           <MapPin className="h-8 w-8 text-white" />
                         </div>
-                        <CardTitle className="text-3xl font-bold mb-3">{service.name}</CardTitle>
-<CardDescription className="text-lg text-muted-foreground mb-4">
-                          {service.description}
+                        <CardTitle className="text-3xl font-bold mb-3">
+                          {(service.region === 'Spain' || service.name.toLowerCase().includes('spain'))
+                            ? t('regionServices.spain.name', { defaultValue: service.name })
+                            : service.name}
+                        </CardTitle>
+                        <CardDescription className="text-lg text-muted-foreground mb-4">
+                          {(service.region === 'Spain' || service.name.toLowerCase().includes('spain'))
+                            ? t('regionServices.spain.description', { defaultValue: service.description })
+                            : service.description}
                         </CardDescription>
                         <div className="mb-6">
                           <span className={`text-4xl font-bold ${
@@ -557,7 +562,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                               ? 'text-green-600'
                               : 'text-secondary'
                           }`}>{formatPriceDisplay(service.price, service.currency)}</span>
-                          <span className="text-muted-foreground text-lg">{t('pricing.perMonth', { defaultValue: '/month' })}</span>
+                          <span className="text-muted-foreground text-lg">{t('common.perMonth', { defaultValue: '/month' })}</span>
                         </div>
                         <Button 
                           size="lg"
@@ -568,7 +573,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                           }`}
                           asChild
                         >
-                          <Link to="/ai-register">{t('nav.regionalCenter')}</Link>
+                          <Link to="/ai-register">{t('nav.regionalCenter', { defaultValue: 'Contact Regional Center' })}</Link>
                         </Button>
                       </div>
                       
@@ -606,20 +611,20 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                       <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-green-500 to-green-600">
                         <MapPin className="h-8 w-8 text-white" />
                       </div>
-                      <CardTitle className="text-3xl font-bold mb-3">Call Centre Spain</CardTitle>
+                      <CardTitle className="text-3xl font-bold mb-3">{t('regionServices.spain.name', { defaultValue: 'Call Centre Spain' })}</CardTitle>
                       <CardDescription className="text-lg text-muted-foreground mb-4">
-                        Bilingual English & Spanish 24/7 emergency support with live translation and coordination with local services.
+                        {t('regionServices.spain.description', { defaultValue: 'Bilingual English & Spanish 24/7 emergency support with live translation and coordination with local services.' })}
                       </CardDescription>
                       <div className="mb-6">
                         <span className="text-4xl font-bold text-green-600">{formatPriceDisplay(4.99, 'EUR')}</span>
-                        <span className="text-muted-foreground text-lg">{t('pricing.perMonth', { defaultValue: '/month' })}</span>
+                        <span className="text-muted-foreground text-lg">{t('common.perMonth', { defaultValue: '/month' })}</span>
                       </div>
                       <Button 
                         size="lg"
                         className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-green-600 hover:bg-green-700 text-white"
                         asChild
                       >
-                        <Link to="/regional-center-spain">{t('nav.regionalCenter')}</Link>
+                        <Link to="/regional-center/spain">{t('nav.regionalCenter', { defaultValue: 'Contact Regional Center' })}</Link>
                       </Button>
                     </div>
                     <div className="lg:col-span-2">

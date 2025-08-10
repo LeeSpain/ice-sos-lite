@@ -37,7 +37,8 @@
       "morning": "Buenos días",
       "afternoon": "Buenas tardes",
       "evening": "Buenas noches"
-    }
+    },
+    "title": "Panel"
   },
   "pricing": {
     "subscribeNow": "Suscríbete",
@@ -115,7 +116,38 @@
     "profileCompletion": "Compleción del perfil",
     "overallProgress": "Progreso general",
     "recentActivity": "Actividad reciente",
-    "noRecentActivity": "Sin actividad reciente"
+    "noRecentActivity": "Sin actividad reciente",
+    "actions": {
+      "testEmergency": {
+        "title": "Probar sistema de emergencia",
+        "description": "Verifica que todos los sistemas funcionen"
+      },
+      "completeSetup": {
+        "title": "Completar configuración",
+        "descriptionIncomplete": "Termina la configuración de tu perfil",
+        "descriptionComplete": "Revisa y actualiza el perfil"
+      }
+    },
+    "status": {
+      "emergency": {
+        "title": "Preparación para emergencias",
+        "ready": "Totalmente preparado para emergencias",
+        "activatePlan": "Activa el plan de protección",
+        "addContacts": "Agrega más contactos de emergencia"
+      },
+      "account": {
+        "title": "Salud de la cuenta",
+        "complete": "Configuración de la cuenta completa",
+        "completeProfile": "Completa tu perfil",
+        "enableLocation": "Habilita el uso compartido de ubicación"
+      }
+    },
+    "checklist": {
+      "personalDetails": "Datos personales",
+      "emergencyContacts": "Contactos de emergencia",
+      "medicalInformation": "Información médica",
+      "subscriptionActive": "Suscripción activa"
+    }
   },
   "common": {
     "perMonth": "/mes",

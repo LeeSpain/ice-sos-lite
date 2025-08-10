@@ -37,7 +37,8 @@
       "morning": "Good Morning",
       "afternoon": "Good Afternoon",
       "evening": "Good Evening"
-    }
+    },
+    "title": "Dashboard"
   },
   "pricing": {
     "subscribeNow": "Subscribe Now",
@@ -115,7 +116,38 @@
     "profileCompletion": "Profile Completion",
     "overallProgress": "Overall Progress",
     "recentActivity": "Recent Activity",
-    "noRecentActivity": "No recent activity"
+    "noRecentActivity": "No recent activity",
+    "actions": {
+      "testEmergency": {
+        "title": "Test Emergency System",
+        "description": "Verify all systems are working"
+      },
+      "completeSetup": {
+        "title": "Complete Setup",
+        "descriptionIncomplete": "Finish your profile setup",
+        "descriptionComplete": "Review and update profile"
+      }
+    },
+    "status": {
+      "emergency": {
+        "title": "Emergency Readiness",
+        "ready": "Fully prepared for emergencies",
+        "activatePlan": "Activate protection plan",
+        "addContacts": "Add more emergency contacts"
+      },
+      "account": {
+        "title": "Account Health",
+        "complete": "Account setup complete",
+        "completeProfile": "Complete your profile",
+        "enableLocation": "Enable location sharing"
+      }
+    },
+    "checklist": {
+      "personalDetails": "Personal Details",
+      "emergencyContacts": "Emergency Contacts",
+      "medicalInformation": "Medical Information",
+      "subscriptionActive": "Subscription Active"
+    }
   },
   "common": {
     "perMonth": "/month",

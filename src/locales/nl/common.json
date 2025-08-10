@@ -5,7 +5,8 @@
     "support": "Ondersteuning",
     "devices": "Apparaten",
     "signIn": "Inloggen",
-    "subscribeNow": "Abonneer Nu"
+    "subscribeNow": "Abonneer Nu",
+    "regionalCenter": "Regionaal centrum contacteren"
   },
   "footer": {
     "quickLinks": "Snelle links",
@@ -36,7 +37,8 @@
       "morning": "Goedemorgen",
       "afternoon": "Goedemiddag",
       "evening": "Goedenavond"
-    }
+    },
+    "title": "Dashboard"
   },
   "pricing": {
     "subscribeNow": "Abonneer Nu",
@@ -114,7 +116,38 @@
     "profileCompletion": "Profielvoltooiing",
     "overallProgress": "Algemene voortgang",
     "recentActivity": "Recente activiteit",
-    "noRecentActivity": "Geen recente activiteit"
+    "noRecentActivity": "Geen recente activiteit",
+    "actions": {
+      "testEmergency": {
+        "title": "Noodsysteem testen",
+        "description": "Controleer of alle systemen werken"
+      },
+      "completeSetup": {
+        "title": "Configuratie voltooien",
+        "descriptionIncomplete": "Rond je profielconfiguratie af",
+        "descriptionComplete": "Profiel bekijken en bijwerken"
+      }
+    },
+    "status": {
+      "emergency": {
+        "title": "Noodgereedheid",
+        "ready": "Volledig voorbereid op noodgevallen",
+        "activatePlan": "Activeer beschermingsplan",
+        "addContacts": "Voeg meer noodcontacten toe"
+      },
+      "account": {
+        "title": "Accountgezondheid",
+        "complete": "Accountinstelling voltooid",
+        "completeProfile": "Vul je profiel aan",
+        "enableLocation": "Locatiedeling inschakelen"
+      }
+    },
+    "checklist": {
+      "personalDetails": "Persoonlijke gegevens",
+      "emergencyContacts": "Noodcontacten",
+      "medicalInformation": "Medische informatie",
+      "subscriptionActive": "Abonnement actief"
+    }
   },
   "common": {
     "perMonth": "/maand",

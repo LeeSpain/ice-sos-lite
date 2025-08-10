@@ -128,16 +128,18 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
 
   const quickActions = [
     {
-      title: "Test Emergency System",
-      description: "Verify all systems are working",
+      title: t('dashboardOverview.actions.testEmergency.title', { defaultValue: 'Test Emergency System' }),
+      description: t('dashboardOverview.actions.testEmergency.description', { defaultValue: 'Verify all systems are working' }),
       icon: Shield,
       action: handleEmergencyTest,
       loading: loading,
       variant: "emergency" as const
     },
     {
-      title: "Complete Setup",
-      description: profileCompletion < 100 ? "Finish your profile setup" : "Review and update profile",
+      title: t('dashboardOverview.actions.completeSetup.title', { defaultValue: 'Complete Setup' }),
+      description: profileCompletion < 100 
+        ? t('dashboardOverview.actions.completeSetup.descriptionIncomplete', { defaultValue: 'Finish your profile setup' })
+        : t('dashboardOverview.actions.completeSetup.descriptionComplete', { defaultValue: 'Review and update profile' }),
       icon: Users,
       action: () => window.location.href = '/dashboard/profile',
       variant: "outline" as const
@@ -146,20 +148,26 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
 
   const statusCards = [
     {
-      title: "Emergency Readiness",
+      title: t('dashboardOverview.status.emergency.title', { defaultValue: 'Emergency Readiness' }),
       value: `${emergencyContactsCount}/5 contacts`,
       status: emergencyContactsCount >= 5 && protectionActive ? "success" : "warning",
       icon: Shield,
-      description: protectionActive && emergencyContactsCount >= 5 ? "Fully prepared for emergencies" : 
-                   !protectionActive ? "Activate protection plan" : "Add more emergency contacts"
+      description: protectionActive && emergencyContactsCount >= 5 
+        ? t('dashboardOverview.status.emergency.ready', { defaultValue: 'Fully prepared for emergencies' }) 
+        : !protectionActive 
+          ? t('dashboardOverview.status.emergency.activatePlan', { defaultValue: 'Activate protection plan' }) 
+          : t('dashboardOverview.status.emergency.addContacts', { defaultValue: 'Add more emergency contacts' })
     },
     {
-      title: "Account Health", 
+      title: t('dashboardOverview.status.account.title', { defaultValue: 'Account Health' }), 
       value: `${profileCompletion}% complete`,
       status: profileCompletion >= 80 && profile?.location_sharing_enabled ? "success" : "warning",
       icon: TrendingUp,
-      description: profileCompletion >= 80 && profile?.location_sharing_enabled ? "Account setup complete" :
-                   profileCompletion < 80 ? "Complete your profile" : "Enable location sharing"
+      description: profileCompletion >= 80 && profile?.location_sharing_enabled 
+        ? t('dashboardOverview.status.account.complete', { defaultValue: 'Account setup complete' }) 
+        : profileCompletion < 80 
+          ? t('dashboardOverview.status.account.completeProfile', { defaultValue: 'Complete your profile' }) 
+          : t('dashboardOverview.status.account.enableLocation', { defaultValue: 'Enable location sharing' })
     }
   ];
 
@@ -261,24 +269,24 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
               <span className="text-sm text-muted-foreground">{profileCompletion}%</span>
             </div>
             <Progress value={profileCompletion} className="h-3" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="flex items-center gap-2">
-                <CheckCircle className={`h-4 w-4 ${profile?.first_name ? 'text-emergency' : 'text-muted-foreground'}`} />
-                <span className="text-sm">Personal Details</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className={`h-4 w-4 ${profile?.first_name ? 'text-emergency' : 'text-muted-foreground'}`} />
+                  <span className="text-sm">{t('dashboardOverview.checklist.personalDetails', { defaultValue: 'Personal Details' })}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className={`h-4 w-4 ${emergencyContactsCount >= 5 ? 'text-emergency' : 'text-muted-foreground'}`} />
+                  <span className="text-sm">{t('dashboardOverview.checklist.emergencyContacts', { defaultValue: 'Emergency Contacts' })}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className={`h-4 w-4 ${profile?.medical_conditions?.length > 0 ? 'text-emergency' : 'text-muted-foreground'}`} />
+                  <span className="text-sm">{t('dashboardOverview.checklist.medicalInformation', { defaultValue: 'Medical Information' })}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className={`h-4 w-4 ${subscription?.subscribed ? 'text-emergency' : 'text-muted-foreground'}`} />
+                  <span className="text-sm">{t('dashboardOverview.checklist.subscriptionActive', { defaultValue: 'Subscription Active' })}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className={`h-4 w-4 ${emergencyContactsCount >= 5 ? 'text-emergency' : 'text-muted-foreground'}`} />
-                <span className="text-sm">Emergency Contacts</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className={`h-4 w-4 ${profile?.medical_conditions?.length > 0 ? 'text-emergency' : 'text-muted-foreground'}`} />
-                <span className="text-sm">Medical Information</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className={`h-4 w-4 ${subscription?.subscribed ? 'text-emergency' : 'text-muted-foreground'}`} />
-                <span className="text-sm">Subscription Active</span>
-              </div>
-            </div>
           </div>
         </CardContent>
       </Card>

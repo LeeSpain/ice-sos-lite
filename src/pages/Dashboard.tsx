@@ -20,7 +20,7 @@ import { NotificationsPage } from "@/components/dashboard/pages/NotificationsPag
 import { SecurityPage } from "@/components/dashboard/pages/SecurityPage";
 import { SettingsPage } from "@/components/dashboard/pages/SettingsPage";
 import { SupportPage } from "@/components/dashboard/pages/SupportPage";
-
+import { useTranslation } from 'react-i18next';
 const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -28,6 +28,7 @@ const Dashboard = () => {
 
   // Auto-scroll to top when navigating
   useScrollToTop();
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadDashboardData();
@@ -97,7 +98,7 @@ const Dashboard = () => {
           <header className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-4 gap-4">
             <SidebarTrigger />
             <div className="flex-1">
-              <h1 className="text-xl font-semibold">Dashboard</h1>
+              <h1 className="text-xl font-semibold">{t('dashboard.title', { defaultValue: 'Dashboard' })}</h1>
             </div>
           </header>
 
