@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
+import RouteChangeTracker from "@/components/RouteChangeTracker";
+
 import TestPage from "./pages/TestPage";
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
@@ -30,6 +32,7 @@ const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <RouteChangeTracker />
         <Routes>
           <Route path="/test" element={<TestPage />} />
           <Route path="/" element={<Index />} />

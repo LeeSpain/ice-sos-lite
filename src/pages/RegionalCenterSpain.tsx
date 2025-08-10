@@ -2,6 +2,8 @@ import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import heroImage from '@/assets/hero-emergency.jpg';
+import SEO from '@/components/SEO';
+
 
 const RegionalCenterSpain: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -32,6 +34,7 @@ const RegionalCenterSpain: React.FC = () => {
 
   return (
     <main className="pt-20">
+      <SEO title="Regional Call Centre Spain – ICE SOS Lite" description="Spain regional emergency support center. English & Spanish assistance for ICE SOS users." structuredData={jsonLd} />
       <section className="container mx-auto px-4 py-10">
         <header className="grid md:grid-cols-2 gap-8 items-center">
           <div>
@@ -98,8 +101,6 @@ const RegionalCenterSpain: React.FC = () => {
           </div>
         </div>
       </section>
-
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
     </main>
   );
 };
