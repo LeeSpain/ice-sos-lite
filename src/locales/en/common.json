@@ -32,14 +32,90 @@
     }
   },
   "dashboard": {
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "greeting": {
+      "morning": "Good Morning",
+      "afternoon": "Good Afternoon",
+      "evening": "Good Evening"
+    }
   },
   "pricing": {
     "subscribeNow": "Subscribe Now",
     "details": "Details",
     "corePlan": "CORE PLAN",
     "addOn": "ADD-ON",
-    "oneTime": "ONE-TIME PURCHASE"
+    "oneTime": "ONE-TIME PURCHASE",
+    "title": "Your Core Protection Subscription",
+    "subtitle": "One simple subscription that unlocks professional emergency protection. Add optional extras — Family Access, Regional Call Centers, and Safety Devices — anytime. Activate instantly in the app.",
+    "everythingIncluded": "Everything Included:",
+    "familyTitle": "Family & Carer Access",
+    "familyDesc": "After you join, you can invite trusted family members or carers to your dashboard. They’ll have secure access to your emergency profile and protection status, receive instant alerts, view GPS location during an SOS, and help coordinate a rapid response.",
+    "familyFeatures": "Family Features:",
+    "safetyProductsTitle": "Safety Products",
+    "safetyProductsDesc": "Enhance your safety with our Bluetooth-enabled emergency devices that work seamlessly with all subscription plans",
+    "oneTimeLabel": "one-time",
+    "productSpecs": "Complete product specifications and setup information"
+  },
+  "hero": {
+    "badge": "Device-Free Emergency Protection",
+    "titlePart1": "Transform Your Phone Into a",
+    "titleEmphasis": "Life-Saving",
+    "titlePart2": "Assistant",
+    "description": "ICE SOS Lite provides multilingual emergency protection with AI Guardian, professional call center access, and family connectivity — globally available.",
+    "ctaJoin": "Join Today",
+    "ctaTalk": "Talk To Emma"
+  },
+  "features": {
+    "title": "Complete Emergency Protection Suite",
+    "description": "Professional emergency protection with global call center access, Bluetooth device support, and AI monitoring — starting from €1.99/month with worldwide coverage.",
+    "items": [
+      { "title": "24/7 Emergency Response", "description": "One-tap SOS activation with instant GPS location sharing to emergency contacts and professional call center." },
+      { "title": "AI Health Monitoring", "description": "Intelligent wellness tracking with Premium Protection plan including AI-powered health insights." },
+      { "title": "Global Call Center Access", "description": "Professional emergency response coordination available 24/7 with multilingual support worldwide." },
+      { "title": "Family Emergency Alerts", "description": "Instant SOS notifications to up to 5 emergency contacts with Family Connection and Premium plans." },
+      { "title": "GPS Location Tracking", "description": "Real-time location sharing during emergencies with precise coordinates sent to responders." },
+      { "title": "Bluetooth Device Support", "description": "Compatible with ICE SOS Bluetooth Pendant for hands-free emergency activation up to 100m range." }
+    ]
+  },
+  "appDownload": {
+    "title": "Professional Mobile App",
+    "subtitle": "Download ICE SOS Lite - Your complete emergency protection platform",
+    "platformBadge": "PROFESSIONAL PLATFORM",
+    "appName": "ICE SOS Lite",
+    "heroDescription": "Professional emergency protection platform for individuals and families. Download free, then activate your premium protection features.",
+    "cta": "Get Started Free",
+    "features": {
+      "emergencySOS": { "title": "Emergency SOS", "description": "One-tap emergency button with GPS location sharing and instant alerts" },
+      "globalCoverage": { "title": "Global Coverage", "description": "Works worldwide with full multilingual support and 24/7 monitoring" },
+      "instantSetup": { "title": "Instant Setup", "description": "Ready to use in minutes with simple configuration and onboarding" }
+    },
+    "infoTitle": "Important Information",
+    "planFeaturesTitle": "Plan Features:",
+    "bullets": {
+      "noFees": "No setup fees or hidden costs",
+      "cancelAnytime": "Cancel anytime with 30 days notice",
+      "hardwareSeparate": "Hardware devices sold separately",
+      "supportIncluded": "Full customer support included"
+    },
+    "cancellationTitle": "Cancellation Policy:",
+    "cancellationDescription": "You can cancel your subscription at any time. Your access will continue until the end of your current billing period. Hardware purchases are non-refundable but carry a 1-year warranty."
+  },
+  "appPreview": {
+    "title": "See how the app looks",
+    "description": "Explore a live preview of our mobile app. It updates automatically when admins save changes and connects with smart devices for real-time wellness and safety data.",
+    "loading": "Loading preview...",
+    "note": "This preview updates automatically when admins save changes in the App Testing page."
+  },
+  "dashboardOverview": {
+    "welcome": "Welcome back, {{name}}!",
+    "subtitle": "Your safety dashboard - everything you need at a glance",
+    "protected": "Protected",
+    "inactive": "Inactive",
+    "quickActions": "Quick Actions",
+    "profileCompletion": "Profile Completion",
+    "overallProgress": "Overall Progress",
+    "recentActivity": "Recent Activity",
+    "noRecentActivity": "No recent activity"
   },
   "regionalCenterES": {
     "h1": "Spain Regional Call Centre",

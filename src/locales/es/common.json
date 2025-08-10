@@ -32,14 +32,90 @@
     }
   },
   "dashboard": {
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "greeting": {
+      "morning": "Buenos días",
+      "afternoon": "Buenas tardes",
+      "evening": "Buenas noches"
+    }
   },
   "pricing": {
     "subscribeNow": "Suscríbete",
     "details": "Detalles",
     "corePlan": "PLAN PRINCIPAL",
     "addOn": "COMPLEMENTO",
-    "oneTime": "COMPRA ÚNICA"
+    "oneTime": "COMPRA ÚNICA",
+    "title": "Tu suscripción de protección principal",
+    "subtitle": "Una suscripción simple que desbloquea protección de emergencia profesional. Agrega extras opcionales — Acceso Familiar, Centros Regionales y Dispositivos de Seguridad — en cualquier momento. Actívala al instante en la app.",
+    "everythingIncluded": "Todo incluido:",
+    "familyTitle": "Acceso Familiar y Cuidadores",
+    "familyDesc": "Después de unirte, puedes invitar a familiares o cuidadores de confianza a tu panel. Tendrán acceso seguro a tu perfil de emergencia y estado de protección, recibirán alertas instantáneas, verán la ubicación GPS durante un SOS y ayudarán a coordinar una respuesta rápida.",
+    "familyFeatures": "Funciones familiares:",
+    "safetyProductsTitle": "Productos de seguridad",
+    "safetyProductsDesc": "Mejora tu seguridad con nuestros dispositivos de emergencia con Bluetooth que funcionan con todos los planes",
+    "oneTimeLabel": "pago único",
+    "productSpecs": "Especificaciones completas del producto e información de configuración"
+  },
+  "hero": {
+    "badge": "Protección de emergencia sin dispositivo",
+    "titlePart1": "Convierte tu teléfono en un",
+    "titleEmphasis": "salvavidas",
+    "titlePart2": "",
+    "description": "ICE SOS Lite ofrece protección de emergencia multilingüe con AI Guardian, acceso a centro de llamadas profesional y conectividad familiar — disponible globalmente.",
+    "ctaJoin": "Únete hoy",
+    "ctaTalk": "Hablar con Emma"
+  },
+  "features": {
+    "title": "Suite completa de protección de emergencia",
+    "description": "Protección profesional con acceso a centro de llamadas global, soporte de dispositivos Bluetooth y monitoreo con IA — desde 1,99 €/mes con cobertura mundial.",
+    "items": [
+      { "title": "Respuesta de emergencia 24/7", "description": "Activación SOS con un toque y compartir ubicación GPS a contactos de emergencia y centro profesional." },
+      { "title": "Monitoreo de salud con IA", "description": "Seguimiento inteligente del bienestar con el plan Premium e información de salud impulsada por IA." },
+      { "title": "Acceso a centro de llamadas global", "description": "Coordinación de respuesta de emergencia 24/7 con soporte multilingüe en todo el mundo." },
+      { "title": "Alertas de emergencia a la familia", "description": "Notificaciones SOS instantáneas a hasta 5 contactos con planes Familiar y Premium." },
+      { "title": "Seguimiento de ubicación GPS", "description": "Compartir ubicación en tiempo real durante emergencias con coordenadas precisas para los respondedores." },
+      { "title": "Compatibilidad con dispositivos Bluetooth", "description": "Compatible con el colgante Bluetooth ICE SOS para activación manos libres hasta 100 m." }
+    ]
+  },
+  "appDownload": {
+    "title": "Aplicación móvil profesional",
+    "subtitle": "Descarga ICE SOS Lite - Tu plataforma completa de protección",
+    "platformBadge": "PLATAFORMA PROFESIONAL",
+    "appName": "ICE SOS Lite",
+    "heroDescription": "Plataforma profesional de protección para individuos y familias. Descárgala gratis y activa las funciones premium.",
+    "cta": "Empieza gratis",
+    "features": {
+      "emergencySOS": { "title": "SOS de emergencia", "description": "Botón de emergencia con un toque con ubicación GPS y alertas instantáneas" },
+      "globalCoverage": { "title": "Cobertura global", "description": "Funciona en todo el mundo con soporte multilingüe y monitoreo 24/7" },
+      "instantSetup": { "title": "Configuración instantánea", "description": "Lista en minutos con una configuración sencilla" }
+    },
+    "infoTitle": "Información importante",
+    "planFeaturesTitle": "Características del plan:",
+    "bullets": {
+      "noFees": "Sin tarifas de instalación ni costos ocultos",
+      "cancelAnytime": "Cancela en cualquier momento con 30 días de aviso",
+      "hardwareSeparate": "Dispositivos vendidos por separado",
+      "supportIncluded": "Soporte al cliente incluido"
+    },
+    "cancellationTitle": "Política de cancelación:",
+    "cancellationDescription": "Puedes cancelar tu suscripción en cualquier momento. El acceso continúa hasta el final del período de facturación actual. Las compras de hardware no son reembolsables pero tienen 1 año de garantía."
+  },
+  "appPreview": {
+    "title": "Mira cómo se ve la app",
+    "description": "Explora una vista previa en vivo de nuestra app móvil. Se actualiza automáticamente y se conecta con dispositivos inteligentes para datos en tiempo real.",
+    "loading": "Cargando vista previa...",
+    "note": "Esta vista previa se actualiza automáticamente cuando los administradores guardan cambios en la página de Pruebas."
+  },
+  "dashboardOverview": {
+    "welcome": "¡Bienvenido de nuevo, {{name}}!",
+    "subtitle": "Tu panel de seguridad: todo lo que necesitas de un vistazo",
+    "protected": "Protegido",
+    "inactive": "Inactivo",
+    "quickActions": "Acciones rápidas",
+    "profileCompletion": "Compleción del perfil",
+    "overallProgress": "Progreso general",
+    "recentActivity": "Actividad reciente",
+    "noRecentActivity": "Sin actividad reciente"
   },
   "regionalCenterES": {
     "h1": "Centro de Llamadas Regional de España",

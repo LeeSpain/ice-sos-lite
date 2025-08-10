@@ -31,13 +31,89 @@
     }
   },
   "dashboard": {
-    "signOut": "Uitloggen"
+    "signOut": "Uitloggen",
+    "greeting": {
+      "morning": "Goedemorgen",
+      "afternoon": "Goedemiddag",
+      "evening": "Goedenavond"
+    }
   },
   "pricing": {
     "subscribeNow": "Abonneer Nu",
     "details": "Details",
     "corePlan": "KERNPLAN",
     "addOn": "UITBREIDING",
-    "oneTime": "EENMALIGE AANKOOP"
+    "oneTime": "EENMALIGE AANKOOP",
+    "title": "Jouw kernbeschermingsabonnement",
+    "subtitle": "Eén eenvoudig abonnement dat professionele noodbescherming biedt. Voeg optionele extra's toe — Familie Toegang, Regionale Callcenters en Veiligheidsapparaten — wanneer je wilt. Activeer direct in de app.",
+    "everythingIncluded": "Alles inbegrepen:",
+    "familyTitle": "Familie- en Zorgtoegang",
+    "familyDesc": "Na aanmelding kun je vertrouwde familieleden of zorgverleners uitnodigen voor je dashboard. Zij hebben veilige toegang tot je noodprofiel en beschermingsstatus, ontvangen directe meldingen, zien GPS-locatie tijdens een SOS en helpen een snelle respons te coördineren.",
+    "familyFeatures": "Familiefuncties:",
+    "safetyProductsTitle": "Veiligheidsproducten",
+    "safetyProductsDesc": "Verhoog je veiligheid met onze Bluetooth-noodapparaten die naadloos werken met alle abonnementen",
+    "oneTimeLabel": "eenmalig",
+    "productSpecs": "Volledige productspecificaties en installatie-informatie"
+  },
+  "hero": {
+    "badge": "Noodbescherming zonder apparaat",
+    "titlePart1": "Verander je telefoon in een",
+    "titleEmphasis": "levensredende",
+    "titlePart2": "assistent",
+    "description": "ICE SOS Lite biedt meertalige noodbescherming met AI Guardian, professioneel callcenter en familieverbinding — wereldwijd beschikbaar.",
+    "ctaJoin": "Meld je vandaag aan",
+    "ctaTalk": "Praat met Emma"
+  },
+  "features": {
+    "title": "Complete noodbeschermingssuite",
+    "description": "Professionele noodbescherming met wereldwijd callcenter, Bluetooth-apparaten en AI-monitoring — vanaf €1,99/maand met wereldwijde dekking.",
+    "items": [
+      { "title": "24/7 Noodrespons", "description": "SOS met één tik en directe GPS-locatie naar noodcontacten en callcenter." },
+      { "title": "AI Gezondheidsmonitoring", "description": "Slimme welzijnsmeting met het Premium-plan inclusief AI-gestuurde inzichten." },
+      { "title": "Toegang tot wereldwijd callcenter", "description": "Professionele coördinatie van noodrespons 24/7 met meertalige ondersteuning." },
+      { "title": "Noodmeldingen voor familie", "description": "Directe SOS-meldingen naar maximaal 5 contacten met Familie en Premium." },
+      { "title": "GPS-locatietracking", "description": "Realtime locatie delen tijdens noodgevallen met nauwkeurige coördinaten." },
+      { "title": "Bluetooth-apparaatondersteuning", "description": "Compatibel met ICE SOS Bluetooth-hanger voor handsfree activatie tot 100 m." }
+    ]
+  },
+  "appDownload": {
+    "title": "Professionele mobiele app",
+    "subtitle": "Download ICE SOS Lite - jouw complete beschermingsplatform",
+    "platformBadge": "PROFESSIONEEL PLATFORM",
+    "appName": "ICE SOS Lite",
+    "heroDescription": "Professioneel noodbeschermingsplatform voor individuen en families. Download gratis en activeer daarna je premiumfuncties.",
+    "cta": "Gratis starten",
+    "features": {
+      "emergencySOS": { "title": "Nood-SOS", "description": "SOS-knop met één tik met GPS-locatie en directe meldingen" },
+      "globalCoverage": { "title": "Wereldwijde dekking", "description": "Werkt wereldwijd met meertalige ondersteuning en 24/7 monitoring" },
+      "instantSetup": { "title": "Directe installatie", "description": "Binnen enkele minuten klaar met eenvoudige configuratie" }
+    },
+    "infoTitle": "Belangrijke informatie",
+    "planFeaturesTitle": "Planfuncties:",
+    "bullets": {
+      "noFees": "Geen installatiekosten of verborgen kosten",
+      "cancelAnytime": "Op elk moment opzeggen met 30 dagen opzegtermijn",
+      "hardwareSeparate": "Hardware apart verkrijgbaar",
+      "supportIncluded": "Volledige klantenondersteuning inbegrepen"
+    },
+    "cancellationTitle": "Annuleringsbeleid:",
+    "cancellationDescription": "Je kunt je abonnement op elk moment annuleren. Toegang blijft tot het einde van je huidige factureringsperiode. Hardwareaankopen zijn niet-restitueerbaar maar hebben 1 jaar garantie."
+  },
+  "appPreview": {
+    "title": "Bekijk hoe de app eruitziet",
+    "description": "Bekijk een live preview van onze mobiele app. Werkt automatisch bij wanneer admins opslaan en verbindt met slimme apparaten voor realtime gegevens.",
+    "loading": "Voorbeeld laden...",
+    "note": "Dit voorbeeld werkt automatisch bij wanneer admins wijzigingen opslaan op de testpagina."
+  },
+  "dashboardOverview": {
+    "welcome": "Welkom terug, {{name}}!",
+    "subtitle": "Jouw veiligheidsdashboard - alles in één oogopslag",
+    "protected": "Beschermd",
+    "inactive": "Inactief",
+    "quickActions": "Snelle acties",
+    "profileCompletion": "Profielvoltooiing",
+    "overallProgress": "Algemene voortgang",
+    "recentActivity": "Recente activiteit",
+    "noRecentActivity": "Geen recente activiteit"
   }
 }

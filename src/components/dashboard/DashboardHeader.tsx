@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { useTranslation } from 'react-i18next';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { languageToLocale } from '@/utils/currency';
 interface DashboardHeaderProps {
   profile: any;
   subscription: any;
@@ -17,6 +19,8 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { language } = usePreferences();
+  const locale = languageToLocale(language as any);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weather, setWeather] = useState({ temp: "22°C", condition: "Partly Cloudy", location: "Current Location" });
 
@@ -133,14 +137,14 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-light text-white mb-1 drop-shadow-lg">
-              Good {currentTime.getHours() < 12 ? 'Morning' : currentTime.getHours() < 18 ? 'Afternoon' : 'Evening'}, {userName}
+              {`${t('dashboard.greeting.' + (currentTime.getHours() < 12 ? 'morning' : currentTime.getHours() < 18 ? 'afternoon' : 'evening'))}, ${userName}`}
             </h1>
             <p className="text-white/80 text-sm drop-shadow-sm">
-              {currentTime.toLocaleDateString('en-US', { 
+              {currentTime.toLocaleDateString(locale, { 
                 weekday: 'long', 
                 month: 'short', 
                 day: 'numeric' 
-              })} • {currentTime.toLocaleTimeString('en-US', { 
+              })} • {currentTime.toLocaleTimeString(locale, { 
                 hour: 'numeric', 
                 minute: '2-digit',
                 hour12: true 

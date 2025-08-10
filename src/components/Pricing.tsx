@@ -197,14 +197,14 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
   };
 
   return (
-    <section className="py-20">
+    <section id="pricing" className="py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-            Your Core Protection Subscription
+            {t('pricing.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            One simple subscription that unlocks professional emergency protection. Add optional extras — Family Access, Regional Call Centers, and Safety Devices — anytime. €4.99/month. Activate instantly in the app.
+            {t('pricing.subtitle')}
           </p>
         </div>
 
@@ -249,7 +249,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       
                       {/* Features */}
                       <div className="lg:col-span-2">
-                        <h4 className="text-xl font-semibold mb-4">Everything Included:</h4>
+                        <h4 className="text-xl font-semibold mb-4">{t('pricing.everythingIncluded')}</h4>
                         <div className="grid md:grid-cols-2 gap-4">
                           {selectedPlan.features.map((feature, featureIndex) => (
                             <div key={featureIndex} className="flex items-start space-x-3">
@@ -269,12 +269,10 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
           {/* Family & Carer Access Information */}
           <div className="text-center mb-8 mt-16">
             <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-              Family & Carer Access
+              {t('pricing.familyTitle')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              After you join, you can invite trusted family members or carers to your dashboard. They’ll have secure access to your
-              emergency profile and protection status, receive instant alerts, view GPS location during an SOS, and help coordinate
-              a rapid response.
+              {t('pricing.familyDesc')}
             </p>
           </div>
 
@@ -306,7 +304,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     
                     {/* Features */}
                     <div className="lg:col-span-2">
-                      <h4 className="text-xl font-semibold mb-4">Family Features:</h4>
+                      <h4 className="text-xl font-semibold mb-4">{t('pricing.familyFeatures')}</h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         {plan.features.map((feature, featureIndex) => (
                           <div key={featureIndex} className="flex items-start space-x-3">
@@ -328,10 +326,10 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
           <>
             <div className="text-center mb-8 mt-16">
               <h3 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-                Safety Products
+                {t('pricing.safetyProductsTitle')}
               </h3>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Enhance your safety with our Bluetooth-enabled emergency devices that work seamlessly with all subscription plans
+                {t('pricing.safetyProductsDesc')}
               </p>
             </div>
 
@@ -364,7 +362,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
       ? 'text-blue-600' 
       : 'text-primary'
   }`}>{formatPriceDisplay(product.price, product.currency)}</span>
-  <span className="text-muted-foreground text-lg"> one-time</span>
+  <span className="text-muted-foreground text-lg"> {t('pricing.oneTimeLabel')}</span>
 </div>
                         <div className="flex gap-3">
 {product.name === 'ICE SOS Bluetooth Pendant' ? (
@@ -394,7 +392,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                       {product.name}
                                     </DialogTitle>
                                     <DialogDescription>
-                                      Complete product specifications and setup information
+                                      {t('pricing.productSpecs')}
                                     </DialogDescription>
                                   </DialogHeader>
                                   

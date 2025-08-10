@@ -1,42 +1,44 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Phone, Shield, Brain, Users, MapPin, MessageCircle } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
 const Features = () => {
+  const { t } = useTranslation();
   const features = [
     {
       icon: Phone,
-      title: "24/7 Emergency Response",
-      description: "One-tap SOS activation with instant GPS location sharing to emergency contacts and professional call center.",
+      title: t('features.items.0.title'),
+      description: t('features.items.0.description'),
       color: "emergency"
     },
     {
       icon: Brain,
-      title: "AI Health Monitoring",
-      description: "Intelligent wellness tracking with Premium Protection plan including AI-powered health insights.",
+      title: t('features.items.1.title'),
+      description: t('features.items.1.description'),
       color: "guardian"
     },
     {
       icon: Shield,
-      title: "Global Call Center Access",
-      description: "Professional emergency response coordination available 24/7 with multilingual support worldwide.",
+      title: t('features.items.2.title'),
+      description: t('features.items.2.description'),
       color: "primary"
     },
     {
       icon: Users,
-      title: "Family Emergency Alerts",
-      description: "Instant SOS notifications to up to 5 emergency contacts with Family Connection and Premium plans.",
+      title: t('features.items.3.title'),
+      description: t('features.items.3.description'),
       color: "wellness"
     },
     {
       icon: MapPin,
-      title: "GPS Location Tracking",
-      description: "Real-time location sharing during emergencies with precise coordinates sent to responders.",
+      title: t('features.items.4.title'),
+      description: t('features.items.4.description'),
       color: "primary"
     },
     {
       icon: MessageCircle,
-      title: "Bluetooth Device Support",
-      description: "Compatible with ICE SOS Bluetooth Pendant for hands-free emergency activation up to 100m range.",
+      title: t('features.items.5.title'),
+      description: t('features.items.5.description'),
       color: "guardian"
     }
   ];
@@ -60,15 +62,14 @@ const Features = () => {
   };
 
   return (
-    <section className="py-20 bg-secondary/30">
+    <section id="features" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-            Complete Emergency Protection Suite
+            {t('features.title')}
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Professional emergency protection with global call center access, Bluetooth device support, 
-            and AI monitoring — starting from €1.99/month with worldwide coverage.
+            {t('features.description')}
           </p>
         </div>
         

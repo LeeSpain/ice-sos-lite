@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 const heroImage = "/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png";
 
 interface HeroProps {
@@ -8,6 +9,7 @@ interface HeroProps {
 }
 
 const Hero = ({ onEmmaClick }: HeroProps) => {
+  const { t } = useTranslation();
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
       {/* Darker Shadow Overlay for Professional Look */}
@@ -24,17 +26,16 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
           <div className="text-center lg:text-left text-white">
             <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
               <Shield className="h-4 w-4 text-emergency-glow" />
-              <span className="text-sm font-medium text-white">Device-Free Emergency Protection</span>
+              <span className="text-sm font-medium text-white">{t('hero.badge')}</span>
             </div>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-              Transform Your Phone Into a 
-              <span className="text-emergency-glow drop-shadow-md"> Life-Saving</span> Assistant
+              {t('hero.titlePart1')} 
+              <span className="text-emergency-glow drop-shadow-md">{t('hero.titleEmphasis')}</span> {t('hero.titlePart2')}
             </h1>
             
             <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
-              ICE SOS Lite provides multilingual emergency protection with AI Guardian, 
-              professional call center access, and family connectivity — globally available.
+              {t('hero.description')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
@@ -43,14 +44,14 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                 size="xl" 
                 className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
               >
-                <Link to="/register">Join Today</Link>
+                <Link to="/register">{t('hero.ctaJoin')}</Link>
               </Button>
               <Button 
                 size="xl" 
                 className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
                 onClick={onEmmaClick}
               >
-                Talk To Emma
+                {t('hero.ctaTalk')}
               </Button>
             </div>
           </div>

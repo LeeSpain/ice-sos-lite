@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from 'react-i18next';
 
 interface DashboardOverviewProps {
   profile: any;
@@ -30,6 +31,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
   const { toast } = useToast();
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     loadRecentActivity();
@@ -169,10 +171,10 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">
-                Welcome back, {profile?.first_name || 'Member'}!
+                {t('dashboardOverview.welcome', { name: profile?.first_name || 'Member' })}
               </h1>
               <p className="text-muted-foreground mt-1">
-                Your safety dashboard - everything you need at a glance
+                {t('dashboardOverview.subtitle')}
               </p>
             </div>
             <div className="hidden sm:block">
@@ -180,7 +182,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
                 variant={protectionActive ? "default" : "destructive"}
                 className={protectionActive ? "bg-emergency text-black" : ""}
               >
-                {protectionActive ? "Protected" : "Inactive"}
+                {protectionActive ? t('dashboardOverview.protected') : t('dashboardOverview.inactive')}
               </Badge>
             </div>
           </div>
@@ -217,7 +219,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            Quick Actions
+            {t('dashboardOverview.quickActions')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -249,13 +251,13 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Profile Completion
+            {t('dashboardOverview.profileCompletion')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Overall Progress</span>
+              <span className="text-sm font-medium">{t('dashboardOverview.overallProgress')}</span>
               <span className="text-sm text-muted-foreground">{profileCompletion}%</span>
             </div>
             <Progress value={profileCompletion} className="h-3" />
@@ -286,7 +288,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5" />
-            Recent Activity
+            {t('dashboardOverview.recentActivity')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -310,7 +312,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
           ) : (
             <div className="text-center py-6">
               <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">No recent activity</p>
+              <p className="text-sm text-muted-foreground">{t('dashboardOverview.noRecentActivity')}</p>
             </div>
           )}
         </CardContent>
