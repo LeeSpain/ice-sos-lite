@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "features": "Functies",
+    "pricing": "Prijzen",
+    "support": "Ondersteuning",
+    "devices": "Apparaten",
+    "signIn": "Inloggen",
+    "subscribeNow": "Abonneer Nu"
+  },
+  "footer": {
+    "quickLinks": "Snelle links",
+    "pricing": "Prijzen",
+    "devices": "Apparaten",
+    "support": "Ondersteuning",
+    "account": "Account",
+    "signIn": "Inloggen",
+    "subscribe": "Abonneren",
+    "signOut": "Uitloggen",
+    "membersDashboard": "Leden Dashboard",
+    "adminDashboard": "Admin Dashboard",
+    "connect": "Contact",
+    "privacy": "Privacybeleid",
+    "terms": "Servicevoorwaarden",
+    "supportLink": "Ondersteuning",
+    "rights": "Alle rechten voorbehouden."
+  },
+  "admin": {
+    "header": {
+      "title": "Admin Dashboard",
+      "subtitle": "ICE SOS Lite Beheerportal"
+    }
+  },
+  "dashboard": {
+    "signOut": "Uitloggen"
+  },
+  "pricing": {
+    "subscribeNow": "Abonneer Nu",
+    "details": "Details",
+    "corePlan": "KERNPLAN",
+    "addOn": "UITBREIDING",
+    "oneTime": "EENMALIGE AANKOOP"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "features": "Features",
+    "pricing": "Pricing",
+    "support": "Support",
+    "devices": "Devices",
+    "signIn": "Sign In",
+    "subscribeNow": "Subscribe Now"
+  },
+  "footer": {
+    "quickLinks": "Quick Links",
+    "pricing": "Pricing",
+    "devices": "Devices",
+    "support": "Support",
+    "account": "Account",
+    "signIn": "Sign In",
+    "subscribe": "Subscribe",
+    "signOut": "Sign Out",
+    "membersDashboard": "Members Dashboard",
+    "adminDashboard": "Admin Dashboard",
+    "connect": "Connect",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "supportLink": "Support",
+    "rights": "All rights reserved."
+  },
+  "admin": {
+    "header": {
+      "title": "Admin Dashboard",
+      "subtitle": "ICE SOS Lite Management Portal"
+    }
+  },
+  "dashboard": {
+    "signOut": "Sign Out"
+  },
+  "pricing": {
+    "subscribeNow": "Subscribe Now",
+    "details": "Details",
+    "corePlan": "CORE PLAN",
+    "addOn": "ADD-ON",
+    "oneTime": "ONE-TIME PURCHASE"
+  }
+}

@@ -6,7 +6,8 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
+import { useTranslation } from 'react-i18next';
 interface DashboardHeaderProps {
   profile: any;
   subscription: any;
@@ -15,6 +16,7 @@ interface DashboardHeaderProps {
 const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weather, setWeather] = useState({ temp: "22°C", condition: "Partly Cloudy", location: "Current Location" });
 
@@ -146,11 +148,12 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
             </p>
           </div>
           
-          <div className="flex items-center gap-3">
+<div className="flex items-center gap-3">
             <div className="text-right text-white/80">
               <p className="text-sm font-medium">{weather.temp}</p>
               <p className="text-xs">{weather.condition}</p>
             </div>
+            <LanguageCurrencySelector compact />
             <Button
               onClick={handleSignOut}
               variant="outline"
@@ -158,7 +161,7 @@ const DashboardHeader = ({ profile, subscription }: DashboardHeaderProps) => {
               className="bg-white/10 border-white/30 text-white hover:bg-white/20 backdrop-blur-sm"
             >
               <LogOut className="h-4 w-4 mr-1" />
-              Sign Out
+              {t('dashboard.signOut')}
             </Button>
           </div>
         </div>

@@ -4,13 +4,15 @@ import { Shield, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
-
+import { useTranslation } from 'react-i18next';
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const defaults = React.useMemo(() => getDefaultAppPreview(), []);
   const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
+  const { t } = useTranslation();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
@@ -24,19 +26,20 @@ const Navigation = () => {
             <span className="text-xl font-bold font-poppins text-foreground">{(value ?? defaults).appName}</span>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-foreground hover:text-primary transition-colors">Features</a>
-            <a href="#pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
-            <a href="#support" className="text-foreground hover:text-primary transition-colors">Support</a>
-            <Link to="/devices/ice-sos-pendant" className="text-foreground hover:text-primary transition-colors">Devices</Link>
-            <Button asChild variant="outline" size="sm">
-              <Link to="/auth">Sign In</Link>
-            </Button>
-            <Button asChild size="sm" className="shadow-primary">
-              <Link to="/register">Subscribe Now</Link>
-            </Button>
-          </div>
+{/* Desktop Navigation */}
+<div className="hidden md:flex items-center space-x-6">
+  <a href="#features" className="text-foreground hover:text-primary transition-colors">{t('nav.features')}</a>
+  <a href="#pricing" className="text-foreground hover:text-primary transition-colors">{t('nav.pricing')}</a>
+  <a href="#support" className="text-foreground hover:text-primary transition-colors">{t('nav.support')}</a>
+  <Link to="/devices/ice-sos-pendant" className="text-foreground hover:text-primary transition-colors">{t('nav.devices')}</Link>
+  <LanguageCurrencySelector compact />
+  <Button asChild variant="outline" size="sm">
+    <Link to="/auth">{t('nav.signIn')}</Link>
+  </Button>
+  <Button asChild size="sm" className="shadow-primary">
+    <Link to="/register">{t('nav.subscribeNow')}</Link>
+  </Button>
+</div>
 
           {/* Mobile Menu Button */}
           <button
@@ -50,22 +53,23 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-border py-4">
-            <div className="flex flex-col space-y-4">
-              <a href="#features" className="text-foreground hover:text-primary transition-colors">Features</a>
-              <a href="#pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
-              <a href="#support" className="text-foreground hover:text-primary transition-colors">Support</a>
-              <Link to="/devices/ice-sos-pendant" className="text-foreground hover:text-primary transition-colors">Devices</Link>
-              <div className="flex flex-col space-y-2 pt-4 border-t border-border">
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/auth">Sign In</Link>
-                </Button>
-                <Button asChild size="sm" className="shadow-primary">
-                  <Link to="/register">Subscribe Now</Link>
-                </Button>
-              </div>
-            </div>
-          </div>
+  <div className="md:hidden border-t border-border py-4">
+    <div className="flex flex-col space-y-4">
+      <LanguageCurrencySelector />
+      <a href="#features" className="text-foreground hover:text-primary transition-colors">{t('nav.features')}</a>
+      <a href="#pricing" className="text-foreground hover:text-primary transition-colors">{t('nav.pricing')}</a>
+      <a href="#support" className="text-foreground hover:text-primary transition-colors">{t('nav.support')}</a>
+      <Link to="/devices/ice-sos-pendant" className="text-foreground hover:text-primary transition-colors">{t('nav.devices')}</Link>
+      <div className="flex flex-col space-y-2 pt-4 border-t border-border">
+        <Button asChild variant="outline" size="sm">
+          <Link to="/auth">{t('nav.signIn')}</Link>
+        </Button>
+        <Button asChild size="sm" className="shadow-primary">
+          <Link to="/register">{t('nav.subscribeNow')}</Link>
+        </Button>
+      </div>
+    </div>
+  </div>
         )}
       </div>
     </nav>

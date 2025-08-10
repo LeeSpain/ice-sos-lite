@@ -188,7 +188,7 @@ export default function AdminLayout() {
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <div className="flex-1 flex flex-col min-h-screen">
-          <header className="h-16 border-b border-border/40 flex items-center px-6 bg-gradient-to-r from-background to-muted/10 backdrop-blur-sm">
+<header className="h-16 border-b border-border/40 flex items-center px-6 bg-gradient-to-r from-background to-muted/10 backdrop-blur-sm">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-muted/60 transition-colors" />
               <div className="h-6 w-px bg-border/60" />
@@ -199,6 +199,7 @@ export default function AdminLayout() {
                 <p className="text-xs text-muted-foreground">ICE SOS Lite Management Portal</p>
               </div>
             </div>
+            <div className="ml-auto"><LanguageCurrencySelector compact /></div>
           </header>
           <main className="flex-1 p-6 bg-gradient-to-br from-background via-background to-muted/5">
             <Outlet />

@@ -5,16 +5,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
-
+import { useTranslation } from 'react-i18next';
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const Footer = () => {
   const { user, loading } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
-  const defaults = React.useMemo(() => getDefaultAppPreview(), []);
-  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
-
+const defaults = React.useMemo(() => getDefaultAppPreview(), []);
+const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
+const { t } = useTranslation();
   const handleDashboardClick = (e: React.MouseEvent, dashboardType: 'member' | 'admin') => {
     e.preventDefault();
     
@@ -71,40 +72,40 @@ const Footer = () => {
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Quick Links</h3>
+<div className="space-y-4">
+            <h3 className="font-semibold text-foreground">{t('footer.quickLinks')}</h3>
             <div className="space-y-2">
               <a href="#features" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Features
+                {t('nav.features')}
               </a>
               <a href="#pricing" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Pricing
+                {t('footer.pricing')}
               </a>
               <Link to="/devices/ice-sos-pendant" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Devices
+                {t('footer.devices')}
               </Link>
               <Link to="/support" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Support
+                {t('footer.supportLink')}
               </Link>
             </div>
           </div>
 
           {/* Account & Legal */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Account</h3>
+<div className="space-y-4">
+            <h3 className="font-semibold text-foreground">{t('footer.account')}</h3>
             <div className="space-y-2">
               {!user ? (
                 <>
                   <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                    Sign In
+                    {t('footer.signIn')}
                   </Link>
                   <Link to="/register" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                    Subscribe
+                    {t('footer.subscribe')}
                   </Link>
                 </>
               ) : (
                 <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                  Sign Out
+                  {t('footer.signOut')}
                 </Link>
               )}
               <a 
@@ -112,20 +113,20 @@ const Footer = () => {
                 onClick={(e) => handleDashboardClick(e, 'member')}
                 className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
               >
-                {loading ? 'Loading...' : 'Members Dashboard'}
+                {loading ? 'Loading...' : t('footer.membersDashboard')}
               </a>
               <Link 
                 to="/admin-dashboard"
                 className="block text-sm text-muted-foreground hover:text-primary transition-colors"
               >
-                Admin Dashboard
+                {t('footer.adminDashboard')}
               </Link>
             </div>
           </div>
 
           {/* Contact & Social */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Connect</h3>
+<div className="space-y-4">
+            <h3 className="font-semibold text-foreground">{t('footer.connect')}</h3>
             <div className="flex space-x-3">
               <a 
                 href="mailto:support@icesoslite.com" 
@@ -158,18 +159,18 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="mt-8 pt-6 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-            <p className="text-sm text-muted-foreground">
-              © 2024 {(value ?? defaults).appName}. All rights reserved.
+<p className="text-sm text-muted-foreground">
+              © 2024 {(value ?? defaults).appName}. {t('footer.rights')}
             </p>
             <div className="flex space-x-6">
               <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Privacy Policy
+                {t('footer.privacy')}
               </Link>
               <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Terms of Service
+                {t('footer.terms')}
               </Link>
               <Link to="/support" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Support
+                {t('footer.supportLink')}
               </Link>
             </div>
           </div>

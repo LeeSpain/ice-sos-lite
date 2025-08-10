@@ -6,7 +6,9 @@ import { Check, MapPin, Brain, Users, Phone, Download, Smartphone, Package, Blue
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
-
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
+import { useTranslation } from 'react-i18next';
 interface Product {
   id: string;
   name: string;
@@ -51,7 +53,16 @@ interface RegionalService {
 const Pricing = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
-  const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
+const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
+
+  const { language, currency: selectedCurrency } = usePreferences();
+  const { t } = useTranslation();
+  const locale = languageToLocale(language as any);
+  const toCurrency = (c: string) => (['EUR','GBP','USD','AUD'].includes((c || '').toUpperCase()) ? (c || 'EUR').toUpperCase() : 'EUR') as any;
+  const formatPriceDisplay = (amount: number, fromCurrency: string) => {
+    const converted = convertCurrency(amount, toCurrency(fromCurrency), selectedCurrency as any);
+    return formatDisplayCurrency(converted, selectedCurrency as any, locale);
+  };
 
   // Icon mapping for subscription plans
   const getIconForPlan = (planName: string) => {
@@ -206,9 +217,9 @@ const Pricing = () => {
             {globalPlans.filter(plan => plan.name === 'Premium Protection').map((plan) => (
               <Card key={plan.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-                <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
-                  CORE PLAN
-                </Badge>
+<Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
+  {t('pricing.corePlan')}
+</Badge>
                 
                 <div className="relative p-8">
                   <div className="grid lg:grid-cols-3 gap-8 items-center">
@@ -221,16 +232,16 @@ const Pricing = () => {
                       <CardDescription className="text-lg text-muted-foreground mb-4">
                         {plan.description}
                       </CardDescription>
-                      <div className="mb-6">
-                        <span className="text-4xl font-bold text-primary">€{plan.price.toFixed(2)}</span>
-                        <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
-                      </div>
+<div className="mb-6">
+  <span className="text-4xl font-bold text-primary">{formatPriceDisplay(plan.price, plan.currency)}</span>
+  <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
+</div>
                       <Button 
                         size="lg"
                         className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                         asChild
                       >
-                        <Link to="/ai-register">Subscribe Now</Link>
+<Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
                       </Button>
                     </div>
                     
@@ -269,9 +280,9 @@ const Pricing = () => {
             {globalPlans.filter(plan => plan.name === 'Family Connection').map((plan) => (
               <Card key={plan.id} className="relative border-2 border-wellness/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-wellness/5 via-transparent to-wellness/10"></div>
-                <Badge className="absolute top-6 right-6 bg-wellness text-white text-sm px-4 py-2 shadow-lg">
-                  ADD-ON
-                </Badge>
+<Badge className="absolute top-6 right-6 bg-wellness text-white text-sm px-4 py-2 shadow-lg">
+  {t('pricing.addOn')}
+</Badge>
                 
                 <div className="relative p-8">
                   <div className="grid lg:grid-cols-3 gap-8 items-center">
@@ -284,10 +295,10 @@ const Pricing = () => {
                       <CardDescription className="text-lg text-muted-foreground mb-4">
                         {plan.description}
                       </CardDescription>
-                      <div className="mb-6">
-                        <span className="text-4xl font-bold text-wellness">€{plan.price.toFixed(2)}</span>
-                        <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
-                      </div>
+<div className="mb-6">
+  <span className="text-4xl font-bold text-wellness">{formatPriceDisplay(plan.price, plan.currency)}</span>
+  <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
+</div>
                     </div>
                     
                     {/* Features */}
@@ -325,9 +336,9 @@ const Pricing = () => {
               {products.map((product) => (
                 <Card key={product.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-                  <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
-                    ONE-TIME PURCHASE
-                  </Badge>
+<Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
+  {t('pricing.oneTime')}
+</Badge>
                   
                   <div className="relative p-8">
                     <div className="grid lg:grid-cols-3 gap-8 items-center">
@@ -344,14 +355,14 @@ const Pricing = () => {
                         <CardDescription className="text-lg text-muted-foreground mb-4">
                           {product.description}
                         </CardDescription>
-                        <div className="mb-6">
-                          <span className={`text-4xl font-bold ${
-                            product.name === 'ICE SOS Bluetooth Pendant' 
-                              ? 'text-blue-600' 
-                              : 'text-primary'
-                          }`}>€{product.price.toFixed(2)}</span>
-                          <span className="text-muted-foreground text-lg"> one-time</span>
-                        </div>
+<div className="mb-6">
+  <span className={`text-4xl font-bold ${
+    product.name === 'ICE SOS Bluetooth Pendant' 
+      ? 'text-blue-600' 
+      : 'text-primary'
+  }`}>{formatPriceDisplay(product.price, product.currency)}</span>
+  <span className="text-muted-foreground text-lg"> one-time</span>
+</div>
                         <div className="flex gap-3">
 {product.name === 'ICE SOS Bluetooth Pendant' ? (
                               <Button 
@@ -368,9 +379,9 @@ const Pricing = () => {
                                   <Button 
                                     variant="outline" 
                                     size="lg"
-                                    className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
+className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                   >
-                                    Details
+                                    {t('pricing.details')}
                                   </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-2xl">
@@ -530,7 +541,7 @@ const Pricing = () => {
                           <MapPin className="h-8 w-8 text-white" />
                         </div>
                         <CardTitle className="text-3xl font-bold mb-3">{service.name}</CardTitle>
-                        <CardDescription className="text-lg text-muted-foreground mb-4">
+<CardDescription className="text-lg text-muted-foreground mb-4">
                           {service.description}
                         </CardDescription>
                         <div className="mb-6">
@@ -538,7 +549,7 @@ const Pricing = () => {
                             service.name === 'Call Centre Spain'
                               ? 'text-green-600'
                               : 'text-secondary'
-                          }`}>€{service.price.toFixed(2)}</span>
+                          }`}>{formatPriceDisplay(service.price, service.currency)}</span>
                           <span className="text-muted-foreground text-lg">/month</span>
                         </div>
                         <Button 

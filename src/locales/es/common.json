@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "features": "Funciones",
+    "pricing": "Precios",
+    "support": "Soporte",
+    "devices": "Dispositivos",
+    "signIn": "Iniciar sesión",
+    "subscribeNow": "Suscríbete"
+  },
+  "footer": {
+    "quickLinks": "Enlaces rápidos",
+    "pricing": "Precios",
+    "devices": "Dispositivos",
+    "support": "Soporte",
+    "account": "Cuenta",
+    "signIn": "Iniciar sesión",
+    "subscribe": "Suscribirse",
+    "signOut": "Cerrar sesión",
+    "membersDashboard": "Panel de Miembros",
+    "adminDashboard": "Panel de Administración",
+    "connect": "Conectar",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "supportLink": "Soporte",
+    "rights": "Todos los derechos reservados."
+  },
+  "admin": {
+    "header": {
+      "title": "Panel de Administración",
+      "subtitle": "Portal de Gestión ICE SOS Lite"
+    }
+  },
+  "dashboard": {
+    "signOut": "Cerrar sesión"
+  },
+  "pricing": {
+    "subscribeNow": "Suscríbete",
+    "details": "Detalles",
+    "corePlan": "PLAN PRINCIPAL",
+    "addOn": "COMPLEMENTO",
+    "oneTime": "COMPRA ÚNICA"
+  }
+}
