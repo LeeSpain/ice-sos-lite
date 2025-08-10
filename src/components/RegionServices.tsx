@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, Phone, Clock, Star } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface RegionalPlan {
   id: string;
@@ -17,6 +18,7 @@ interface RegionalPlan {
 }
 
 const RegionServices = () => {
+  const { t } = useTranslation();
   const [regionalPlans, setRegionalPlans] = useState<RegionalPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,7 +56,7 @@ const RegionServices = () => {
       <section className="py-20 bg-gradient-to-br from-muted/30 to-background">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Loading Regional Services...</h2>
+            <h2 className="text-4xl font-bold mb-4">{t('regionServices.loading', { defaultValue: 'Loading Regional Services...' })}</h2>
           </div>
         </div>
       </section>
@@ -71,13 +73,13 @@ const RegionServices = () => {
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4 px-4 py-2">
             <MapPin className="h-4 w-4 mr-2" />
-            Regional Services
+            {t('regionServices.badge', { defaultValue: 'Regional Services' })}
           </Badge>
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Specialized Regional Coverage
+            {t('regionServices.title', { defaultValue: 'Specialized Regional Coverage' })}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Enhanced emergency services tailored for specific regions with local expertise and 24/7 support
+            {t('regionServices.subtitle', { defaultValue: 'Enhanced emergency services tailored for specific regions with local expertise and 24/7 support' })}
           </p>
         </div>
 
@@ -93,7 +95,7 @@ const RegionServices = () => {
                 {plan.is_popular && (
                   <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-medium">
                     <Star className="h-3 w-3 inline mr-1" />
-                    Popular
+                    {t('regionServices.popular', { defaultValue: 'Popular' })}
                   </div>
                 )}
                 
@@ -112,7 +114,7 @@ const RegionServices = () => {
                       <span className="text-lg text-muted-foreground">
                         {plan.currency}
                       </span>
-                      <span className="text-sm text-muted-foreground">/month</span>
+                      <span className="text-sm text-muted-foreground">{t('common.perMonth', { defaultValue: '/month' })}</span>
                     </div>
                     <Badge variant="outline" className="mt-2">
                       <MapPin className="h-3 w-3 mr-1" />
@@ -138,7 +140,7 @@ const RegionServices = () => {
                     onClick={() => trackRegionServiceClick(plan.id, plan.name)}
                   >
                     <Phone className="h-4 w-4 mr-2" />
-                    Contact Regional Center
+                    {t('regionServices.cta', { defaultValue: 'Contact Regional Center' })}
                   </Button>
                 </CardFooter>
               </Card>
@@ -150,7 +152,7 @@ const RegionServices = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
             <Clock className="h-4 w-4 text-primary" />
             <span className="text-sm text-muted-foreground">
-              All regional services include 24/7 emergency response
+              {t('regionServices.footerNote', { defaultValue: 'All regional services include 24/7 emergency response' })}
             </span>
           </div>
         </div>

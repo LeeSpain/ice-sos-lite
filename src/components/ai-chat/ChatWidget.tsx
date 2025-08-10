@@ -6,6 +6,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { X, Send, MessageCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Message {
   id: string;
@@ -22,6 +23,7 @@ interface ChatWidgetProps {
 }
 
 const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "User", context = "registration" }) => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -81,14 +83,14 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
-        title: "Connection Error",
-        description: "Unable to connect to Emma. Please try again.",
+        title: t('chatWidget.connectionErrorTitle', { defaultValue: 'Connection Error' }),
+        description: t('chatWidget.connectionErrorDesc', { defaultValue: 'Unable to connect to Emma. Please try again.' }),
         variant: "destructive"
       });
       
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: "I apologize, but I'm having trouble connecting right now. Please try again in a moment.",
+        content: t('chatWidget.apiErrorMessage', { defaultValue: "I apologize, but I'm having trouble connecting right now. Please try again in a moment." }),
         isUser: false,
         timestamp: new Date()
       };
@@ -116,8 +118,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
               <MessageCircle className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <CardTitle className="text-lg truncate">Emma AI Assistant</CardTitle>
-              <p className="text-xs text-white/80 truncate">Emergency Protection Guide</p>
+              <CardTitle className="text-lg truncate">{t('chatWidget.headerTitle', { defaultValue: 'Emma AI Assistant' })}</CardTitle>
+              <p className="text-xs text-white/80 truncate">{t('chatWidget.headerSubtitle', { defaultValue: 'Emergency Protection Guide' })}</p>
             </div>
           </div>
           <Button
@@ -165,7 +167,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
                 <div className="flex justify-start">
                   <div className="bg-muted p-3 rounded-lg flex items-center space-x-2 max-w-[85%]">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span className="text-sm">Emma is thinking...</span>
+                    <span className="text-sm">{t('chatWidget.thinking', { defaultValue: 'Emma is thinking...' })}</span>
                   </div>
                 </div>
               )}
@@ -179,7 +181,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Ask Emma about emergency protection..."
+                placeholder={t('chatWidget.inputPlaceholder', { defaultValue: 'Ask Emma about emergency protection...' })}
                 disabled={isLoading}
                 className="flex-1 min-w-0"
               />
@@ -193,7 +195,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              Emma can help with registration, plans, and emergency features
+              {t('chatWidget.footerNote', { defaultValue: 'Emma can help with registration, plans, and emergency features' })}
             </p>
           </div>
         </CardContent>

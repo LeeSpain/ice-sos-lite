@@ -13,9 +13,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sparkles } from 'lucide-react';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import AppPreviewSection from '@/components/AppPreviewSection';
+import { useTranslation } from 'react-i18next';
 
 const Index = () => {
   useScrollToTop();
+  const { t } = useTranslation();
   const [isEmmaOpen, setIsEmmaOpen] = useState(false);
 
   const handleEmmaClick = useCallback(() => {
@@ -64,11 +66,11 @@ const Index = () => {
                     Emma AI
                   </div>
                   <div className="text-sm text-muted-foreground font-medium">
-                    Customer Service
+                    {t('index.emma.roleCustomerService', { defaultValue: 'Customer Service' })}
                   </div>
                   <div className="text-xs text-green-600 font-semibold flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    Online & Ready
+                    {t('index.emma.online', { defaultValue: 'Online & Ready' })}
                   </div>
                 </div>
                 
@@ -82,7 +84,7 @@ const Index = () => {
               
               {/* Hover tooltip */}
               <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                Click to chat with Emma! 💬
+                {t('index.emma.tooltip', { defaultValue: 'Click to chat with Emma! 💬' })}
                 <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
               </div>
             </div>
@@ -113,7 +115,7 @@ const Index = () => {
       <ChatWidget 
         isOpen={isEmmaOpen} 
         onClose={handleEmmaClose}
-        userName="Visitor"
+        userName={t('common.visitor', { defaultValue: 'Visitor' })}
         context="homepage"
       />
     </div>

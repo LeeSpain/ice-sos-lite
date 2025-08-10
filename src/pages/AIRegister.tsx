@@ -12,6 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import EmbeddedPayment from '@/components/EmbeddedPayment';
 import ChatWidget from '@/components/ai-chat/ChatWidget';
+import { useTranslation } from 'react-i18next';
 
 interface Plan {
   id: string;
@@ -75,6 +76,7 @@ const AIRegister = () => {
   const [currentStep, setCurrentStep] = useState<'details' | 'payment'>('details');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   // Fetch plans, products, and regional services from database
   useEffect(() => {
@@ -154,8 +156,8 @@ const AIRegister = () => {
       } catch (error) {
         console.error('Error fetching data:', error);
         toast({
-          title: "Error loading data",
-          description: "Failed to load subscription options. Please refresh the page.",
+          title: t('register.loadErrorTitle', { defaultValue: 'Error loading data' }),
+          description: t('register.loadErrorDesc', { defaultValue: 'Failed to load subscription options. Please refresh the page.' }),
           variant: "destructive"
         });
       }
@@ -209,8 +211,8 @@ const AIRegister = () => {
     }
     if (password.length < 6) {
       toast({
-        title: "Invalid Password",
-        description: "Password must be at least 6 characters long.",
+        title: t('register.invalidPasswordTitle', { defaultValue: 'Invalid Password' }),
+        description: t('register.invalidPasswordDesc', { defaultValue: 'Password must be at least 6 characters long.' }),
         variant: "destructive"
       });
       return false;
@@ -221,8 +223,8 @@ const AIRegister = () => {
   const handleContinueToPayment = () => {
     if (!validatePersonalDetails()) {
       toast({
-        title: "Incomplete Information",
-        description: "Please fill in all personal details before continuing.",
+        title: t('register.incompleteInfoTitle', { defaultValue: 'Incomplete Information' }),
+        description: t('register.incompleteInfoDesc', { defaultValue: 'Please fill in all personal details before continuing.' }),
         variant: "destructive"
       });
       return;
@@ -308,8 +310,8 @@ const AIRegister = () => {
       sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
 
       toast({
-        title: "Registration Complete!",
-        description: "Welcome to ICE SOS Lite. You can now access your dashboard.",
+        title: t('register.successTitle', { defaultValue: 'Registration Complete!' }),
+        description: t('register.successDesc', { defaultValue: 'Welcome to ICE SOS Lite. You can now access your dashboard.' }),
       });
       
       // Redirect to welcome page instead of dashboard
@@ -319,8 +321,8 @@ const AIRegister = () => {
     } catch (error) {
       console.error('Registration error:', error);
       toast({
-        title: "Registration Error",
-        description: "Failed to create your account. Please try again or contact support.",
+        title: t('register.errorTitle', { defaultValue: 'Registration Error' }),
+        description: t('register.errorDesc', { defaultValue: 'Failed to create your account. Please try again or contact support.' }),
         variant: "destructive"
       });
     }
@@ -447,11 +449,11 @@ const AIRegister = () => {
                     Emma AI
                   </div>
                   <div className="text-sm text-muted-foreground font-medium">
-                    Safety Advisor
+                    {t('emma.safetyAdvisor', { defaultValue: 'Safety Advisor' })}
                   </div>
                   <div className="text-xs text-green-600 font-semibold flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    Online & Ready
+                    {t('emma.online', { defaultValue: 'Online & Ready' })}
                   </div>
                 </div>
                 
@@ -465,7 +467,7 @@ const AIRegister = () => {
               
               {/* Hover tooltip */}
               <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                Click to chat with Emma! 💬
+                {t('emma.tooltip', { defaultValue: 'Click to chat with Emma! 💬' })}
                 <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
               </div>
             </div>
