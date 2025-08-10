@@ -63,6 +63,8 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                 src={heroImage} 
                 alt="ICE SOS Emergency Protection App Interface"
                 className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
+                loading="eager"
+                decoding="async"
               />
             </div>
             {/* Floating Elements */}

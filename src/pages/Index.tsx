@@ -14,6 +14,7 @@ import { Sparkles } from 'lucide-react';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import AppPreviewSection from '@/components/AppPreviewSection';
 import { useTranslation } from 'react-i18next';
+import SEO from '@/components/SEO';
 
 const Index = () => {
   useScrollToTop();
@@ -30,9 +31,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO 
+        title="ICE SOS Lite – Emergency SOS, Bluetooth SOS App"
+        description="Tap once for immediate emergency help. Bluetooth SOS, secure profiles, regional services."
+        structuredData={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "ICE SOS Lite",
+          "url": typeof window !== 'undefined' ? window.location.origin : 'https://example.com'
+        }}
+      />
       <Navigation />
-      
-      {/* Enhanced Emma AI Assistant */}
+
       <div className="fixed top-20 right-4 z-50">
         <div className="relative group cursor-pointer" onClick={handleEmmaClick}>
           {/* Floating animation wrapper */}
