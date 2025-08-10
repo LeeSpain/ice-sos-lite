@@ -315,7 +315,7 @@ const ProductsPage = () => {
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Product</DialogTitle>
             <DialogDescription>
@@ -404,7 +404,7 @@ const ProductsPage = () => {
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-50 bg-background">
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="coming_soon">Coming Soon</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
@@ -423,7 +423,7 @@ const ProductsPage = () => {
 
       {/* View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{selectedProduct?.name}</DialogTitle>
             <DialogDescription>
