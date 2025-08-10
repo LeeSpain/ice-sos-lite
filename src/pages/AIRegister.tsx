@@ -13,6 +13,7 @@ import Navigation from '@/components/Navigation';
 import EmbeddedPayment from '@/components/EmbeddedPayment';
 import ChatWidget from '@/components/ai-chat/ChatWidget';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '@/components/ui/badge';
 
 interface Plan {
   id: string;
@@ -33,6 +34,7 @@ interface Product {
   currency: string;
   features: string[];
   images: any[];
+  status: string;
 }
 
 interface RegionalService {
@@ -115,7 +117,7 @@ const AIRegister = () => {
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*')
-          .eq('status', 'active')
+          .in('status', ['active', 'coming_soon'])
           .order('sort_order');
 
         if (productsError) throw productsError;
@@ -127,7 +129,8 @@ const AIRegister = () => {
           price: parseFloat(product.price.toString()),
           currency: product.currency,
           features: Array.isArray(product.features) ? product.features.map(f => String(f)) : [],
-          images: Array.isArray(product.images) ? product.images : []
+          images: Array.isArray(product.images) ? product.images : [],
+          status: product.status || 'active'
         }));
 
         setProducts(formattedProducts);
@@ -667,13 +670,16 @@ const AIRegister = () => {
                                   <Checkbox
                                     id={product.id}
                                     checked={selectedProducts.includes(product.id)}
+                                    disabled={product.status === 'coming_soon'}
                                     onCheckedChange={(checked) => handleProductToggle(product.id, checked as boolean)}
                                     className="mt-1"
                                   />
                                   <Label htmlFor={product.id} className="flex-1 cursor-pointer">
                                     <div className="flex justify-between items-start">
                                       <div className="flex-1">
-                                        <h4 className="font-semibold text-base mb-1">{product.name}</h4>
+                                        <h4 className="font-semibold text-base mb-1 flex items-center gap-2">{product.name}{product.status === 'coming_soon' && (
+                                          <Badge className="bg-secondary text-white">{t('common.comingSoon', { defaultValue: 'Coming Soon' })}</Badge>
+                                        )}</h4>
                                         <p className="text-muted-foreground text-sm mb-2">{product.description}</p>
                                         {product.features.length > 0 && (
                                           <div className="flex flex-wrap gap-x-4 gap-y-1">

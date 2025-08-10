@@ -153,7 +153,8 @@
     "perMonth": "/month",
     "buyNow": "Buy now",
     "howItWorks": "How it works",
-    "visitor": "Visitor"
+    "visitor": "Visitor",
+    "comingSoon": "Coming Soon"
   },
   "products": {
     "icePendant": {

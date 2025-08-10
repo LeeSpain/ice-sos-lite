@@ -406,6 +406,7 @@ const ProductsPage = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="coming_soon">Coming Soon</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
                 </SelectContent>
               </Select>

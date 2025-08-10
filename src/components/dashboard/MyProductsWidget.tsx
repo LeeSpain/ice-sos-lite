@@ -79,7 +79,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       const { data: productsData } = await supabase
         .from('products')
         .select('*')
-        .eq('status', 'active')
+        .in('status', ['active', 'coming_soon'])
         .order('sort_order');
       
       setAvailableProducts(productsData || []);
@@ -370,10 +370,10 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                       <Button 
                         size="sm" 
                         onClick={() => handlePurchaseProduct(product)}
-                        disabled={purchaseLoading === product.id}
+                        disabled={purchaseLoading === product.id || product.status === 'coming_soon'}
                         className="bg-primary text-white hover:bg-primary/90 ml-3"
                       >
-                        {purchaseLoading === product.id ? 'Processing...' : 'Buy Now'}
+                        {product.status === 'coming_soon' ? 'Coming Soon' : (purchaseLoading === product.id ? 'Processing...' : 'Buy Now')}
                       </Button>
                     </div>
                   </div>

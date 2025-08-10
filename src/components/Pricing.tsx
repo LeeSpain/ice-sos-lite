@@ -100,7 +100,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('status', 'active')
+        .in('status', ['active', 'coming_soon'])
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
@@ -341,9 +341,15 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
               {products.map((product) => (
                 <Card key={product.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-<Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
-  {t('pricing.oneTime')}
-</Badge>
+{product.status === 'coming_soon' ? (
+  <Badge className="absolute top-6 right-6 bg-secondary text-white text-sm px-4 py-2 shadow-lg">
+    {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
+  </Badge>
+) : (
+  <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
+    {t('pricing.oneTime')}
+  </Badge>
+)}
                   
                   <div className="relative p-8">
                     <div className="grid lg:grid-cols-3 gap-8 items-center">
@@ -449,16 +455,22 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                     </div>
 
                                      <div className="flex gap-3 pt-4">
-                                       <Button 
-                                         className={`flex-1 ${
-                                           product.name === 'ICE SOS Bluetooth Pendant'
-                                             ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                             : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                                         }`}
-                                         asChild
-                                       >
-                                         <Link to="/ai-register">{t('pricing.purchaseDevice', { defaultValue: 'Purchase Device' })}</Link>
-                                       </Button>
+                                       {product.status === 'coming_soon' ? (
+                                         <Badge className="bg-secondary text-white px-3 py-1">
+                                           {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
+                                         </Badge>
+                                       ) : (
+                                         <Button 
+                                           className={`flex-1 ${
+                                             product.name === 'ICE SOS Bluetooth Pendant'
+                                               ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                               : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                           }`}
+                                           asChild
+                                         >
+                                           <Link to="/ai-register">{t('pricing.purchaseDevice', { defaultValue: 'Purchase Device' })}</Link>
+                                         </Button>
+                                       )}
                                      </div>
                                   </div>
                                 </DialogContent>
@@ -466,6 +478,11 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                             )}
 
                           
+                        {product.status === 'coming_soon' ? (
+                          <Badge className="bg-secondary text-white text-sm px-4 py-2 shadow-lg">
+                            {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
+                          </Badge>
+                        ) : (
                         <Button 
                           size="lg"
                           className={`font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
@@ -477,6 +494,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                         >
                           <Link to="/ai-register">{t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}</Link>
                         </Button>
+                        )}
                         </div>
                       </div>
                       

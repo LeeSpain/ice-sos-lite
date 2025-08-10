@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,11 @@ import heroImg from "@/assets/hero-emergency.jpg";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useTranslation } from 'react-i18next';
+import { supabase } from "@/integrations/supabase/client";
 
 const DeviceIceSosPendant = () => {
   const { t } = useTranslation();
+  const [comingSoon, setComingSoon] = useState(false);
   const title = t('devices.icePendant.seoTitle', { defaultValue: 'ICE SOS Bluetooth Pendant – ICE SOS Lite' });
   const description = t('devices.icePendant.metaDescription', { defaultValue: 'Hands-free emergency pendant with Bluetooth, waterproof design, and 7-day battery. Works with ICE SOS Lite app.' });
   const canonical = typeof window !== "undefined" ? `${window.location.origin}/devices/ice-sos-pendant` : "https://example.com/devices/ice-sos-pendant";
@@ -36,6 +38,18 @@ const DeviceIceSosPendant = () => {
       url: canonical
     }
   };
+
+  React.useEffect(() => {
+    const fetchStatus = async () => {
+      const { data } = await supabase
+        .from('products')
+        .select('status')
+        .eq('name', 'ICE SOS Bluetooth Pendant')
+        .maybeSingle();
+      if (data?.status === 'coming_soon') setComingSoon(true);
+    };
+    fetchStatus();
+  }, []);
 
   const features = [
     { icon: Bluetooth, text: "Bluetooth 5.0 Low Energy – fast, reliable pairing" },
@@ -92,14 +106,18 @@ const DeviceIceSosPendant = () => {
               <p className="text-xl md:text-2xl mb-8 text-white/90 leading-relaxed font-medium drop-shadow-sm">
                 {t('devices.icePendant.hero', { defaultValue: 'A discreet, one-button pendant that instantly activates your emergency plan via the ICE SOS Lite app. Designed for reliability, comfort, and peace of mind.' })}
               </p>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
-                <Button className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
-                  <Link to="/ai-register">{t('common.buyNow', { defaultValue: 'Buy now' })}</Link>
-                </Button>
-                <Button variant="outline" className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
-                  <Link to="#how-it-works">{t('common.howItWorks', { defaultValue: 'How it works' })}</Link>
-                </Button>
-              </div>
+                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                  {comingSoon ? (
+                    <Badge className="px-8 py-4 text-lg font-semibold bg-secondary text-white">{t('common.comingSoon', { defaultValue: 'Coming Soon' })}</Badge>
+                  ) : (
+                    <Button className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
+                      <Link to="/ai-register">{t('common.buyNow', { defaultValue: 'Buy now' })}</Link>
+                    </Button>
+                  )}
+                  <Button variant="outline" className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
+                    <Link to="#how-it-works">{t('common.howItWorks', { defaultValue: 'How it works' })}</Link>
+                  </Button>
+                </div>
               <ul className="mt-8 space-y-3 text-white/80">
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> Works with any ICE SOS subscription</li>
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> One‑tap SOS activation from a wearable</li>
@@ -136,8 +154,12 @@ const DeviceIceSosPendant = () => {
                 <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>4. Your phone securely shares GPS location and critical info with responders.</span></li>
               </ol>
               <div className="mt-6">
-                <Button asChild>
-                  <Link to="/ai-register">Get the pendant</Link>
+                <Button asChild disabled={comingSoon}>
+                  {comingSoon ? (
+                    <span>{t('common.comingSoon', { defaultValue: 'Coming Soon' })}</span>
+                  ) : (
+                    <Link to="/ai-register">Get the pendant</Link>
+                  )}
                 </Button>
               </div>
             </div>
