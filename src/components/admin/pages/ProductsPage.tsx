@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Trash2, Edit, Plus, Package, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+// Extend Product with coming_soon_url
 interface Product {
   id: string;
   name: string;
@@ -26,6 +28,7 @@ interface Product {
   compatibility: string[];
   status: string;
   sort_order: number;
+  coming_soon_url?: string | null;
   category: {
     name: string;
   };
@@ -43,6 +46,7 @@ const ProductsPage = () => {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -54,7 +58,8 @@ const ProductsPage = () => {
     weight: '',
     category_id: '',
     compatibility: '',
-    status: 'active'
+    status: 'active',
+    coming_soon_url: '',
   });
   const { toast } = useToast();
 
@@ -115,7 +120,8 @@ const ProductsPage = () => {
       weight: product.weight?.toString() || '0',
       category_id: '', // Will be set based on category name
       compatibility: product.compatibility?.join(', ') || '',
-      status: product.status
+      status: product.status,
+      coming_soon_url: product.coming_soon_url || '',
     });
     setIsEditDialogOpen(true);
   };
@@ -128,41 +134,41 @@ const ProductsPage = () => {
   const handleSave = async () => {
     if (!selectedProduct) return;
 
-    try {
-      const features = formData.features.split('\n').filter(f => f.trim());
-      const compatibility = formData.compatibility.split(',').map(c => c.trim()).filter(c => c);
+    const features = formData.features.split('\n').map(f => f.trim()).filter(Boolean);
+    const compatibility = formData.compatibility.split(',').map(c => c.trim()).filter(Boolean);
 
-      const { error } = await supabase
-        .from('products')
-        .update({
-          name: formData.name,
-          price: parseFloat(formData.price),
-          description: formData.description,
-          features,
-          sku: formData.sku,
-          inventory_count: parseInt(formData.inventory_count),
-          weight: parseFloat(formData.weight),
-          compatibility,
-          status: formData.status,
-        })
-        .eq('id', selectedProduct.id);
+    const { error } = await supabase
+      .from('products')
+      .update({
+        name: formData.name,
+        price: parseFloat(formData.price),
+        description: formData.description,
+        features,
+        sku: formData.sku,
+        inventory_count: parseInt(formData.inventory_count),
+        weight: parseFloat(formData.weight),
+        compatibility,
+        status: formData.status,
+        coming_soon_url: formData.coming_soon_url?.trim() ? formData.coming_soon_url.trim() : null,
+      })
+      .eq('id', selectedProduct.id);
 
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Product updated successfully",
-      });
-
-      setIsEditDialogOpen(false);
-      fetchProducts();
-    } catch (error) {
+    if (error) {
       toast({
         title: "Error",
         description: "Failed to update product",
         variant: "destructive",
       });
+      return;
     }
+
+    toast({
+      title: "Success",
+      description: "Product updated successfully",
+    });
+
+    setIsEditDialogOpen(false);
+    fetchProducts();
   };
 
   const handleDelete = async (productId: string) => {
@@ -217,6 +223,74 @@ const ProductsPage = () => {
     }
   };
 
+  // Create Product
+  const openAddDialog = () => {
+    setFormData({
+      name: '',
+      price: '',
+      description: '',
+      features: '',
+      sku: '',
+      inventory_count: '0',
+      weight: '0',
+      category_id: '',
+      compatibility: '',
+      status: 'active',
+      coming_soon_url: '',
+    });
+    setIsAddDialogOpen(true);
+  };
+
+  const handleCreate = async () => {
+    const price = parseFloat(formData.price);
+    if (Number.isNaN(price)) {
+      toast({
+        title: "Invalid price",
+        description: "Please enter a valid numeric price.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const features = formData.features.split('\n').map(f => f.trim()).filter(Boolean);
+    const compatibility = formData.compatibility.split(',').map(c => c.trim()).filter(Boolean);
+
+    const { error } = await supabase
+      .from('products')
+      .insert([
+        {
+          name: formData.name,
+          price,
+          description: formData.description,
+          features,
+          sku: formData.sku || null,
+          inventory_count: parseInt(formData.inventory_count || '0'),
+          weight: parseFloat(formData.weight || '0'),
+          compatibility,
+          status: formData.status,
+          coming_soon_url: formData.coming_soon_url?.trim() ? formData.coming_soon_url.trim() : null,
+          // currency defaults to EUR in DB, sort_order defaults to 0
+        }
+      ]);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create product",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Product created successfully",
+    });
+
+    setIsAddDialogOpen(false);
+    fetchProducts();
+  };
+
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
@@ -226,7 +300,7 @@ const ProductsPage = () => {
             Manage your Bluetooth pendant and other safety products
           </p>
         </div>
-        <Button>
+        <Button onClick={openAddDialog}>
           <Plus className="mr-2 h-4 w-4" />
           Add Product
         </Button>
@@ -411,6 +485,20 @@ const ProductsPage = () => {
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="comingSoonUrl">Coming Soon Link (URL)</Label>
+              <Input
+                id="comingSoonUrl"
+                type="url"
+                placeholder="https://example.com/learn-more"
+                value={formData.coming_soon_url}
+                onChange={(e) => setFormData({ ...formData, coming_soon_url: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                This link will be shown to users when the product status is set to Coming Soon.
+              </p>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
@@ -478,10 +566,155 @@ const ProductsPage = () => {
                   ))}
                 </div>
               </div>
+
+              <div>
+                <Label className="text-sm font-medium">Coming Soon Link</Label>
+                {selectedProduct.coming_soon_url ? (
+                  <a
+                    href={selectedProduct.coming_soon_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-primary hover:underline break-all"
+                  >
+                    {selectedProduct.coming_soon_url}
+                  </a>
+                ) : (
+                  <p className="text-sm text-muted-foreground">None</p>
+                )}
+              </div>
             </div>
           )}
           <DialogFooter>
             <Button onClick={() => setIsViewDialogOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Dialog */}
+      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add Product</DialogTitle>
+            <DialogDescription>
+              Create a new product entry
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="add-name">Product Name</Label>
+                <Input
+                  id="add-name"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-price">Price (€)</Label>
+                <Input
+                  id="add-price"
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-description">Description</Label>
+              <Textarea
+                id="add-description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-features">Features (one per line)</Label>
+              <Textarea
+                id="add-features"
+                placeholder="Bluetooth connectivity&#10;Waterproof design&#10;Long battery life"
+                value={formData.features}
+                onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="add-sku">SKU</Label>
+                <Input
+                  id="add-sku"
+                  value={formData.sku}
+                  onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-inventory">Inventory</Label>
+                <Input
+                  id="add-inventory"
+                  type="number"
+                  value={formData.inventory_count}
+                  onChange={(e) => setFormData({ ...formData, inventory_count: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-weight">Weight (g)</Label>
+                <Input
+                  id="add-weight"
+                  type="number"
+                  step="0.1"
+                  value={formData.weight}
+                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-compatibility">Compatible Plans (comma separated)</Label>
+              <Input
+                id="add-compatibility"
+                placeholder="Basic Plan, Premium Plan, Enterprise Plan"
+                value={formData.compatibility}
+                onChange={(e) => setFormData({ ...formData, compatibility: e.target.value })}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-status">Status</Label>
+              <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="z-50 bg-background">
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="coming_soon">Coming Soon</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-comingSoonUrl">Coming Soon Link (URL)</Label>
+              <Input
+                id="add-comingSoonUrl"
+                type="url"
+                placeholder="https://example.com/learn-more"
+                value={formData.coming_soon_url}
+                onChange={(e) => setFormData({ ...formData, coming_soon_url: e.target.value })}
+              />
+              <p className="text-xs text-muted-foreground">
+                This link will be shown to users when the product status is set to Coming Soon.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreate}>Create Product</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

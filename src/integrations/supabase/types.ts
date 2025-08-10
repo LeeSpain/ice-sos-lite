@@ -990,6 +990,7 @@ export type Database = {
       products: {
         Row: {
           category_id: string | null
+          coming_soon_url: string | null
           compatibility: string[] | null
           created_at: string
           currency: string | null
@@ -1009,6 +1010,7 @@ export type Database = {
         }
         Insert: {
           category_id?: string | null
+          coming_soon_url?: string | null
           compatibility?: string[] | null
           created_at?: string
           currency?: string | null
@@ -1028,6 +1030,7 @@ export type Database = {
         }
         Update: {
           category_id?: string | null
+          coming_soon_url?: string | null
           compatibility?: string[] | null
           created_at?: string
           currency?: string | null
