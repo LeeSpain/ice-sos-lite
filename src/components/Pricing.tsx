@@ -352,7 +352,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         } rounded-2xl flex items-center justify-center shadow-lg`}>
                           <Package className="h-8 w-8 text-white" />
                         </div>
-                        <CardTitle className="text-3xl font-bold mb-3">{product.name}</CardTitle>
+                        <CardTitle className="text-3xl font-bold mb-3">{product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant') : product.name}</CardTitle>
                         <CardDescription className="text-lg text-muted-foreground mb-4">
                           {product.description}
                         </CardDescription>
@@ -372,7 +372,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                                 className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                 asChild
                               >
-                                <Link to="/devices/ice-sos-pendant">Details</Link>
+                                <Link to="/devices/ice-sos-pendant">{t('pricing.details')}</Link>
                               </Button>
                             ) : (
                               <Dialog>
@@ -398,7 +398,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                   
                                   <div className="space-y-6">
                                     <div>
-                                      <h4 className="font-semibold mb-3">Technical Specifications:</h4>
+                                      <h4 className="font-semibold mb-3">{t('pricing.technicalSpecsTitle', { defaultValue: 'Technical Specifications:' })}</h4>
                                       <div className="grid grid-cols-2 gap-4 text-sm">
                                         <div className="flex items-center gap-2">
                                           <Bluetooth className="h-4 w-4 text-blue-500" />
@@ -420,7 +420,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                     </div>
 
                                     <div>
-                                      <h4 className="font-semibold mb-3">All Features:</h4>
+                                      <h4 className="font-semibold mb-3">{t('pricing.allFeaturesTitle', { defaultValue: 'All Features:' })}</h4>
                                       <ul className="grid grid-cols-1 gap-2">
                                         {product.features.map((feature, index) => (
                                           <li key={index} className="flex items-start gap-2">
@@ -432,7 +432,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                     </div>
 
                                     <div>
-                                      <h4 className="font-semibold mb-3">How It Works:</h4>
+                                      <h4 className="font-semibold mb-3">{t('pricing.howItWorksTitle', { defaultValue: 'How It Works:' })}</h4>
                                       <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
                                         <li>Pair the pendant with your smartphone via Bluetooth</li>
                                         <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
@@ -451,7 +451,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                          }`}
                                          asChild
                                        >
-                                         <Link to="/ai-register">Purchase Device</Link>
+                                         <Link to="/ai-register">{t('pricing.purchaseDevice', { defaultValue: 'Purchase Device' })}</Link>
                                        </Button>
                                      </div>
                                   </div>
@@ -469,14 +469,14 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                           }`}
                           asChild
                         >
-                          <Link to="/ai-register">Purchase Now</Link>
+                          <Link to="/ai-register">{t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}</Link>
                         </Button>
                         </div>
                       </div>
                       
                       {/* Features */}
                       <div className="lg:col-span-2">
-                        <h4 className="text-xl font-semibold mb-4">Key Features:</h4>
+                        <h4 className="text-xl font-semibold mb-4">{t('pricing.keyFeaturesTitle', { defaultValue: 'Key Features:' })}</h4>
                         <div className="grid md:grid-cols-2 gap-4">
                           {product.features.slice(0, 6).map((feature, index) => (
                             <div key={index} className="flex items-start space-x-3">
@@ -487,7 +487,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Check className="h-4 w-4 text-green-500" />
-                          <span>Free shipping • {product.inventory_count} units available</span>
+                          <span>{t('pricing.freeShippingInventory', { count: product.inventory_count, defaultValue: 'Free shipping • {{count}} units available' })}</span>
                         </div>
                       </div>
                     </div>
@@ -502,10 +502,10 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
         <>
           <div className="text-center mb-8 mt-16">
             <h3 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-              Regional Services
+              {t('pricing.regionalServicesTitle', { defaultValue: 'Regional Services' })}
             </h3>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Specialized coverage in your local area with dedicated emergency response teams
+              {t('pricing.regionalServicesDesc', { defaultValue: 'Specialized coverage in your local area with dedicated emergency response teams' })}
             </p>
           </div>
 
@@ -551,7 +551,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                               ? 'text-green-600'
                               : 'text-secondary'
                           }`}>{formatPriceDisplay(service.price, service.currency)}</span>
-                          <span className="text-muted-foreground text-lg">/month</span>
+                          <span className="text-muted-foreground text-lg">{t('pricing.perMonth', { defaultValue: '/month' })}</span>
                         </div>
                         <Button 
                           size="lg"
@@ -562,13 +562,13 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                           }`}
                           asChild
                         >
-                          <Link to="/ai-register">Contact Regional Center</Link>
+                          <Link to="/ai-register">{t('nav.regionalCenter')}</Link>
                         </Button>
                       </div>
                       
                       {/* Features */}
                       <div className="lg:col-span-2">
-                        <h4 className="text-xl font-semibold mb-4">Regional Features:</h4>
+                        <h4 className="text-xl font-semibold mb-4">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
                         <div className="grid md:grid-cols-2 gap-4">
                           {service.features.map((feature, featureIndex) => (
                             <div key={featureIndex} className="flex items-start space-x-3">
@@ -606,18 +606,18 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                       </CardDescription>
                       <div className="mb-6">
                         <span className="text-4xl font-bold text-green-600">{formatPriceDisplay(4.99, 'EUR')}</span>
-                        <span className="text-muted-foreground text-lg">/month</span>
+                        <span className="text-muted-foreground text-lg">{t('pricing.perMonth', { defaultValue: '/month' })}</span>
                       </div>
                       <Button 
                         size="lg"
                         className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-green-600 hover:bg-green-700 text-white"
                         asChild
                       >
-                        <Link to="/regional-center-spain">Contact Regional Center</Link>
+                        <Link to="/regional-center-spain">{t('nav.regionalCenter')}</Link>
                       </Button>
                     </div>
                     <div className="lg:col-span-2">
-                      <h4 className="text-xl font-semibold mb-4">Regional Features:</h4>
+                      <h4 className="text-xl font-semibold mb-4">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
                       <div className="grid md:grid-cols-2 gap-4">
                         {[
                           'Bilingual English & Spanish agents',

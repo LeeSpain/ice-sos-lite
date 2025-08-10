@@ -10,6 +10,7 @@ import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall, CheckCi
 import heroImg from "@/assets/hero-emergency.jpg";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { useTranslation } from 'react-i18next';
 
 const DeviceIceSosPendant = () => {
   const title = "ICE SOS Bluetooth Pendant – ICE SOS Lite";
