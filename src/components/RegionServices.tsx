@@ -101,10 +101,14 @@ const RegionServices = () => {
                 
                 <CardHeader className="text-center">
                   <CardTitle className="text-xl font-bold text-foreground">
-                    {plan.name}
+                    {(plan.region === 'Spain' || plan.name.toLowerCase().includes('spain')) 
+                      ? t('regionServices.spain.name', { defaultValue: plan.name }) 
+                      : plan.name}
                   </CardTitle>
                   <CardDescription className="text-muted-foreground">
-                    {plan.description}
+                    {(plan.region === 'Spain' || plan.name.toLowerCase().includes('spain')) 
+                      ? t('regionServices.spain.description', { defaultValue: plan.description }) 
+                      : plan.description}
                   </CardDescription>
                   <div className="mt-4">
                     <div className="flex items-baseline justify-center gap-1">

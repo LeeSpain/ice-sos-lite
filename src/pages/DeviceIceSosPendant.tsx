@@ -13,8 +13,9 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { useTranslation } from 'react-i18next';
 
 const DeviceIceSosPendant = () => {
-  const title = "ICE SOS Bluetooth Pendant – ICE SOS Lite";
-  const description = "Hands-free emergency pendant with Bluetooth, waterproof design, and 7-day battery. Works with ICE SOS Lite app.";
+  const { t } = useTranslation();
+  const title = t('devices.icePendant.seoTitle', { defaultValue: 'ICE SOS Bluetooth Pendant – ICE SOS Lite' });
+  const description = t('devices.icePendant.metaDescription', { defaultValue: 'Hands-free emergency pendant with Bluetooth, waterproof design, and 7-day battery. Works with ICE SOS Lite app.' });
   const canonical = typeof window !== "undefined" ? `${window.location.origin}/devices/ice-sos-pendant` : "https://example.com/devices/ice-sos-pendant";
 
   const productJsonLd = {
@@ -86,18 +87,17 @@ const DeviceIceSosPendant = () => {
             <div className="text-center lg:text-left text-white">
               <Badge variant="secondary" className="mb-6">ICE SOS Lite Device</Badge>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                ICE SOS Bluetooth Pendant
+                {t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' })}
               </h1>
               <p className="text-xl md:text-2xl mb-8 text-white/90 leading-relaxed font-medium drop-shadow-sm">
-                A discreet, one-button pendant that instantly activates your emergency plan via the ICE SOS Lite app. Designed for
-                reliability, comfort, and peace of mind.
+                {t('devices.icePendant.hero', { defaultValue: 'A discreet, one-button pendant that instantly activates your emergency plan via the ICE SOS Lite app. Designed for reliability, comfort, and peace of mind.' })}
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
                 <Button className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
-                  <Link to="/ai-register">Buy now</Link>
+                  <Link to="/ai-register">{t('common.buyNow', { defaultValue: 'Buy now' })}</Link>
                 </Button>
                 <Button variant="outline" className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
-                  <Link to="#how-it-works">How it works</Link>
+                  <Link to="#how-it-works">{t('common.howItWorks', { defaultValue: 'How it works' })}</Link>
                 </Button>
               </div>
               <ul className="mt-8 space-y-3 text-white/80">

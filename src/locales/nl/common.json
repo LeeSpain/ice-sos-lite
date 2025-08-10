@@ -115,5 +115,49 @@
     "overallProgress": "Algemene voortgang",
     "recentActivity": "Recente activiteit",
     "noRecentActivity": "Geen recente activiteit"
+  },
+  "common": {
+    "perMonth": "/maand",
+    "buyNow": "Nu kopen",
+    "howItWorks": "Hoe het werkt",
+    "visitor": "Bezoeker"
+  },
+  "products": {
+    "icePendant": {
+      "name": "ICE SOS Bluetooth-hanger",
+      "description": "Handsfree noodhanger compatibel met ICE SOS Lite."
+    }
+  },
+  "plans": {
+    "premium": {
+      "name": "Premium Bescherming",
+      "description": "Geavanceerde bescherming met AI-monitoring"
+    },
+    "family": {
+      "name": "Familieverbinding",
+      "description": "Nodig vertrouwde familie of zorgverleners uit met gedeelde meldingen en locatie."
+    }
+  },
+  "devices": {
+    "icePendant": {
+      "hero": "Een discrete hanger met één knop die direct je noodplan activeert via de ICE SOS Lite‑app. Ontworpen voor betrouwbaarheid, comfort en gemoedsrust.",
+      "seoTitle": "ICE SOS Bluetooth-hanger – ICE SOS Lite",
+      "metaDescription": "Handsfree noodhanger met Bluetooth, waterdicht ontwerp en 7 dagen batterij."
+    }
+  },
+  "register": {
+    "plans": {
+      "personal": { "name": "Persoonlijk Account", "desc": "Individueel noodcontactsysteem" },
+      "guardian": { "name": "Guardian Wellness", "desc": "Geavanceerde gezondheidsmonitoring en meldingen" },
+      "family": { "name": "Gezinsdeling", "desc": "Perfect voor gezinnen met meerdere leden" },
+      "callcenterES": { "name": "Callcenter Spanje", "desc": "24/7 professionele noodrespons" }
+    }
+  },
+  "regionServices": {
+    "spain": {
+      "name": "Callcenter Spanje",
+      "description": "Gespecialiseerde noodhulp voor Spanje met lokale taalondersteuning en 24/7 beschikbaarheid."
+    }
   }
 }
+

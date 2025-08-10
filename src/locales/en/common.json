@@ -117,6 +117,49 @@
     "recentActivity": "Recent Activity",
     "noRecentActivity": "No recent activity"
   },
+  "common": {
+    "perMonth": "/month",
+    "buyNow": "Buy now",
+    "howItWorks": "How it works",
+    "visitor": "Visitor"
+  },
+  "products": {
+    "icePendant": {
+      "name": "ICE SOS Bluetooth Pendant",
+      "description": "Hands-free emergency pendant compatible with ICE SOS Lite."
+    }
+  },
+  "plans": {
+    "premium": {
+      "name": "Premium Protection",
+      "description": "Advanced protection with AI monitoring"
+    },
+    "family": {
+      "name": "Family Connection",
+      "description": "Invite trusted family or carers with shared alerts and location."
+    }
+  },
+  "devices": {
+    "icePendant": {
+      "hero": "A discreet, one-button pendant that instantly activates your emergency plan via the ICE SOS Lite app. Designed for reliability, comfort, and peace of mind.",
+      "seoTitle": "ICE SOS Bluetooth Pendant – ICE SOS Lite",
+      "metaDescription": "Hands-free emergency pendant with Bluetooth, waterproof design, and 7-day battery."
+    }
+  },
+  "register": {
+    "plans": {
+      "personal": { "name": "Personal Account", "desc": "Individual emergency contact system" },
+      "guardian": { "name": "Guardian Wellness", "desc": "Advanced health monitoring and alerts" },
+      "family": { "name": "Family Sharing", "desc": "Perfect for families with multiple members" },
+      "callcenterES": { "name": "Call Centre Spain", "desc": "24/7 professional emergency response" }
+    }
+  },
+  "regionServices": {
+    "spain": {
+      "name": "Call Centre Spain",
+      "description": "Specialized emergency response for Spain with local language support and 24/7 availability."
+    }
+  },
   "regionalCenterES": {
     "h1": "Spain Regional Call Centre",
     "intro": "24/7 bilingual emergency support for residents and visitors in Spain.",

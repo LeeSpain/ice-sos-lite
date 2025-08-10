@@ -230,9 +230,11 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
                           <Brain className="h-8 w-8 text-white" />
                         </div>
-                        <CardTitle className="text-3xl font-bold mb-3">{selectedPlan.name}</CardTitle>
+                        <CardTitle className="text-3xl font-bold mb-3">
+                          {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
+                        </CardTitle>
                         <CardDescription className="text-lg text-muted-foreground mb-4">
-                          {selectedPlan.description}
+                          {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
                         </CardDescription>
 <div className="mb-6">
   <span className="text-4xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
@@ -292,9 +294,11 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center shadow-lg">
                         <Users className="h-8 w-8 text-white" />
                       </div>
-                      <CardTitle className="text-3xl font-bold mb-3">{plan.name}</CardTitle>
+                      <CardTitle className="text-3xl font-bold mb-3">
+                        {plan.name === 'Family Connection' ? t('plans.family.name', { defaultValue: 'Family Connection' }) : plan.name}
+                      </CardTitle>
                       <CardDescription className="text-lg text-muted-foreground mb-4">
-                        {plan.description}
+                        {plan.name === 'Family Connection' ? t('plans.family.description', { defaultValue: plan.description }) : plan.description}
                       </CardDescription>
 <div className="mb-6">
   <span className="text-4xl font-bold text-wellness">{formatPriceDisplay(plan.price, plan.currency)}</span>
@@ -352,9 +356,11 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         } rounded-2xl flex items-center justify-center shadow-lg`}>
                           <Package className="h-8 w-8 text-white" />
                         </div>
-                        <CardTitle className="text-3xl font-bold mb-3">{product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant') : product.name}</CardTitle>
+                        <CardTitle className="text-3xl font-bold mb-3">
+                          {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' }) : product.name}
+                        </CardTitle>
                         <CardDescription className="text-lg text-muted-foreground mb-4">
-                          {product.description}
+                          {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
                         </CardDescription>
 <div className="mb-6">
   <span className={`text-4xl font-bold ${

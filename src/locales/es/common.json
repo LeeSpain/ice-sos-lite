@@ -117,6 +117,49 @@
     "recentActivity": "Actividad reciente",
     "noRecentActivity": "Sin actividad reciente"
   },
+  "common": {
+    "perMonth": "/mes",
+    "buyNow": "Comprar ahora",
+    "howItWorks": "Cómo funciona",
+    "visitor": "Visitante"
+  },
+  "products": {
+    "icePendant": {
+      "name": "Colgante Bluetooth ICE SOS",
+      "description": "Colgante de emergencia manos libres compatible con ICE SOS Lite."
+    }
+  },
+  "plans": {
+    "premium": {
+      "name": "Protección Premium",
+      "description": "Protección avanzada con monitoreo de IA"
+    },
+    "family": {
+      "name": "Conexión Familiar",
+      "description": "Invita a familiares o cuidadores de confianza con alertas y ubicación compartidas."
+    }
+  },
+  "devices": {
+    "icePendant": {
+      "hero": "Un colgante discreto de un solo botón que activa al instante tu plan de emergencia con la app ICE SOS Lite. Diseñado para la fiabilidad, la comodidad y la tranquilidad.",
+      "seoTitle": "Colgante Bluetooth ICE SOS – ICE SOS Lite",
+      "metaDescription": "Colgante de emergencia manos libres con Bluetooth, diseño impermeable y batería de 7 días."
+    }
+  },
+  "register": {
+    "plans": {
+      "personal": { "name": "Cuenta Personal", "desc": "Sistema individual de contacto de emergencia" },
+      "guardian": { "name": "Bienestar Guardian", "desc": "Monitoreo de salud avanzado y alertas" },
+      "family": { "name": "Compartir en Familia", "desc": "Perfecto para familias con varios miembros" },
+      "callcenterES": { "name": "Centro de Llamadas España", "desc": "Respuesta profesional de emergencia 24/7" }
+    }
+  },
+  "regionServices": {
+    "spain": {
+      "name": "Centro de Llamadas España",
+      "description": "Respuesta de emergencia especializada para España con soporte en el idioma local y disponibilidad 24/7."
+    }
+  },
   "regionalCenterES": {
     "h1": "Centro de Llamadas Regional de España",
     "intro": "Soporte de emergencia bilingüe 24/7 para residentes y visitantes en España.",

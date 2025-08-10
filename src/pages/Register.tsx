@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import EmbeddedPayment from "@/components/EmbeddedPayment";
+import { useTranslation } from 'react-i18next';
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -33,6 +34,7 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleNextStep = () => {
     if (step === 1) {
@@ -230,12 +232,12 @@ const Register = () => {
                   </div>
 
                   <div className="space-y-4">
-                    {[
-                      { id: "personal", name: "Personal Account", price: "€1.99/month", description: "Individual emergency contact system" },
-                      { id: "guardian", name: "Guardian Wellness", price: "€4.99/month", description: "Advanced health monitoring and alerts" },
-                      { id: "family", name: "Family Sharing", price: "€0.99/month", description: "Perfect for families with multiple members" },
-                      { id: "callcenter", name: "Call Centre (Spain)", price: "€24.99/month", description: "24/7 professional emergency response" }
-                    ].map((plan) => (
+                  {[
+                    { id: "personal", name: t('register.plans.personal.name', { defaultValue: 'Personal Account' }), price: `€1.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.personal.desc', { defaultValue: 'Individual emergency contact system' }) },
+                    { id: "guardian", name: t('register.plans.guardian.name', { defaultValue: 'Guardian Wellness' }), price: `€4.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.guardian.desc', { defaultValue: 'Advanced health monitoring and alerts' }) },
+                    { id: "family", name: t('register.plans.family.name', { defaultValue: 'Family Sharing' }), price: `€0.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.family.desc', { defaultValue: 'Perfect for families with multiple members' }) },
+                    { id: "callcenter", name: t('register.plans.callcenterES.name', { defaultValue: 'Call Centre Spain' }), price: `€24.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.callcenterES.desc', { defaultValue: '24/7 professional emergency response' }) }
+                  ].map((plan) => (
                       <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
                         <Checkbox
                           id={plan.id}
