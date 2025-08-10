@@ -29,6 +29,8 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg}'],
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6MB to allow main chunk
+        globIgnores: ['lovable-uploads/**'], // avoid precaching large uploads
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.origin.includes('supabase.co'),
