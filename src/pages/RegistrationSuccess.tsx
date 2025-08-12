@@ -115,6 +115,8 @@ const RegistrationSuccess = () => {
                           src={iosQR} 
                           alt="iOS App Store QR Code"
                           className="mx-auto rounded-lg shadow-md"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <p className="text-xs text-muted-foreground mt-2">
                           Scan with your iPhone camera
@@ -152,6 +154,8 @@ const RegistrationSuccess = () => {
                           src={androidQR} 
                           alt="Google Play Store QR Code"
                           className="mx-auto rounded-lg shadow-md"
+                          loading="lazy"
+                          decoding="async"
                         />
                         <p className="text-xs text-muted-foreground mt-2">
                           Scan with your Android camera

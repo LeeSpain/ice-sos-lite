@@ -269,13 +269,13 @@ const PaymentSuccess = () => {
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="text-center">
                           <div className="bg-white p-3 rounded-lg shadow-sm border">
-                            {iosQRCode && <img src={iosQRCode} alt="iOS QR Code" className="w-24 h-24 mx-auto" />}
+                            {iosQRCode && <img src={iosQRCode} alt="iOS QR Code" className="w-24 h-24 mx-auto" loading="lazy" decoding="async" />}
                           </div>
                           <p className="text-xs text-muted-foreground mt-2">iOS App Store</p>
                         </div>
                         <div className="text-center">
                           <div className="bg-white p-3 rounded-lg shadow-sm border">
-                            {androidQRCode && <img src={androidQRCode} alt="Android QR Code" className="w-24 h-24 mx-auto" />}
+                            {androidQRCode && <img src={androidQRCode} alt="Android QR Code" className="w-24 h-24 mx-auto" loading="lazy" decoding="async" />}
                           </div>
                           <p className="text-xs text-muted-foreground mt-2">Google Play</p>
                         </div>

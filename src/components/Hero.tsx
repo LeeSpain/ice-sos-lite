@@ -59,6 +59,8 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                 className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                 loading="eager"
                 decoding="async"
+                fetchPriority="high"
+                sizes="(min-width: 1024px) 512px, 90vw"
               />
             </div>
           </div>

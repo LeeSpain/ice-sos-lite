@@ -368,7 +368,7 @@ const AuthPage = () => {
                 </div>
                 {iosQr && (
                   <div className="flex justify-center">
-                    <img src={iosQr} alt="iOS QR Code" className="border-2 border-gray-200 rounded-lg" />
+                    <img src={iosQr} alt="iOS QR Code" className="border-2 border-gray-200 rounded-lg" loading="lazy" decoding="async" />
                   </div>
                 )}
                 <Button
@@ -388,7 +388,7 @@ const AuthPage = () => {
                 </div>
                 {androidQr && (
                   <div className="flex justify-center">
-                    <img src={androidQr} alt="Android QR Code" className="border-2 border-gray-200 rounded-lg" />
+                    <img src={androidQr} alt="Android QR Code" className="border-2 border-gray-200 rounded-lg" loading="lazy" decoding="async" />
                   </div>
                 )}
                 <Button
