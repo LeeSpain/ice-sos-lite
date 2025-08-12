@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import heroImage from '@/assets/hero-emergency.jpg';
+const heroImage = '/lovable-uploads/0254354f-98df-4b5b-938e-aa7fa5cfc9ec.png';
 
 
 interface HeroProps {
@@ -13,13 +13,6 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
   const { t } = useTranslation();
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
-      {/* Darker Shadow Overlay for Professional Look */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30" />
-      
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:20px_20px]" />
-      </div>
       
       <div className="container mx-auto px-4 py-20 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -62,15 +55,12 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
             <div className="relative z-10">
               <img 
                 src={heroImage} 
-                alt="ICE SOS Emergency Protection App Interface"
+                alt="ICE SOS pendant and smartphone - emergency alert device"
                 className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                 loading="eager"
                 decoding="async"
               />
             </div>
-            {/* Floating Elements */}
-            <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-pulse" />
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-guardian/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
           </div>
         </div>
       </div>
