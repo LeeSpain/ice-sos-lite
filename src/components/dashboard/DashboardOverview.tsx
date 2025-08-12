@@ -126,6 +126,40 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
   const profileCompletion = profile?.profile_completion_percentage || 0;
   const protectionActive = subscription?.subscribed;
 
+  const hasPremiumActive = Boolean(
+    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.some((p: any) => /premium/i.test(p?.name || ''))) ||
+    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.some((t: string) => /premium/i.test(t))) ||
+    (typeof subscription?.subscription_tier === 'string' && /premium/i.test(subscription.subscription_tier)) ||
+    subscription?.subscribed
+  );
+
+  const hasFamilyActive = Boolean(
+    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.some((p: any) => p?.name === 'Family Connection')) ||
+    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.includes('Family Connection')) ||
+    subscription?.subscription_tier === 'Family Connection'
+  );
+
+  const hasSpainCallCentre = Boolean(profile?.has_spain_call_center);
+  const [hasFlicConnected, setHasFlicConnected] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: orders } = await supabase
+          .from('orders')
+          .select('id, product:products(name)')
+          .eq('user_id', user.id)
+          .eq('status', 'paid')
+          .limit(50);
+        const connected = (orders || []).some((o: any) => /flic/i.test(o.product?.name || ''));
+        setHasFlicConnected(connected);
+      } catch (e) {
+        console.error('Failed loading product connections', e);
+      }
+    })();
+  }, []);
   const quickActions = [
     {
       title: t('dashboardOverview.actions.testEmergency.title', { defaultValue: 'Test Emergency System' }),
@@ -221,6 +255,52 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
           </Card>
         ))}
       </div>
+
+      {/* Connected Products & Subscriptions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Connected Products & Subscriptions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <span className="text-sm">Premium Protection</span>
+              {hasPremiumActive ? (
+                <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
+              ) : (
+                <Badge variant="secondary">Not connected</Badge>
+              )}
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <span className="text-sm">Family Connection</span>
+              {hasFamilyActive ? (
+                <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
+              ) : (
+                <Badge variant="secondary">Not connected</Badge>
+              )}
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <span className="text-sm">Call Centre (Spain)</span>
+              {hasSpainCallCentre ? (
+                <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
+              ) : (
+                <Badge variant="secondary">Not connected</Badge>
+              )}
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <span className="text-sm">Flic 2 Devices</span>
+              {hasFlicConnected ? (
+                <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
+              ) : (
+                <Badge variant="secondary">Not connected</Badge>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Quick Actions */}
       <Card>

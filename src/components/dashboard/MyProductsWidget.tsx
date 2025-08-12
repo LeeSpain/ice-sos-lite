@@ -233,6 +233,16 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     subscription?.subscription_tier === 'Family Connection'
   );
 
+  const hasPremiumActive = Boolean(
+    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.some((p: any) => /premium/i.test(p?.name || ''))) ||
+    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.some((t: string) => /premium/i.test(t))) ||
+    (typeof subscription?.subscription_tier === 'string' && /premium/i.test(subscription.subscription_tier)) ||
+    subscription?.subscribed
+  );
+
+  const hasSpainCallCentre = Boolean(profile?.has_spain_call_center);
+  const hasFlicConnected = userProducts.some((p) => /flic/i.test(p.name));
+
   if (loading) {
     return (
       <Card>
@@ -254,6 +264,29 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Connected Products & Subscriptions */}
+        <div className="space-y-2">
+          <h4 className="font-medium">Connected Products & Subscriptions</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <span className="text-sm">Premium Protection</span>
+              {getStatusBadge(hasPremiumActive ? 'connected' : 'disconnected')}
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <span className="text-sm">Family Connection</span>
+              {getStatusBadge(hasFamilyActive ? 'connected' : 'disconnected')}
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <span className="text-sm">Call Centre (Spain)</span>
+              {getStatusBadge(hasSpainCallCentre ? 'connected' : 'disconnected')}
+            </div>
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <span className="text-sm">Flic 2 Devices</span>
+              {getStatusBadge(hasFlicConnected ? 'connected' : 'disconnected')}
+            </div>
+          </div>
+        </div>
+
         {/* Subscription Overview */}
         {subscription?.subscribed ? (
           <div className="p-4 bg-emergency/5 rounded-lg border border-emergency/20">
