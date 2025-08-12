@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-const heroImage = '/lovable-uploads/0254354f-98df-4b5b-938e-aa7fa5cfc9ec.png';
+const heroImage = '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png';
 
 
 interface HeroProps {
@@ -55,7 +55,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
             <div className="relative z-10">
               <img 
                 src={heroImage} 
-                alt="ICE SOS pendant and smartphone - emergency alert device"
+                alt="ICE Bluetooth pendant and smartphone with SOS app - hero image"
                 className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                 loading="eager"
                 decoding="async"
