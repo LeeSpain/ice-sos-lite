@@ -54,18 +54,19 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
 
       const { data: ordersData } = await supabase
         .from('orders')
-        .select(`*, product:products(*)`)
+        .select('id, created_at, unit_price, currency, product:products(id, name, sku)')
         .eq('user_id', user.id)
         .eq('status', 'paid')
         .order('created_at', { ascending: false });
 
-      const userProductsList = ordersData?.map(order => ({
+      const userProductsList = ordersData?.map((order: any) => ({
         id: `user-product-${order.id}`,
         name: order.product?.name || 'Unknown Product',
+        productSku: order.product?.sku || null,
         status: 'connected',
         purchase_date: order.created_at,
         price: order.unit_price,
-        currency: order.currency
+        currency: order.currency,
       })) || [];
 
       setUserProducts(userProductsList);
@@ -241,7 +242,10 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
   );
 
   const hasSpainCallCentre = Boolean(profile?.has_spain_call_center);
-  const hasFlicConnected = userProducts.some((p) => /flic/i.test(p.name));
+  const hasFlicConnected = userProducts.some((p: any) =>
+    (p.productSku === 'ICE-PENDANT-001') ||
+    /ice\s*sos|pendant|flic/i.test(p.name || '')
+  );
 
   if (loading) {
     return (
@@ -280,9 +284,55 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
               <span className="text-sm">Call Centre (Spain)</span>
               {getStatusBadge(hasSpainCallCentre ? 'connected' : 'disconnected')}
             </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+            <div
+              className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/40 cursor-pointer transition"
+              role="button"
+              tabIndex={0}
+              aria-label={hasFlicConnected ? "Manage Flic devices" : "Add your Flic pendant"}
+              onClick={() => {
+                if (hasFlicConnected) {
+                  window.location.href = '/full-dashboard/flic';
+                } else {
+                  window.dispatchEvent(new Event('open-device-settings'));
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  if (hasFlicConnected) {
+                    window.location.href = '/full-dashboard/flic';
+                  } else {
+                    window.dispatchEvent(new Event('open-device-settings'));
+                  }
+                }
+              }}
+            >
               <span className="text-sm">Flic 2 Devices</span>
-              {getStatusBadge(hasFlicConnected ? 'connected' : 'disconnected')}
+              <div className="flex items-center gap-2">
+                {getStatusBadge(hasFlicConnected ? 'connected' : 'disconnected')}
+                {!hasFlicConnected ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.dispatchEvent(new Event('open-device-settings'));
+                    }}
+                  >
+                    Add
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.location.href = '/full-dashboard/flic';
+                    }}
+                  >
+                    Manage
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>

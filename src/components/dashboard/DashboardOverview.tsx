@@ -149,11 +149,14 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
         if (!user) return;
         const { data: orders } = await supabase
           .from('orders')
-          .select('id, product:products(name)')
+          .select('id, product:products(name, sku)')
           .eq('user_id', user.id)
           .eq('status', 'paid')
           .limit(50);
-        const connected = (orders || []).some((o: any) => /flic/i.test(o.product?.name || ''));
+        const connected = (orders || []).some((o: any) =>
+          (o.product?.sku === 'ICE-PENDANT-001') ||
+          /ice\s*sos|pendant|flic/i.test(o.product?.name || '')
+        );
         setHasFlicConnected(connected);
       } catch (e) {
         console.error('Failed loading product connections', e);
@@ -292,11 +295,25 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
             </div>
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
               <span className="text-sm">Flic 2 Devices</span>
-              {hasFlicConnected ? (
-                <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
-              ) : (
-                <Badge variant="secondary">Not connected</Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {hasFlicConnected ? (
+                  <>
+                    <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
+                    <Button size="sm" variant="outline" onClick={() => (window.location.href = '/full-dashboard/flic')}>Manage</Button>
+                  </>
+                ) : (
+                  <>
+                    <Badge variant="secondary">Not connected</Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => window.dispatchEvent(new Event('open-device-settings'))}
+                    >
+                      Connect
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </CardContent>
