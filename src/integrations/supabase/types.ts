@@ -446,6 +446,65 @@ export type Database = {
         }
         Relationships: []
       }
+      devices_flic_buttons: {
+        Row: {
+          created_at: string
+          flic_uuid: string
+          id: string
+          last_voltage: number | null
+          name: string | null
+          owner_user: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          flic_uuid: string
+          id?: string
+          last_voltage?: number | null
+          name?: string | null
+          owner_user: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          flic_uuid?: string
+          id?: string
+          last_voltage?: number | null
+          name?: string | null
+          owner_user?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      devices_flic_events: {
+        Row: {
+          button_id: string
+          event: string
+          id: string
+          ts: string
+        }
+        Insert: {
+          button_id: string
+          event: string
+          id?: string
+          ts?: string
+        }
+        Update: {
+          button_id?: string
+          event?: string
+          id?: string
+          ts?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devices_flic_events_button_id_fkey"
+            columns: ["button_id"]
+            isOneToOne: false
+            referencedRelation: "devices_flic_buttons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_automation_settings: {
         Row: {
           created_at: string
@@ -1063,11 +1122,14 @@ export type Database = {
           address: string | null
           allergies: string[] | null
           blood_type: string | null
+          call_center_number: string | null
           country: string | null
           created_at: string
           date_of_birth: string | null
           emergency_contacts: Json | null
+          emergency_numbers: string[]
           first_name: string | null
+          has_spain_call_center: boolean
           id: string
           language_preference: string | null
           last_name: string | null
@@ -1084,11 +1146,14 @@ export type Database = {
           address?: string | null
           allergies?: string[] | null
           blood_type?: string | null
+          call_center_number?: string | null
           country?: string | null
           created_at?: string
           date_of_birth?: string | null
           emergency_contacts?: Json | null
+          emergency_numbers?: string[]
           first_name?: string | null
+          has_spain_call_center?: boolean
           id?: string
           language_preference?: string | null
           last_name?: string | null
@@ -1105,11 +1170,14 @@ export type Database = {
           address?: string | null
           allergies?: string[] | null
           blood_type?: string | null
+          call_center_number?: string | null
           country?: string | null
           created_at?: string
           date_of_birth?: string | null
           emergency_contacts?: Json | null
+          emergency_numbers?: string[]
           first_name?: string | null
+          has_spain_call_center?: boolean
           id?: string
           language_preference?: string | null
           last_name?: string | null

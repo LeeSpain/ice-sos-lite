@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { 
@@ -31,7 +32,8 @@ import {
   Package,
   MapPin,
   Mail,
-  Smartphone
+  Smartphone,
+  Bluetooth
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 
@@ -89,6 +91,7 @@ const adminMenuItems = [
       { title: "Products", url: "/admin-dashboard/products", icon: Package },
       { title: "Regional Services", url: "/admin-dashboard/regional-services", icon: MapPin },
       { title: "Subscription Plans", url: "/admin-dashboard/protection-plans", icon: Shield },
+      { title: "Flic Control", url: "/admin-dashboard/app-testing", icon: Bluetooth },
     ]
   },
   {
@@ -210,3 +213,4 @@ export default function AdminLayout() {
     </SidebarProvider>
   );
 }
+
