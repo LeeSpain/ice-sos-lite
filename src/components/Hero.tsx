@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-const heroImage = '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png';
+const heroImage = '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png?v=1';
 
 
 interface HeroProps {
