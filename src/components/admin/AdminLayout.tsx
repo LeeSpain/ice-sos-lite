@@ -91,7 +91,7 @@ const adminMenuItems = [
       { title: "Products", url: "/admin-dashboard/products", icon: Package },
       { title: "Regional Services", url: "/admin-dashboard/regional-services", icon: MapPin },
       { title: "Subscription Plans", url: "/admin-dashboard/protection-plans", icon: Shield },
-      { title: "Flic Control", url: "/admin-dashboard/app-testing", icon: Bluetooth },
+      { title: "Flic Control", url: "/admin-dashboard/flic-control", icon: Bluetooth },
     ]
   },
   {
