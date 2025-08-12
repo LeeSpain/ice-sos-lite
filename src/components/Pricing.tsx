@@ -372,6 +372,17 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     <div className="grid lg:grid-cols-3 gap-8 items-center">
                        {/* Product Info */}
                       <div className="text-center lg:text-left">
+                        {product.name === 'ICE SOS Bluetooth Pendant' && (
+                          <div className="mb-5">
+                            <img
+                              src="/lovable-uploads/6adce9d3-1bbc-4e72-87d5-d397b11fcab8.png"
+                              alt="ICE SOS Bluetooth Pendant on smartphone, ideal for active safety with Bluetooth pairing"
+                              className="w-full max-w-md mx-auto lg:mx-0 rounded-2xl shadow-2xl object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                        )}
                         <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 ${
                           product.name === 'ICE SOS Bluetooth Pendant' 
                             ? 'bg-gradient-to-br from-blue-500 to-blue-600' 
