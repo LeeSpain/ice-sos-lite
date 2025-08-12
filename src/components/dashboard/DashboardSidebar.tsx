@@ -46,6 +46,11 @@ const dashboardItems = [
     icon: Package
   },
   {
+    title: "Flic Control",
+    url: "/full-dashboard/flic",
+    icon: Bluetooth
+  },
+  {
     title: "Activity",
     url: "/full-dashboard/activity",
     icon: Activity

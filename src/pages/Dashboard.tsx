@@ -20,6 +20,7 @@ import { NotificationsPage } from "@/components/dashboard/pages/NotificationsPag
 import { SecurityPage } from "@/components/dashboard/pages/SecurityPage";
 import { SettingsPage } from "@/components/dashboard/pages/SettingsPage";
 import { SupportPage } from "@/components/dashboard/pages/SupportPage";
+import { FlicControlPage } from "@/components/dashboard/pages/FlicControlPage";
 import { useTranslation } from 'react-i18next';
 const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
@@ -138,6 +139,13 @@ const Dashboard = () => {
                   <div className="max-w-4xl mx-auto">
                     <MyProductsWidget profile={profile} />
                   </div>
+                </div>
+              } />
+
+              {/* Flic Control Page */}
+              <Route path="/flic" element={
+                <div className="container mx-auto px-4 py-6">
+                  <FlicControlPage />
                 </div>
               } />
 
