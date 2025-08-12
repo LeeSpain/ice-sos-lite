@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Bluetooth, ShoppingCart, History } from "lucide-react";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
+import { useLocation } from "react-router-dom";
 
 interface FlicButton {
   id: string;
@@ -58,6 +59,17 @@ export const FlicControlPage: React.FC = () => {
     };
     load();
   }, []);
+
+  // Auto-open device manager when ?open=connect is present
+  const location = useLocation();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('open') === 'connect') {
+      setTimeout(() => {
+        window.dispatchEvent(new Event('open-device-settings'));
+      }, 300);
+    }
+  }, [location.search]);
 
   const primaryButton = useMemo(() => buttons[0], [buttons]);
 

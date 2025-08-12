@@ -24,3 +24,6 @@ verify_jwt = true
 
 [functions.setup-stripe-products]
 verify_jwt = true
+
+[functions.flic-webhook]
+verify_jwt = false
