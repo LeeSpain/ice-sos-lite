@@ -67,36 +67,36 @@ const FamilyCarerAccess = () => {
   };
 
   return (
-    <section className="py-20 bg-secondary/30">
+    <section className="py-16 bg-gradient-to-br from-secondary/20 to-secondary/40">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <Badge className="mb-4 bg-wellness text-white">
+        <div className="text-center mb-12">
+          <Badge className="mb-3 bg-wellness/10 text-wellness border border-wellness/20 hover:bg-wellness/20 transition-colors">
             Family & Carer Support
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
             Family & Carer Access
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Connect your loved ones and care providers for comprehensive emergency support and peace of mind
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Connect your loved ones and care providers for comprehensive emergency support
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10 max-w-5xl mx-auto">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
               <Card 
                 key={index} 
-                className={`border-2 transition-all duration-300 hover:shadow-lg hover:scale-105 ${getCardBorder(feature.color)}`}
+                className={`group border transition-all duration-300 hover:shadow-md hover:-translate-y-1 bg-white/80 backdrop-blur-sm ${getCardBorder(feature.color)}`}
               >
-                <CardHeader>
-                  <div className={`w-12 h-12 rounded-lg bg-secondary flex items-center justify-center mb-4 ${getIconColor(feature.color)}`}>
-                    <Icon className="h-6 w-6" />
+                <CardHeader className="pb-3">
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br from-secondary/50 to-secondary/80 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 ${getIconColor(feature.color)}`}>
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <CardTitle className="text-lg font-semibold">{feature.title}</CardTitle>
+                  <CardTitle className="text-base font-semibold leading-tight">{feature.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-sm leading-relaxed">
+                <CardContent className="pt-0">
+                  <CardDescription className="text-xs leading-relaxed text-muted-foreground/80">
                     {feature.description}
                   </CardDescription>
                 </CardContent>
@@ -108,8 +108,8 @@ const FamilyCarerAccess = () => {
         <div className="text-center">
           <Dialog>
             <DialogTrigger asChild>
-              <Button size="lg" className="bg-wellness hover:bg-wellness/90">
-                <Users className="mr-2 h-5 w-5" />
+              <Button size="default" variant="outline" className="border-wellness/20 text-wellness hover:bg-wellness/10 hover:border-wellness/30 transition-all duration-300">
+                <Users className="mr-2 h-4 w-4" />
                 Learn More
               </Button>
             </DialogTrigger>
