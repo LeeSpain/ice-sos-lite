@@ -82,8 +82,8 @@ const RegionalCenterSpain: React.FC = () => {
               <div className="relative">
                 <div className="relative z-10">
                   <img 
-                    src="/lovable-uploads/f65e7524-8dfe-491a-86d1-8d153266a17f.png" 
-                    alt="Spain Regional Emergency Call Center - Bilingual Support Team"
+                    src="/lovable-uploads/ad6fb102-913b-42c4-a5e9-81162c5616c0.png" 
+                    alt="Spain Regional Emergency Call Center Team - Professional bilingual support staff with headsets"
                     className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                     loading="eager"
                     decoding="async"
