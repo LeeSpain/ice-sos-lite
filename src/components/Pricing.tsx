@@ -370,9 +370,9 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 )}
                   
                   <div className="relative p-8">
-                    <div className="grid lg:grid-cols-3 gap-8 items-start">
+                    <div className="grid lg:grid-cols-5 gap-8 items-start">
                        {/* Product Info */}
-                      <div className="text-center lg:text-left lg:col-span-2">
+                      <div className="text-center lg:text-left lg:col-span-3">
                         <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg`}>
                           <Package className="h-8 w-8 text-white" />
                         </div>
@@ -388,15 +388,6 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 </div>
                         <div className="flex gap-3">
 {product.name === 'ICE SOS Bluetooth Pendant' ? (
-                              <Button 
-                                variant="outline" 
-                                size="lg"
-                                className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
-                                asChild
-                              >
-                                <Link to="/devices/ice-sos-pendant">{t('pricing.details')}</Link>
-                              </Button>
-                            ) : (
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <Button 
@@ -480,7 +471,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                                   </div>
                                 </DialogContent>
                               </Dialog>
-                            )}
+                            ) : null}
 
                           
 {product.status === 'coming_soon' ? (
@@ -512,14 +503,14 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         </div>
                        </div>
                        
-                       {/* Image positioned in bottom right */}
-                       <div className="relative h-32">
+                       {/* Product Image - positioned where the black box is shown */}
+                       <div className="lg:col-span-2 flex justify-center items-center">
                         {product.name === 'ICE SOS Bluetooth Pendant' && (
-                          <div className="absolute bottom-4 right-4 w-32 h-24">
+                          <div className="w-full max-w-xs p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
                             <img
                               src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png"
                               alt="ICE SOS Bluetooth Pendant with smartphone – Bluetooth emergency pendant"
-                              className="w-full h-full object-cover rounded-lg shadow-md"
+                              className="w-full h-auto rounded-xl shadow-lg object-cover"
                               loading="lazy"
                               decoding="async"
                             />
