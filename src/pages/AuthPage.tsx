@@ -63,8 +63,8 @@ const AuthPage = () => {
     setMessage("");
 
     // Check rate limiting
-    if (signUpRateLimit.isRateLimited) {
-      setError(`Too many sign-up attempts. Please wait ${signUpRateLimit.getRemainingTime} seconds before trying again.`);
+    if (signUpRateLimit.isRateLimited()) {
+      setError(`Too many sign-up attempts. Please wait ${signUpRateLimit.getRemainingTime()} seconds before trying again.`);
       setLoading(false);
       return;
     }
@@ -142,8 +142,8 @@ const AuthPage = () => {
     setMessage("");
 
     // Check rate limiting
-    if (signInRateLimit.isRateLimited) {
-      setError(`Too many sign-in attempts. Please wait ${signInRateLimit.getRemainingTime} seconds before trying again.`);
+    if (signInRateLimit.isRateLimited()) {
+      setError(`Too many sign-in attempts. Please wait ${signInRateLimit.getRemainingTime()} seconds before trying again.`);
       setLoading(false);
       return;
     }

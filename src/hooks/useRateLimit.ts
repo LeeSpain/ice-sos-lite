@@ -47,9 +47,9 @@ const useRateLimit = (key: string, config: RateLimitConfig) => {
   }, []);
 
   return {
-    isRateLimited: isRateLimited(),
+    isRateLimited,
     recordAttempt,
-    getRemainingTime: getRemainingTime(),
+    getRemainingTime,
     reset,
     attemptsRemaining: Math.max(0, config.maxAttempts - attempts.count)
   };
