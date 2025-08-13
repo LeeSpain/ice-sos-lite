@@ -72,20 +72,17 @@ const { t } = useTranslation();
           </div>
 
           {/* Quick Links */}
-<div className="space-y-4">
+          <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.quickLinks')}</h3>
             <div className="space-y-2">
-              <a href="#features" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                {t('nav.features')}
-              </a>
-              <a href="#pricing" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                {t('footer.pricing')}
-              </a>
               <Link to="/devices/ice-sos-pendant" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                {t('footer.devices')}
+                Safety Products
               </Link>
-              <Link to="/support" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                {t('footer.supportLink')}
+              <Link to="/regional-center/spain" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Regional Services
+              </Link>
+              <Link to="/family-carer-access" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Family & Carer Access
               </Link>
             </div>
           </div>
