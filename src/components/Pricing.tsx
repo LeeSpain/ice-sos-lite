@@ -400,9 +400,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                               <Dialog>
                                 <DialogTrigger asChild>
                                   <Button 
-                                    variant="outline" 
                                     size="lg"
-                                    className="px-8 py-4 bg-blue-600 text-white border-blue-600 hover:bg-blue-700 font-semibold"
+                                    className="px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 border-0 font-semibold"
                                   >
                                     {t('pricing.details')}
                                   </Button>
