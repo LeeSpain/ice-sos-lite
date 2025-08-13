@@ -103,8 +103,8 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
             >
               <action.icon className="h-4 w-4 mr-2" />
               <div className="text-left">
-                <div className="text-sm font-medium">{action.title}</div>
-                <div className="text-xs opacity-80">{action.description}</div>
+                <div className={`text-sm font-medium ${action.variant === 'emergency' ? 'text-primary' : ''}`}>{action.title}</div>
+                <div className={`text-xs opacity-80 ${action.variant === 'emergency' ? 'text-primary' : ''}`}>{action.description}</div>
               </div>
             </Button>
           ))}

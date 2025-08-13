@@ -340,9 +340,9 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
               >
                 <div className="flex items-center gap-2 w-full">
                   <action.icon className="h-5 w-5" />
-                  <span className="font-medium">{action.title}</span>
+                  <span className={`font-medium ${action.variant === 'emergency' ? 'text-primary' : ''}`}>{action.title}</span>
                 </div>
-                <span className="text-xs text-left opacity-80">
+                <span className={`text-xs text-left opacity-80 ${action.variant === 'emergency' ? 'text-primary' : ''}`}>
                   {action.description}
                 </span>
               </Button>
