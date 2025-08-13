@@ -43,7 +43,7 @@ const Index = () => {
       />
       <Navigation />
 
-      <div className="fixed top-20 right-4 z-50">
+      <div className="fixed top-28 right-4 z-50">
         <div className="relative group cursor-pointer" onClick={handleEmmaClick}>
           {/* Floating animation wrapper */}
           <div className="animate-bounce">
