@@ -514,9 +514,9 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                        </div>
                        
                        {/* Image positioned in bottom right */}
-                       <div className="relative">
+                       <div className="relative h-32">
                         {product.name === 'ICE SOS Bluetooth Pendant' && (
-                          <div className="absolute bottom-0 right-0 w-40 h-32">
+                          <div className="absolute bottom-4 right-4 w-32 h-24">
                             <img
                               src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png"
                               alt="ICE SOS Bluetooth Pendant with smartphone – Bluetooth emergency pendant"
