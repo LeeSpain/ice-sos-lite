@@ -87,73 +87,63 @@ const DeviceIceSosPendant = () => {
         <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
       </Helmet>
 
-      {/* Hero Section with existing image */}
-      <header className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
-        <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30" />
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:20px_20px]" />
-        </div>
-
+      {/* Hero Section */}
+      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Content */}
             <div className="text-center lg:text-left text-white">
-              <Badge variant="secondary" className="mb-6 text-sm px-4 py-2">✅ Professional response within 60 seconds, 24/7</Badge>
+              <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
+                <Shield className="h-4 w-4 text-emergency-glow" />
+                <span className="text-sm font-medium text-white">✅ Professional response within 60 seconds, 24/7</span>
+              </div>
+              
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
                 Get Emergency Help in 30 Seconds - <span className="text-emergency">Even When You Can't Speak or Dial</span>
               </h1>
-              <p className="text-xl md:text-2xl mb-8 text-white/90 leading-relaxed font-medium drop-shadow-sm">
+              
+              <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
                 Professional emergency operators respond to your GPS location with your medical information - in any language, anywhere in the world
               </p>
               
-              {/* Hero Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-8 text-center">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <div className="text-2xl font-bold text-white">45 seconds</div>
-                  <div className="text-sm text-white/80">Average response time</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <div className="text-2xl font-bold text-white">15+ years</div>
-                  <div className="text-sm text-white/80">Emergency experience</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                  <div className="text-2xl font-bold text-white">24/7</div>
-                  <div className="text-sm text-white/80">Global coverage</div>
-                </div>
-              </div>
               <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
                 {comingSoon ? (
                   <Badge className="px-8 py-4 text-lg font-semibold bg-secondary text-white">Coming Soon</Badge>
                 ) : (
-                  <Button className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-emergency to-primary hover:from-emergency/90 hover:to-primary/90 shadow-xl" size="xl" asChild>
+                  <Button 
+                    asChild 
+                    size="xl" 
+                    className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
+                  >
                     <Link to="/ai-register">Order Now - €59.99</Link>
                   </Button>
                 )}
-                <Button variant="outline" className="px-8 py-4 text-lg font-semibold border-white/30 text-white hover:bg-white/10" size="xl" asChild>
+                <Button 
+                  size="xl" 
+                  className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
+                  asChild
+                >
                   <Link to="#product-gallery">View Details</Link>
                 </Button>
               </div>
-              <ul className="mt-8 space-y-3 text-white/90">
-                <li className="flex items-center gap-3"><Check className="h-5 w-5 text-emergency" /> Works with any ICE SOS subscription</li>
-                <li className="flex items-center gap-3"><Check className="h-5 w-5 text-emergency" /> One-tap SOS activation from anywhere</li>
-                <li className="flex items-center gap-3"><Check className="h-5 w-5 text-emergency" /> 7-day battery life</li>
-                <li className="flex items-center gap-3"><Check className="h-5 w-5 text-emergency" /> IP67 waterproof design</li>
-              </ul>
             </div>
+            
+            {/* Hero Image */}
             <div className="relative">
-              <img
-                src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png"
-                alt="ICE SOS Lite Bluetooth Pendant with smartphone showing emergency activation"
-                className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl hover-scale"
-                loading="eager"
-                decoding="async"
-                sizes="(min-width: 1024px) 512px, 90vw"
-              />
-              <div className="absolute -top-8 -right-8 w-24 h-24 bg-emergency/20 rounded-full blur-xl animate-pulse" />
-              <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="relative z-10">
+                <img 
+                  src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png" 
+                  alt="ICE SOS Lite Bluetooth Pendant with smartphone showing emergency activation"
+                  className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
+                  loading="eager"
+                  decoding="async"
+                  sizes="(min-width: 1024px) 512px, 90vw"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </header>
+      </section>
 
       {/* Product Gallery Section */}
       <section id="product-gallery" className="py-20 bg-gradient-to-br from-background via-muted/20 to-background">
