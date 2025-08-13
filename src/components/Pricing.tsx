@@ -402,7 +402,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                                   <Button 
                                     variant="outline" 
                                     size="lg"
-className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
+                                    className="px-8 py-4 bg-blue-600 text-white border-blue-600 hover:bg-blue-700 font-semibold"
                                   >
                                     {t('pricing.details')}
                                   </Button>
@@ -504,7 +504,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
 ) : (
    <Button 
      size="lg"
-     className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground"
+     className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-blue-600 hover:bg-blue-700 text-white"
      onClick={() => handleProductPurchase(product)}
    >
      {t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}
