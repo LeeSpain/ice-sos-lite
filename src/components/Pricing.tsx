@@ -383,89 +383,15 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 </div>
                         <div className="flex gap-3">
 {product.name === 'ICE SOS Bluetooth Pendant' ? (
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button 
-                                    size="lg"
-                                    className="px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 border-0 font-semibold"
-                                  >
-                                    {t('pricing.details')}
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-2xl">
-                                  <DialogHeader>
-                                    <DialogTitle className="flex items-center gap-2">
-                                      <Package className="h-5 w-5 text-secondary" />
-                                      {product.name}
-                                    </DialogTitle>
-                                    <DialogDescription>
-                                      {t('pricing.productSpecs')}
-                                    </DialogDescription>
-                                  </DialogHeader>
-                                  
-                                  <div className="space-y-6">
-                                    <div>
-                                      <h4 className="font-semibold mb-3">{t('pricing.technicalSpecsTitle', { defaultValue: 'Technical Specifications:' })}</h4>
-                                      <div className="grid grid-cols-2 gap-4 text-sm">
-                                        <div className="flex items-center gap-2">
-                                          <Bluetooth className="h-4 w-4 text-blue-500" />
-                                          <span>Bluetooth 5.0 Low Energy</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          <Battery className="h-4 w-4 text-green-500" />
-                                          <span>7-day battery life</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          <Droplets className="h-4 w-4 text-blue-500" />
-                                          <span>IP67 Waterproof</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                          <MapPin className="h-4 w-4 text-red-500" />
-                                          <span>100m range</span>
-                                        </div>
-                                      </div>
-                                    </div>
-
-                                    <div>
-                                      <h4 className="font-semibold mb-3">{t('pricing.allFeaturesTitle', { defaultValue: 'All Features:' })}</h4>
-                                      <ul className="grid grid-cols-1 gap-2">
-                                        {product.features.map((feature, index) => (
-                                          <li key={index} className="flex items-start gap-2">
-                                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                            <span className="text-sm">{feature}</span>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    </div>
-
-                                    <div>
-                                      <h4 className="font-semibold mb-3">{t('pricing.howItWorksTitle', { defaultValue: 'How It Works:' })}</h4>
-                                      <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                                        <li>Pair the pendant with your smartphone via Bluetooth</li>
-                                        <li>Connect to the ICE SOS Lite app (works with any subscription plan)</li>
-                                        <li>Press the button once to activate emergency mode</li>
-                                        <li>Your emergency contacts and services are notified instantly</li>
-                                        <li>GPS location is shared automatically through your phone</li>
-                                      </ol>
-                                    </div>
-
-                                         <div className="flex gap-3 pt-4">
-                                           {product.status === 'coming_soon' ? (
-                                             <Badge className="bg-secondary text-white px-3 py-1">
-                                               {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
-                                             </Badge>
-                                           ) : (
-                                             <Button 
-                                               className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
-                                               onClick={() => handleProductPurchase(product)}
-                                             >
-                                               {t('pricing.purchaseDevice', { defaultValue: 'Purchase Device' })}
-                                             </Button>
-                                           )}
-                                         </div>
-                                  </div>
-                                </DialogContent>
-                              </Dialog>
+                              <Button 
+                                size="lg"
+                                className="px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 border-0 font-semibold"
+                                asChild
+                              >
+                                <Link to="/devices/ice-sos-pendant">
+                                  {t('pricing.details')}
+                                </Link>
+                              </Button>
                             ) : null}
 
                           
@@ -490,9 +416,11 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
    <Button 
      size="lg"
      className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-blue-600 hover:bg-blue-700 text-white"
-     onClick={() => handleProductPurchase(product)}
+     asChild
    >
-     {t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}
+     <Link to="/ai-register">
+       {t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}
+     </Link>
    </Button>
 )}
                         </div>
