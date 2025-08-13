@@ -226,8 +226,9 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 </Badge>
                   
                   <div className="relative p-8">
-                    <div className="grid lg:grid-cols-3 gap-8 items-center">
-                      {/* Plan Info */}
+                    {/* Upper half - Image and Text side by side */}
+                    <div className="grid lg:grid-cols-2 gap-8 items-center mb-8">
+                       {/* Plan Info - Left Side */}
                       <div className="text-center lg:text-left">
                         <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
                           <Brain className="h-8 w-8 text-white" />
@@ -249,19 +250,32 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         >
 <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
                         </Button>
-                      </div>
-                      
-                      {/* Features */}
-                      <div className="lg:col-span-2">
-                        <h4 className="text-xl font-semibold mb-4">{t('pricing.everythingIncluded')}</h4>
-                        <div className="grid md:grid-cols-2 gap-4">
-                          {selectedPlan.features.map((feature, featureIndex) => (
-                            <div key={featureIndex} className="flex items-start space-x-3">
-                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-muted-foreground">{feature}</span>
-                            </div>
-                          ))}
+                       </div>
+                        
+                        {/* Plan Image - Right Side */}
+                        <div className="flex justify-center items-center">
+                          <div className="w-full max-w-md p-6 bg-gradient-to-br from-primary/10 to-guardian/10 rounded-2xl">
+                            <img
+                              src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
+                              alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
+                              className="w-full h-auto rounded-xl shadow-lg object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
                         </div>
+                    </div>
+                        
+                    {/* Features - Bottom half */}
+                    <div className="border-t pt-6">
+                      <h4 className="text-xl font-semibold mb-4">{t('pricing.everythingIncluded')}</h4>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {selectedPlan.features.map((feature, featureIndex) => (
+                          <div key={featureIndex} className="flex items-start space-x-3">
+                            <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground">{feature}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
