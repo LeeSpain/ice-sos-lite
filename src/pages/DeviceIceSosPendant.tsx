@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall, CheckCircle2, Smartphone } from "lucide-react";
-import heroImg from "@/assets/hero-emergency.jpg";
+
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useTranslation } from 'react-i18next';
@@ -29,7 +29,7 @@ const DeviceIceSosPendant = () => {
       name: "ICE SOS Lite"
     },
     description,
-    image: canonical.replace("/devices/ice-sos-pendant", "/images/ice-sos-pendant.jpg"),
+    image: typeof window !== "undefined" ? `${window.location.origin}/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png` : "",
     offers: {
       "@type": "Offer",
       priceCurrency: "EUR",
@@ -80,7 +80,7 @@ const DeviceIceSosPendant = () => {
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:url" content={canonical} />
-        <meta property="og:image" content={typeof window !== "undefined" ? `${window.location.origin}/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png` : ""} />
+        <meta property="og:image" content={typeof window !== "undefined" ? `${window.location.origin}/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png` : ""} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
@@ -130,10 +130,13 @@ const DeviceIceSosPendant = () => {
             </div>
             <div className="relative">
               <img
-                src={heroImg}
+                src="/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png"
                 alt="ICE SOS Lite Bluetooth Pendant with smartphone showing emergency activation"
                 className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl hover-scale"
-                loading="lazy"
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
+                sizes="(min-width: 1024px) 512px, 90vw"
               />
               <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-pulse" />
               <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-guardian/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
