@@ -500,7 +500,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                        {/* Product Image - positioned where the black box is shown */}
                        <div className="lg:col-span-2 flex justify-center items-center">
                         {product.name === 'ICE SOS Bluetooth Pendant' && (
-                          <div className="w-full max-w-lg p-8 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
+                          <div className="w-full max-w-2xl p-12 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
                             <img
                               src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
                               alt="ICE Smart SOS Button – Emergency pendant device"
