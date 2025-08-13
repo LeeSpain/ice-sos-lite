@@ -52,7 +52,7 @@ export default function StripeSetupPage() {
           <CardDescription>
             This will create all your products and services in your new Stripe account:
             <ul className="mt-2 space-y-1">
-              <li>• 2 Subscription Plans (Family Connection €1.99/mo, Premium Protection €4.99/mo)</li>
+              <li>• 2 Subscription Plans (Family Connection €4.99/mo, Premium Protection €4.99/mo)</li>
               <li>• 1 Regional Service (Call Centre Spain €24.99/mo)</li>
               <li>• 1 Physical Product (ICE SOS Bluetooth Pendant €59.99)</li>
             </ul>

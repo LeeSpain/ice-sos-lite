@@ -233,7 +233,7 @@ const Register = () => {
 
                   <div className="space-y-4">
                   {[
-                    { id: "personal", name: t('register.plans.personal.name', { defaultValue: 'Personal Account' }), price: `€1.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.personal.desc', { defaultValue: 'Individual emergency contact system' }) },
+                    { id: "personal", name: t('register.plans.personal.name', { defaultValue: 'Personal Account' }), price: `€4.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.personal.desc', { defaultValue: 'Individual emergency contact system' }) },
                     { id: "guardian", name: t('register.plans.guardian.name', { defaultValue: 'Guardian Wellness' }), price: `€4.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.guardian.desc', { defaultValue: 'Advanced health monitoring and alerts' }) },
                     { id: "family", name: t('register.plans.family.name', { defaultValue: 'Family Sharing' }), price: `€0.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.family.desc', { defaultValue: 'Perfect for families with multiple members' }) },
                     { id: "callcenter", name: t('register.plans.callcenterES.name', { defaultValue: 'Call Centre Spain' }), price: `€24.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.callcenterES.desc', { defaultValue: '24/7 professional emergency response' }) }

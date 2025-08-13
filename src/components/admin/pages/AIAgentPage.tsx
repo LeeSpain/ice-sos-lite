@@ -425,7 +425,7 @@ Company overview: ICE SOS Lite provides instant SOS alerts, live location sharin
 Current offers and pricing (always quote in Euros €):
 
 Core Plan: Premium Protection — €4.99/month Includes one-touch SOS alerts, live GPS sharing during an SOS, medical profile, emergency contact management, AI wellness checks, and voice activation.
-Add-on: Family Connection — €1.99/month per additional member Invite trusted family members or carers to securely view protection status, receive instant alerts, see live SOS location, and access the emergency profile.
+Add-on: Family Connection — €4.99/month per additional member Invite trusted family members or carers to securely view protection status, receive instant alerts, see live SOS location, and access the emergency profile.
 Optional Regional Service: Call Centre Spain — €24.99/month Professional 24/7 regional call-centre support and emergency coordination (availability varies by region).
 Safety Device (one-time): ICE SOS Bluetooth Pendant — €59.99 Waterproof, one-button SOS pendant that connects via Bluetooth to the ICE SOS Lite app for instant alerts.
 
