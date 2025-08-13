@@ -98,8 +98,8 @@ const DeviceIceSosPendant = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left text-white">
               <Badge variant="secondary" className="mb-6 text-sm px-4 py-2">✅ Professional response within 60 seconds, 24/7</Badge>
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Get Emergency Help in 30 Seconds - Even When You Can't Speak or Dial
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                Get Emergency Help in 30 Seconds - <span className="text-guardian">Even When You Can't Speak or Dial</span>
               </h1>
               <p className="text-xl md:text-2xl mb-8 text-white/90 leading-relaxed font-medium drop-shadow-sm">
                 Professional emergency operators respond to your GPS location with your medical information - in any language, anywhere in the world
