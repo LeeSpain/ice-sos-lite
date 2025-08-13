@@ -84,7 +84,7 @@
     "platformBadge": "PROFESSIONAL PLATFORM",
     "appName": "ICE SOS Lite",
     "heroDescription": "Professional emergency protection platform for individuals and families. Download free, then activate your premium protection features.",
-    "cta": "Get Started Free",
+    "cta": "Join Now",
     "features": {
       "emergencySOS": { "title": "Emergency SOS", "description": "One-tap emergency button with GPS location sharing and instant alerts" },
       "globalCoverage": { "title": "Global Coverage", "description": "Works worldwide with full multilingual support and 24/7 monitoring" },
