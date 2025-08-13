@@ -1,10 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
+import { PrivacyDialog } from "@/components/legal/PrivacyDialog";
 
 const Privacy: React.FC = () => {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const title = "Privacy Policy | ICE SOS Lite";
   const description = "Privacy Policy for ICE SOS Lite emergency SOS app.";
   const canonical = "/privacy";
+
+  // Open dialog automatically when page loads
+  useEffect(() => {
+    setDialogOpen(true);
+  }, []);
+
+  const handleDialogClose = () => {
+    setDialogOpen(false);
+    // Navigate back to previous page or home
+    window.history.back();
+  };
 
   return (
     <>
@@ -13,7 +26,14 @@ const Privacy: React.FC = () => {
         <meta name="description" content={description} />
         <link rel="canonical" href={canonical} />
       </Helmet>
-      <main className="container mx-auto px-4 py-10">
+      
+      <PrivacyDialog 
+        open={dialogOpen} 
+        onOpenChange={handleDialogClose}
+      />
+      
+      {/* Fallback content for SEO and accessibility */}
+      <main className="container mx-auto px-4 py-10" style={{ display: dialogOpen ? 'none' : 'block' }}>
         <header className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Privacy Policy</h1>
           <p className="text-muted-foreground mt-2">
@@ -21,25 +41,13 @@ const Privacy: React.FC = () => {
           </p>
         </header>
         <section className="prose prose-invert max-w-none">
-          <h2>Information We Collect</h2>
           <p>
-            We collect account details (email, name), emergency contacts, and optional medical profile data to help responders in emergencies. Location data is processed during active SOS only.
+            Our comprehensive Privacy Policy is displayed in an interactive dialog for better readability. 
+            If you're having trouble viewing the policy, please contact us at 
+            <a href="mailto:icesoslite@gmail.com" className="text-primary hover:underline">
+              icesoslite@gmail.com
+            </a>
           </p>
-          <h2>How We Use Data</h2>
-          <ul>
-            <li>Provide SOS and emergency features</li>
-            <li>Improve reliability and safety</li>
-            <li>Comply with legal requirements</li>
-          </ul>
-          <h2>Data Sharing</h2>
-          <p>
-            We may share necessary information with emergency services and trusted partners strictly to deliver the service.
-          </p>
-          <h2>Contact</h2>
-          <p>
-            For questions or data requests, email support@icesoslite.com
-          </p>
-          <p className="text-sm text-muted-foreground mt-6">Last updated: {new Date().getFullYear()}</p>
         </section>
       </main>
     </>
