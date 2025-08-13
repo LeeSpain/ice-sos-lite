@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from "@/integrations/supabase/client";
 
 const DeviceIceSosPendant = () => {
+  console.log('[DeviceIceSosPendant] Component rendering started');
   const { t } = useTranslation();
   const [comingSoon, setComingSoon] = useState(false);
   const title = t('devices.icePendant.seoTitle', { defaultValue: 'ICE SOS Bluetooth Pendant – ICE SOS Lite' });
@@ -40,13 +41,19 @@ const DeviceIceSosPendant = () => {
   };
 
   React.useEffect(() => {
+    console.log('[DeviceIceSosPendant] useEffect running - fetching product status');
     const fetchStatus = async () => {
-      const { data } = await supabase
-        .from('products')
-        .select('status')
-        .eq('name', 'ICE SOS Bluetooth Pendant')
-        .maybeSingle();
-      if (data?.status === 'coming_soon') setComingSoon(true);
+      try {
+        const { data } = await supabase
+          .from('products')
+          .select('status')
+          .eq('name', 'ICE SOS Bluetooth Pendant')
+          .maybeSingle();
+        console.log('[DeviceIceSosPendant] Product status data:', data);
+        if (data?.status === 'coming_soon') setComingSoon(true);
+      } catch (error) {
+        console.error('[DeviceIceSosPendant] Error fetching product status:', error);
+      }
     };
     fetchStatus();
   }, []);
@@ -67,6 +74,8 @@ const DeviceIceSosPendant = () => {
     { time: "14:00", alerts: 7 },
     { time: "15:00", alerts: 4 },
   ];
+
+  console.log('[DeviceIceSosPendant] Rendering with comingSoon:', comingSoon);
 
   return (
     <div className="min-h-screen">
