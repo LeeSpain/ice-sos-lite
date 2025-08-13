@@ -50,7 +50,7 @@
     "subtitle": "One simple subscription that unlocks professional emergency protection. Add optional extras — Family Access, Regional Call Centers, and Safety Devices — anytime. Activate instantly in the app.",
     "everythingIncluded": "Everything Included:",
     "familyTitle": "Family & Carer Access",
-    "familyDesc": "After you join, you can invite trusted family members or carers to your dashboard. They’ll have secure access to your emergency profile and protection status, receive instant alerts, view GPS location during an SOS, and help coordinate a rapid response.",
+    "familyDesc": "After you join, you can invite trusted family members or carers to your dashboard. They'll have secure access to your emergency profile and protection status, receive instant alerts, view GPS location during an SOS, and help coordinate a rapid response. All data is encrypted and GDPR-compliant, with granular permission controls for complete peace of mind.",
     "familyFeatures": "Family Features:",
     "safetyProductsTitle": "Safety Products",
     "safetyProductsDesc": "Enhance your safety with our Bluetooth-enabled emergency devices that work seamlessly with all subscription plans",
@@ -223,6 +223,6 @@
     "coverageRegion": "Region: Spain (ES)",
     "confidentialityTitle": "Confidentiality & safety",
     "confidentialityDesc": "All calls are recorded for safety and training. Personal data is handled according to our Privacy Policy.",
-    "noEmergency": "If you are in immediate danger, call 112 (Spain’s emergency number)."
+    "noEmergency": "If you are in immediate danger, call 112 (Spain's emergency number)."
   }
 }
