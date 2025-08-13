@@ -1,9 +1,13 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import heroImage from '@/assets/hero-emergency.jpg';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Phone, Clock, Shield, Users, CheckCircle2 } from 'lucide-react';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-
 
 const RegionalCenterSpain: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -33,75 +37,187 @@ const RegionalCenterSpain: React.FC = () => {
   const whenToContact: string[] = t('regionalCenterES.whenToContact', { returnObjects: true }) as unknown as string[];
 
   return (
-    <main className="pt-20">
-      <SEO title="Regional Call Centre Spain – ICE SOS Lite" description="Spain regional emergency support center. English & Spanish assistance for ICE SOS users." structuredData={jsonLd} />
-      <section className="container mx-auto px-4 py-10">
-        <header className="grid md:grid-cols-2 gap-8 items-center">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">{t('regionalCenterES.h1')}</h1>
-            <p className="text-muted-foreground mb-4">{t('regionalCenterES.intro')}</p>
-            <p className="text-foreground/90 mb-6">{t('regionalCenterES.heroDescription')}</p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/sos" className="inline-flex items-center px-5 py-2 rounded-md bg-primary text-primary-foreground shadow-primary transition-colors hover:opacity-90">
-                {t('regionalCenterES.ctaSOS')}
-              </Link>
-              <Link to="/support" className="inline-flex items-center px-5 py-2 rounded-md border border-border text-foreground hover:bg-accent/50 transition-colors">
-                {t('regionalCenterES.ctaSupport')}
-              </Link>
+    <div className="min-h-screen">
+      <Navigation />
+      
+      <main className="pt-16 md:pt-20">
+        <SEO 
+          title="Regional Call Centre Spain – ICE SOS Lite" 
+          description="Spain regional emergency support center. English & Spanish assistance for ICE SOS users." 
+          structuredData={jsonLd} 
+        />
+        
+        {/* Hero Section - Matching brand style */}
+        <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
+          <div className="container mx-auto px-4 py-20 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Content */}
+              <div className="text-center lg:text-left text-white">
+                <div className="inline-flex items-center space-x-2 bg-green-500/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-green-500/30">
+                  <MapPin className="h-4 w-4 text-green-400" />
+                  <span className="text-sm font-medium text-white">✅ Regional Emergency Support - Spain</span>
+                </div>
+                
+                <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                  {t('regionalCenterES.h1', { defaultValue: 'Spain Regional Call Centre' })}
+                  <span className="text-green-400 drop-shadow-md"> - Emergency Support</span>
+                </h1>
+                
+                <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
+                  {t('regionalCenterES.heroDescription', { defaultValue: 'Bilingual English & Spanish 24/7 emergency support with live translation and coordination with local services.' })}
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                  <Button 
+                    asChild 
+                    size="xl" 
+                    className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
+                  >
+                    <Link to="/sos">{t('regionalCenterES.ctaSOS', { defaultValue: 'Emergency SOS' })}</Link>
+                  </Button>
+                  <Button 
+                    asChild
+                    size="xl" 
+                    className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:border-white/50 font-semibold text-lg px-8 py-4 rounded-xl transition-all duration-300"
+                  >
+                    <Link to="/support">{t('regionalCenterES.ctaSupport', { defaultValue: 'Contact Support' })}</Link>
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Hero Image */}
+              <div className="relative">
+                <div className="relative z-10">
+                  <img 
+                    src="/lovable-uploads/f65e7524-8dfe-491a-86d1-8d153266a17f.png" 
+                    alt="Spain Regional Emergency Call Center - Bilingual Support Team"
+                    className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
+                    loading="eager"
+                    decoding="async"
+                    sizes="(min-width: 1024px) 512px, 90vw"
+                  />
+                </div>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-3">{t('regionalCenterES.noEmergency')}</p>
           </div>
-          <figure className="rounded-lg overflow-hidden shadow-xl">
-            <img src={heroImage} alt="Emergency call centre support in Spain (English & Spanish)" loading="lazy" className="w-full h-auto object-cover" />
-          </figure>
-        </header>
-      </section>
+        </section>
 
-      <section className="bg-muted/30 border-t border-b border-border">
-        <div className="container mx-auto px-4 py-10 grid md:grid-cols-2 gap-8">
-          <article>
-            <h2 className="text-2xl font-semibold text-foreground mb-3">{t('regionalCenterES.whatWeDoTitle')}</h2>
-            <ul className="list-disc pl-5 space-y-2 text-foreground/90">
-              {whatWeDo?.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </article>
-          <aside>
-            <h2 className="text-2xl font-semibold text-foreground mb-3">{t('regionalCenterES.whenToContactTitle')}</h2>
-            <ul className="list-disc pl-5 space-y-2 text-foreground/90">
-              {whenToContact?.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </aside>
-        </div>
-      </section>
+        {/* What We Do & When to Contact Section */}
+        <section className="py-20 bg-gradient-to-br from-background via-muted/20 to-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent mb-6">
+                Professional Emergency Support
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Our Spain regional center provides specialized bilingual emergency coordination with local expertise and cultural understanding.
+              </p>
+            </div>
 
-      <section>
-        <div className="container mx-auto px-4 py-10 grid md:grid-cols-3 gap-6">
-          <div className="rounded-lg border border-border p-5">
-            <h3 className="font-semibold mb-2">{t('regionalCenterES.coverageTitle')}</h3>
-            <ul className="space-y-1 text-foreground/90">
-              <li>{t('regionalCenterES.coverageHours')}</li>
-              <li>{t('regionalCenterES.coverageLanguages')}</li>
-              <li>{t('regionalCenterES.coverageRegion')}</li>
-            </ul>
+            <div className="grid md:grid-cols-2 gap-8">
+              <Card className="shadow-xl border-2 border-green-500/20 hover:border-green-500/40 transition-colors">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-green-600 flex items-center justify-center">
+                      <Users className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold">What We Do</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {(whatWeDo || [
+                      'Bilingual English & Spanish emergency response',
+                      'Live translation during critical situations',
+                      'Direct coordination with local emergency services',
+                      'Medical information relay to responders',
+                      'Cultural and regional expertise',
+                      'Priority escalation protocols'
+                    ]).map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-foreground">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="shadow-xl border-2 border-primary/20 hover:border-primary/40 transition-colors">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-guardian flex items-center justify-center">
+                      <Phone className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold">When to Contact</h3>
+                  </div>
+                  <div className="space-y-3">
+                    {(whenToContact || [
+                      'Medical emergencies requiring immediate response',
+                      'Situations needing Spanish-speaking assistance',
+                      'Tourist or travel emergency situations',
+                      'Complex emergencies requiring local coordination',
+                      'When language barriers affect emergency response',
+                      'Any life-threatening situation in Spain'
+                    ]).map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <span className="text-foreground">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
-          <div className="rounded-lg border border-border p-5">
-            <h3 className="font-semibold mb-2">{t('regionalCenterES.confidentialityTitle')}</h3>
-            <p className="text-foreground/90">{t('regionalCenterES.confidentialityDesc')}</p>
+        </section>
+
+        {/* Service Details Section */}
+        <section className="py-20 bg-secondary/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">Service Details</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Comprehensive coverage and specialized support for Spanish regions.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="text-center p-6 border-2 border-green-500/20 hover:border-green-500/50 transition-colors shadow-lg">
+                <Clock className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                <h3 className="font-semibold mb-2 text-lg">{t('regionalCenterES.coverageTitle', { defaultValue: 'Coverage' })}</h3>
+                <div className="space-y-2 text-muted-foreground">
+                  <p>{t('regionalCenterES.coverageHours', { defaultValue: '24/7 Emergency Response' })}</p>
+                  <p>{t('regionalCenterES.coverageLanguages', { defaultValue: 'English & Spanish' })}</p>
+                  <p>{t('regionalCenterES.coverageRegion', { defaultValue: 'Spain & Territories' })}</p>
+                </div>
+              </Card>
+
+              <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors shadow-lg">
+                <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="font-semibold mb-2 text-lg">{t('regionalCenterES.confidentialityTitle', { defaultValue: 'Privacy' })}</h3>
+                <p className="text-muted-foreground">
+                  {t('regionalCenterES.confidentialityDesc', { defaultValue: 'All communications are secure and confidential following medical privacy standards.' })}
+                </p>
+              </Card>
+
+              <Card className="text-center p-6 border-2 border-emergency/20 hover:border-emergency/50 transition-colors shadow-lg">
+                <MapPin className="h-12 w-12 text-emergency mx-auto mb-4" />
+                <h3 className="font-semibold mb-2 text-lg">Quick Links</h3>
+                <div className="space-y-3">
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/support">{t('regionalCenterES.ctaSupport', { defaultValue: 'Contact Support' })}</Link>
+                  </Button>
+                  <Button asChild className="w-full bg-emergency hover:bg-emergency/90">
+                    <Link to="/sos">{t('regionalCenterES.ctaSOS', { defaultValue: 'Emergency SOS' })}</Link>
+                  </Button>
+                </div>
+              </Card>
+            </div>
           </div>
-          <div className="rounded-lg border border-border p-5">
-            <h3 className="font-semibold mb-2">Support & Links</h3>
-            <ul className="space-y-2">
-              <li><Link to="/support" className="text-primary hover:underline">{t('regionalCenterES.ctaSupport')}</Link></li>
-              <li><Link to="/sos" className="text-primary hover:underline">{t('regionalCenterES.ctaSOS')}</Link></li>
-            </ul>
-          </div>
-        </div>
-      </section>
-    </main>
+        </section>
+      </main>
+      
+      <Footer />
+    </div>
   );
 };
 
