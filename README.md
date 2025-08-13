@@ -69,9 +69,13 @@ Simply open [Lovable](https://lovable.dev/projects/a856a70f-639b-4212-b411-d2cdb
 1. Connect your GitHub repository to Vercel
 2. Vercel will automatically detect this as a Vite project
 3. The build settings are configured in `vercel.json`
-4. Set up the following environment variables in Vercel:
-   - Your Supabase URL and keys (if different from development)
+4. Environment variables are pre-configured in `vercel.json` for basic functionality
+5. **Optional**: Override environment variables in Vercel dashboard if you need different production values:
+   - `VITE_SUPABASE_URL`: Your production Supabase URL (defaults to development URL)
+   - `VITE_SUPABASE_ANON_KEY`: Your production Supabase anon key (defaults to development key)
    - Any other production-specific variables
+
+**Note**: The project includes fallback values in `vercel.json`, so deployments will work out of the box with the development Supabase instance.
 
 ### Option 3: Manual Deployment
 ```sh
