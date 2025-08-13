@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
 import QRCode from 'qrcode';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-// import useRateLimit from '@/hooks/useRateLimit';
 
 const AuthPage = () => {
   useScrollToTop();
@@ -24,12 +23,6 @@ const AuthPage = () => {
   const [iosQr, setIosQr] = useState("");
   const [androidQr, setAndroidQr] = useState("");
   const navigate = useNavigate();
-
-  // Temporarily disable rate limiting to fix infinite render
-  // const signInConfig = useMemo(() => ({ maxAttempts: 5, windowMs: 15 * 60 * 1000 }), []); 
-  // const signUpConfig = useMemo(() => ({ maxAttempts: 3, windowMs: 60 * 60 * 1000 }), []);
-  // const signInRateLimit = useRateLimit('signIn', signInConfig);
-  // const signUpRateLimit = useRateLimit('signUp', signUpConfig);
 
   // App store URLs
   const iosUrl = "https://apps.apple.com/app/ice-sos-lite/id123456789";
@@ -56,20 +49,13 @@ const AuthPage = () => {
       }
     };
     generateQRCodes();
-  }, []);
+  }, [iosUrl, androidUrl]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setMessage("");
-
-    // Rate limiting temporarily disabled
-    // if (signUpRateLimit.isRateLimited()) {
-    //   setError(`Too many sign-up attempts. Please wait ${signUpRateLimit.getRemainingTime()} seconds before trying again.`);
-    //   setLoading(false);
-    //   return;
-    // }
 
     try {
       // Validate password strength
@@ -99,7 +85,6 @@ const AuthPage = () => {
       });
 
       if (authError) {
-        // signUpRateLimit.recordAttempt();
         if (authError.message.includes("already registered")) {
           setError("This email is already registered. Please try signing in instead.");
         } else {
@@ -143,13 +128,6 @@ const AuthPage = () => {
     setError("");
     setMessage("");
 
-    // Rate limiting temporarily disabled
-    // if (signInRateLimit.isRateLimited()) {
-    //   setError(`Too many sign-in attempts. Please wait ${signInRateLimit.getRemainingTime()} seconds before trying again.`);
-    //   setLoading(false);
-    //   return;
-    // }
-
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -157,7 +135,6 @@ const AuthPage = () => {
       });
 
       if (error) {
-        // signInRateLimit.recordAttempt();
         if (error.message.includes("Invalid login credentials")) {
           setError("Invalid email or password. Please check your credentials and try again.");
         } else {
@@ -349,8 +326,6 @@ const AuthPage = () => {
                 <p className="text-sm text-green-600">{message}</p>
               </div>
             )}
-
-
 
             {/* Additional Info */}
             <div className="mt-6 text-center text-sm text-muted-foreground">
