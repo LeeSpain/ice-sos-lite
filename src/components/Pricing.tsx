@@ -504,7 +504,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                             <img
                               src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
                               alt="ICE Smart SOS Button – Emergency pendant device"
-                              className="w-full h-auto rounded-xl shadow-lg object-cover"
+                              className="w-96 h-96 rounded-xl shadow-lg object-cover mx-auto"
                               loading="lazy"
                               decoding="async"
                             />
