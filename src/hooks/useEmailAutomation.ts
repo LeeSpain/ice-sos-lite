@@ -31,6 +31,34 @@ export const useEmailAutomation = () => {
     }
   };
 
+  // Test email system functionality
+  const testEmailSystem = async () => {
+    try {
+      // Test queue processing
+      const queueResponse = await supabase.functions.invoke('email-automation', {
+        body: { action: 'process_queue' }
+      });
+
+      // Test scheduler
+      const schedulerResponse = await supabase.functions.invoke('email-scheduler', {
+        body: { trigger: 'manual_test' }
+      });
+
+      console.log('Email system test results:', {
+        queue: queueResponse,
+        scheduler: schedulerResponse
+      });
+
+      return {
+        queue: !queueResponse.error,
+        scheduler: !schedulerResponse.error
+      };
+    } catch (error) {
+      console.error('Email system test failed:', error);
+      return { queue: false, scheduler: false };
+    }
+  };
+
   // Specific automation triggers
   const triggerUserSignup = (signupSource: string = 'web') => {
     return triggerAutomation('user_signup', { source: signupSource });
@@ -76,6 +104,7 @@ export const useEmailAutomation = () => {
 
   return {
     triggerAutomation,
+    testEmailSystem,
     triggerUserSignup,
     triggerProfileUpdate,
     triggerSOSActivation,

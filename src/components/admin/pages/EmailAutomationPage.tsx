@@ -20,6 +20,7 @@ import {
   XCircle,
   AlertCircle
 } from "lucide-react";
+import { EmailSystemTest } from "../EmailSystemTest";
 
 interface EmailAutomation {
   id: string;
@@ -225,6 +226,12 @@ export default function EmailAutomationPage() {
           <Mail className="h-4 w-4" />
           {processing ? 'Processing...' : 'Process Queue'}
         </Button>
+      </div>
+
+      {/* Email System Test Section */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <h2 className="text-lg font-semibold mb-4 text-yellow-800">System Health Check</h2>
+        <EmailSystemTest />
       </div>
 
       {/* Statistics Cards */}
