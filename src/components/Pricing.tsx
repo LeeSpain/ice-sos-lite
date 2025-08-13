@@ -545,17 +545,6 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                                 {t('pricing.details')}
                               </Link>
                             </Button>
-                            <Button 
-                              size="lg"
-                              className={`font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                                service.name === 'Call Centre Spain'
-                                  ? 'bg-green-600 hover:bg-green-700 text-white'
-                                  : 'bg-secondary hover:bg-secondary/90 text-white'
-                              }`}
-                              asChild
-                            >
-                              <Link to="/ai-register">{t('nav.regionalCenter', { defaultValue: 'Contact Now' })}</Link>
-                            </Button>
                           </div>
                          </div>
                           
@@ -579,26 +568,23 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="border-t pt-6">
                         <h4 className="text-xl font-semibold mb-4">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
                         <div className="grid md:grid-cols-3 gap-4">
-                          {service.features.map((feature, featureIndex) => (
-                            <div key={featureIndex} className="flex items-start space-x-3">
-                              <Check className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                                service.name === 'Call Centre Spain'
-                                  ? 'text-green-600'
-                                  : 'text-secondary'
-                              }`} />
-                              <span className="text-sm text-muted-foreground">{feature}</span>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
-                          <Check className="h-4 w-4 text-green-500" />
-                          <span>
-                            {service.name === 'Call Centre Spain' 
-                              ? '24/7 Professional Support • Live Translation Available'
-                              : 'Professional Regional Support Available'
-                            }
-                          </span>
-                        </div>
+                           {service.features.map((feature, featureIndex) => (
+                             <div key={featureIndex} className="flex items-start space-x-3">
+                               <Check className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
+                                 service.name === 'Call Centre Spain'
+                                   ? 'text-green-600'
+                                   : 'text-secondary'
+                               }`} />
+                               <span className="text-sm text-muted-foreground">{feature}</span>
+                             </div>
+                           ))}
+                           {service.name === 'Call Centre Spain' && (
+                             <div className="flex items-start space-x-3">
+                               <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                               <span className="text-sm text-muted-foreground">24/7 Professional Support • Live Translation Available</span>
+                             </div>
+                           )}
+                         </div>
                       </div>
                     </div>
                   </Card>
@@ -638,13 +624,6 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                               {t('pricing.details')}
                             </Link>
                           </Button>
-                          <Button 
-                            size="lg"
-                            className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-green-600 hover:bg-green-700 text-white"
-                            asChild
-                          >
-                            <Link to="/ai-register">{t('nav.regionalCenter', { defaultValue: 'Contact Now' })}</Link>
-                          </Button>
                         </div>
                        </div>
                         
@@ -666,24 +645,21 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     <div className="border-t pt-6">
                       <h4 className="text-xl font-semibold mb-4">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
                       <div className="grid md:grid-cols-3 gap-4">
-                        {[
-                          'Bilingual English & Spanish agents',
-                          'Live translation during emergencies',
-                          'Direct coordination with local services',
-                          'Priority escalation and callback',
-                          'Cultural and regional expertise',
-                          'SMS and phone support options'
-                        ].map((feature, idx) => (
-                          <div key={idx} className="flex items-start space-x-3">
-                            <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground">{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
-                        <Check className="h-4 w-4 text-green-500" />
-                        <span>24/7 Professional Support • Live Translation Available</span>
-                      </div>
+                         {[
+                           'Bilingual English & Spanish agents',
+                           'Live translation during emergencies',
+                           'Direct coordination with local services',
+                           'Priority escalation and callback',
+                           'Cultural and regional expertise',
+                           'SMS and phone support options',
+                           '24/7 Professional Support • Live Translation Available'
+                         ].map((feature, idx) => (
+                           <div key={idx} className="flex items-start space-x-3">
+                             <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                             <span className="text-sm text-muted-foreground">{feature}</span>
+                           </div>
+                         ))}
+                       </div>
                     </div>
                   </div>
                 </Card>

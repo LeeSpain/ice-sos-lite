@@ -3,8 +3,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { MapPin, Phone, Clock, Star } from 'lucide-react';
+import { MapPin, Clock, Star } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 interface RegionalPlan {
   id: string;
@@ -135,16 +136,23 @@ const RegionServices = () => {
                         <span className="text-sm text-foreground">{feature}</span>
                       </li>
                     ))}
+                    {(plan.region === 'Spain' || plan.name.toLowerCase().includes('spain')) && (
+                      <li className="flex items-center gap-3">
+                        <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
+                        <span className="text-sm text-foreground">24/7 Professional Support • Live Translation Available</span>
+                      </li>
+                    )}
                   </ul>
                 </CardContent>
                 
                 <CardFooter className="pt-0">
                   <Button 
                     className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium"
-                    onClick={() => trackRegionServiceClick(plan.id, plan.name)}
+                    asChild
                   >
-                    <Phone className="h-4 w-4 mr-2" />
-                    {t('regionServices.cta', { defaultValue: 'Contact Regional Center' })}
+                    <Link to="/regional-center/spain">
+                      {t('regionServices.details', { defaultValue: 'Details' })}
+                    </Link>
                   </Button>
                 </CardFooter>
               </Card>
