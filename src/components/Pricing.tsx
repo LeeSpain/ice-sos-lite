@@ -382,9 +382,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         <CardDescription className="text-lg text-muted-foreground mb-4">
                           {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
                         </CardDescription>
-                        <div className="mb-6">
+                         <div className="mb-6">
   <span className={`text-4xl font-bold text-blue-600`}>{formatPriceDisplay(product.price, product.currency)}</span>
-  <span className="text-muted-foreground text-lg"> {t('pricing.oneTimeLabel')}</span>
 </div>
                         <div className="flex gap-3">
 {product.name === 'ICE SOS Bluetooth Pendant' ? (
@@ -506,7 +505,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                        {/* Product Image - positioned where the black box is shown */}
                        <div className="lg:col-span-2 flex justify-center items-center">
                         {product.name === 'ICE SOS Bluetooth Pendant' && (
-                          <div className="w-full max-w-xs p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
+                          <div className="w-full max-w-md p-6 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
                             <img
                               src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
                               alt="ICE Smart SOS Button – Emergency pendant device"
@@ -518,10 +517,10 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         )}
                        </div>
                        
-                       {/* Features */}
-                       <div className="lg:col-span-3">
+                       {/* Features - stretched across full card width */}
+                       <div className="lg:col-span-5">
                         <h4 className="text-xl font-semibold mb-4">{t('pricing.keyFeaturesTitle', { defaultValue: 'Key Features:' })}</h4>
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid md:grid-cols-3 gap-4">
                           {product.features.slice(0, 6).map((feature, index) => (
                             <div key={index} className="flex items-start space-x-3">
                               <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -529,7 +528,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                             </div>
                           ))}
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
                           <Check className="h-4 w-4 text-green-500" />
                           <span>{t('pricing.freeShippingInventory', { count: product.inventory_count, defaultValue: 'Free shipping • {{count}} units available' })}</span>
                         </div>
