@@ -30,3 +30,9 @@ verify_jwt = false
 
 [functions.twilio-status-webhook]
 verify_jwt = false
+
+[functions.automation-triggers]
+verify_jwt = true
+
+[functions.email-scheduler]
+verify_jwt = false

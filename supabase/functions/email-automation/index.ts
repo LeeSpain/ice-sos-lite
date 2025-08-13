@@ -14,36 +14,22 @@ const supabase = createClient(
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
-const EMAIL_TEMPLATES = {
-  welcome: {
-    subject: "🛡️ Welcome to ICE SOS - Your Safety Network is Active!",
-    content: `
-      <h1>Welcome to ICE SOS!</h1>
-      <p>Thank you for joining our personal safety network. Your account is now active and ready to protect you.</p>
-      <h3>Next Steps:</h3>
-      <ul>
-        <li>Complete your profile and emergency contacts</li>
-        <li>Set up your medical information</li>
-        <li>Download our mobile app</li>
-      </ul>
-      <a href="{{dashboard_url}}" style="background: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Access Dashboard</a>
-    `
-  },
-  follow_up: {
-    subject: "🚀 Complete Your ICE SOS Setup",
-    content: `
-      <h1>Complete Your Safety Setup</h1>
-      <p>We noticed you haven't finished setting up your ICE SOS profile yet. Your safety is important to us!</p>
-      <p>Missing items:</p>
-      <ul>
-        <li>Emergency contacts</li>
-        <li>Medical information</li>
-        <li>Location preferences</li>
-      </ul>
-      <a href="{{dashboard_url}}" style="background: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Complete Setup</a>
-    `
+// Enhanced template handling - now uses database templates
+async function getEmailTemplate(templateName: string) {
+  const { data: template, error } = await supabase
+    .from('email_templates')
+    .select('*')
+    .eq('name', templateName)
+    .eq('is_active', true)
+    .single();
+
+  if (error || !template) {
+    console.warn(`Template not found in database: ${templateName}`);
+    return null;
   }
-};
+
+  return template;
+}
 
 interface AutomationRequest {
   action: "trigger" | "process_queue" | "check_automations";
@@ -133,7 +119,7 @@ async function triggerAutomation(triggerType: string, userId: string, data: any 
 
   // Process each automation
   for (const automation of automations) {
-    const template = EMAIL_TEMPLATES[automation.email_template as keyof typeof EMAIL_TEMPLATES];
+    const template = await getEmailTemplate(automation.email_template);
     
     if (!template) {
       console.warn(`Template not found: ${automation.email_template}`);
@@ -150,14 +136,26 @@ async function triggerAutomation(triggerType: string, userId: string, data: any 
       scheduledAt = new Date(Date.now() + (config.delay_hours * 60 * 60 * 1000));
     }
 
-    // Personalize content
-    let personalizedSubject = template.subject;
-    let personalizedContent = template.content;
+    // Personalize content using database template
+    let personalizedSubject = template.subject_template;
+    let personalizedContent = template.body_template;
     
-    // Replace variables
-    const dashboardUrl = `${Deno.env.get("SUPABASE_URL")?.replace('mqroziggaalltuzoyyao.supabase.co', 'your-app-domain.com')}/dashboard`;
-    personalizedContent = personalizedContent.replace(/\{\{dashboard_url\}\}/g, dashboardUrl);
-    personalizedContent = personalizedContent.replace(/\{\{first_name\}\}/g, profile.first_name || '');
+    // Replace variables with user data
+    const dashboardUrl = `${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '')}.vercel.app/dashboard`;
+    const variables = {
+      first_name: profile.first_name || 'there',
+      last_name: profile.last_name || '',
+      dashboard_url: dashboardUrl,
+      user_email: userEmail,
+      ...data // Include any additional data passed to the trigger
+    };
+
+    // Replace all template variables
+    for (const [key, value] of Object.entries(variables)) {
+      const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+      personalizedSubject = personalizedSubject.replace(regex, String(value || ''));
+      personalizedContent = personalizedContent.replace(regex, String(value || ''));
+    }
 
     // Queue email for sending
     const { error: queueError } = await supabase
