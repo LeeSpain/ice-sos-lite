@@ -6,6 +6,7 @@ import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import RouteChangeTracker from "@/components/RouteChangeTracker";
 import ScrollToTop from "@/components/ScrollToTop";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
+import GlobalEmmaChat from "@/components/GlobalEmmaChat";
 import Index from "./pages/Index";
 
 const TestPage = lazy(() => import("./pages/TestPage"));
@@ -84,8 +85,12 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        
         {/* Global floating device/settings button */}
         <DeviceManagerButton />
+        
+        {/* Global Emma Chat - Available on all pages */}
+        <GlobalEmmaChat />
       </BrowserRouter>
     </AuthProvider>
   );
