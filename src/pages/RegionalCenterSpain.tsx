@@ -99,7 +99,7 @@ const RegionalCenterSpain: React.FC = () => {
         <section className="py-20 bg-gradient-to-br from-background via-muted/20 to-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
                 Professional Emergency Support
               </h2>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -167,7 +167,7 @@ const RegionalCenterSpain: React.FC = () => {
         <section className="py-20 bg-secondary/30">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">Service Details</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">Service Details</h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Comprehensive coverage and specialized support for Spanish regions.
               </p>
