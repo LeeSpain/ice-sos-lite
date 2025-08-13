@@ -424,7 +424,7 @@ export type Database = {
           message_type: string
           metadata: Json | null
           session_id: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           content: string
@@ -433,7 +433,7 @@ export type Database = {
           message_type: string
           metadata?: Json | null
           session_id?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           content?: string
@@ -442,7 +442,7 @@ export type Database = {
           message_type?: string
           metadata?: Json | null
           session_id?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1404,6 +1404,110 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      sos_call_attempts: {
+        Row: {
+          attempt_order: number
+          call_sid: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          duration_seconds: number | null
+          ended_at: string | null
+          error: string | null
+          id: string
+          incident_id: string
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempt_order?: number
+          call_sid?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          error?: string | null
+          id?: string
+          incident_id: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempt_order?: number
+          call_sid?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          error?: string | null
+          id?: string
+          incident_id?: string
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_call_attempts_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "sos_incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sos_incidents: {
+        Row: {
+          calls_initiated: number
+          completed_at: string | null
+          contact_emails_sent: number
+          created_at: string
+          error: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          status: string
+          triggered_via: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calls_initiated?: number
+          completed_at?: string | null
+          contact_emails_sent?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          status?: string
+          triggered_via?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calls_initiated?: number
+          completed_at?: string | null
+          contact_emails_sent?: number
+          created_at?: string
+          error?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          status?: string
+          triggered_via?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
