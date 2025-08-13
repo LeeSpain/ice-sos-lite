@@ -146,6 +146,15 @@ Deno.serve(async (req: Request) => {
     const supabaseUser = getUserSupabaseClient(req);
     const body = (await req.json()) as EmergencySOSRequest;
 
+    // Resolve authenticated user for RLS-bound inserts
+    const { data: userData, error: userErr } = await supabaseUser.auth.getUser();
+    if (userErr || !userData?.user) {
+      console.error("No authenticated user in request", userErr);
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const authedUserId = userData.user.id;
+    console.log("Creating SOS incident for user:", authedUserId);
+
     const contacts = (body.userProfile?.emergency_contacts || []).filter(c => c && (c.email || c.phone));
     if (!contacts.length) {
       return new Response(JSON.stringify({ error: "No emergency contacts configured" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -157,7 +166,7 @@ Deno.serve(async (req: Request) => {
     // Create incident under user's RLS context
     const { data: incident, error: incErr } = await supabaseUser
       .from("sos_incidents")
-      .insert({ location: body.location || null, triggered_via: "app" })
+      .insert({ user_id: authedUserId, location: body.location || null, triggered_via: "app" })
       .select("id, contact_emails_sent, calls_initiated, status")
       .single();
 

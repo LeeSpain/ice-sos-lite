@@ -484,9 +484,9 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                            ) : (
                                              <Button 
                                                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
-                                               asChild
+                                               onClick={() => handleProductPurchase(product)}
                                              >
-                                               <Link to="/ai-register">{t('pricing.purchaseDevice', { defaultValue: 'Purchase Device' })}</Link>
+                                               {t('pricing.purchaseDevice', { defaultValue: 'Purchase Device' })}
                                              </Button>
                                            )}
                                          </div>
@@ -514,13 +514,13 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
     </Badge>
   )
 ) : (
-  <Button 
-    size="lg"
-    className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground"
-    asChild
-  >
-    <Link to="/ai-register">{t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}</Link>
-  </Button>
+   <Button 
+     size="lg"
+     className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground"
+     onClick={() => handleProductPurchase(product)}
+   >
+     {t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}
+   </Button>
 )}
                         </div>
                       </div>

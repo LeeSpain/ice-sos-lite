@@ -135,7 +135,6 @@ const DeviceIceSosPendant = () => {
                 className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl hover-scale"
                 loading="eager"
                 decoding="async"
-                fetchPriority="high"
                 sizes="(min-width: 1024px) 512px, 90vw"
               />
               <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-pulse" />
