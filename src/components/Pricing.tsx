@@ -370,21 +370,9 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 )}
                   
                   <div className="relative p-8">
-                    <div className="grid lg:grid-cols-3 gap-8 items-center">
+                    <div className="grid lg:grid-cols-3 gap-8 items-start">
                        {/* Product Info */}
-                      <div className="text-center lg:text-left">
-                        {product.name === 'ICE SOS Bluetooth Pendant' && (
-                          <div className="relative mb-6 p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
-                            <img
-                              src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png"
-                              alt="ICE SOS Bluetooth Pendant with smartphone – Bluetooth emergency pendant"
-                              className="w-full max-w-sm mx-auto lg:mx-0 rounded-xl shadow-lg object-cover"
-                              loading="lazy"
-                              decoding="async"
-                              sizes="(min-width: 1024px) 384px, 80vw"
-                            />
-                          </div>
-                        )}
+                      <div className="text-center lg:text-left lg:col-span-2">
                         <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg`}>
                           <Package className="h-8 w-8 text-white" />
                         </div>
@@ -523,10 +511,25 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
    </Button>
 )}
                         </div>
-                      </div>
-                      
-                      {/* Features */}
-                      <div className="lg:col-span-2">
+                       </div>
+                       
+                       {/* Image positioned in bottom right */}
+                       <div className="relative">
+                        {product.name === 'ICE SOS Bluetooth Pendant' && (
+                          <div className="absolute bottom-0 right-0 w-40 h-32">
+                            <img
+                              src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png"
+                              alt="ICE SOS Bluetooth Pendant with smartphone – Bluetooth emergency pendant"
+                              className="w-full h-full object-cover rounded-lg shadow-md"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                        )}
+                       </div>
+                       
+                       {/* Features */}
+                       <div className="lg:col-span-3">
                         <h4 className="text-xl font-semibold mb-4">{t('pricing.keyFeaturesTitle', { defaultValue: 'Key Features:' })}</h4>
                         <div className="grid md:grid-cols-2 gap-4">
                           {product.features.slice(0, 6).map((feature, index) => (
