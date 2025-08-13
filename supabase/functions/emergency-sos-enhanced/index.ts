@@ -1,249 +1,237 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
+// Enhanced Emergency SOS Edge Function
+// - Creates sos_incidents record
+// - Sends emails to contacts via Resend
+// - Initiates sequential Twilio calls and records sos_call_attempts
+// - Uses user JWT context so RLS applies to inserts/updates
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface EmergencyContact {
-  name: string;
+  name?: string;
+  phone?: string;
   email?: string;
-  phone: string;
-  relationship: string;
+  relationship?: string;
 }
 
 interface EmergencySOSRequest {
   userProfile: {
-    first_name: string;
-    last_name: string;
+    first_name?: string;
+    last_name?: string;
     emergency_contacts: EmergencyContact[];
   };
   location: string;
   timestamp: string;
 }
 
-// Sequential calling with Twilio
-const makeSequentialCalls = async (contacts: EmergencyContact[], userName: string, location: string) => {
-  const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-  const twilioAuthToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const twilioPhoneNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+function getUserSupabaseClient(req: Request) {
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+  const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+  const authHeader = req.headers.get("authorization") || req.headers.get("Authorization") || "";
+  return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    global: { headers: { Authorization: authHeader } },
+  });
+}
 
-  if (!twilioAccountSid || !twilioAuthToken || !twilioPhoneNumber) {
-    console.log("⚠️ Twilio not configured - calls will be simulated");
-    return contacts.map((contact, index) => ({
-      contact: contact.name,
-      phone: contact.phone,
-      priority: index + 1,
-      status: "simulated",
-      message: "Call simulation - Twilio not configured"
-    }));
+async function sendEmail(to: string, subject: string, html: string) {
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (!RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY not set, skipping email to", to);
+    return { skipped: true } as const;
+  }
+  const resp = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "ICE SOS <noreply@icesos.app>",
+      to: [to],
+      subject,
+      html,
+    }),
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(`Resend error: ${resp.status} ${JSON.stringify(data)}`);
+  return data;
+}
+
+function toForm(data: Record<string, string | string[] | undefined>) {
+  const params = new URLSearchParams();
+  Object.entries(data).forEach(([k, v]) => {
+    if (Array.isArray(v)) v.forEach((vv) => params.append(k, vv));
+    else if (v !== undefined) params.append(k, v);
+  });
+  return params;
+}
+
+async function makeTwilioCall(contact: EmergencyContact, incidentId: string, order: number, userName: string, location: string, supabaseUser: ReturnType<typeof createClient>) {
+  const ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
+  const AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
+  const FROM = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+  if (!ACCOUNT_SID || !AUTH_TOKEN || !FROM) {
+    console.warn("Twilio secrets missing, simulating call for", contact.phone);
+    const { data: callAttempt, error: insErr } = await supabaseUser
+      .from("sos_call_attempts")
+      .insert({
+        incident_id: incidentId,
+        attempt_order: order,
+        contact_name: contact.name || null,
+        contact_phone: contact.phone || null,
+        contact_email: contact.email || null,
+        status: "simulated",
+      })
+      .select("id")
+      .maybeSingle();
+    if (insErr) console.error("Insert simulated call attempt failed", insErr);
+    return { simulated: true, callAttemptId: callAttempt?.id } as const;
   }
 
-  const callResults = [];
-  
-  for (let i = 0; i < contacts.length; i++) {
-    const contact = contacts[i];
-    if (!contact.phone) continue;
+  const statusCallbackUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/twilio-status-webhook`;
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Say voice="Polly.Joanna">This is an emergency alert for ${userName}. Their last known location is: ${location}. If you know their status, please reach out or press any key to acknowledge.</Say>\n  <Pause length="2"/>\n  <Say>If you were not able to answer, the system will contact the next person.</Say>\n</Response>`;
 
-    try {
-      const emergencyMessage = `Emergency alert for ${userName}. Location: ${location}. This is an automated emergency call from ICE SOS. Please check on ${userName} immediately and contact emergency services if needed.`;
-      
-      // Make Twilio call
-      const response = await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Calls.json`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${btoa(`${twilioAccountSid}:${twilioAuthToken}`)}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            To: contact.phone,
-            From: twilioPhoneNumber,
-            Twiml: `<Response><Say voice="alice">${emergencyMessage}</Say><Pause length="2"/><Say voice="alice">Press any key to confirm you received this emergency alert.</Say><Gather numDigits="1" timeout="10"><Say voice="alice">Waiting for confirmation...</Say></Gather><Say voice="alice">Emergency alert complete. Please take immediate action.</Say></Response>`
-          })
-        }
-      );
+  const body = toForm({
+    To: contact.phone!,
+    From: FROM,
+    Twiml: twiml,
+    StatusCallback: statusCallbackUrl,
+    // Twilio expects multiple entries for this key
+    StatusCallbackEvent: ["initiated", "ringing", "answered", "completed"],
+  });
 
-      if (response.ok) {
-        const callData = await response.json();
-        callResults.push({
-          contact: contact.name,
-          phone: contact.phone,
-          priority: i + 1,
-          status: "initiated",
-          callSid: callData.sid,
-          message: "Emergency call initiated successfully"
-        });
+  const auth = btoa(`${ACCOUNT_SID}:${AUTH_TOKEN}`);
+  const resp = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${ACCOUNT_SID}/Calls.json`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${auth}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body,
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(`Twilio call error: ${resp.status} ${JSON.stringify(data)}`);
 
-        console.log(`📞 Emergency call initiated to ${contact.name} (${contact.phone})`);
-        
-        // Wait 30 seconds before next call (allows time for answer)
-        if (i < contacts.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 30000));
-        }
-      } else {
-        throw new Error(`Twilio API error: ${response.status}`);
-      }
+  const callSid = data.sid as string | undefined;
+  const { error: insErr } = await supabaseUser.from("sos_call_attempts").insert({
+    incident_id: incidentId,
+    attempt_order: order,
+    contact_name: contact.name || null,
+    contact_phone: contact.phone || null,
+    contact_email: contact.email || null,
+    call_sid: callSid || null,
+    status: "queued",
+  });
+  if (insErr) console.error("Insert call attempt failed", insErr);
+  return { callSid } as const;
+}
 
-    } catch (error) {
-      console.error(`❌ Failed to call ${contact.name}:`, error);
-      callResults.push({
-        contact: contact.name,
-        phone: contact.phone,
-        priority: i + 1,
-        status: "failed",
-        error: error.message
-      });
-    }
-  }
+const wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-  return callResults;
-};
-
-const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
+Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { userProfile, location, timestamp }: EmergencySOSRequest = await req.json();
-    
-    const userName = `${userProfile.first_name} ${userProfile.last_name}`.trim();
-    const emergencyTime = new Date(timestamp).toLocaleString();
-    
-    console.log(`🚨 ENHANCED EMERGENCY SOS triggered by ${userName} at ${emergencyTime}`);
-    console.log(`📍 Location: ${location}`);
-
-    const notifications = [];
-    const callResults = [];
-
-    // Start sequential calling immediately for high priority
-    const phoneContacts = userProfile.emergency_contacts.filter(c => c.phone);
-    if (phoneContacts.length > 0) {
-      console.log(`📞 Initiating sequential calls to ${phoneContacts.length} contacts...`);
-      const calls = await makeSequentialCalls(phoneContacts, userName, location);
-      callResults.push(...calls);
+    if (req.method !== "POST") {
+      return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Send email notifications simultaneously
-    for (const contact of userProfile.emergency_contacts) {
-      if (contact.email) {
+    const supabaseUser = getUserSupabaseClient(req);
+    const body = (await req.json()) as EmergencySOSRequest;
+
+    const contacts = (body.userProfile?.emergency_contacts || []).filter(c => c && (c.email || c.phone));
+    if (!contacts.length) {
+      return new Response(JSON.stringify({ error: "No emergency contacts configured" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Derive user full name for messages
+    const userName = `${body.userProfile?.first_name || ""} ${body.userProfile?.last_name || ""}`.trim() || "your contact";
+
+    // Create incident under user's RLS context
+    const { data: incident, error: incErr } = await supabaseUser
+      .from("sos_incidents")
+      .insert({ location: body.location || null, triggered_via: "app" })
+      .select("id, contact_emails_sent, calls_initiated, status")
+      .single();
+
+    if (incErr || !incident) {
+      console.error("Failed to create incident", incErr);
+      throw new Error("Could not create SOS incident");
+    }
+
+    const incidentId = incident.id as string;
+
+    // Send emails (best-effort)
+    let emailsSent = 0;
+    for (const c of contacts) {
+      if (c.email) {
         try {
-          const emailResponse = await resend.emails.send({
-            from: "ICE SOS Emergency <emergency@resend.dev>",
-            to: [contact.email],
-            subject: `🚨 CRITICAL EMERGENCY - ${userName} needs immediate assistance`,
-            html: `
-              <div style="background: linear-gradient(135deg, #00CC66, #00AA55); color: white; padding: 20px; border-radius: 10px; font-family: Arial, sans-serif;">
-                <h1 style="color: white; text-align: center; margin: 0 0 20px 0;">🚨 CRITICAL EMERGENCY ALERT 🚨</h1>
-                
-                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
-                  <h2 style="color: white; margin: 0 0 10px 0;">Emergency Details:</h2>
-                  <p><strong>Person in Emergency:</strong> ${userName}</p>
-                  <p><strong>Time:</strong> ${emergencyTime}</p>
-                  <p><strong>Location:</strong> ${location}</p>
-                  <p><strong>Your Relationship:</strong> ${contact.relationship}</p>
-                  <p><strong>Contact Priority:</strong> ${userProfile.emergency_contacts.indexOf(contact) + 1}</p>
-                </div>
-
-                <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
-                  <h3 style="color: white; margin: 0 0 10px 0;">🚨 IMMEDIATE ACTION REQUIRED:</h3>
-                  <ol style="color: white; line-height: 1.6;">
-                    <li><strong>Call ${userName} immediately: ${contact.phone || 'Phone not provided'}</strong></li>
-                    <li><strong>If no response, call emergency services NOW</strong></li>
-                    <li><strong>Go to their location if possible: ${location}</strong></li>
-                    <li><strong>This is a REAL EMERGENCY - not a test</strong></li>
-                  </ol>
-                </div>
-
-                <div style="text-align: center; margin: 20px 0; background: rgba(255,0,0,0.3); padding: 15px; border-radius: 8px;">
-                  <p style="font-size: 20px; font-weight: bold; color: white; margin: 0;">⚠️ AUTOMATIC CALLS IN PROGRESS ⚠️</p>
-                  <p style="color: white; margin: 5px 0 0 0;">Sequential emergency calls are being made to all contacts</p>
-                </div>
-
-                <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-top: 20px;">
-                  <p style="font-size: 12px; color: white; margin: 0; text-align: center;">
-                    Sent by ICE SOS Enhanced Emergency Protection System | If false alarm, contact ${userName} immediately
-                  </p>
-                </div>
-              </div>
-            `,
-          });
-
-          notifications.push({
-            contact: contact.name,
-            email: contact.email,
-            status: "sent",
-            response: emailResponse
-          });
-
-          console.log(`✅ Emergency email sent to ${contact.name} (${contact.email})`);
-        } catch (emailError) {
-          console.error(`❌ Failed to send email to ${contact.name}:`, emailError);
-          notifications.push({
-            contact: contact.name,
-            email: contact.email,
-            status: "failed",
-            error: emailError.message
-          });
+          await sendEmail(
+            c.email,
+            `Emergency alert for ${userName}`,
+            `<p>This is an emergency alert for <strong>${userName}</strong>.</p><p>Last known location: ${body.location}</p><p>Time: ${new Date(body.timestamp).toLocaleString()}</p>`
+          );
+          emailsSent++;
+        } catch (e) {
+          console.error("Email send failed for", c.email, e);
         }
       }
     }
 
-    // Log comprehensive emergency summary
-    console.log(`📋 ENHANCED EMERGENCY SOS SUMMARY:
-      - User: ${userName}
-      - Time: ${emergencyTime}
-      - Location: ${location}
-      - Total contacts: ${userProfile.emergency_contacts.length}
-      - Emails sent: ${notifications.filter(n => n.status === 'sent').length}
-      - Calls initiated: ${callResults.filter(c => c.status === 'initiated').length}
-      - Failed emails: ${notifications.filter(n => n.status === 'failed').length}
-      - Failed calls: ${callResults.filter(c => c.status === 'failed').length}
-    `);
+    if (emailsSent > 0) {
+      const { error: updErr } = await supabaseUser
+        .from("sos_incidents")
+        .update({ contact_emails_sent: emailsSent, status: "in_progress" })
+        .eq("id", incidentId);
+      if (updErr) console.warn("Failed to update incident emails count", updErr);
+    }
 
-    return new Response(JSON.stringify({
-      success: true,
-      message: "Enhanced emergency SOS activated successfully",
-      notifications,
-      calls: callResults,
-      summary: {
-        total_contacts: userProfile.emergency_contacts.length,
-        emails_sent: notifications.filter(n => n.status === 'sent').length,
-        failed_emails: notifications.filter(n => n.status === 'failed').length,
-        calls_initiated: callResults.filter(c => c.status === 'initiated').length,
-        failed_calls: callResults.filter(c => c.status === 'failed').length,
-        emergency_time: emergencyTime,
-        location: location
+    // Initiate sequential calls with short spacing
+    let callsInitiated = 0;
+    let order = 1;
+    for (const c of contacts) {
+      if (c.phone) {
+        try {
+          await makeTwilioCall(c, incidentId, order, userName, body.location, supabaseUser);
+          callsInitiated++;
+          order++;
+          // small delay to avoid burst; adjust as needed
+          await wait(3000);
+        } catch (e) {
+          console.error("Twilio call failed for", c.phone, e);
+          // record failed attempt as well
+          await supabaseUser.from("sos_call_attempts").insert({
+            incident_id: incidentId,
+            attempt_order: order,
+            contact_name: c.name || null,
+            contact_phone: c.phone || null,
+            contact_email: c.email || null,
+            status: "failed",
+            error: String(e?.message || e),
+          });
+          order++;
+        }
       }
-    }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
+    }
 
-  } catch (error: any) {
-    console.error("🚨 Enhanced Emergency SOS function error:", error);
-    return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        success: false,
-        message: "Enhanced emergency notification system encountered an error"
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    // Update incident with call count and mark as in_progress/completed
+    const { error: finalUpdErr } = await supabaseUser
+      .from("sos_incidents")
+      .update({ calls_initiated: callsInitiated, status: "completed", completed_at: new Date().toISOString() })
+      .eq("id", incidentId);
+    if (finalUpdErr) console.warn("Failed to finalize incident", finalUpdErr);
+
+    const summary = { emails_sent: emailsSent, calls_initiated: callsInitiated, incident_id: incidentId };
+    return new Response(JSON.stringify({ ok: true, summary }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  } catch (error) {
+    console.error("Emergency SOS enhanced error:", error);
+    return new Response(JSON.stringify({ error: String(error?.message || error) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
-};
-
-serve(handler);
+});
