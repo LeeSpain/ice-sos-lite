@@ -338,63 +338,6 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
               </p>
             </div>
 
-            {(() => {
-              const fp = products.find(p => p.name === 'ICE SOS Bluetooth Pendant') || products[0];
-              if (!fp) return null;
-              const isComingSoon = fp.status === 'coming_soon';
-              return (
-                <Card className="relative mb-10 border-2 border-primary/40 shadow-2xl bg-gradient-to-br from-card to-card/80 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-                  <div className="relative p-8">
-                    <div className="grid lg:grid-cols-2 gap-8 items-center">
-                      <div>
-                        <Badge className="mb-4 bg-primary text-white">Featured Product</Badge>
-                        <h4 className="text-3xl font-bold mb-2">{t('products.icePendant.name', { defaultValue: fp.name })}</h4>
-                        <p className="text-lg text-muted-foreground mb-4">{t('products.icePendant.description', { defaultValue: fp.description })}</p>
-                        <div className="mb-6 flex items-baseline gap-2">
-                          <span className="text-4xl font-bold text-primary">{formatPriceDisplay(fp.price, fp.currency)}</span>
-                          <span className="text-sm text-muted-foreground">{t('pricing.oneTime', { defaultValue: 'One-time' })}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-3">
-                          {isComingSoon ? (
-                            <Badge className="px-6 py-3 text-base bg-secondary text-white">{t('common.comingSoon', { defaultValue: 'Coming Soon' })}</Badge>
-                          ) : (
-                            <Button size="lg" className="px-7 py-3" onClick={() => handleProductPurchase(fp)} aria-label={`Buy ${fp.name}`}>
-                              {t('common.buyNow', { defaultValue: 'Buy now' })}
-                            </Button>
-                          )}
-                          <Button size="lg" variant="outline" asChild className="px-7 py-3">
-                            <Link to="/devices/ice-sos-pendant">{t('common.learnMore', { defaultValue: 'Learn more' })}</Link>
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="relative">
-                        <img
-                          src="/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png"
-                          alt="ICE SOS Bluetooth Pendant product photo"
-                          className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
-                          loading="eager"
-                          decoding="async"
-                          fetchPriority="high"
-                          sizes="(min-width: 1024px) 512px, 90vw"
-                        />
-                        <div className="absolute -top-3 -right-3 w-16 h-16 bg-primary/20 rounded-full blur-xl" />
-                      </div>
-                    </div>
-                  </div>
-                  <script type="application/ld+json">
-                    {JSON.stringify({
-                      "@context": "https://schema.org",
-                      "@type": "Product",
-                      name: fp.name,
-                      description: fp.description,
-                      image: (typeof window !== 'undefined' ? `${window.location.origin}/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png` : ''),
-                      offers: { "@type": "Offer", priceCurrency: fp.currency, price: fp.price?.toString?.() || '0', availability: isComingSoon ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock' }
-                    })}
-                  </script>
-                </Card>
-              );
-            })()}
 
             <div className="max-w-4xl mx-auto">
               {products.map((product) => (
@@ -433,7 +376,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         {product.name === 'ICE SOS Bluetooth Pendant' && (
                           <div className="mb-5">
                             <img
-                              src="/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png"
+                              src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png"
                               alt="ICE SOS Bluetooth Pendant with smartphone – Bluetooth emergency pendant"
                               className="w-full max-w-md mx-auto lg:mx-0 rounded-2xl shadow-2xl object-cover"
                               loading="lazy"
@@ -442,11 +385,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                             />
                           </div>
                         )}
-                        <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 ${
-                          product.name === 'ICE SOS Bluetooth Pendant' 
-                            ? 'bg-gradient-to-br from-blue-500 to-blue-600' 
-                            : 'bg-gradient-to-br from-primary to-guardian'
-                        } rounded-2xl flex items-center justify-center shadow-lg`}>
+                        <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg`}>
                           <Package className="h-8 w-8 text-white" />
                         </div>
                         <CardTitle className="text-3xl font-bold mb-3">
@@ -455,12 +394,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         <CardDescription className="text-lg text-muted-foreground mb-4">
                           {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
                         </CardDescription>
-<div className="mb-6">
-  <span className={`text-4xl font-bold ${
-    product.name === 'ICE SOS Bluetooth Pendant' 
-      ? 'text-blue-600' 
-      : 'text-primary'
-  }`}>{formatPriceDisplay(product.price, product.currency)}</span>
+                        <div className="mb-6">
+  <span className={`text-4xl font-bold text-primary`}>{formatPriceDisplay(product.price, product.currency)}</span>
   <span className="text-muted-foreground text-lg"> {t('pricing.oneTimeLabel')}</span>
 </div>
                         <div className="flex gap-3">
@@ -541,24 +476,20 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
                                       </ol>
                                     </div>
 
-                                     <div className="flex gap-3 pt-4">
-                                       {product.status === 'coming_soon' ? (
-                                         <Badge className="bg-secondary text-white px-3 py-1">
-                                           {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
-                                         </Badge>
-                                       ) : (
-                                         <Button 
-                                           className={`flex-1 ${
-                                             product.name === 'ICE SOS Bluetooth Pendant'
-                                               ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                               : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-                                           }`}
-                                           asChild
-                                         >
-                                           <Link to="/ai-register">{t('pricing.purchaseDevice', { defaultValue: 'Purchase Device' })}</Link>
-                                         </Button>
-                                       )}
-                                     </div>
+                                         <div className="flex gap-3 pt-4">
+                                           {product.status === 'coming_soon' ? (
+                                             <Badge className="bg-secondary text-white px-3 py-1">
+                                               {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
+                                             </Badge>
+                                           ) : (
+                                             <Button 
+                                               className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                                               asChild
+                                             >
+                                               <Link to="/ai-register">{t('pricing.purchaseDevice', { defaultValue: 'Purchase Device' })}</Link>
+                                             </Button>
+                                           )}
+                                         </div>
                                   </div>
                                 </DialogContent>
                               </Dialog>
@@ -585,11 +516,7 @@ className="px-8 py-4 border-secondary/20 hover:bg-secondary/5 font-semibold"
 ) : (
   <Button 
     size="lg"
-    className={`font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
-      product.name === 'ICE SOS Bluetooth Pendant'
-        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-        : 'bg-primary hover:bg-primary/90 text-primary-foreground'
-    }`}
+    className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-primary hover:bg-primary/90 text-primary-foreground"
     asChild
   >
     <Link to="/ai-register">{t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}</Link>
