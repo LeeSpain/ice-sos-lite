@@ -28,9 +28,9 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg}'],
-        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6MB to allow main chunk
-        globIgnores: ['lovable-uploads/**'], // avoid precaching large uploads
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}'],
+        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 8MB to allow optimized images
+        globIgnores: ['lovable-uploads/**'], // avoid precaching large uploads initially
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.origin.includes('supabase.co'),
@@ -44,9 +44,15 @@ export default defineConfig(({ mode }) => ({
             urlPattern: ({ url }) => url.pathname.startsWith('/lovable-uploads/'),
             handler: 'CacheFirst',
             options: {
-              cacheName: 'image-cache',
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheName: 'optimized-images',
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 90 }, // 90 days
               cacheableResponse: { statuses: [0, 200] },
+              plugins: [{
+                cacheKeyWillBeUsed: async ({ request }) => {
+                  // Cache different sizes separately
+                  return `${request.url}?optimized=true`;
+                },
+              }],
             },
           },
         ],

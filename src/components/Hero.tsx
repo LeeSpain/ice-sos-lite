@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import OptimizedImage from "@/components/ui/optimized-image";
+import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
+
 const heroImage = '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png?v=1';
 
 
@@ -53,13 +56,13 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
           {/* Hero Image */}
           <div className="relative">
             <div className="relative z-10">
-              <img 
+              <OptimizedImage 
                 src={heroImage} 
                 alt="ICE Bluetooth pendant and smartphone with SOS app - hero image"
                 className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
-                loading="eager"
-                decoding="async"
-                sizes="(min-width: 1024px) 512px, 90vw"
+                priority={true}
+                sizes={getImageSizes('hero')}
+                blurDataURL={generateBlurPlaceholder(400, 600)}
               />
             </div>
           </div>

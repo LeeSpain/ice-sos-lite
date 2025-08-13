@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
@@ -15,11 +15,19 @@ import { useScrollToTop } from '@/hooks/useScrollToTop';
 import AppPreviewSection from '@/components/AppPreviewSection';
 import { useTranslation } from 'react-i18next';
 import SEO from '@/components/SEO';
+import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
+import { preloadCriticalImages } from "@/utils/imageOptimization";
 
 const Index = () => {
   useScrollToTop();
+  usePerformanceMonitoring();
   const { t } = useTranslation();
   const [isEmmaOpen, setIsEmmaOpen] = useState(false);
+
+  // Preload critical images
+  useEffect(() => {
+    preloadCriticalImages();
+  }, []);
 
   const handleEmmaClick = useCallback(() => {
     setIsEmmaOpen(true);
