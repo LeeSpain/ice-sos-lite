@@ -365,9 +365,10 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 )}
                   
                   <div className="relative p-8">
-                    <div className="grid lg:grid-cols-5 gap-8 items-start">
-                       {/* Product Info */}
-                      <div className="text-center lg:text-left lg:col-span-3">
+                    {/* Upper half - Image and Text side by side */}
+                    <div className="grid lg:grid-cols-2 gap-8 items-center mb-8">
+                       {/* Product Info - Left Side */}
+                      <div className="text-center lg:text-left">
                         <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg`}>
                           <Package className="h-8 w-8 text-white" />
                         </div>
@@ -496,41 +497,41 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 )}
                         </div>
                        </div>
-                       
-                       {/* Product Image - positioned where the black box is shown */}
-                       <div className="lg:col-span-2 flex justify-center items-center">
-                        {product.name === 'ICE SOS Bluetooth Pendant' && (
-                          <div className="w-full max-w-2xl p-12 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
-                            <img
-                              src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
-                              alt="ICE Smart SOS Button – Emergency pendant device"
-                              className="w-96 h-96 rounded-xl shadow-lg object-cover mx-auto"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          </div>
-                        )}
-                       </div>
-                       
-                       {/* Features - stretched across full card width */}
-                       <div className="lg:col-span-5">
-                        <h4 className="text-xl font-semibold mb-4">{t('pricing.keyFeaturesTitle', { defaultValue: 'Key Features:' })}</h4>
-                        <div className="grid md:grid-cols-3 gap-4">
-                          {product.features.slice(0, 6).map((feature, index) => (
-                            <div key={index} className="flex items-start space-x-3">
-                              <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-muted-foreground">{feature}</span>
-                            </div>
-                          ))}
+                        
+                        {/* Product Image - Right Side */}
+                        <div className="flex justify-center items-center">
+                         {product.name === 'ICE SOS Bluetooth Pendant' && (
+                           <div className="w-full max-w-md p-6 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
+                             <img
+                               src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
+                               alt="ICE Smart SOS Button – Emergency pendant device"
+                               className="w-full h-auto rounded-xl shadow-lg object-cover"
+                               loading="lazy"
+                               decoding="async"
+                             />
+                           </div>
+                         )}
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
-                          <Check className="h-4 w-4 text-green-500" />
-                          <span>{t('pricing.freeShippingInventory', { count: product.inventory_count, defaultValue: 'Free shipping • {{count}} units available' })}</span>
-                        </div>
-                      </div>
                     </div>
-                  </div>
-                </Card>
+                        
+                        {/* Features - Bottom half */}
+                        <div className="border-t pt-6">
+                         <h4 className="text-xl font-semibold mb-4">{t('pricing.keyFeaturesTitle', { defaultValue: 'Key Features:' })}</h4>
+                         <div className="grid md:grid-cols-3 gap-4">
+                           {product.features.slice(0, 6).map((feature, index) => (
+                             <div key={index} className="flex items-start space-x-3">
+                               <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                               <span className="text-sm text-muted-foreground">{feature}</span>
+                             </div>
+                           ))}
+                         </div>
+                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
+                           <Check className="h-4 w-4 text-green-500" />
+                           <span>{t('pricing.freeShippingInventory', { count: product.inventory_count, defaultValue: 'Free shipping • {{count}} units available' })}</span>
+                         </div>
+                       </div>
+                   </div>
+                 </Card>
               ))}
             </div>
           </>
