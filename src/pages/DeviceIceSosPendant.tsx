@@ -151,7 +151,7 @@ const DeviceIceSosPendant = () => {
       <section id="product-gallery" className="py-20 bg-gradient-to-br from-background via-muted/20 to-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
               Meet Your Emergency Guardian
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -239,7 +239,7 @@ const DeviceIceSosPendant = () => {
       <section id="how-it-works" className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">How it Works</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">How it Works</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Simple setup, powerful protection. Get emergency help with just one button press.
             </p>
@@ -322,7 +322,7 @@ const DeviceIceSosPendant = () => {
       {/* Tech Specs */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block text-center w-full">
             Technical Specifications
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -375,7 +375,7 @@ const DeviceIceSosPendant = () => {
       <section className="py-20 bg-gradient-to-br from-muted/30 via-background to-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
               Real Stories from Real People
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-12">
@@ -448,7 +448,7 @@ const DeviceIceSosPendant = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
               Complete Technical Specifications
             </h2>
           </div>
@@ -508,7 +508,7 @@ const DeviceIceSosPendant = () => {
       <section className="py-20 bg-gradient-to-br from-muted/30 via-background to-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
               Frequently Asked Questions
             </h2>
           </div>
