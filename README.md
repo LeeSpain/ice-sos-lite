@@ -85,9 +85,14 @@ npm run build
 ### GitHub Integration
 - The `.github/workflows/deploy.yml` file sets up automatic deployment to Vercel
 - Configure the required secrets in your GitHub repository settings:
-  - `VERCEL_TOKEN`
-  - `VERCEL_ORG_ID` 
-  - `VERCEL_PROJECT_ID`
+  - `VERCEL_TOKEN`: Get from [Vercel Account Settings](https://vercel.com/account/tokens)
+  - `VERCEL_ORG_ID`: Found in your Vercel team settings
+  - `VERCEL_PROJECT_ID`: Found in your project settings on Vercel
+
+To set up GitHub secrets:
+1. Go to your GitHub repository → Settings → Secrets and variables → Actions
+2. Click "New repository secret" for each required secret
+3. Once configured, pushes to main/master will automatically deploy to Vercel
 
 ## Can I connect a custom domain to my Lovable project?
 
