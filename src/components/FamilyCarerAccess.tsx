@@ -73,7 +73,7 @@ const FamilyCarerAccess = () => {
           <Badge className="mb-4 bg-wellness text-white">
             Family & Carer Support
           </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Family & Carer Access
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
