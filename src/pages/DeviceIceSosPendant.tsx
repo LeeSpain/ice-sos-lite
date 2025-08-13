@@ -118,13 +118,6 @@ const DeviceIceSosPendant = () => {
                     <Link to="/ai-register">Order Now - €59.99</Link>
                   </Button>
                 )}
-                <Button 
-                  size="xl" 
-                  className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
-                  asChild
-                >
-                  <Link to="#product-gallery">View Details</Link>
-                </Button>
               </div>
             </div>
             
