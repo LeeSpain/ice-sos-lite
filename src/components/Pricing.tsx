@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, MapPin, Brain, Users, Phone, Download, Smartphone, Package, Bluetooth, Battery, Droplets, CheckCircle } from "lucide-react";
+import { Check, MapPin, Brain, Users, Phone, Download, Smartphone, Package, Bluetooth, Battery, Droplets, CheckCircle, UserCheck, Heart, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -284,14 +284,55 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
             })()}
           </div>
 
-          {/* Family & Carer Access Information */}
-          <div className="text-center mb-8 mt-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
+          {/* Family & Carer Access Cards */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
               {t('pricing.familyTitle')}
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('pricing.familyDesc')}
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
+              Connect your loved ones and care providers for comprehensive emergency support
             </p>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+              {/* Trusted Contacts Card */}
+              <Card className="border-2 border-wellness/20 hover:border-wellness/40 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-wellness/10 flex items-center justify-center mb-4">
+                    <UserCheck className="h-6 w-6 text-wellness" />
+                  </div>
+                  <CardTitle className="text-lg font-semibold">Trusted Contacts</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Add family members and carers as emergency contacts with priority access levels</p>
+                </CardContent>
+              </Card>
+
+              {/* Care Coordination Card */}
+              <Card className="border-2 border-wellness/20 hover:border-wellness/40 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-wellness/10 flex items-center justify-center mb-4">
+                    <Heart className="h-6 w-6 text-wellness" />
+                  </div>
+                  <CardTitle className="text-lg font-semibold">Care Coordination</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Seamless coordination between family members during emergencies</p>
+                </CardContent>
+              </Card>
+
+              {/* Privacy Controls Card */}
+              <Card className="border-2 border-wellness/20 hover:border-wellness/40 transition-all duration-300 hover:shadow-lg hover:scale-105">
+                <CardHeader>
+                  <div className="w-12 h-12 rounded-lg bg-wellness/10 flex items-center justify-center mb-4">
+                    <Shield className="h-6 w-6 text-wellness" />
+                  </div>
+                  <CardTitle className="text-lg font-semibold">Privacy Controls</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">Granular privacy settings to control what information is shared with whom</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
           {/* Family Connection Card - Connected below */}
