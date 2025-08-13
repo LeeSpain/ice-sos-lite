@@ -2,9 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Heart, Shield, Clock, ExternalLink, UserCheck, CheckCircle } from 'lucide-react';
+import { Users, Heart, Shield, Clock, UserCheck, CheckCircle } from 'lucide-react';
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 
@@ -104,90 +102,12 @@ const FamilyCarerAccess = () => {
                 </p>
                 
                 {/* CTA Button */}
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button size="lg" className="bg-gradient-to-r from-wellness to-wellness/80 hover:from-wellness/90 hover:to-wellness/70 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
-                      <Users className="mr-2 h-4 w-4" />
-                      Learn More
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle className="text-2xl font-bold text-center mb-4">Family & Carer Access</DialogTitle>
-                      <DialogDescription className="text-center text-lg text-muted-foreground">
-                        Comprehensive emergency support through trusted connections
-                      </DialogDescription>
-                    </DialogHeader>
-
-                    <Tabs defaultValue="overview" className="w-full">
-                      <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                        <TabsTrigger value="features">Features</TabsTrigger>
-                        <TabsTrigger value="details">Details</TabsTrigger>
-                      </TabsList>
-
-                      <TabsContent value="overview" className="space-y-6">
-                        <div className="grid md:grid-cols-2 gap-6">
-                          <div className="p-6 bg-muted/50 rounded-lg">
-                            <h3 className="text-lg font-semibold mb-3 text-foreground">For Families</h3>
-                            <ul className="space-y-2 text-sm text-muted-foreground">
-                              <li>• Receive instant emergency alerts</li>
-                              <li>• Access medical information when needed</li>
-                              <li>• Coordinate response with other family members</li>
-                              <li>• Real-time location sharing during emergencies</li>
-                              <li>• Secure messaging and communication</li>
-                            </ul>
-                          </div>
-                          
-                          <div className="p-6 bg-muted/50 rounded-lg">
-                            <h3 className="text-lg font-semibold mb-3 text-foreground">For Professional Carers</h3>
-                            <ul className="space-y-2 text-sm text-muted-foreground">
-                              <li>• Access authorized emergency protocols</li>
-                              <li>• View relevant medical history</li>
-                              <li>• Communicate with emergency services</li>
-                              <li>• Track incident progress and resolution</li>
-                              <li>• Professional liability protection</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </TabsContent>
-
-                      <TabsContent value="features" className="space-y-4">
-                        <div className="grid md:grid-cols-2 gap-4">
-                          {features.map((feature, index) => {
-                            const Icon = feature.icon;
-                            return (
-                              <div key={index} className="flex items-start gap-3 p-4 border rounded-lg">
-                                <div className={`w-10 h-10 rounded-lg bg-secondary flex items-center justify-center ${getIconColor(feature.color)}`}>
-                                  <Icon className="h-5 w-5" />
-                                </div>
-                                <div>
-                                  <h4 className="font-semibold text-sm">{feature.title}</h4>
-                                  <p className="text-xs text-muted-foreground mt-1">{feature.description}</p>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </TabsContent>
-
-                      <TabsContent value="details" className="space-y-4">
-                        <div className="text-center p-8">
-                          <h3 className="text-xl font-semibold mb-4">Ready to Get Started?</h3>
-                          <p className="text-muted-foreground mb-6">
-                            Learn more about our comprehensive Family & Carer Access features and how they can protect your loved ones.
-                          </p>
-                          <Button asChild className="bg-wellness hover:bg-wellness/90">
-                            <a href="/family-carer-access" target="_blank" rel="noopener noreferrer">
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              Visit Full Page
-                            </a>
-                          </Button>
-                        </div>
-                      </TabsContent>
-                    </Tabs>
-                  </DialogContent>
-                </Dialog>
+                <Button asChild size="lg" className="bg-gradient-to-r from-wellness to-wellness/80 hover:from-wellness/90 hover:to-wellness/70 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+                  <Link to="/family-carer-access">
+                    <Users className="mr-2 h-4 w-4" />
+                    Learn More
+                  </Link>
+                </Button>
                 <p className="text-xs text-muted-foreground mt-2">
                   Secure access control • Privacy protected
                 </p>

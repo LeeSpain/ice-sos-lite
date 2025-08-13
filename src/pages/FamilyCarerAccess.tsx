@@ -203,7 +203,7 @@ const FamilyCarerAccessPage = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Access Levels</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">Access Levels</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Customize access permissions for different types of contacts based on their role in your care network
             </p>
@@ -239,7 +239,7 @@ const FamilyCarerAccessPage = () => {
       <section className="py-20 bg-gradient-subtle">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Use Cases</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">Use Cases</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               See how Family & Carer Access can benefit different types of care situations
             </p>
@@ -273,7 +273,7 @@ const FamilyCarerAccessPage = () => {
       {/* CTA Section */}
       <section className="py-20 bg-primary/5">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-6 inline-block">
             Ready to Connect Your Care Network?
           </h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
