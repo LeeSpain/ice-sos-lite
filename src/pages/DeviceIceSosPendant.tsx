@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall, CheckCircle2, Smartphone } from "lucide-react";
+import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall, CheckCircle2, Smartphone, Zap, Clock, Heart } from "lucide-react";
 
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -87,11 +87,9 @@ const DeviceIceSosPendant = () => {
         <script type="application/ld+json">{JSON.stringify(productJsonLd)}</script>
       </Helmet>
 
-      <header className="relative min-h-[70vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
-        {/* Dark overlay for contrast */}
+      {/* Hero Section with existing image */}
+      <header className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
         <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/30" />
-
-        {/* Subtle pattern like homepage */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-[size:20px_20px]" />
         </div>
@@ -99,34 +97,31 @@ const DeviceIceSosPendant = () => {
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left text-white">
-              <Badge variant="secondary" className="mb-6">ICE SOS Lite Device</Badge>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                {t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' })}
+              <Badge variant="secondary" className="mb-6 text-sm px-4 py-2">🚨 ICE SOS Lite Device</Badge>
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                ICE Smart SOS Button
               </h1>
               <p className="text-xl md:text-2xl mb-8 text-white/90 leading-relaxed font-medium drop-shadow-sm">
-                {t('devices.icePendant.hero', { defaultValue: 'A discreet, one-button pendant that instantly activates your emergency plan via the ICE SOS Lite app. Designed for reliability, comfort, and peace of mind.' })}
+                One-button emergency activation. Instant alerts. Complete peace of mind. Designed for reliability when every second counts.
               </p>
-                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
-                  {comingSoon ? (
-                    <Badge className="px-8 py-4 text-lg font-semibold bg-secondary text-white">{t('common.comingSoon', { defaultValue: 'Coming Soon' })}</Badge>
-                  ) : (
-                    <Button className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
-                      <Link to="/ai-register">{t('common.buyNow', { defaultValue: 'Buy now' })}</Link>
-                    </Button>
-                  )}
-                  <Button variant="outline" className="px-8 py-4 text-lg font-semibold" size="xl" asChild>
-                    <Link to="#how-it-works">{t('common.howItWorks', { defaultValue: 'How it works' })}</Link>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                {comingSoon ? (
+                  <Badge className="px-8 py-4 text-lg font-semibold bg-secondary text-white">Coming Soon</Badge>
+                ) : (
+                  <Button className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-emergency to-primary hover:from-emergency/90 hover:to-primary/90 shadow-xl" size="xl" asChild>
+                    <Link to="/ai-register">Order Now - €59.99</Link>
                   </Button>
-                </div>
-              <ul className="mt-8 space-y-3 text-white/80">
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> Works with any ICE SOS subscription</li>
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> One‑tap SOS activation from a wearable</li>
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emergency" /> Quick pairing, secure connection</li>
-              </ul>
-              <div className="mt-6 flex flex-wrap gap-4 text-xs text-white/80">
-                <span className="inline-flex items-center gap-2"><Shield className="h-4 w-4 text-emergency" />IP67 Waterproof</span>
-                <span className="inline-flex items-center gap-2"><PhoneCall className="h-4 w-4 text-emergency" />App-assisted response</span>
+                )}
+                <Button variant="outline" className="px-8 py-4 text-lg font-semibold border-white/30 text-white hover:bg-white/10" size="xl" asChild>
+                  <Link to="#product-gallery">View Details</Link>
+                </Button>
               </div>
+              <ul className="mt-8 space-y-3 text-white/90">
+                <li className="flex items-center gap-3"><Check className="h-5 w-5 text-emergency" /> Works with any ICE SOS subscription</li>
+                <li className="flex items-center gap-3"><Check className="h-5 w-5 text-emergency" /> One-tap SOS activation from anywhere</li>
+                <li className="flex items-center gap-3"><Check className="h-5 w-5 text-emergency" /> 7-day battery life</li>
+                <li className="flex items-center gap-3"><Check className="h-5 w-5 text-emergency" /> IP67 waterproof design</li>
+              </ul>
             </div>
             <div className="relative">
               <img
@@ -137,151 +132,229 @@ const DeviceIceSosPendant = () => {
                 decoding="async"
                 sizes="(min-width: 1024px) 512px, 90vw"
               />
-              <div className="absolute -top-4 -right-4 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-pulse" />
-              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-guardian/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute -top-8 -right-8 w-24 h-24 bg-emergency/20 rounded-full blur-xl animate-pulse" />
+              <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-primary/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
           </div>
         </div>
       </header>
 
-      <section id="how-it-works" className="py-20">
+      {/* Product Gallery Section */}
+      <section id="product-gallery" className="py-20 bg-gradient-to-br from-background via-muted/20 to-background">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-start">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">How it works</h2>
-              <ol className="mt-4 space-y-3 text-muted-foreground">
-                <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>1. Pair the pendant with your phone via Bluetooth in the ICE SOS Lite app.</span></li>
-                <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>2. Wear it like a pendant, clip, or keyring for easy access.</span></li>
-                <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>3. Press once to trigger SOS. Your emergency contacts are alerted instantly.</span></li>
-                <li className="flex items-start gap-3"><CheckCircle2 className="h-5 w-5 text-emergency mt-0.5" /><span>4. Your phone securely shares GPS location and critical info with responders.</span></li>
-              </ol>
-              <div className="mt-6">
-                <Button asChild disabled={comingSoon}>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent mb-6">
+              Meet Your Emergency Guardian
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Sleek, discreet, and powerful. The ICE Smart SOS Button combines premium design with life-saving technology.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {/* Packaging View */}
+            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-white to-muted/50 shadow-xl hover:shadow-2xl transition-all duration-500">
+              <div className="aspect-square p-8">
+                <img
+                  src="/lovable-uploads/eed57ca0-9285-4130-a053-d65b3e140e53.png"
+                  alt="ICE Smart SOS Button with packaging and accessories"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-6 left-6 right-6 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <h3 className="text-lg font-semibold text-white mb-2">Complete Package</h3>
+                <p className="text-sm text-white/80">Everything you need to get started</p>
+              </div>
+            </div>
+
+            {/* Card View */}
+            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-muted/30 to-background shadow-xl hover:shadow-2xl transition-all duration-500">
+              <div className="aspect-square p-8">
+                <img
+                  src="/lovable-uploads/fc8e5cbc-2145-4857-81a9-17c7795350c1.png"
+                  alt="ICE Smart SOS Button with product card and keyring"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-6 left-6 right-6 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <h3 className="text-lg font-semibold text-white mb-2">Premium Design</h3>
+                <p className="text-sm text-white/80">Elegant and functional</p>
+              </div>
+            </div>
+
+            {/* White Pendant View */}
+            <div className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 to-emergency/10 shadow-xl hover:shadow-2xl transition-all duration-500">
+              <div className="aspect-square p-8">
+                <img
+                  src="/lovable-uploads/5c1a45e0-5a70-4691-bc64-550668fe6e0f.png"
+                  alt="ICE Smart SOS Button white pendant on lanyard"
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-6 left-6 right-6 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <h3 className="text-lg font-semibold text-white mb-2">Wearable Safety</h3>
+                <p className="text-sm text-white/80">Comfortable daily wear</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Key Features Grid */}
+          <div className="grid md:grid-cols-4 gap-6">
+            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors">
+              <Zap className="h-12 w-12 text-emergency mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Instant Activation</h3>
+              <p className="text-sm text-muted-foreground">One-button emergency alert</p>
+            </Card>
+            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors">
+              <Clock className="h-12 w-12 text-primary mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">7-Day Battery</h3>
+              <p className="text-sm text-muted-foreground">Long-lasting reliability</p>
+            </Card>
+            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors">
+              <Droplets className="h-12 w-12 text-guardian mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Waterproof</h3>
+              <p className="text-sm text-muted-foreground">IP67 rated protection</p>
+            </Card>
+            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors">
+              <Heart className="h-12 w-12 text-emergency mx-auto mb-4" />
+              <h3 className="font-semibold mb-2">Peace of Mind</h3>
+              <p className="text-sm text-muted-foreground">Always connected to help</p>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* How it Works Section */}
+      <section id="how-it-works" className="py-20 bg-secondary/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">How it Works</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Simple setup, powerful protection. Get emergency help with just one button press.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-emergency flex items-center justify-center text-white font-bold text-lg">1</div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Pair & Setup</h3>
+                  <p className="text-muted-foreground">Connect the pendant to your phone via Bluetooth in the ICE SOS Lite app. Quick 2-minute setup.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-emergency flex items-center justify-center text-white font-bold text-lg">2</div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Wear Anywhere</h3>
+                  <p className="text-muted-foreground">Attach to clothing, wear as a pendant, or keep on your keyring. Comfortable for daily use.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-emergency flex items-center justify-center text-white font-bold text-lg">3</div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">One-Button Alert</h3>
+                  <p className="text-muted-foreground">Press once to trigger SOS. Your emergency contacts receive instant alerts with your location.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-emergency flex items-center justify-center text-white font-bold text-lg">4</div>
+                <div>
+                  <h3 className="text-xl font-semibold mb-2">Help Arrives</h3>
+                  <p className="text-muted-foreground">Emergency responders receive your GPS location and critical medical information instantly.</p>
+                </div>
+              </div>
+
+              <div className="pt-6">
+                <Button size="lg" className="w-full md:w-auto" asChild disabled={comingSoon}>
                   {comingSoon ? (
-                    <span>{t('common.comingSoon', { defaultValue: 'Coming Soon' })}</span>
+                    <span>Coming Soon</span>
                   ) : (
-                    <Link to="/ai-register">Get the pendant</Link>
+                    <Link to="/ai-register">Get Your ICE Pendant - €59.99</Link>
                   )}
                 </Button>
               </div>
             </div>
-            <Card>
+
+            {/* Visual representation */}
+            <div className="relative">
+              <div className="w-full max-w-md mx-auto aspect-square relative">
+                {/* Bluetooth connection rings */}
+                <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping" />
+                <div className="absolute inset-4 rounded-full border-2 border-primary/50 animate-ping" style={{ animationDelay: '0.5s' }} />
+                <div className="absolute inset-8 rounded-full border-2 border-primary/70 animate-ping" style={{ animationDelay: '1s' }} />
+                
+                {/* Center device */}
+                <div className="absolute inset-1/3 rounded-full bg-gradient-to-br from-white to-muted border-4 border-primary/20 shadow-2xl flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="w-8 h-8 rounded-full bg-emergency mb-2 mx-auto animate-pulse" />
+                    <p className="text-xs font-semibold">SOS</p>
+                  </div>
+                </div>
+                
+                {/* Connection indicators */}
+                <div className="absolute top-4 right-4 w-16 h-16 rounded-full bg-gradient-to-br from-guardian/20 to-guardian/10 flex items-center justify-center">
+                  <Smartphone className="h-8 w-8 text-guardian" />
+                </div>
+                <div className="absolute bottom-4 left-4 w-16 h-16 rounded-full bg-gradient-to-br from-emergency/20 to-emergency/10 flex items-center justify-center">
+                  <PhoneCall className="h-8 w-8 text-emergency" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tech Specs */}
+      <section className="py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">
+            Technical Specifications
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="shadow-lg border-2 border-primary/10 hover:border-primary/30 transition-colors">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold">Key features</h3>
-                <ul className="mt-4 grid gap-3">
-                  {features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <f.icon className="h-5 w-5 text-primary mt-0.5" />
-                      <span className="text-sm text-muted-foreground">{f.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Instant Alerts card with phone analytics */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-3xl bg-background rounded-3xl shadow-xl border border-border p-8 text-center">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Every Second Counts</p>
-            <h2 className="mt-2 text-2xl md:text-3xl font-semibold">Instant Alerts for Faster Emergency Response</h2>
-            <p className="mt-3 text-muted-foreground">
-              ICE SOS Lite sends instant alerts to your trusted contacts and responders with location and essential health info,
-              reducing response times when it matters most.
-            </p>
-            <div className="mt-6 flex justify-center">
-              <div className="relative w-80 md:w-96 aspect-[4/3] bg-muted/20 rounded-2xl p-4 shadow-lg border border-border">
-                <div className="h-full rounded-xl bg-background p-4 shadow-inner">
-                  <div className="mb-3 text-center">
-                    <p className="text-xs text-muted-foreground">Emergency Response Times</p>
-                    <p className="text-sm font-medium">Daily Alert Volume</p>
-                  </div>
-                  <ChartContainer className="h-32 w-full" config={{ alerts: { color: "hsl(var(--emergency))" } }}>
-                    <AreaChart data={alertData} margin={{ left: 5, right: 5, top: 5, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                      <XAxis dataKey="time" tick={{ fontSize: 10 }} />
-                      <YAxis tick={{ fontSize: 10 }} />
-                      <Area type="monotone" dataKey="alerts" stroke="var(--color-alerts)" fill="var(--color-alerts)" fillOpacity={0.2} strokeWidth={2} />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                    </AreaChart>
-                  </ChartContainer>
-                  <p className="mt-2 text-xs text-center text-muted-foreground">Real-time monitoring active</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-secondary/30">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-semibold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">Tech specs</h2>
-          <div className="mt-6 grid md:grid-cols-3 gap-6">
-            <Card className="shadow-md border-border">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <Bluetooth className="h-5 w-5 text-primary mt-0.5" />
+                <div className="flex items-start gap-4">
+                  <Bluetooth className="h-8 w-8 text-primary mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Connectivity</p>
-                    <p className="text-sm text-muted-foreground">Bluetooth 5.0 LE, quick pairing</p>
+                    <h3 className="font-semibold text-lg mb-2">Connectivity</h3>
+                    <p className="text-muted-foreground">Bluetooth 5.0 LE</p>
+                    <p className="text-muted-foreground">Quick pairing</p>
+                    <p className="text-muted-foreground">100m range</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="shadow-md border-border">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <Battery className="h-5 w-5 text-primary mt-0.5" />
+            
+            <Card className="shadow-lg border-2 border-primary/10 hover:border-primary/30 transition-colors">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <Battery className="h-8 w-8 text-guardian mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Battery</p>
-                    <p className="text-sm text-muted-foreground">Rechargeable, up to 7 days typical use</p>
+                    <h3 className="font-semibold text-lg mb-2">Power</h3>
+                    <p className="text-muted-foreground">Rechargeable battery</p>
+                    <p className="text-muted-foreground">7 days typical use</p>
+                    <p className="text-muted-foreground">USB-C charging</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
-            <Card className="shadow-md border-border">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <Droplets className="h-5 w-5 text-primary mt-0.5" />
+            
+            <Card className="shadow-lg border-2 border-primary/10 hover:border-primary/30 transition-colors">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <Shield className="h-8 w-8 text-emergency mt-1" />
                   <div>
-                    <p className="font-medium text-foreground">Durability</p>
-                    <p className="text-sm text-muted-foreground">IP67 water and dust resistance</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="shadow-md border-border">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium text-foreground">Range</p>
-                    <p className="text-sm text-muted-foreground">Up to 100 meters from paired phone</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="shadow-md border-border">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <Smartphone className="h-5 w-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium text-foreground">Compatibility</p>
-                    <p className="text-sm text-muted-foreground">Works with ICE SOS Lite app on iOS and Android</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="shadow-md border-border">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-3">
-                  <Shield className="h-5 w-5 text-primary mt-0.5" />
-                  <div>
-                    <p className="font-medium text-foreground">What’s included</p>
-                    <p className="text-sm text-muted-foreground">Pendant, charging cable, quick start guide</p>
+                    <h3 className="font-semibold text-lg mb-2">Durability</h3>
+                    <p className="text-muted-foreground">IP67 waterproof</p>
+                    <p className="text-muted-foreground">Shock resistant</p>
+                    <p className="text-muted-foreground">Premium materials</p>
                   </div>
                 </div>
               </CardContent>
@@ -290,149 +363,36 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
-      {/* Feature ring visuals */}
-      <section className="py-20 bg-gradient-to-br from-secondary/10 via-background to-primary/5 relative overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(var(--primary-rgb),0.1),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(var(--emergency-rgb),0.1),transparent_50%)]" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-emergency to-guardian bg-clip-text text-transparent mb-4">
-              ICE SOS Lite pendant — built for all needs
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-primary/10 via-emergency/5 to-guardian/10">
+        <div className="container mx-auto px-4 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Ready for Ultimate Peace of Mind?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Durable design with flexible wearing options and low‑energy connectivity for reliable, instant activation.
+            <p className="text-xl text-muted-foreground mb-8">
+              Join thousands who trust ICE SOS Lite for their emergency protection. Get your Smart SOS Button today.
             </p>
-          </div>
-
-          <div className="relative mx-auto mt-12 max-w-4xl">
-            <div className="relative grid place-items-center">
-              {/* Enhanced concentric rings with gradients */}
-              <div className="w-80 h-80 md:w-96 md:h-96 rounded-full border-2 border-gradient-to-r from-primary/30 to-emergency/30 bg-gradient-to-br from-background via-muted/20 to-background shadow-2xl animate-pulse" style={{animationDuration: '4s'}} />
-              <div className="absolute w-52 h-52 md:w-64 md:h-64 rounded-full border border-primary/40 bg-gradient-to-br from-muted/30 to-background shadow-inner" />
-
-              {/* Enhanced center token */}
-              <div className="absolute w-28 h-28 md:w-32 md:h-32 rounded-full bg-gradient-to-br from-white via-muted/50 to-white border-2 border-primary/30 shadow-2xl grid place-items-center group hover:scale-105 transition-transform duration-300">
-                <div className="text-center">
-                  <Shield className="h-6 w-6 md:h-8 md:w-8 text-primary mx-auto mb-1" />
-                  <span className="text-xs md:text-sm font-bold text-foreground">ICE SOS</span>
-                </div>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-emergency/20 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-
-              {/* Enhanced floating badges with improved colors and effects */}
-              <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-emergency to-emergency-glow text-white rounded-2xl border border-emergency/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <span className="inline-flex items-center gap-2 font-semibold">
-                  <Battery className="h-4 w-4" />7‑day battery
-                </span>
-              </div>
-              
-              <div className="absolute top-1/2 -right-6 -translate-y-1/2 bg-gradient-to-r from-primary to-primary-glow text-white rounded-2xl border border-primary/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <span className="inline-flex items-center gap-2 font-semibold">
-                  <Shield className="h-4 w-4" />Secure fit
-                </span>
-              </div>
-              
-              <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-gradient-to-r from-guardian to-guardian-glow text-white rounded-2xl border border-guardian/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <span className="inline-flex items-center gap-2 font-semibold">
-                  <MapPin className="h-4 w-4" />Accurate location
-                </span>
-              </div>
-              
-              <div className="absolute top-1/2 -left-6 -translate-y-1/2 bg-gradient-to-r from-wellness to-wellness-glow text-white rounded-2xl border border-wellness/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <span className="inline-flex items-center gap-2 font-semibold">
-                  <Bluetooth className="h-4 w-4" />BLE connectivity
-                </span>
-              </div>
-              
-              <div className="absolute top-8 left-8 bg-gradient-to-r from-blue to-blue-glow text-white rounded-2xl border border-blue/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <span className="inline-flex items-center gap-2 font-semibold">
-                  <Check className="h-4 w-4" />Reliable & fast
-                </span>
-              </div>
-              
-              <div className="absolute top-8 right-8 bg-gradient-to-r from-green to-green-glow text-white rounded-2xl border border-green/30 px-4 py-2 text-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <span className="inline-flex items-center gap-2 font-semibold">
-                  <Droplets className="h-4 w-4" />IP67 waterproof
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Enhanced accessory cards with colorful gradients */}
-          <div className="mt-16 grid md:grid-cols-3 gap-6">
-            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 hover:border-primary/40 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-glow rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Shield className="h-6 w-6 text-white" />
-                </div>
-                <p className="font-semibold text-lg text-foreground">Wristband</p>
-                <p className="text-sm text-muted-foreground mt-1">Comfortable everyday wear</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-emergency/5 to-emergency/10 border-emergency/20 hover:border-emergency/40 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-emergency to-emergency-glow rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Check className="h-6 w-6 text-white" />
-                </div>
-                <p className="font-semibold text-lg text-foreground">Clip</p>
-                <p className="text-sm text-muted-foreground mt-1">Attach to clothing or belts</p>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-gradient-to-br from-guardian/5 to-guardian/10 border-guardian/20 hover:border-guardian/40 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-              <CardContent className="p-6 text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-guardian to-guardian-glow rounded-full flex items-center justify-center mx-auto mb-3">
-                  <MapPin className="h-6 w-6 text-white" />
-                </div>
-                <p className="font-semibold text-lg text-foreground">Keyring</p>
-                <p className="text-sm text-muted-foreground mt-1">Keep it with your keys</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Brand strip - only our logo */}
-      <section className="py-10">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-xl text-center">
-            <p className="text-xs uppercase tracking-wide text-muted-foreground">Brand</p>
-            <img
-              src="/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png"
-              alt="ICE SOS Lite brand logo"
-              className="mx-auto h-12 md:h-14 object-contain"
-              loading="lazy"
-            />
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-semibold">Safety you can trust</h2>
-              <p className="mt-4 text-muted-foreground">
-                The ICE SOS Bluetooth Pendant is purpose-built for reliability. It’s a simple, tactile way to trigger an SOS when
-                reaching for your phone isn’t practical. Perfect for independent living, outdoor activities, or added assurance at
-                home and on the go.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Button asChild className="shadow-glow">
-                <Link to="/ai-register">Buy now</Link>
-              </Button>
-              <Button variant="outline" asChild className="shadow-md">
-                <Link to="/">Back to home</Link>
-              </Button>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              {comingSoon ? (
+                <Badge className="px-8 py-4 text-lg font-semibold bg-secondary text-white">Coming Soon</Badge>
+              ) : (
+                <>
+                  <Button size="lg" className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-emergency to-primary hover:from-emergency/90 hover:to-primary/90 shadow-xl" asChild>
+                    <Link to="/ai-register">Order Now - €59.99</Link>
+                  </Button>
+                  <div className="text-sm text-muted-foreground">
+                    <Check className="h-4 w-4 inline mr-2 text-green-600" />
+                    Free shipping • 30-day guarantee • 24/7 support
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
       </section>
-    </main>
+
+      </main>
       <Footer />
     </div>
   );
