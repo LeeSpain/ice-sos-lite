@@ -2161,6 +2161,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      get_communication_metrics_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          date: string
+          channel: string
+          total_conversations: number
+          total_messages: number
+          avg_response_time: number
+          avg_resolution_time: number
+        }[]
+      }
       get_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
