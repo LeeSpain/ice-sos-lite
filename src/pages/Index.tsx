@@ -6,6 +6,7 @@ import Features from "@/components/Features";
 // import MetricPreview from "@/components/MetricPreview";
 import Pricing from "@/components/Pricing";
 
+import FamilyCarerAccess from "@/components/FamilyCarerAccess";
 import AppDownload from "@/components/AppDownload";
 import Footer from "@/components/Footer";
 import { useScrollToTop } from '@/hooks/useScrollToTop';
@@ -49,6 +50,8 @@ const Index = () => {
       {/* <MetricPreview /> */}
 
       {/* Live App Preview Section (reflects admin "App Testing" settings) */}
+      <FamilyCarerAccess />
+
       <AppPreviewSection />
 
       <Pricing />
