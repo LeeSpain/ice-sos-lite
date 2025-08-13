@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
@@ -7,15 +7,13 @@ const DashboardRedirect = () => {
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading, isAdmin } = useUserRole();
 
-  console.log('🔄 DashboardRedirect Debug:', {
+  console.log('🔄 DashboardRedirect:', {
     user: user?.id || 'none',
-    email: user?.email || 'none',
     role,
     isAdmin,
     authLoading,
     roleLoading,
-    currentPath: window.location.pathname,
-    timestamp: new Date().toISOString()
+    currentPath: window.location.pathname
   });
 
   // Show loading while checking authentication and role

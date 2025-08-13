@@ -27,8 +27,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   React.useEffect(() => {
     let mounted = true;
+    let initialSessionLoaded = false;
 
-    // Get initial session first
+    // Get initial session first with proper error handling
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -36,37 +37,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.error('Error getting session:', error);
         }
         
-        if (mounted) {
+        if (mounted && !initialSessionLoaded) {
+          initialSessionLoaded = true;
           setSession(session);
           setUser(session?.user ?? null);
           setLoading(false);
+          console.log('✅ Initial session loaded:', session?.user?.id || 'no user');
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
-        if (mounted) {
+        if (mounted && !initialSessionLoaded) {
+          initialSessionLoaded = true;
           setLoading(false);
         }
       }
     };
 
-    // Set up auth state listener
+    // Set up auth state listener with proper guards
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
         
-        console.log('Auth state changed:', event, session?.user?.id);
+        console.log('🔄 Auth state changed:', event, session?.user?.id || 'no user');
         
-        // Skip INITIAL_SESSION to avoid double-setting
+        // Skip INITIAL_SESSION to avoid double-setting from getInitialSession
         if (event === 'INITIAL_SESSION') {
           return;
         }
         
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Handle email confirmation status
-        if (session?.user && !session.user.email_confirmed_at) {
-          console.log('⚠️ User email not confirmed:', session.user.email);
+        // Only update state if we have a meaningful change
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          setSession(session);
+          setUser(session?.user ?? null);
+          
+          // Handle email confirmation status
+          if (session?.user && !session.user.email_confirmed_at) {
+            console.log('⚠️ User email not confirmed:', session.user.email);
+          }
         }
       }
     );

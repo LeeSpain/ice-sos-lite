@@ -11,8 +11,7 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
   const { user, loading: authLoading } = useAuth();
   const { role, loading: roleLoading, isAdmin } = useUserRole();
 
-  // Debug logging
-  console.log('🔐 AdminProtectedRoute Debug:', {
+  console.log('🔐 AdminProtectedRoute:', {
     user: user?.id || 'none',
     role,
     isAdmin,

@@ -10,11 +10,15 @@ export const useUserRole = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchUserRole = async () => {
       if (!user) {
         console.log('👤 useUserRole: No user found');
-        setRole(null);
-        setLoading(false);
+        if (mounted) {
+          setRole(null);
+          setLoading(false);
+        }
         return;
       }
 
@@ -26,6 +30,8 @@ export const useUserRole = () => {
           .select('role')
           .eq('user_id', user.id)
           .maybeSingle();
+
+        if (!mounted) return;
 
         if (error) {
           console.error('❌ useUserRole: Error fetching user role:', error);
@@ -40,14 +46,22 @@ export const useUserRole = () => {
         }
       } catch (error) {
         console.error('❌ useUserRole: Unexpected error:', error);
-        setRole('user'); // Default to user role on error
+        if (mounted) {
+          setRole('user'); // Default to user role on error
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchUserRole();
-  }, [user]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [user?.id]); // Only depend on user.id, not the entire user object
 
   return {
     role,

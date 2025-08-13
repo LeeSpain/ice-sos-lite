@@ -1,12 +1,256 @@
-import React from "react";
+import React, { useState, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Navigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import useRateLimit from '@/hooks/useRateLimit';
 
 const AuthPage = () => {
+  const { user, loading } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
+  // Rate limiting for auth attempts
+  const {
+    isRateLimited,
+    recordAttempt,
+    getRemainingTime,
+    reset: resetRateLimit
+  } = useRateLimit('auth-attempts', { maxAttempts: 5, windowMs: 15 * 60 * 1000 }); // 5 attempts per 15 minutes
+
+  console.log('🔐 AuthPage render:', { 
+    hasUser: !!user, 
+    loading, 
+    isSubmitting,
+    path: window.location.pathname 
+  });
+
+  // Redirect if already authenticated
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard-redirect" replace />;
+  }
+
+  const handleSignIn = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isRateLimited()) {
+      setError(`Too many attempts. Please wait ${getRemainingTime()} seconds.`);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+
+      if (error) {
+        recordAttempt();
+        throw error;
+      }
+
+      if (data.user) {
+        setSuccess('Sign in successful! Redirecting...');
+        resetRateLimit();
+      }
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      setError(error.message || 'Failed to sign in');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [email, password, isRateLimited, getRemainingTime, recordAttempt, resetRateLimit]);
+
+  const handleSignUp = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isRateLimited()) {
+      setError(`Too many attempts. Please wait ${getRemainingTime()} seconds.`);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: redirectUrl
+        }
+      });
+
+      if (error) {
+        recordAttempt();
+        throw error;
+      }
+
+      if (data.user) {
+        if (data.user.email_confirmed_at) {
+          setSuccess('Account created successfully! Redirecting...');
+          resetRateLimit();
+        } else {
+          setSuccess('Please check your email to confirm your account before signing in.');
+        }
+      }
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      setError(error.message || 'Failed to create account');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [email, password, isRateLimited, getRemainingTime, recordAttempt, resetRateLimit]);
+
+  const clearMessages = useCallback(() => {
+    setError('');
+    setSuccess('');
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
-      <div className="text-white text-center">
-        <h1>Auth Page - Testing</h1>
-        <p>This is a minimal version to debug the infinite render issue.</p>
-      </div>
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Welcome</CardTitle>
+          <CardDescription>Sign in to your account or create a new one</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="signin" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="signin" onClick={clearMessages}>Sign In</TabsTrigger>
+              <TabsTrigger value="signup" onClick={clearMessages}>Sign Up</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="signin">
+              <form onSubmit={handleSignIn} className="space-y-4">
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
+                
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                
+                {success && (
+                  <Alert>
+                    <AlertDescription>{success}</AlertDescription>
+                  </Alert>
+                )}
+                
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isSubmitting || isRateLimited()}
+                >
+                  {isSubmitting ? 'Signing In...' : 'Sign In'}
+                </Button>
+                
+                {isRateLimited() && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    Too many attempts. Try again in {getRemainingTime()} seconds.
+                  </p>
+                )}
+              </form>
+            </TabsContent>
+            
+            <TabsContent value="signup">
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    type="password"
+                    placeholder="Password (min. 6 characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    disabled={isSubmitting}
+                  />
+                </div>
+                
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+                
+                {success && (
+                  <Alert>
+                    <AlertDescription>{success}</AlertDescription>
+                  </Alert>
+                )}
+                
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  disabled={isSubmitting || isRateLimited()}
+                >
+                  {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                </Button>
+                
+                {isRateLimited() && (
+                  <p className="text-sm text-muted-foreground text-center">
+                    Too many attempts. Try again in {getRemainingTime()} seconds.
+                  </p>
+                )}
+              </form>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
