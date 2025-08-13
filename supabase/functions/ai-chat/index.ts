@@ -119,6 +119,25 @@ serve(async (req) => {
         }
       });
 
+    // Get active training data for enhanced knowledge
+    const { data: trainingData } = await supabase
+      .from('training_data')
+      .select('question, answer, category')
+      .eq('status', 'active')
+      .order('confidence_score', { ascending: false })
+      .limit(50);
+
+    // Build enhanced knowledge base
+    let enhancedKnowledge = ICE_SOS_KNOWLEDGE;
+    
+    if (trainingData && trainingData.length > 0) {
+      const trainingContent = trainingData.map(item => 
+        `Q: ${item.question}\nA: ${item.answer}`
+      ).join('\n\n');
+      
+      enhancedKnowledge += `\n\nADDITIONAL TRAINING DATA:\n${trainingContent}\n\nUse this training data to provide more accurate and detailed responses when relevant.`;
+    }
+
     // Build conversation context
     const conversationContext = conversationHistory?.map(msg => ({
       role: msg.message_type === 'user' ? 'user' : 'assistant',
@@ -129,7 +148,7 @@ serve(async (req) => {
     const messages = [
       {
         role: 'system',
-        content: ICE_SOS_KNOWLEDGE
+        content: enhancedKnowledge
       },
       ...conversationContext,
       {
@@ -169,6 +188,26 @@ serve(async (req) => {
         message_type: 'ai',
         content: aiResponse
       });
+
+    // Update usage statistics for training data that might have been used
+    if (trainingData && trainingData.length > 0) {
+      // Simple keyword matching to identify which training data was likely used
+      const usedTrainingItems = trainingData.filter(item => 
+        aiResponse.toLowerCase().includes(item.answer.toLowerCase().slice(0, 20)) ||
+        message.toLowerCase().includes(item.question.toLowerCase().slice(0, 20))
+      );
+
+      for (const item of usedTrainingItems) {
+        await supabase
+          .from('training_data')
+          .update({
+            usage_count: item.usage_count ? item.usage_count + 1 : 1,
+            last_used_at: new Date().toISOString()
+          })
+          .eq('question', item.question)
+          .eq('answer', item.answer);
+      }
+    }
 
     // Analyze conversation for lead scoring
     const isShowingInterest = /\b(interested|price|cost|sign up|subscribe|family|emergency|elderly|relative|parent|protection|safety)\b/i.test(message);

@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Database, 
   Brain, 
@@ -19,7 +20,8 @@ import {
   MessageSquare,
   TrendingUp,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
 
 interface TrainingData {
@@ -42,6 +44,14 @@ export default function AITrainingPage() {
   const [newAnswer, setNewAnswer] = useState('');
   const [newCategory, setNewCategory] = useState('general');
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editQuestion, setEditQuestion] = useState('');
+  const [editAnswer, setEditAnswer] = useState('');
+  const [editCategory, setEditCategory] = useState('general');
+  const [editStatus, setEditStatus] = useState('pending');
+  const [testMessage, setTestMessage] = useState('');
+  const [testLoading, setTestLoading] = useState(false);
+  const { toast } = useToast();
 
   // Now using real database operations with training_data table
 
@@ -106,6 +116,105 @@ export default function AITrainingPage() {
       setTrainingData(trainingData.filter(item => item.id !== id));
     } catch (error) {
       console.error('Error deleting training data:', error);
+    }
+  };
+
+  const startEdit = (item: TrainingData) => {
+    setEditingId(item.id);
+    setEditQuestion(item.question);
+    setEditAnswer(item.answer);
+    setEditCategory(item.category);
+    setEditStatus(item.status);
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditQuestion('');
+    setEditAnswer('');
+    setEditCategory('general');
+    setEditStatus('pending');
+  };
+
+  const saveEdit = async () => {
+    if (!editingId || !editQuestion || !editAnswer) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('training_data')
+        .update({
+          question: editQuestion,
+          answer: editAnswer,
+          category: editCategory,
+          status: editStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setTrainingData(trainingData.map(item => 
+        item.id === editingId ? data : item
+      ));
+      
+      cancelEdit();
+    } catch (error) {
+      console.error('Error updating training data:', error);
+    }
+  };
+
+  const updateStatus = async (id: string, newStatus: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('training_data')
+        .update({ status: newStatus })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setTrainingData(trainingData.map(item => 
+        item.id === id ? data : item
+      ));
+    } catch (error) {
+      console.error('Error updating status:', error);
+    }
+  };
+
+  const testEmmaConnection = async () => {
+    if (!testMessage.trim()) return;
+
+    try {
+      setTestLoading(true);
+      
+      const { data, error } = await supabase.functions.invoke('ai-chat', {
+        body: {
+          message: testMessage,
+          sessionId: `admin-test-${Date.now()}`,
+          userId: null,
+          context: 'admin-training-test'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "✅ Emma Connection Test Successful",
+        description: `Emma responded: "${data.response?.slice(0, 100)}..."`,
+      });
+
+      setTestMessage('');
+    } catch (error) {
+      console.error('Error testing Emma:', error);
+      toast({
+        title: "❌ Emma Connection Test Failed",
+        description: "Unable to connect to Emma. Check the AI Chat edge function.",
+        variant: "destructive"
+      });
+    } finally {
+      setTestLoading(false);
     }
   };
 
@@ -291,68 +400,186 @@ export default function AITrainingPage() {
         <CardContent>
           <ScrollArea className="h-[600px]">
             <Table>
-              <TableHeader>
+                <TableHeader>
                 <TableRow>
                   <TableHead>Status</TableHead>
                   <TableHead>Question</TableHead>
                   <TableHead>Answer</TableHead>
                   <TableHead>Category</TableHead>
+                  <TableHead>Usage</TableHead>
                   <TableHead>Updated</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {trainingData.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(item.status)}
-                        <Badge className={getStatusColor(item.status)}>
-                          {item.status}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="max-w-xs">
-                        <p className="font-medium truncate">{item.question}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="max-w-md">
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {item.answer}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
-                        {item.category}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(item.updated_at).toLocaleDateString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => deleteTrainingData(item.id)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {trainingData.map((item) => 
+                  editingId === item.id ? (
+                   <TableRow key={item.id}>
+                     <TableCell>
+                       <select 
+                         value={editStatus}
+                         onChange={(e) => setEditStatus(e.target.value)}
+                         className="p-1 border rounded text-xs"
+                       >
+                         <option value="pending">Pending</option>
+                         <option value="active">Active</option>
+                         <option value="disabled">Disabled</option>
+                       </select>
+                     </TableCell>
+                     <TableCell>
+                       <Input
+                         value={editQuestion}
+                         onChange={(e) => setEditQuestion(e.target.value)}
+                         className="min-w-[200px]"
+                       />
+                     </TableCell>
+                     <TableCell>
+                       <Textarea
+                         value={editAnswer}
+                         onChange={(e) => setEditAnswer(e.target.value)}
+                         className="min-w-[300px] min-h-[60px]"
+                         rows={2}
+                       />
+                     </TableCell>
+                     <TableCell>
+                       <select 
+                         value={editCategory}
+                         onChange={(e) => setEditCategory(e.target.value)}
+                         className="p-1 border rounded text-xs"
+                       >
+                         {categories.map(category => (
+                           <option key={category} value={category}>
+                             {category.charAt(0).toUpperCase() + category.slice(1)}
+                           </option>
+                         ))}
+                       </select>
+                     </TableCell>
+                     <TableCell>
+                       <div className="text-center text-sm text-muted-foreground">
+                         Editing...
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className="text-sm text-muted-foreground">
+                         {new Date(item.updated_at).toLocaleDateString()}
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className="flex gap-1">
+                         <Button variant="outline" size="sm" onClick={saveEdit}>
+                           <CheckCircle className="h-3 w-3" />
+                         </Button>
+                         <Button variant="outline" size="sm" onClick={cancelEdit}>
+                           <X className="h-3 w-3" />
+                         </Button>
+                       </div>
+                     </TableCell>
+                   </TableRow>
+                 ) : (
+                   <TableRow key={item.id}>
+                     <TableCell>
+                       <div className="flex items-center gap-2">
+                         {getStatusIcon(item.status)}
+                         <Badge 
+                           className={`${getStatusColor(item.status)} cursor-pointer`}
+                           onClick={() => {
+                             const newStatus = item.status === 'active' ? 'pending' : 
+                                             item.status === 'pending' ? 'disabled' : 'active';
+                             updateStatus(item.id, newStatus);
+                           }}
+                         >
+                           {item.status}
+                         </Badge>
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className="max-w-xs">
+                         <p className="font-medium truncate">{item.question}</p>
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className="max-w-md">
+                         <p className="text-sm text-muted-foreground line-clamp-2">
+                           {item.answer}
+                         </p>
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <Badge variant="outline">
+                         {item.category}
+                       </Badge>
+                     </TableCell>
+                     <TableCell>
+                       <div className="text-center">
+                         <div className="text-sm font-medium">{item.usage_count || 0}</div>
+                         {item.last_used_at && (
+                           <div className="text-xs text-muted-foreground">
+                             {new Date(item.last_used_at).toLocaleDateString()}
+                           </div>
+                         )}
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className="text-sm text-muted-foreground">
+                         {new Date(item.updated_at).toLocaleDateString()}
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className="flex gap-2">
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => startEdit(item)}
+                         >
+                           <Edit className="h-3 w-3" />
+                         </Button>
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => deleteTrainingData(item.id)}
+                         >
+                           <Trash2 className="h-3 w-3" />
+                         </Button>
+                       </div>
+                     </TableCell>
+                   </TableRow>
+                  )
+                )}
               </TableBody>
             </Table>
           </ScrollArea>
+        </CardContent>
+      </Card>
+
+      {/* Test Emma Connection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="h-5 w-5" />
+            Test Emma Connection
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Test if Emma can use the training data you've added. Try asking a question that should be covered by your training examples.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                value={testMessage}
+                onChange={(e) => setTestMessage(e.target.value)}
+                placeholder="Ask Emma a question to test the training data..."
+                onKeyPress={(e) => e.key === 'Enter' && testEmmaConnection()}
+                disabled={testLoading}
+              />
+              <Button 
+                onClick={testEmmaConnection}
+                disabled={!testMessage.trim() || testLoading}
+              >
+                {testLoading ? 'Testing...' : 'Test Emma'}
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
@@ -368,20 +595,23 @@ export default function AITrainingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-6 rounded-lg bg-blue-50 border border-blue-200">
               <MessageSquare className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <h3 className="font-semibold text-blue-900 mb-1">Most Asked</h3>
-              <p className="text-sm text-blue-700">"What is ICE SOS Lite?"</p>
+              <h3 className="font-semibold text-blue-900 mb-1">Most Used</h3>
+              <p className="text-sm text-blue-700">
+                {trainingData
+                  .sort((a, b) => (b.usage_count || 0) - (a.usage_count || 0))[0]?.question?.slice(0, 30) + "..." || "No data yet"}
+              </p>
             </div>
             
             <div className="text-center p-6 rounded-lg bg-green-50 border border-green-200">
               <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <h3 className="font-semibold text-green-900 mb-1">Best Coverage</h3>
-              <p className="text-sm text-green-700">Product & Pricing questions</p>
+              <h3 className="font-semibold text-green-900 mb-1">Active Training</h3>
+              <p className="text-sm text-green-700">{stats.active} examples ready for Emma</p>
             </div>
             
             <div className="text-center p-6 rounded-lg bg-yellow-50 border border-yellow-200">
               <AlertCircle className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-              <h3 className="font-semibold text-yellow-900 mb-1">Needs Attention</h3>
-              <p className="text-sm text-yellow-700">Technical support topics</p>
+              <h3 className="font-semibold text-yellow-900 mb-1">Needs Review</h3>
+              <p className="text-sm text-yellow-700">{stats.pending} examples pending approval</p>
             </div>
           </div>
         </CardContent>
