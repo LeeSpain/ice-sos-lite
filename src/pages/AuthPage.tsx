@@ -8,10 +8,10 @@ import { Shield, Mail, Lock, ArrowLeft, Phone, User, Smartphone, QrCode } from "
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
 import QRCode from 'qrcode';
-import { useScrollToTop } from '@/hooks/useScrollToTop';
+// import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 const AuthPage = () => {
-  useScrollToTop();
+  // useScrollToTop(); // Temporarily disabled to debug infinite render
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -49,7 +49,7 @@ const AuthPage = () => {
       }
     };
     generateQRCodes();
-  }, [iosUrl, androidUrl]);
+  }, []); // Removed dependencies to prevent re-runs
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
