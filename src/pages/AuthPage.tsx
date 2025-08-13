@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
 import QRCode from 'qrcode';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import useRateLimit from '@/hooks/useRateLimit';
+// import useRateLimit from '@/hooks/useRateLimit';
 
 const AuthPage = () => {
   useScrollToTop();
@@ -25,11 +25,11 @@ const AuthPage = () => {
   const [androidQr, setAndroidQr] = useState("");
   const navigate = useNavigate();
 
-  // Rate limiting for auth attempts - using useMemo to prevent recreation
-  const signInConfig = useMemo(() => ({ maxAttempts: 5, windowMs: 15 * 60 * 1000 }), []); // 5 attempts per 15 minutes
-  const signUpConfig = useMemo(() => ({ maxAttempts: 3, windowMs: 60 * 60 * 1000 }), []); // 3 attempts per hour
-  const signInRateLimit = useRateLimit('signIn', signInConfig);
-  const signUpRateLimit = useRateLimit('signUp', signUpConfig);
+  // Temporarily disable rate limiting to fix infinite render
+  // const signInConfig = useMemo(() => ({ maxAttempts: 5, windowMs: 15 * 60 * 1000 }), []); 
+  // const signUpConfig = useMemo(() => ({ maxAttempts: 3, windowMs: 60 * 60 * 1000 }), []);
+  // const signInRateLimit = useRateLimit('signIn', signInConfig);
+  // const signUpRateLimit = useRateLimit('signUp', signUpConfig);
 
   // App store URLs
   const iosUrl = "https://apps.apple.com/app/ice-sos-lite/id123456789";
@@ -64,12 +64,12 @@ const AuthPage = () => {
     setError("");
     setMessage("");
 
-    // Check rate limiting
-    if (signUpRateLimit.isRateLimited()) {
-      setError(`Too many sign-up attempts. Please wait ${signUpRateLimit.getRemainingTime()} seconds before trying again.`);
-      setLoading(false);
-      return;
-    }
+    // Rate limiting temporarily disabled
+    // if (signUpRateLimit.isRateLimited()) {
+    //   setError(`Too many sign-up attempts. Please wait ${signUpRateLimit.getRemainingTime()} seconds before trying again.`);
+    //   setLoading(false);
+    //   return;
+    // }
 
     try {
       // Validate password strength
@@ -99,7 +99,7 @@ const AuthPage = () => {
       });
 
       if (authError) {
-        signUpRateLimit.recordAttempt();
+        // signUpRateLimit.recordAttempt();
         if (authError.message.includes("already registered")) {
           setError("This email is already registered. Please try signing in instead.");
         } else {
@@ -143,12 +143,12 @@ const AuthPage = () => {
     setError("");
     setMessage("");
 
-    // Check rate limiting
-    if (signInRateLimit.isRateLimited()) {
-      setError(`Too many sign-in attempts. Please wait ${signInRateLimit.getRemainingTime()} seconds before trying again.`);
-      setLoading(false);
-      return;
-    }
+    // Rate limiting temporarily disabled
+    // if (signInRateLimit.isRateLimited()) {
+    //   setError(`Too many sign-in attempts. Please wait ${signInRateLimit.getRemainingTime()} seconds before trying again.`);
+    //   setLoading(false);
+    //   return;
+    // }
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -157,7 +157,7 @@ const AuthPage = () => {
       });
 
       if (error) {
-        signInRateLimit.recordAttempt();
+        // signInRateLimit.recordAttempt();
         if (error.message.includes("Invalid login credentials")) {
           setError("Invalid email or password. Please check your credentials and try again.");
         } else {
