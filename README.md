@@ -62,7 +62,32 @@ This project is built with:
 
 ## How can I deploy this project?
 
+### Option 1: Deploy via Lovable (Recommended)
 Simply open [Lovable](https://lovable.dev/projects/a856a70f-639b-4212-b411-d2cdb524d754) and click on Share -> Publish.
+
+### Option 2: Deploy to Vercel
+1. Connect your GitHub repository to Vercel
+2. Vercel will automatically detect this as a Vite project
+3. The build settings are configured in `vercel.json`
+4. Set up the following environment variables in Vercel:
+   - Your Supabase URL and keys (if different from development)
+   - Any other production-specific variables
+
+### Option 3: Manual Deployment
+```sh
+# Build the project
+npm run build
+
+# The dist/ folder contains the built application
+# Deploy the contents of dist/ to your hosting provider
+```
+
+### GitHub Integration
+- The `.github/workflows/deploy.yml` file sets up automatic deployment to Vercel
+- Configure the required secrets in your GitHub repository settings:
+  - `VERCEL_TOKEN`
+  - `VERCEL_ORG_ID` 
+  - `VERCEL_PROJECT_ID`
 
 ## Can I connect a custom domain to my Lovable project?
 
