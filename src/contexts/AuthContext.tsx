@@ -28,29 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   React.useEffect(() => {
     let mounted = true;
 
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
-        
-        console.log('Auth state changed:', event, session?.user?.id);
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Handle email confirmation status
-        if (session?.user && !session.user.email_confirmed_at) {
-          console.log('⚠️ User email not confirmed:', session.user.email);
-        }
-        
-        // Only set loading to false after we've processed the auth change
-        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-          setLoading(false);
-        }
-      }
-    );
-
-    // THEN check for existing session
+    // Get initial session first
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -70,6 +48,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
     };
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!mounted) return;
+        
+        console.log('Auth state changed:', event, session?.user?.id);
+        
+        // Skip INITIAL_SESSION to avoid double-setting
+        if (event === 'INITIAL_SESSION') {
+          return;
+        }
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        // Handle email confirmation status
+        if (session?.user && !session.user.email_confirmed_at) {
+          console.log('⚠️ User email not confirmed:', session.user.email);
+        }
+      }
+    );
 
     getInitialSession();
 
