@@ -817,6 +817,8 @@ export type Database = {
           email_address: string | null
           expires_at: string
           id: string
+          last_refreshed_at: string | null
+          refresh_count: number | null
           refresh_token: string
           scope: string
           updated_at: string
@@ -828,6 +830,8 @@ export type Database = {
           email_address?: string | null
           expires_at: string
           id?: string
+          last_refreshed_at?: string | null
+          refresh_count?: number | null
           refresh_token: string
           scope?: string
           updated_at?: string
@@ -839,6 +843,8 @@ export type Database = {
           email_address?: string | null
           expires_at?: string
           id?: string
+          last_refreshed_at?: string | null
+          refresh_count?: number | null
           refresh_token?: string
           scope?: string
           updated_at?: string
@@ -1192,6 +1198,39 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          action_type: string
+          attempt_count: number
+          blocked_until: string | null
+          created_at: string
+          id: string
+          identifier: string
+          updated_at: string
+          window_start: string
+        }
+        Insert: {
+          action_type: string
+          attempt_count?: number
+          blocked_until?: string | null
+          created_at?: string
+          id?: string
+          identifier: string
+          updated_at?: string
+          window_start?: string
+        }
+        Update: {
+          action_type?: string
+          attempt_count?: number
+          blocked_until?: string | null
+          created_at?: string
+          id?: string
+          identifier?: string
+          updated_at?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       regional_services: {
         Row: {
           created_at: string
@@ -1318,6 +1357,42 @@ export type Database = {
           name?: string
           priority?: number | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      security_audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          resource_id: string | null
+          resource_type: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resource_id?: string | null
+          resource_type?: string
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1797,8 +1872,11 @@ export type Database = {
           access_token: string
           business_account_id: string
           created_at: string
+          created_by: string | null
           display_name: string | null
+          encrypted_access_token: string | null
           id: string
+          is_active: boolean
           phone_number: string
           phone_number_id: string
           status: string
@@ -1809,8 +1887,11 @@ export type Database = {
           access_token: string
           business_account_id: string
           created_at?: string
+          created_by?: string | null
           display_name?: string | null
+          encrypted_access_token?: string | null
           id?: string
+          is_active?: boolean
           phone_number: string
           phone_number_id: string
           status?: string
@@ -1821,8 +1902,11 @@ export type Database = {
           access_token?: string
           business_account_id?: string
           created_at?: string
+          created_by?: string | null
           display_name?: string | null
+          encrypted_access_token?: string | null
           id?: string
+          is_active?: boolean
           phone_number?: string
           phone_number_id?: string
           status?: string
