@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Phone, Mic, MicOff } from "lucide-react";
+import { Phone, Mic, MicOff, MapPin, AlertTriangle } from "lucide-react";
 import { useVoiceActivation } from "@/hooks/useVoiceActivation";
 import { useEmergencySOS } from "@/hooks/useEmergencySOS";
 import { useToast } from "@/hooks/use-toast";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
+import { LocationPermissionPrompt } from "@/components/LocationPermissionPrompt";
 
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const SosButton = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
-  const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
+  const { triggerEmergencySOS, isTriggering, locationPermissionGranted, locationPermissionDenied } = useEmergencySOS();
   const { toast } = useToast();
   const defaults = getDefaultAppPreview();
   const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
@@ -53,7 +54,10 @@ const SosButton = () => {
   }, [voiceEnabled, isListening, toast]);
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex flex-col items-center space-y-4 w-full max-w-md mx-auto">
+      {/* Location permission prompt */}
+      <LocationPermissionPrompt />
+      
       {/* Voice Activation Toggle */}
       <div className="flex items-center gap-2 mb-2">
         <Button
@@ -71,6 +75,21 @@ const SosButton = () => {
           </span>
         )}
       </div>
+
+      {/* Location status indicator */}
+      {locationPermissionDenied && (
+        <div className="flex items-center justify-center gap-2 text-sm text-warning">
+          <AlertTriangle className="h-4 w-4" />
+          <span className="text-xs text-center">Location access required for precise emergency alerts</span>
+        </div>
+      )}
+
+      {locationPermissionGranted && (
+        <div className="flex items-center justify-center gap-2 text-sm text-success">
+          <MapPin className="h-4 w-4" />
+          <span className="text-xs text-center">GPS location sharing enabled</span>
+        </div>
+      )}
 
       {/* Main Emergency Button */}
       <Button

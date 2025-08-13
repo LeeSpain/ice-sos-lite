@@ -5,6 +5,9 @@
   "display": "standalone",
   "background_color": "#0b0b0f",
   "theme_color": "#ef4444",
+  "permissions": [
+    "geolocation"
+  ],
   "icons": [
     {
       "src": "/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png",

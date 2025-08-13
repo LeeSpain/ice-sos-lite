@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useLocationServices } from '@/hooks/useLocationServices';
 
 interface EmergencyContact {
   name: string;
@@ -17,6 +18,13 @@ interface EmergencySOSData {
     emergency_contacts: EmergencyContact[];
   };
   location: string;
+  locationData?: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    address?: string;
+    googleMapsLink: string;
+  };
   timestamp: string;
 }
 
@@ -24,23 +32,45 @@ export const useEmergencySOS = () => {
   const [isTriggering, setIsTriggering] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const { getCurrentLocationData, formatLocationForEmergency, permissionState } = useLocationServices();
 
-  const getCurrentLocation = (): Promise<string> => {
-    return new Promise((resolve) => {
+  const getEnhancedLocation = async () => {
+    try {
+      const locationData = await getCurrentLocationData();
+      if (locationData) {
+        return {
+          locationString: formatLocationForEmergency(locationData),
+          locationData: {
+            latitude: locationData.latitude,
+            longitude: locationData.longitude,
+            accuracy: locationData.accuracy,
+            address: locationData.address,
+            googleMapsLink: locationData.googleMapsLink
+          }
+        };
+      }
+    } catch (error) {
+      console.error('Enhanced location failed:', error);
+    }
+    
+    // Fallback to basic location
+    return new Promise<{ locationString: string; locationData?: undefined }>((resolve) => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
-            resolve(`Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`);
+            resolve({ 
+              locationString: `Lat: ${latitude.toFixed(6)}, Lng: ${longitude.toFixed(6)}`,
+            });
           },
           (error) => {
             console.error('Location error:', error);
-            resolve('Location unavailable');
+            resolve({ locationString: 'Location unavailable' });
           },
           { timeout: 10000, enableHighAccuracy: true }
         );
       } else {
-        resolve('Geolocation not supported');
+        resolve({ locationString: 'Geolocation not supported' });
       }
     });
   };
@@ -86,10 +116,15 @@ export const useEmergencySOS = () => {
     try {
       console.log('🚨 Triggering Emergency SOS...');
       
-      // Get user profile and location
-      const [profile, location] = await Promise.all([
+      // Check location permission first
+      if (!permissionState.granted && permissionState.denied) {
+        throw new Error('Location permission required for emergency SOS. Please enable location access in your browser settings.');
+      }
+
+      // Get user profile and enhanced location
+      const [profile, locationResult] = await Promise.all([
         getUserProfile(),
-        getCurrentLocation()
+        getEnhancedLocation()
       ]);
 
       if (!profile.emergency_contacts || profile.emergency_contacts.length === 0) {
@@ -98,7 +133,8 @@ export const useEmergencySOS = () => {
 
       const emergencyData: EmergencySOSData = {
         userProfile: profile,
-        location,
+        location: locationResult.locationString,
+        locationData: locationResult.locationData,
         timestamp: new Date().toISOString()
       };
 
@@ -136,6 +172,8 @@ export const useEmergencySOS = () => {
 
   return {
     triggerEmergencySOS,
-    isTriggering
+    isTriggering,
+    locationPermissionGranted: permissionState.granted,
+    locationPermissionDenied: permissionState.denied
   };
 };

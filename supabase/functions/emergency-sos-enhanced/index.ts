@@ -25,6 +25,13 @@ interface EmergencySOSRequest {
     emergency_contacts: EmergencyContact[];
   };
   location: string;
+  locationData?: {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    address?: string;
+    googleMapsLink: string;
+  };
   timestamp: string;
 }
 
@@ -94,7 +101,21 @@ async function makeTwilioCall(contact: EmergencyContact, incidentId: string, ord
   }
 
   const statusCallbackUrl = `${Deno.env.get("SUPABASE_URL")}/functions/v1/twilio-status-webhook`;
-  const twiml = `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Say voice="Polly.Joanna">This is an emergency alert for ${userName}. Their last known location is: ${location}. If you know their status, please reach out or press any key to acknowledge.</Say>\n  <Pause length="2"/>\n  <Say>If you were not able to answer, the system will contact the next person.</Say>\n</Response>`;
+  
+  // Enhanced location message for voice calls
+  let locationMessage = location;
+  if (location.includes('Lat:') && location.includes('Lng:')) {
+    // Extract coordinates for better voice pronunciation
+    const latMatch = location.match(/Lat:\s*([-\d.]+)/);
+    const lngMatch = location.match(/Lng:\s*([-\d.]+)/);
+    if (latMatch && lngMatch) {
+      const lat = parseFloat(latMatch[1]);
+      const lng = parseFloat(lngMatch[1]);
+      locationMessage = `coordinates latitude ${lat.toFixed(4)}, longitude ${lng.toFixed(4)}. ${location.includes('(') ? location.split('(')[0].trim() : ''}`;
+    }
+  }
+  
+  const twiml = `<?xml version="1.0" encoding="UTF-8"?>\n<Response>\n  <Say voice="Polly.Joanna">Emergency alert! This is an urgent message for ${userName}. They have activated their emergency S.O.S. system. Their last known location is: ${locationMessage}. Please check on them immediately or call them back. If you cannot reach them, consider contacting emergency services. Press any key to acknowledge this message.</Say>\n  <Pause length="3"/>\n  <Say>Repeating: Emergency alert for ${userName}. Check their location and contact them immediately.</Say>\n</Response>`;
 
   const body = toForm({
     To: contact.phone!,
@@ -182,10 +203,40 @@ Deno.serve(async (req: Request) => {
     for (const c of contacts) {
       if (c.email) {
         try {
+          const locationInfo = body.locationData 
+            ? `${body.location}<br><br><strong>📍 <a href="${body.locationData.googleMapsLink}" target="_blank" style="color: #ef4444; text-decoration: none;">View on Google Maps →</a></strong><br><small>Coordinates: ${body.locationData.latitude.toFixed(6)}, ${body.locationData.longitude.toFixed(6)}${body.locationData.accuracy ? ` (±${Math.round(body.locationData.accuracy)}m accuracy)` : ''}</small>`
+            : body.location;
+
+          const emailHTML = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 2px solid #ef4444; border-radius: 8px;">
+              <h2 style="color: #ef4444; margin-top: 0;">🚨 EMERGENCY ALERT</h2>
+              <p style="font-size: 18px; font-weight: bold;">Emergency SOS activated for <strong>${userName}</strong></p>
+              
+              <div style="background-color: #fef2f2; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                <h3 style="color: #dc2626; margin-top: 0;">📍 Location Information:</h3>
+                <p style="margin: 10px 0; font-size: 16px;">${locationInfo}</p>
+              </div>
+              
+              <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                <h3 style="color: #374151; margin-top: 0;">⏰ Alert Details:</h3>
+                <p><strong>Time:</strong> ${new Date(body.timestamp).toLocaleString()}</p>
+                <p><strong>Contact:</strong> ${userName}</p>
+              </div>
+              
+              <div style="background-color: #fee2e2; padding: 15px; border-radius: 6px; border-left: 4px solid #ef4444;">
+                <p style="margin: 0; font-weight: bold; color: #991b1b;">⚠️ This is an automated emergency alert. Please check on ${userName} immediately.</p>
+              </div>
+              
+              <p style="margin-top: 20px; font-size: 14px; color: #6b7280;">
+                Sent by ICE SOS Lite Emergency System
+              </p>
+            </div>
+          `;
+
           await sendEmail(
             c.email,
-            `Emergency alert for ${userName}`,
-            `<p>This is an emergency alert for <strong>${userName}</strong>.</p><p>Last known location: ${body.location}</p><p>Time: ${new Date(body.timestamp).toLocaleString()}</p>`
+            `🚨 EMERGENCY ALERT - ${userName} needs help`,
+            emailHTML
           );
           emailsSent++;
         } catch (e) {

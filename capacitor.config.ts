@@ -23,6 +23,21 @@ const config: CapacitorConfig = {
       splashImmersive: true,
       layoutName: "launch_screen",
       useDialog: true
+    },
+    Geolocation: {
+      // Enable GPS settings for enhanced accuracy
+      enableHighAccuracy: true,
+      timeout: 10000,
+      permissions: {
+        android: [
+          "android.permission.ACCESS_COARSE_LOCATION",
+          "android.permission.ACCESS_FINE_LOCATION"
+        ],
+        ios: [
+          "NSLocationWhenInUseUsageDescription",
+          "NSLocationAlwaysAndWhenInUseUsageDescription"
+        ]
+      }
     }
   }
 };
