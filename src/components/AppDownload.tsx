@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 const AppDownload = () => {
   const { t } = useTranslation();
   return (
-    <section className="py-8 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <section className="py-20 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-8">
