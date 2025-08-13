@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { TermsDialog } from "@/components/legal/TermsDialog";
+import { useTranslation } from "react-i18next";
 
 const Terms: React.FC = () => {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const title = "Terms of Service | ICE SOS Lite";
-  const description = "Terms of Service for ICE SOS Lite emergency SOS app.";
+  const title = `${t('terms.title')} | ICE SOS Lite`;
+  const description = t('terms.description');
   const canonical = "/terms";
 
   // Open dialog automatically when page loads
@@ -35,17 +37,16 @@ const Terms: React.FC = () => {
       {/* Fallback content for SEO and accessibility */}
       <main className="container mx-auto px-4 py-10" style={{ display: dialogOpen ? 'none' : 'block' }}>
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Terms of Service</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('terms.title')}</h1>
           <p className="text-muted-foreground mt-2">
-            Please read these terms carefully before using ICE SOS Lite.
+            {t('terms.description')}
           </p>
         </header>
         <section className="prose prose-invert max-w-none">
           <p>
-            Our comprehensive Terms of Service are displayed in an interactive dialog for better readability. 
-            If you're having trouble viewing the terms, please contact us at 
-            <a href="mailto:icesoslite@gmail.com" className="text-primary hover:underline">
-              icesoslite@gmail.com
+            {t('terms.fallback')} {" "}
+            <a href={`mailto:${t('terms.email')}`} className="text-primary hover:underline">
+              {t('terms.email')}
             </a>
           </p>
         </section>

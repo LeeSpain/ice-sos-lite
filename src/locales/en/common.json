@@ -194,6 +194,50 @@
       "description": "Specialized emergency response for Spain with local language support and 24/7 availability."
     }
   },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Get in touch with our team",
+    "description": "Have questions about ICE SOS Lite? Need help with your account? Get in touch with our support team.",
+    "form": {
+      "name": "Full Name",
+      "email": "Email Address", 
+      "subject": "Subject",
+      "message": "Message",
+      "acceptTerms": "I agree to the Terms of Service and Privacy Policy",
+      "submit": "Send Message",
+      "sending": "Sending...",
+      "success": "Message sent successfully!",
+      "error": "Failed to send message. Please try again."
+    }
+  },
+  "support": {
+    "title": "Support",
+    "subtitle": "We're here to help. Reach us anytime.",
+    "email": {
+      "title": "Email Support",
+      "address": "support@icesoslite.com"
+    },
+    "emergency": {
+      "title": "Emergency Hotline", 
+      "description": "Use in-app SOS to dial your regional emergency number."
+    },
+    "faq": {
+      "title": "FAQs",
+      "description": "Coming soon."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "description": "Your privacy matters. This page describes how we handle your data.",
+    "fallback": "Our comprehensive Privacy Policy is displayed in an interactive dialog for better readability. If you're having trouble viewing the policy, please contact us at",
+    "email": "icesoslite@gmail.com"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "description": "Please read these terms carefully before using ICE SOS Lite.",
+    "fallback": "Our comprehensive Terms of Service are displayed in an interactive dialog for better readability. If you're having trouble viewing the terms, please contact us at",
+    "email": "icesoslite@gmail.com"
+  },
   "regionalCenterES": {
     "h1": "Spain Regional Call Centre",
     "intro": "24/7 bilingual emergency support for residents and visitors in Spain.",

@@ -188,6 +188,50 @@
       "callcenterES": { "name": "Callcenter Spanje", "desc": "24/7 professionele noodrespons" }
     }
   },
+  "contact": {
+    "title": "Contact",
+    "subtitle": "Neem contact op met ons team",
+    "description": "Heb je vragen over ICE SOS Lite? Hulp nodig bij je account? Neem contact op met ons supportteam.",
+    "form": {
+      "name": "Volledige naam",
+      "email": "E-mailadres",
+      "subject": "Onderwerp",
+      "message": "Bericht",
+      "acceptTerms": "Ik ga akkoord met de servicevoorwaarden en het privacybeleid",
+      "submit": "Bericht verzenden",
+      "sending": "Verzenden...",
+      "success": "Bericht succesvol verzonden!",
+      "error": "Verzenden mislukt. Probeer opnieuw."
+    }
+  },
+  "support": {
+    "title": "Ondersteuning",
+    "subtitle": "We zijn er om te helpen. Bereik ons altijd.",
+    "email": {
+      "title": "E-mailondersteuning",
+      "address": "support@icesoslite.com"
+    },
+    "emergency": {
+      "title": "Noodlijn",
+      "description": "Gebruik de SOS-functie in de app om je regionale alarmnummer te bellen."
+    },
+    "faq": {
+      "title": "Veelgestelde vragen",
+      "description": "Binnenkort beschikbaar."
+    }
+  },
+  "privacy": {
+    "title": "Privacybeleid",
+    "description": "Jouw privacy is belangrijk. Deze pagina beschrijft hoe we met je gegevens omgaan.",
+    "fallback": "Ons uitgebreide privacybeleid wordt weergegeven in een interactieve dialoog voor betere leesbaarheid. Als je problemen hebt met het bekijken van het beleid, neem dan contact met ons op via",
+    "email": "icesoslite@gmail.com"
+  },
+  "terms": {
+    "title": "Servicevoorwaarden",
+    "description": "Lees deze voorwaarden zorgvuldig voordat je ICE SOS Lite gebruikt.",
+    "fallback": "Onze uitgebreide servicevoorwaarden worden weergegeven in een interactieve dialoog voor betere leesbaarheid. Als je problemen hebt met het bekijken van de voorwaarden, neem dan contact met ons op via",
+    "email": "icesoslite@gmail.com"
+  },
   "regionServices": {
     "spain": {
       "name": "Callcenter Spanje",

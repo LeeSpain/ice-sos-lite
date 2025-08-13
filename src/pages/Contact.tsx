@@ -17,6 +17,7 @@ import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, MessageCircle, Send, CheckCircle, Clock } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -31,6 +32,7 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 const Contact: React.FC = () => {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
@@ -81,8 +83,8 @@ const Contact: React.FC = () => {
     }
   };
 
-  const title = "Contact Us | ICE SOS Lite";
-  const description = "Get in touch with ICE SOS Lite support team. Send us a message or chat with Emma, our AI assistant, for immediate help.";
+  const title = `${t('contact.title')} | ICE SOS Lite`;
+  const description = t('contact.description');
   const canonical = "/contact";
 
   return (
@@ -103,9 +105,9 @@ const Contact: React.FC = () => {
 
       <main className="container mx-auto px-4 py-12">
         <header className="text-center mb-12">
-          <h1 className="text-4xl font-bold tracking-tight mb-4">Contact Us</h1>
+          <h1 className="text-4xl font-bold tracking-tight mb-4">{t('contact.title')}</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get in touch with our support team or chat with Emma, our AI assistant, for immediate help.
+            {t('contact.subtitle')}
           </p>
         </header>
 
@@ -138,11 +140,11 @@ const Contact: React.FC = () => {
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="name">Your Name</Label>
+                        <Label htmlFor="name">{t('contact.form.name')}</Label>
                         <Input
                           id="name"
                           {...register("name")}
-                          placeholder="Enter your full name"
+                          placeholder={t('contact.form.name')}
                           className={errors.name ? "border-destructive" : ""}
                         />
                         {errors.name && (
@@ -150,12 +152,12 @@ const Contact: React.FC = () => {
                         )}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email Address</Label>
+                        <Label htmlFor="email">{t('contact.form.email')}</Label>
                         <Input
                           id="email"
                           type="email"
                           {...register("email")}
-                          placeholder="your.email@example.com"
+                          placeholder={t('contact.form.email')}
                           className={errors.email ? "border-destructive" : ""}
                         />
                         {errors.email && (
@@ -165,11 +167,11 @@ const Contact: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="subject">Subject</Label>
+                      <Label htmlFor="subject">{t('contact.form.subject')}</Label>
                       <Input
                         id="subject"
                         {...register("subject")}
-                        placeholder="Brief description of your inquiry"
+                        placeholder={t('contact.form.subject')}
                         className={errors.subject ? "border-destructive" : ""}
                       />
                       {errors.subject && (
@@ -178,11 +180,11 @@ const Contact: React.FC = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="message">Message</Label>
+                      <Label htmlFor="message">{t('contact.form.message')}</Label>
                       <Textarea
                         id="message"
                         {...register("message")}
-                        placeholder="Please provide details about your inquiry or issue..."
+                        placeholder={t('contact.form.message')}
                         rows={6}
                         className={errors.message ? "border-destructive" : ""}
                       />
@@ -205,13 +207,13 @@ const Contact: React.FC = () => {
                             htmlFor="acceptTerms"
                             className="text-sm font-normal leading-relaxed cursor-pointer"
                           >
-                            I agree to the{" "}
+                            {t('contact.form.acceptTerms').split(' and ')[0]} {" "}
                             <button
                               type="button"
                               onClick={() => setShowTermsDialog(true)}
                               className="text-primary hover:underline font-medium"
                             >
-                              Terms of Service
+                              {t('footer.terms')}
                             </button>{" "}
                             and{" "}
                             <button
@@ -219,7 +221,7 @@ const Contact: React.FC = () => {
                               onClick={() => setShowPrivacyDialog(true)}
                               className="text-primary hover:underline font-medium"
                             >
-                              Privacy Policy
+                              {t('footer.privacy')}
                             </button>
                           </Label>
                         </div>
@@ -233,12 +235,12 @@ const Contact: React.FC = () => {
                       {isSubmitting ? (
                         <>
                           <Clock className="h-4 w-4 mr-2 animate-spin" />
-                          Sending Message...
+                          {t('contact.form.sending')}
                         </>
                       ) : (
                         <>
                           <Send className="h-4 w-4 mr-2" />
-                          Send Message
+                          {t('contact.form.submit')}
                         </>
                       )}
                     </Button>

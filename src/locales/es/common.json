@@ -188,6 +188,50 @@
       "callcenterES": { "name": "Centro de Llamadas España", "desc": "Respuesta profesional de emergencia 24/7" }
     }
   },
+  "contact": {
+    "title": "Contacto",
+    "subtitle": "Ponte en contacto con nuestro equipo",
+    "description": "¿Tienes preguntas sobre ICE SOS Lite? ¿Necesitas ayuda con tu cuenta? Ponte en contacto con nuestro equipo de soporte.",
+    "form": {
+      "name": "Nombre completo",
+      "email": "Dirección de correo",
+      "subject": "Asunto",
+      "message": "Mensaje",
+      "acceptTerms": "Acepto los términos de servicio y la política de privacidad",
+      "submit": "Enviar mensaje",
+      "sending": "Enviando...",
+      "success": "¡Mensaje enviado con éxito!",
+      "error": "Error al enviar el mensaje. Inténtalo de nuevo."
+    }
+  },
+  "support": {
+    "title": "Soporte",
+    "subtitle": "Estamos aquí para ayudar. Contáctanos en cualquier momento.",
+    "email": {
+      "title": "Soporte por correo",
+      "address": "support@icesoslite.com"
+    },
+    "emergency": {
+      "title": "Línea de emergencia",
+      "description": "Usa el SOS de la app para marcar tu número de emergencia regional."
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "description": "Próximamente."
+    }
+  },
+  "privacy": {
+    "title": "Política de privacidad",
+    "description": "Tu privacidad importa. Esta página describe cómo manejamos tus datos.",
+    "fallback": "Nuestra política de privacidad integral se muestra en un diálogo interactivo para mejor legibilidad. Si tienes problemas para ver la política, contáctanos en",
+    "email": "icesoslite@gmail.com"
+  },
+  "terms": {
+    "title": "Términos de servicio",
+    "description": "Lee estos términos cuidadosamente antes de usar ICE SOS Lite.",
+    "fallback": "Nuestros términos de servicio integrales se muestran en un diálogo interactivo para mejor legibilidad. Si tienes problemas para ver los términos, contáctanos en",
+    "email": "icesoslite@gmail.com"
+  },
   "regionServices": {
     "spain": {
       "name": "Centro de Llamadas España",

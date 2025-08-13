@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { PrivacyDialog } from "@/components/legal/PrivacyDialog";
+import { useTranslation } from "react-i18next";
 
 const Privacy: React.FC = () => {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const title = "Privacy Policy | ICE SOS Lite";
-  const description = "Privacy Policy for ICE SOS Lite emergency SOS app.";
+  const title = `${t('privacy.title')} | ICE SOS Lite`;
+  const description = t('privacy.description');
   const canonical = "/privacy";
 
   // Open dialog automatically when page loads
@@ -35,17 +37,16 @@ const Privacy: React.FC = () => {
       {/* Fallback content for SEO and accessibility */}
       <main className="container mx-auto px-4 py-10" style={{ display: dialogOpen ? 'none' : 'block' }}>
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">Privacy Policy</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t('privacy.title')}</h1>
           <p className="text-muted-foreground mt-2">
-            Your privacy matters. This page describes how we handle your data.
+            {t('privacy.description')}
           </p>
         </header>
         <section className="prose prose-invert max-w-none">
           <p>
-            Our comprehensive Privacy Policy is displayed in an interactive dialog for better readability. 
-            If you're having trouble viewing the policy, please contact us at 
-            <a href="mailto:icesoslite@gmail.com" className="text-primary hover:underline">
-              icesoslite@gmail.com
+            {t('privacy.fallback')} {" "}
+            <a href={`mailto:${t('privacy.email')}`} className="text-primary hover:underline">
+              {t('privacy.email')}
             </a>
           </p>
         </section>
