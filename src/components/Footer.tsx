@@ -115,12 +115,13 @@ const { t } = useTranslation();
               >
                 {loading ? 'Loading...' : t('footer.membersDashboard')}
               </a>
-              <Link 
-                to="/admin-dashboard"
-                className="block text-sm text-muted-foreground hover:text-primary transition-colors"
+              <a 
+                href="#" 
+                onClick={(e) => handleDashboardClick(e, 'admin')}
+                className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
               >
-                {t('footer.adminDashboard')}
-              </Link>
+                {loading ? 'Loading...' : t('footer.adminDashboard')}
+              </a>
             </div>
           </div>
 
