@@ -102,10 +102,10 @@
     "cancellationDescription": "You can cancel your subscription at any time. Your access will continue until the end of your current billing period. Hardware purchases are non-refundable but carry a 1-year warranty."
   },
   "appPreview": {
-    "title": "See how the app looks",
-    "description": "Explore a live preview of our mobile app. It updates automatically when admins save changes and connects with smart devices for real-time wellness and safety data.",
+    "title": "Experience Your Emergency Protection App",
+    "description": "See exactly what you'll get with ICE SOS Lite. This interactive preview shows your personal emergency dashboard, one-tap SOS activation, family connections, and Bluetooth device integration.",
     "loading": "Loading preview...",
-    "note": "This preview updates automatically when admins save changes in the App Testing page."
+    "note": "This preview demonstrates the actual app interface you'll use for emergency protection."
   },
   "dashboardOverview": {
     "welcome": "Welcome back, {{name}}!",
