@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, Github, Twitter, Mail } from "lucide-react";
+import { Shield, Mail } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -122,35 +122,15 @@ const { t } = useTranslation();
             </div>
           </div>
 
-          {/* Contact & Social */}
-<div className="space-y-4">
+          {/* Connect */}
+          <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.connect')}</h3>
-            <div className="flex space-x-3">
-              <a 
-                href="mailto:support@icesoslite.com" 
-                className="p-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-                aria-label="Email"
-              >
-                <Mail className="h-4 w-4 text-muted-foreground" />
-              </a>
-              <a 
-                href="#" 
-                className="p-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="h-4 w-4 text-muted-foreground" />
-              </a>
-              <a 
-                href="#" 
-                className="p-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-                aria-label="GitHub"
-              >
-                <Github className="h-4 w-4 text-muted-foreground" />
-              </a>
+            <div className="space-y-2">
+              <Link to="/contact" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Mail className="h-4 w-4" />
+                Contact Us
+              </Link>
             </div>
-            <p className="text-xs text-muted-foreground">
-              24/7 Emergency Support Available
-            </p>
           </div>
         </div>
 

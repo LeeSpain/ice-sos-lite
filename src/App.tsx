@@ -29,6 +29,7 @@ const Support = lazy(() => import("./pages/Support"));
 const DeviceIceSosPendant = lazy(() => import("./pages/DeviceIceSosPendant"));
 const RegionalCenterSpain = lazy(() => import("./pages/RegionalCenterSpain"));
 const FamilyCarerAccess = lazy(() => import("./pages/FamilyCarerAccess"));
+const Contact = lazy(() => import("./pages/Contact"));
 
 
 const App = () => {
@@ -89,6 +90,7 @@ const App = () => {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/support" element={<Support />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/devices/ice-sos-pendant" element={<DeviceIceSosPendant />} />
             <Route path="/regional-center/spain" element={<RegionalCenterSpain />} />
             <Route path="/family-carer-access" element={<FamilyCarerAccess />} />
