@@ -567,8 +567,11 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                   <Badge className="absolute top-6 right-6 bg-green-600 text-white text-sm px-4 py-2 shadow-lg">
                     SPAIN
                   </Badge>
+                  
                   <div className="relative p-8">
-                    <div className="grid lg:grid-cols-3 gap-8 items-center">
+                    {/* Upper half - Image and Text side by side */}
+                    <div className="grid lg:grid-cols-2 gap-8 items-center mb-8">
+                       {/* Service Info - Left Side */}
                       <div className="text-center lg:text-left">
                         <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 rounded-2xl flex items-center justify-center shadow-lg bg-gradient-to-br from-green-500 to-green-600">
                           <MapPin className="h-8 w-8 text-white" />
@@ -581,31 +584,61 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           <span className="text-4xl font-bold text-green-600">{formatPriceDisplay(4.99, 'EUR')}</span>
                           <span className="text-muted-foreground text-lg">{t('common.perMonth', { defaultValue: '/month' })}</span>
                         </div>
-                        <Button 
-                          size="lg"
-                          className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-green-600 hover:bg-green-700 text-white"
-                          asChild
-                        >
-                          <Link to="/regional-center/spain">{t('nav.regionalCenter', { defaultValue: 'Contact Regional Center' })}</Link>
-                        </Button>
-                      </div>
-                      <div className="lg:col-span-2">
-                        <h4 className="text-xl font-semibold mb-4">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
-                        <div className="grid md:grid-cols-2 gap-4">
-                          {[
-                            'Bilingual English & Spanish agents',
-                            'Live translation during emergencies',
-                            'Direct coordination with local services',
-                            'Priority escalation and callback',
-                            'Cultural and regional expertise',
-                            'SMS and phone support options'
-                          ].map((feature, idx) => (
-                            <div key={idx} className="flex items-start space-x-3">
-                              <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                              <span className="text-sm text-muted-foreground">{feature}</span>
-                            </div>
-                          ))}
+                        <div className="flex gap-3">
+                          <Button 
+                            size="lg"
+                            className="px-8 py-4 bg-green-600 text-white hover:bg-green-700 border-0 font-semibold"
+                            asChild
+                          >
+                            <Link to="/regional-center/spain">
+                              {t('pricing.details')}
+                            </Link>
+                          </Button>
+                          <Button 
+                            size="lg"
+                            className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-green-600 hover:bg-green-700 text-white"
+                            asChild
+                          >
+                            <Link to="/ai-register">{t('nav.regionalCenter', { defaultValue: 'Contact Now' })}</Link>
+                          </Button>
                         </div>
+                       </div>
+                        
+                        {/* Call Center Image - Right Side */}
+                        <div className="flex justify-center items-center">
+                          <div className="w-full max-w-md p-6 bg-gradient-to-br from-green-50 to-green-100/50 rounded-2xl">
+                            <img
+                              src="/lovable-uploads/f65e7524-8dfe-491a-86d1-8d153266a17f.png"
+                              alt="Centro de Respuesta 24/7 - Spanish Call Center Emergency Response Team"
+                              className="w-full h-auto rounded-xl shadow-lg object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                        </div>
+                    </div>
+                        
+                    {/* Features - Bottom half */}
+                    <div className="border-t pt-6">
+                      <h4 className="text-xl font-semibold mb-4">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
+                      <div className="grid md:grid-cols-3 gap-4">
+                        {[
+                          'Bilingual English & Spanish agents',
+                          'Live translation during emergencies',
+                          'Direct coordination with local services',
+                          'Priority escalation and callback',
+                          'Cultural and regional expertise',
+                          'SMS and phone support options'
+                        ].map((feature, idx) => (
+                          <div key={idx} className="flex items-start space-x-3">
+                            <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
+                        <Check className="h-4 w-4 text-green-500" />
+                        <span>24/7 Professional Support • Live Translation Available</span>
                       </div>
                     </div>
                   </div>
