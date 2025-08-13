@@ -398,6 +398,20 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 </div>
                         <div className="flex gap-3">
 {product.name === 'ICE SOS Bluetooth Pendant' ? (
+                              <div className="flex gap-3">
+                                {product.status === 'coming_soon' ? (
+                                  <Badge className="px-8 py-4 text-lg font-semibold bg-secondary text-white">Coming Soon</Badge>
+                                ) : (
+                                  <Button 
+                                    size="lg"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                                    asChild
+                                  >
+                                    <Link to="/devices/ice-sos-pendant">Learn More</Link>
+                                  </Button>
+                                 )}
+                              </div>
+                            ) : (
                               <Button 
                                 size="lg"
                                 className="px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 border-0 font-semibold"
@@ -407,37 +421,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                                   {t('pricing.details')}
                                 </Link>
                               </Button>
-                            ) : null}
+                            )}
 
-                          
-{product.status === 'coming_soon' ? (
-  product.coming_soon_url ? (
-    <Button 
-      variant="outline" 
-      size="lg"
-      className="px-8 py-4 border-secondary/30 hover:bg-secondary/5 font-semibold"
-      asChild
-    >
-      <a href={product.coming_soon_url} target="_blank" rel="noreferrer">
-        {t('common.learnMore', { defaultValue: 'Learn more' })}
-      </a>
-    </Button>
-  ) : (
-    <Badge className="bg-secondary text-white text-sm px-4 py-2 shadow-lg">
-      {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
-    </Badge>
-  )
-) : (
-   <Button 
-     size="lg"
-     className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 bg-blue-600 hover:bg-blue-700 text-white"
-     asChild
-   >
-     <Link to="/ai-register">
-       {t('pricing.purchaseNow', { defaultValue: 'Purchase Now' })}
-     </Link>
-   </Button>
-)}
                         </div>
                        </div>
                         
