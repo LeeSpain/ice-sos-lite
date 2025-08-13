@@ -73,14 +73,7 @@ const RegionalCenterSpain: React.FC = () => {
                     size="xl" 
                     className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
                   >
-                    <Link to="/sos">{t('regionalCenterES.ctaSOS', { defaultValue: 'Emergency SOS' })}</Link>
-                  </Button>
-                  <Button 
-                    asChild
-                    size="xl" 
-                    className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:border-white/50 font-semibold text-lg px-8 py-4 rounded-xl transition-all duration-300"
-                  >
-                    <Link to="/support">{t('regionalCenterES.ctaSupport', { defaultValue: 'Contact Support' })}</Link>
+                    <Link to="/register">Join Now</Link>
                   </Button>
                 </div>
               </div>
