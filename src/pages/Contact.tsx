@@ -12,6 +12,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import ContactChatWidget from "@/components/ContactChatWidget";
 import { TermsDialog } from "@/components/legal/TermsDialog";
 import { PrivacyDialog } from "@/components/legal/PrivacyDialog";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, MessageCircle, Send, CheckCircle, Clock } from "lucide-react";
@@ -84,7 +86,7 @@ const Contact: React.FC = () => {
   const canonical = "/contact";
 
   return (
-    <>
+    <div className="min-h-screen">
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={description} />
@@ -96,6 +98,8 @@ const Contact: React.FC = () => {
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
       </Helmet>
+
+      <Navigation />
 
       <main className="container mx-auto px-4 py-12">
         <header className="text-center mb-12">
@@ -308,7 +312,9 @@ const Contact: React.FC = () => {
           onOpenChange={setShowPrivacyDialog}
         />
       </main>
-    </>
+
+      <Footer />
+    </div>
   );
 };
 
