@@ -9,11 +9,13 @@ const DashboardRedirect = () => {
 
   console.log('🔄 DashboardRedirect Debug:', {
     user: user?.id || 'none',
+    email: user?.email || 'none',
     role,
     isAdmin,
     authLoading,
     roleLoading,
-    currentPath: window.location.pathname
+    currentPath: window.location.pathname,
+    timestamp: new Date().toISOString()
   });
 
   // Show loading while checking authentication and role
