@@ -38,6 +38,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Handle email confirmation status
+        if (session?.user && !session.user.email_confirmed_at) {
+          console.log('⚠️ User email not confirmed:', session.user.email);
+        }
+        
         // Only set loading to false after we've processed the auth change
         if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
           setLoading(false);

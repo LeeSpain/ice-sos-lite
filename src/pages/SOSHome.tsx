@@ -3,6 +3,7 @@ import SosButton from '@/components/SosButton';
 import { useWakeLock } from '@/hooks/useWakeLock';
 import { Shield, BatteryCharging } from 'lucide-react';
 import SEO from '@/components/SEO';
+import EmailVerificationBanner from '@/components/EmailVerificationBanner';
 
 
 const SOSHome = () => {
@@ -12,6 +13,9 @@ const SOSHome = () => {
   return (
     <div className="min-h-screen bg-gradient-hero flex flex-col items-center justify-center p-6">
       <SEO title="Emergency SOS – ICE SOS Lite" description="Trigger emergency alerts and share live location with one tap." />
+      <div className="w-full max-w-md">
+        <EmailVerificationBanner />
+      </div>
       <header className="w-full max-w-md mb-8 text-center">
         <div className="flex items-center justify-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-lg bg-white/90 flex items-center justify-center shadow">

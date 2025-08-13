@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import Dashboard from "./Dashboard";
+import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 
 const SimpleDashboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -45,8 +46,15 @@ const SimpleDashboard = () => {
     );
   }
 
-  // Directly render the Dashboard component for members
-  return <Dashboard />;
+  // Directly render the Dashboard component for members with email verification banner
+  return (
+    <div>
+      <div className="container mx-auto px-4 pt-4">
+        <EmailVerificationBanner />
+      </div>
+      <Dashboard />
+    </div>
+  );
 };
 
 export default SimpleDashboard;

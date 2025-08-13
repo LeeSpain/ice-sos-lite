@@ -392,31 +392,33 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         </CardContent>
       </Card>
       
-      {/* Testing Skip Button */}
-      <Button 
-        onClick={() => {
-          // Store welcome data for testing, same as payment success
-          const welcomeData = {
-            firstName,
-            lastName,
-            email: userEmail,
-            subscriptionPlans: planData,
-            products: productData,
-            regionalServices: serviceData,
-            totalAmount: grandTotal
-          };
-          
-          sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
-          
-          // Navigate to welcome page
-          window.location.href = '/welcome';
-        }} 
-        variant="secondary" 
-        className="w-full"
-        size="lg"
-      >
-        Skip Payment (Testing Only)
-      </Button>
+      {/* Development Environment Testing - Only show in dev */}
+      {process.env.NODE_ENV === 'development' && (
+        <Button 
+          onClick={() => {
+            // Store welcome data for testing, same as payment success
+            const welcomeData = {
+              firstName,
+              lastName,
+              email: userEmail,
+              subscriptionPlans: planData,
+              products: productData,
+              regionalServices: serviceData,
+              totalAmount: grandTotal
+            };
+            
+            sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
+            
+            // Navigate to welcome page
+            window.location.href = '/welcome';
+          }} 
+          variant="secondary" 
+          className="w-full"
+          size="lg"
+        >
+          Skip Payment (Development Only)
+        </Button>
+      )}
       
       <Button variant="outline" onClick={onBack} className="w-full">
         Back to Plans

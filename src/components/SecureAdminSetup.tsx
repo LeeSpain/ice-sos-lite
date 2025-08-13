@@ -46,6 +46,12 @@ const SecureAdminSetup = () => {
       return;
     }
 
+    // Verify email is confirmed before allowing admin setup
+    if (!user.email_confirmed_at) {
+      toast.error('Please verify your email address before setting up admin access');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('secure-admin-setup', {

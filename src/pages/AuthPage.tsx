@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
 import QRCode from 'qrcode';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import useRateLimit from '@/hooks/useRateLimit';
 
 const AuthPage = () => {
   useScrollToTop();
@@ -23,6 +24,10 @@ const AuthPage = () => {
   const [iosQr, setIosQr] = useState("");
   const [androidQr, setAndroidQr] = useState("");
   const navigate = useNavigate();
+
+  // Rate limiting for auth attempts
+  const signInRateLimit = useRateLimit('signIn', { maxAttempts: 5, windowMs: 15 * 60 * 1000 }); // 5 attempts per 15 minutes
+  const signUpRateLimit = useRateLimit('signUp', { maxAttempts: 3, windowMs: 60 * 60 * 1000 }); // 3 attempts per hour
 
   // App store URLs
   const iosUrl = "https://apps.apple.com/app/ice-sos-lite/id123456789";
@@ -57,7 +62,20 @@ const AuthPage = () => {
     setError("");
     setMessage("");
 
+    // Check rate limiting
+    if (signUpRateLimit.isRateLimited) {
+      setError(`Too many sign-up attempts. Please wait ${signUpRateLimit.getRemainingTime} seconds before trying again.`);
+      setLoading(false);
+      return;
+    }
+
     try {
+      // Validate password strength
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+      if (!passwordRegex.test(password)) {
+        setError("Password must contain at least 8 characters with uppercase, lowercase, and number.");
+        return;
+      }
       if (!firstName || !lastName || !phoneNumber) {
         setError("Please fill in all required fields including name and phone number.");
         return;
@@ -79,6 +97,7 @@ const AuthPage = () => {
       });
 
       if (authError) {
+        signUpRateLimit.recordAttempt();
         if (authError.message.includes("already registered")) {
           setError("This email is already registered. Please try signing in instead.");
         } else {
@@ -108,7 +127,7 @@ const AuthPage = () => {
         }
       }
 
-      setMessage("Account created successfully! Check your email for the confirmation link.");
+      setMessage("Account created successfully! Please check your email and click the confirmation link before proceeding.");
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
     } finally {
@@ -122,6 +141,13 @@ const AuthPage = () => {
     setError("");
     setMessage("");
 
+    // Check rate limiting
+    if (signInRateLimit.isRateLimited) {
+      setError(`Too many sign-in attempts. Please wait ${signInRateLimit.getRemainingTime} seconds before trying again.`);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
@@ -129,6 +155,7 @@ const AuthPage = () => {
       });
 
       if (error) {
+        signInRateLimit.recordAttempt();
         if (error.message.includes("Invalid login credentials")) {
           setError("Invalid email or password. Please check your credentials and try again.");
         } else {
@@ -292,13 +319,15 @@ const AuthPage = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="pl-10"
-                        required
-                        minLength={6}
+                         required
+                         minLength={8}
+                         pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}"
+                         title="Password must contain at least 8 characters with uppercase, lowercase, and number"
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Password must be at least 6 characters long
-                    </p>
+                     <p className="text-xs text-muted-foreground">
+                       Password must be at least 8 characters with uppercase, lowercase, and number
+                     </p>
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Creating Account..." : "Create Account"}
@@ -319,20 +348,6 @@ const AuthPage = () => {
               </div>
             )}
 
-            {/* Testing Links */}
-            <div className="mt-4 text-center space-y-2">
-              <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
-                <Link to="/full-dashboard">Members Dashboard (Testing) →</Link>
-              </Button>
-              <br />
-              <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
-                <Link to="/admin-dashboard">Admin Dashboard (Testing) →</Link>
-              </Button>
-              <br />
-              <Button asChild variant="ghost" size="sm" className="text-muted-foreground">
-                <Link to="/admin-setup">Admin Setup (Create Test Account) →</Link>
-              </Button>
-            </div>
 
 
             {/* Additional Info */}

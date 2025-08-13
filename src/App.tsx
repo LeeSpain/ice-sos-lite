@@ -70,8 +70,16 @@ const App = () => {
               </ProtectedRoute>
             } />
             <Route path="/admin-setup" element={<AdminSetupPage />} />
-            <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
-            <Route path="/full-dashboard/*" element={<Dashboard />} />
+            <Route path="/admin-dashboard/*" element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            } />
+            <Route path="/full-dashboard/*" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/welcome-questionnaire" element={
               <ProtectedRoute>
                 <WelcomeQuestionnaire />
