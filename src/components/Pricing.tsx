@@ -508,8 +508,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         {product.name === 'ICE SOS Bluetooth Pendant' && (
                           <div className="w-full max-w-xs p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
                             <img
-                              src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png"
-                              alt="ICE SOS Bluetooth Pendant with smartphone – Bluetooth emergency pendant"
+                              src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
+                              alt="ICE Smart SOS Button – Emergency pendant device"
                               className="w-full h-auto rounded-xl shadow-lg object-cover"
                               loading="lazy"
                               decoding="async"
