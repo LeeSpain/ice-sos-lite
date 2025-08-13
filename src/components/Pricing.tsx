@@ -341,8 +341,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
             <div className="max-w-4xl mx-auto">
               {products.map((product) => (
-                <Card key={product.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
+                <Card key={product.id} className="relative border-2 border-blue-400 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-600/5"></div>
 {product.status === 'coming_soon' && (
   <div className="absolute top-0 left-0 right-0">
     <div className="bg-gradient-to-r from-secondary to-primary text-white text-sm md:text-base font-semibold py-2 px-4 flex items-center justify-between shadow-md">
@@ -364,7 +364,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
   </div>
 )}
 {product.status !== 'coming_soon' && (
-  <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
+  <Badge className="absolute top-6 right-6 bg-blue-600 text-white text-sm px-4 py-2 shadow-lg">
     {t('pricing.oneTime')}
   </Badge>
 )}
@@ -374,18 +374,18 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                        {/* Product Info */}
                       <div className="text-center lg:text-left">
                         {product.name === 'ICE SOS Bluetooth Pendant' && (
-                          <div className="mb-5">
+                          <div className="relative mb-6 p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
                             <img
                               src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png"
                               alt="ICE SOS Bluetooth Pendant with smartphone – Bluetooth emergency pendant"
-                              className="w-full max-w-md mx-auto lg:mx-0 rounded-2xl shadow-2xl object-cover"
+                              className="w-full max-w-sm mx-auto lg:mx-0 rounded-xl shadow-lg object-cover"
                               loading="lazy"
                               decoding="async"
-                              sizes="(min-width: 1024px) 512px, 90vw"
+                              sizes="(min-width: 1024px) 384px, 80vw"
                             />
                           </div>
                         )}
-                        <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg`}>
+                        <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg`}>
                           <Package className="h-8 w-8 text-white" />
                         </div>
                         <CardTitle className="text-3xl font-bold mb-3">
@@ -395,7 +395,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
                         </CardDescription>
                         <div className="mb-6">
-  <span className={`text-4xl font-bold text-primary`}>{formatPriceDisplay(product.price, product.currency)}</span>
+  <span className={`text-4xl font-bold text-blue-600`}>{formatPriceDisplay(product.price, product.currency)}</span>
   <span className="text-muted-foreground text-lg"> {t('pricing.oneTimeLabel')}</span>
 </div>
                         <div className="flex gap-3">
