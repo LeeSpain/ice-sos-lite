@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 interface RateLimitConfig {
   maxAttempts: number;
@@ -13,56 +13,68 @@ interface AttemptRecord {
 const useRateLimit = (key: string, config: RateLimitConfig) => {
   const [attempts, setAttempts] = useState<AttemptRecord>({ count: 0, lastAttempt: 0 });
 
-  // Check and reset expired window
-  useEffect(() => {
-    if (attempts.lastAttempt === 0) return;
-    
-    const now = Date.now();
-    const timeSinceLastAttempt = now - attempts.lastAttempt;
-    
-    if (timeSinceLastAttempt > config.windowMs) {
-      setAttempts({ count: 0, lastAttempt: 0 });
-    }
-  }, [attempts.lastAttempt, config.windowMs]);
-
   const isRateLimited = useCallback(() => {
     const now = Date.now();
     const timeSinceLastAttempt = now - attempts.lastAttempt;
     
     // If window has passed, we're not rate limited
-    if (timeSinceLastAttempt > config.windowMs) {
+    if (attempts.lastAttempt > 0 && timeSinceLastAttempt > config.windowMs) {
       return false;
     }
     
     return attempts.count >= config.maxAttempts;
-  }, [attempts, config]);
+  }, [attempts.count, attempts.lastAttempt, config.maxAttempts, config.windowMs]);
 
   const recordAttempt = useCallback(() => {
     const now = Date.now();
-    setAttempts(prev => ({
-      count: prev.count + 1,
-      lastAttempt: now
-    }));
-  }, []);
+    setAttempts(prev => {
+      const timeSinceLastAttempt = now - prev.lastAttempt;
+      
+      // Reset if window has passed
+      if (prev.lastAttempt > 0 && timeSinceLastAttempt > config.windowMs) {
+        return { count: 1, lastAttempt: now };
+      }
+      
+      // Otherwise increment
+      return { count: prev.count + 1, lastAttempt: now };
+    });
+  }, [config.windowMs]);
 
   const getRemainingTime = useCallback(() => {
-    if (!isRateLimited()) return 0;
-    
     const now = Date.now();
-    const timeRemaining = config.windowMs - (now - attempts.lastAttempt);
+    const timeSinceLastAttempt = now - attempts.lastAttempt;
+    
+    // If window has passed or not rate limited, no remaining time
+    if (attempts.lastAttempt === 0 || timeSinceLastAttempt > config.windowMs || attempts.count < config.maxAttempts) {
+      return 0;
+    }
+    
+    const timeRemaining = config.windowMs - timeSinceLastAttempt;
     return Math.max(0, Math.ceil(timeRemaining / 1000)); // Return seconds
-  }, [attempts, config, isRateLimited]);
+  }, [attempts.count, attempts.lastAttempt, config.maxAttempts, config.windowMs]);
 
   const reset = useCallback(() => {
     setAttempts({ count: 0, lastAttempt: 0 });
   }, []);
+
+  const attemptsRemaining = useMemo(() => {
+    const now = Date.now();
+    const timeSinceLastAttempt = now - attempts.lastAttempt;
+    
+    // If window has passed, reset count for calculation
+    if (attempts.lastAttempt > 0 && timeSinceLastAttempt > config.windowMs) {
+      return config.maxAttempts;
+    }
+    
+    return Math.max(0, config.maxAttempts - attempts.count);
+  }, [attempts.count, attempts.lastAttempt, config.maxAttempts, config.windowMs]);
 
   return {
     isRateLimited,
     recordAttempt,
     getRemainingTime,
     reset,
-    attemptsRemaining: Math.max(0, config.maxAttempts - attempts.count)
+    attemptsRemaining
   };
 };
 

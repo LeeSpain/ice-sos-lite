@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,9 +25,11 @@ const AuthPage = () => {
   const [androidQr, setAndroidQr] = useState("");
   const navigate = useNavigate();
 
-  // Rate limiting for auth attempts
-  const signInRateLimit = useRateLimit('signIn', { maxAttempts: 5, windowMs: 15 * 60 * 1000 }); // 5 attempts per 15 minutes
-  const signUpRateLimit = useRateLimit('signUp', { maxAttempts: 3, windowMs: 60 * 60 * 1000 }); // 3 attempts per hour
+  // Rate limiting for auth attempts - using useMemo to prevent recreation
+  const signInConfig = useMemo(() => ({ maxAttempts: 5, windowMs: 15 * 60 * 1000 }), []); // 5 attempts per 15 minutes
+  const signUpConfig = useMemo(() => ({ maxAttempts: 3, windowMs: 60 * 60 * 1000 }), []); // 3 attempts per hour
+  const signInRateLimit = useRateLimit('signIn', signInConfig);
+  const signUpRateLimit = useRateLimit('signUp', signUpConfig);
 
   // App store URLs
   const iosUrl = "https://apps.apple.com/app/ice-sos-lite/id123456789";
