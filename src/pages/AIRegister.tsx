@@ -10,6 +10,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import EmbeddedPayment from '@/components/EmbeddedPayment';
+import { TermsDialog } from '@/components/legal/TermsDialog';
+import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 
@@ -53,7 +55,7 @@ interface PersonalDetails {
   phone: string;
   city: string;
   country: string;
-  address?: string;
+  acceptTerms: boolean;
 }
 
 const AIRegister = () => {
@@ -64,7 +66,8 @@ const AIRegister = () => {
     password: '',
     phone: '',
     city: '',
-    country: ''
+    country: '',
+    acceptTerms: false,
   });
   const [dbPlans, setDbPlans] = useState<Plan[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -73,6 +76,8 @@ const AIRegister = () => {
   const [hasFamilyPlan, setHasFamilyPlan] = useState<boolean>(false);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [selectedRegionalServices, setSelectedRegionalServices] = useState<string[]>([]);
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState<'details' | 'payment'>('details');
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -167,10 +172,10 @@ const AIRegister = () => {
     fetchData();
   }, []);
 
-  const handlePersonalDetailsChange = (field: keyof PersonalDetails, value: string) => {
+  const handlePersonalDetailsChange = (field: keyof PersonalDetails, value: string | boolean) => {
     setPersonalDetails(prev => ({
       ...prev,
-      [field]: value
+      [field]: field === 'acceptTerms' ? value === 'true' || value === true : value
     }));
   };
 
@@ -200,14 +205,23 @@ const AIRegister = () => {
 
   // Simple validation for button disabled state (no side effects)
   const isFormValid = () => {
-    const { firstName, lastName, email, password, phone, city, country } = personalDetails;
-    return firstName && lastName && email && password && phone && city && country && password.length >= 6;
+    const { firstName, lastName, email, password, phone, city, country, acceptTerms } = personalDetails;
+    return firstName && lastName && email && password && phone && city && country && acceptTerms && password.length >= 6;
   };
 
   // Validation with toast messages (only called on submit)
   const validatePersonalDetails = () => {
-    const { firstName, lastName, email, password, phone, city, country } = personalDetails;
+    const { firstName, lastName, email, password, phone, city, country, acceptTerms } = personalDetails;
     if (!firstName || !lastName || !email || !password || !phone || !city || !country) {
+      return false;
+    }
+    
+    if (!acceptTerms) {
+      toast({
+        title: t('register.termsErrorTitle', { defaultValue: 'Terms Required' }),
+        description: t('register.termsErrorDesc', { defaultValue: 'You must accept the Terms of Service and Privacy Policy to continue.' }),
+        variant: "destructive"
+      });
       return false;
     }
     if (password.length < 6) {
@@ -518,9 +532,45 @@ const AIRegister = () => {
                           placeholder="Enter your country"
                           required
                         />
-                      </div>
-                    </div>
-                  </div>
+                       </div>
+                     </div>
+
+                     {/* Terms and Conditions Checkbox */}
+                     <div className="space-y-3 mt-6">
+                       <div className="flex items-start space-x-3">
+                         <Checkbox
+                           id="acceptTerms"
+                           checked={personalDetails.acceptTerms}
+                           onCheckedChange={(checked) => 
+                             handlePersonalDetailsChange('acceptTerms', checked as boolean ? 'true' : 'false')
+                           }
+                         />
+                         <div className="grid gap-1.5 leading-none">
+                           <Label
+                             htmlFor="acceptTerms"
+                             className="text-sm font-normal leading-relaxed cursor-pointer"
+                           >
+                             I agree to the{" "}
+                             <button
+                               type="button"
+                               onClick={() => setShowTermsDialog(true)}
+                               className="text-primary hover:underline font-medium"
+                             >
+                               Terms of Service
+                             </button>{" "}
+                             and{" "}
+                             <button
+                               type="button"
+                               onClick={() => setShowPrivacyDialog(true)}
+                               className="text-primary hover:underline font-medium"
+                             >
+                               Privacy Policy
+                             </button>
+                           </Label>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
 
                   {/* Protection Plans */}
                   <div className="space-y-6">
@@ -939,6 +989,16 @@ const AIRegister = () => {
           </Card>
         </div>
       </div>
+
+      {/* Legal Dialogs */}
+      <TermsDialog 
+        open={showTermsDialog} 
+        onOpenChange={setShowTermsDialog}
+      />
+      <PrivacyDialog 
+        open={showPrivacyDialog} 
+        onOpenChange={setShowPrivacyDialog}
+      />
     </div>
   );
 };

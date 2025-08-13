@@ -8,7 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import ContactChatWidget from "@/components/ContactChatWidget";
+import { TermsDialog } from "@/components/legal/TermsDialog";
+import { PrivacyDialog } from "@/components/legal/PrivacyDialog";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, MessageCircle, Send, CheckCircle, Clock } from "lucide-react";
@@ -18,6 +21,9 @@ const contactSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   subject: z.string().min(5, "Subject must be at least 5 characters"),
   message: z.string().min(20, "Message must be at least 20 characters"),
+  acceptTerms: z.boolean().refine(val => val === true, {
+    message: "You must accept the terms and conditions to proceed"
+  }),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -25,14 +31,21 @@ type ContactFormData = z.infer<typeof contactSchema>;
 const Contact: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
+    defaultValues: {
+      acceptTerms: false,
+    },
   });
 
   const onSubmit = async (data: ContactFormData) => {
@@ -174,6 +187,44 @@ const Contact: React.FC = () => {
                       )}
                     </div>
 
+                    {/* Terms and Conditions Checkbox */}
+                    <div className="space-y-3">
+                      <div className="flex items-start space-x-3">
+                        <Checkbox
+                          id="acceptTerms"
+                          checked={watch("acceptTerms")}
+                          onCheckedChange={(checked) => setValue("acceptTerms", checked as boolean)}
+                          className={errors.acceptTerms ? "border-destructive" : ""}
+                        />
+                        <div className="grid gap-1.5 leading-none">
+                          <Label
+                            htmlFor="acceptTerms"
+                            className="text-sm font-normal leading-relaxed cursor-pointer"
+                          >
+                            I agree to the{" "}
+                            <button
+                              type="button"
+                              onClick={() => setShowTermsDialog(true)}
+                              className="text-primary hover:underline font-medium"
+                            >
+                              Terms of Service
+                            </button>{" "}
+                            and{" "}
+                            <button
+                              type="button"
+                              onClick={() => setShowPrivacyDialog(true)}
+                              className="text-primary hover:underline font-medium"
+                            >
+                              Privacy Policy
+                            </button>
+                          </Label>
+                        </div>
+                      </div>
+                      {errors.acceptTerms && (
+                        <p className="text-sm text-destructive ml-6">{errors.acceptTerms.message}</p>
+                      )}
+                    </div>
+
                     <Button type="submit" disabled={isSubmitting} className="w-full">
                       {isSubmitting ? (
                         <>
@@ -246,6 +297,16 @@ const Contact: React.FC = () => {
             </Card>
           </div>
         </div>
+
+        {/* Legal Dialogs */}
+        <TermsDialog 
+          open={showTermsDialog} 
+          onOpenChange={setShowTermsDialog}
+        />
+        <PrivacyDialog 
+          open={showPrivacyDialog} 
+          onOpenChange={setShowPrivacyDialog}
+        />
       </main>
     </>
   );

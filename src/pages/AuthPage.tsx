@@ -4,9 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TermsDialog } from '@/components/legal/TermsDialog';
+import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import useRateLimit from '@/hooks/useRateLimit';
 
 const AuthPage = () => {
@@ -16,6 +20,9 @@ const AuthPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
   
   // Rate limiting for auth attempts
   const {
@@ -86,6 +93,11 @@ const AuthPage = () => {
   const handleSignUp = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!acceptTerms) {
+      setError('You must accept the Terms of Service and Privacy Policy to create an account.');
+      return;
+    }
+    
     if (isRateLimited()) {
       setError(`Too many attempts. Please wait ${getRemainingTime()} seconds.`);
       return;
@@ -125,133 +137,183 @@ const AuthPage = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [email, password, isRateLimited, getRemainingTime, recordAttempt, resetRateLimit]);
+  }, [email, password, acceptTerms, isRateLimited, getRemainingTime, recordAttempt, resetRateLimit]);
 
   const clearMessages = useCallback(() => {
     setError('');
     setSuccess('');
+    setAcceptTerms(false);
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">Welcome</CardTitle>
-          <CardDescription>Sign in to your account or create a new one</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin" onClick={clearMessages}>Sign In</TabsTrigger>
-              <TabsTrigger value="signup" onClick={clearMessages}>Sign Up</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-                
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-                
-                {success && (
-                  <Alert>
-                    <AlertDescription>{success}</AlertDescription>
-                  </Alert>
-                )}
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isSubmitting || isRateLimited()}
-                >
-                  {isSubmitting ? 'Signing In...' : 'Sign In'}
-                </Button>
-                
-                {isRateLimited() && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    Too many attempts. Try again in {getRemainingTime()} seconds.
-                  </p>
-                )}
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Input
-                    type="password"
-                    placeholder="Password (min. 6 characters)"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    disabled={isSubmitting}
-                  />
-                </div>
-                
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-                
-                {success && (
-                  <Alert>
-                    <AlertDescription>{success}</AlertDescription>
-                  </Alert>
-                )}
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isSubmitting || isRateLimited()}
-                >
-                  {isSubmitting ? 'Creating Account...' : 'Create Account'}
-                </Button>
-                
-                {isRateLimited() && (
-                  <p className="text-sm text-muted-foreground text-center">
-                    Too many attempts. Try again in {getRemainingTime()} seconds.
-                  </p>
-                )}
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+    <>
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold">Welcome</CardTitle>
+            <CardDescription>Sign in to your account or create a new one</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin" onClick={clearMessages}>Sign In</TabsTrigger>
+                <TabsTrigger value="signup" onClick={clearMessages}>Sign Up</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      type="password"
+                      placeholder="Password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  {success && (
+                    <Alert>
+                      <AlertDescription>{success}</AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isSubmitting || isRateLimited()}
+                  >
+                    {isSubmitting ? 'Signing In...' : 'Sign In'}
+                  </Button>
+                  
+                  {isRateLimited() && (
+                    <p className="text-sm text-muted-foreground text-center">
+                      Too many attempts. Try again in {getRemainingTime()} seconds.
+                    </p>
+                  )}
+                </form>
+              </TabsContent>
+              
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Input
+                      type="email"
+                      placeholder="Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Input
+                      type="password"
+                      placeholder="Password (min. 6 characters)"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+
+                  {/* Terms and Conditions Checkbox */}
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <Checkbox
+                        id="acceptTerms"
+                        checked={acceptTerms}
+                        onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                        disabled={isSubmitting}
+                      />
+                      <div className="grid gap-1.5 leading-none">
+                        <Label
+                          htmlFor="acceptTerms"
+                          className="text-sm font-normal leading-relaxed cursor-pointer"
+                        >
+                          I agree to the{" "}
+                          <button
+                            type="button"
+                            onClick={() => setShowTermsDialog(true)}
+                            className="text-primary hover:underline font-medium"
+                            disabled={isSubmitting}
+                          >
+                            Terms of Service
+                          </button>{" "}
+                          and{" "}
+                          <button
+                            type="button"
+                            onClick={() => setShowPrivacyDialog(true)}
+                            className="text-primary hover:underline font-medium"
+                            disabled={isSubmitting}
+                          >
+                            Privacy Policy
+                          </button>
+                        </Label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  {success && (
+                    <Alert>
+                      <AlertDescription>{success}</AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={isSubmitting || isRateLimited() || !acceptTerms}
+                  >
+                    {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                  </Button>
+                  
+                  {isRateLimited() && (
+                    <p className="text-sm text-muted-foreground text-center">
+                      Too many attempts. Try again in {getRemainingTime()} seconds.
+                    </p>
+                  )}
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Legal Dialogs */}
+      <TermsDialog 
+        open={showTermsDialog} 
+        onOpenChange={setShowTermsDialog}
+      />
+      <PrivacyDialog 
+        open={showPrivacyDialog} 
+        onOpenChange={setShowPrivacyDialog}
+      />
+    </>
   );
 };
 
