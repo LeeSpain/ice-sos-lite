@@ -134,7 +134,7 @@ const DeviceIceSosPendant = () => {
             <div className="relative">
               <div className="relative z-10">
                 <img 
-                  src="/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png" 
+                  src="/lovable-uploads/acfcc77a-7e34-44f5-8487-4069c2acb56b.png" 
                   alt="ICE SOS Lite Bluetooth Pendant with smartphone showing emergency activation"
                   className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                   loading="eager"
