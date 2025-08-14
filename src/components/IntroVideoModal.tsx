@@ -25,7 +25,6 @@ interface IntroVideoModalProps {
 
 export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) => {
   const { t } = useTranslation();
-  const [isOpen, setIsOpen] = React.useState(false);
   const [selectedVideo, setSelectedVideo] = React.useState<Video | null>(null);
 
   const videos: Video[] = [
@@ -77,12 +76,11 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
   };
 
   const handleClose = () => {
-    setIsOpen(false);
     setSelectedVideo(null);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog onOpenChange={handleClose}>
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>

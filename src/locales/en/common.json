@@ -6,7 +6,8 @@
     "devices": "Devices",
     "signIn": "Sign In",
     "subscribeNow": "Subscribe Now",
-    "regionalCenter": "Contact Regional Center"
+    "regionalCenter": "Contact Regional Center",
+    "introVideo": "Intro Video"
   },
   "footer": {
     "quickLinks": "Quick Links",
@@ -277,5 +278,9 @@
       "title": "Error",
       "description": "Failed to send message. Please try again."
     }
+  },
+  "introVideo": {
+    "title": "ICE SOS Introduction Videos",
+    "description": "Choose a video to learn more about ICE SOS Lite"
   }
 }
