@@ -109,8 +109,8 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
               </Button>
             </DialogHeader>
             
-            <div className="flex justify-center p-4">
-              <div className="relative w-full max-w-2xl bg-black rounded-lg overflow-hidden shadow-2xl" style={{ paddingBottom: '28.125%' }}>
+            <div className="flex justify-center px-6 pt-6">
+              <div className="relative w-full max-w-3xl bg-black rounded-lg overflow-hidden shadow-2xl" style={{ paddingBottom: '36%' }}>
                 <iframe
                   src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3`}
                   title={selectedVideo.title}
@@ -122,11 +122,11 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
               </div>
             </div>
             
-            <div className="px-4 pb-6 max-w-2xl mx-auto">
-              <DialogTitle className="text-xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-center">
+            <div className="px-6 py-4 max-w-3xl mx-auto bg-gradient-to-br from-background to-muted/5">
+              <DialogTitle className="text-lg font-semibold mb-2 text-center text-foreground">
                 {selectedVideo.title}
               </DialogTitle>
-              <p className="text-muted-foreground leading-relaxed text-center">
+              <p className="text-muted-foreground text-sm leading-relaxed text-center">
                 {selectedVideo.description}
               </p>
             </div>
