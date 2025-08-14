@@ -34,9 +34,11 @@ const AuthPage = () => {
 
   console.log('🔐 AuthPage render:', { 
     hasUser: !!user, 
+    userEmail: user?.email,
     loading, 
     isSubmitting,
-    path: window.location.pathname 
+    path: window.location.pathname,
+    href: window.location.href
   });
 
   // Redirect if already authenticated
