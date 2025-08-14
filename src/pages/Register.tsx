@@ -46,15 +46,16 @@ const Register = () => {
   const { currency, language } = usePreferences();
   
   // Debug logging - Force re-render when currency changes
-  console.log('Register component - Current currency:', currency, 'language:', language);
+  console.log('🔄 Register component render - Current currency:', currency, 'Step:', step, 'Plans count:', subscriptionPlans.length);
   
   // Force component to re-render when currency changes by adding it as a dependency
   useEffect(() => {
-    console.log('Currency changed to:', currency);
+    console.log('💰 Currency effect triggered - Currency changed to:', currency);
   }, [currency]);
 
   // Fetch data from database on component mount
   useEffect(() => {
+    console.log('📊 Fetching data for currency:', currency);
     const fetchData = async () => {
       try {
         // Fetch subscription plans
@@ -305,9 +306,10 @@ const Register = () => {
                     <div className="space-y-4">
                       <h4 className="font-medium text-lg">Monthly Subscription Plans</h4>
                       {subscriptionPlans.map((plan) => {
+                        console.log('🔢 Converting plan:', plan.name, 'from EUR', plan.price, 'to', currency);
                         const convertedPrice = convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency);
                         const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-                        console.log('Plan conversion:', plan.name, 'EUR', plan.price, '->', currency, convertedPrice, formattedPrice);
+                        console.log('✅ Converted:', convertedPrice, 'Formatted:', formattedPrice);
                         return (
                           <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
                             <Checkbox
