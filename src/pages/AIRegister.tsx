@@ -386,38 +386,28 @@ const AIRegister = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="pt-20 pb-16 px-4">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0">
-            <CardHeader className="text-center border-b bg-gradient-to-r from-emergency/5 to-primary/5 py-6">
-              <div className="flex justify-center items-center gap-3 mb-3">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Shield className="h-8 w-8 text-primary" />
-                </div>
-              </div>
-              <CardTitle className="text-3xl font-bold text-foreground">
+        <div className="max-w-2xl mx-auto">
+          <Card>
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-bold">
                 {t('register.title')}
               </CardTitle>
-              <CardDescription className="text-lg">
+              <CardDescription>
                 {currentStep === 'details' ? t('register.stepDetails') : t('register.stepPayment')}
               </CardDescription>
             </CardHeader>
             
-            <CardContent className="p-8">
+            <CardContent className="p-6">
               {currentStep === 'details' ? (
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {/* Personal Details */}
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-primary/10 rounded-full">
-                        <User className="h-5 w-5 text-primary" />
-                      </div>
-                      <h2 className="text-xl font-bold text-foreground">{t('register.personalDetails.title')}</h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h2 className="text-lg font-semibold">{t('register.personalDetails.title')}</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="firstName">{t('register.personalDetails.firstName')} *</Label>
                         <Input
@@ -439,7 +429,7 @@ const AIRegister = () => {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="email">{t('register.personalDetails.email')} *</Label>
                         <Input
@@ -463,7 +453,7 @@ const AIRegister = () => {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="phone">{t('register.personalDetails.phone')} *</Label>
                         <Input
@@ -486,7 +476,7 @@ const AIRegister = () => {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="country">{t('register.personalDetails.country')} *</Label>
                         <Input
@@ -501,17 +491,12 @@ const AIRegister = () => {
                   </div>
 
                   {/* Protection Plans */}
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-primary/10 rounded-full">
-                        <Shield className="h-5 w-5 text-primary" />
-                      </div>
-                      <h2 className="text-xl font-bold text-foreground">{t('register.plans.title')}</h2>
-                    </div>
+                  <div className="space-y-4">
+                    <h2 className="text-lg font-semibold">{t('register.plans.title')}</h2>
                     
                     {/* Main Plans */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">{t('register.plans.selectMain')} *</h3>
+                      <h3 className="text-base font-medium">{t('register.plans.selectMain')} *</h3>
                       <RadioGroup value={selectedMainPlan} onValueChange={handleMainPlanChange}>
                         <div className="grid gap-4">
                           {convertedPlans.map((plan) => (
@@ -534,8 +519,8 @@ const AIRegister = () => {
                     </div>
 
                     {/* Family Plan Add-on */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold">{t('register.plans.familyAdd')}</h3>
+                    <div className="space-y-3">
+                      <h3 className="text-base font-medium">{t('register.plans.familyAdd')}</h3>
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           id="familyPlan"
@@ -551,17 +536,12 @@ const AIRegister = () => {
 
                   {/* Safety Products */}
                   {convertedProducts.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-primary/10 rounded-full">
-                          <Phone className="h-5 w-5 text-primary" />
-                        </div>
-                        <h2 className="text-xl font-bold text-foreground">
-                          {t('register.products.title')} 
-                          <Badge variant="secondary" className="ml-2">{t('register.products.optional')}</Badge>
-                        </h2>
-                      </div>
-                      <p className="text-muted-foreground">{t('register.products.subtitle')}</p>
+                    <div className="space-y-4">
+                      <h2 className="text-lg font-semibold">
+                        {t('register.products.title')} 
+                        <Badge variant="secondary" className="ml-2">{t('register.products.optional')}</Badge>
+                      </h2>
+                      <p className="text-sm text-muted-foreground">{t('register.products.subtitle')}</p>
                       <div className="grid gap-4">
                         {convertedProducts.map((product) => (
                           <div key={product.id} className="border rounded-lg p-4">
@@ -587,14 +567,9 @@ const AIRegister = () => {
 
                   {/* Regional Services */}
                   {convertedRegionalServices.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-primary/10 rounded-full">
-                          <MapPin className="h-5 w-5 text-primary" />
-                        </div>
-                        <h2 className="text-xl font-bold text-foreground">{t('register.regionalServices.title')}</h2>
-                      </div>
-                      <p className="text-muted-foreground">{t('register.regionalServices.subtitle')}</p>
+                    <div className="space-y-4">
+                      <h2 className="text-lg font-semibold">{t('register.regionalServices.title')}</h2>
+                      <p className="text-sm text-muted-foreground">{t('register.regionalServices.subtitle')}</p>
                       <div className="grid gap-4">
                         {convertedRegionalServices.map((service) => (
                           <div key={service.id} className="border rounded-lg p-4">
@@ -619,8 +594,8 @@ const AIRegister = () => {
                   )}
 
                   {/* Order Summary */}
-                  <div className="bg-muted/50 p-6 rounded-lg space-y-4">
-                    <h3 className="text-xl font-semibold">{t('register.summary.title')}</h3>
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+                    <h3 className="text-lg font-semibold">{t('register.summary.title')}</h3>
                     
                     {/* Monthly Subscriptions */}
                     {calculateSubscriptionTotal() > 0 && (
