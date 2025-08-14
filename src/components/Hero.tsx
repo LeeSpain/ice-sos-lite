@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Heart, MapPin, Smartphone } from "lucide-react";
+import { Shield, Heart, MapPin, Smartphone, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import OptimizedImage from "@/components/ui/optimized-image";
 import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
+import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 const heroImage = '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png?v=1';
 
@@ -50,6 +51,18 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
               >
                 {t('hero.ctaTalk')}
               </Button>
+              <IntroVideoModal 
+                defaultVideoId="meet-emma"
+                trigger={
+                  <Button 
+                    size="xl" 
+                    className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
+                  >
+                    <Play className="h-5 w-5 mr-2" />
+                    Meet Emma
+                  </Button>
+                }
+              />
             </div>
           </div>
           

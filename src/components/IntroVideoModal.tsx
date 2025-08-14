@@ -30,6 +30,13 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
 
   const videos: Video[] = React.useMemo(() => [
     {
+      id: 'meet-emma',
+      title: 'Meet Emma',
+      description: 'Meet Emma, your AI assistant ready to help you',
+      youtubeId: 'VC01cLzxjo4',
+      available: true
+    },
+    {
       id: 'overview',
       title: 'ICE SOS Lite Overview',
       description: 'Complete overview of ICE SOS Lite features and capabilities',
