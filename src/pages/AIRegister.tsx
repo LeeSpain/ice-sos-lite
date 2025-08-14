@@ -1028,8 +1028,8 @@ const AIRegister = () => {
                     </div>
                   </div>
 
-                  {/* Testing Mode Toggle (Development Only) */}
-                  {process.env.NODE_ENV === 'development' && (
+                  {/* Testing Mode Toggle */}
+                  {(
                     <div className="pt-4 pb-4 border-t border-border/30">
                       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <div className="flex items-center space-x-3">
