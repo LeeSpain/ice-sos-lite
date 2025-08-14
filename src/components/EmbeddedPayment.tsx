@@ -378,14 +378,14 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           <div className="flex justify-between text-lg font-bold border-t pt-2">
             <span>Total Payment:</span>
             <span className="text-foreground">
-              {testingMode ? `0.01 ${selectedCurrency} (Test Mode)` : formatDisplayCurrency(grandTotal, selectedCurrency, languageToLocale(language))}
+              {testingMode ? `0.50 ${selectedCurrency} (Test Mode)` : formatDisplayCurrency(grandTotal, selectedCurrency, languageToLocale(language))}
             </span>
           </div>
           {testingMode && (
             <div className="mt-2 p-3 bg-yellow-100 rounded-md border border-yellow-300">
               <div className="text-sm font-medium text-yellow-800">⚠️ Test Payment Mode Active</div>
               <div className="text-xs text-yellow-700 mt-1">
-                This payment will only charge 0.01 {selectedCurrency} for testing purposes
+                This payment will only charge 0.50 {selectedCurrency} for testing purposes
               </div>
             </div>
           )}

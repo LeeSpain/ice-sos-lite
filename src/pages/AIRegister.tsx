@@ -626,9 +626,7 @@ const AIRegister = () => {
                             <div className="grid gap-1.5 leading-none flex-1">
                               <Label
                                 htmlFor="acceptTerms"
-                                className={`text-base font-medium leading-relaxed cursor-pointer transition-colors ${
-                                  personalDetails.acceptTerms ? 'text-foreground' : 'text-destructive'
-                                }`}
+                                className="text-base font-medium leading-relaxed cursor-pointer text-black"
                               >
                                 I agree to the{" "}
                                 <button
@@ -648,7 +646,7 @@ const AIRegister = () => {
                                 </button>
                               </Label>
                               {!personalDetails.acceptTerms && (
-                                <p className="text-sm text-destructive font-medium mt-2">
+                                <p className="text-sm text-black font-medium mt-2">
                                   ⚠️ Required: You must accept the terms to continue
                                 </p>
                               )}

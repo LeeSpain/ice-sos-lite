@@ -103,10 +103,11 @@ serve(async (req) => {
 
     let totalAmount = subscriptionTotal + productTotal;
     
-    // Override amount for testing mode
+    // Override amount for testing mode (minimum 50 cents for Stripe)
     if (testingMode) {
-      totalAmount = 1; // 1 cent in the smallest currency unit
-      logStep("Testing mode enabled - overriding amount to 1 cent", { originalAmount: subscriptionTotal + productTotal, testAmount: totalAmount });
+      const originalAmount = totalAmount;
+      totalAmount = 50; // 50 cents minimum for Stripe
+      logStep("Testing mode enabled - overriding amount to 50 cents", { originalAmount, testAmount: totalAmount });
     }
     
     if (totalAmount === 0) {
