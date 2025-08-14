@@ -359,19 +359,35 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                          <div className="mb-6">
   <span className={`text-4xl font-bold text-blue-600`}>{formatPriceDisplay(product.price, product.currency)}</span>
 </div>
-                        <div className="flex gap-3">
+                        <div className="flex flex-col gap-3">
 {product.name === 'ICE SOS Bluetooth Pendant' ? (
-                              <div className="flex gap-3">
+                              <div className="flex flex-col gap-3">
                                 {product.status === 'coming_soon' ? (
                                   <Badge className="px-8 py-4 text-lg font-semibold bg-secondary text-white">Coming Soon</Badge>
                                 ) : (
-                                  <Button 
-                                    size="lg"
-                                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                                    asChild
-                                  >
-                                    <Link to="/devices/ice-sos-pendant">Learn More</Link>
-                                  </Button>
+                                  <>
+                                    <Button 
+                                      size="lg"
+                                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                                      asChild
+                                    >
+                                      <Link to="/devices/ice-sos-pendant">Learn More</Link>
+                                    </Button>
+                                    
+                                    <IntroVideoModal 
+                                      defaultVideoId="all-ages"
+                                      trigger={
+                                        <Button 
+                                          size="lg"
+                                          variant="outline"
+                                          className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                                        >
+                                          <Play className="h-4 w-4 mr-2" />
+                                          Watch Video
+                                        </Button>
+                                      }
+                                    />
+                                  </>
                                  )}
                               </div>
                             ) : (
