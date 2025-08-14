@@ -10,8 +10,9 @@ import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/util
 import { usePreferences } from '@/contexts/PreferencesContext';
 import type { SupportedCurrency } from '@/contexts/PreferencesContext';
 
-// Use your Stripe publishable key here (this is safe to expose)
-const stripePromise = loadStripe("pk_test_51RqcQwBBb55hy3jU9L30IHx9w1sFZ4NoQngm6UwgwyiY1ZBF56QJ5DbeDxMxoHJwWEruoPbmmfrz27ClAS0qe3YO00S4yLN5Va");
+// Get Stripe publishable key from environment variables
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_51RqcQwBBb55hy3jU9L30IHx9w1sFZ4NoQngm6UwgwyiY1ZBF56QJ5DbeDxMxoHJwWEruoPbmmfrz27ClAS0qe3YO00S4yLN5Va";
+const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -203,14 +204,26 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
 
   const grandTotal = subscriptionTotal + productTotal;
 
-  const initializePayment = async () => {
-    console.log("Initializing payment...", { plans, products, regionalServices, userEmail, firstName, lastName });
+  const initializePayment = async (retryCount = 0) => {
+    console.log("Initializing payment...", { plans, products, regionalServices, userEmail, firstName, lastName, retryCount });
     
     if ((!plans || plans.length === 0) && (!products || products.length === 0) && (!regionalServices || regionalServices.length === 0)) {
       console.error("No items provided to payment initialization");
       toast({
         title: "Error",
         description: "No items selected for payment. Please go back and select items.",
+        variant: "destructive"
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Validate Stripe key configuration
+    if (!STRIPE_PUBLISHABLE_KEY) {
+      console.error("Stripe publishable key is not configured");
+      toast({
+        title: "Configuration Error",
+        description: "Payment system is not properly configured. Please contact support.",
         variant: "destructive"
       });
       setLoading(false);
@@ -233,13 +246,40 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
 
       console.log("Payment intent response:", { data, error });
 
-      if (error) throw error;
+      if (error) {
+        // Check for specific client_secret mismatch error
+        if (error.message && error.message.includes('client_secret')) {
+          console.error("Client secret mismatch error - likely Stripe key configuration issue");
+          toast({
+            title: "Payment Configuration Error",
+            description: "There's a mismatch in payment configuration. Please contact support.",
+            variant: "destructive"
+          });
+          setLoading(false);
+          return;
+        }
+        throw error;
+      }
+
+      if (!data?.client_secret) {
+        throw new Error("No client secret received from payment service");
+      }
 
       console.log("Setting client secret:", data.client_secret);
       setClientSecret(data.client_secret);
       setCustomerId(data.customer_id);
     } catch (error) {
       console.error("Payment initialization error:", error);
+      
+      // Retry logic with exponential backoff for network errors
+      if (retryCount < 2 && error instanceof Error && 
+          (error.message.includes('network') || error.message.includes('timeout'))) {
+        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        console.log(`Retrying payment initialization in ${delay}ms...`);
+        setTimeout(() => initializePayment(retryCount + 1), delay);
+        return;
+      }
+      
       toast({
         title: "Error",
         description: "Failed to initialize payment. Please try again.",
@@ -416,9 +456,12 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
               />
             </Elements>
           ) : (
-            <div className="text-center p-4">
+            <div className="text-center p-4 space-y-3">
               <p className="text-destructive">Failed to load payment form</p>
-              <Button onClick={initializePayment} className="mt-2">
+              <p className="text-sm text-muted-foreground">
+                Please check your internet connection and try again
+              </p>
+              <Button onClick={() => initializePayment()} className="mt-2">
                 Retry
               </Button>
             </div>
