@@ -11,10 +11,12 @@ const FIRST_VISIT_KEY = 'hasVisitedBefore';
 
 export const FirstVisitPreferencesModal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>('en');
-  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>('EUR');
   const [isApplying, setIsApplying] = useState(false);
-  const { setLanguage, setCurrency } = usePreferences();
+  const { language, currency, setLanguage, setCurrency } = usePreferences();
+  
+  // Initialize with current preferences from context
+  const [selectedLanguage, setSelectedLanguage] = useState<SupportedLanguage>(language);
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>(currency);
 
   useEffect(() => {
     // Check if this is the user's first visit
@@ -27,18 +29,30 @@ export const FirstVisitPreferencesModal: React.FC = () => {
   const handleApplyPreferences = async () => {
     setIsApplying(true);
     
-    // Apply the selected preferences
-    setLanguage(selectedLanguage);
-    setCurrency(selectedCurrency);
-    
-    // Mark that the user has visited before
-    localStorage.setItem(FIRST_VISIT_KEY, 'true');
-    
-    // Add a small delay for better UX
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    setIsApplying(false);
-    setIsOpen(false);
+    try {
+      console.log('Applying preferences:', { selectedLanguage, selectedCurrency });
+      
+      // Apply the selected preferences
+      setLanguage(selectedLanguage);
+      setCurrency(selectedCurrency);
+      
+      // Wait for i18n language change to complete
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mark that the user has visited before
+      localStorage.setItem(FIRST_VISIT_KEY, 'true');
+      
+      console.log('Preferences applied successfully');
+      
+      setIsApplying(false);
+      setIsOpen(false);
+      
+      // Force a page refresh to ensure all components update
+      window.location.reload();
+    } catch (error) {
+      console.error('Error applying preferences:', error);
+      setIsApplying(false);
+    }
   };
 
   const languageOptions = [
