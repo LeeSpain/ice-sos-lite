@@ -6,8 +6,7 @@
     "devices": "Apparaten",
     "signIn": "Inloggen",
     "subscribeNow": "Abonneer Nu",
-    "regionalCenter": "Regionaal centrum contacteren",
-    "contact": "Contact"
+    "regionalCenter": "Regionaal centrum contacteren"
   },
   "footer": {
     "quickLinks": "Snelle links",
@@ -182,72 +181,11 @@
     }
   },
   "register": {
-    "title": "Word lid van ICE SOS Lite",
-    "subtitle": "Beveilig vandaag je noodbescherming",
-    "stepDetails": "Word lid van ICE SOS Lite en beveilig je noodbescherming",
-    "stepPayment": "Rond je abonnement af en begin met het beschermen van wat belangrijk is",
-    "personalDetails": {
-      "title": "Persoonlijke gegevens",
-      "firstName": "Voornaam",
-      "lastName": "Achternaam",
-      "email": "E-mailadres",
-      "password": "Wachtwoord",
-      "phone": "Telefoonnummer",
-      "city": "Stad",
-      "country": "Land",
-      "required": "Verplicht"
-    },
     "plans": {
-      "title": "Kies je beschermingsplan",
-      "selectMain": "Selecteer hoofdplan",
-      "familyAdd": "Familie- en zorgtoegang toevoegen",
-      "familyDesc": "Laat vertrouwde familieleden of zorgverleners toegang krijgen tot je noodprofiel",
       "personal": { "name": "Persoonlijk Account", "desc": "Individueel noodcontactsysteem" },
       "guardian": { "name": "Guardian Wellness", "desc": "Geavanceerde gezondheidsmonitoring en meldingen" },
       "family": { "name": "Gezinsdeling", "desc": "Perfect voor gezinnen met meerdere leden" },
       "callcenterES": { "name": "Callcenter Spanje", "desc": "24/7 professionele noodrespons" }
-    },
-    "products": {
-      "title": "Veiligheidsproducten",
-      "subtitle": "Verbeter je bescherming met Bluetooth-apparaten",
-      "optional": "Optioneel"
-    },
-    "regionalServices": {
-      "title": "Regionale diensten",
-      "subtitle": "Professionele lokale noodondersteuning"
-    },
-    "summary": {
-      "title": "Bestelsamenvatting",
-      "monthly": "Maandelijks abonnement",
-      "oneTime": "Eenmalige aankopen",
-      "subtotal": "Subtotaal",
-      "vat": "BTW/Belasting",
-      "total": "Totaal",
-      "totalMonthly": "Totaal maandelijks",
-      "totalOneTime": "Totaal eenmalig"
-    },
-    "validation": {
-      "firstNameRequired": "Voornaam is verplicht",
-      "lastNameRequired": "Achternaam is verplicht",
-      "emailRequired": "E-mail is verplicht",
-      "emailInvalid": "Voer een geldig e-mailadres in",
-      "passwordRequired": "Wachtwoord is verplicht",
-      "passwordMinLength": "Wachtwoord moet minstens 6 karakters lang zijn",
-      "phoneRequired": "Telefoonnummer is verplicht",
-      "cityRequired": "Stad is verplicht",
-      "countryRequired": "Land is verplicht",
-      "acceptTermsRequired": "Je moet de algemene voorwaarden accepteren",
-      "planRequired": "Selecteer een hoofdbeschermingsplan"
-    },
-    "buttons": {
-      "continueToPayment": "Ga door naar betaling",
-      "processing": "Verwerken...",
-      "backToDetails": "Terug naar details"
-    },
-    "legal": {
-      "acceptTerms": "Ik ga akkoord met de servicevoorwaarden en het privacybeleid",
-      "termsLink": "Servicevoorwaarden",
-      "privacyLink": "Privacybeleid"
     }
   },
   "contact": {

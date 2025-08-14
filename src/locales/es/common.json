@@ -6,8 +6,7 @@
     "devices": "Dispositivos",
     "signIn": "Iniciar sesión",
     "subscribeNow": "Suscríbete",
-    "regionalCenter": "Contactar Centro Regional",
-    "contact": "Contacto"
+    "regionalCenter": "Contactar Centro Regional"
   },
   "footer": {
     "quickLinks": "Enlaces rápidos",
@@ -182,72 +181,11 @@
     }
   },
   "register": {
-    "title": "Únete a ICE SOS Lite",
-    "subtitle": "Asegura tu protección de emergencia hoy",
-    "stepDetails": "Únete a ICE SOS Lite y asegura tu protección de emergencia",
-    "stepPayment": "Finaliza tu suscripción y comienza a proteger lo que más importa",
-    "personalDetails": {
-      "title": "Información personal",
-      "firstName": "Nombre",
-      "lastName": "Apellido",
-      "email": "Dirección de correo",
-      "password": "Contraseña",
-      "phone": "Número de teléfono",
-      "city": "Ciudad",
-      "country": "País",
-      "required": "Obligatorio"
-    },
     "plans": {
-      "title": "Elige tu plan de protección",
-      "selectMain": "Selecciona plan principal",
-      "familyAdd": "Añadir acceso familiar y de cuidadores",
-      "familyDesc": "Permite que familiares o cuidadores de confianza accedan a tu perfil de emergencia",
       "personal": { "name": "Cuenta Personal", "desc": "Sistema individual de contacto de emergencia" },
       "guardian": { "name": "Bienestar Guardian", "desc": "Monitoreo de salud avanzado y alertas" },
       "family": { "name": "Compartir en Familia", "desc": "Perfecto para familias con varios miembros" },
       "callcenterES": { "name": "Centro de Llamadas España", "desc": "Respuesta profesional de emergencia 24/7" }
-    },
-    "products": {
-      "title": "Productos de seguridad",
-      "subtitle": "Mejora tu protección con dispositivos Bluetooth",
-      "optional": "Opcional"
-    },
-    "regionalServices": {
-      "title": "Servicios regionales",
-      "subtitle": "Soporte de emergencia local profesional"
-    },
-    "summary": {
-      "title": "Resumen del pedido",
-      "monthly": "Suscripción mensual",
-      "oneTime": "Compras únicas",
-      "subtotal": "Subtotal",
-      "vat": "IVA/Impuesto",
-      "total": "Total",
-      "totalMonthly": "Total mensual",
-      "totalOneTime": "Total único"
-    },
-    "validation": {
-      "firstNameRequired": "El nombre es obligatorio",
-      "lastNameRequired": "El apellido es obligatorio",
-      "emailRequired": "El correo es obligatorio",
-      "emailInvalid": "Por favor ingresa una dirección de correo válida",
-      "passwordRequired": "La contraseña es obligatoria",
-      "passwordMinLength": "La contraseña debe tener al menos 6 caracteres",
-      "phoneRequired": "El número de teléfono es obligatorio",
-      "cityRequired": "La ciudad es obligatoria",
-      "countryRequired": "El país es obligatorio",
-      "acceptTermsRequired": "Debes aceptar los términos y condiciones",
-      "planRequired": "Por favor selecciona un plan de protección principal"
-    },
-    "buttons": {
-      "continueToPayment": "Continuar al pago",
-      "processing": "Procesando...",
-      "backToDetails": "Volver a detalles"
-    },
-    "legal": {
-      "acceptTerms": "Acepto los términos de servicio y la política de privacidad",
-      "termsLink": "Términos de servicio",
-      "privacyLink": "Política de privacidad"
     }
   },
   "contact": {
