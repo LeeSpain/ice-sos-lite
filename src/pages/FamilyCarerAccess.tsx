@@ -23,6 +23,8 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import SEO from '@/components/SEO';
+import OptimizedImage from "@/components/ui/optimized-image";
+import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
 
 const FamilyCarerAccessPage = () => {
   const keyFeatures = [
@@ -132,31 +134,59 @@ const FamilyCarerAccessPage = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative min-h-[60vh] flex items-center justify-center bg-gradient-hero">
-        <div className="container mx-auto px-4 text-center text-white">
-          <Badge className="mb-6 bg-wellness text-white px-4 py-2">
-            <Users className="mr-2 h-4 w-4" />
-            Family & Carer Support
-          </Badge>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Family & Carer <span className="text-wellness-glow">Access</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-8">
-            Connect your loved ones and care providers for comprehensive emergency support and peace of mind
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/register">
-              <Button size="lg" className="bg-wellness hover:bg-wellness/90">
-                <UserPlus className="mr-2 h-5 w-5" />
-                Get Started
-              </Button>
-            </Link>
-            <Link to="/">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900">
-                <ArrowLeft className="mr-2 h-5 w-5" />
-                Back to Home
-              </Button>
-            </Link>
+      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
+        <div className="container mx-auto px-4 py-20 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Content */}
+            <div className="text-center lg:text-left text-white">
+              <Badge className="mb-6 bg-wellness/20 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg border border-wellness/30">
+                <Users className="mr-2 h-4 w-4 text-wellness-glow" />
+                Family & Carer Support
+              </Badge>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                Family & Carer <span className="text-wellness-glow drop-shadow-md">Access</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-white/90 max-w-3xl lg:max-w-none mx-auto mb-8 leading-relaxed font-medium drop-shadow-sm">
+                Connect your loved ones and care providers for comprehensive emergency support and peace of mind
+              </p>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                <Button 
+                  asChild 
+                  size="xl" 
+                  className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness-glow/20"
+                >
+                  <Link to="/register">
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    Get Started
+                  </Link>
+                </Button>
+                <Button 
+                  asChild
+                  size="xl" 
+                  variant="outline" 
+                  className="border-white text-white hover:bg-white hover:text-gray-900 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
+                >
+                  <Link to="/">
+                    <ArrowLeft className="mr-2 h-5 w-5" />
+                    Back to Home
+                  </Link>
+                </Button>
+              </div>
+            </div>
+            
+            {/* Hero Image */}
+            <div className="relative">
+              <div className="relative z-10">
+                <OptimizedImage 
+                  src="/lovable-uploads/0365334e-7587-4cf4-96a6-5744399b84b2.png" 
+                  alt="Family using ICE SOS for emergency coordination and care support"
+                  className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
+                  priority={true}
+                  sizes={getImageSizes('hero')}
+                  blurDataURL={generateBlurPlaceholder(400, 600)}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>

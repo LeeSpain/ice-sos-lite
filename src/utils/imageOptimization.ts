@@ -10,7 +10,8 @@ export interface ImageConfig {
 }
 
 export const CRITICAL_IMAGES = [
-  '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png', // Hero image
+  '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png', // Hero image (main)
+  '/lovable-uploads/0365334e-7587-4cf4-96a6-5744399b84b2.png', // Family hero image
   '/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png', // App icon
 ];
 
