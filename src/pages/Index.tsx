@@ -16,6 +16,7 @@ import SEO from '@/components/SEO';
 import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
 import { preloadCriticalImages } from "@/utils/imageOptimization";
 import { useEmmaChat } from "@/contexts/EmmaChatContext";
+import { FirstVisitPreferencesModal } from "@/components/FirstVisitPreferencesModal";
 
 const Index = () => {
   useScrollToTop();
@@ -40,6 +41,7 @@ const Index = () => {
           "url": typeof window !== 'undefined' ? window.location.origin : 'https://example.com'
         }}
       />
+      <FirstVisitPreferencesModal />
       <Navigation />
 
       <Hero onEmmaClick={openEmmaChat} />
