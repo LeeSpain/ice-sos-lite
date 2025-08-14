@@ -268,5 +268,14 @@
     "confidentialityTitle": "Confidentiality & safety",
     "confidentialityDesc": "All calls are recorded for safety and training. Personal data is handled according to our Privacy Policy.",
     "noEmergency": "If you are in immediate danger, call 112 (Spain's emergency number)."
+  },
+  "emma": {
+    "title": "Emma AI Assistant",
+    "greeting": "👋 Hi {{userName}}! I'm Emma, your AI assistant. I'm here to help you with your emergency protection registration. How can I assist you today?",
+    "placeholder": "Ask Emma about emergency protection...",
+    "error": {
+      "title": "Error",
+      "description": "Failed to send message. Please try again."
+    }
   }
 }

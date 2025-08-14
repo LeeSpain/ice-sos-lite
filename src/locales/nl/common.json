@@ -237,6 +237,15 @@
       "name": "Callcenter Spanje",
       "description": "Gespecialiseerde noodhulp voor Spanje met lokale taalondersteuning en 24/7 beschikbaarheid."
     }
+  },
+  "emma": {
+    "title": "Emma AI Assistent",
+    "greeting": "👋 Hallo {{userName}}! Ik ben Emma, je AI-assistent. Ik ben hier om je te helpen met je noodbeschermingsregistratie. Hoe kan ik je vandaag helpen?",
+    "placeholder": "Vraag Emma over noodbescherming...",
+    "error": {
+      "title": "Fout",
+      "description": "Bericht verzenden mislukt. Probeer het opnieuw."
+    }
   }
 }
 

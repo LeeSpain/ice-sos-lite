@@ -7,6 +7,7 @@ import { X, Send, MessageCircle, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { usePreferences } from '@/contexts/PreferencesContext';
 
 interface Message {
   id: string;
@@ -24,10 +25,14 @@ interface ChatWidgetProps {
 
 const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "User", context = "registration" }) => {
   const { t } = useTranslation();
+  const { language, currency } = usePreferences();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: `👋 Hi ${userName}! I'm Emma, your AI assistant. I'm here to help you with your emergency protection registration. How can I assist you today?`,
+      content: t('emma.greeting', { 
+        defaultValue: `👋 Hi {{userName}}! I'm Emma, your AI assistant. I'm here to help you with your emergency protection registration. How can I assist you today?`,
+        userName 
+      }),
       isUser: false,
       timestamp: new Date()
     }
@@ -66,6 +71,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
           sessionId: `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           userId: null,
           context: `${context} - User: ${userName}`,
+          language,
+          currency,
           conversation_history: messages.slice(-5) // Send last 5 messages for context
         }
       });
@@ -118,7 +125,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
               <MessageCircle className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <CardTitle className="text-lg truncate">{t('chatWidget.headerTitle', { defaultValue: 'Emma AI Assistant' })}</CardTitle>
+              <CardTitle className="text-lg truncate">{t('emma.title', { defaultValue: 'Emma AI Assistant' })}</CardTitle>
               <p className="text-xs text-white/80 truncate">{t('chatWidget.headerSubtitle', { defaultValue: 'Emergency Protection Guide' })}</p>
             </div>
           </div>
@@ -181,7 +188,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={t('chatWidget.inputPlaceholder', { defaultValue: 'Ask Emma about emergency protection...' })}
+                placeholder={t('emma.placeholder', { defaultValue: 'Ask Emma about emergency protection...' })}
                 disabled={isLoading}
                 className="flex-1 min-w-0"
               />
