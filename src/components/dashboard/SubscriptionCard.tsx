@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CheckCircle, Settings, CreditCard, AlertCircle, Download, Plus, Users, FileText, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 
 interface SubscriptionCardProps {
   subscription: any;
@@ -18,6 +20,15 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
   const [isLoadingFamily, setIsLoadingFamily] = useState(false);
   const [showInviteForm, setShowInviteForm] = useState(false);
   const [inviteForm, setInviteForm] = useState({ email: '', name: '', relationship: '' });
+  const { language, currency: selectedCurrency } = usePreferences();
+  const locale = languageToLocale(language as any);
+  
+  const toCurrency = (c: string) => (['EUR','GBP','USD','AUD'].includes((c || '').toUpperCase()) ? (c || 'EUR').toUpperCase() : 'EUR') as any;
+  const formatPriceDisplay = (amount: number, fromCurrency = 'EUR') => {
+    const converted = convertCurrency(amount, toCurrency(fromCurrency), selectedCurrency as any);
+    return formatDisplayCurrency(converted, selectedCurrency as any, locale);
+  };
+  
   // Temporary simple toast function to avoid useToast dependency
   const toast = ({ title, description, variant }: any) => {
     console.log(`Toast: ${title} - ${description} (${variant || 'default'})`);
@@ -233,10 +244,10 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">Total Paid This Month:</span>
-                      <span className="ml-2 font-semibold">€{
-                        subscription.subscription_tier === 'spain_plan' ? '24.99' :
-                        subscription.subscription_tier === 'premium_protection' ? '4.99' : '1.99'
-                      }</span>
+                      <span className="ml-2 font-semibold">{formatPriceDisplay(
+                        subscription.subscription_tier === 'spain_plan' ? 24.99 :
+                        subscription.subscription_tier === 'premium_protection' ? 4.99 : 1.99
+                      )}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Payment Method:</span>
@@ -347,18 +358,18 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                   <h5 className="font-semibold text-green-800 mb-1">Total Paid</h5>
-                  <p className="text-2xl font-bold text-green-900">€{
-                    subscription.subscription_tier === 'spain_plan' ? '74.97' :
-                    subscription.subscription_tier === 'premium_protection' ? '14.97' : '5.97'
-                  }</p>
+                  <p className="text-2xl font-bold text-green-900">{formatPriceDisplay(
+                    subscription.subscription_tier === 'spain_plan' ? 74.97 :
+                    subscription.subscription_tier === 'premium_protection' ? 14.97 : 5.97
+                  )}</p>
                   <p className="text-xs text-green-600">Last 3 months</p>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <h5 className="font-semibold text-blue-800 mb-1">Next Payment</h5>
-                  <p className="text-2xl font-bold text-blue-900">€{
-                    subscription.subscription_tier === 'spain_plan' ? '24.99' :
-                    subscription.subscription_tier === 'premium_protection' ? '4.99' : '1.99'
-                  }</p>
+                  <p className="text-2xl font-bold text-blue-900">{formatPriceDisplay(
+                    subscription.subscription_tier === 'spain_plan' ? 24.99 :
+                    subscription.subscription_tier === 'premium_protection' ? 4.99 : 1.99
+                  )}</p>
                   <p className="text-xs text-blue-600">Due {new Date(subscription.subscription_end).toLocaleDateString()}</p>
                 </div>
                 <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">

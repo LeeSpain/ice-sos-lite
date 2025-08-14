@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 
 // Use your Stripe publishable key here (this is safe to expose)
 const stripePromise = loadStripe("pk_test_51RqcQwBBb55hy3jU9L30IHx9w1sFZ4NoQngm6UwgwyiY1ZBF56QJ5DbeDxMxoHJwWEruoPbmmfrz27ClAS0qe3YO00S4yLN5Va");
@@ -124,6 +126,14 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { language, currency: selectedCurrency } = usePreferences();
+  const locale = languageToLocale(language as any);
+  
+  const toCurrency = (c: string) => (['EUR','GBP','USD','AUD'].includes((c || '').toUpperCase()) ? (c || 'EUR').toUpperCase() : 'EUR') as any;
+  const formatPriceDisplay = (amount: number, fromCurrency: string) => {
+    const converted = convertCurrency(amount, toCurrency(fromCurrency), selectedCurrency as any);
+    return formatDisplayCurrency(converted, selectedCurrency as any, locale);
+  };
 
   // Fetch data from database for display
   const [planData, setPlanData] = useState<any[]>([]);
@@ -280,7 +290,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
               {planData.map(plan => (
                 <li key={plan.id} className="flex justify-between p-2 bg-white rounded border">
                   <span className="font-medium">{plan.name}</span>
-                  <span className="text-foreground">€{parseFloat(plan.price.toString()).toFixed(2)}/month</span>
+                  <span className="text-foreground">{formatPriceDisplay(parseFloat(plan.price.toString()), plan.currency)}/month</span>
                 </li>
               ))}
             </ul>
@@ -296,13 +306,16 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
                 const netPrice = parseFloat(service.price.toString());
                 const ivaAmount = netPrice * SERVICE_IVA_RATE;
                 const totalPrice = netPrice * (1 + SERVICE_IVA_RATE);
+                const convertedNetPrice = convertCurrency(netPrice, toCurrency(service.currency), selectedCurrency as any);
+                const convertedIvaAmount = convertedNetPrice * SERVICE_IVA_RATE;
+                const convertedTotalPrice = convertedNetPrice * (1 + SERVICE_IVA_RATE);
                 return (
                   <li key={service.id} className="p-2 bg-white rounded border">
                     <div className="flex justify-between items-start">
                       <span className="font-medium">{service.name} ({service.region})</span>
                       <div className="text-right text-sm">
-                        <div className="text-muted-foreground">Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}</div>
-                        <div className="font-bold text-foreground">€{totalPrice.toFixed(2)}/month</div>
+                        <div className="text-muted-foreground">Net: {formatDisplayCurrency(convertedNetPrice, selectedCurrency as any, locale)} + IVA: {formatDisplayCurrency(convertedIvaAmount, selectedCurrency as any, locale)}</div>
+                        <div className="font-bold text-foreground">{formatDisplayCurrency(convertedTotalPrice, selectedCurrency as any, locale)}/month</div>
                       </div>
                     </div>
                   </li>
@@ -321,13 +334,16 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
                 const netPrice = parseFloat(product.price.toString());
                 const ivaAmount = netPrice * PRODUCT_IVA_RATE;
                 const totalPrice = netPrice * (1 + PRODUCT_IVA_RATE);
+                const convertedNetPrice = convertCurrency(netPrice, toCurrency(product.currency), selectedCurrency as any);
+                const convertedIvaAmount = convertedNetPrice * PRODUCT_IVA_RATE;
+                const convertedTotalPrice = convertedNetPrice * (1 + PRODUCT_IVA_RATE);
                 return (
                   <li key={product.id} className="p-2 bg-white rounded border">
                     <div className="flex justify-between items-start">
                       <span className="font-medium">{product.name}</span>
                       <div className="text-right text-sm">
-                        <div className="text-muted-foreground">Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}</div>
-                        <div className="font-bold text-foreground">€{totalPrice.toFixed(2)}</div>
+                        <div className="text-muted-foreground">Net: {formatDisplayCurrency(convertedNetPrice, selectedCurrency as any, locale)} + IVA: {formatDisplayCurrency(convertedIvaAmount, selectedCurrency as any, locale)}</div>
+                        <div className="font-bold text-foreground">{formatDisplayCurrency(convertedTotalPrice, selectedCurrency as any, locale)}</div>
                       </div>
                     </div>
                   </li>
@@ -342,18 +358,18 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           {subscriptionTotal > 0 && (
             <div className="flex justify-between text-base">
               <span>Monthly Subscription:</span>
-              <span className="text-foreground">€{subscriptionTotal.toFixed(2)}/month</span>
+              <span className="text-foreground">{formatDisplayCurrency(subscriptionTotal, selectedCurrency as any, locale)}/month</span>
             </div>
           )}
           {productTotal > 0 && (
             <div className="flex justify-between text-base">
               <span>One-time Products:</span>
-              <span className="text-foreground">€{productTotal.toFixed(2)}</span>
+              <span className="text-foreground">{formatDisplayCurrency(productTotal, selectedCurrency as any, locale)}</span>
             </div>
           )}
           <div className="flex justify-between text-lg font-bold border-t pt-2">
             <span>Total Payment:</span>
-            <span className="text-foreground">€{grandTotal.toFixed(2)}</span>
+            <span className="text-foreground">{formatDisplayCurrency(grandTotal, selectedCurrency as any, locale)}</span>
           </div>
         </div>
       </div>

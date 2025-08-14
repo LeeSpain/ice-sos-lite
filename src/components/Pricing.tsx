@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 import { useTranslation } from 'react-i18next';
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 interface Product {
   id: string;
   name: string;
@@ -205,9 +206,12 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
           <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
             {t('pricing.title')}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
             {t('pricing.subtitle')}
           </p>
+          <div className="flex justify-center">
+            <LanguageCurrencySelector compact />
+          </div>
         </div>
 
 

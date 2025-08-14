@@ -22,6 +22,8 @@ import { SettingsPage } from "@/components/dashboard/pages/SettingsPage";
 import { SupportPage } from "@/components/dashboard/pages/SupportPage";
 import { FlicControlPage } from "@/components/dashboard/pages/FlicControlPage";
 import { useTranslation } from 'react-i18next';
+import LanguageCurrencySelector from "@/components/LanguageCurrencySelector";
+
 const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -100,6 +102,9 @@ const Dashboard = () => {
             <SidebarTrigger />
             <div className="flex-1">
               <h1 className="text-xl font-semibold">{t('dashboard.title', { defaultValue: 'Dashboard' })}</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <LanguageCurrencySelector compact />
             </div>
           </header>
 
