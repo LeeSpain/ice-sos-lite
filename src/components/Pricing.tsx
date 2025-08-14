@@ -285,51 +285,6 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
           </div>
 
 
-          {/* Family Connection Card - Connected below */}
-          <div className="max-w-4xl mx-auto mt-6">
-            {globalPlans.filter(plan => plan.name === 'Family Connection').map((plan) => (
-              <Card key={plan.id} className="relative border-2 border-wellness/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-wellness/5 via-transparent to-wellness/10"></div>
-<Badge className="absolute top-6 right-6 bg-wellness text-white text-sm px-4 py-2 shadow-lg">
-  {t('pricing.addOn')}
-</Badge>
-                
-                <div className="relative p-8">
-                  <div className="grid lg:grid-cols-3 gap-8 items-center">
-                    {/* Plan Info */}
-                    <div className="text-center lg:text-left">
-                      <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Users className="h-8 w-8 text-white" />
-                      </div>
-                      <CardTitle className="text-3xl font-bold mb-3">
-                        {plan.name === 'Family Connection' ? t('plans.family.name', { defaultValue: 'Family Connection' }) : plan.name}
-                      </CardTitle>
-                      <CardDescription className="text-lg text-muted-foreground mb-4">
-                        {plan.name === 'Family Connection' ? t('plans.family.description', { defaultValue: plan.description }) : plan.description}
-                      </CardDescription>
-<div className="mb-6">
-  <span className="text-4xl font-bold text-wellness">{formatPriceDisplay(plan.price, plan.currency)}</span>
-  <span className="text-muted-foreground text-lg">/{plan.billing_interval}</span>
-</div>
-                    </div>
-                    
-                    {/* Features */}
-                    <div className="lg:col-span-2">
-                      <h4 className="text-xl font-semibold mb-4">{t('pricing.familyFeatures')}</h4>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        {plan.features.map((feature, featureIndex) => (
-                          <div key={featureIndex} className="flex items-start space-x-3">
-                            <Check className="h-5 w-5 text-wellness mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground">{feature}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
         </div>
 
         {/* Safety Products Section */}
