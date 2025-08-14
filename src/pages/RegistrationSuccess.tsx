@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Download, Smartphone, QrCode, ArrowRight, Star, Shield } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import QRCode from 'qrcode';
+import SEO from '@/components/SEO';
 
 const RegistrationSuccess = () => {
   const [iosQR, setIosQR] = useState('');
@@ -39,8 +40,37 @@ const RegistrationSuccess = () => {
     generateQRCodes();
   }, []);
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Welcome to ICE SOS Lite – Registration Complete",
+    "description": "Your ICE SOS Lite registration is complete. Download the app and activate your emergency protection now.",
+    "provider": {
+      "@type": "Organization",
+      "name": "ICE SOS Lite",
+      "url": "https://icesoslite.com"
+    },
+    "mainEntity": {
+      "@type": "SoftwareApplication",
+      "name": "ICE SOS Lite App",
+      "operatingSystem": ["iOS", "Android"],
+      "applicationCategory": "HealthApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-hero">
+      <SEO 
+        title="Welcome to ICE SOS Lite – Registration Complete"
+        description="Your ICE SOS Lite registration is complete. Download the app and activate your emergency protection now. Available on iOS and Android."
+        canonical="/welcome"
+        structuredData={structuredData}
+      />
       <Navigation />
       
       <div className="container mx-auto px-4 py-24">

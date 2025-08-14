@@ -12,6 +12,30 @@ Allow: /
 
 User-agent: *
 Allow: /
+Allow: /register
+Allow: /ai-register
+Allow: /auth
+Allow: /welcome
+Allow: /privacy
+Allow: /terms
+Allow: /support
+Allow: /contact
+Allow: /sos
+Allow: /devices/
+Allow: /regional-center/
+Allow: /family-carer-access
+Allow: /payment-success
 
-Sitemap: /sitemap.xml
+# Disallow admin and internal pages
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /test
+Disallow: /api/
+Disallow: /_next/
+Disallow: /static/
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
+
+Sitemap: https://icesoslite.com/sitemap.xml
 

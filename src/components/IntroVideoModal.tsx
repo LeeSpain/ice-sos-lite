@@ -43,6 +43,13 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
       available: true
     },
     {
+      id: 'family-connection',
+      title: 'ICE SOS Lite - Family Connection',
+      description: 'How to connect and protect your family members through ICE SOS Lite',
+      youtubeId: 'zOgSKzktc7g',
+      available: true
+    },
+    {
       id: 'all-ages',
       title: 'ICE SOS Lite - For All Ages',
       description: 'Protection solutions for every age group',

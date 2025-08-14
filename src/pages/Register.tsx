@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
+import SEO from '@/components/SEO';
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -259,8 +260,31 @@ const Register = () => {
     }
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Register for ICE SOS Lite Emergency Protection",
+    "description": "Complete emergency protection registration with detailed setup. Choose your plans, add safety products, and activate comprehensive protection.",
+    "provider": {
+      "@type": "Organization",
+      "name": "ICE SOS Lite",
+      "url": "https://icesoslite.com"
+    },
+    "mainEntity": {
+      "@type": "Service",
+      "name": "ICE SOS Lite Emergency Protection",
+      "category": "Emergency Response Service"
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-hero">
+      <SEO 
+        title="Register for ICE SOS Lite – Complete Emergency Protection Setup"
+        description="Complete emergency protection registration with detailed setup. Choose your plans, add safety products, and activate comprehensive protection for you and your family."
+        canonical="/register"
+        structuredData={structuredData}
+      />
       <Navigation />
       
       <div className="container mx-auto px-4 py-24">

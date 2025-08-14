@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TermsDialog } from '@/components/legal/TermsDialog';
 import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import useRateLimit from '@/hooks/useRateLimit';
+import SEO from '@/components/SEO';
 
 const AuthPage = () => {
   const { user, loading } = useAuth();
@@ -147,8 +148,32 @@ const AuthPage = () => {
     setAcceptTerms(false);
   }, []);
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Sign In to ICE SOS Lite – Emergency Protection Access",
+    "description": "Access your ICE SOS Lite emergency protection dashboard. Sign in to manage your safety profile and emergency contacts.",
+    "provider": {
+      "@type": "Organization",
+      "name": "ICE SOS Lite",
+      "url": "https://icesoslite.com"
+    },
+    "mainEntity": {
+      "@type": "WebApplication",
+      "name": "ICE SOS Lite Dashboard",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Web Browser"
+    }
+  };
+
   return (
     <>
+      <SEO 
+        title="Sign In to ICE SOS Lite – Emergency Protection Access"
+        description="Access your ICE SOS Lite emergency protection dashboard. Sign in to manage your safety profile and emergency contacts."
+        canonical="/auth"
+        structuredData={structuredData}
+      />
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">

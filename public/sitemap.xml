@@ -3,10 +3,15 @@
   <url><loc>/</loc></url>
   <url><loc>/register</loc></url>
   <url><loc>/ai-register</loc></url>
+  <url><loc>/auth</loc></url>
+  <url><loc>/welcome</loc></url>
   <url><loc>/privacy</loc></url>
   <url><loc>/terms</loc></url>
   <url><loc>/support</loc></url>
+  <url><loc>/contact</loc></url>
   <url><loc>/sos</loc></url>
   <url><loc>/devices/ice-sos-pendant</loc></url>
   <url><loc>/regional-center/spain</loc></url>
+  <url><loc>/family-carer-access</loc></url>
+  <url><loc>/payment-success</loc></url>
 </urlset>

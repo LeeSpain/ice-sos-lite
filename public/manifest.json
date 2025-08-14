@@ -1,0 +1,52 @@
+{
+  "name": "ICE SOS Lite - Emergency Protection Service",
+  "short_name": "ICE SOS Lite",
+  "description": "Advanced emergency protection service with AI-powered assistance and 24/7 monitoring for you and your family.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ef4444",
+  "orientation": "portrait",
+  "categories": ["health", "safety", "emergency", "family"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Emergency SOS",
+      "short_name": "SOS",
+      "description": "Quick access to emergency SOS",
+      "url": "/sos",
+      "icons": [
+        {
+          "src": "/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Register",
+      "short_name": "Register",
+      "description": "Sign up for ICE SOS Lite",
+      "url": "/register",
+      "icons": [
+        {
+          "src": "/lovable-uploads/7ad599e6-d1cd-4a1b-84f4-9b6b1e4242e1.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

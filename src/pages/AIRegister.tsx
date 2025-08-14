@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
+import SEO from '@/components/SEO';
 
 
 interface Plan {
@@ -491,8 +492,35 @@ const AIRegister = () => {
     };
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Join ICE SOS Lite – Emergency Protection Registration",
+    "description": "Register for ICE SOS Lite emergency protection service. Quick setup with AI assistance and instant access to life-saving features.",
+    "provider": {
+      "@type": "Organization",
+      "name": "ICE SOS Lite",
+      "url": "https://icesoslite.com"
+    },
+    "mainEntity": {
+      "@type": "Service",
+      "name": "ICE SOS Lite Emergency Protection",
+      "category": "Emergency Response Service",
+      "provider": {
+        "@type": "Organization",
+        "name": "ICE SOS Lite"
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-hero">
+      <SEO 
+        title="Join ICE SOS Lite – Emergency Protection Registration"
+        description="Register for ICE SOS Lite emergency protection service. Quick setup with AI assistance and instant access to life-saving features for you and your family."
+        canonical="/ai-register"
+        structuredData={structuredData}
+      />
       <Navigation />
       
       
