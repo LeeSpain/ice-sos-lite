@@ -7,6 +7,7 @@ import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
 import { useTranslation } from 'react-i18next';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { usePreferences } from '@/contexts/PreferencesContext';
+import IntroVideoModal from '@/components/IntroVideoModal';
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const Navigation = () => {
@@ -32,6 +33,7 @@ const Navigation = () => {
             <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
               {t('nav.contact', 'Contact Us')}
             </Link>
+            <IntroVideoModal className="text-foreground hover:text-primary transition-colors" />
             {language === 'es' && (
               <Link to="/regional-center/spain" className="text-foreground hover:text-primary transition-colors">
                 {t('nav.regionalCenter')}
@@ -64,6 +66,13 @@ const Navigation = () => {
               <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
                 {t('nav.contact', 'Contact Us')}
               </Link>
+              <IntroVideoModal 
+                trigger={
+                  <button className="text-left text-foreground hover:text-primary transition-colors">
+                    {t('nav.introVideo', 'Intro Video')}
+                  </button>
+                }
+              />
               {language === 'es' && (
                 <Link to="/regional-center/spain" className="text-foreground hover:text-primary transition-colors">
                   {t('nav.regionalCenter')}
