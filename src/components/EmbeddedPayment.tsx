@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,16 @@ import type { SupportedCurrency } from '@/contexts/PreferencesContext';
 // Get Stripe publishable key from environment variables
 // Note: This needs to match the account that has the STRIPE_SECRET_KEY in the backend
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_51QqZFsDjSIrwQaMA1rJTVVhFVPuFPXJPWQiGw9mH3xUnJ3YAj8hv5OA2n9EjKGtHv8tHoQhJIqIANZ7RfNSQTAar00jK0CUIZv";
-const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+
+// Initialize Stripe promise once and memoize it
+let stripePromiseInstance: Promise<any> | null = null;
+const getStripePromise = () => {
+  if (!stripePromiseInstance) {
+    console.log("🔧 Initializing Stripe with key:", STRIPE_PUBLISHABLE_KEY);
+    stripePromiseInstance = loadStripe(STRIPE_PUBLISHABLE_KEY);
+  }
+  return stripePromiseInstance;
+};
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -27,10 +36,16 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [elementReady, setElementReady] = useState(false);
   const { toast } = useToast();
 
   // Debug logging
-  console.log("PaymentForm rendered", { stripe: !!stripe, elements: !!elements, clientSecret: !!clientSecret });
+  console.log("💳 PaymentForm rendered", { 
+    stripe: !!stripe, 
+    elements: !!elements, 
+    clientSecret: clientSecret?.slice(-10), 
+    elementReady 
+  });
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -83,16 +98,43 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
     }
   };
 
+  // PaymentElement options - memoized to prevent re-renders
+  const paymentElementOptions = useMemo(() => ({
+    layout: "tabs" as const,
+    fields: {
+      billingDetails: {
+        address: {
+          country: "never" as const,
+          postalCode: "never" as const
+        }
+      }
+    }
+  }), []);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement 
-        options={{
-          layout: "tabs"
-        }}
-      />
+      <div className="min-h-[200px] border rounded-lg p-4">
+        <PaymentElement 
+          options={paymentElementOptions}
+          onReady={() => {
+            console.log("✅ PaymentElement is ready");
+            setElementReady(true);
+          }}
+          onLoadError={(error) => {
+            console.error("❌ PaymentElement load error:", error);
+            onError("Payment form failed to load. Please refresh and try again.");
+          }}
+        />
+        {!elementReady && (
+          <div className="flex items-center justify-center h-32">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="ml-2 text-sm text-muted-foreground">Loading payment form...</span>
+          </div>
+        )}
+      </div>
       <Button
         type="submit" 
-        disabled={!stripe || isProcessing} 
+        disabled={!stripe || !elements || isProcessing || !elementReady} 
         className="w-full bg-emergency hover:bg-emergency/90"
         size="lg"
       >
@@ -130,9 +172,30 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [initializationError, setInitializationError] = useState<string | null>(null);
   const { toast } = useToast();
   const { currency: contextCurrency, language } = usePreferences();
   const selectedCurrency = propCurrency || contextCurrency;
+
+  // Memoize Stripe options to prevent re-mounting Elements
+  const stripeOptions = useMemo(() => {
+    if (!clientSecret) return null;
+    return {
+      clientSecret,
+      appearance: {
+        theme: 'stripe' as const,
+        variables: {
+          colorPrimary: 'hsl(var(--primary))',
+          colorBackground: 'hsl(var(--background))',
+          colorText: 'hsl(var(--foreground))',
+          colorDanger: 'hsl(var(--destructive))',
+          fontFamily: 'system-ui, sans-serif',
+          spacingUnit: '4px',
+          borderRadius: '6px'
+        }
+      }
+    };
+  }, [clientSecret]);
 
   // Fetch data from database for display
   const [planData, setPlanData] = useState<any[]>([]);
@@ -206,10 +269,13 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const grandTotal = subscriptionTotal + productTotal;
 
   const initializePayment = async (retryCount = 0) => {
-    console.log("Initializing payment...", { plans, products, regionalServices, userEmail, firstName, lastName, retryCount });
+    console.log("🚀 Initializing payment...", { plans, products, regionalServices, userEmail, firstName, lastName, retryCount });
+    setInitializationError(null);
     
     if ((!plans || plans.length === 0) && (!products || products.length === 0) && (!regionalServices || regionalServices.length === 0)) {
-      console.error("No items provided to payment initialization");
+      const errorMsg = "No items provided to payment initialization";
+      console.error("❌", errorMsg);
+      setInitializationError(errorMsg);
       toast({
         title: "Error",
         description: "No items selected for payment. Please go back and select items.",
@@ -221,7 +287,9 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
 
     // Validate Stripe key configuration
     if (!STRIPE_PUBLISHABLE_KEY) {
-      console.error("Stripe publishable key is not configured");
+      const errorMsg = "Stripe publishable key is not configured";
+      console.error("❌", errorMsg);
+      setInitializationError(errorMsg);
       toast({
         title: "Configuration Error",
         description: "Payment system is not properly configured. Please contact support.",
@@ -232,6 +300,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
     }
     
     try {
+      console.log("📡 Calling create-mixed-payment...");
       const { data, error } = await supabase.functions.invoke('create-mixed-payment', {
         body: { 
           subscriptionPlans: plans, 
@@ -245,12 +314,19 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         }
       });
 
-      console.log("Payment intent response:", { data, error });
+      console.log("📦 Payment intent response:", { 
+        hasData: !!data, 
+        hasError: !!error, 
+        clientSecret: data?.client_secret?.slice(-10),
+        customerId: data?.customer_id 
+      });
 
       if (error) {
         // Check for specific client_secret mismatch error
         if (error.message && error.message.includes('client_secret')) {
-          console.error("Client secret mismatch error - likely Stripe key configuration issue");
+          const errorMsg = "Client secret mismatch error - likely Stripe key configuration issue";
+          console.error("❌", errorMsg);
+          setInitializationError(errorMsg);
           toast({
             title: "Payment Configuration Error",
             description: "There's a mismatch in payment configuration. Please contact support.",
@@ -266,24 +342,32 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         throw new Error("No client secret received from payment service");
       }
 
-      console.log("Setting client secret:", data.client_secret);
+      // Validate client secret format
+      if (!data.client_secret.startsWith('pi_')) {
+        throw new Error("Invalid client secret format received");
+      }
+
+      console.log("✅ Setting client secret and customer ID");
       setClientSecret(data.client_secret);
       setCustomerId(data.customer_id);
+      setInitializationError(null);
     } catch (error) {
-      console.error("Payment initialization error:", error);
+      const errorMsg = error instanceof Error ? error.message : "Unknown error";
+      console.error("❌ Payment initialization error:", errorMsg);
+      setInitializationError(errorMsg);
       
       // Retry logic with exponential backoff for network errors
       if (retryCount < 2 && error instanceof Error && 
-          (error.message.includes('network') || error.message.includes('timeout'))) {
+          (error.message.includes('network') || error.message.includes('timeout') || error.message.includes('fetch'))) {
         const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-        console.log(`Retrying payment initialization in ${delay}ms...`);
+        console.log(`🔄 Retrying payment initialization in ${delay}ms...`);
         setTimeout(() => initializePayment(retryCount + 1), delay);
         return;
       }
       
       toast({
-        title: "Error",
-        description: "Failed to initialize payment. Please try again.",
+        title: "Payment Error",
+        description: "Failed to initialize payment. Please try again or contact support.",
         variant: "destructive"
       });
     } finally {
@@ -291,10 +375,15 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
     }
   };
 
-  // Initialize payment on component mount
+  // Initialize payment on component mount - only once
   useEffect(() => {
+    console.log("🎬 EmbeddedPayment mounted, initializing payment...");
     initializePayment();
-  }, []);
+    
+    return () => {
+      console.log("🎬 EmbeddedPayment unmounting...");
+    };
+  }, []); // Empty dependency array to run only once
 
   return (
     <div className="space-y-6">
@@ -444,18 +533,46 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
               <Loader2 className="h-8 w-8 animate-spin" />
               <span className="ml-2">Loading payment form...</span>
             </div>
-          ) : clientSecret ? (
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <PaymentForm
-                clientSecret={clientSecret}
-                customerId={customerId}
-                plans={plans}
-                onSuccess={onSuccess}
-                onError={(error) => {
-                  console.error("Payment error:", error);
+          ) : initializationError ? (
+            <div className="text-center p-4 space-y-3">
+              <p className="text-destructive font-medium">Payment Setup Failed</p>
+              <p className="text-sm text-muted-foreground">
+                {initializationError}
+              </p>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setLoading(true);
+                  initializePayment();
                 }}
-              />
-            </Elements>
+                className="bg-background hover:bg-muted"
+              >
+                <Loader2 className="mr-2 h-4 w-4" />
+                Retry Payment Setup
+              </Button>
+            </div>
+          ) : clientSecret && stripeOptions ? (
+            <div className="space-y-4">
+              <div className="text-sm text-muted-foreground text-center">
+                🔒 Secure payment powered by Stripe
+              </div>
+              <Elements 
+                stripe={getStripePromise()} 
+                options={stripeOptions}
+                key={clientSecret} // Force re-mount if clientSecret changes
+              >
+                <PaymentForm
+                  clientSecret={clientSecret}
+                  customerId={customerId}
+                  plans={plans}
+                  onSuccess={onSuccess}
+                  onError={(error) => {
+                    console.error("💳 Payment error:", error);
+                    setInitializationError(error);
+                  }}
+                />
+              </Elements>
+            </div>
           ) : (
             <div className="text-center p-4 space-y-3">
               <p className="text-destructive">Failed to load payment form</p>
