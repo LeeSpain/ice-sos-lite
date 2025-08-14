@@ -14,15 +14,8 @@ import type { SupportedCurrency } from '@/contexts/PreferencesContext';
 // Note: This needs to match the account that has the STRIPE_SECRET_KEY in the backend
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_51QqZFsDjSIrwQaMA1rJTVVhFVPuFPXJPWQiGw9mH3xUnJ3YAj8hv5OA2n9EjKGtHv8tHoQhJIqIANZ7RfNSQTAar00jK0CUIZv";
 
-// Initialize Stripe promise once and memoize it
-let stripePromiseInstance: Promise<any> | null = null;
-const getStripePromise = () => {
-  if (!stripePromiseInstance) {
-    console.log("🔧 Initializing Stripe with key:", STRIPE_PUBLISHABLE_KEY);
-    stripePromiseInstance = loadStripe(STRIPE_PUBLISHABLE_KEY);
-  }
-  return stripePromiseInstance;
-};
+// Initialize Stripe promise - stable singleton pattern
+const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 interface PaymentFormProps {
   clientSecret: string;
@@ -557,7 +550,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
                 🔒 Secure payment powered by Stripe
               </div>
               <Elements 
-                stripe={getStripePromise()} 
+                stripe={stripePromise} 
                 options={stripeOptions}
                 key={clientSecret} // Force re-mount if clientSecret changes
               >
