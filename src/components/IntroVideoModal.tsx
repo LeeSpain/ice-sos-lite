@@ -109,15 +109,17 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
               </Button>
             </DialogHeader>
             
-            <div className="relative w-full bg-black rounded-t-lg overflow-hidden" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1`}
-                title={selectedVideo.title}
-                className="absolute top-0 left-0 w-full h-full"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
+            <div className="flex justify-center p-6">
+              <div className="relative w-full max-w-2xl bg-black rounded-lg overflow-hidden shadow-2xl" style={{ paddingBottom: '28.125%' }}>
+                <iframe
+                  src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1`}
+                  title={selectedVideo.title}
+                  className="absolute top-0 left-0 w-full h-full"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
             </div>
             
             <div className="p-8 bg-gradient-to-br from-background to-muted/10">
