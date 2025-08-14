@@ -182,9 +182,9 @@ const AIRegister = () => {
         setDbPlans(formattedPlans);
         
         // Set Premium Protection as default (fixed standard plan)
-        const premiumPlan = formattedPlans.find(p => p.name === 'Premium Protection');
-        if (premiumPlan) {
-          setSelectedMainPlan(premiumPlan.id);
+        const defaultPremiumPlan = formattedPlans.find(p => p.name === 'Premium Protection');
+        if (defaultPremiumPlan) {
+          setSelectedMainPlan(defaultPremiumPlan.id);
         }
 
         // Fetch products
