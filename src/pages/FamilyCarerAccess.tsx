@@ -141,7 +141,7 @@ const FamilyCarerAccessPage = () => {
             <div className="text-center lg:text-left text-white animate-fade-in">
               <div className="inline-flex items-center space-x-2 bg-wellness/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-wellness/30">
                 <Heart className="h-4 w-4 text-wellness-glow animate-pulse" />
-                <span className="text-sm font-medium text-white">Family Connection Platform</span>
+                <span className="text-sm font-medium text-wellness-glow">Family Connection Platform</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
                 Connect Your <span className="text-wellness-glow drop-shadow-md">Loved Ones</span>
@@ -157,18 +157,7 @@ const FamilyCarerAccessPage = () => {
                 >
                   <Link to="/register">
                     <UserPlus className="mr-2 h-5 w-5" />
-                    Start Connecting
-                  </Link>
-                </Button>
-                <Button 
-                  asChild
-                  size="xl" 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-gray-900 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
-                >
-                  <Link to="/">
-                    <ArrowLeft className="mr-2 h-5 w-5" />
-                    Back to Home
+                    <span className="text-wellness-glow font-bold">Start Connecting</span>
                   </Link>
                 </Button>
               </div>
