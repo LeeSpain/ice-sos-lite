@@ -21,9 +21,10 @@ interface Video {
 interface IntroVideoModalProps {
   trigger?: React.ReactNode;
   className?: string;
+  defaultVideoId?: string;
 }
 
-export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) => {
+export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVideoModalProps) => {
   const { t } = useTranslation();
   const [selectedVideo, setSelectedVideo] = React.useState<Video | null>(null);
 
@@ -78,6 +79,16 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
   const handleClose = () => {
     setSelectedVideo(null);
   };
+
+  // Auto-select video when modal opens if defaultVideoId is provided
+  React.useEffect(() => {
+    if (defaultVideoId) {
+      const video = videos.find(v => v.id === defaultVideoId);
+      if (video && video.available) {
+        setSelectedVideo(video);
+      }
+    }
+  }, [defaultVideoId, videos]);
 
   return (
     <Dialog onOpenChange={(open) => { if (!open) handleClose(); }}>

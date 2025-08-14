@@ -244,7 +244,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
   <span className="text-4xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
   <span className="text-muted-foreground text-lg">/{selectedPlan.billing_interval}</span>
 </div>
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex flex-col gap-3">
                           <Button 
                             size="lg"
                             className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
@@ -254,6 +254,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           </Button>
                           
                           <IntroVideoModal 
+                            defaultVideoId="overview"
                             trigger={
                               <Button 
                                 size="lg"
