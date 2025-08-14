@@ -271,16 +271,6 @@ const Contact: React.FC = () => {
           {/* Emma AI Chat */}
           <div className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5 text-primary" />
-                  Chat with Emma
-                </CardTitle>
-                <CardDescription>
-                  Get immediate help from our AI assistant. Emma can answer questions about our services, 
-                  help with app features, and provide general support.
-                </CardDescription>
-              </CardHeader>
               <CardContent className="p-0">
                 <div className="h-[600px] border rounded-lg overflow-hidden">
                   <ContactChatWidget 
@@ -288,19 +278,6 @@ const Contact: React.FC = () => {
                     placeholder="Hi! I'm Emma, your ICE SOS Lite assistant. How can I help you today?"
                   />
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Additional Help */}
-            <Card className="bg-muted/30">
-              <CardContent className="pt-6">
-                <h3 className="font-semibold mb-3">Other Ways to Get Help</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Check our documentation and user guides</li>
-                  <li>• Visit our support center for common questions</li>
-                  <li>• Join our community forums for peer support</li>
-                  <li>• Follow us for updates and announcements</li>
-                </ul>
               </CardContent>
             </Card>
           </div>
