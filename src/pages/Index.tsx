@@ -15,21 +15,18 @@ import { useTranslation } from 'react-i18next';
 import SEO from '@/components/SEO';
 import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
 import { preloadCriticalImages } from "@/utils/imageOptimization";
+import { useEmmaChat } from "@/contexts/EmmaChatContext";
 
 const Index = () => {
   useScrollToTop();
   usePerformanceMonitoring();
   const { t } = useTranslation();
+  const { openEmmaChat } = useEmmaChat();
 
   // Preload critical images
   useEffect(() => {
     preloadCriticalImages();
   }, []);
-
-  const handleEmmaClick = () => {
-    // Emma click handler for Hero component
-    console.log('Emma clicked from Hero');
-  };
 
   return (
     <div className="min-h-screen">
@@ -45,7 +42,7 @@ const Index = () => {
       />
       <Navigation />
 
-      <Hero onEmmaClick={handleEmmaClick} />
+      <Hero onEmmaClick={openEmmaChat} />
       <Features />
       {/* <MetricPreview /> */}
 

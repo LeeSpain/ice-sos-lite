@@ -1,26 +1,19 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import ChatWidget from "@/components/ai-chat/ChatWidget";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useEmmaChat } from '@/contexts/EmmaChatContext';
 
 const GlobalEmmaChat: React.FC = () => {
   const { t } = useTranslation();
-  const [isEmmaOpen, setIsEmmaOpen] = useState(false);
-
-  const handleEmmaClick = useCallback(() => {
-    setIsEmmaOpen(true);
-  }, []);
-
-  const handleEmmaClose = useCallback(() => {
-    setIsEmmaOpen(false);
-  }, []);
+  const { isEmmaOpen, openEmmaChat, closeEmmaChat } = useEmmaChat();
 
   return (
     <>
       {/* Floating Emma Chat Trigger */}
       <div className="fixed top-28 right-4 z-50">
-        <div className="relative group cursor-pointer" onClick={handleEmmaClick}>
+        <div className="relative group cursor-pointer" onClick={openEmmaChat}>
           {/* Floating animation wrapper */}
           <div className="animate-bounce">
             {/* Main container with gradient and glow */}
@@ -88,7 +81,7 @@ const GlobalEmmaChat: React.FC = () => {
       {/* Emma Chat Widget */}
       <ChatWidget 
         isOpen={isEmmaOpen} 
-        onClose={handleEmmaClose}
+        onClose={closeEmmaChat}
         userName={t('common.visitor', { defaultValue: 'Visitor' })}
         context="global"
       />

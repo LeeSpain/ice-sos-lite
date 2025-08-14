@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { EmmaChatProvider } from "@/contexts/EmmaChatContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import RouteChangeTracker from "@/components/RouteChangeTracker";
@@ -35,10 +36,11 @@ const Contact = lazy(() => import("./pages/Contact"));
 const App = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <RouteChangeTracker />
-        <ScrollToTop />
-        <Suspense fallback={<div className="p-6 text-sm">Loading…</div>}>
+      <EmmaChatProvider>
+        <BrowserRouter>
+          <RouteChangeTracker />
+          <ScrollToTop />
+          <Suspense fallback={<div className="p-6 text-sm">Loading…</div>}>
           <Routes>
             <Route path="/test" element={<TestPage />} />
             <Route path="/" element={<Index />} />
@@ -96,14 +98,15 @@ const App = () => {
             <Route path="/family-carer-access" element={<FamilyCarerAccess />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </Suspense>
-        
-        {/* Global floating device/settings button */}
-        <DeviceManagerButton />
-        
-        {/* Global Emma Chat - Available on all pages */}
-        <GlobalEmmaChat />
-      </BrowserRouter>
+          </Suspense>
+          
+          {/* Global floating device/settings button */}
+          <DeviceManagerButton />
+          
+          {/* Global Emma Chat - Available on all pages */}
+          <GlobalEmmaChat />
+        </BrowserRouter>
+      </EmmaChatProvider>
     </AuthProvider>
   );
 };
