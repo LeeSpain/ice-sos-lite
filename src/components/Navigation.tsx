@@ -29,6 +29,9 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
+            <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
+              {t('nav.contact', 'Contact Us')}
+            </Link>
             {language === 'es' && (
               <Link to="/regional-center/spain" className="text-foreground hover:text-primary transition-colors">
                 {t('nav.regionalCenter')}
@@ -58,6 +61,9 @@ const Navigation = () => {
           <div className="md:hidden border-t border-border py-4">
             <div className="flex flex-col space-y-4">
               <LanguageCurrencySelector />
+              <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
+                {t('nav.contact', 'Contact Us')}
+              </Link>
               {language === 'es' && (
                 <Link to="/regional-center/spain" className="text-foreground hover:text-primary transition-colors">
                   {t('nav.regionalCenter')}

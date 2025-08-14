@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Mail, MessageCircle, Send, CheckCircle, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -33,6 +34,7 @@ type ContactFormData = z.infer<typeof contactSchema>;
 
 const Contact: React.FC = () => {
   const { t } = useTranslation();
+  useScrollToTop(); // Ensure page scrolls to top when navigated to
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
