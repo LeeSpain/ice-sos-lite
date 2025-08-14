@@ -33,7 +33,13 @@ const Navigation = () => {
             <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
               {t('nav.contact', 'Contact Us')}
             </Link>
-            <IntroVideoModal className="text-foreground hover:text-primary transition-colors" />
+            <IntroVideoModal 
+              trigger={
+                <button className="text-foreground hover:text-primary transition-colors text-sm">
+                  {t('nav.introVideo', 'Intro Video')}
+                </button>
+              }
+            />
             {language === 'es' && (
               <Link to="/regional-center/spain" className="text-foreground hover:text-primary transition-colors">
                 {t('nav.regionalCenter')}
