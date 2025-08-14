@@ -11,7 +11,8 @@ import { usePreferences } from '@/contexts/PreferencesContext';
 import type { SupportedCurrency } from '@/contexts/PreferencesContext';
 
 // Get Stripe publishable key from environment variables
-const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_51RqcQwBBb55hy3jU9L30IHx9w1sFZ4NoQngm6UwgwyiY1ZBF56QJ5DbeDxMxoHJwWEruoPbmmfrz27ClAS0qe3YO00S4yLN5Va";
+// Note: This needs to match the account that has the STRIPE_SECRET_KEY in the backend
+const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || "pk_test_51QqZFsDjSIrwQaMA1rJTVVhFVPuFPXJPWQiGw9mH3xUnJ3YAj8hv5OA2n9EjKGtHv8tHoQhJIqIANZ7RfNSQTAar00jK0CUIZv";
 const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 interface PaymentFormProps {
