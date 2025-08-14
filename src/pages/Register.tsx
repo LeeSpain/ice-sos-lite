@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,9 +12,6 @@ import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import EmbeddedPayment from "@/components/EmbeddedPayment";
 import { useTranslation } from 'react-i18next';
-import { usePreferences } from '@/contexts/PreferencesContext';
-import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
-import LanguageCurrencySelector from "@/components/LanguageCurrencySelector";
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -36,17 +33,8 @@ const Register = () => {
     acceptTerms: false
   });
   const [loading, setLoading] = useState(false);
-  const [subscriptionPlans, setSubscriptionPlans] = useState<any[]>([]);
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { language, currency: selectedCurrency } = usePreferences();
-  const locale = languageToLocale(language as any);
-  
-  const toCurrency = (c: string) => (['EUR','GBP','USD','AUD'].includes((c || '').toUpperCase()) ? (c || 'EUR').toUpperCase() : 'EUR') as any;
-  const formatPriceDisplay = (amount: number, fromCurrency: string) => {
-    const converted = convertCurrency(amount, toCurrency(fromCurrency), selectedCurrency as any);
-    return formatDisplayCurrency(converted, selectedCurrency as any, locale);
-  };
 
   const handleNextStep = () => {
     if (step === 1) {
@@ -113,8 +101,7 @@ const Register = () => {
             medical_conditions: formData.medicalConditions,
             allergies: formData.allergies,
             current_location: formData.currentLocation,
-            preferred_language: language, // Save user's language preference in metadata
-            preferred_currency: selectedCurrency, // Save user's currency preference in metadata
+            preferred_language: formData.preferredLanguage,
           }
         }
       });
@@ -143,26 +130,6 @@ const Register = () => {
     }
   };
 
-  // Fetch subscription plans
-  useEffect(() => {
-    const fetchSubscriptionPlans = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('subscription_plans')
-          .select('*')
-          .eq('is_active', true)
-          .order('sort_order', { ascending: true });
-
-        if (error) throw error;
-        setSubscriptionPlans(data || []);
-      } catch (error) {
-        console.error('Error fetching subscription plans:', error);
-      }
-    };
-
-    fetchSubscriptionPlans();
-  }, []);
-
   return (
     <div className="min-h-screen bg-gradient-hero">
       <Navigation />
@@ -180,9 +147,6 @@ const Register = () => {
               <CardDescription className="text-lg">
                 Register now to receive your personalized app download link via email
               </CardDescription>
-              <div className="flex justify-center mt-4">
-                <LanguageCurrencySelector compact />
-              </div>
             </CardHeader>
             
             <CardContent>
@@ -268,7 +232,12 @@ const Register = () => {
                   </div>
 
                   <div className="space-y-4">
-                  {subscriptionPlans.map((plan) => (
+                  {[
+                    { id: "personal", name: t('register.plans.personal.name', { defaultValue: 'Personal Account' }), price: `€4.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.personal.desc', { defaultValue: 'Individual emergency contact system' }) },
+                    { id: "guardian", name: t('register.plans.guardian.name', { defaultValue: 'Guardian Wellness' }), price: `€4.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.guardian.desc', { defaultValue: 'Advanced health monitoring and alerts' }) },
+                    { id: "family", name: t('register.plans.family.name', { defaultValue: 'Family Sharing' }), price: `€0.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.family.desc', { defaultValue: 'Perfect for families with multiple members' }) },
+                    { id: "callcenter", name: t('register.plans.callcenterES.name', { defaultValue: 'Call Centre Spain' }), price: `€24.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.callcenterES.desc', { defaultValue: '24/7 professional emergency response' }) }
+                  ].map((plan) => (
                       <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
                         <Checkbox
                           id={plan.id}
@@ -288,7 +257,7 @@ const Register = () => {
                           }}
                         />
                         <div className="flex-1">
-                          <Label htmlFor={plan.id} className="font-medium">{plan.name} - {formatPriceDisplay(plan.price, plan.currency)}{t('common.perMonth', { defaultValue: '/month' })}</Label>
+                          <Label htmlFor={plan.id} className="font-medium">{plan.name} - {plan.price}</Label>
                           <p className="text-sm text-muted-foreground">{plan.description}</p>
                         </div>
                       </div>
