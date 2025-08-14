@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,9 @@ import { TermsDialog } from '@/components/legal/TermsDialog';
 import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 
 interface Plan {
   id: string;
@@ -82,6 +85,74 @@ const AIRegister = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { currency, language } = usePreferences();
+
+  // Debug log for component renders and currency changes
+  console.log('🎯 AIRegister component render - Currency:', currency, 'Language:', language);
+
+  // Convert all data based on current currency using useMemo for proper re-rendering
+  const convertedPlans = useMemo(() => {
+    console.log('🔄 [RECALCULATING] Converting plans, currency:', currency, 'plans:', dbPlans.length);
+    if (dbPlans.length === 0) {
+      console.log('⚠️ No plans to convert yet');
+      return [];
+    }
+    const converted = dbPlans.map(plan => {
+      const originalPrice = parseFloat(plan.price.toString());
+      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
+      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+      console.log(`📋 Plan "${plan.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      return {
+        ...plan,
+        convertedPrice,
+        formattedPrice
+      };
+    });
+    console.log('✅ Final converted plans:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
+    return converted;
+  }, [dbPlans, currency, language]);
+
+  const convertedProducts = useMemo(() => {
+    console.log('🔄 [RECALCULATING] Converting products, currency:', currency, 'products:', products.length);
+    if (products.length === 0) {
+      console.log('⚠️ No products to convert yet');
+      return [];
+    }
+    const converted = products.map(product => {
+      const originalPrice = parseFloat(product.price.toString());
+      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
+      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+      console.log(`📦 Product "${product.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      return {
+        ...product,
+        convertedPrice,
+        formattedPrice
+      };
+    });
+    console.log('✅ Final converted products:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
+    return converted;
+  }, [products, currency, language]);
+
+  const convertedRegionalServices = useMemo(() => {
+    console.log('🔄 [RECALCULATING] Converting regional services, currency:', currency, 'services:', regionalServices.length);
+    if (regionalServices.length === 0) {
+      console.log('⚠️ No regional services to convert yet');
+      return [];
+    }
+    const converted = regionalServices.map(service => {
+      const originalPrice = parseFloat(service.price.toString());
+      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
+      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+      console.log(`🌍 Service "${service.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      return {
+        ...service,
+        convertedPrice,
+        formattedPrice
+      };
+    });
+    console.log('✅ Final converted regional services:', converted.map(s => ({ name: s.name, formatted: s.formattedPrice })));
+    return converted;
+  }, [regionalServices, currency, language]);
 
   // Fetch plans, products, and regional services from database
   useEffect(() => {
@@ -344,24 +415,24 @@ const AIRegister = () => {
   };
 
 
-  // Helper functions
-  const premiumPlan = dbPlans.find(p => p.name === 'Premium Protection');
-  const familyPlan = dbPlans.find(p => p.name.includes('Family'));
+  // Helper functions using converted data
+  const convertedPremiumPlan = convertedPlans.find(p => p.name === 'Premium Protection');
+  const convertedFamilyPlan = convertedPlans.find(p => p.name.includes('Family'));
 
   // Tax rates
   const PRODUCT_IVA_RATE = 0.21; // 21% for products
   const SERVICE_IVA_RATE = 0.10; // 10% for regional services
 
   const calculateSubscriptionTotal = () => {
-    let total = premiumPlan ? premiumPlan.price : 0;
-    if (hasFamilyPlan && familyPlan) {
-      total += familyPlan.price;
+    let total = convertedPremiumPlan ? convertedPremiumPlan.convertedPrice : 0;
+    if (hasFamilyPlan && convertedFamilyPlan) {
+      total += convertedFamilyPlan.convertedPrice;
     }
     // Add regional services (subscription-based) with IVA
     selectedRegionalServices.forEach(serviceId => {
-      const service = regionalServices.find(s => s.id === serviceId);
+      const service = convertedRegionalServices.find(s => s.id === serviceId);
       if (service) {
-        const priceWithIva = service.price * (1 + SERVICE_IVA_RATE);
+        const priceWithIva = service.convertedPrice * (1 + SERVICE_IVA_RATE);
         total += priceWithIva;
       }
     });
@@ -371,9 +442,9 @@ const AIRegister = () => {
   const calculateProductTotal = () => {
     let total = 0;
     selectedProducts.forEach(productId => {
-      const product = products.find(p => p.id === productId);
+      const product = convertedProducts.find(p => p.id === productId);
       if (product) {
-        const priceWithIva = product.price * (1 + PRODUCT_IVA_RATE);
+        const priceWithIva = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
         total += priceWithIva;
       }
     });
@@ -404,8 +475,8 @@ const AIRegister = () => {
 
   const getSelectedSubscriptionPlans = (): string[] => {
     const planIds: string[] = [];
-    if (premiumPlan) planIds.push(premiumPlan.id);
-    if (hasFamilyPlan && familyPlan) planIds.push(familyPlan.id);
+    if (convertedPremiumPlan) planIds.push(convertedPremiumPlan.id);
+    if (hasFamilyPlan && convertedFamilyPlan) planIds.push(convertedFamilyPlan.id);
     // Add selected regional services as they are subscription-based
     planIds.push(...selectedRegionalServices);
     return planIds;
@@ -440,6 +511,9 @@ const AIRegister = () => {
               <CardDescription className="text-lg">
                 {currentStep === 'details' ? 'Join ICE SOS Lite and secure your emergency protection' : 'Finalize your subscription and start protecting what matters most'}
               </CardDescription>
+              <div className="flex justify-end mt-4">
+                <LanguageCurrencySelector compact />
+              </div>
             </CardHeader>
             
             <CardContent className="p-8">
@@ -584,20 +658,20 @@ const AIRegister = () => {
                     {/* Premium Protection Plan - Fixed Standard */}
                     <div className="space-y-4">
                       <h3 className="font-medium text-foreground">Standard Protection Plan:</h3>
-                      {premiumPlan && (
+                      {convertedPremiumPlan && (
                         <div className="p-4 border-2 border-primary bg-primary/5 rounded-lg">
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <Shield className="h-5 w-5 text-primary" />
-                                <h3 className="font-semibold text-lg">{premiumPlan.name}</h3>
+                                <h3 className="font-semibold text-lg">{convertedPremiumPlan.name}</h3>
                                 <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
                                   Standard
                                 </span>
                               </div>
-                              <p className="text-muted-foreground mb-3">{premiumPlan.description}</p>
+                              <p className="text-muted-foreground mb-3">{convertedPremiumPlan.description}</p>
                               <div className="grid grid-cols-2 gap-2">
-                                {premiumPlan.features.map((feature, idx) => (
+                                {convertedPremiumPlan.features.map((feature, idx) => (
                                   <div key={idx} className="flex items-center gap-1 text-sm">
                                     <Check className="h-3 w-3 text-green-500" />
                                     <span>{feature}</span>
@@ -608,12 +682,12 @@ const AIRegister = () => {
                             <div className="text-right ml-4">
                               <div className="space-y-1">
                                 <div className="text-sm text-muted-foreground">
-                                  Net: €{premiumPlan.price.toFixed(2)}
+                                  Net: {convertedPremiumPlan.formattedPrice}
                                 </div>
                                 <div className="font-bold text-lg text-primary">
-                                  €{premiumPlan.price.toFixed(2)}
+                                  {convertedPremiumPlan.formattedPrice}
                                 </div>
-                                <div className="text-sm text-muted-foreground">per {premiumPlan.billing_interval}</div>
+                                <div className="text-sm text-muted-foreground">per {convertedPremiumPlan.billing_interval}</div>
                               </div>
                             </div>
                           </div>
@@ -796,22 +870,22 @@ const AIRegister = () => {
                             </div>
                             <div className="text-right ml-6">
                               <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                <div className="font-bold text-lg text-foreground">€{(premiumPlan?.price || 0).toFixed(2)}</div>
+                                <div className="font-bold text-lg text-foreground">{convertedPremiumPlan?.formattedPrice || '€0.00'}</div>
                                 <div className="text-xs text-muted-foreground mt-1">per month</div>
                               </div>
                             </div>
                           </div>
                           
                           {/* Family Plan */}
-                          {hasFamilyPlan && familyPlan && (
+                          {hasFamilyPlan && convertedFamilyPlan && (
                             <div className="flex justify-between items-start border-t border-border/30 pt-4">
                               <div className="flex-1">
-                                <div className="font-medium text-foreground text-base">{familyPlan.name}</div>
+                                <div className="font-medium text-foreground text-base">{convertedFamilyPlan.name}</div>
                                 <div className="text-sm text-muted-foreground mt-1">Family protection add-on • Monthly subscription</div>
                               </div>
                               <div className="text-right ml-6">
                                 <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                  <div className="font-bold text-lg text-foreground">€{familyPlan.price.toFixed(2)}</div>
+                                  <div className="font-bold text-lg text-foreground">{convertedFamilyPlan.formattedPrice}</div>
                                   <div className="text-xs text-muted-foreground mt-1">per month</div>
                                 </div>
                               </div>
