@@ -114,6 +114,8 @@ const Register = () => {
             allergies: formData.allergies,
             current_location: formData.currentLocation,
             preferred_language: formData.preferredLanguage,
+            preferred_currency: selectedCurrency, // Save user's currency preference
+            language_preference: language, // Save user's language preference
           }
         }
       });
