@@ -11,8 +11,6 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { usePreferences } from '@/contexts/PreferencesContext';
-import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 
 interface MyProductsWidgetProps {
   profile: any;
@@ -20,14 +18,6 @@ interface MyProductsWidgetProps {
 
 const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
   const [userProducts, setUserProducts] = useState<any[]>([]);
-  const { language, currency: selectedCurrency } = usePreferences();
-  const locale = languageToLocale(language as any);
-  
-  const toCurrency = (c: string) => (['EUR','GBP','USD','AUD'].includes((c || '').toUpperCase()) ? (c || 'EUR').toUpperCase() : 'EUR') as any;
-  const formatPriceDisplay = (amount: number, fromCurrency = 'EUR') => {
-    const converted = convertCurrency(amount, toCurrency(fromCurrency), selectedCurrency as any);
-    return formatDisplayCurrency(converted, selectedCurrency as any, locale);
-  };
   const [subscription, setSubscription] = useState<any>(null);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
   const [regionalServices, setRegionalServices] = useState<any[]>([]);
@@ -356,7 +346,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                   {subscription.plans?.[0]?.name || subscription.subscription_tier || 'Active Plan'}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {subscription.plans?.[0]?.price ? `${formatPriceDisplay(subscription.plans[0].price, subscription.plans[0].currency)} per ${subscription.plans[0].billing_interval}` : 'Active subscription'}
+                  {subscription.plans?.[0]?.price ? `€${subscription.plans[0].price} per ${subscription.plans[0].billing_interval}` : 'Active subscription'}
                 </p>
               </div>
               <Badge className="bg-emergency text-black">
@@ -396,7 +386,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                     Invite a trusted family member or carer to your dashboard for secure monitoring and support.
                   </p>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span className="font-semibold text-primary">{formatPriceDisplay(Number(familyPlan.price || 1.99), familyPlan.currency)}/month</span>
+                    <span className="font-semibold text-primary">€{Number(familyPlan.price || 1.99).toFixed(2)}/month</span>
                     <span>• Add-on</span>
                   </div>
                   <div className="mt-1 text-xs text-muted-foreground">
@@ -453,7 +443,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                             {product.description || "Premium emergency device for enhanced personal safety and protection."}
                           </p>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="font-semibold text-primary">{formatPriceDisplay(product.price, product.currency)}</span>
+                            <span className="font-semibold text-primary">€{product.price}</span>
                             {product.features && (
                               <span>• {Array.isArray(product.features) ? product.features.slice(0, 2).join(' • ') : 'Advanced Features'}</span>
                             )}
@@ -491,7 +481,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                             {service.description || "24/7 emergency response and monitoring service for your region with local emergency coordination."}
                           </p>
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="font-semibold text-green-600">{formatPriceDisplay(service.price, service.currency)}/month</span>
+                            <span className="font-semibold text-green-600">€{service.price}/month</span>
                             <span>• {service.region || 'Regional Coverage'}</span>
                             {service.features && Array.isArray(service.features) && (
                               <span>• {service.features.slice(0, 1).join(', ')}</span>
