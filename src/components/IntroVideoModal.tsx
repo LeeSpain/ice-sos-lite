@@ -27,7 +27,7 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
   const { t } = useTranslation();
   const [selectedVideo, setSelectedVideo] = React.useState<Video | null>(null);
 
-  const videos: Video[] = [
+  const videos: Video[] = React.useMemo(() => [
     {
       id: 'overview',
       title: 'ICE SOS Lite Overview',
@@ -56,7 +56,7 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
       youtubeId: '',
       available: false
     }
-  ];
+  ], []);
 
   const defaultTrigger = (
     <Button variant="ghost" size="sm" className={className}>
@@ -65,11 +65,11 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
     </Button>
   );
 
-  const handleVideoSelect = (video: Video) => {
+  const handleVideoSelect = React.useCallback((video: Video) => {
     if (video.available) {
       setSelectedVideo(video);
     }
-  };
+  }, []);
 
   const handleBack = () => {
     setSelectedVideo(null);
@@ -80,20 +80,21 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
   };
 
   return (
-    <Dialog onOpenChange={handleClose}>
+    <Dialog onOpenChange={(open) => { if (!open) handleClose(); }}>
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
       <DialogContent className="max-w-4xl w-full max-h-[95vh] overflow-y-auto p-0 bg-gradient-to-br from-background via-background/95 to-muted/30 border border-border/50 shadow-2xl backdrop-blur-sm">
-        <DialogHeader className="absolute top-4 right-4 z-10">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            className="hover:bg-background/90 backdrop-blur-md rounded-full h-10 w-10 p-0 shadow-lg border border-border/20"
-          >
-            <X className="h-5 w-5" />
-          </Button>
+        <DialogHeader className="absolute top-4 right-4 z-20">
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hover:bg-background/90 backdrop-blur-md rounded-full h-10 w-10 p-0 shadow-lg border border-border/20"
+            >
+              <X className="h-5 w-5" />
+            </Button>
+          </DialogTrigger>
         </DialogHeader>
 
         {selectedVideo && selectedVideo.available ? (
@@ -157,11 +158,12 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
                     {video.available && video.youtubeId ? (
                       <>
                         <img
-                          src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                          src={`https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`}
                           alt={video.title}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
                           onError={(e) => {
-                            e.currentTarget.src = `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`;
+                            e.currentTarget.src = `https://img.youtube.com/vi/${video.youtubeId}/default.jpg`;
                           }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20"></div>
