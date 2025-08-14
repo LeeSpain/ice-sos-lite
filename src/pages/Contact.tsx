@@ -105,7 +105,7 @@ const Contact: React.FC = () => {
 
       <Navigation />
 
-      <main className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 py-12 pt-24">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight mb-4">{t('contact.title')}</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -259,8 +259,7 @@ const Contact: React.FC = () => {
                   <div>
                     <h3 className="font-semibold text-primary mb-1">Response Time</h3>
                     <p className="text-sm text-muted-foreground">
-                      We typically respond within 24-48 hours during business days. 
-                      For urgent emergency situations, please contact your local emergency services directly.
+                      We typically respond within 24-48 hours during business days.
                     </p>
                   </div>
                 </div>
