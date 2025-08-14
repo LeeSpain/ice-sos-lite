@@ -45,9 +45,13 @@ const Register = () => {
   const { t } = useTranslation();
   const { currency, language } = usePreferences();
   
+  // Debug log for component renders and currency changes
+  console.log('🎯 Register component render - Currency:', currency, 'Language:', language);
+  
   // Convert all data based on current currency using useMemo for proper re-rendering
   const convertedSubscriptionPlans = useMemo(() => {
-    return subscriptionPlans.map(plan => ({
+    console.log('🔄 Converting subscription plans, currency:', currency, 'plans:', subscriptionPlans.length);
+    const converted = subscriptionPlans.map(plan => ({
       ...plan,
       convertedPrice: convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency),
       formattedPrice: formatDisplayCurrency(
@@ -56,10 +60,13 @@ const Register = () => {
         languageToLocale(language)
       )
     }));
+    console.log('✅ Converted subscription plans:', converted.map(p => ({ name: p.name, original: p.price, converted: p.convertedPrice, formatted: p.formattedPrice })));
+    return converted;
   }, [subscriptionPlans, currency, language]);
 
   const convertedProducts = useMemo(() => {
-    return products.map(product => ({
+    console.log('🔄 Converting products, currency:', currency, 'products:', products.length);
+    const converted = products.map(product => ({
       ...product,
       convertedPrice: convertCurrency(parseFloat(product.price.toString()), 'EUR', currency),
       formattedPrice: formatDisplayCurrency(
@@ -68,10 +75,13 @@ const Register = () => {
         languageToLocale(language)
       )
     }));
+    console.log('✅ Converted products:', converted.map(p => ({ name: p.name, original: p.price, converted: p.convertedPrice, formatted: p.formattedPrice })));
+    return converted;
   }, [products, currency, language]);
 
   const convertedRegionalServices = useMemo(() => {
-    return regionalServices.map(service => ({
+    console.log('🔄 Converting regional services, currency:', currency, 'services:', regionalServices.length);
+    const converted = regionalServices.map(service => ({
       ...service,
       convertedPrice: convertCurrency(parseFloat(service.price.toString()), 'EUR', currency),
       formattedPrice: formatDisplayCurrency(
@@ -80,6 +90,8 @@ const Register = () => {
         languageToLocale(language)
       )
     }));
+    console.log('✅ Converted regional services:', converted.map(s => ({ name: s.name, original: s.price, converted: s.convertedPrice, formatted: s.formattedPrice })));
+    return converted;
   }, [regionalServices, currency, language]);
 
   // Fetch data from database on component mount
