@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -2215,12 +2215,12 @@ export type Database = {
       get_communication_metrics_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
-          date: string
+          avg_resolution_time: number
+          avg_response_time: number
           channel: string
+          date: string
           total_conversations: number
           total_messages: number
-          avg_response_time: number
-          avg_resolution_time: number
         }[]
       }
       get_user_role: {
