@@ -84,28 +84,28 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="max-w-5xl w-full h-auto p-0 bg-gradient-to-br from-background via-background to-muted/30 border border-border/50 shadow-2xl">
-        <DialogHeader className="absolute top-4 right-4 z-10">
+      <DialogContent className="max-w-3xl w-full max-h-[90vh] overflow-y-auto p-0 bg-gradient-to-br from-background via-background to-muted/20 border border-border/50 shadow-xl">
+        <DialogHeader className="absolute top-3 right-3 z-10">
           <Button
             variant="ghost"
             size="sm"
             onClick={handleClose}
-            className="hover:bg-background/80 backdrop-blur-sm rounded-full h-10 w-10 p-0 shadow-lg"
+            className="hover:bg-background/80 backdrop-blur-sm rounded-full h-8 w-8 p-0 shadow-md"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
         </DialogHeader>
 
         {selectedVideo && selectedVideo.available ? (
           <>
-            <DialogHeader className="absolute top-4 left-4 z-10">
+            <DialogHeader className="absolute top-3 left-3 z-10">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleBack}
-                className="hover:bg-background/80 backdrop-blur-sm rounded-full h-10 w-10 p-0 shadow-lg"
+                className="hover:bg-background/80 backdrop-blur-sm rounded-full h-8 w-8 p-0 shadow-md"
               >
-                <ArrowLeft className="h-5 w-5" />
+                <ArrowLeft className="h-4 w-4" />
               </Button>
             </DialogHeader>
             
@@ -120,60 +120,59 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
               />
             </div>
             
-            <div className="p-8 bg-gradient-to-br from-background to-muted/20">
-              <DialogTitle className="text-2xl font-bold mb-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+            <div className="p-6 bg-gradient-to-br from-background to-muted/10">
+              <DialogTitle className="text-xl font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
                 {selectedVideo.title}
               </DialogTitle>
-              <p className="text-muted-foreground text-lg leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 {selectedVideo.description}
               </p>
             </div>
           </>
         ) : (
-          <div className="p-8 md:p-12">
-            <DialogHeader className="mb-12 text-center">
-              <DialogTitle className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent">
+          <div className="p-6">
+            <DialogHeader className="mb-8 text-center">
+              <DialogTitle className="text-2xl font-bold mb-3 bg-gradient-to-r from-primary via-primary to-primary/80 bg-clip-text text-transparent">
                 {t('introVideo.title', 'ICE SOS Introduction Videos')}
               </DialogTitle>
-              <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+              <p className="text-muted-foreground max-w-xl mx-auto">
                 {t('introVideo.description', 'Choose a video to learn more about ICE SOS Lite')}
               </p>
             </DialogHeader>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto">
               {videos.map((video) => (
                 <div
                   key={video.id}
-                  className={`group cursor-pointer border border-border/50 rounded-xl overflow-hidden transition-all duration-300 bg-gradient-to-br from-card via-card to-muted/10 backdrop-blur-sm ${
+                  className={`group cursor-pointer border border-border/50 rounded-lg overflow-hidden transition-all duration-300 bg-gradient-to-br from-card to-muted/5 ${
                     video.available 
-                      ? 'hover:shadow-xl hover:scale-[1.02] hover:border-primary/30 hover:bg-gradient-to-br hover:from-card hover:to-primary/5' 
+                      ? 'hover:shadow-lg hover:scale-[1.03] hover:border-primary/30' 
                       : 'opacity-60 cursor-not-allowed'
                   }`}
                   onClick={() => handleVideoSelect(video)}
                 >
-                  <div className="aspect-[16/10] bg-gradient-to-br from-primary/5 via-primary/10 to-primary/5 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-primary/5 to-primary/10 opacity-50"></div>
+                  <div className="aspect-[4/3] bg-gradient-to-br from-primary/5 to-primary/10 flex items-center justify-center relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary/5"></div>
                     {video.available ? (
-                      <div className="relative z-10 bg-gradient-to-br from-primary/20 to-primary/30 rounded-full p-6 group-hover:from-primary/30 group-hover:to-primary/40 transition-all duration-300 shadow-lg backdrop-blur-sm">
-                        <Play className="h-8 w-8 text-primary drop-shadow-sm" />
+                      <div className="relative z-10 bg-gradient-to-br from-primary/20 to-primary/30 rounded-full p-2 group-hover:from-primary/30 group-hover:to-primary/40 transition-all duration-300 shadow-md">
+                        <Play className="h-4 w-4 text-primary" />
                       </div>
                     ) : (
-                      <div className="relative z-10 bg-gradient-to-br from-muted/30 to-muted/50 rounded-full p-6 backdrop-blur-sm">
-                        <Play className="h-8 w-8 text-muted-foreground/70" />
+                      <div className="relative z-10 bg-gradient-to-br from-muted/30 to-muted/50 rounded-full p-2">
+                        <Play className="h-4 w-4 text-muted-foreground/70" />
                       </div>
                     )}
-                    <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black/20 to-transparent"></div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="font-bold text-lg mb-3 group-hover:text-primary transition-colors duration-200">
+                  <div className="p-3">
+                    <h3 className="font-semibold text-xs mb-1 group-hover:text-primary transition-colors duration-200 line-clamp-2">
                       {video.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
+                    <p className="text-muted-foreground text-xs leading-tight line-clamp-2">
                       {video.description}
                     </p>
                     {!video.available && (
-                      <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full bg-muted/50 border border-border/30">
-                        <p className="text-xs text-muted-foreground font-medium">Coming Soon</p>
+                      <div className="mt-2 inline-flex items-center px-2 py-0.5 rounded-full bg-muted/50 border border-border/30">
+                        <p className="text-xs text-muted-foreground font-medium">Soon</p>
                       </div>
                     )}
                   </div>
@@ -181,9 +180,9 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
               ))}
             </div>
             
-            <div className="mt-12 text-center">
-              <p className="text-sm text-muted-foreground/80">
-                More videos will be added soon to help you get the most out of ICE SOS Lite
+            <div className="mt-8 text-center">
+              <p className="text-xs text-muted-foreground/80">
+                More videos coming soon to help you master ICE SOS Lite
               </p>
             </div>
           </div>
