@@ -26,13 +26,13 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { subscriptionPlans, products, regionalServices, email, firstName, lastName, currency = 'eur' } = await req.json();
+    const { subscriptionPlans, products, regionalServices, email, firstName, lastName, currency = 'eur', testingMode = false } = await req.json();
     
     if (!email) {
       throw new Error("Email is required for payment processing");
     }
     
-    logStep("Request data received", { email, firstName, lastName, subscriptionPlans, products, regionalServices, currency });
+    logStep("Request data received", { email, firstName, lastName, subscriptionPlans, products, regionalServices, currency, testingMode });
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
@@ -101,13 +101,19 @@ serve(async (req) => {
       }, 0);
     }
 
-    const totalAmount = subscriptionTotal + productTotal;
+    let totalAmount = subscriptionTotal + productTotal;
+    
+    // Override amount for testing mode
+    if (testingMode) {
+      totalAmount = 1; // 1 cent in the smallest currency unit
+      logStep("Testing mode enabled - overriding amount to 1 cent", { originalAmount: subscriptionTotal + productTotal, testAmount: totalAmount });
+    }
     
     if (totalAmount === 0) {
       throw new Error("No valid items selected for payment");
     }
 
-    logStep("Calculated totals", { subscriptionTotal, productTotal, totalAmount });
+    logStep("Calculated totals", { subscriptionTotal, productTotal, totalAmount, testingMode });
 
     // Create payment intent for the total amount
     const paymentIntent = await stripe.paymentIntents.create({
@@ -122,6 +128,7 @@ serve(async (req) => {
         subscription_amount: subscriptionTotal.toString(),
         product_amount: productTotal.toString(),
         payment_currency: currency,
+        testing_mode: testingMode.toString(),
       },
       automatic_payment_methods: {
         enabled: true,

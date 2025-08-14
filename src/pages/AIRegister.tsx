@@ -83,6 +83,7 @@ const AIRegister = () => {
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
   const [currentStep, setCurrentStep] = useState<'details' | 'payment'>('details');
   const [isLoading, setIsLoading] = useState(false);
+  const [testingMode, setTestingMode] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
   const { currency, language } = usePreferences();
@@ -1027,6 +1028,35 @@ const AIRegister = () => {
                     </div>
                   </div>
 
+                  {/* Testing Mode Toggle (Development Only) */}
+                  {process.env.NODE_ENV === 'development' && (
+                    <div className="pt-4 pb-4 border-t border-border/30">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <div className="flex items-center space-x-3">
+                          <Checkbox
+                            id="testingMode"
+                            checked={testingMode}
+                            onCheckedChange={(checked) => setTestingMode(checked as boolean)}
+                          />
+                          <Label htmlFor="testingMode" className="flex-1 cursor-pointer">
+                            <div className="font-medium text-yellow-800">Testing Mode (Development Only)</div>
+                            <div className="text-sm text-yellow-600">
+                              Process payment for only 1 cent to test the full payment flow
+                            </div>
+                          </Label>
+                        </div>
+                        {testingMode && (
+                          <div className="mt-3 p-3 bg-yellow-100 rounded-md border border-yellow-300">
+                            <div className="text-sm font-medium text-yellow-800">⚠️ Test Payment Active</div>
+                            <div className="text-xs text-yellow-700 mt-1">
+                              Payment will be processed for 0.01 {currency} instead of the full amount
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Continue Button */}
                   <div className="pt-6">
                     <Button 
@@ -1036,7 +1066,7 @@ const AIRegister = () => {
                       disabled={!isFormValid()}
                     >
                       <CreditCard className="mr-2 h-4 w-4" />
-                      Continue to Payment
+                      {testingMode ? 'Continue to Test Payment (1 cent)' : 'Continue to Payment'}
                     </Button>
                   </div>
                 </div>
@@ -1054,6 +1084,7 @@ const AIRegister = () => {
                   country={personalDetails.country}
                   onSuccess={handlePaymentSuccess}
                   onBack={() => setCurrentStep('details')}
+                  testingMode={testingMode}
                 />
               )}
             </CardContent>
