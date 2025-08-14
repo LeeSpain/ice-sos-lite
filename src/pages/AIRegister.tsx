@@ -166,7 +166,11 @@ const AIRegister = () => {
         console.log('✅ Plans loaded:', plansData?.length || 0, 'plans');
         setDbPlans((plansData || []).map(plan => ({
           ...plan,
-          features: Array.isArray(plan.features) ? plan.features : []
+          features: Array.isArray(plan.features) 
+            ? plan.features.filter(f => typeof f === 'string') as string[]
+            : typeof plan.features === 'string' 
+              ? [plan.features]
+              : []
         })));
 
         console.log('🛍️ Fetching products...');
@@ -307,8 +311,8 @@ const AIRegister = () => {
     setCurrentStep('payment');
   };
 
-  const handlePaymentSuccess = async (paymentData: any) => {
-    console.log('💳 Payment successful, creating user...', paymentData);
+  const handlePaymentSuccess = async () => {
+    console.log('💳 Payment successful, creating user...');
     setIsLoading(true);
     
     try {
@@ -726,11 +730,19 @@ const AIRegister = () => {
                     {t('register.buttons.backToDetails')}
                   </Button>
                   <EmbeddedPayment
-                    oneTimeAmount={calculateProductTotal()}
-                    recurringAmount={calculateSubscriptionTotal()}
+                    plans={selectedMainPlan ? [selectedMainPlan] : []}
+                    products={selectedProducts}
+                    regionalServices={selectedRegionalServices}
+                    userEmail={personalDetails.email}
+                    firstName={personalDetails.firstName}
+                    lastName={personalDetails.lastName}
+                    password={personalDetails.password}
+                    phone={personalDetails.phone}
+                    city={personalDetails.city}
+                    country={personalDetails.country}
                     currency={currency}
-                    onPaymentSuccess={handlePaymentSuccess}
-                    customerEmail={personalDetails.email}
+                    onSuccess={handlePaymentSuccess}
+                    onBack={() => setCurrentStep('details')}
                   />
                 </div>
               )}
