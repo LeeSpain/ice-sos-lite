@@ -51,7 +51,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Processing contact form submission:', { name, email, subject, sessionId });
 
-    // Validate required fields
+    // Enhanced validation and sanitization
     if (!name || !email || !subject || !message) {
       return new Response(JSON.stringify({ error: 'All fields are required' }), {
         status: 400,
@@ -59,18 +59,67 @@ const handler = async (req: Request): Promise<Response> => {
       });
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return new Response(JSON.stringify({ error: 'Invalid email format' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
+    // Input sanitization function
+    const sanitizeInput = (input: string, maxLength: number = 1000): string => {
+      if (!input) return '';
+      let sanitized = input.trim();
+      // Remove null bytes and control characters
+      sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+      // Remove script tags and dangerous content
+      sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+      sanitized = sanitized.replace(/\s*on\w+\s*=\s*['""][^'""]*['""]?/gi, '');
+      sanitized = sanitized.replace(/\s*javascript\s*:/gi, '');
+      // Limit length
+      if (sanitized.length > maxLength) {
+        sanitized = sanitized.substring(0, maxLength);
+      }
+      return sanitized;
+    };
+
+    // Sanitize all inputs
+    const sanitizedName = sanitizeInput(name, 100);
+    const sanitizedEmail = email.toLowerCase().trim();
+    const sanitizedSubject = sanitizeInput(subject, 200);
+    const sanitizedMessage = sanitizeInput(message, 5000);
+
     // Get client IP and user agent from headers
     const clientIP = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
     const userAgent = req.headers.get('user-agent') || 'unknown';
 
-    // Store contact submission in database
+    // Rate limiting check
+    const { data: existingSubmissions } = await supabase
+      .from('contact_submissions')
+      .select('created_at')
+      .eq('ip_address', clientIP)
+      .gte('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString()) // Last hour
+      .order('created_at', { ascending: false });
+
+    if (existingSubmissions && existingSubmissions.length >= 3) {
+      return new Response(JSON.stringify({ 
+        error: 'Too many submissions. Please wait before submitting again.' 
+      }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
+
+    // Store contact submission in database using sanitized inputs
     const { data: submission, error: dbError } = await supabase
       .from('contact_submissions')
       .insert({
-        name,
-        email,
-        subject,
-        message,
+        name: sanitizedName,
+        email: sanitizedEmail,
+        subject: sanitizedSubject,
+        message: sanitizedMessage,
         ip_address: clientIP,
         user_agent: userAgent,
         session_id: sessionId || null,

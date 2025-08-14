@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Mail, MessageCircle, Send, CheckCircle, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
+import { sanitizeInput, isValidEmail, checkRateLimit, logSecurityEvent } from "@/utils/security";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -57,11 +58,33 @@ const Contact: React.FC = () => {
   const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     try {
+      // Client-side rate limiting check
+      if (!checkRateLimit('contact_form', 3, 60 * 60 * 1000)) {
+        toast.error("Too many submissions. Please wait before submitting again.");
+        logSecurityEvent('rate_limit_exceeded', { action: 'contact_form' });
+        return;
+      }
+
+      // Additional client-side validation
+      if (!isValidEmail(data.email)) {
+        toast.error("Please enter a valid email address.");
+        return;
+      }
+
+      // Sanitize inputs before sending
+      const sanitizedData = {
+        name: sanitizeInput(data.name, 100),
+        email: data.email.toLowerCase().trim(),
+        subject: sanitizeInput(data.subject, 200),
+        message: sanitizeInput(data.message, 5000),
+        acceptTerms: data.acceptTerms,
+      };
+
       const sessionId = crypto.randomUUID();
       
       const { data: response, error } = await supabase.functions.invoke('contact-form', {
         body: {
-          ...data,
+          ...sanitizedData,
           sessionId,
         },
       });
@@ -74,12 +97,19 @@ const Contact: React.FC = () => {
         setIsSubmitted(true);
         reset();
         toast.success("Message sent successfully! Check your email for confirmation.");
+        logSecurityEvent('contact_form_submitted', { submissionId: response.submissionId });
       } else {
         throw new Error(response?.error || 'Unknown error occurred');
       }
     } catch (error: any) {
       console.error('Contact form error:', error);
-      toast.error(error.message || "Failed to send message. Please try again.");
+      if (error.message?.includes('Too many')) {
+        toast.error("Too many submissions. Please wait before submitting again.");
+        logSecurityEvent('rate_limit_server_rejection', { error: error.message });
+      } else {
+        toast.error(error.message || "Failed to send message. Please try again.");
+        logSecurityEvent('contact_form_error', { error: error.message });
+      }
     } finally {
       setIsSubmitting(false);
     }
