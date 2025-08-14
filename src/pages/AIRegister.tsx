@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
-import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
+
 
 interface Plan {
   id: string;
@@ -511,9 +511,6 @@ const AIRegister = () => {
               <CardDescription className="text-lg">
                 {currentStep === 'details' ? 'Join ICE SOS Lite and secure your emergency protection' : 'Finalize your subscription and start protecting what matters most'}
               </CardDescription>
-              <div className="flex justify-end mt-4">
-                <LanguageCurrencySelector compact />
-              </div>
             </CardHeader>
             
             <CardContent className="p-8">
