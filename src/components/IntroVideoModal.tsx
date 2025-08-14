@@ -46,8 +46,8 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
       id: 'all-ages',
       title: 'ICE SOS Lite - For All Ages',
       description: 'Protection solutions for every age group',
-      youtubeId: '',
-      available: false
+      youtubeId: 'G016_sqtg48',
+      available: true
     },
     {
       id: 'spain',
