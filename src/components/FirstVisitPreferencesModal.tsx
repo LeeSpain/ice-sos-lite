@@ -102,7 +102,7 @@ export const FirstVisitPreferencesModal: React.FC = () => {
                 <DollarSign className="w-4 h-4" />
                 Currency
               </div>
-              <Select value={selectedCurrency} onValueChange={(value) => setCurrency(value as SupportedCurrency)}>
+              <Select value={selectedCurrency} onValueChange={(value) => setSelectedCurrency(value as SupportedCurrency)}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
