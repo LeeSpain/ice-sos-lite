@@ -17,7 +17,6 @@ import { Badge } from '@/components/ui/badge';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 
-
 interface Plan {
   id: string;
   name: string;
@@ -98,19 +97,17 @@ const AIRegister = () => {
       return [];
     }
     const converted = dbPlans.map(plan => {
-      const originalPrice = parseFloat(plan.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`📋 Plan "${plan.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      const convertedPrice = convertCurrency(plan.price, plan.currency as any, currency);
+      console.log(`💰 Plan ${plan.name}: ${plan.price} ${plan.currency} → ${convertedPrice.toFixed(2)} ${currency}`);
       return {
         ...plan,
-        convertedPrice,
-        formattedPrice
+        price: convertedPrice,
+        currency: currency
       };
     });
-    console.log('✅ Final converted plans:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
+    console.log('✅ Plans conversion complete:', converted.length, 'plans converted');
     return converted;
-  }, [dbPlans, currency, language]);
+  }, [dbPlans, currency]);
 
   const convertedProducts = useMemo(() => {
     console.log('🔄 [RECALCULATING] Converting products, currency:', currency, 'products:', products.length);
@@ -119,19 +116,17 @@ const AIRegister = () => {
       return [];
     }
     const converted = products.map(product => {
-      const originalPrice = parseFloat(product.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`📦 Product "${product.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      const convertedPrice = convertCurrency(product.price, product.currency as any, currency);
+      console.log(`🛒 Product ${product.name}: ${product.price} ${product.currency} → ${convertedPrice.toFixed(2)} ${currency}`);
       return {
         ...product,
-        convertedPrice,
-        formattedPrice
+        price: convertedPrice,
+        currency: currency
       };
     });
-    console.log('✅ Final converted products:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
+    console.log('✅ Products conversion complete:', converted.length, 'products converted');
     return converted;
-  }, [products, currency, language]);
+  }, [products, currency]);
 
   const convertedRegionalServices = useMemo(() => {
     console.log('🔄 [RECALCULATING] Converting regional services, currency:', currency, 'services:', regionalServices.length);
@@ -140,363 +135,257 @@ const AIRegister = () => {
       return [];
     }
     const converted = regionalServices.map(service => {
-      const originalPrice = parseFloat(service.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`🌍 Service "${service.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      const convertedPrice = convertCurrency(service.price, service.currency as any, currency);
+      console.log(`🗺️ Service ${service.name}: ${service.price} ${service.currency} → ${convertedPrice.toFixed(2)} ${currency}`);
       return {
         ...service,
-        convertedPrice,
-        formattedPrice
+        price: convertedPrice,
+        currency: currency
       };
     });
-    console.log('✅ Final converted regional services:', converted.map(s => ({ name: s.name, formatted: s.formattedPrice })));
+    console.log('✅ Regional services conversion complete:', converted.length, 'services converted');
     return converted;
-  }, [regionalServices, currency, language]);
+  }, [regionalServices, currency]);
 
-  // Fetch plans, products, and regional services from database
+  // Load data on component mount
   useEffect(() => {
-    const fetchData = async () => {
+    console.log('🚀 AIRegister useEffect triggered - Loading data');
+    const loadData = async () => {
       try {
-        // Fetch subscription plans
+        console.log('📊 Fetching subscription plans...');
         const { data: plansData, error: plansError } = await supabase
           .from('subscription_plans')
           .select('*')
           .eq('is_active', true)
-          .eq('billing_interval', 'month')
-          .order('sort_order');
-
-        if (plansError) throw plansError;
-
-        const formattedPlans = plansData.map(plan => ({
-          id: plan.id,
-          name: plan.name,
-          description: plan.description || '',
-          price: parseFloat(plan.price.toString()),
-          currency: plan.currency,
-          billing_interval: plan.billing_interval,
-          features: Array.isArray(plan.features) ? plan.features.map(f => String(f)) : [],
-          is_popular: plan.is_popular
-        }));
-
-        setDbPlans(formattedPlans);
+          .order('price');
         
-        // Set Premium Protection as default (fixed standard plan)
-        const defaultPremiumPlan = formattedPlans.find(p => p.name === 'Premium Protection');
-        if (defaultPremiumPlan) {
-          setSelectedMainPlan(defaultPremiumPlan.id);
+        if (plansError) {
+          console.error('❌ Plans fetch error:', plansError);
+          throw plansError;
         }
+        console.log('✅ Plans loaded:', plansData?.length || 0, 'plans');
+        setDbPlans((plansData || []).map(plan => ({
+          ...plan,
+          features: Array.isArray(plan.features) ? plan.features : []
+        })));
 
-        // Fetch products
+        console.log('🛍️ Fetching products...');
         const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*')
           .in('status', ['active', 'coming_soon'])
           .order('sort_order');
+        
+        if (productsError) {
+          console.error('❌ Products fetch error:', productsError);
+          throw productsError;
+        }
+        console.log('✅ Products loaded:', productsData?.length || 0, 'products');
+        setProducts((productsData || []).map(product => ({
+          ...product,
+          images: Array.isArray(product.images) ? product.images : []
+        })));
 
-        if (productsError) throw productsError;
-
-        const formattedProducts = productsData.map(product => ({
-          id: product.id,
-          name: product.name,
-          description: product.description || '',
-          price: parseFloat(product.price.toString()),
-          currency: product.currency,
-          features: Array.isArray(product.features) ? product.features.map(f => String(f)) : [],
-          images: Array.isArray(product.images) ? product.images : [],
-          status: product.status || 'active'
-        }));
-
-        setProducts(formattedProducts);
-
-        // Fetch regional services
+        console.log('🗺️ Fetching regional services...');
         const { data: servicesData, error: servicesError } = await supabase
           .from('regional_services')
           .select('*')
           .eq('is_active', true)
           .order('sort_order');
-
-        if (servicesError) throw servicesError;
-
-        const formattedServices = servicesData.map(service => ({
-          id: service.id,
-          name: service.name,
-          description: service.description || '',
-          price: parseFloat(service.price.toString()),
-          currency: service.currency,
-          region: service.region,
-          features: Array.isArray(service.features) ? service.features.map(f => String(f)) : []
-        }));
-
-        setRegionalServices(formattedServices);
-
+        
+        if (servicesError) {
+          console.error('❌ Regional services fetch error:', servicesError);
+          throw servicesError;
+        }
+        console.log('✅ Regional services loaded:', servicesData?.length || 0, 'services');
+        setRegionalServices(servicesData || []);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('💥 Data loading error:', error);
         toast({
-          title: t('register.loadErrorTitle', { defaultValue: 'Error loading data' }),
-          description: t('register.loadErrorDesc', { defaultValue: 'Failed to load subscription options. Please refresh the page.' }),
-          variant: "destructive"
+          title: "Error",
+          description: "Failed to load registration data. Please refresh the page.",
+          variant: "destructive",
         });
       }
     };
 
-    fetchData();
+    loadData();
+  }, [toast]);
+
+  const handlePersonalDetailsChange = useCallback((field: keyof PersonalDetails, value: string | boolean) => {
+    setPersonalDetails(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  const handlePersonalDetailsChange = (field: keyof PersonalDetails, value: string | boolean) => {
-    setPersonalDetails(prev => ({
-      ...prev,
-      [field]: field === 'acceptTerms' ? value === 'true' || value === true : value
-    }));
-  };
+  const handleMainPlanChange = useCallback((planId: string) => {
+    console.log('📋 Main plan selected:', planId);
+    setSelectedMainPlan(planId);
+  }, []);
 
-  const handleMainPlanChange = (value: string) => {
-    setSelectedMainPlan(value);
-  };
+  const handleFamilyPlanToggle = useCallback((enabled: boolean) => {
+    console.log('👨‍👩‍👧‍👦 Family plan toggled:', enabled);
+    setHasFamilyPlan(enabled);
+  }, []);
 
-  const handleFamilyPlanToggle = (checked: boolean) => {
-    setHasFamilyPlan(checked);
-  };
-
-  const handleProductToggle = (productId: string, checked: boolean) => {
+  const handleProductToggle = useCallback((productId: string) => {
+    console.log('🛒 Product toggled:', productId);
     setSelectedProducts(prev => 
-      checked 
-        ? [...prev, productId]
-        : prev.filter(id => id !== productId)
+      prev.includes(productId) 
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
     );
-  };
+  }, []);
 
-  const handleRegionalServiceToggle = (serviceId: string, checked: boolean) => {
+  const handleRegionalServiceToggle = useCallback((serviceId: string) => {
+    console.log('🗺️ Regional service toggled:', serviceId);
     setSelectedRegionalServices(prev => 
-      checked 
-        ? [...prev, serviceId]
-        : prev.filter(id => id !== serviceId)
+      prev.includes(serviceId) 
+        ? prev.filter(id => id !== serviceId)
+        : [...prev, serviceId]
     );
-  };
+  }, []);
 
-  // Simple validation for button disabled state (no side effects)
-  const isFormValid = () => {
-    const { firstName, lastName, email, password, phone, city, country, acceptTerms } = personalDetails;
-    return firstName && lastName && email && password && phone && city && country && acceptTerms && password.length >= 6;
-  };
-
-  // Validation with toast messages (only called on submit)
   const validatePersonalDetails = () => {
-    const { firstName, lastName, email, password, phone, city, country, acceptTerms } = personalDetails;
-    if (!firstName || !lastName || !email || !password || !phone || !city || !country) {
-      return false;
-    }
-    
-    if (!acceptTerms) {
-      toast({
-        title: t('register.termsErrorTitle', { defaultValue: 'Terms Required' }),
-        description: t('register.termsErrorDesc', { defaultValue: 'You must accept the Terms of Service and Privacy Policy to continue.' }),
-        variant: "destructive"
-      });
-      return false;
-    }
-    if (password.length < 6) {
-      toast({
-        title: t('register.invalidPasswordTitle', { defaultValue: 'Invalid Password' }),
-        description: t('register.invalidPasswordDesc', { defaultValue: 'Password must be at least 6 characters long.' }),
-        variant: "destructive"
-      });
-      return false;
-    }
-    return true;
+    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;
+    return {
+      firstName: personalDetails.firstName.trim().length > 0,
+      lastName: personalDetails.lastName.trim().length > 0,
+      email: personalDetails.email.trim().length > 0 && emailRegex.test(personalDetails.email),
+      password: personalDetails.password.length >= 6,
+      phone: personalDetails.phone.trim().length > 0,
+      city: personalDetails.city.trim().length > 0,
+      country: personalDetails.country.trim().length > 0,
+      acceptTerms: personalDetails.acceptTerms,
+    };
   };
 
-  const handleContinueToPayment = () => {
-    if (!validatePersonalDetails()) {
-      toast({
-        title: t('register.incompleteInfoTitle', { defaultValue: 'Incomplete Information' }),
-        description: t('register.incompleteInfoDesc', { defaultValue: 'Please fill in all personal details before continuing.' }),
-        variant: "destructive"
-      });
-      return;
-    }
-    setCurrentStep('payment');
+  const isFormValid = () => {
+    const validation = validatePersonalDetails();
+    return Object.values(validation).every(isValid => isValid) && selectedMainPlan;
   };
-
-  const handlePaymentSuccess = async () => {
-    try {
-      // Create Supabase user account
-      const redirectUrl = `${window.location.origin}/dashboard`;
-      
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: personalDetails.email,
-        password: personalDetails.password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            first_name: personalDetails.firstName,
-            last_name: personalDetails.lastName,
-            phone: personalDetails.phone
-          }
-        }
-      });
-
-      if (authError) {
-        if (authError.message.includes("already registered")) {
-          // User exists, try to sign them in
-          const { error: signInError } = await supabase.auth.signInWithPassword({
-            email: personalDetails.email,
-            password: personalDetails.password,
-          });
-          
-          if (signInError) {
-            toast({
-              title: "Account Creation Failed",
-              description: "Email already exists but password doesn't match. Please use a different email or sign in with existing credentials.",
-              variant: "destructive"
-            });
-            return;
-          }
-        } else {
-          throw authError;
-        }
-      }
-
-      // Create or update profile record
-      if (authData?.user || !authError) {
-        const userId = authData?.user?.id;
-        if (userId) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert({
-              user_id: userId,
-              first_name: personalDetails.firstName,
-              last_name: personalDetails.lastName,
-              phone: personalDetails.phone,
-              address: `${personalDetails.city}, ${personalDetails.country}`,
-              country: personalDetails.country,
-              emergency_contacts: [],
-              medical_conditions: [],
-              allergies: [],
-              medications: []
-            });
-
-          if (profileError) {
-            console.error('Error creating profile:', profileError);
-          }
-        }
-      }
-
-      // Store welcome data for the PaymentSuccess page
-      const welcomeData = {
-        firstName: personalDetails.firstName,
-        lastName: personalDetails.lastName,
-        email: personalDetails.email,
-        subscriptionPlans: getSelectedSubscriptionPlans(),
-        products: selectedProducts,
-        regionalServices: selectedRegionalServices,
-        totalAmount: calculateGrandTotal()
-      };
-      
-      sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
-
-      toast({
-        title: t('register.successTitle', { defaultValue: 'Registration Complete!' }),
-        description: t('register.successDesc', { defaultValue: 'Welcome to ICE SOS Lite. You can now access your dashboard.' }),
-      });
-      
-      // Redirect to welcome page instead of dashboard
-      setTimeout(() => {
-        window.location.href = '/welcome';
-      }, 2000);
-    } catch (error) {
-      console.error('Registration error:', error);
-      toast({
-        title: t('register.errorTitle', { defaultValue: 'Registration Error' }),
-        description: t('register.errorDesc', { defaultValue: 'Failed to create your account. Please try again or contact support.' }),
-        variant: "destructive"
-      });
-    }
-  };
-
-
-  // Helper functions using converted data
-  const convertedPremiumPlan = convertedPlans.find(p => p.name === 'Premium Protection');
-  const convertedFamilyPlan = convertedPlans.find(p => p.name.includes('Family'));
-
-  // Tax rates
-  const PRODUCT_IVA_RATE = 0.21; // 21% for products
-  const SERVICE_IVA_RATE = 0.10; // 10% for regional services
 
   const calculateSubscriptionTotal = () => {
-    let total = convertedPremiumPlan ? convertedPremiumPlan.convertedPrice : 0;
-    if (hasFamilyPlan && convertedFamilyPlan) {
-      total += convertedFamilyPlan.convertedPrice;
+    let total = 0;
+    
+    if (selectedMainPlan) {
+      const plan = convertedPlans.find(p => p.id === selectedMainPlan);
+      if (plan) total += plan.price;
     }
-    // Add regional services (subscription-based) with IVA
+    
+    if (hasFamilyPlan) {
+      const familyPlan = convertedPlans.find(p => p.name.toLowerCase().includes('family'));
+      if (familyPlan) total += familyPlan.price;
+    }
+    
     selectedRegionalServices.forEach(serviceId => {
       const service = convertedRegionalServices.find(s => s.id === serviceId);
-      if (service) {
-        const priceWithIva = service.convertedPrice * (1 + SERVICE_IVA_RATE);
-        total += priceWithIva;
-      }
+      if (service) total += service.price;
     });
+    
     return total;
   };
 
   const calculateProductTotal = () => {
-    let total = 0;
-    selectedProducts.forEach(productId => {
+    return selectedProducts.reduce((total, productId) => {
       const product = convertedProducts.find(p => p.id === productId);
-      if (product) {
-        const priceWithIva = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
-        total += priceWithIva;
-      }
-    });
-    return total;
-  };
-
-  const calculateProductsSubtotal = () => {
-    let total = 0;
-    selectedProducts.forEach(productId => {
-      const product = products.find(p => p.id === productId);
-      if (product) total += product.price;
-    });
-    return total;
-  };
-
-  const calculateServicesSubtotal = () => {
-    let total = 0;
-    selectedRegionalServices.forEach(serviceId => {
-      const service = regionalServices.find(s => s.id === serviceId);
-      if (service) total += service.price;
-    });
-    return total;
+      return total + (product ? product.price : 0);
+    }, 0);
   };
 
   const calculateGrandTotal = () => {
     return calculateSubscriptionTotal() + calculateProductTotal();
   };
 
-  const getSelectedSubscriptionPlans = (): string[] => {
-    const planIds: string[] = [];
-    if (convertedPremiumPlan) planIds.push(convertedPremiumPlan.id);
-    if (hasFamilyPlan && convertedFamilyPlan) planIds.push(convertedFamilyPlan.id);
-    // Add selected regional services as they are subscription-based
-    planIds.push(...selectedRegionalServices);
-    return planIds;
+  const handleContinueToPayment = async () => {
+    if (!isFormValid()) {
+      toast({
+        title: t('register.validation.planRequired'),
+        description: "Please complete all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    setCurrentStep('payment');
   };
 
-  const getAllSelections = () => {
-    return {
-      subscriptionPlans: getSelectedSubscriptionPlans(),
-      products: selectedProducts,
-      regionalServices: selectedRegionalServices
-    };
+  const handlePaymentSuccess = async (paymentData: any) => {
+    console.log('💳 Payment successful, creating user...', paymentData);
+    setIsLoading(true);
+    
+    try {
+      // Create Supabase user
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: personalDetails.email,
+        password: personalDetails.password,
+        options: {
+          data: {
+            first_name: personalDetails.firstName,
+            last_name: personalDetails.lastName,
+            phone_number: personalDetails.phone,
+            preferred_language: language,
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      // Update profile with additional data
+      if (authData.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            first_name: personalDetails.firstName,
+            last_name: personalDetails.lastName,
+            phone: personalDetails.phone,
+            address: `${personalDetails.city}, ${personalDetails.country}`,
+            language_preference: language,
+          })
+          .eq('user_id', authData.user.id);
+
+        if (profileError) {
+          console.error('Profile update error:', profileError);
+        }
+      }
+
+      // Store welcome data for later processing
+      await supabase.from('registration_selections').insert({
+        user_id: authData.user?.id,
+        session_id: crypto.randomUUID(),
+        subscription_plans: [
+          { id: selectedMainPlan, selected: true },
+          ...(hasFamilyPlan ? [{ id: 'family', selected: true }] : [])
+        ],
+        selected_products: selectedProducts.map(id => ({ id, selected: true })),
+        selected_regional_services: selectedRegionalServices.map(id => ({ id, selected: true })),
+        total_subscription_amount: calculateSubscriptionTotal(),
+        total_product_amount: calculateProductTotal(),
+        currency: currency,
+        registration_completed: true,
+      });
+
+      toast({
+        title: "Registration Successful!",
+        description: "Welcome to ICE SOS Lite! Check your email for verification.",
+      });
+
+      // Redirect to success page or dashboard
+      window.location.href = '/registration-success';
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast({
+        title: "Registration Error",
+        description: "There was an issue completing your registration. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5">
       <Navigation />
       
-      
-      {/* Registration Form */}
-      <div className="pt-32 pb-8 px-4">
+      <div className="pt-20 pb-16 px-4">
         <div className="max-w-4xl mx-auto">
           <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0">
             <CardHeader className="text-center border-b bg-gradient-to-r from-emergency/5 to-primary/5 py-6">
@@ -506,10 +395,10 @@ const AIRegister = () => {
                 </div>
               </div>
               <CardTitle className="text-3xl font-bold text-foreground">
-                {currentStep === 'details' ? 'Emergency Protection Registration' : 'Complete Your Payment'}
+                {t('register.title')}
               </CardTitle>
               <CardDescription className="text-lg">
-                {currentStep === 'details' ? 'Join ICE SOS Lite and secure your emergency protection' : 'Finalize your subscription and start protecting what matters most'}
+                {currentStep === 'details' ? t('register.stepDetails') : t('register.stepPayment')}
               </CardDescription>
             </CardHeader>
             
@@ -522,554 +411,336 @@ const AIRegister = () => {
                       <div className="p-2 bg-primary/10 rounded-full">
                         <User className="h-5 w-5 text-primary" />
                       </div>
-                      <h2 className="text-xl font-bold text-foreground">Personal Details</h2>
+                      <h2 className="text-xl font-bold text-foreground">{t('register.personalDetails.title')}</h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="firstName">First Name *</Label>
+                        <Label htmlFor="firstName">{t('register.personalDetails.firstName')} *</Label>
                         <Input
                           id="firstName"
                           value={personalDetails.firstName}
                           onChange={(e) => handlePersonalDetailsChange('firstName', e.target.value)}
-                          placeholder="Enter your first name"
+                          placeholder={t('register.personalDetails.firstName')}
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="lastName">Last Name *</Label>
+                        <Label htmlFor="lastName">{t('register.personalDetails.lastName')} *</Label>
                         <Input
                           id="lastName"
                           value={personalDetails.lastName}
                           onChange={(e) => handlePersonalDetailsChange('lastName', e.target.value)}
-                          placeholder="Enter your last name"
+                          placeholder={t('register.personalDetails.lastName')}
                           required
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="email">Email Address *</Label>
+                        <Label htmlFor="email">{t('register.personalDetails.email')} *</Label>
                         <Input
                           id="email"
                           type="email"
                           value={personalDetails.email}
                           onChange={(e) => handlePersonalDetailsChange('email', e.target.value)}
-                          placeholder="Enter your email address"
+                          placeholder={t('register.personalDetails.email')}
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="password">Password *</Label>
+                        <Label htmlFor="password">{t('register.personalDetails.password')} *</Label>
                         <Input
                           id="password"
                           type="password"
                           value={personalDetails.password}
                           onChange={(e) => handlePersonalDetailsChange('password', e.target.value)}
-                          placeholder="Enter your password (min. 6 characters)"
+                          placeholder={t('register.personalDetails.password')}
                           required
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="phone">Phone Number *</Label>
+                        <Label htmlFor="phone">{t('register.personalDetails.phone')} *</Label>
                         <Input
                           id="phone"
                           type="tel"
                           value={personalDetails.phone}
                           onChange={(e) => handlePersonalDetailsChange('phone', e.target.value)}
-                          placeholder="Enter your phone number"
+                          placeholder={t('register.personalDetails.phone')}
                           required
                         />
                       </div>
                       <div>
-                        <Label htmlFor="city">City *</Label>
+                        <Label htmlFor="city">{t('register.personalDetails.city')} *</Label>
                         <Input
                           id="city"
                           value={personalDetails.city}
                           onChange={(e) => handlePersonalDetailsChange('city', e.target.value)}
-                          placeholder="Enter your city"
+                          placeholder={t('register.personalDetails.city')}
                           required
                         />
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="country">Country *</Label>
+                        <Label htmlFor="country">{t('register.personalDetails.country')} *</Label>
                         <Input
                           id="country"
                           value={personalDetails.country}
                           onChange={(e) => handlePersonalDetailsChange('country', e.target.value)}
-                          placeholder="Enter your country"
+                          placeholder={t('register.personalDetails.country')}
                           required
                         />
-                       </div>
-                     </div>
-
-                     {/* Terms and Conditions Checkbox */}
-                     <div className="space-y-3 mt-6">
-                       <div className="flex items-start space-x-3">
-                         <Checkbox
-                           id="acceptTerms"
-                           checked={personalDetails.acceptTerms}
-                           onCheckedChange={(checked) => 
-                             handlePersonalDetailsChange('acceptTerms', checked as boolean ? 'true' : 'false')
-                           }
-                         />
-                         <div className="grid gap-1.5 leading-none">
-                           <Label
-                             htmlFor="acceptTerms"
-                             className="text-sm font-normal leading-relaxed cursor-pointer"
-                           >
-                             I agree to the{" "}
-                             <button
-                               type="button"
-                               onClick={() => setShowTermsDialog(true)}
-                               className="text-primary hover:underline font-medium"
-                             >
-                               Terms of Service
-                             </button>{" "}
-                             and{" "}
-                             <button
-                               type="button"
-                               onClick={() => setShowPrivacyDialog(true)}
-                               className="text-primary hover:underline font-medium"
-                             >
-                               Privacy Policy
-                             </button>
-                           </Label>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Protection Plans */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-emergency/10 rounded-full">
-                        <Shield className="h-5 w-5 text-emergency" />
+                      <div className="p-2 bg-primary/10 rounded-full">
+                        <Shield className="h-5 w-5 text-primary" />
                       </div>
-                      <h2 className="text-xl font-bold text-foreground">Protection Plans</h2>
+                      <h2 className="text-xl font-bold text-foreground">{t('register.plans.title')}</h2>
                     </div>
                     
-                    {/* Premium Protection Plan - Fixed Standard */}
+                    {/* Main Plans */}
                     <div className="space-y-4">
-                      <h3 className="font-medium text-foreground">Standard Protection Plan:</h3>
-                      {convertedPremiumPlan && (
-                        <div className="p-4 border-2 border-primary bg-primary/5 rounded-lg">
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Shield className="h-5 w-5 text-primary" />
-                                <h3 className="font-semibold text-lg">{convertedPremiumPlan.name}</h3>
-                                <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
-                                  Standard
-                                </span>
-                              </div>
-                              <p className="text-muted-foreground mb-3">{convertedPremiumPlan.description}</p>
-                              <div className="grid grid-cols-2 gap-2">
-                                {convertedPremiumPlan.features.map((feature, idx) => (
-                                  <div key={idx} className="flex items-center gap-1 text-sm">
-                                    <Check className="h-3 w-3 text-green-500" />
-                                    <span>{feature}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="text-right ml-4">
-                              <div className="space-y-1">
-                                <div className="text-sm text-muted-foreground">
-                                  Net: {convertedPremiumPlan.formattedPrice}
-                                </div>
-                                <div className="font-bold text-lg text-primary">
-                                  {convertedPremiumPlan.formattedPrice}
-                                </div>
-                                <div className="text-sm text-muted-foreground">per {convertedPremiumPlan.billing_interval}</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Optional Add-ons Section */}
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-secondary/10 rounded-full">
-                          <Star className="h-5 w-5 text-secondary" />
-                        </div>
-                        <h3 className="text-lg font-bold text-foreground">Optional Add-ons</h3>
-                      </div>
-
-
-                      {/* Safety Products Section */}
-                      {convertedProducts.length > 0 && (
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-foreground">Safety Products (One-time purchase):</h4>
-                          {convertedProducts.map((product) => {
-                            const priceWithIva = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
-                            return (
-                              <div key={product.id} className={`p-3 border rounded-lg transition-all ${
-                                selectedProducts.includes(product.id) ? 'border-primary bg-primary/5' : 'border-border'
-                              }`}>
-                                <div className="flex items-start gap-3">
-                                  <Checkbox
-                                    id={product.id}
-                                    checked={selectedProducts.includes(product.id)}
-                                    disabled={product.status === 'coming_soon'}
-                                    onCheckedChange={(checked) => handleProductToggle(product.id, checked as boolean)}
-                                    className="mt-1"
-                                  />
-                                  <Label htmlFor={product.id} className="flex-1 cursor-pointer">
-                                    <div className="flex justify-between items-start">
-                                      <div className="flex-1">
-                                        <h4 className="font-semibold text-base mb-1 flex items-center gap-2">{product.name}{product.status === 'coming_soon' && (
-                                          <Badge className="bg-secondary text-white">{t('common.comingSoon', { defaultValue: 'Coming Soon' })}</Badge>
-                                        )}</h4>
-                                        <p className="text-muted-foreground text-sm mb-2">{product.description}</p>
-                                        {product.features.length > 0 && (
-                                          <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                            {product.features.slice(0, 3).map((feature, idx) => (
-                                              <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
-                                                <Check className="h-3 w-3 text-green-500" />
-                                                <span>{feature}</span>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="text-right ml-4">
-                                        <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                          <div className="space-y-2">
-                                            <div className="flex justify-between items-center text-sm">
-                                              <span className="text-muted-foreground">Net Price:</span>
-                                              <span className="font-medium">{product.formattedPrice}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-xs">
-                                              <span className="text-muted-foreground">IVA (21%):</span>
-                                              <span className="font-medium">+ {formatDisplayCurrency(product.convertedPrice * PRODUCT_IVA_RATE, currency, languageToLocale(language))}</span>
-                                            </div>
-                                            <div className="border-t border-border pt-2">
-                                              <div className="flex justify-between items-center">
-                                                <span className="font-semibold text-foreground">Total:</span>
-                                                <span className="font-bold text-lg text-primary">{formatDisplayCurrency(priceWithIva, currency, languageToLocale(language))}</span>
-                                              </div>
-                                              <div className="text-center mt-1">
-                                                <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
-                                                  One-time purchase
-                                                </span>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </Label>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-
-                      {/* Regional Services Section */}
-                      {convertedRegionalServices.length > 0 && (
-                        <div className="space-y-3">
-                          <h4 className="font-medium text-foreground">Regional Services (Monthly subscription):</h4>
-                          {convertedRegionalServices.map((service) => {
-                            const priceWithIva = service.convertedPrice * (1 + SERVICE_IVA_RATE);
-                            return (
-                              <div key={service.id} className={`p-3 border rounded-lg transition-all ${
-                                selectedRegionalServices.includes(service.id) ? 'border-primary bg-primary/5' : 'border-border'
-                              }`}>
-                                <div className="flex items-start gap-3">
-                                  <Checkbox
-                                    id={service.id}
-                                    checked={selectedRegionalServices.includes(service.id)}
-                                    onCheckedChange={(checked) => handleRegionalServiceToggle(service.id, checked as boolean)}
-                                    className="mt-1"
-                                  />
-                                  <Label htmlFor={service.id} className="flex-1 cursor-pointer">
-                                    <div className="flex justify-between items-start">
-                                      <div className="flex-1">
-                                        <div className="flex items-center gap-2 mb-1">
-                                          <h4 className="font-semibold text-base">{service.name}</h4>
-                                          <span className="bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-full">
-                                            {service.region}
-                                          </span>
-                                        </div>
-                                        <p className="text-muted-foreground text-sm mb-2">{service.description}</p>
-                                        {service.features.length > 0 && (
-                                          <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                            {service.features.slice(0, 3).map((feature, idx) => (
-                                              <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
-                                                <Check className="h-3 w-3 text-green-500" />
-                                                <span>{feature}</span>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        )}
-                                      </div>
-                                      <div className="text-right ml-4">
-                                        <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                          <div className="space-y-2">
-                                            <div className="flex justify-between items-center text-sm">
-                                              <span className="text-muted-foreground">Net Price:</span>
-                                              <span className="font-medium">{service.formattedPrice}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center text-sm">
-                                              <span className="text-muted-foreground">IVA (10%):</span>
-                                              <span className="font-medium">+ {formatDisplayCurrency(service.convertedPrice * SERVICE_IVA_RATE, currency, languageToLocale(language))}</span>
-                                            </div>
-                                            <div className="border-t border-border pt-2">
-                                              <div className="flex justify-between items-center">
-                                                <span className="font-semibold text-foreground">Total:</span>
-                                                <span className="font-bold text-lg text-primary">{formatDisplayCurrency(priceWithIva, currency, languageToLocale(language))}</span>
-                                              </div>
-                                              <div className="text-center mt-1">
-                                                <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
-                                                  Monthly subscription
-                                                </span>
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </Label>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Enhanced Order Summary */}
-                    <div className="border-t pt-6 space-y-4 bg-gradient-to-br from-muted/20 to-muted/40 -mx-8 px-8 pb-6 mt-8 rounded-b-lg">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="p-2 bg-primary/10 rounded-full">
-                          <CreditCard className="h-5 w-5 text-primary" />
-                        </div>
-                        <h4 className="font-bold text-lg text-foreground">Order Summary</h4>
-                      </div>
-                      
-                      {/* Monthly Subscriptions Section */}
-                      <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 border border-border/30 shadow-sm">
-                        <h5 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wide">Monthly Subscriptions</h5>
-                        
-                        {/* Premium Protection Plan */}
-                        <div className="space-y-4">
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <div className="font-medium text-foreground text-base">Premium Protection Plan</div>
-                              <div className="text-sm text-muted-foreground mt-1">Standard emergency protection • Monthly subscription</div>
-                            </div>
-                            <div className="text-right ml-6">
-                              <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                <div className="font-bold text-lg text-foreground">{convertedPremiumPlan?.formattedPrice || formatDisplayCurrency(0, currency, languageToLocale(language))}</div>
-                                <div className="text-xs text-muted-foreground mt-1">per month</div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {/* Family Plan */}
-                          {hasFamilyPlan && convertedFamilyPlan && (
-                            <div className="flex justify-between items-start border-t border-border/30 pt-4">
+                      <h3 className="text-lg font-semibold">{t('register.plans.selectMain')} *</h3>
+                      <RadioGroup value={selectedMainPlan} onValueChange={handleMainPlanChange}>
+                        <div className="grid gap-4">
+                          {convertedPlans.map((plan) => (
+                            <div key={plan.id} className="flex items-center space-x-3 border rounded-lg p-4">
+                              <RadioGroupItem value={plan.id} id={plan.id} />
                               <div className="flex-1">
-                                <div className="font-medium text-foreground text-base">{convertedFamilyPlan.name}</div>
-                                <div className="text-sm text-muted-foreground mt-1">Family protection add-on • Monthly subscription</div>
-                              </div>
-                              <div className="text-right ml-6">
-                                <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                  <div className="font-bold text-lg text-foreground">{convertedFamilyPlan.formattedPrice}</div>
-                                  <div className="text-xs text-muted-foreground mt-1">per month</div>
+                                <div className="flex items-center gap-2">
+                                  <Label htmlFor={plan.id} className="font-semibold">{plan.name}</Label>
+                                  {plan.is_popular && <Badge variant="default">Popular</Badge>}
                                 </div>
+                                <p className="text-sm text-muted-foreground">{plan.description}</p>
+                                <p className="font-bold text-primary">
+                                  {formatDisplayCurrency(plan.price, currency, languageToLocale(language))}/{t('common.perMonth')}
+                                </p>
                               </div>
                             </div>
-                          )}
-                          
-                          {/* Regional Services */}
-                          {selectedRegionalServices.length > 0 && selectedRegionalServices.map(serviceId => {
-                            const service = convertedRegionalServices.find(s => s.id === serviceId);
-                            if (!service) return null;
-                            const netPrice = service.convertedPrice;
-                            const ivaAmount = service.convertedPrice * SERVICE_IVA_RATE;
-                            const totalPrice = service.convertedPrice * (1 + SERVICE_IVA_RATE);
-                            return (
-                              <div key={serviceId} className="border-t border-border/30 pt-4">
-                                <div className="flex justify-between items-start">
-                                  <div className="flex-1">
-                                    <div className="font-medium text-foreground text-base">{service.name}</div>
-                                    <div className="text-sm text-muted-foreground mt-1">{service.region} • Regional service • Monthly subscription</div>
-                                  </div>
-                                  <div className="text-right ml-6">
-                                    <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                      <div className="space-y-2">
-                                        <div className="flex justify-between items-center text-sm">
-                                          <span className="text-muted-foreground">Net Price:</span>
-                                          <span className="font-medium">{formatDisplayCurrency(netPrice, currency, languageToLocale(language))}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-xs">
-                                          <span className="text-muted-foreground">IVA (10%):</span>
-                                          <span className="font-medium">+ {formatDisplayCurrency(ivaAmount, currency, languageToLocale(language))}</span>
-                                        </div>
-                                        <div className="border-t border-border pt-2">
-                                          <div className="flex justify-between items-center">
-                                            <span className="font-semibold text-foreground">Total:</span>
-                                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(totalPrice, currency, languageToLocale(language))}</span>
-                                          </div>
-                                          <div className="text-center mt-1">
-                                            <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
-                                              Monthly subscription
-                                            </span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          })}
+                          ))}
                         </div>
-                      </div>
-                      
-                      {/* One-time Products Section */}
-                      {selectedProducts.length > 0 && (
-                        <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 border border-border/30 shadow-sm">
-                          <h5 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wide">Safety Products (One-time purchase)</h5>
-                          <div className="space-y-4">
-                            {selectedProducts.map(productId => {
-                              const product = convertedProducts.find(p => p.id === productId);
-                              if (!product) return null;
-                              const netPrice = product.convertedPrice;
-                              const ivaAmount = product.convertedPrice * PRODUCT_IVA_RATE;
-                              const totalPrice = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
-                              return (
-                                <div key={productId} className="flex justify-between items-start">
-                                  <div className="flex-1">
-                                    <div className="font-medium text-foreground text-base">{product.name}</div>
-                                    <div className="text-sm text-muted-foreground mt-1">Safety equipment • One-time purchase</div>
-                                  </div>
-                                  <div className="text-right ml-6">
-                                    <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                      <div className="space-y-2">
-                                        <div className="flex justify-between items-center text-sm">
-                                          <span className="text-muted-foreground">Net Price:</span>
-                                          <span className="font-medium">{formatDisplayCurrency(netPrice, currency, languageToLocale(language))}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center text-xs">
-                                          <span className="text-muted-foreground">IVA (21%):</span>
-                                          <span className="font-medium">+ {formatDisplayCurrency(ivaAmount, currency, languageToLocale(language))}</span>
-                                        </div>
-                                        <div className="border-t border-border pt-2">
-                                          <div className="flex justify-between items-center">
-                                            <span className="font-semibold text-foreground">Total:</span>
-                                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(totalPrice, currency, languageToLocale(language))}</span>
-                                          </div>
-                                          <div className="text-center mt-1">
-                                            <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
-                                              One-time purchase
-                                            </span>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Payment Summary */}
-                      <div className="bg-gradient-to-r from-primary/10 to-emergency/10 rounded-lg p-6 border-2 border-primary/20 shadow-lg">
-                        <div className="space-y-3">
-                          {/* Monthly Subscription Total */}
-                          <div className="flex justify-between items-center pb-2 border-b border-border/30">
-                            <div>
-                              <span className="font-semibold text-foreground">Monthly Subscription:</span>
-                              <div className="text-sm text-muted-foreground">Recurring monthly charge</div>
-                            </div>
-                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(calculateSubscriptionTotal(), currency, languageToLocale(language))}/month</span>
-                          </div>
-                          
-                          {/* One-time Products Total */}
-                          {calculateProductTotal() > 0 && (
-                            <div className="flex justify-between items-center pb-2 border-b border-border/30">
-                              <div>
-                                <span className="font-semibold text-foreground">One-time Products:</span>
-                                <div className="text-sm text-muted-foreground">Today only charge</div>
-                              </div>
-                              <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(calculateProductTotal(), currency, languageToLocale(language))}</span>
-                            </div>
-                          )}
-                          
-                          {/* Total Payment Today */}
-                          <div className="flex justify-between items-center pt-2">
-                            <div>
-                              <span className="text-xl font-bold text-foreground">Total Payment Today:</span>
-                              <div className="text-sm text-muted-foreground">
-                                {calculateProductTotal() > 0 ? 'Monthly + one-time charges' : 'Monthly subscription charge'}
-                              </div>
-                            </div>
-                            <span className="text-3xl font-bold text-foreground">{formatDisplayCurrency(calculateGrandTotal(), currency, languageToLocale(language))}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Tax Notice */}
-                      <div className="text-xs text-muted-foreground p-3 bg-muted/50 rounded-lg border border-border/30">
-                        <strong>Tax Information:</strong> Products include 21% IVA, Regional Services include 10% IVA. All prices shown include applicable taxes.
+                      </RadioGroup>
+                    </div>
+
+                    {/* Family Plan Add-on */}
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">{t('register.plans.familyAdd')}</h3>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="familyPlan"
+                          checked={hasFamilyPlan}
+                          onCheckedChange={(checked) => handleFamilyPlanToggle(!!checked)}
+                        />
+                        <label htmlFor="familyPlan" className="text-sm font-medium">
+                          {t('register.plans.familyAdd')} - {t('register.plans.familyDesc')}
+                        </label>
                       </div>
                     </div>
+                  </div>
+
+                  {/* Safety Products */}
+                  {convertedProducts.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-primary/10 rounded-full">
+                          <Phone className="h-5 w-5 text-primary" />
+                        </div>
+                        <h2 className="text-xl font-bold text-foreground">
+                          {t('register.products.title')} 
+                          <Badge variant="secondary" className="ml-2">{t('register.products.optional')}</Badge>
+                        </h2>
+                      </div>
+                      <p className="text-muted-foreground">{t('register.products.subtitle')}</p>
+                      <div className="grid gap-4">
+                        {convertedProducts.map((product) => (
+                          <div key={product.id} className="border rounded-lg p-4">
+                            <div className="flex items-center space-x-3">
+                              <Checkbox
+                                id={product.id}
+                                checked={selectedProducts.includes(product.id)}
+                                onCheckedChange={() => handleProductToggle(product.id)}
+                              />
+                              <div className="flex-1">
+                                <Label htmlFor={product.id} className="font-semibold">{product.name}</Label>
+                                <p className="text-sm text-muted-foreground">{product.description}</p>
+                                <p className="font-bold text-primary">
+                                  {formatDisplayCurrency(product.price, currency, languageToLocale(language))} {t('pricing.oneTimeLabel')}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Regional Services */}
+                  {convertedRegionalServices.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="p-2 bg-primary/10 rounded-full">
+                          <MapPin className="h-5 w-5 text-primary" />
+                        </div>
+                        <h2 className="text-xl font-bold text-foreground">{t('register.regionalServices.title')}</h2>
+                      </div>
+                      <p className="text-muted-foreground">{t('register.regionalServices.subtitle')}</p>
+                      <div className="grid gap-4">
+                        {convertedRegionalServices.map((service) => (
+                          <div key={service.id} className="border rounded-lg p-4">
+                            <div className="flex items-center space-x-3">
+                              <Checkbox
+                                id={service.id}
+                                checked={selectedRegionalServices.includes(service.id)}
+                                onCheckedChange={() => handleRegionalServiceToggle(service.id)}
+                              />
+                              <div className="flex-1">
+                                <Label htmlFor={service.id} className="font-semibold">{service.name}</Label>
+                                <p className="text-sm text-muted-foreground">{service.description}</p>
+                                <p className="font-bold text-primary">
+                                  {formatDisplayCurrency(service.price, currency, languageToLocale(language))}/{t('common.perMonth')}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Order Summary */}
+                  <div className="bg-muted/50 p-6 rounded-lg space-y-4">
+                    <h3 className="text-xl font-semibold">{t('register.summary.title')}</h3>
+                    
+                    {/* Monthly Subscriptions */}
+                    {calculateSubscriptionTotal() > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-medium">{t('register.summary.monthly')}</h4>
+                        {selectedMainPlan && (
+                          <div className="flex justify-between text-sm">
+                            <span>{convertedPlans.find(p => p.id === selectedMainPlan)?.name}</span>
+                            <span>{formatDisplayCurrency(convertedPlans.find(p => p.id === selectedMainPlan)?.price || 0, currency, languageToLocale(language))}</span>
+                          </div>
+                        )}
+                        {hasFamilyPlan && (
+                          <div className="flex justify-between text-sm">
+                            <span>{t('register.plans.familyAdd')}</span>
+                            <span>{formatDisplayCurrency(convertedPlans.find(p => p.name.toLowerCase().includes('family'))?.price || 0, currency, languageToLocale(language))}</span>
+                          </div>
+                        )}
+                        {selectedRegionalServices.map(serviceId => {
+                          const service = convertedRegionalServices.find(s => s.id === serviceId);
+                          return service ? (
+                            <div key={serviceId} className="flex justify-between text-sm">
+                              <span>{service.name}</span>
+                              <span>{formatDisplayCurrency(service.price, currency, languageToLocale(language))}</span>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+
+                    {/* One-time Purchases */}
+                    {calculateProductTotal() > 0 && (
+                      <div className="space-y-2">
+                        <h4 className="font-medium">{t('register.summary.oneTime')}</h4>
+                        {selectedProducts.map(productId => {
+                          const product = convertedProducts.find(p => p.id === productId);
+                          return product ? (
+                            <div key={productId} className="flex justify-between text-sm">
+                              <span>{product.name}</span>
+                              <span>{formatDisplayCurrency(product.price, currency, languageToLocale(language))}</span>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    )}
+
+                    {/* Total Summary */}
+                    <div className="border-t pt-4 space-y-2">
+                      {calculateSubscriptionTotal() > 0 && (
+                        <div className="flex justify-between text-lg font-semibold">
+                          <span>{t('register.summary.totalMonthly')}:</span>
+                          <span>{formatDisplayCurrency(calculateSubscriptionTotal(), currency, languageToLocale(language))}</span>
+                        </div>
+                      )}
+                      {calculateProductTotal() > 0 && (
+                        <div className="flex justify-between text-lg font-semibold">
+                          <span>{t('register.summary.totalOneTime')}:</span>
+                          <span>{formatDisplayCurrency(calculateProductTotal(), currency, languageToLocale(language))}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Terms and Conditions */}
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="acceptTerms"
+                      checked={personalDetails.acceptTerms}
+                      onCheckedChange={(checked) => handlePersonalDetailsChange('acceptTerms', !!checked)}
+                    />
+                    <label htmlFor="acceptTerms" className="text-sm font-medium">
+                      {t('register.legal.acceptTerms').split('Terms of Service')[0]}
+                      <button
+                        type="button"
+                        onClick={() => setShowTermsDialog(true)}
+                        className="text-primary underline hover:no-underline"
+                      >
+                        {t('register.legal.termsLink')}
+                      </button>
+                      {t('register.legal.acceptTerms').includes('and') ? ' and ' : ' '}
+                      <button
+                        type="button"
+                        onClick={() => setShowPrivacyDialog(true)}
+                        className="text-primary underline hover:no-underline"
+                      >
+                        {t('register.legal.privacyLink')}
+                      </button>
+                    </label>
                   </div>
 
                   {/* Continue Button */}
-                  <div className="pt-6">
-                    <Button 
-                      onClick={handleContinueToPayment}
-                      className="w-full bg-emergency hover:bg-emergency/90"
-                      size="lg"
-                      disabled={!isFormValid()}
-                    >
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Continue to Payment
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={handleContinueToPayment}
+                    disabled={!isFormValid() || isLoading}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {isLoading ? t('register.buttons.processing') : t('register.buttons.continueToPayment')}
+                  </Button>
                 </div>
               ) : (
-                <EmbeddedPayment
-                  plans={getSelectedSubscriptionPlans()}
-                  products={selectedProducts}
-                  regionalServices={selectedRegionalServices}
-                  userEmail={personalDetails.email}
-                  firstName={personalDetails.firstName}
-                  lastName={personalDetails.lastName}
-                  password={personalDetails.password}
-                  phone={personalDetails.phone}
-                  city={personalDetails.city}
-                  country={personalDetails.country}
-                  onSuccess={handlePaymentSuccess}
-                  onBack={() => setCurrentStep('details')}
-                />
+                <div className="space-y-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentStep('details')}
+                    className="mb-4"
+                  >
+                    {t('register.buttons.backToDetails')}
+                  </Button>
+                  <EmbeddedPayment
+                    oneTimeAmount={calculateProductTotal()}
+                    recurringAmount={calculateSubscriptionTotal()}
+                    currency={currency}
+                    onPaymentSuccess={handlePaymentSuccess}
+                    customerEmail={personalDetails.email}
+                  />
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Legal Dialogs */}
-      <TermsDialog 
-        open={showTermsDialog} 
-        onOpenChange={setShowTermsDialog}
-      />
-      <PrivacyDialog 
-        open={showPrivacyDialog} 
-        onOpenChange={setShowPrivacyDialog}
-      />
+      <TermsDialog open={showTermsDialog} onOpenChange={setShowTermsDialog} />
+      <PrivacyDialog open={showPrivacyDialog} onOpenChange={setShowPrivacyDialog} />
     </div>
   );
 };

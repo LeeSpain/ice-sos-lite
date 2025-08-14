@@ -6,7 +6,8 @@
     "devices": "Devices",
     "signIn": "Sign In",
     "subscribeNow": "Subscribe Now",
-    "regionalCenter": "Contact Regional Center"
+    "regionalCenter": "Contact Regional Center",
+    "contact": "Contact Us"
   },
   "footer": {
     "quickLinks": "Quick Links",
@@ -181,11 +182,72 @@
     }
   },
   "register": {
+    "title": "Join ICE SOS Lite",
+    "subtitle": "Secure your emergency protection today",
+    "stepDetails": "Join ICE SOS Lite and secure your emergency protection",
+    "stepPayment": "Finalize your subscription and start protecting what matters most",
+    "personalDetails": {
+      "title": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "password": "Password",
+      "phone": "Phone Number",
+      "city": "City",
+      "country": "Country",
+      "required": "Required"
+    },
     "plans": {
+      "title": "Choose Your Protection Plan",
+      "selectMain": "Select Main Plan",
+      "familyAdd": "Add Family & Carer Access",
+      "familyDesc": "Allow trusted family members or carers to access your emergency profile",
       "personal": { "name": "Personal Account", "desc": "Individual emergency contact system" },
       "guardian": { "name": "Guardian Wellness", "desc": "Advanced health monitoring and alerts" },
       "family": { "name": "Family Sharing", "desc": "Perfect for families with multiple members" },
       "callcenterES": { "name": "Call Centre Spain", "desc": "24/7 professional emergency response" }
+    },
+    "products": {
+      "title": "Safety Products",
+      "subtitle": "Enhance your protection with Bluetooth devices",
+      "optional": "Optional"
+    },
+    "regionalServices": {
+      "title": "Regional Services",
+      "subtitle": "Professional local emergency support"
+    },
+    "summary": {
+      "title": "Order Summary",
+      "monthly": "Monthly Subscription",
+      "oneTime": "One-time Purchases",
+      "subtotal": "Subtotal",
+      "vat": "VAT/Tax",
+      "total": "Total",
+      "totalMonthly": "Total Monthly",
+      "totalOneTime": "Total One-time"
+    },
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "phoneRequired": "Phone number is required",
+      "cityRequired": "City is required",
+      "countryRequired": "Country is required",
+      "acceptTermsRequired": "You must accept the terms and conditions",
+      "planRequired": "Please select a main protection plan"
+    },
+    "buttons": {
+      "continueToPayment": "Continue to Payment",
+      "processing": "Processing...",
+      "backToDetails": "Back to Details"
+    },
+    "legal": {
+      "acceptTerms": "I agree to the Terms of Service and Privacy Policy",
+      "termsLink": "Terms of Service",
+      "privacyLink": "Privacy Policy"
     }
   },
   "regionServices": {
