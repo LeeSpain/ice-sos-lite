@@ -53,14 +53,14 @@ const RegionalCenterSpain: React.FC = () => {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* Content */}
               <div className="text-center lg:text-left text-white">
-                <div className="inline-flex items-center space-x-2 bg-green-500/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-green-500/30">
-                  <MapPin className="h-4 w-4 text-green-400" />
-                  <span className="text-sm font-medium text-white">✅ Regional Emergency Support - Spain</span>
+                <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
+                  <MapPin className="h-4 w-4 text-emergency-glow" />
+                  <span className="text-sm font-medium text-white">Regional Emergency Support - Spain</span>
                 </div>
                 
                 <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
                   {t('regionalCenterES.h1', { defaultValue: 'Spain Regional Call Centre' })}
-                  <span className="text-green-400 drop-shadow-md"> - Emergency Support</span>
+                  <span className="text-emergency-glow drop-shadow-md"> - Emergency Support</span>
                 </h1>
                 
                 <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">

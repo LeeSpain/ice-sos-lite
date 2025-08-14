@@ -139,12 +139,12 @@ const FamilyCarerAccessPage = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Content */}
             <div className="text-center lg:text-left text-white animate-fade-in">
-              <div className="inline-flex items-center space-x-2 bg-wellness/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-wellness/30">
-                <Heart className="h-4 w-4 text-wellness-glow animate-pulse" />
-                <span className="text-sm font-medium text-wellness-glow">Family Connection Platform</span>
+              <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
+                <Heart className="h-4 w-4 text-emergency-glow" />
+                <span className="text-sm font-medium text-white">Family Connection Platform</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Connect Your <span className="text-wellness-glow drop-shadow-md">Loved Ones</span>
+                Connect Your <span className="text-emergency-glow drop-shadow-md">Loved Ones</span>
               </h1>
               <p className="text-xl md:text-2xl text-white/90 max-w-3xl lg:max-w-none mx-auto mb-8 leading-relaxed font-medium drop-shadow-sm">
                 Build a comprehensive support network that keeps your family connected and protected during emergencies and everyday care moments
@@ -153,11 +153,11 @@ const FamilyCarerAccessPage = () => {
                 <Button 
                   asChild 
                   size="xl" 
-                  className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness-glow/20"
+                  className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
                 >
                   <Link to="/register">
                     <UserPlus className="mr-2 h-5 w-5" />
-                    <span className="text-wellness-glow font-bold">Start Connecting</span>
+                    Start Connecting
                   </Link>
                 </Button>
               </div>

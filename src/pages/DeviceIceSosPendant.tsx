@@ -104,7 +104,7 @@ const DeviceIceSosPendant = () => {
             <div className="text-center lg:text-left text-white">
               <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
                 <Shield className="h-4 w-4 text-emergency-glow" />
-                <span className="text-sm font-medium text-white">✅ Professional response within 60 seconds, 24/7</span>
+                <span className="text-sm font-medium text-white">Professional response within 60 seconds, 24/7</span>
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
