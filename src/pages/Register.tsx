@@ -48,49 +48,73 @@ const Register = () => {
   // Debug log for component renders and currency changes
   console.log('🎯 Register component render - Currency:', currency, 'Language:', language);
   
+  // Add useEffect to track currency changes and force re-renders
+  useEffect(() => {
+    console.log('💰 Currency changed to:', currency, 'Language:', language);
+    console.log('📊 Current data lengths - Plans:', subscriptionPlans.length, 'Products:', products.length, 'Services:', regionalServices.length);
+  }, [currency, language, subscriptionPlans.length, products.length, regionalServices.length]);
+
   // Convert all data based on current currency using useMemo for proper re-rendering
   const convertedSubscriptionPlans = useMemo(() => {
-    console.log('🔄 Converting subscription plans, currency:', currency, 'plans:', subscriptionPlans.length);
-    const converted = subscriptionPlans.map(plan => ({
-      ...plan,
-      convertedPrice: convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency),
-      formattedPrice: formatDisplayCurrency(
-        convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency), 
-        currency, 
-        languageToLocale(language)
-      )
-    }));
-    console.log('✅ Converted subscription plans:', converted.map(p => ({ name: p.name, original: p.price, converted: p.convertedPrice, formatted: p.formattedPrice })));
+    console.log('🔄 [RECALCULATING] Converting subscription plans, currency:', currency, 'plans:', subscriptionPlans.length);
+    if (subscriptionPlans.length === 0) {
+      console.log('⚠️ No subscription plans to convert yet');
+      return [];
+    }
+    const converted = subscriptionPlans.map(plan => {
+      const originalPrice = parseFloat(plan.price.toString());
+      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
+      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+      console.log(`📋 Plan "${plan.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      return {
+        ...plan,
+        convertedPrice,
+        formattedPrice
+      };
+    });
+    console.log('✅ Final converted subscription plans:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
     return converted;
   }, [subscriptionPlans, currency, language]);
 
   const convertedProducts = useMemo(() => {
-    console.log('🔄 Converting products, currency:', currency, 'products:', products.length);
-    const converted = products.map(product => ({
-      ...product,
-      convertedPrice: convertCurrency(parseFloat(product.price.toString()), 'EUR', currency),
-      formattedPrice: formatDisplayCurrency(
-        convertCurrency(parseFloat(product.price.toString()), 'EUR', currency), 
-        currency, 
-        languageToLocale(language)
-      )
-    }));
-    console.log('✅ Converted products:', converted.map(p => ({ name: p.name, original: p.price, converted: p.convertedPrice, formatted: p.formattedPrice })));
+    console.log('🔄 [RECALCULATING] Converting products, currency:', currency, 'products:', products.length);
+    if (products.length === 0) {
+      console.log('⚠️ No products to convert yet');
+      return [];
+    }
+    const converted = products.map(product => {
+      const originalPrice = parseFloat(product.price.toString());
+      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
+      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+      console.log(`📦 Product "${product.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      return {
+        ...product,
+        convertedPrice,
+        formattedPrice
+      };
+    });
+    console.log('✅ Final converted products:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
     return converted;
   }, [products, currency, language]);
 
   const convertedRegionalServices = useMemo(() => {
-    console.log('🔄 Converting regional services, currency:', currency, 'services:', regionalServices.length);
-    const converted = regionalServices.map(service => ({
-      ...service,
-      convertedPrice: convertCurrency(parseFloat(service.price.toString()), 'EUR', currency),
-      formattedPrice: formatDisplayCurrency(
-        convertCurrency(parseFloat(service.price.toString()), 'EUR', currency), 
-        currency, 
-        languageToLocale(language)
-      )
-    }));
-    console.log('✅ Converted regional services:', converted.map(s => ({ name: s.name, original: s.price, converted: s.convertedPrice, formatted: s.formattedPrice })));
+    console.log('🔄 [RECALCULATING] Converting regional services, currency:', currency, 'services:', regionalServices.length);
+    if (regionalServices.length === 0) {
+      console.log('⚠️ No regional services to convert yet');
+      return [];
+    }
+    const converted = regionalServices.map(service => {
+      const originalPrice = parseFloat(service.price.toString());
+      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
+      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+      console.log(`🌍 Service "${service.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
+      return {
+        ...service,
+        convertedPrice,
+        formattedPrice
+      };
+    });
+    console.log('✅ Final converted regional services:', converted.map(s => ({ name: s.name, formatted: s.formattedPrice })));
     return converted;
   }, [regionalServices, currency, language]);
 
