@@ -2,9 +2,10 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Users, Heart, Shield, Clock, UserCheck, CheckCircle } from 'lucide-react';
+import { Users, Heart, Shield, Clock, UserCheck, CheckCircle, Play } from 'lucide-react';
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import { IntroVideoModal } from '@/components/IntroVideoModal';
 
 const FamilyCarerAccess = () => {
   const { t } = useTranslation();
@@ -101,13 +102,29 @@ const FamilyCarerAccess = () => {
                   Enable trusted family members and professional carers to access your emergency profile, receive instant alerts, and coordinate rapid response during critical situations.
                 </p>
                 
-                {/* CTA Button */}
-                <Button asChild size="lg" className="bg-gradient-to-r from-wellness to-wellness/80 hover:from-wellness/90 hover:to-wellness/70 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
-                  <Link to="/family-carer-access">
-                    <Users className="mr-2 h-4 w-4" />
-                    Learn More
-                  </Link>
-                </Button>
+                {/* CTA Buttons */}
+                <div className="flex flex-col gap-3">
+                  <Button asChild size="lg" className="bg-gradient-to-r from-wellness to-wellness/80 hover:from-wellness/90 hover:to-wellness/70 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+                    <Link to="/family-carer-access">
+                      <Users className="mr-2 h-4 w-4" />
+                      Learn More
+                    </Link>
+                  </Button>
+                  
+                  <IntroVideoModal 
+                    defaultVideoId="family"
+                    trigger={
+                      <Button 
+                        variant="outline"
+                        size="lg"
+                        className="border-wellness text-wellness hover:bg-wellness hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        Watch Video
+                      </Button>
+                    }
+                  />
+                </div>
                 <p className="text-xs text-muted-foreground mt-2">
                   Secure access control • Privacy protected
                 </p>

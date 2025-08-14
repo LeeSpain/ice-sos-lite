@@ -3,9 +3,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { MapPin, Clock, Star } from 'lucide-react';
+import { MapPin, Clock, Star, Play } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { IntroVideoModal } from '@/components/IntroVideoModal';
 
 interface RegionalPlan {
   id: string;
@@ -145,7 +146,7 @@ const RegionServices = () => {
                   </ul>
                 </CardContent>
                 
-                <CardFooter className="pt-0">
+                <CardFooter className="pt-0 space-y-3">
                   <Button 
                     className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-medium"
                     asChild
@@ -154,6 +155,19 @@ const RegionServices = () => {
                       {t('regionServices.details', { defaultValue: 'Details' })}
                     </Link>
                   </Button>
+                  
+                  <IntroVideoModal 
+                    defaultVideoId="spain"
+                    trigger={
+                      <Button 
+                        variant="outline"
+                        className="w-full border-primary text-primary hover:bg-primary hover:text-white font-medium"
+                      >
+                        <Play className="h-4 w-4 mr-2" />
+                        Watch Video
+                      </Button>
+                    }
+                  />
                 </CardFooter>
               </Card>
             ))}
