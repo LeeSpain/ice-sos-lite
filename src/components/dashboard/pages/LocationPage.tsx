@@ -123,8 +123,8 @@ export function LocationPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="p-6">
+      <div className="space-y-6">
         {/* Header */}
         <Card className="bg-white/95 backdrop-blur-sm">
           <CardHeader>

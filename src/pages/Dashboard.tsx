@@ -135,80 +135,66 @@ const Dashboard = () => {
 
               {/* Products Page */}
               <Route path="/products" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <MyProductsWidget profile={profile} />
-                  </div>
+                <div className="p-6">
+                  <MyProductsWidget profile={profile} />
                 </div>
               } />
 
               {/* Flic Control Page */}
               <Route path="/flic" element={
-                <div className="container mx-auto px-4 py-6">
+                <div className="p-6">
                   <FlicControlPage />
                 </div>
               } />
 
               {/* Profile Page */}
               <Route path="/profile" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto space-y-6">
-                    <PersonalDetailsCard 
-                      profile={profile} 
-                      onProfileUpdate={loadProfile}
-                    />
-                  </div>
+                <div className="p-6">
+                  <PersonalDetailsCard 
+                    profile={profile} 
+                    onProfileUpdate={loadProfile}
+                  />
                 </div>
               } />
 
               {/* Emergency Page */}
               <Route path="/emergency" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto space-y-6">
-                    <EmergencyContactsCard 
-                      profile={profile} 
-                      onProfileUpdate={loadProfile}
-                    />
-                  </div>
+                <div className="p-6">
+                  <EmergencyContactsCard 
+                    profile={profile} 
+                    onProfileUpdate={loadProfile}
+                  />
                 </div>
               } />
 
               {/* Health Page */}
               <Route path="/health" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto space-y-6">
-                    <MedicalInfoCard 
-                      profile={profile} 
-                      onProfileUpdate={loadProfile}
-                    />
-                  </div>
+                <div className="p-6">
+                  <MedicalInfoCard 
+                    profile={profile} 
+                    onProfileUpdate={loadProfile}
+                  />
                 </div>
               } />
 
               {/* Activity Page */}
               <Route path="/activity" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <ActivityCard />
-                  </div>
+                <div className="p-6">
+                  <ActivityCard />
                 </div>
               } />
 
               {/* Subscription Page */}
               <Route path="/subscription" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <SubscriptionCard subscription={subscription} />
-                  </div>
+                <div className="p-6">
+                  <SubscriptionCard subscription={subscription} />
                 </div>
               } />
 
               {/* Mobile App Page */}
               <Route path="/mobile-app" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <MobileAppCard />
-                  </div>
+                <div className="p-6">
+                  <MobileAppCard />
                 </div>
               } />
 
@@ -216,31 +202,23 @@ const Dashboard = () => {
               <Route path="/family" element={<FamilyPage />} />
               <Route path="/location" element={<LocationPage />} />
               <Route path="/notifications" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <NotificationsPage />
-                  </div>
+                <div className="p-6">
+                  <NotificationsPage />
                 </div>
               } />
               <Route path="/security" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <SecurityPage />
-                  </div>
+                <div className="p-6">
+                  <SecurityPage />
                 </div>
               } />
               <Route path="/settings" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <SettingsPage />
-                  </div>
+                <div className="p-6">
+                  <SettingsPage />
                 </div>
               } />
               <Route path="/support" element={
-                <div className="container mx-auto px-4 py-6">
-                  <div className="max-w-4xl mx-auto">
-                    <SupportPage />
-                  </div>
+                <div className="p-6">
+                  <SupportPage />
                 </div>
               } />
             </Routes>
