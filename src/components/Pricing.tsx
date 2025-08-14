@@ -2,13 +2,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Check, MapPin, Brain, Users, Phone, Download, Smartphone, Package, Bluetooth, Battery, Droplets, CheckCircle, UserCheck, Heart, Shield } from "lucide-react";
+import { Check, MapPin, Brain, Users, Phone, Download, Smartphone, Package, Bluetooth, Battery, Droplets, CheckCircle, UserCheck, Heart, Shield, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 import { useTranslation } from 'react-i18next';
+import { IntroVideoModal } from "@/components/IntroVideoModal";
 interface Product {
   id: string;
   name: string;
@@ -243,13 +244,28 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
   <span className="text-4xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
   <span className="text-muted-foreground text-lg">/{selectedPlan.billing_interval}</span>
 </div>
-                        <Button 
-                          size="lg"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                          asChild
-                        >
-<Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
-                        </Button>
+                        <div className="flex flex-col sm:flex-row gap-4">
+                          <Button 
+                            size="lg"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                            asChild
+                          >
+                            <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
+                          </Button>
+                          
+                          <IntroVideoModal 
+                            trigger={
+                              <Button 
+                                size="lg"
+                                variant="outline"
+                                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                              >
+                                <Play className="h-4 w-4 mr-2" />
+                                Watch Intro Video
+                              </Button>
+                            }
+                          />
+                        </div>
                        </div>
                         
                         {/* Plan Image - Right Side */}
