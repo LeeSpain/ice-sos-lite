@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import type { SupportedCurrency } from '@/contexts/PreferencesContext';
 
 // Use your Stripe publishable key here (this is safe to expose)
 const stripePromise = loadStripe("pk_test_51RqcQwBBb55hy3jU9L30IHx9w1sFZ4NoQngm6UwgwyiY1ZBF56QJ5DbeDxMxoHJwWEruoPbmmfrz27ClAS0qe3YO00S4yLN5Va");
@@ -115,15 +118,18 @@ interface EmbeddedPaymentProps {
   phone?: string;
   city?: string;
   country?: string;
+  currency?: SupportedCurrency;
   onSuccess: () => void;
   onBack: () => void;
 }
 
-const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmail, firstName, lastName, password, phone, city, country, onSuccess, onBack }: EmbeddedPaymentProps) => {
+const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmail, firstName, lastName, password, phone, city, country, currency: propCurrency, onSuccess, onBack }: EmbeddedPaymentProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { currency: contextCurrency, language } = usePreferences();
+  const selectedCurrency = propCurrency || contextCurrency;
 
   // Fetch data from database for display
   const [planData, setPlanData] = useState<any[]>([]);
@@ -178,17 +184,20 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const SERVICE_IVA_RATE = 0.10; // 10% for regional services
 
   const subscriptionTotal = planData.reduce((sum, plan) => {
-    return sum + parseFloat(plan.price.toString());
+    const convertedPrice = convertCurrency(parseFloat(plan.price.toString()), 'EUR', selectedCurrency);
+    return sum + convertedPrice;
   }, 0) + serviceData.reduce((sum, service) => {
     // Add IVA tax for regional services
     const servicePrice = parseFloat(service.price.toString());
-    return sum + (servicePrice * (1 + SERVICE_IVA_RATE));
+    const convertedPrice = convertCurrency(servicePrice, 'EUR', selectedCurrency);
+    return sum + (convertedPrice * (1 + SERVICE_IVA_RATE));
   }, 0);
 
   const productTotal = productData.reduce((sum, product) => {
     // Add IVA tax for products
     const productPrice = parseFloat(product.price.toString());
-    return sum + (productPrice * (1 + PRODUCT_IVA_RATE));
+    const convertedPrice = convertCurrency(productPrice, 'EUR', selectedCurrency);
+    return sum + (convertedPrice * (1 + PRODUCT_IVA_RATE));
   }, 0);
 
   const grandTotal = subscriptionTotal + productTotal;
@@ -215,7 +224,8 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           regionalServices,
           email: userEmail, 
           firstName, 
-          lastName 
+          lastName,
+          currency: selectedCurrency
         }
       });
 
@@ -277,12 +287,16 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           <div>
             <h5 className="text-sm font-medium text-muted-foreground mb-2">Monthly Subscriptions:</h5>
             <ul className="space-y-2">
-              {planData.map(plan => (
-                <li key={plan.id} className="flex justify-between p-2 bg-white rounded border">
-                  <span className="font-medium">{plan.name}</span>
-                  <span className="text-foreground">€{parseFloat(plan.price.toString()).toFixed(2)}/month</span>
-                </li>
-              ))}
+              {planData.map(plan => {
+                const convertedPrice = convertCurrency(parseFloat(plan.price.toString()), 'EUR', selectedCurrency);
+                const formattedPrice = formatDisplayCurrency(convertedPrice, selectedCurrency, languageToLocale(language));
+                return (
+                  <li key={plan.id} className="flex justify-between p-2 bg-white rounded border">
+                    <span className="font-medium">{plan.name}</span>
+                    <span className="text-foreground">{formattedPrice}/month</span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         )}
@@ -294,15 +308,19 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
             <ul className="space-y-2">
               {serviceData.map(service => {
                 const netPrice = parseFloat(service.price.toString());
-                const ivaAmount = netPrice * SERVICE_IVA_RATE;
-                const totalPrice = netPrice * (1 + SERVICE_IVA_RATE);
+                const convertedNetPrice = convertCurrency(netPrice, 'EUR', selectedCurrency);
+                const ivaAmount = convertedNetPrice * SERVICE_IVA_RATE;
+                const totalPrice = convertedNetPrice * (1 + SERVICE_IVA_RATE);
+                const formattedNetPrice = formatDisplayCurrency(convertedNetPrice, selectedCurrency, languageToLocale(language));
+                const formattedIvaAmount = formatDisplayCurrency(ivaAmount, selectedCurrency, languageToLocale(language));
+                const formattedTotalPrice = formatDisplayCurrency(totalPrice, selectedCurrency, languageToLocale(language));
                 return (
                   <li key={service.id} className="p-2 bg-white rounded border">
                     <div className="flex justify-between items-start">
                       <span className="font-medium">{service.name} ({service.region})</span>
                       <div className="text-right text-sm">
-                        <div className="text-muted-foreground">Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}</div>
-                        <div className="font-bold text-foreground">€{totalPrice.toFixed(2)}/month</div>
+                        <div className="text-muted-foreground">Net: {formattedNetPrice} + IVA: {formattedIvaAmount}</div>
+                        <div className="font-bold text-foreground">{formattedTotalPrice}/month</div>
                       </div>
                     </div>
                   </li>
@@ -319,15 +337,19 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
             <ul className="space-y-2">
               {productData.map(product => {
                 const netPrice = parseFloat(product.price.toString());
-                const ivaAmount = netPrice * PRODUCT_IVA_RATE;
-                const totalPrice = netPrice * (1 + PRODUCT_IVA_RATE);
+                const convertedNetPrice = convertCurrency(netPrice, 'EUR', selectedCurrency);
+                const ivaAmount = convertedNetPrice * PRODUCT_IVA_RATE;
+                const totalPrice = convertedNetPrice * (1 + PRODUCT_IVA_RATE);
+                const formattedNetPrice = formatDisplayCurrency(convertedNetPrice, selectedCurrency, languageToLocale(language));
+                const formattedIvaAmount = formatDisplayCurrency(ivaAmount, selectedCurrency, languageToLocale(language));
+                const formattedTotalPrice = formatDisplayCurrency(totalPrice, selectedCurrency, languageToLocale(language));
                 return (
                   <li key={product.id} className="p-2 bg-white rounded border">
                     <div className="flex justify-between items-start">
                       <span className="font-medium">{product.name}</span>
                       <div className="text-right text-sm">
-                        <div className="text-muted-foreground">Net: €{netPrice.toFixed(2)} + IVA: €{ivaAmount.toFixed(2)}</div>
-                        <div className="font-bold text-foreground">€{totalPrice.toFixed(2)}</div>
+                        <div className="text-muted-foreground">Net: {formattedNetPrice} + IVA: {formattedIvaAmount}</div>
+                        <div className="font-bold text-foreground">{formattedTotalPrice}</div>
                       </div>
                     </div>
                   </li>
@@ -342,18 +364,18 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           {subscriptionTotal > 0 && (
             <div className="flex justify-between text-base">
               <span>Monthly Subscription:</span>
-              <span className="text-foreground">€{subscriptionTotal.toFixed(2)}/month</span>
+              <span className="text-foreground">{formatDisplayCurrency(subscriptionTotal, selectedCurrency, languageToLocale(language))}/month</span>
             </div>
           )}
           {productTotal > 0 && (
             <div className="flex justify-between text-base">
               <span>One-time Products:</span>
-              <span className="text-foreground">€{productTotal.toFixed(2)}</span>
+              <span className="text-foreground">{formatDisplayCurrency(productTotal, selectedCurrency, languageToLocale(language))}</span>
             </div>
           )}
           <div className="flex justify-between text-lg font-bold border-t pt-2">
             <span>Total Payment:</span>
-            <span className="text-foreground">€{grandTotal.toFixed(2)}</span>
+            <span className="text-foreground">{formatDisplayCurrency(grandTotal, selectedCurrency, languageToLocale(language))}</span>
           </div>
         </div>
       </div>

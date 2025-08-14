@@ -26,13 +26,13 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { subscriptionPlans, products, regionalServices, email, firstName, lastName } = await req.json();
+    const { subscriptionPlans, products, regionalServices, email, firstName, lastName, currency = 'eur' } = await req.json();
     
     if (!email) {
       throw new Error("Email is required for payment processing");
     }
     
-    logStep("Request data received", { email, firstName, lastName, subscriptionPlans, products, regionalServices });
+    logStep("Request data received", { email, firstName, lastName, subscriptionPlans, products, regionalServices, currency });
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
@@ -112,7 +112,7 @@ serve(async (req) => {
     // Create payment intent for the total amount
     const paymentIntent = await stripe.paymentIntents.create({
       amount: totalAmount,
-      currency: 'eur', // Default currency
+      currency: currency.toLowerCase(),
       customer: customerId,
       metadata: {
         email: email,
@@ -121,6 +121,7 @@ serve(async (req) => {
         regional_services: JSON.stringify(regionalServices || []),
         subscription_amount: subscriptionTotal.toString(),
         product_amount: productTotal.toString(),
+        payment_currency: currency,
       },
       automatic_payment_methods: {
         enabled: true,

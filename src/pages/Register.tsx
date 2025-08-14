@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import EmbeddedPayment from "@/components/EmbeddedPayment";
 import { useTranslation } from 'react-i18next';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -22,6 +25,8 @@ const Register = () => {
     phoneNumber: "",
     password: "",
     plans: [] as string[],
+    products: [] as string[],
+    regionalServices: [] as string[],
     // Payment step
     paymentMethod: "",
     // Questionnaire step
@@ -33,8 +38,59 @@ const Register = () => {
     acceptTerms: false
   });
   const [loading, setLoading] = useState(false);
+  const [subscriptionPlans, setSubscriptionPlans] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [regionalServices, setRegionalServices] = useState<any[]>([]);
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { currency, language } = usePreferences();
+
+  // Fetch data from database on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch subscription plans
+        const { data: plansData, error: plansError } = await supabase
+          .from('subscription_plans')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true });
+        
+        if (plansError) throw plansError;
+        setSubscriptionPlans(plansData || []);
+
+        // Fetch products
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .eq('status', 'active')
+          .order('sort_order', { ascending: true });
+        
+        if (productsError) throw productsError;
+        setProducts(productsData || []);
+
+        // Fetch regional services
+        const { data: servicesData, error: servicesError } = await supabase
+          .from('regional_services')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order', { ascending: true });
+        
+        if (servicesError) throw servicesError;
+        setRegionalServices(servicesData || []);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load subscription options. Please refresh the page.",
+          variant: "destructive"
+        });
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleNextStep = () => {
     if (step === 1) {
@@ -48,10 +104,10 @@ const Register = () => {
       }
       setStep(2);
     } else if (step === 2) {
-      if (formData.plans.length === 0) {
+      if (formData.plans.length === 0 && formData.products.length === 0 && formData.regionalServices.length === 0) {
         toast({
-          title: "Plan Required",
-          description: "Please select at least one subscription plan.",
+          title: "Selection Required",
+          description: "Please select at least one subscription plan, product, or service.",
           variant: "destructive"
         });
         return;
@@ -138,10 +194,15 @@ const Register = () => {
         <div className="max-w-2xl mx-auto">
           <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0">
             <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="p-3 bg-emergency/10 rounded-full">
-                  <Shield className="h-8 w-8 text-emergency" />
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <div className="flex justify-center mb-4">
+                    <div className="p-3 bg-emergency/10 rounded-full">
+                      <Shield className="h-8 w-8 text-emergency" />
+                    </div>
+                  </div>
                 </div>
+                <LanguageCurrencySelector compact />
               </div>
               <CardTitle className="text-3xl font-bold">Join ICE SOS Platform</CardTitle>
               <CardDescription className="text-lg">
@@ -227,42 +288,117 @@ const Register = () => {
               {step === 2 && (
                 <div className="space-y-6">
                   <div className="text-center mb-6">
-                    <h3 className="text-xl font-semibold mb-2">Choose your plan(s)</h3>
-                    <p className="text-muted-foreground">Select one or more subscription plans that fit your needs</p>
+                    <h3 className="text-xl font-semibold mb-2">Choose your plan(s) and products</h3>
+                    <p className="text-muted-foreground">Select subscription plans, products, and services that fit your needs</p>
                   </div>
 
-                  <div className="space-y-4">
-                  {[
-                    { id: "personal", name: t('register.plans.personal.name', { defaultValue: 'Personal Account' }), price: `€4.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.personal.desc', { defaultValue: 'Individual emergency contact system' }) },
-                    { id: "guardian", name: t('register.plans.guardian.name', { defaultValue: 'Guardian Wellness' }), price: `€4.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.guardian.desc', { defaultValue: 'Advanced health monitoring and alerts' }) },
-                    { id: "family", name: t('register.plans.family.name', { defaultValue: 'Family Sharing' }), price: `€0.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.family.desc', { defaultValue: 'Perfect for families with multiple members' }) },
-                    { id: "callcenter", name: t('register.plans.callcenterES.name', { defaultValue: 'Call Centre Spain' }), price: `€24.99${t('common.perMonth', { defaultValue: '/month' })}`, description: t('register.plans.callcenterES.desc', { defaultValue: '24/7 professional emergency response' }) }
-                  ].map((plan) => (
-                      <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                        <Checkbox
-                          id={plan.id}
-                          checked={formData.plans.includes(plan.id)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setFormData({
-                                ...formData,
-                                plans: [...formData.plans, plan.id]
-                              });
-                            } else {
-                              setFormData({
-                                ...formData,
-                                plans: formData.plans.filter(p => p !== plan.id)
-                              });
-                            }
-                          }}
-                        />
-                        <div className="flex-1">
-                          <Label htmlFor={plan.id} className="font-medium">{plan.name} - {plan.price}</Label>
-                          <p className="text-sm text-muted-foreground">{plan.description}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Subscription Plans */}
+                  {subscriptionPlans.length > 0 && (
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-lg">Monthly Subscription Plans</h4>
+                      {subscriptionPlans.map((plan) => {
+                        const convertedPrice = convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency);
+                        const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+                        return (
+                          <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
+                            <Checkbox
+                              id={plan.id}
+                              checked={formData.plans.includes(plan.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData({
+                                    ...formData,
+                                    plans: [...formData.plans, plan.id]
+                                  });
+                                } else {
+                                  setFormData({
+                                    ...formData,
+                                    plans: formData.plans.filter(p => p !== plan.id)
+                                  });
+                                }
+                              }}
+                            />
+                            <div className="flex-1">
+                              <Label htmlFor={plan.id} className="font-medium">{plan.name} - {formattedPrice}/month</Label>
+                              <p className="text-sm text-muted-foreground">{plan.description}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Products */}
+                  {products.length > 0 && (
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-lg">Safety Products (One-time purchase)</h4>
+                      {products.map((product) => {
+                        const convertedPrice = convertCurrency(parseFloat(product.price.toString()), 'EUR', currency);
+                        const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+                        return (
+                          <div key={product.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
+                            <Checkbox
+                              id={product.id}
+                              checked={formData.products.includes(product.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData({
+                                    ...formData,
+                                    products: [...formData.products, product.id]
+                                  });
+                                } else {
+                                  setFormData({
+                                    ...formData,
+                                    products: formData.products.filter(p => p !== product.id)
+                                  });
+                                }
+                              }}
+                            />
+                            <div className="flex-1">
+                              <Label htmlFor={product.id} className="font-medium">{product.name} - {formattedPrice}</Label>
+                              <p className="text-sm text-muted-foreground">{product.description}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Regional Services */}
+                  {regionalServices.length > 0 && (
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-lg">Regional Services</h4>
+                      {regionalServices.map((service) => {
+                        const convertedPrice = convertCurrency(parseFloat(service.price.toString()), 'EUR', currency);
+                        const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+                        return (
+                          <div key={service.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
+                            <Checkbox
+                              id={service.id}
+                              checked={formData.regionalServices.includes(service.id)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setFormData({
+                                    ...formData,
+                                    regionalServices: [...formData.regionalServices, service.id]
+                                  });
+                                } else {
+                                  setFormData({
+                                    ...formData,
+                                    regionalServices: formData.regionalServices.filter(s => s !== service.id)
+                                  });
+                                }
+                              }}
+                            />
+                            <div className="flex-1">
+                              <Label htmlFor={service.id} className="font-medium">{service.name} ({service.region}) - {formattedPrice}/month</Label>
+                              <p className="text-sm text-muted-foreground">{service.description}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   <div className="flex gap-3">
                     <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
@@ -285,10 +421,13 @@ const Register = () => {
 
                   <EmbeddedPayment 
                     plans={formData.plans}
+                    products={formData.products}
+                    regionalServices={formData.regionalServices}
                     userEmail={formData.email}
                     firstName={formData.firstName}
                     lastName={formData.lastName}
                     password={formData.password || Math.random().toString(36).slice(-8)}
+                    currency={currency}
                     onSuccess={handlePaymentSuccess}
                     onBack={() => setStep(2)}
                   />
