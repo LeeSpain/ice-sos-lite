@@ -30,7 +30,7 @@ const DeviceIceSosPendant = () => {
       name: "ICE SOS Lite"
     },
     description,
-    image: typeof window !== "undefined" ? `${window.location.origin}/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png` : "",
+    image: typeof window !== "undefined" ? `${window.location.origin}/lovable-uploads/acfcc77a-7e34-44f5-8487-4069c2acb56b.png` : "",
     offers: {
       "@type": "Offer",
       priceCurrency: "EUR",
@@ -89,7 +89,7 @@ const DeviceIceSosPendant = () => {
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:url" content={canonical} />
-        <meta property="og:image" content={typeof window !== "undefined" ? `${window.location.origin}/lovable-uploads/0fa5e960-e1ec-4a6b-ac84-1017544dfeca.png` : ""} />
+        <meta property="og:image" content={typeof window !== "undefined" ? `${window.location.origin}/lovable-uploads/acfcc77a-7e34-44f5-8487-4069c2acb56b.png` : ""} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={title} />
         <meta name="twitter:description" content={description} />
