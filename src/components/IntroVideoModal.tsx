@@ -43,13 +43,6 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
       available: true
     },
     {
-      id: 'family-connection',
-      title: 'ICE SOS Lite - Family Connection',
-      description: 'How to connect and protect your family members through ICE SOS Lite',
-      youtubeId: 'zOgSKzktc7g',
-      available: true
-    },
-    {
       id: 'all-ages',
       title: 'ICE SOS Lite - For All Ages',
       description: 'Protection solutions for every age group',
@@ -60,8 +53,8 @@ export const IntroVideoModal = ({ trigger, className }: IntroVideoModalProps) =>
       id: 'spain',
       title: 'ICE SOS Lite - Call Centre Spain',
       description: 'Our Spanish call center operations and services',
-      youtubeId: '',
-      available: false
+      youtubeId: 'zOgSKzktc7g',
+      available: true
     }
   ], []);
 
