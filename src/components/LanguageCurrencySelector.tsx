@@ -4,6 +4,8 @@ import React from 'react';
 
 export const LanguageCurrencySelector: React.FC<{ compact?: boolean }> = ({ compact }) => {
   const { language, setLanguage, currency, setCurrency } = usePreferences();
+  
+  console.log('LanguageCurrencySelector - Current values:', { language, currency });
 
   return (
     <div className={`flex items-center gap-2 ${compact ? '' : 'ml-2'}`}>
@@ -18,7 +20,10 @@ export const LanguageCurrencySelector: React.FC<{ compact?: boolean }> = ({ comp
         </SelectContent>
       </Select>
 
-      <Select value={currency} onValueChange={(v) => setCurrency(v as any)}>
+      <Select value={currency} onValueChange={(v) => {
+        console.log('Currency changing from', currency, 'to', v);
+        setCurrency(v as any);
+      }}>
         <SelectTrigger className="h-8 w-[120px]">
           <SelectValue placeholder="Currency" />
         </SelectTrigger>

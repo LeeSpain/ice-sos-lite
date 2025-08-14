@@ -44,6 +44,14 @@ const Register = () => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { currency, language } = usePreferences();
+  
+  // Debug logging - Force re-render when currency changes
+  console.log('Register component - Current currency:', currency, 'language:', language);
+  
+  // Force component to re-render when currency changes by adding it as a dependency
+  useEffect(() => {
+    console.log('Currency changed to:', currency);
+  }, [currency]);
 
   // Fetch data from database on component mount
   useEffect(() => {
@@ -90,7 +98,7 @@ const Register = () => {
     };
 
     fetchData();
-  }, []);
+  }, [currency]); // Re-fetch when currency changes to trigger re-render
 
   const handleNextStep = () => {
     if (step === 1) {
@@ -299,6 +307,7 @@ const Register = () => {
                       {subscriptionPlans.map((plan) => {
                         const convertedPrice = convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency);
                         const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+                        console.log('Plan conversion:', plan.name, 'EUR', plan.price, '->', currency, convertedPrice, formattedPrice);
                         return (
                           <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
                             <Checkbox
