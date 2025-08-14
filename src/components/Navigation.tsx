@@ -29,29 +29,39 @@ const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
-            <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
+          <div className="hidden md:flex items-center space-x-8">
+            <Link 
+              to="/contact" 
+              className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 hover:scale-105 px-3 py-2 rounded-lg hover:bg-primary/5"
+            >
               {t('nav.contact', 'Contact Us')}
             </Link>
             <IntroVideoModal 
               trigger={
-                <button className="text-foreground hover:text-primary transition-colors text-sm">
+                <button className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 hover:scale-105 px-3 py-2 rounded-lg hover:bg-primary/5">
                   {t('nav.introVideo', 'Intro Video')}
                 </button>
               }
             />
             {language === 'es' && (
-              <Link to="/regional-center/spain" className="text-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/regional-center/spain" 
+                className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 hover:scale-105 px-3 py-2 rounded-lg hover:bg-primary/5"
+              >
                 {t('nav.regionalCenter')}
               </Link>
             )}
-            <LanguageCurrencySelector compact />
-            <Button asChild variant="outline" size="sm">
-              <Link to="/auth">{t('nav.signIn')}</Link>
-            </Button>
-            <Button asChild size="sm" className="shadow-primary">
-              <Link to="/register">{t('nav.subscribeNow')}</Link>
-            </Button>
+            <div className="border-l border-border/30 pl-6 ml-2">
+              <LanguageCurrencySelector compact />
+            </div>
+            <div className="flex items-center space-x-3">
+              <Button asChild variant="outline" size="sm" className="font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
+                <Link to="/auth">{t('nav.signIn')}</Link>
+              </Button>
+              <Button asChild size="sm" className="shadow-primary bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-medium transition-all duration-200 hover:scale-105">
+                <Link to="/register">{t('nav.subscribeNow')}</Link>
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -66,30 +76,43 @@ const Navigation = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-border py-4">
-            <div className="flex flex-col space-y-4">
-              <LanguageCurrencySelector />
-              <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
+          <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-sm">
+            <div className="flex flex-col space-y-1 py-4">
+              <div className="mb-4">
+                <LanguageCurrencySelector />
+              </div>
+              <Link 
+                to="/contact" 
+                className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 px-4 py-3 rounded-lg hover:bg-primary/5"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 {t('nav.contact', 'Contact Us')}
               </Link>
               <IntroVideoModal 
                 trigger={
-                  <button className="text-left text-foreground hover:text-primary transition-colors">
+                  <button 
+                    className="text-left w-full text-sm font-medium text-foreground hover:text-primary transition-all duration-200 px-4 py-3 rounded-lg hover:bg-primary/5"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     {t('nav.introVideo', 'Intro Video')}
                   </button>
                 }
               />
               {language === 'es' && (
-                <Link to="/regional-center/spain" className="text-foreground hover:text-primary transition-colors">
+                <Link 
+                  to="/regional-center/spain" 
+                  className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 px-4 py-3 rounded-lg hover:bg-primary/5"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   {t('nav.regionalCenter')}
                 </Link>
               )}
-              <div className="flex flex-col space-y-2 pt-4 border-t border-border">
-                <Button asChild variant="outline" size="sm">
-                  <Link to="/auth">{t('nav.signIn')}</Link>
+              <div className="flex flex-col space-y-3 pt-6 mt-4 border-t border-border">
+                <Button asChild variant="outline" size="sm" className="font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
+                  <Link to="/auth" onClick={() => setIsMenuOpen(false)}>{t('nav.signIn')}</Link>
                 </Button>
-                <Button asChild size="sm" className="shadow-primary">
-                  <Link to="/register">{t('nav.subscribeNow')}</Link>
+                <Button asChild size="sm" className="shadow-primary bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-medium transition-all duration-200">
+                  <Link to="/register" onClick={() => setIsMenuOpen(false)}>{t('nav.subscribeNow')}</Link>
                 </Button>
               </div>
             </div>
