@@ -29,18 +29,17 @@ const Navigation = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/contact" 
-              className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 hover:scale-105 px-3 py-2 rounded-lg hover:bg-primary/5"
-            >
-              {t('nav.contact', 'Contact Us')}
-            </Link>
+          <div className="hidden md:flex items-center space-x-6">
+            <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm">
+              <Link to="/contact">
+                {t('nav.contact', 'Contact Us')}
+              </Link>
+            </Button>
             <IntroVideoModal 
               trigger={
-                <button className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 hover:scale-105 px-3 py-2 rounded-lg hover:bg-primary/5">
+                <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm">
                   {t('nav.introVideo', 'Intro Video')}
-                </button>
+                </Button>
               }
             />
             {language === 'es' && (
@@ -77,27 +76,28 @@ const Navigation = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-sm">
-            <div className="flex flex-col space-y-1 py-4">
+            <div className="flex flex-col space-y-3 py-4">
               <div className="mb-4">
                 <LanguageCurrencySelector />
               </div>
-              <Link 
-                to="/contact" 
-                className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 px-4 py-3 rounded-lg hover:bg-primary/5"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {t('nav.contact', 'Contact Us')}
-              </Link>
-              <IntroVideoModal 
-                trigger={
-                  <button 
-                    className="text-left w-full text-sm font-medium text-foreground hover:text-primary transition-all duration-200 px-4 py-3 rounded-lg hover:bg-primary/5"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('nav.introVideo', 'Intro Video')}
-                  </button>
-                }
-              />
+              <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm mx-4">
+                <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
+                  {t('nav.contact', 'Contact Us')}
+                </Link>
+              </Button>
+              <div className="mx-4">
+                <IntroVideoModal 
+                  trigger={
+                    <Button 
+                      size="sm" 
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-sm"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {t('nav.introVideo', 'Intro Video')}
+                    </Button>
+                  }
+                />
+              </div>
               {language === 'es' && (
                 <Link 
                   to="/regional-center/spain" 
@@ -107,7 +107,7 @@ const Navigation = () => {
                   {t('nav.regionalCenter')}
                 </Link>
               )}
-              <div className="flex flex-col space-y-3 pt-6 mt-4 border-t border-border">
+              <div className="flex flex-col space-y-3 pt-6 mt-4 border-t border-border mx-4">
                 <Button asChild variant="outline" size="sm" className="font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>{t('nav.signIn')}</Link>
                 </Button>
