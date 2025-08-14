@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -45,17 +45,45 @@ const Register = () => {
   const { t } = useTranslation();
   const { currency, language } = usePreferences();
   
-  // Debug logging - Force re-render when currency changes
-  console.log('🔄 Register component render - Current currency:', currency, 'Step:', step, 'Plans count:', subscriptionPlans.length);
-  
-  // Force component to re-render when currency changes by adding it as a dependency
-  useEffect(() => {
-    console.log('💰 Currency effect triggered - Currency changed to:', currency);
-  }, [currency]);
+  // Convert all data based on current currency using useMemo for proper re-rendering
+  const convertedSubscriptionPlans = useMemo(() => {
+    return subscriptionPlans.map(plan => ({
+      ...plan,
+      convertedPrice: convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency),
+      formattedPrice: formatDisplayCurrency(
+        convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency), 
+        currency, 
+        languageToLocale(language)
+      )
+    }));
+  }, [subscriptionPlans, currency, language]);
+
+  const convertedProducts = useMemo(() => {
+    return products.map(product => ({
+      ...product,
+      convertedPrice: convertCurrency(parseFloat(product.price.toString()), 'EUR', currency),
+      formattedPrice: formatDisplayCurrency(
+        convertCurrency(parseFloat(product.price.toString()), 'EUR', currency), 
+        currency, 
+        languageToLocale(language)
+      )
+    }));
+  }, [products, currency, language]);
+
+  const convertedRegionalServices = useMemo(() => {
+    return regionalServices.map(service => ({
+      ...service,
+      convertedPrice: convertCurrency(parseFloat(service.price.toString()), 'EUR', currency),
+      formattedPrice: formatDisplayCurrency(
+        convertCurrency(parseFloat(service.price.toString()), 'EUR', currency), 
+        currency, 
+        languageToLocale(language)
+      )
+    }));
+  }, [regionalServices, currency, language]);
 
   // Fetch data from database on component mount
   useEffect(() => {
-    console.log('📊 Fetching data for currency:', currency);
     const fetchData = async () => {
       try {
         // Fetch subscription plans
@@ -99,7 +127,7 @@ const Register = () => {
     };
 
     fetchData();
-  }, [currency]); // Re-fetch when currency changes to trigger re-render
+  }, []); // Only fetch once on mount
 
   const handleNextStep = () => {
     if (step === 1) {
@@ -301,115 +329,101 @@ const Register = () => {
                     <p className="text-muted-foreground">Select subscription plans, products, and services that fit your needs</p>
                   </div>
 
-                  {/* Subscription Plans */}
-                  {subscriptionPlans.length > 0 && (
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-lg">Monthly Subscription Plans</h4>
-                      {subscriptionPlans.map((plan) => {
-                        console.log('🔢 Converting plan:', plan.name, 'from EUR', plan.price, 'to', currency);
-                        const convertedPrice = convertCurrency(parseFloat(plan.price.toString()), 'EUR', currency);
-                        const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-                        console.log('✅ Converted:', convertedPrice, 'Formatted:', formattedPrice);
-                        return (
-                          <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                            <Checkbox
-                              id={plan.id}
-                              checked={formData.plans.includes(plan.id)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setFormData({
-                                    ...formData,
-                                    plans: [...formData.plans, plan.id]
-                                  });
-                                } else {
-                                  setFormData({
-                                    ...formData,
-                                    plans: formData.plans.filter(p => p !== plan.id)
-                                  });
-                                }
-                              }}
-                            />
-                            <div className="flex-1">
-                              <Label htmlFor={plan.id} className="font-medium">{plan.name} - {formattedPrice}/month</Label>
-                              <p className="text-sm text-muted-foreground">{plan.description}</p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                   {/* Subscription Plans */}
+                   {convertedSubscriptionPlans.length > 0 && (
+                     <div key={`plans-${currency}`} className="space-y-4">
+                       <h4 className="font-medium text-lg">Monthly Subscription Plans</h4>
+                       {convertedSubscriptionPlans.map((plan) => (
+                         <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
+                           <Checkbox
+                             id={plan.id}
+                             checked={formData.plans.includes(plan.id)}
+                             onCheckedChange={(checked) => {
+                               if (checked) {
+                                 setFormData({
+                                   ...formData,
+                                   plans: [...formData.plans, plan.id]
+                                 });
+                               } else {
+                                 setFormData({
+                                   ...formData,
+                                   plans: formData.plans.filter(p => p !== plan.id)
+                                 });
+                               }
+                             }}
+                           />
+                           <div className="flex-1">
+                             <Label htmlFor={plan.id} className="font-medium">{plan.name} - {plan.formattedPrice}/month</Label>
+                             <p className="text-sm text-muted-foreground">{plan.description}</p>
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   )}
 
-                  {/* Products */}
-                  {products.length > 0 && (
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-lg">Safety Products (One-time purchase)</h4>
-                      {products.map((product) => {
-                        const convertedPrice = convertCurrency(parseFloat(product.price.toString()), 'EUR', currency);
-                        const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-                        return (
-                          <div key={product.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                            <Checkbox
-                              id={product.id}
-                              checked={formData.products.includes(product.id)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setFormData({
-                                    ...formData,
-                                    products: [...formData.products, product.id]
-                                  });
-                                } else {
-                                  setFormData({
-                                    ...formData,
-                                    products: formData.products.filter(p => p !== product.id)
-                                  });
-                                }
-                              }}
-                            />
-                            <div className="flex-1">
-                              <Label htmlFor={product.id} className="font-medium">{product.name} - {formattedPrice}</Label>
-                              <p className="text-sm text-muted-foreground">{product.description}</p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                   {/* Products */}
+                   {convertedProducts.length > 0 && (
+                     <div key={`products-${currency}`} className="space-y-4">
+                       <h4 className="font-medium text-lg">Safety Products (One-time purchase)</h4>
+                       {convertedProducts.map((product) => (
+                         <div key={product.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
+                           <Checkbox
+                             id={product.id}
+                             checked={formData.products.includes(product.id)}
+                             onCheckedChange={(checked) => {
+                               if (checked) {
+                                 setFormData({
+                                   ...formData,
+                                   products: [...formData.products, product.id]
+                                 });
+                               } else {
+                                 setFormData({
+                                   ...formData,
+                                   products: formData.products.filter(p => p !== product.id)
+                                 });
+                               }
+                             }}
+                           />
+                           <div className="flex-1">
+                             <Label htmlFor={product.id} className="font-medium">{product.name} - {product.formattedPrice}</Label>
+                             <p className="text-sm text-muted-foreground">{product.description}</p>
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   )}
 
-                  {/* Regional Services */}
-                  {regionalServices.length > 0 && (
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-lg">Regional Services</h4>
-                      {regionalServices.map((service) => {
-                        const convertedPrice = convertCurrency(parseFloat(service.price.toString()), 'EUR', currency);
-                        const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-                        return (
-                          <div key={service.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
-                            <Checkbox
-                              id={service.id}
-                              checked={formData.regionalServices.includes(service.id)}
-                              onCheckedChange={(checked) => {
-                                if (checked) {
-                                  setFormData({
-                                    ...formData,
-                                    regionalServices: [...formData.regionalServices, service.id]
-                                  });
-                                } else {
-                                  setFormData({
-                                    ...formData,
-                                    regionalServices: formData.regionalServices.filter(s => s !== service.id)
-                                  });
-                                }
-                              }}
-                            />
+                   {/* Regional Services */}
+                   {convertedRegionalServices.length > 0 && (
+                     <div key={`services-${currency}`} className="space-y-4">
+                       <h4 className="font-medium text-lg">Regional Services</h4>
+                       {convertedRegionalServices.map((service) => (
+                         <div key={service.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
+                           <Checkbox
+                             id={service.id}
+                             checked={formData.regionalServices.includes(service.id)}
+                             onCheckedChange={(checked) => {
+                               if (checked) {
+                                 setFormData({
+                                   ...formData,
+                                   regionalServices: [...formData.regionalServices, service.id]
+                                 });
+                               } else {
+                                 setFormData({
+                                   ...formData,
+                                   regionalServices: formData.regionalServices.filter(s => s !== service.id)
+                                 });
+                               }
+                             }}
+                           />
                             <div className="flex-1">
-                              <Label htmlFor={service.id} className="font-medium">{service.name} ({service.region}) - {formattedPrice}/month</Label>
+                              <Label htmlFor={service.id} className="font-medium">{service.name} ({service.region}) - {service.formattedPrice}/month</Label>
                               <p className="text-sm text-muted-foreground">{service.description}</p>
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                        ))}
+                      </div>
+                    )}
 
                   <div className="flex gap-3">
                     <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
