@@ -592,7 +592,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           <span className="text-4xl font-bold text-green-600">{formatPriceDisplay(4.99, 'EUR')}</span>
                           <span className="text-muted-foreground text-lg">{t('common.perMonth', { defaultValue: '/month' })}</span>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex flex-col gap-3">
                           <Button 
                             size="lg"
                             className="px-8 py-4 bg-green-600 text-white hover:bg-green-700 border-0 font-semibold"
@@ -602,6 +602,20 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                               {t('pricing.details')}
                             </Link>
                           </Button>
+                          
+                          <IntroVideoModal 
+                            defaultVideoId="spain"
+                            trigger={
+                              <Button 
+                                size="lg"
+                                variant="outline"
+                                className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                              >
+                                <Play className="h-4 w-4 mr-2" />
+                                Watch Video
+                              </Button>
+                            }
+                          />
                         </div>
                        </div>
                         
