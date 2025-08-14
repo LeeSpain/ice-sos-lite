@@ -113,9 +113,8 @@ const Register = () => {
             medical_conditions: formData.medicalConditions,
             allergies: formData.allergies,
             current_location: formData.currentLocation,
-            preferred_language: formData.preferredLanguage,
-            preferred_currency: selectedCurrency, // Save user's currency preference
-            language_preference: language, // Save user's language preference
+            preferred_language: language, // Save user's language preference in metadata
+            preferred_currency: selectedCurrency, // Save user's currency preference in metadata
           }
         }
       });
