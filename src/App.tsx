@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { EmmaChatProvider } from "@/contexts/EmmaChatContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -32,6 +32,16 @@ const RegionalCenterSpain = lazy(() => import("./pages/RegionalCenterSpain"));
 const FamilyCarerAccess = lazy(() => import("./pages/FamilyCarerAccess"));
 const Contact = lazy(() => import("./pages/Contact"));
 
+// Component to conditionally render Emma Chat
+const ConditionalEmmaChat = () => {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin-dashboard');
+  
+  // Don't show Emma chat in admin routes
+  if (isAdminRoute) return null;
+  
+  return <GlobalEmmaChat />;
+};
 
 const App = () => {
   return (
@@ -103,8 +113,8 @@ const App = () => {
           {/* Global floating device/settings button */}
           <DeviceManagerButton />
           
-          {/* Global Emma Chat - Available on all pages */}
-          <GlobalEmmaChat />
+          {/* Global Emma Chat - Available on all pages except admin */}
+          <ConditionalEmmaChat />
         </BrowserRouter>
       </EmmaChatProvider>
     </AuthProvider>

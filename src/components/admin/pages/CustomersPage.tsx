@@ -6,7 +6,10 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, Users, Mail, Phone, Calendar } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Search, Users, Mail, Phone, Calendar, Plus, Eye, Trash2, Download, RefreshCw } from 'lucide-react';
+import CustomerDetailsModal from '@/components/admin/CustomerDetailsModal';
+import AddCustomerModal from '@/components/admin/AddCustomerModal';
 
 interface Customer {
   id: string;
@@ -17,6 +20,9 @@ interface Customer {
   email?: string;
   date_of_birth?: string;
   country?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  medical_conditions?: string;
   created_at: string;
   profile_completion_percentage?: number;
   subscription?: {
@@ -31,6 +37,10 @@ export default function CustomersPage() {
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     loadCustomers();
@@ -65,7 +75,20 @@ export default function CustomersPage() {
 
       // Transform data to include subscription info and email
       const transformedCustomers = profilesData?.map(profile => ({
-        ...profile,
+        id: profile.id,
+        user_id: profile.user_id,
+        first_name: profile.first_name,
+        last_name: profile.last_name,
+        phone: profile.phone,
+        country: profile.country,
+        date_of_birth: profile.date_of_birth,
+        emergency_contact_name: '',
+        emergency_contact_phone: '',
+        medical_conditions: Array.isArray(profile.medical_conditions) 
+          ? profile.medical_conditions.join(', ') 
+          : profile.medical_conditions || '',
+        created_at: profile.created_at,
+        profile_completion_percentage: profile.profile_completion_percentage,
         email: Array.isArray(profile.subscribers) && profile.subscribers.length > 0 
           ? profile.subscribers[0].email 
           : null,
@@ -100,6 +123,61 @@ export default function CustomersPage() {
     });
 
     setFilteredCustomers(filtered);
+  };
+
+  const handleViewCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleDeleteCustomer = async (customer: Customer) => {
+    if (!confirm(`Are you sure you want to delete ${customer.first_name} ${customer.last_name}?`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase.auth.admin.deleteUser(customer.user_id);
+      
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Customer Deleted",
+        description: "Customer has been permanently deleted.",
+      });
+
+      loadCustomers();
+    } catch (error: any) {
+      console.error('Error deleting customer:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete customer.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportData = () => {
+    const csv = [
+      ['Name', 'Email', 'Phone', 'Country', 'Subscription', 'Joined'].join(','),
+      ...filteredCustomers.map(customer => [
+        `"${customer.first_name || ''} ${customer.last_name || ''}"`,
+        `"${customer.email || ''}"`,
+        `"${customer.phone || ''}"`,
+        `"${customer.country || ''}"`,
+        `"${customer.subscription?.subscribed ? customer.subscription.subscription_tier || 'Basic' : 'Free'}"`,
+        `"${new Date(customer.created_at).toLocaleDateString()}"`
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `customers-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const getSubscriptionBadge = (subscription: Customer['subscription']) => {
@@ -138,9 +216,15 @@ export default function CustomersPage() {
           <h1 className="text-3xl font-bold">Customer Management</h1>
           <p className="text-muted-foreground">Manage and view all customer profiles</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          <span className="font-medium">{filteredCustomers.length} customers</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            <span className="font-medium">{filteredCustomers.length} customers</span>
+          </div>
+          <Button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add Customer
+          </Button>
         </div>
       </div>
 
@@ -157,9 +241,16 @@ export default function CustomersPage() {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline">
-              Export Data
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={loadCustomers} disabled={loading}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+              <Button variant="outline" onClick={handleExportData}>
+                <Download className="h-4 w-4 mr-2" />
+                Export Data
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -246,11 +337,23 @@ export default function CustomersPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewCustomer(customer)}
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
                           View
                         </Button>
                         <Button variant="outline" size="sm">
                           <Mail className="h-3 w-3" />
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => handleDeleteCustomer(customer)}
+                        >
+                          <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>
                     </TableCell>
@@ -261,6 +364,22 @@ export default function CustomersPage() {
           </ScrollArea>
         </CardContent>
       </Card>
+
+      <CustomerDetailsModal
+        customer={selectedCustomer}
+        isOpen={isDetailsModalOpen}
+        onClose={() => {
+          setIsDetailsModalOpen(false);
+          setSelectedCustomer(null);
+        }}
+        onUpdate={loadCustomers}
+      />
+
+      <AddCustomerModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={loadCustomers}
+      />
     </div>
   );
 }
