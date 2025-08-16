@@ -25,6 +25,7 @@ import ReportsPage from '@/components/admin/pages/ReportsPage';
 import SubscriptionPlansPage from '@/components/admin/pages/SubscriptionPlansPage';
 import AppTestingPage from '@/components/admin/pages/AppTestingPage';
 import FlicControlAdminPage from '@/components/admin/pages/FlicControlAdminPage';
+import ContactSubmissionsPage from '@/components/admin/pages/ContactSubmissionsPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -47,6 +48,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="leads" element={<LeadsPage />} />
         <Route path="conversations" element={<ConversationsPage />} />
         <Route path="ai-metrics" element={<div className="p-6"><h1 className="text-3xl font-bold">AI Performance</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
+        <Route path="contact-submissions" element={<ContactSubmissionsPage />} />
         <Route path="email-campaigns" element={<EmailCampaignsPage />} />
         <Route path="communication" element={<CommunicationPage />} />
         <Route path="whatsapp" element={<div className="p-6"><h1 className="text-3xl font-bold">WhatsApp Integration</h1><p className="text-muted-foreground">Coming soon...</p></div>} />

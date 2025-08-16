@@ -137,6 +137,39 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log('Contact submission stored:', submission.id);
 
+    // Create a lead entry in the CRM for tracking
+    try {
+      const { data: leadData, error: leadError } = await supabase
+        .from('leads')
+        .insert({
+          session_id: sessionId || crypto.randomUUID(),
+          email: sanitizedEmail,
+          interest_level: subject.toLowerCase().includes('join') || subject.toLowerCase().includes('subscribe') || subject.toLowerCase().includes('buy') ? 7 : 5,
+          recommended_plan: subject.toLowerCase().includes('premium') ? 'Premium' : 'Basic',
+          conversation_summary: `Contact form submission: ${sanitizedSubject}. Message: ${sanitizedMessage.substring(0, 200)}${sanitizedMessage.length > 200 ? '...' : ''}`,
+          status: 'new',
+          metadata: {
+            source: 'contact_form',
+            contact_submission_id: submission.id,
+            name: sanitizedName,
+            subject: sanitizedSubject,
+            ip_address: clientIP,
+            user_agent: userAgent
+          }
+        })
+        .select()
+        .single();
+
+      if (leadError) {
+        console.error('Error creating lead:', leadError);
+      } else {
+        console.log('Lead created:', leadData.id);
+      }
+    } catch (error) {
+      console.error('Error creating lead:', error);
+      // Don't fail the main request if lead creation fails
+    }
+
     // Send notification email to admin
     const adminEmailResponse = await resend.emails.send({
       from: 'ICE SOS Lite Contact <noreply@icesoslite.com>',
