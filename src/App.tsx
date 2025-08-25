@@ -13,6 +13,10 @@ import GlobalEmmaChat from "@/components/GlobalEmmaChat";
 import { queryClient } from "@/lib/queryClient";
 import Index from "./pages/Index";
 import { usePageTracking } from '@/hooks/usePageTracking';
+import OptimizedSuspense from '@/components/OptimizedSuspense';
+import EnhancedErrorBoundary from '@/components/EnhancedErrorBoundary';
+import PerformanceMonitor from '@/components/PerformanceMonitor';
+import { usePageErrorDetection } from '@/hooks/usePageErrorDetection';
 
 const TestPage = lazy(() => import("./pages/TestPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
@@ -47,87 +51,183 @@ const ConditionalEmmaChat = () => {
   return <GlobalEmmaChat />;
 };
 
-// Component to track page views
+// Component to track page views and errors
 const PageTracker = () => {
   usePageTracking();
+  const errorDetection = usePageErrorDetection();
+  
+  // Auto-retry chunk loading errors
+  React.useEffect(() => {
+    const chunkErrors = errorDetection.errors.filter(e => e.type === 'chunk_load_error');
+    if (chunkErrors.length > 0) {
+      console.log('🔄 Auto-retrying due to chunk load errors...');
+      setTimeout(() => {
+        errorDetection.retryChunkLoading();
+      }, 1000);
+    }
+  }, [errorDetection.errors]);
+  
   return null;
 };
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <EmmaChatProvider>
-        <BrowserRouter>
-          <RouteChangeTracker />
-          <ScrollToTop />
-          <PageTracker />
-          <Suspense fallback={<div className="p-6 text-sm">Loading…</div>}>
-          <Routes>
-            <Route path="/test" element={<TestPage />} />
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/register" element={<AIRegister />} />
-            <Route path="/ai-register" element={<AIRegister />} />
-            <Route path="/register-classic" element={
-              <ProtectedRoute>
-                <Register />
-              </ProtectedRoute>
-            } />
-            <Route path="/registration-success" element={<RegistrationSuccess />} />
-            <Route path="/welcome" element={<RegistrationSuccess />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <DashboardRedirect />
-              </ProtectedRoute>
-            } />
-            <Route path="/member-dashboard" element={
-              <ProtectedRoute>
-                <SimpleDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/sos" element={
-              <ProtectedRoute>
-                <SOSHome />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin-setup" element={<AdminSetupPage />} />
-            <Route path="/admin-dashboard/*" element={
-              <AdminProtectedRoute>
-                <AdminDashboard />
-              </AdminProtectedRoute>
-            } />
-            <Route path="/full-dashboard/*" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/welcome-questionnaire" element={
-              <ProtectedRoute>
-                <WelcomeQuestionnaire />
-              </ProtectedRoute>
-            } />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/support" element={<Support />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/devices/ice-sos-pendant" element={<DeviceIceSosPendant />} />
-            <Route path="/regional-center/spain" element={<RegionalCenterSpain />} />
-            <Route path="/family-carer-access" element={<FamilyCarerAccess />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          </Suspense>
-          
-          {/* Global floating device/settings button */}
-          <DeviceManagerButton />
-          
-          {/* Global Emma Chat - Available on all pages except admin */}
-          <ConditionalEmmaChat />
-        </BrowserRouter>
-      </EmmaChatProvider>
-    </AuthProvider>
-    <ReactQueryDevtools initialIsOpen={false} />
-  </QueryClientProvider>
+    <EnhancedErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <EmmaChatProvider>
+          <BrowserRouter>
+            <RouteChangeTracker />
+            <ScrollToTop />
+            <PageTracker />
+            <Routes>
+              <Route path="/test" element={
+                <OptimizedSuspense skeletonType="card">
+                  <TestPage />
+                </OptimizedSuspense>
+              } />
+              <Route path="/" element={
+                <OptimizedSuspense skeletonType="dashboard">
+                  <Index />
+                </OptimizedSuspense>
+              } />
+              <Route path="/auth" element={
+                <OptimizedSuspense skeletonType="form" skeletonCount={3}>
+                  <AuthPage />
+                </OptimizedSuspense>
+              } />
+              <Route path="/register" element={
+                <OptimizedSuspense skeletonType="form" skeletonCount={6}>
+                  <AIRegister />
+                </OptimizedSuspense>
+              } />
+              <Route path="/ai-register" element={
+                <OptimizedSuspense skeletonType="form" skeletonCount={6}>
+                  <AIRegister />
+                </OptimizedSuspense>
+              } />
+              <Route path="/register-classic" element={
+                <ProtectedRoute>
+                  <OptimizedSuspense skeletonType="form" skeletonCount={5}>
+                    <Register />
+                  </OptimizedSuspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/registration-success" element={
+                <OptimizedSuspense skeletonType="card">
+                  <RegistrationSuccess />
+                </OptimizedSuspense>
+              } />
+              <Route path="/welcome" element={
+                <OptimizedSuspense skeletonType="card">
+                  <RegistrationSuccess />
+                </OptimizedSuspense>
+              } />
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <OptimizedSuspense skeletonType="dashboard">
+                    <DashboardRedirect />
+                  </OptimizedSuspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/member-dashboard" element={
+                <ProtectedRoute>
+                  <OptimizedSuspense skeletonType="dashboard">
+                    <SimpleDashboard />
+                  </OptimizedSuspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/sos" element={
+                <ProtectedRoute>
+                  <OptimizedSuspense skeletonType="card">
+                    <SOSHome />
+                  </OptimizedSuspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/admin-setup" element={
+                <OptimizedSuspense skeletonType="form" skeletonCount={4}>
+                  <AdminSetupPage />
+                </OptimizedSuspense>
+              } />
+              <Route path="/admin-dashboard/*" element={
+                <AdminProtectedRoute>
+                  <OptimizedSuspense skeletonType="analytics">
+                    <AdminDashboard />
+                  </OptimizedSuspense>
+                </AdminProtectedRoute>
+              } />
+              <Route path="/full-dashboard/*" element={
+                <ProtectedRoute>
+                  <OptimizedSuspense skeletonType="dashboard">
+                    <Dashboard />
+                  </OptimizedSuspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/welcome-questionnaire" element={
+                <ProtectedRoute>
+                  <OptimizedSuspense skeletonType="form" skeletonCount={8}>
+                    <WelcomeQuestionnaire />
+                  </OptimizedSuspense>
+                </ProtectedRoute>
+              } />
+              <Route path="/privacy" element={
+                <OptimizedSuspense skeletonType="card">
+                  <Privacy />
+                </OptimizedSuspense>
+              } />
+              <Route path="/terms" element={
+                <OptimizedSuspense skeletonType="card">
+                  <Terms />
+                </OptimizedSuspense>
+              } />
+              <Route path="/support" element={
+                <OptimizedSuspense skeletonType="card" skeletonCount={3}>
+                  <Support />
+                </OptimizedSuspense>
+              } />
+              <Route path="/contact" element={
+                <OptimizedSuspense skeletonType="form" skeletonCount={4}>
+                  <Contact />
+                </OptimizedSuspense>
+              } />
+              <Route path="/devices/ice-sos-pendant" element={
+                <OptimizedSuspense skeletonType="card">
+                  <DeviceIceSosPendant />
+                </OptimizedSuspense>
+              } />
+              <Route path="/regional-center/spain" element={
+                <OptimizedSuspense skeletonType="card">
+                  <RegionalCenterSpain />
+                </OptimizedSuspense>
+              } />
+              <Route path="/family-carer-access" element={
+                <OptimizedSuspense skeletonType="card">
+                  <FamilyCarerAccess />
+                </OptimizedSuspense>
+              } />
+              <Route path="*" element={
+                <OptimizedSuspense skeletonType="card">
+                  <NotFound />
+                </OptimizedSuspense>
+              } />
+            </Routes>
+            
+            {/* Global floating device/settings button */}
+            <DeviceManagerButton />
+            
+            {/* Global Emma Chat - Available on all pages except admin */}
+            <ConditionalEmmaChat />
+            
+            {/* Performance Monitor - Development only */}
+            {process.env.NODE_ENV === 'development' && (
+              <PerformanceMonitor show={false} />
+            )}
+          </BrowserRouter>
+        </EmmaChatProvider>
+      </AuthProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+    </EnhancedErrorBoundary>
   );
 };
 

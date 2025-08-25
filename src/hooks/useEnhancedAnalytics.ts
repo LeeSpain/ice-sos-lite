@@ -74,7 +74,9 @@ export function useEnhancedTrafficSources() {
         ];
       }
     },
-    refetchInterval: 60000,
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
 
@@ -127,7 +129,9 @@ export function useEnhancedDeviceData() {
         ];
       }
     },
-    refetchInterval: 60000,
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
 
@@ -206,6 +210,8 @@ export function useSessionMetrics() {
         };
       }
     },
-    refetchInterval: 30000,
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
+    staleTime: 2 * 60 * 1000, // Data is fresh for 2 minutes
+    refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }

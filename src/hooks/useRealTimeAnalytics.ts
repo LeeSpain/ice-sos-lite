@@ -107,8 +107,9 @@ export function useRealTimeAnalytics() {
         };
       }
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
-    staleTime: 30000, // Data is fresh for 30 seconds
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes (less aggressive)
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
 
@@ -195,7 +196,9 @@ export function useTopPages() {
         ];
       }
     },
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
 
@@ -258,7 +261,9 @@ export function useCustomEvents() {
         ];
       }
     },
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
 
@@ -319,6 +324,8 @@ export function useRealTimeActiveUsers() {
         };
       }
     },
-    refetchInterval: 10000, // Refetch every 10 seconds for real-time data
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes (less aggressive)
+    staleTime: 60 * 1000, // Data is fresh for 1 minute
+    refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
