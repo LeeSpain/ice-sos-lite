@@ -75,8 +75,8 @@ export const FreeTrialPopup = ({ onClose }: FreeTrialPopupProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in">
-      <Card className="w-full max-w-md mx-4 bg-gradient-to-br from-white to-gray-50 border-2 border-primary/20 shadow-2xl animate-scale-in">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in">
+      <Card className="w-full max-w-md mx-4 bg-gradient-to-br from-white to-gray-50 border-2 border-primary/20 shadow-2xl animate-scale-in relative z-[10000]">
         <CardHeader className="relative text-center">
           <button
             onClick={onClose}
