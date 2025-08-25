@@ -623,8 +623,8 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           
           sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
           
-          // Call onSuccess to trigger account creation
-          onSuccess();
+          // Navigate directly to welcome page
+          window.location.href = '/welcome';
         }} 
         variant="secondary" 
         className="w-full"

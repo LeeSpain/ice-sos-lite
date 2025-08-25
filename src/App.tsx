@@ -63,11 +63,7 @@ const App = () => {
               </ProtectedRoute>
             } />
             <Route path="/registration-success" element={<RegistrationSuccess />} />
-            <Route path="/welcome" element={
-              <ProtectedRoute>
-                <PaymentSuccess />
-              </ProtectedRoute>
-            } />
+            <Route path="/welcome" element={<RegistrationSuccess />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardRedirect />
