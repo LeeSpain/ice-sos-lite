@@ -29,6 +29,8 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
   const { t } = useTranslation();
   const [selectedVideo, setSelectedVideo] = React.useState<Video | null>(null);
   const { trackVideoEvent } = useVideoTracker();
+  const playerRef = React.useRef<any>(null);
+  const playStartRef = React.useRef<number | null>(null);
 
   const videos: Video[] = React.useMemo(() => [
     {
@@ -101,6 +103,72 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
     }
   }, [defaultVideoId, videos]);
 
+  // Setup YouTube Iframe API and track detailed events
+  React.useEffect(() => {
+    if (!selectedVideo) return;
+    let canceled = false;
+
+    const ensureYouTubeAPI = () => new Promise<void>((resolve) => {
+      const w = window as any;
+      if (w.YT && w.YT.Player) return resolve();
+      const existing = document.getElementById('youtube-iframe-api');
+      if (!existing) {
+        const tag = document.createElement('script');
+        tag.id = 'youtube-iframe-api';
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.body.appendChild(tag);
+      }
+      (window as any).onYouTubeIframeAPIReady = () => resolve();
+    });
+
+    const setupPlayer = async () => {
+      try {
+        await ensureYouTubeAPI();
+        if (canceled) return;
+        const YT = (window as any).YT;
+        playerRef.current = new YT.Player(`youtube-player-${selectedVideo.id}`, {
+          events: {
+            onStateChange: (e: any) => {
+              const state = e.data;
+              const player = e.target;
+              const pos = Math.floor(player?.getCurrentTime?.() || 0);
+              const dur = Math.floor(player?.getDuration?.() || 0);
+
+              if (state === YT.PlayerState.PLAYING) {
+                if (playStartRef.current === null) {
+                  playStartRef.current = pos;
+                  trackVideoEvent(selectedVideo.id, selectedVideo.title, 'play', { totalDuration: dur, videoPosition: pos });
+                }
+              } else if (state === YT.PlayerState.PAUSED) {
+                if (playStartRef.current !== null) {
+                  const watched = Math.max(0, pos - playStartRef.current);
+                  trackVideoEvent(selectedVideo.id, selectedVideo.title, 'pause', { watchDuration: watched, videoPosition: pos, totalDuration: dur });
+                  playStartRef.current = null;
+                }
+              } else if (state === YT.PlayerState.ENDED) {
+                const start = playStartRef.current ?? 0;
+                const watched = Math.max(0, dur - start);
+                trackVideoEvent(selectedVideo.id, selectedVideo.title, 'ended', { watchDuration: watched, videoPosition: dur, totalDuration: dur });
+                playStartRef.current = null;
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.warn('YouTube Player setup failed:', err);
+      }
+    };
+
+    setupPlayer();
+
+    return () => {
+      canceled = true;
+      try { playerRef.current?.destroy?.(); } catch {}
+      playerRef.current = null;
+      playStartRef.current = null;
+    };
+  }, [selectedVideo, trackVideoEvent]);
+
   return (
     <Dialog onOpenChange={(open) => { if (!open) handleClose(); }}>
       <DialogTrigger asChild>
@@ -143,16 +211,9 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                   onLoad={() => {
-                    // Track video play event when iframe loads with autoplay
-                    trackVideoEvent(selectedVideo.id, selectedVideo.title, 'play', {
-                      totalDuration: 0, // Will be updated when YouTube API provides duration
-                      videoPosition: 0,
-                      watchDuration: 0
-                    });
-                    
-                    // Track video analytics in our custom analytics system
-                    if (typeof window !== 'undefined' && window.gtag) {
-                      window.gtag('event', 'video_play', {
+                    // Analytics tag (non-persistent)
+                    if (typeof window !== 'undefined' && window.gtag && selectedVideo) {
+                      window.gtag('event', 'video_iframe_loaded', {
                         video_title: selectedVideo.title,
                         video_id: selectedVideo.id,
                         video_provider: 'youtube'
