@@ -33,17 +33,26 @@ export default function UserGrowthPage() {
     try {
       setLoading(true);
       
-      // Load user profiles
-      const { data: profilesData } = await supabase
+      // Load user profiles with better error handling
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('user_id, created_at, country, updated_at')
         .order('created_at', { ascending: false });
 
-      // Load subscribers
-      const { data: subscribersData } = await supabase
+      if (profilesError) {
+        console.error('Error loading profiles:', profilesError);
+        return;
+      }
+
+      // Load subscribers with relationship to profiles
+      const { data: subscribersData, error: subscribersError } = await supabase
         .from('subscribers')
-        .select('*')
+        .select('user_id, created_at, subscribed')
         .eq('subscribed', true);
+
+      if (subscribersError) {
+        console.error('Error loading subscribers:', subscribersError);
+      }
 
       if (profilesData) {
         const now = new Date();
@@ -64,22 +73,34 @@ export default function UserGrowthPage() {
         
         const growthRate = newUsersLastMonth > 0 
           ? ((newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * 100 
-          : 0;
+          : newUsersThisMonth > 0 ? 100 : 0;
 
-        // Count users by country
+        // Count users by country with better handling
         const countryCount: { [key: string]: number } = {};
         profilesData.forEach(profile => {
-          const country = profile.country || 'Unknown';
+          const country = profile.country || 'Not specified';
           countryCount[country] = (countryCount[country] || 0) + 1;
         });
+        
+        // Calculate active subscribers more accurately
+        const activeSubscribers = subscribersData?.length || 0;
         
         setGrowthData({
           totalUsers: profilesData.length,
           newUsersThisMonth,
           newUsersLastMonth,
-          growthRate,
-          activeUsers: subscribersData?.length || 0,
+          growthRate: Math.max(0, growthRate),
+          activeUsers: activeSubscribers,
           usersByCountry: countryCount
+        });
+
+        console.log('📊 Growth data loaded:', {
+          totalUsers: profilesData.length,
+          newUsersThisMonth,
+          newUsersLastMonth,
+          growthRate,
+          activeSubscribers,
+          countries: Object.keys(countryCount).length
         });
       }
     } catch (error) {

@@ -13,6 +13,15 @@ interface RevenueData {
   totalSubscribers: number;
   churnRate: number;
   growthRate: number;
+  planBreakdown: { [key: string]: { count: number; revenue: number; price: number } };
+}
+
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+  billing_interval: string;
 }
 
 export default function RevenueAnalyticsPage() {
@@ -23,8 +32,10 @@ export default function RevenueAnalyticsPage() {
     averageRevenuePerUser: 0,
     totalSubscribers: 0,
     churnRate: 0,
-    growthRate: 15.2
+    growthRate: 15.2,
+    planBreakdown: {}
   });
+  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,31 +46,95 @@ export default function RevenueAnalyticsPage() {
     try {
       setLoading(true);
       
-      // Load subscription data
+      // Load subscription plans first
+      const { data: plansData } = await supabase
+        .from('subscription_plans')
+        .select('*')
+        .eq('is_active', true);
+
+      // Load subscriber data with plan information
       const { data: subscribersData } = await supabase
         .from('subscribers')
         .select('*')
         .eq('subscribed', true);
 
-      if (subscribersData) {
-        // Count subscribers by tier - default to 'Basic' if no tier specified
-        const basicCount = subscribersData.filter(s => (s.subscription_tier || 'Basic') === 'Basic').length;
-        const premiumCount = subscribersData.filter(s => s.subscription_tier === 'Premium').length;
-        const enterpriseCount = subscribersData.filter(s => s.subscription_tier === 'Enterprise').length;
+      if (plansData && subscribersData) {
+        setSubscriptionPlans(plansData);
         
-        // Calculate revenue in euros
-        const monthlyRevenue = (basicCount * 7.99) + (premiumCount * 19.99) + (enterpriseCount * 49.99);
-        const yearlyRevenue = monthlyRevenue * 12;
-        const averageRevenuePerUser = subscribersData.length > 0 ? monthlyRevenue / subscribersData.length : 0;
+        // Create plan breakdown with actual subscriber counts and revenue
+        const planBreakdown: { [key: string]: { count: number; revenue: number; price: number } } = {};
+        let totalMonthlyRevenue = 0;
+
+        // Initialize all plans
+        plansData.forEach(plan => {
+          planBreakdown[plan.name] = { count: 0, revenue: 0, price: plan.price };
+        });
+
+        // Count subscribers by plan using subscription_tier
+        subscribersData.forEach(subscriber => {
+          // Find plan by subscription_tier name
+          let plan = plansData.find(p => p.name === subscriber.subscription_tier);
+          
+          // If no direct match, try to map common tier names
+          if (!plan && subscriber.subscription_tier) {
+            const tierMappings: { [key: string]: string } = {
+              'Basic': 'Personal Account',
+              'Premium': 'Premium Protection',
+              'Family': 'Family Connection',
+              'Enterprise': 'Guardian Wellness'
+            };
+            const mappedName = tierMappings[subscriber.subscription_tier];
+            if (mappedName) {
+              plan = plansData.find(p => p.name === mappedName);
+            }
+          }
+          
+          // Default to first plan if none found
+          if (!plan && plansData.length > 0) {
+            plan = plansData[0];
+          }
+          
+          if (plan) {
+            planBreakdown[plan.name].count += 1;
+            const revenue = plan.billing_interval === 'month' ? plan.price : plan.price / 12;
+            planBreakdown[plan.name].revenue += revenue;
+            totalMonthlyRevenue += revenue;
+          }
+        });
+
+        const yearlyRevenue = totalMonthlyRevenue * 12;
+        const averageRevenuePerUser = subscribersData.length > 0 ? totalMonthlyRevenue / subscribersData.length : 0;
+        
+        // Calculate growth rate from last month vs this month
+        const now = new Date();
+        const thisMonth = now.getMonth();
+        const thisYear = now.getFullYear();
+        const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+        const lastMonthYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+
+        const thisMonthSubscribers = subscribersData.filter(s => {
+          const createdDate = new Date(s.created_at);
+          return createdDate.getMonth() === thisMonth && createdDate.getFullYear() === thisYear;
+        }).length;
+
+        const lastMonthSubscribers = subscribersData.filter(s => {
+          const createdDate = new Date(s.created_at);
+          return createdDate.getMonth() === lastMonth && createdDate.getFullYear() === lastMonthYear;
+        }).length;
+
+        const growthRate = lastMonthSubscribers > 0 
+          ? ((thisMonthSubscribers - lastMonthSubscribers) / lastMonthSubscribers) * 100 
+          : 0;
         
         setRevenueData({
           totalRevenue: yearlyRevenue,
-          monthlyRevenue,
+          monthlyRevenue: totalMonthlyRevenue,
           yearlyRevenue,
           averageRevenuePerUser,
           totalSubscribers: subscribersData.length,
-          churnRate: 3.2, // Mock data
-          growthRate: 15.2 // Mock data
+          churnRate: 3.2, // Mock data - would need unsubscribe tracking
+          growthRate: Math.max(0, growthRate),
+          planBreakdown
         });
       }
     } catch (error) {
@@ -171,38 +246,33 @@ export default function RevenueAnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                  <div>
-                    <p className="font-medium">Basic Plan</p>
-                    <p className="text-sm text-muted-foreground">€7.99/month</p>
+              {Object.entries(revenueData.planBreakdown).map(([planName, data], index) => {
+                const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-red-500'];
+                const color = colors[index % colors.length];
+                
+                return (
+                  <div key={planName} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-3 h-3 rounded-full ${color}`}></div>
+                      <div>
+                        <p className="font-medium">{planName}</p>
+                        <p className="text-sm text-muted-foreground">€{data.price.toFixed(2)}/month</p>
+                        <p className="text-xs text-muted-foreground">{data.count} subscribers</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant="secondary">€{data.revenue.toFixed(2)}/month</Badge>
+                      <p className="text-xs text-muted-foreground mt-1">Total revenue</p>
+                    </div>
                   </div>
-                </div>
-                <Badge variant="secondary">€7.99/user</Badge>
-              </div>
+                );
+              })}
               
-              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                  <div>
-                    <p className="font-medium">Premium Plan</p>
-                    <p className="text-sm text-muted-foreground">€19.99/month</p>
-                  </div>
+              {Object.keys(revenueData.planBreakdown).length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No subscription data available</p>
                 </div>
-                <Badge variant="secondary">€19.99/user</Badge>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                  <div>
-                    <p className="font-medium">Enterprise Plan</p>
-                    <p className="text-sm text-muted-foreground">€49.99/month</p>
-                  </div>
-                </div>
-                <Badge variant="secondary">€49.99/user</Badge>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
