@@ -19,6 +19,7 @@ import { useEmmaChat } from "@/contexts/EmmaChatContext";
 import { FirstVisitPreferencesModal } from "@/components/FirstVisitPreferencesModal";
 import { FreeTrialPopup } from "@/components/FreeTrialPopup";
 import { useFreeTrialPopup } from "@/hooks/useFreeTrialPopup";
+import { useState } from "react";
 
 const Index = () => {
   useScrollToTop();
@@ -26,6 +27,7 @@ const Index = () => {
   const { t } = useTranslation();
   const { openEmmaChat } = useEmmaChat();
   const { showPopup, closePopup } = useFreeTrialPopup();
+  const [showFreeTrialPopup, setShowFreeTrialPopup] = useState(false);
 
   // Preload critical images
   useEffect(() => {
@@ -36,7 +38,7 @@ const Index = () => {
     <div className="min-h-screen">
       <PageSEO pageType="home" />
       <FirstVisitPreferencesModal />
-      <Navigation />
+      <Navigation onFreeTrialClick={() => setShowFreeTrialPopup(true)} />
 
       <Hero onEmmaClick={openEmmaChat} />
       <Features />
@@ -53,8 +55,9 @@ const Index = () => {
       <AppDownload />
       <Footer />
       
-      {/* Free Trial Popup */}
+      {/* Free Trial Popups - Both rendered at root level */}
       {showPopup && <FreeTrialPopup onClose={closePopup} />}
+      {showFreeTrialPopup && <FreeTrialPopup onClose={() => setShowFreeTrialPopup(false)} />}
     </div>
   );
 };

@@ -8,12 +8,14 @@ import { useTranslation } from 'react-i18next';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import IntroVideoModal from '@/components/IntroVideoModal';
-import { FreeTrialPopup } from '@/components/FreeTrialPopup';
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
-const Navigation = () => {
+interface NavigationProps {
+  onFreeTrialClick?: () => void;
+}
+
+const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showFreeTrialPopup, setShowFreeTrialPopup] = useState(false);
   const defaults = React.useMemo(() => getDefaultAppPreview(), []);
   const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
   const { t } = useTranslation();
@@ -62,7 +64,7 @@ const Navigation = () => {
               <Button 
                 size="sm" 
                 className="shadow-primary bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-medium transition-all duration-200 hover:scale-105"
-                onClick={() => setShowFreeTrialPopup(true)}
+                onClick={onFreeTrialClick || (() => {})}
               >
                 {t('nav.freeTrial', 'Free Trial')}
               </Button>
@@ -121,7 +123,7 @@ const Navigation = () => {
                   size="sm" 
                   className="shadow-primary bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-medium transition-all duration-200"
                   onClick={() => {
-                    setShowFreeTrialPopup(true);
+                    onFreeTrialClick?.();
                     setIsMenuOpen(false);
                   }}
                 >
@@ -132,11 +134,6 @@ const Navigation = () => {
           </div>
         )}
       </div>
-      
-      {/* Free Trial Popup */}
-      {showFreeTrialPopup && (
-        <FreeTrialPopup onClose={() => setShowFreeTrialPopup(false)} />
-      )}
     </nav>
   );
 };
