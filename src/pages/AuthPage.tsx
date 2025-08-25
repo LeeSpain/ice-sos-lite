@@ -55,7 +55,7 @@ const AuthPage = () => {
   }
 
   if (user) {
-    return <Navigate to="/dashboard-redirect" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleSignIn = useCallback(async (e: React.FormEvent) => {
