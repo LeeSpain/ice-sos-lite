@@ -317,6 +317,13 @@ const AIRegister = () => {
       });
       return;
     }
+    
+    // If testing mode is enabled, skip payment and complete registration directly
+    if (testingMode) {
+      handlePaymentSuccess();
+      return;
+    }
+    
     setCurrentStep('payment');
   };
 
@@ -1081,15 +1088,15 @@ const AIRegister = () => {
                           <Label htmlFor="testingMode" className="flex-1 cursor-pointer">
                             <div className="font-medium text-yellow-800">Testing Mode (Development Only)</div>
                             <div className="text-sm text-yellow-600">
-                              Process payment for only 1 cent to test the full payment flow
+                              Skip payment completely to test the full registration flow
                             </div>
                           </Label>
                         </div>
                         {testingMode && (
                           <div className="mt-3 p-3 bg-yellow-100 rounded-md border border-yellow-300">
-                            <div className="text-sm font-medium text-yellow-800">⚠️ Test Payment Active</div>
+                            <div className="text-sm font-medium text-yellow-800">⚠️ Test Mode Active</div>
                             <div className="text-xs text-yellow-700 mt-1">
-                              Payment will be processed for 0.01 {currency} instead of the full amount
+                              Registration will complete without any payment processing
                             </div>
                           </div>
                         )}
@@ -1106,7 +1113,7 @@ const AIRegister = () => {
                       disabled={!isFormValid()}
                     >
                       <CreditCard className="mr-2 h-4 w-4" />
-                      {testingMode ? 'Continue to Test Payment (1 cent)' : 'Continue to Payment'}
+                      {testingMode ? 'Complete Registration (Free)' : 'Continue to Payment'}
                     </Button>
                   </div>
                 </div>

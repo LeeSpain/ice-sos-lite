@@ -311,7 +311,8 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         hasData: !!data, 
         hasError: !!error, 
         clientSecret: data?.client_secret?.slice(-10),
-        customerId: data?.customer_id 
+        customerId: data?.customer_id,
+        testMode: data?.test_mode
       });
 
       if (error) {
@@ -329,6 +330,16 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           return;
         }
         throw error;
+      }
+
+      // Handle test mode response - skip payment processing entirely
+      if (testingMode && data?.test_mode) {
+        console.log("✅ Test mode active - skipping payment processing");
+        setCustomerId(data.customer_id);
+        setClientSecret("test_mode_skip_payment");
+        setInitializationError(null);
+        setLoading(false);
+        return;
       }
 
       if (!data?.client_secret) {
@@ -501,14 +512,14 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           <div className="flex justify-between text-lg font-bold border-t pt-2">
             <span>Total Payment:</span>
             <span className="text-foreground">
-              {testingMode ? `0.50 ${selectedCurrency} (Test Mode)` : formatDisplayCurrency(grandTotal, selectedCurrency, languageToLocale(language))}
+              {testingMode ? `Free (Test Mode)` : formatDisplayCurrency(grandTotal, selectedCurrency, languageToLocale(language))}
             </span>
           </div>
           {testingMode && (
             <div className="mt-2 p-3 bg-yellow-100 rounded-md border border-yellow-300">
-              <div className="text-sm font-medium text-yellow-800">⚠️ Test Payment Mode Active</div>
+              <div className="text-sm font-medium text-yellow-800">⚠️ Test Mode Active</div>
               <div className="text-xs text-yellow-700 mt-1">
-                This payment will only charge 0.50 {selectedCurrency} for testing purposes
+                Registration will complete without any payment processing
               </div>
             </div>
           )}
@@ -542,6 +553,22 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
               >
                 <Loader2 className="mr-2 h-4 w-4" />
                 Retry Payment Setup
+              </Button>
+            </div>
+          ) : testingMode && clientSecret === "test_mode_skip_payment" ? (
+            <div className="space-y-4 text-center">
+              <div className="text-lg font-medium text-green-600">
+                ✅ Test Mode - No Payment Required
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Click the button below to complete your registration without payment.
+              </div>
+              <Button
+                onClick={onSuccess}
+                className="w-full bg-emergency hover:bg-emergency/90"
+                size="lg"
+              >
+                Complete Registration (Free)
               </Button>
             </div>
           ) : clientSecret && stripeOptions ? (

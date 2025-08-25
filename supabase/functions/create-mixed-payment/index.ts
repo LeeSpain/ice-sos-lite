@@ -103,11 +103,20 @@ serve(async (req) => {
 
     let totalAmount = subscriptionTotal + productTotal;
     
-    // Override amount for testing mode (minimum 50 cents for Stripe)
+    // Override amount for testing mode - return free test mode response
     if (testingMode) {
-      const originalAmount = totalAmount;
-      totalAmount = 50; // 50 cents minimum for Stripe
-      logStep("Testing mode enabled - overriding amount to 50 cents", { originalAmount, testAmount: totalAmount });
+      logStep("Testing mode enabled - returning test response without creating payment intent");
+      return new Response(JSON.stringify({ 
+        client_secret: "test_mode_no_payment",
+        customer_id: customerId,
+        subscription_total: subscriptionTotal / 100,
+        product_total: productTotal / 100,
+        total_amount: 0,
+        test_mode: true
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
     
     if (totalAmount === 0) {
