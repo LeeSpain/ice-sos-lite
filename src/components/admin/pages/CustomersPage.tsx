@@ -5,11 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Search, Users, Mail, Phone, Calendar, Plus, Eye, Trash2, Download, RefreshCw } from 'lucide-react';
 import CustomerDetailsModal from '@/components/admin/CustomerDetailsModal';
 import AddCustomerModal from '@/components/admin/AddCustomerModal';
 import { useCustomers } from '@/hooks/useOptimizedData';
+import { useDebounce } from '@/hooks/useDebounce';
+import { VirtualizedList, OptimizedTableRow } from '@/hooks/usePerformanceOptimizedComponents';
+import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring';
 
 interface Customer {
   id: string;
@@ -33,15 +36,21 @@ export default function CustomersPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { toast } = useToast();
 
+  // Performance monitoring
+  usePerformanceMonitoring();
+
   // Use optimized data fetching
   const { data: customers = [], isLoading, error, refetch } = useCustomers();
 
+  // Debounce search for better performance
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
   // Memoized filtered customers for performance
   const filteredCustomers = useMemo(() => {
-    if (!searchTerm) return customers;
+    if (!debouncedSearchTerm) return customers;
     
     return customers.filter(customer => {
-      const searchLower = searchTerm.toLowerCase();
+      const searchLower = debouncedSearchTerm.toLowerCase();
       return (
         customer.first_name?.toLowerCase().includes(searchLower) ||
         customer.last_name?.toLowerCase().includes(searchLower) ||
@@ -49,7 +58,7 @@ export default function CustomersPage() {
         customer.country?.toLowerCase().includes(searchLower)
       );
     });
-  }, [customers, searchTerm]);
+  }, [customers, debouncedSearchTerm]);
 
   const handleViewCustomer = (customer: Customer) => {
     setSelectedCustomer(customer);
@@ -151,45 +160,94 @@ export default function CustomersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredCustomers.map((customer) => (
-                  <TableRow key={customer.id}>
-                    <TableCell>
-                      <div className="font-medium">
-                        {customer.first_name || customer.last_name 
-                          ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim()
-                          : 'Unnamed User'
-                        }
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {customer.phone && (
-                        <div className="flex items-center gap-1 text-sm">
-                          <Phone className="h-3 w-3" />
-                          {customer.phone}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>{customer.country || 'Not specified'}</TableCell>
-                    <TableCell>
-                      <Badge variant={customer.subscriber?.subscribed ? "default" : "secondary"}>
-                        {customer.subscriber?.subscribed ? customer.subscriber.subscription_tier || 'Active' : 'Free'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(customer.created_at).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleViewCustomer(customer)}
-                      >
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </Button>
+                {filteredCustomers.length > 100 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="p-0">
+                      <VirtualizedList
+                        items={filteredCustomers}
+                        itemHeight={65}
+                        containerHeight={500}
+                        renderItem={(customer: any, index: number) => (
+                          <div key={customer.id} className="flex items-center p-4 border-b hover:bg-muted/50">
+                            <div className="flex-1 grid grid-cols-6 gap-4">
+                              <div className="font-medium">
+                                {customer.first_name || customer.last_name 
+                                  ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim()
+                                  : 'Unnamed User'
+                                }
+                              </div>
+                              <div>
+                                {customer.phone && (
+                                  <div className="flex items-center gap-1 text-sm">
+                                    <Phone className="h-3 w-3" />
+                                    {customer.phone}
+                                  </div>
+                                )}
+                              </div>
+                              <div>{customer.country || 'Not specified'}</div>
+                              <div>
+                                <Badge variant={customer.subscriber?.subscribed ? "default" : "secondary"}>
+                                  {customer.subscriber?.subscribed ? customer.subscriber.subscription_tier || 'Active' : 'Free'}
+                                </Badge>
+                              </div>
+                              <div>{new Date(customer.created_at).toLocaleDateString()}</div>
+                              <div>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleViewCustomer(customer)}
+                                >
+                                  <Eye className="h-3 w-3 mr-1" />
+                                  View
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      />
                     </TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  filteredCustomers.map((customer) => (
+                    <TableRow key={customer.id}>
+                      <TableCell>
+                        <div className="font-medium">
+                          {customer.first_name || customer.last_name 
+                            ? `${customer.first_name || ''} ${customer.last_name || ''}`.trim()
+                            : 'Unnamed User'
+                          }
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {customer.phone && (
+                          <div className="flex items-center gap-1 text-sm">
+                            <Phone className="h-3 w-3" />
+                            {customer.phone}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>{customer.country || 'Not specified'}</TableCell>
+                      <TableCell>
+                        <Badge variant={customer.subscriber?.subscribed ? "default" : "secondary"}>
+                          {customer.subscriber?.subscribed ? customer.subscriber.subscription_tier || 'Active' : 'Free'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(customer.created_at).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewCustomer(customer)}
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </ScrollArea>

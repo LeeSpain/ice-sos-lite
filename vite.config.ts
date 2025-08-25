@@ -10,6 +10,26 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  build: {
+    target: 'esnext',
+    minify: 'terser',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
+          supabase: ['@supabase/supabase-js'],
+          tanstack: ['@tanstack/react-query'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+    cssCodeSplit: true,
+    sourcemap: false,
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom', '@supabase/supabase-js', '@tanstack/react-query'],
+  },
   plugins: [
     react(),
     VitePWA({
