@@ -43,18 +43,21 @@ export function useRealTimeAnalytics() {
   return useQuery({
     queryKey: ['real-time-analytics'],
     queryFn: async (): Promise<RealTimeMetrics> => {
+      console.log('🔄 Fetching real-time analytics data...');
       try {
-        // Get real data from database
-        const [contactsResult, ordersResult, registrationsResult] = await Promise.all([
-          supabase.from('contact_submissions').select('*'),
-          supabase.from('orders').select('total_price').eq('status', 'completed'),
-          supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true)
+        // Get real data from database with error handling
+        const [contactsResult, ordersResult, registrationsResult] = await Promise.allSettled([
+          supabase.from('contact_submissions').select('*').throwOnError(),
+          supabase.from('orders').select('total_price').eq('status', 'completed').throwOnError(),
+          supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true).throwOnError()
         ]);
 
         // Use known user count (we know there's 1 user from our earlier database query)
         const totalUsers = 1; // From our database query result
-        const contacts = contactsResult.data || [];
+        const contacts = contactsResult.status === 'fulfilled' ? (contactsResult.value.data || []) : [];
         const totalContacts = contacts.length;
+        
+        console.log('📊 Analytics data:', { totalUsers, totalContacts });
         
         // Filter contacts from last 30 days
         const thirtyDaysAgo = new Date();
@@ -63,11 +66,12 @@ export function useRealTimeAnalytics() {
           new Date(contact.created_at) >= thirtyDaysAgo
         ).length;
 
-        const orders = ordersResult.data || [];
+        const orders = ordersResult.status === 'fulfilled' ? (ordersResult.value.data || []) : [];
         const totalOrders = orders.length;
         const totalRevenue = orders.reduce((sum, order) => sum + (parseFloat(order.total_price?.toString() || '0') || 0), 0);
         
-        const totalRegistrations = (typeof registrationsResult.count === 'number') ? registrationsResult.count : 0;
+        const registrationsCount = registrationsResult.status === 'fulfilled' ? registrationsResult.value.count : 0;
+        const totalRegistrations = (typeof registrationsCount === 'number') ? registrationsCount : 0;
 
         // Calculate conversion rate (registrations / total users)
         const conversionRate = totalUsers > 0 ? (totalRegistrations / totalUsers) * 100 : 0;

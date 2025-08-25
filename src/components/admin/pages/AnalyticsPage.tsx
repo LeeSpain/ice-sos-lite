@@ -32,6 +32,7 @@ import {
   type TrafficSource,
   type DeviceData 
 } from '@/hooks/useRealTimeAnalytics';
+import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
 const AnalyticsPage = () => {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
@@ -103,7 +104,8 @@ const AnalyticsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <AdminErrorBoundary>
+      <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
@@ -376,7 +378,8 @@ const AnalyticsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AdminErrorBoundary>
   );
 };
 
