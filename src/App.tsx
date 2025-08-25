@@ -22,7 +22,7 @@ const RegistrationSuccess = lazy(() => import("./pages/RegistrationSuccess"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const SimpleDashboard = lazy(() => import("./pages/SimpleDashboard"));
-const AdminDashboard = lazy(() => import("./components/ai-chat/AdminDashboard"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const DashboardRedirect = lazy(() => import("./components/DashboardRedirect"));
