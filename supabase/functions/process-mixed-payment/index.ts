@@ -65,14 +65,34 @@ serve(async (req) => {
 
     // Process subscriptions if any
     let subscriptions = [];
-    const allSubscriptionData = [...subscriptionData, ...regionalData];
+    let allSubscriptionData: any[] = [];
+    
+    // Fetch subscription plan details by IDs from metadata
+    if (subscriptionPlans && subscriptionPlans.length > 0) {
+      const { data: dbPlans, error: plansError } = await supabaseClient
+        .from('subscription_plans')
+        .select('*')
+        .in('id', subscriptionPlans);
+      if (plansError) throw new Error(`Error fetching subscription plans: ${plansError.message}`);
+      allSubscriptionData = allSubscriptionData.concat(dbPlans || []);
+    }
+
+    // Fetch regional service details by IDs from metadata
+    if (regionalServices && regionalServices.length > 0) {
+      const { data: dbServices, error: servicesError } = await supabaseClient
+        .from('regional_services')
+        .select('*')
+        .in('id', regionalServices);
+      if (servicesError) throw new Error(`Error fetching regional services: ${servicesError.message}`);
+      allSubscriptionData = allSubscriptionData.concat(dbServices || []);
+    }
     
     if (allSubscriptionData.length > 0) {
       // Create subscriptions for each plan/service using their database data
       for (const item of allSubscriptionData) {
         // Create a price for this plan/service
         const price = await stripe.prices.create({
-          currency: item.currency?.toLowerCase() || "eur",
+          currency: (item.currency || "EUR").toLowerCase(),
           unit_amount: Math.round(parseFloat(item.price.toString()) * 100),
           recurring: { interval: "month" },
           product_data: { name: item.name },
@@ -92,7 +112,7 @@ serve(async (req) => {
       }
 
       // Update subscriber record
-      const subscriptionTiers = allSubscriptionData.map(item => item.name).join(", ");
+      const subscriptionTiers = allSubscriptionData.map((item: any) => item.name).join(", ");
 
       await supabaseClient.from("subscribers").upsert({
         email: user.email,
@@ -153,7 +173,7 @@ serve(async (req) => {
       selected_regional_services: regionalServices,
       total_subscription_amount: subscriptionAmount + regionalAmount,
       total_product_amount: productAmount,
-      currency: 'EUR',
+      currency: paymentIntent.metadata.payment_currency || 'EUR',
       registration_completed: true,
     });
 

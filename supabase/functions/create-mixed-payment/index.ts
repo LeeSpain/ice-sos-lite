@@ -128,8 +128,9 @@ serve(async (req) => {
       return new Response(JSON.stringify({ 
         client_secret: "test_mode_no_payment",
         customer_id: customerId,
-        subscription_total: subscriptionTotal / 100,
-        product_total: productTotal / 100,
+        subscription_total: subscriptionTotal,
+        product_total: productTotal,
+        regional_total: regionalTotal,
         total_amount: 0,
         test_mode: true
       }), {
@@ -154,9 +155,6 @@ serve(async (req) => {
         subscription_plans: JSON.stringify(subscriptionPlans || []),
         products: JSON.stringify(products || []),
         regional_services: JSON.stringify(regionalServices || []),
-        subscription_data: JSON.stringify(subscriptionData),
-        product_data: JSON.stringify(productData),
-        regional_data: JSON.stringify(regionalData),
         subscription_amount: subscriptionTotal.toString(),
         product_amount: productTotal.toString(),
         regional_amount: regionalTotal.toString(),
