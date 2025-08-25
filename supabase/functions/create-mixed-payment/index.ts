@@ -145,22 +145,30 @@ serve(async (req) => {
 
     logStep("Calculated totals", { subscriptionTotal, productTotal, totalAmount, testingMode });
 
+    // Debug metadata before sending to Stripe
+    const metadataToSend = {
+      email: email,
+      subscription_plans: JSON.stringify(subscriptionPlans || []),
+      products: JSON.stringify(products || []),
+      regional_services: JSON.stringify(regionalServices || []),
+      subscription_amount: subscriptionTotal.toString(),
+      product_amount: productTotal.toString(),
+      regional_amount: regionalTotal.toString(),
+      payment_currency: currency,
+      testing_mode: testingMode.toString(),
+    };
+    
+    // Log each metadata field length for debugging
+    Object.entries(metadataToSend).forEach(([key, value]) => {
+      logStep(`Metadata field ${key}`, { length: value.length, value: value.substring(0, 100) });
+    });
+
     // Create payment intent for the total amount (convert to cents)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(totalAmount * 100), // Convert to cents
       currency: currency.toLowerCase(),
       customer: customerId,
-      metadata: {
-        email: email,
-        subscription_plans: JSON.stringify(subscriptionPlans || []),
-        products: JSON.stringify(products || []),
-        regional_services: JSON.stringify(regionalServices || []),
-        subscription_amount: subscriptionTotal.toString(),
-        product_amount: productTotal.toString(),
-        regional_amount: regionalTotal.toString(),
-        payment_currency: currency,
-        testing_mode: testingMode.toString(),
-      },
+      metadata: metadataToSend,
       automatic_payment_methods: {
         enabled: true,
       },
