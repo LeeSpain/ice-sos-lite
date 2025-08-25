@@ -1,21 +1,14 @@
 import React from "react";
-import { Helmet } from "react-helmet-async";
 import { Mail, Phone, MessageSquare } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { PageSEO } from "@/components/PageSEO";
 
 const Support: React.FC = () => {
   const { t } = useTranslation();
-  const title = `${t('support.title')} | ICE SOS Lite`;
-  const description = t('support.subtitle');
-  const canonical = "/support";
 
   return (
     <>
-      <Helmet>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <link rel="canonical" href={canonical} />
-      </Helmet>
+      <PageSEO pageType="support" />
       <main className="container mx-auto px-4 py-10">
         <header className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">{t('support.title')}</h1>

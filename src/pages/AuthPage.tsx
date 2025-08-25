@@ -12,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TermsDialog } from '@/components/legal/TermsDialog';
 import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import useRateLimit from '@/hooks/useRateLimit';
-import SEO from '@/components/SEO';
+import { PageSEO } from '@/components/PageSEO';
 
 const AuthPage = () => {
   const { user, loading } = useAuth();
@@ -168,12 +168,7 @@ const AuthPage = () => {
 
   return (
     <>
-      <SEO 
-        title="Sign In to ICE SOS Lite – Emergency Protection Access"
-        description="Access your ICE SOS Lite emergency protection dashboard. Sign in to manage your safety profile and emergency contacts."
-        canonical="/auth"
-        structuredData={structuredData}
-      />
+      <PageSEO pageType="auth" />
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">

@@ -1,8 +1,13 @@
+# Enhanced robots.txt for ICE SOS Lite Emergency Protection
+
+# Allow all search engines and AI crawlers
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -10,6 +15,37 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+# AI and ML crawlers
+User-agent: OpenAI
+Allow: /
+Crawl-delay: 2
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 2
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+# Default for all other crawlers
 User-agent: *
 Allow: /
 Allow: /register
@@ -25,17 +61,33 @@ Allow: /devices/
 Allow: /regional-center/
 Allow: /family-carer-access
 Allow: /payment-success
+Crawl-delay: 1
 
-# Disallow admin and internal pages
-Disallow: /dashboard
-Disallow: /admin
+# Disallow sensitive areas (but allow public pages)
+Disallow: /dashboard/
+Disallow: /admin-dashboard/
+Disallow: /member-dashboard/
 Disallow: /test
 Disallow: /api/
 Disallow: /_next/
 Disallow: /static/
+Disallow: /tmp/
+Disallow: /.env
+Disallow: /node_modules/
 
-# Crawl delay for respectful crawling
-Crawl-delay: 1
+# Allow important static assets for better indexing
+Allow: /public/
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+Allow: /*.pdf
 
+# Sitemap location
 Sitemap: https://icesoslite.com/sitemap.xml
-
+Sitemap: https://icesoslite.com/sitemap-images.xml
+Sitemap: https://icesoslite.com/sitemap-pages.xml

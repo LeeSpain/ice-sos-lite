@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
-import SEO from '@/components/SEO';
+import { PageSEO } from '@/components/PageSEO';
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -279,12 +279,7 @@ const Register = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <SEO 
-        title="Register for ICE SOS Lite – Complete Emergency Protection Setup"
-        description="Complete emergency protection registration with detailed setup. Choose your plans, add safety products, and activate comprehensive protection for you and your family."
-        canonical="/register"
-        structuredData={structuredData}
-      />
+      <PageSEO pageType="register" />
       <Navigation />
       
       <div className="container mx-auto px-4 py-24">

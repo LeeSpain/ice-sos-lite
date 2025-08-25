@@ -12,7 +12,7 @@ import Footer from "@/components/Footer";
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import AppPreviewSection from '@/components/AppPreviewSection';
 import { useTranslation } from 'react-i18next';
-import SEO from '@/components/SEO';
+import { PageSEO } from '@/components/PageSEO';
 import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
 import { preloadCriticalImages } from "@/utils/imageOptimization";
 import { useEmmaChat } from "@/contexts/EmmaChatContext";
@@ -31,16 +31,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
-      <SEO 
-        title="ICE SOS Lite – Emergency SOS, Bluetooth SOS App"
-        description="Tap once for immediate emergency help. Bluetooth SOS, secure profiles, regional services."
-        structuredData={{
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "ICE SOS Lite",
-          "url": typeof window !== 'undefined' ? window.location.origin : 'https://example.com'
-        }}
-      />
+      <PageSEO pageType="home" />
       <FirstVisitPreferencesModal />
       <Navigation />
 

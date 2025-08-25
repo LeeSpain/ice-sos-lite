@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -20,6 +19,7 @@ import { Mail, MessageCircle, Send, CheckCircle, Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { sanitizeInput, isValidEmail, checkRateLimit, logSecurityEvent } from "@/utils/security";
+import { PageSEO } from "@/components/PageSEO";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -121,17 +121,7 @@ const Contact: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      <Helmet>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <link rel="canonical" href={canonical} />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-      </Helmet>
+      <PageSEO pageType="contact" />
 
       <Navigation />
 
