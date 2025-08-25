@@ -52,21 +52,6 @@ const ConditionalEmmaChat = () => {
   return <GlobalEmmaChat />;
 };
 
-// Component to conditionally render Device Manager (only for authenticated dashboard users)
-const ConditionalDeviceManager = () => {
-  const location = useLocation();
-  const { user } = useAuth();
-  
-  // Only show on dashboard routes for authenticated users
-  const isDashboardRoute = location.pathname.startsWith('/full-dashboard') || 
-                          location.pathname.startsWith('/member-dashboard') ||
-                          location.pathname === '/sos';
-  
-  if (!user || !isDashboardRoute) return null;
-  
-  return <DeviceManagerButton />;
-};
-
 // Component to track page views and errors
 const PageTracker = () => {
   usePageTracking();
@@ -87,6 +72,21 @@ const PageTracker = () => {
 };
 
 const App = () => {
+  // Component to conditionally render Device Manager (only for authenticated dashboard users)
+  const ConditionalDeviceManager = () => {
+    const location = useLocation();
+    const { user } = useAuth();
+    
+    // Only show on dashboard routes for authenticated users
+    const isDashboardRoute = location.pathname.startsWith('/full-dashboard') || 
+                            location.pathname.startsWith('/member-dashboard') ||
+                            location.pathname === '/sos';
+    
+    if (!user || !isDashboardRoute) return null;
+    
+    return <DeviceManagerButton />;
+  };
+
   return (
     <EnhancedErrorBoundary>
       <QueryClientProvider client={queryClient}>
