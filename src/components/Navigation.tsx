@@ -30,14 +30,14 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Button asChild size="sm" className="bg-emergency hover:bg-emergency/90 text-emergency-foreground font-medium shadow-sm">
+            <Button asChild size="sm" className="bg-emergency hover:bg-emergency/90 text-black font-medium shadow-sm">
               <Link to="/contact">
                 {t('nav.contact', 'Contact Us')}
               </Link>
             </Button>
             <IntroVideoModal 
               trigger={
-                <Button size="sm" className="bg-emergency hover:bg-emergency/90 text-emergency-foreground font-medium shadow-sm">
+                <Button size="sm" className="bg-emergency hover:bg-emergency/90 text-black font-medium shadow-sm">
                   {t('nav.introVideo', 'Intro Video')}
                 </Button>
               }
@@ -80,7 +80,7 @@ const Navigation = () => {
               <div className="mb-4">
                 <LanguageCurrencySelector />
               </div>
-              <Button asChild size="sm" className="bg-emergency hover:bg-emergency/90 text-emergency-foreground font-medium shadow-sm mx-4">
+              <Button asChild size="sm" className="bg-emergency hover:bg-emergency/90 text-black font-medium shadow-sm mx-4">
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   {t('nav.contact', 'Contact Us')}
                 </Link>
@@ -90,7 +90,7 @@ const Navigation = () => {
                   trigger={
                     <Button 
                       size="sm" 
-                      className="w-full bg-emergency hover:bg-emergency/90 text-emergency-foreground font-medium shadow-sm"
+                      className="w-full bg-emergency hover:bg-emergency/90 text-black font-medium shadow-sm"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('nav.introVideo', 'Intro Video')}
