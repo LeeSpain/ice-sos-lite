@@ -11,33 +11,27 @@ import { usePreferences } from '@/contexts/PreferencesContext';
 import type { SupportedCurrency } from '@/contexts/PreferencesContext';
 
 // Dynamic Stripe initialization - fetches the correct publishable key from backend
-let stripePromise: Promise<any> | null = null;
-
-const getStripePromise = async () => {
-  if (!stripePromise) {
-    try {
-      console.log("🔑 Fetching Stripe configuration...");
-      const { data, error } = await supabase.functions.invoke('get-stripe-config');
-      
-      if (error) {
-        console.error('❌ Failed to get Stripe config:', error);
-        throw new Error('Payment configuration error');
-      }
-      
-      if (!data?.publishableKey) {
-        console.error('❌ No publishable key received from config');
-        throw new Error('Payment configuration incomplete');
-      }
-      
-      console.log('✅ Stripe config retrieved successfully');
-      stripePromise = loadStripe(data.publishableKey);
-    } catch (error) {
-      console.error('❌ Error fetching Stripe config:', error);
-      throw new Error('Failed to initialize payment system');
+const getStripeConfig = async () => {
+  try {
+    console.log("🔑 Fetching Stripe configuration...");
+    const { data, error } = await supabase.functions.invoke('get-stripe-config');
+    
+    if (error) {
+      console.error('❌ Failed to get Stripe config:', error);
+      throw new Error('Payment configuration error');
     }
+    
+    if (!data?.publishableKey) {
+      console.error('❌ No publishable key received from config');
+      throw new Error('Payment configuration incomplete');
+    }
+    
+    console.log('✅ Stripe config retrieved successfully');
+    return data.publishableKey;
+  } catch (error) {
+    console.error('❌ Error fetching Stripe config:', error);
+    throw new Error('Failed to initialize payment system');
   }
-  
-  return stripePromise;
 };
 
 interface PaymentFormProps {
@@ -189,6 +183,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [initializationError, setInitializationError] = useState<string | null>(null);
+  const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
   const { toast } = useToast();
   const { currency: contextCurrency, language } = usePreferences();
   const selectedCurrency = propCurrency || contextCurrency;
@@ -313,7 +308,9 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
 
     // Initialize Stripe for real payments
     try {
-      await getStripePromise();
+      const publishableKey = await getStripeConfig();
+      const stripe = loadStripe(publishableKey);
+      setStripePromise(stripe);
       console.log("✅ Stripe initialized successfully");
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Failed to initialize Stripe";
@@ -602,7 +599,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
                 🔒 Secure payment powered by Stripe
               </div>
               <Elements 
-                stripe={getStripePromise()} 
+                stripe={stripePromise} 
                 options={stripeOptions}
                 key={clientSecret} // Force re-mount if clientSecret changes
               >
