@@ -42,6 +42,7 @@ const adminMenuItems = [
     title: "📊 Overview & Analytics",
     items: [
       { title: "Dashboard", url: "/admin-dashboard", icon: BarChart3 },
+      { title: "Analytics", url: "/admin-dashboard/analytics", icon: BarChart3 },
       { title: "Revenue Analytics", url: "/admin-dashboard/revenue", icon: DollarSign },
       { title: "User Growth", url: "/admin-dashboard/growth", icon: TrendingUp },
     ]

@@ -6,7 +6,9 @@ const RouteChangeTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
-    trackPageView(location.pathname + location.search);
+    // Get page title for better tracking
+    const pageTitle = document.title;
+    trackPageView(location.pathname + location.search, pageTitle);
   }, [location.pathname, location.search]);
 
   return null;
