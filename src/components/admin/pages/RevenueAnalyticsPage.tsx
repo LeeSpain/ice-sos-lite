@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, DollarSign, Users, ShoppingCart, Calendar, Euro } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useSubscriptionPlans, useProducts, useSubscribers, useOrders } from '@/hooks/useOptimizedData';
 
 interface SubscriptionPlan {
   id: string;
@@ -57,181 +57,132 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'
 
 const RevenueAnalyticsPage = () => {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
-  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchRevenueData();
-  }, []);
+  // Use optimized data fetching hooks
+  const { data: subscriptionPlans = [], isLoading: plansLoading, error: plansError } = useSubscriptionPlans();
+  const { data: products = [], isLoading: productsLoading, error: productsError } = useProducts();
+  const { data: subscribers = [], isLoading: subscribersLoading, error: subscribersError } = useSubscribers();
+  const { data: orders = [], isLoading: ordersLoading, error: ordersError } = useOrders();
 
-  const fetchRevenueData = async () => {
-    try {
-      setLoading(true);
+  const loading = plansLoading || productsLoading || subscribersLoading || ordersLoading;
+  const hasError = plansError || productsError || subscribersError || ordersError;
 
-      // Fetch subscription plans
-      const { data: plansData, error: plansError } = await supabase
-        .from('subscription_plans')
-        .select('*')
-        .eq('is_active', true);
+  // Calculate revenue data from optimized hooks
+  const revenueData = useMemo(() => {
+    if (loading || !subscriptionPlans.length) return null;
 
-      if (plansError) {
-        console.error('Error fetching subscription plans:', plansError);
-        toast({
-          title: "Error",
-          description: "Failed to fetch subscription plans",
-          variant: "destructive",
-        });
-        return;
-      }
+    console.log('📊 Revenue Analytics Debug:', {
+      plans: subscriptionPlans.length,
+      subscribers: subscribers.length,
+      orders: orders.length,
+      planData: subscriptionPlans,
+      subscriberData: subscribers
+    });
 
-      // Fetch products (pendants)
-      const { data: productsData, error: productsError } = await supabase
-        .from('products')
-        .select('*')
-        .eq('status', 'active');
+    // Calculate subscription revenue and plan breakdown
+    let subscriptionRevenue = 0;
+    const planBreakdown: { [key: string]: { count: number; revenue: number; price: number } } = {};
 
-      if (productsError) {
-        console.error('Error fetching products:', productsError);
-      }
+    // Initialize all plans
+    subscriptionPlans.forEach(plan => {
+      planBreakdown[plan.name] = { count: 0, revenue: 0, price: plan.price };
+    });
 
-      // Fetch subscribers
-      const { data: subscribersData, error: subscribersError } = await supabase
-        .from('subscribers')
-        .select('*');
-
-      if (subscribersError) {
-        console.error('Error fetching subscribers:', subscribersError);
-      }
-
-      // Fetch completed orders
-      const { data: ordersData, error: ordersError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('status', 'completed');
-
-      if (ordersError) {
-        console.error('Error fetching orders:', ordersError);
-      }
-
-      setSubscriptionPlans(plansData || []);
-      setProducts(productsData || []);
-
-      // Calculate revenue metrics
-      const plans = plansData || [];
-      const subscribers = subscribersData || [];
-      const orders = ordersData || [];
-
-      console.log('📊 Revenue Analytics Debug:', {
-        plans: plans.length,
-        subscribers: subscribers.length,
-        orders: orders.length,
-        planData: plans,
-        subscriberData: subscribers
-      });
-
-      // Calculate subscription revenue and plan breakdown
-      let subscriptionRevenue = 0;
-      const planBreakdown: { [key: string]: { count: number; revenue: number; price: number } } = {};
-
-      // Initialize all plans
-      plans.forEach(plan => {
-        planBreakdown[plan.name] = { count: 0, revenue: 0, price: plan.price };
-      });
-
-      subscribers.forEach(subscriber => {
-        if (subscriber.subscribed && subscriber.subscription_tier) {
-          // Find plan by exact name match first
-          let plan = plans.find(p => p.name.toLowerCase() === subscriber.subscription_tier.toLowerCase());
+    subscribers.forEach(subscriber => {
+      if (subscriber.subscribed && subscriber.subscription_tier) {
+        // Find plan by exact name match first
+        let plan = subscriptionPlans.find(p => p.name.toLowerCase() === subscriber.subscription_tier.toLowerCase());
+        
+        // If no direct match, try mapping common variations
+        if (!plan) {
+          const tierMappings: { [key: string]: string } = {
+            'basic': 'Family Connection',
+            'premium': 'Premium Protection', 
+            'family': 'Family Connection',
+            'pro': 'Premium Protection',
+            'call center': 'Call Centre (Spain)',
+            'call centre': 'Call Centre (Spain)',
+            'personal': 'Personal Account',
+            'guardian': 'Guardian Wellness',
+            'wellness': 'Guardian Wellness',
+            'sharing': 'Family Sharing'
+          };
           
-          // If no direct match, try mapping common variations
-          if (!plan) {
-            const tierMappings: { [key: string]: string } = {
-              'basic': 'Family Connection',
-              'premium': 'Premium Protection', 
-              'family': 'Family Connection',
-              'pro': 'Premium Protection',
-              'call center': 'Call Centre (Spain)',
-              'call centre': 'Call Centre (Spain)',
-              'personal': 'Personal Account',
-              'guardian': 'Guardian Wellness',
-              'wellness': 'Guardian Wellness',
-              'sharing': 'Family Sharing'
-            };
-            
-            const mappedName = tierMappings[subscriber.subscription_tier.toLowerCase()];
-            if (mappedName) {
-              plan = plans.find(p => p.name === mappedName);
-            }
-          }
-          
-          if (plan) {
-            subscriptionRevenue += plan.price;
-            planBreakdown[plan.name].count += 1;
-            planBreakdown[plan.name].revenue += plan.price;
-          } else {
-            console.warn(`No matching plan found for tier: ${subscriber.subscription_tier}`);
+          const mappedName = tierMappings[subscriber.subscription_tier.toLowerCase()];
+          if (mappedName) {
+            plan = subscriptionPlans.find(p => p.name === mappedName);
           }
         }
-      });
+        
+        if (plan) {
+          subscriptionRevenue += plan.price;
+          planBreakdown[plan.name].count += 1;
+          planBreakdown[plan.name].revenue += plan.price;
+        } else {
+          console.warn(`No matching plan found for tier: ${subscriber.subscription_tier}`);
+        }
+      }
+    });
 
-      // Calculate product revenue
-      const productRevenue = orders.reduce((total, order) => total + order.total_price, 0);
-      
-      // Count pendant sales
-      const pendantProduct = products.find(p => p.name.toLowerCase().includes('pendant'));
-      const pendantSales = orders.filter(order => 
-        pendantProduct && order.product_id === pendantProduct.id
-      ).length;
+    // Calculate product revenue
+    const productRevenue = orders.reduce((total, order) => total + order.total_price, 0);
+    
+    // Count pendant sales
+    const pendantProduct = products.find(p => p.name.toLowerCase().includes('pendant'));
+    const pendantSales = orders.filter(order => 
+      pendantProduct && order.product_id === pendantProduct.id
+    ).length;
 
-      const totalRevenue = subscriptionRevenue + productRevenue;
-      const subscriberCount = subscribers.filter(s => s.subscribed).length;
-      const averageRevenuePerUser = subscriberCount > 0 ? totalRevenue / subscriberCount : 0;
+    const totalRevenue = subscriptionRevenue + productRevenue;
+    const subscriberCount = subscribers.filter(s => s.subscribed).length;
+    const averageRevenuePerUser = subscriberCount > 0 ? totalRevenue / subscriberCount : 0;
 
-      console.log('💰 Revenue Calculations:', {
-        subscriptionRevenue,
-        productRevenue,
-        totalRevenue,
-        subscriberCount,
-        averageRevenuePerUser,
-        pendantSales,
-        planBreakdown
-      });
+    console.log('💰 Revenue Calculations:', {
+      subscriptionRevenue,
+      productRevenue,
+      totalRevenue,
+      subscriberCount,
+      averageRevenuePerUser,
+      pendantSales,
+      planBreakdown
+    });
 
-      setRevenueData({
-        subscriptionRevenue,
-        productRevenue,
-        totalRevenue,
-        subscriberCount,
-        averageRevenuePerUser,
-        pendantSales,
-        planBreakdown
-      });
+    return {
+      subscriptionRevenue,
+      productRevenue,
+      totalRevenue,
+      subscriberCount,
+      averageRevenuePerUser,
+      pendantSales,
+      planBreakdown
+    };
+  }, [subscriptionPlans, products, subscribers, orders, loading]);
 
-      // Generate monthly trend data (mock data for visualization)
+  // Generate monthly trend data
+  useEffect(() => {
+    if (revenueData) {
       const monthlyTrend = [
-        { month: 'Jan', subscription: subscriptionRevenue * 0.6, product: productRevenue * 0.4 },
-        { month: 'Feb', subscription: subscriptionRevenue * 0.7, product: productRevenue * 0.5 },
-        { month: 'Mar', subscription: subscriptionRevenue * 0.8, product: productRevenue * 0.7 },
-        { month: 'Apr', subscription: subscriptionRevenue * 0.9, product: productRevenue * 0.8 },
-        { month: 'May', subscription: subscriptionRevenue, product: productRevenue }
+        { month: 'Jan', subscription: revenueData.subscriptionRevenue * 0.6, product: revenueData.productRevenue * 0.4 },
+        { month: 'Feb', subscription: revenueData.subscriptionRevenue * 0.7, product: revenueData.productRevenue * 0.5 },
+        { month: 'Mar', subscription: revenueData.subscriptionRevenue * 0.8, product: revenueData.productRevenue * 0.7 },
+        { month: 'Apr', subscription: revenueData.subscriptionRevenue * 0.9, product: revenueData.productRevenue * 0.8 },
+        { month: 'May', subscription: revenueData.subscriptionRevenue, product: revenueData.productRevenue }
       ];
-
       setMonthlyData(monthlyTrend);
+    }
+  }, [revenueData]);
 
-    } catch (error) {
-      console.error('Error in fetchRevenueData:', error);
+  // Show error if any
+  useEffect(() => {
+    if (hasError) {
       toast({
         title: "Error",
         description: "Failed to fetch revenue data",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [hasError, toast]);
 
   if (loading) {
     return (
@@ -380,7 +331,7 @@ const RevenueAnalyticsPage = () => {
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={Object.entries(revenueData.planBreakdown).map(([name, data]) => ({
+                  <BarChart data={Object.entries(revenueData.planBreakdown).map(([name, data]: [string, any]) => ({
                     name,
                     revenue: data.revenue,
                     subscribers: data.count
@@ -407,7 +358,7 @@ const RevenueAnalyticsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {Object.entries(revenueData.planBreakdown).map(([planName, data], index) => {
+                {Object.entries(revenueData.planBreakdown).map(([planName, data]: [string, any], index) => {
                   const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-red-500', 'bg-yellow-500'];
                   const color = colors[index % colors.length];
                   

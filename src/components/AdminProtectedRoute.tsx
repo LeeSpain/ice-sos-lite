@@ -1,6 +1,5 @@
 import React from 'react';
-import { useUserRole } from '@/hooks/useUserRole';
-import { useAuth } from '@/contexts/AuthContext';
+import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { Navigate } from 'react-router-dom';
 
 interface AdminProtectedRouteProps {
@@ -8,21 +7,18 @@ interface AdminProtectedRouteProps {
 }
 
 const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
-  const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading, isAdmin } = useUserRole();
+  const { user, loading, isAdmin } = useOptimizedAuth();
 
   console.log('🔐 AdminProtectedRoute:', {
     user: user?.id || 'none',
-    role,
     isAdmin,
-    authLoading,
-    roleLoading,
+    loading,
     currentPath: window.location.pathname,
-    shouldRedirect: !authLoading && !roleLoading && user && !isAdmin
+    shouldRedirect: !loading && user && !isAdmin
   });
 
   // Show loading while checking authentication and role
-  if (authLoading || roleLoading) {
+  if (loading) {
     console.log('🔐 AdminProtectedRoute: Still loading, showing spinner');
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
@@ -41,14 +37,8 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
   }
 
   // Only redirect if we have a definitive role and it's not admin
-  if (role !== null && !isAdmin) {
+  if (!isAdmin) {
     console.log('🔐 AdminProtectedRoute: User is not admin, redirecting to member dashboard');
-    return <Navigate to="/member-dashboard" replace />;
-  }
-
-  // If role is still null but loading is false, something went wrong
-  if (role === null && !roleLoading) {
-    console.warn('🔐 AdminProtectedRoute: Role is null but not loading, defaulting to member dashboard');
     return <Navigate to="/member-dashboard" replace />;
   }
 

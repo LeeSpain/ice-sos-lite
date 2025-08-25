@@ -1,5 +1,7 @@
 import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AuthProvider } from "@/contexts/AuthContext";
 import { EmmaChatProvider } from "@/contexts/EmmaChatContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -8,6 +10,7 @@ import RouteChangeTracker from "@/components/RouteChangeTracker";
 import ScrollToTop from "@/components/ScrollToTop";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
+import { queryClient } from "@/lib/queryClient";
 import Index from "./pages/Index";
 
 const TestPage = lazy(() => import("./pages/TestPage"));
@@ -45,8 +48,9 @@ const ConditionalEmmaChat = () => {
 
 const App = () => {
   return (
-    <AuthProvider>
-      <EmmaChatProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <EmmaChatProvider>
         <BrowserRouter>
           <RouteChangeTracker />
           <ScrollToTop />
@@ -114,6 +118,8 @@ const App = () => {
         </BrowserRouter>
       </EmmaChatProvider>
     </AuthProvider>
+    <ReactQueryDevtools initialIsOpen={false} />
+  </QueryClientProvider>
   );
 };
 
