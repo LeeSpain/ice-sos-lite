@@ -157,8 +157,8 @@ const Videos = () => {
     <div className="min-h-screen">
       <PageSEO 
         pageType="videos"
-        title="ICE SOS Lite Video Library"
-        description="Watch our comprehensive video library to learn about ICE SOS Lite features, capabilities, and how we protect families of all ages."
+        customTitle="ICE SOS Lite Video Library"
+        customDescription="Watch our comprehensive video library to learn about ICE SOS Lite features, capabilities, and how we protect families of all ages."
       />
       
       <Navigation />
