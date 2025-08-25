@@ -10,14 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Play, X, ArrowLeft } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { useVideoTracker } from '@/hooks/useVideoAnalytics';
-
-interface Video {
-  id: string;
-  title: string;
-  description: string;
-  youtubeId: string;
-  available: boolean;
-}
+import { VIDEO_CATALOG, Video } from '@/config/videos';
 
 interface IntroVideoModalProps {
   trigger?: React.ReactNode;
@@ -32,43 +25,7 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
   const playerRef = React.useRef<any>(null);
   const playStartRef = React.useRef<number | null>(null);
 
-  const videos: Video[] = React.useMemo(() => [
-    {
-      id: 'meet-emma',
-      title: 'Meet Emma',
-      description: 'Meet Emma, your AI assistant ready to help you',
-      youtubeId: 'VC01cLzxjo4',
-      available: true
-    },
-    {
-      id: 'overview',
-      title: 'ICE SOS Lite Overview',
-      description: 'Complete overview of ICE SOS Lite features and capabilities',
-      youtubeId: '2LBrvRXiYwg',
-      available: true
-    },
-    {
-      id: 'family',
-      title: 'ICE SOS Lite Family Protection',
-      description: 'How ICE SOS Lite protects your entire family',
-      youtubeId: 'A5xiJUS0aq0',
-      available: true
-    },
-    {
-      id: 'all-ages',
-      title: 'ICE SOS Lite - For All Ages',
-      description: 'Protection solutions for every age group',
-      youtubeId: 'G016_sqtg48',
-      available: true
-    },
-    {
-      id: 'spain',
-      title: 'ICE SOS Lite - Call Centre Spain',
-      description: 'Our Spanish call center operations and services',
-      youtubeId: 'zOgSKzktc7g',
-      available: true
-    }
-  ], []);
+  const videos = VIDEO_CATALOG;
 
   const defaultTrigger = (
     <Button variant="ghost" size="sm" className={className}>

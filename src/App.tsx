@@ -40,6 +40,7 @@ const DeviceIceSosPendant = lazy(() => import("./pages/DeviceIceSosPendant"));
 const RegionalCenterSpain = lazy(() => import("./pages/RegionalCenterSpain"));
 const FamilyCarerAccess = lazy(() => import("./pages/FamilyCarerAccess"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Videos = lazy(() => import("./pages/Videos"));
 
 // Component to conditionally render Emma Chat
 const ConditionalEmmaChat = () => {
@@ -203,6 +204,11 @@ const App = () => {
               <Route path="/contact" element={
                 <OptimizedSuspense skeletonType="form" skeletonCount={4}>
                   <Contact />
+                </OptimizedSuspense>
+              } />
+              <Route path="/videos" element={
+                <OptimizedSuspense skeletonType="card" skeletonCount={6}>
+                  <Videos />
                 </OptimizedSuspense>
               } />
               <Route path="/devices/ice-sos-pendant" element={

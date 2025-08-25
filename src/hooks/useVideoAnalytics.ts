@@ -33,9 +33,9 @@ export interface VideoEvent {
   browser: string;
 }
 
-// Hook to fetch video analytics summary
+// Hook to fetch video analytics summary with realtime updates
 export function useVideoAnalytics() {
-  return useQuery({
+  const { data, refetch, isLoading } = useQuery({
     queryKey: ['video-analytics'],
     queryFn: async (): Promise<VideoAnalytics[]> => {
       try {
@@ -58,8 +58,34 @@ export function useVideoAnalytics() {
         return [];
       }
     },
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: 10000, // Refetch every 10 seconds for faster updates
+    refetchOnWindowFocus: true, // Refetch when window gains focus
   });
+
+  // Subscribe to realtime updates for video_analytics table
+  useEffect(() => {
+    const channel = supabase
+      .channel('video-analytics-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'video_analytics'
+        },
+        () => {
+          console.log('🎥 New video event detected, refreshing analytics...');
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
+
+  return { data, refetch, isLoading };
 }
 
 // Hook to track video events
@@ -209,9 +235,9 @@ export function useVideoTracker() {
   return { trackVideoEvent, userLocation, sessionId };
 }
 
-// Hook to get recent video events
+// Hook to get recent video events with realtime updates
 export function useVideoEvents(limit: number = 50) {
-  return useQuery({
+  const { data, refetch, isLoading } = useQuery({
     queryKey: ['video-events', limit],
     queryFn: async (): Promise<VideoEvent[]> => {
       try {
@@ -240,6 +266,32 @@ export function useVideoEvents(limit: number = 50) {
         return [];
       }
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 10000, // Refetch every 10 seconds
+    refetchOnWindowFocus: true, // Refetch when window gains focus
   });
+
+  // Subscribe to realtime updates for video_analytics table
+  useEffect(() => {
+    const channel = supabase
+      .channel('video-events-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'video_analytics'
+        },
+        () => {
+          console.log('🎥 New video event detected, refreshing events...');
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
+
+  return { data, refetch, isLoading };
 }

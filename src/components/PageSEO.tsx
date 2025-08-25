@@ -2,7 +2,7 @@ import React from 'react';
 import { SEO } from './SEO';
 
 interface PageSEOProps {
-  pageType: 'home' | 'register' | 'auth' | 'dashboard' | 'support' | 'contact' | 'privacy' | 'terms' | 'sos' | 'devices' | 'regional' | 'family' | 'admin';
+  pageType: 'home' | 'register' | 'auth' | 'dashboard' | 'support' | 'contact' | 'privacy' | 'terms' | 'sos' | 'devices' | 'regional' | 'family' | 'admin' | 'videos';
   customTitle?: string;
   customDescription?: string;
   customKeywords?: string[];
@@ -158,6 +158,17 @@ const getPageSEO = (pageType: PageSEOProps['pageType']) => {
       keywords: ['admin dashboard', 'emergency service management', 'system administration'],
       noIndex: true,
       noFollow: true
+    },
+    videos: {
+      title: 'ICE SOS Lite Video Library - Learn About Emergency Protection',
+      description: 'Watch our comprehensive video library to learn about ICE SOS Lite features, capabilities, and how we protect families of all ages.',
+      keywords: ['emergency protection videos', 'safety tutorials', 'ICE SOS videos', 'emergency training', 'protection demos', 'safety education'],
+      structuredData: {
+        "@context": "https://schema.org",
+        "@type": "VideoGallery",
+        "name": "ICE SOS Lite Video Library",
+        "description": "Educational videos about emergency protection services"
+      }
     }
   };
 
