@@ -1918,6 +1918,66 @@ export type Database = {
         }
         Relationships: []
       }
+      video_analytics: {
+        Row: {
+          browser: string | null
+          created_at: string
+          device_type: string | null
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          referrer: string | null
+          session_id: string | null
+          total_video_duration_seconds: number | null
+          user_agent: string | null
+          user_id: string | null
+          user_location: Json | null
+          video_id: string
+          video_position_seconds: number | null
+          video_title: string
+          watch_duration_seconds: number | null
+          youtube_id: string | null
+        }
+        Insert: {
+          browser?: string | null
+          created_at?: string
+          device_type?: string | null
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          referrer?: string | null
+          session_id?: string | null
+          total_video_duration_seconds?: number | null
+          user_agent?: string | null
+          user_id?: string | null
+          user_location?: Json | null
+          video_id: string
+          video_position_seconds?: number | null
+          video_title: string
+          watch_duration_seconds?: number | null
+          youtube_id?: string | null
+        }
+        Update: {
+          browser?: string | null
+          created_at?: string
+          device_type?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          referrer?: string | null
+          session_id?: string | null
+          total_video_duration_seconds?: number | null
+          user_agent?: string | null
+          user_id?: string | null
+          user_location?: Json | null
+          video_id?: string
+          video_position_seconds?: number | null
+          video_title?: string
+          watch_duration_seconds?: number | null
+          youtube_id?: string | null
+        }
+        Relationships: []
+      }
       whatsapp_accounts: {
         Row: {
           access_token: string
@@ -2226,6 +2286,19 @@ export type Database = {
       get_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
+      }
+      get_video_analytics_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avg_watch_time_minutes: number
+          completion_rate: number
+          top_countries: Json
+          total_views: number
+          total_watch_time_minutes: number
+          unique_viewers: number
+          video_id: string
+          video_title: string
+        }[]
       }
       is_admin: {
         Args: Record<PropertyKey, never>

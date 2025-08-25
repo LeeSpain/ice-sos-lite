@@ -27,6 +27,7 @@ import AppTestingPage from '@/components/admin/pages/AppTestingPage';
 import FlicControlAdminPage from '@/components/admin/pages/FlicControlAdminPage';
 import ContactSubmissionsPage from '@/components/admin/pages/ContactSubmissionsPage';
 import AnalyticsPage from '@/components/admin/pages/AnalyticsPage';
+import VideoAnalyticsPage from '@/components/admin/pages/VideoAnalyticsPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -38,6 +39,7 @@ const AdminDashboard: React.FC = () => {
       <Route path="/" element={<AdminLayout />}>
         <Route index element={<DashboardOverview />} />
         <Route path="analytics" element={<AnalyticsPage />} />
+        <Route path="video-analytics" element={<VideoAnalyticsPage />} />
         <Route path="revenue" element={<RevenueAnalyticsPage />} />
         <Route path="growth" element={<UserGrowthPage />} />
         <Route path="ai-agent" element={<AIAgentPage />} />

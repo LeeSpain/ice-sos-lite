@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Play, X, ArrowLeft } from "lucide-react";
 import { useTranslation } from 'react-i18next';
+import { useVideoTracker } from '@/hooks/useVideoAnalytics';
 
 interface Video {
   id: string;
@@ -27,6 +28,7 @@ interface IntroVideoModalProps {
 export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVideoModalProps) => {
   const { t } = useTranslation();
   const [selectedVideo, setSelectedVideo] = React.useState<Video | null>(null);
+  const { trackVideoEvent } = useVideoTracker();
 
   const videos: Video[] = React.useMemo(() => [
     {
@@ -76,8 +78,10 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
   const handleVideoSelect = React.useCallback((video: Video) => {
     if (video.available) {
       setSelectedVideo(video);
+      // Track video click event
+      trackVideoEvent(video.id, video.title, 'click');
     }
-  }, []);
+  }, [trackVideoEvent]);
 
   const handleBack = () => {
     setSelectedVideo(null);
@@ -131,12 +135,16 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
             <div className="flex justify-center px-6 pt-6">
               <div className="relative w-full max-w-2xl bg-black rounded-lg overflow-hidden shadow-2xl" style={{ paddingBottom: '56.25%' }}>
                 <iframe
-                  src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3`}
+                  src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&enablejsapi=1`}
                   title={selectedVideo.title}
                   className="absolute top-0 left-0 w-full h-full"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
+                  onLoad={() => {
+                    // Track video play event when iframe loads with autoplay
+                    trackVideoEvent(selectedVideo.id, selectedVideo.title, 'play');
+                  }}
                 />
               </div>
             </div>

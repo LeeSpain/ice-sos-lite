@@ -33,7 +33,8 @@ import {
   MapPin,
   Mail,
   Smartphone,
-  Bluetooth
+  Bluetooth,
+  Video
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 
@@ -43,6 +44,7 @@ const adminMenuItems = [
     items: [
       { title: "Dashboard", url: "/admin-dashboard", icon: BarChart3 },
       { title: "Analytics", url: "/admin-dashboard/analytics", icon: BarChart3 },
+      { title: "Video Analytics", url: "/admin-dashboard/video-analytics", icon: Video },
       { title: "Revenue Analytics", url: "/admin-dashboard/revenue", icon: DollarSign },
       { title: "User Growth", url: "/admin-dashboard/growth", icon: TrendingUp },
     ]
