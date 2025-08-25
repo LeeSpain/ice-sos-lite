@@ -46,11 +46,6 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
                 </Button>
               }
             />
-            <Button asChild size="sm" variant="ghost" className="font-medium hover:bg-primary/5 transition-all duration-200">
-              <Link to="/videos">
-                {t('nav.videos', 'Videos')}
-              </Link>
-            </Button>
             {language === 'es' && (
               <Link 
                 to="/regional-center/spain" 
@@ -111,11 +106,6 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
                   }
                 />
               </div>
-              <Button asChild size="sm" variant="ghost" className="font-medium hover:bg-primary/5 transition-all duration-200 mx-4">
-                <Link to="/videos" onClick={() => setIsMenuOpen(false)}>
-                  {t('nav.videos', 'Videos')}
-                </Link>
-              </Button>
               {language === 'es' && (
                 <Link 
                   to="/regional-center/spain" 
