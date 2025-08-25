@@ -607,33 +607,31 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         </CardContent>
       </Card>
       
-      {/* Development Environment Testing - Only show in dev */}
-      {process.env.NODE_ENV === 'development' && (
-        <Button 
-          onClick={() => {
-            // Store welcome data for testing, same as payment success
-            const welcomeData = {
-              firstName,
-              lastName,
-              email: userEmail,
-              subscriptionPlans: planData,
-              products: productData,
-              regionalServices: serviceData,
-              totalAmount: grandTotal
-            };
-            
-            sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
-            
-            // Navigate to welcome page
-            window.location.href = '/welcome';
-          }} 
-          variant="secondary" 
-          className="w-full"
-          size="lg"
-        >
-          Skip Payment (Development Only)
-        </Button>
-      )}
+      {/* Skip Payment Option */}
+      <Button 
+        onClick={() => {
+          // Store welcome data for testing, same as payment success
+          const welcomeData = {
+            firstName,
+            lastName,
+            email: userEmail,
+            subscriptionPlans: planData,
+            products: productData,
+            regionalServices: serviceData,
+            totalAmount: grandTotal
+          };
+          
+          sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
+          
+          // Call onSuccess to trigger account creation
+          onSuccess();
+        }} 
+        variant="secondary" 
+        className="w-full"
+        size="lg"
+      >
+        Skip Payment & Continue
+      </Button>
       
       <Button variant="outline" onClick={onBack} className="w-full">
         Back to Plans
