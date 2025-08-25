@@ -6,7 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { EmmaChatProvider } from "@/contexts/EmmaChatContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
-import RouteChangeTracker from "@/components/RouteChangeTracker";
+
 import ScrollToTop from "@/components/ScrollToTop";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import { useAuth } from "@/contexts/AuthContext";
@@ -93,7 +93,6 @@ const App = () => {
         <AuthProvider>
           <EmmaChatProvider>
           <BrowserRouter>
-            <RouteChangeTracker />
             <ScrollToTop />
             <PageTracker />
             <Routes>

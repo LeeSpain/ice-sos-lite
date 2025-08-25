@@ -14,11 +14,22 @@ export function usePageTracking() {
       // Track in Google Analytics
       trackPageView(pagePath, pageTitle);
       
-      // Track in our custom analytics
+      // Track in our custom analytics with geographic data
       try {
         const sessionId = sessionStorage.getItem('analytics_session_id') || 
           crypto.randomUUID();
         sessionStorage.setItem('analytics_session_id', sessionId);
+        
+        // Get geographic location data
+        let locationData = null;
+        try {
+          const geoResponse = await supabase.functions.invoke('geo-lookup');
+          if (geoResponse.data && !geoResponse.error) {
+            locationData = geoResponse.data;
+          }
+        } catch (geoError) {
+          console.warn('Could not fetch location data:', geoError);
+        }
         
         await supabase.from('homepage_analytics').insert({
           event_type: 'page_view',
@@ -30,7 +41,8 @@ export function usePageTracking() {
             user_agent: navigator.userAgent,
             timestamp: new Date().toISOString(),
             screen_resolution: `${screen.width}x${screen.height}`,
-            viewport_size: `${window.innerWidth}x${window.innerHeight}`
+            viewport_size: `${window.innerWidth}x${window.innerHeight}`,
+            location: locationData
           }
         });
         

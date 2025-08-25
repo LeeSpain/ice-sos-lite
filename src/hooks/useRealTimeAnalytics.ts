@@ -113,25 +113,46 @@ export function useRealTimeAnalytics() {
   });
 }
 
-// Hook for Lovable analytics data
+// Hook for Lovable analytics data - now fetches real page view data
 export function useLovableAnalytics() {
-  const [analyticsData, setAnalyticsData] = useState({
-    pageViews: 0,
-    uniqueVisitors: 0,
-    sessions: 0
+  return useQuery({
+    queryKey: ['lovable-analytics'],
+    queryFn: async () => {
+      try {
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        // Get page views from the last 30 days
+        const { data: pageViewData, error } = await supabase
+          .from('homepage_analytics')
+          .select('session_id, event_data')
+          .eq('event_type', 'page_view')
+          .gte('created_at', thirtyDaysAgo.toISOString());
+
+        if (error) throw error;
+
+        const pageViews = pageViewData?.length || 0;
+        const uniqueVisitors = new Set(pageViewData?.map(item => item.session_id) || []).size;
+        const sessions = uniqueVisitors; // For simplicity, treat unique visitors as sessions
+
+        return {
+          pageViews,
+          uniqueVisitors,
+          sessions
+        };
+      } catch (error) {
+        console.error('Error fetching analytics data:', error);
+        return {
+          pageViews: 0,
+          uniqueVisitors: 0,
+          sessions: 0
+        };
+      }
+    },
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchIntervalInBackground: false,
   });
-
-  useEffect(() => {
-    // For now, we'll use the data from the analytics API call
-    // In the future, this could connect to a real-time analytics service
-    setAnalyticsData({
-      pageViews: 0, // From analytics API - currently 0
-      uniqueVisitors: 0, // From analytics API - currently 0
-      sessions: 0 // Calculated from unique visitors
-    });
-  }, []);
-
-  return { data: analyticsData };
 }
 
 // Hook for real-time traffic sources - now deprecated, use useEnhancedTrafficSources

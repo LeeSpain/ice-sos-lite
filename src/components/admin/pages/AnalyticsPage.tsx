@@ -34,6 +34,11 @@ import {
   type TrafficSource,
   type DeviceData 
 } from '@/hooks/useEnhancedAnalytics';
+import { 
+  usePageAnalytics, 
+  useGeographicAnalytics, 
+  useUserJourneyAnalytics 
+} from '@/hooks/usePageAnalytics';
 import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
 const AnalyticsPage = () => {
@@ -41,14 +46,19 @@ const AnalyticsPage = () => {
   
   // Real-time data hooks
   const { data: realTimeMetrics, isLoading: isLoadingMetrics, refetch: refetchMetrics } = useRealTimeAnalytics();
-  const { data: lovableAnalytics } = useLovableAnalytics();
+  const { data: lovableAnalytics, isLoading: isLoadingLovable } = useLovableAnalytics();
   const { data: trafficSources, isLoading: isLoadingTraffic } = useEnhancedTrafficSources();
   const { data: deviceData, isLoading: isLoadingDevices } = useEnhancedDeviceData();
   const { data: topPages, isLoading: isLoadingPages } = useTopPages();
   const { data: customEvents, isLoading: isLoadingEvents } = useCustomEvents();
   const { data: realTimeData, isLoading: isLoadingRealTime } = useRealTimeActiveUsers();
+  
+  // Enhanced analytics hooks
+  const { data: pageAnalytics, isLoading: isLoadingPageAnalytics } = usePageAnalytics();
+  const { data: geographicData, isLoading: isLoadingGeographic } = useGeographicAnalytics();
+  const { data: userJourneys, isLoading: isLoadingJourneys } = useUserJourneyAnalytics();
 
-  const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime || isLoadingTraffic || isLoadingDevices;
+  const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime || isLoadingTraffic || isLoadingDevices || isLoadingLovable || isLoadingPageAnalytics || isLoadingGeographic || isLoadingJourneys;
 
   // Refresh all data
   const refreshAllData = async () => {
@@ -135,12 +145,12 @@ const AnalyticsPage = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
         <MetricCard
           title="Page Views"
-          value={lovableAnalytics.pageViews}
+          value={lovableAnalytics?.pageViews || 0}
           icon={Eye}
         />
         <MetricCard
           title="Unique Visitors"
-          value={lovableAnalytics.uniqueVisitors}
+          value={lovableAnalytics?.uniqueVisitors || 0}
           icon={Users}
         />
         <MetricCard
@@ -170,9 +180,12 @@ const AnalyticsPage = () => {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="pages">Page Analytics</TabsTrigger>
+          <TabsTrigger value="geographic">Geographic</TabsTrigger>
           <TabsTrigger value="traffic">Traffic Sources</TabsTrigger>
           <TabsTrigger value="devices">Devices</TabsTrigger>
           <TabsTrigger value="events">Custom Events</TabsTrigger>
+          <TabsTrigger value="journeys">User Journeys</TabsTrigger>
           <TabsTrigger value="real-time">Real-time</TabsTrigger>
         </TabsList>
 
@@ -192,7 +205,7 @@ const AnalyticsPage = () => {
             />
             <MetricCard
               title="Sessions"
-              value={lovableAnalytics.sessions}
+              value={lovableAnalytics?.sessions || 0}
               icon={Calendar}
             />
           </div>
@@ -241,6 +254,100 @@ const AnalyticsPage = () => {
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">No page view data available yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="pages" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Page Performance</CardTitle>
+              <CardDescription>Detailed analytics for each page</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingPageAnalytics ? (
+                <p className="text-sm text-muted-foreground">Loading page analytics...</p>
+              ) : pageAnalytics && pageAnalytics.length > 0 ? (
+                <div className="space-y-4">
+                  {pageAnalytics.map((page, index) => (
+                    <div key={index} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium">{page.page}</h4>
+                        <Badge variant="outline">{page.views} views</Badge>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Unique Visitors</p>
+                          <p className="font-medium">{page.uniqueVisitors}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Bounce Rate</p>
+                          <p className="font-medium">{page.bounceRate}%</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Avg Time</p>
+                          <p className="font-medium">{page.avgTimeOnPage}s</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Top Country</p>
+                          <p className="font-medium">{page.topCountries[0]?.country || 'N/A'}</p>
+                        </div>
+                      </div>
+                      {page.topReferrers.length > 0 && (
+                        <div className="mt-3 pt-3 border-t">
+                          <p className="text-xs text-muted-foreground mb-2">Top Referrers:</p>
+                          <div className="flex flex-wrap gap-1">
+                            {page.topReferrers.slice(0, 3).map((ref, i) => (
+                              <Badge key={i} variant="secondary" className="text-xs">
+                                {ref.referrer} ({ref.visitors})
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No page analytics data available yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="geographic" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Geographic Distribution</CardTitle>
+              <CardDescription>Visitors by country</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingGeographic ? (
+                <p className="text-sm text-muted-foreground">Loading geographic data...</p>
+              ) : geographicData && geographicData.length > 0 ? (
+                <div className="space-y-3">
+                  {geographicData.map((country, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full" />
+                        <span className="font-medium">{country.country}</span>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <span className="text-sm text-muted-foreground">{country.visitors} visitors</span>
+                        <span className="text-sm font-medium">{country.percentage}%</span>
+                        <div className="w-16 h-2 bg-secondary rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary rounded-full"
+                            style={{ width: `${country.percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No geographic data available yet</p>
               )}
             </CardContent>
           </Card>
@@ -370,6 +477,48 @@ const AnalyticsPage = () => {
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">No custom event data available yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="journeys" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>User Journey Analysis</CardTitle>
+              <CardDescription>Common paths users take through your site</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoadingJourneys ? (
+                <p className="text-sm text-muted-foreground">Loading user journey data...</p>
+              ) : userJourneys && userJourneys.length > 0 ? (
+                <div className="space-y-4">
+                  {userJourneys.map((journey, index) => (
+                    <div key={index} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium">Journey #{index + 1}</span>
+                          <Badge variant="outline">{journey.count} users</Badge>
+                        </div>
+                        <span className="text-sm text-muted-foreground">{journey.conversionRate}% of total</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm">
+                        {journey.path.map((step, stepIndex) => (
+                          <React.Fragment key={stepIndex}>
+                            <span className="bg-secondary px-2 py-1 rounded text-xs font-mono">
+                              {step}
+                            </span>
+                            {stepIndex < journey.path.length - 1 && (
+                              <span className="text-muted-foreground">→</span>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No user journey data available yet</p>
               )}
             </CardContent>
           </Card>
