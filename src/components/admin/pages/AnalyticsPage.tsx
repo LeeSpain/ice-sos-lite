@@ -15,89 +15,43 @@ import {
   RefreshCw,
   Calendar,
   DollarSign,
-  Activity
+  Activity,
+  UserPlus,
+  Mail,
+  ShoppingCart
 } from 'lucide-react';
-// Analytics integration will be implemented with Google Analytics API
-
-interface AnalyticsMetrics {
-  pageViews: number;
-  uniqueVisitors: number;
-  bounceRate: number;
-  avgSessionDuration: number;
-  conversionRate: number;
-  totalRevenue: number;
-}
-
-interface TrafficSource {
-  source: string;
-  visitors: number;
-  percentage: number;
-}
-
-interface DeviceData {
-  device: string;
-  sessions: number;
-  percentage: number;
-}
+import { 
+  useRealTimeAnalytics, 
+  useLovableAnalytics, 
+  useTrafficSources, 
+  useDeviceData, 
+  useTopPages, 
+  useCustomEvents, 
+  useRealTimeActiveUsers,
+  type RealTimeMetrics,
+  type TrafficSource,
+  type DeviceData 
+} from '@/hooks/useRealTimeAnalytics';
 
 const AnalyticsPage = () => {
-  const [metrics, setMetrics] = useState<AnalyticsMetrics>({
-    pageViews: 0,
-    uniqueVisitors: 0,
-    bounceRate: 0,
-    avgSessionDuration: 0,
-    conversionRate: 0,
-    totalRevenue: 0
-  });
-  
-  const [trafficSources, setTrafficSources] = useState<TrafficSource[]>([]);
-  const [deviceData, setDeviceData] = useState<DeviceData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  
+  // Real-time data hooks
+  const { data: realTimeMetrics, isLoading: isLoadingMetrics, refetch: refetchMetrics } = useRealTimeAnalytics();
+  const { data: lovableAnalytics } = useLovableAnalytics();
+  const trafficSources = useTrafficSources();
+  const deviceData = useDeviceData();
+  const { data: topPages, isLoading: isLoadingPages } = useTopPages();
+  const { data: customEvents, isLoading: isLoadingEvents } = useCustomEvents();
+  const { data: realTimeData, isLoading: isLoadingRealTime } = useRealTimeActiveUsers();
 
-  // Fetch analytics data
-  const fetchAnalyticsData = async () => {
-    setIsLoading(true);
-    try {
-      // Get last 30 days of data
-      const endDate = new Date().toISOString().split('T')[0];
-      const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      
-      // This would integrate with Google Analytics API in production
-      // For now, showing sample data structure
-      setMetrics({
-        pageViews: 15420,
-        uniqueVisitors: 8934,
-        bounceRate: 42.3,
-        avgSessionDuration: 245,
-        conversionRate: 3.2,
-        totalRevenue: 2840.50
-      });
+  const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime;
 
-      setTrafficSources([
-        { source: 'Organic Search', visitors: 4521, percentage: 50.6 },
-        { source: 'Direct', visitors: 2145, percentage: 24.0 },
-        { source: 'Social Media', visitors: 1289, percentage: 14.4 },
-        { source: 'Referral', visitors: 979, percentage: 11.0 }
-      ]);
-
-      setDeviceData([
-        { device: 'Mobile', sessions: 5421, percentage: 60.7 },
-        { device: 'Desktop', sessions: 2876, percentage: 32.2 },
-        { device: 'Tablet', sessions: 637, percentage: 7.1 }
-      ]);
-
-      setLastUpdated(new Date());
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  // Refresh all data
+  const refreshAllData = async () => {
+    setLastUpdated(new Date());
+    await refetchMetrics();
   };
-
-  useEffect(() => {
-    fetchAnalyticsData();
-  }, []);
 
   const MetricCard = ({ 
     title, 
@@ -164,7 +118,7 @@ const AnalyticsPage = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={fetchAnalyticsData}
+            onClick={refreshAllData}
             disabled={isLoading}
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
@@ -174,30 +128,36 @@ const AnalyticsPage = () => {
       </div>
 
       {/* Overview Metrics */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
         <MetricCard
           title="Page Views"
-          value={metrics.pageViews}
-          change={12.5}
+          value={lovableAnalytics.pageViews}
           icon={Eye}
         />
         <MetricCard
           title="Unique Visitors"
-          value={metrics.uniqueVisitors}
-          change={8.2}
+          value={lovableAnalytics.uniqueVisitors}
           icon={Users}
         />
         <MetricCard
+          title="Total Users"
+          value={realTimeMetrics?.totalUsers || 0}
+          icon={UserPlus}
+        />
+        <MetricCard
+          title="Contacts (30d)"
+          value={realTimeMetrics?.contactsLast30Days || 0}
+          icon={Mail}
+        />
+        <MetricCard
           title="Conversion Rate"
-          value={metrics.conversionRate}
-          change={0.8}
+          value={realTimeMetrics?.conversionRate || 0}
           icon={TrendingUp}
           format="percentage"
         />
         <MetricCard
           title="Revenue"
-          value={metrics.totalRevenue}
-          change={15.3}
+          value={realTimeMetrics?.totalRevenue || 0}
           icon={DollarSign}
           format="currency"
         />
@@ -216,23 +176,39 @@ const AnalyticsPage = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <MetricCard
               title="Bounce Rate"
-              value={metrics.bounceRate}
-              change={-2.1}
+              value={realTimeMetrics?.bounceRate || 0}
               icon={MousePointer}
               format="percentage"
             />
             <MetricCard
               title="Avg. Session Duration"
-              value={metrics.avgSessionDuration}
-              change={5.7}
+              value={realTimeMetrics?.avgSessionDuration || 0}
               icon={Activity}
               format="duration"
             />
             <MetricCard
               title="Sessions"
-              value={8934}
-              change={11.2}
+              value={lovableAnalytics.sessions}
               icon={Calendar}
+            />
+          </div>
+
+          {/* Additional Metrics */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <MetricCard
+              title="Total Contacts"
+              value={realTimeMetrics?.totalContacts || 0}
+              icon={Mail}
+            />
+            <MetricCard
+              title="Completed Orders"
+              value={realTimeMetrics?.totalOrders || 0}
+              icon={ShoppingCart}
+            />
+            <MetricCard
+              title="Registrations"
+              value={realTimeMetrics?.totalRegistrations || 0}
+              icon={UserPlus}
             />
           </div>
 
@@ -243,25 +219,25 @@ const AnalyticsPage = () => {
               <CardDescription>Most visited pages in the last 30 days</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {[
-                  { page: '/', views: 3421, percentage: 22.2 },
-                  { page: '/register', views: 2156, percentage: 14.0 },
-                  { page: '/auth', views: 1834, percentage: 11.9 },
-                  { page: '/support', views: 1245, percentage: 8.1 },
-                  { page: '/contact', views: 892, percentage: 5.8 }
-                ].map((item, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">{item.page}</p>
-                      <p className="text-sm text-muted-foreground">{item.views.toLocaleString()} views</p>
+              {isLoadingPages ? (
+                <p className="text-sm text-muted-foreground">Loading page data...</p>
+              ) : topPages && topPages.length > 0 ? (
+                <div className="space-y-4">
+                  {topPages.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">{item.page}</p>
+                        <p className="text-sm text-muted-foreground">{item.views.toLocaleString()} views</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{item.percentage}%</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">{item.percentage}%</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No page view data available yet</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -336,27 +312,27 @@ const AnalyticsPage = () => {
               <CardDescription>ICE SOS specific event tracking</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {[
-                  { event: 'Emergency SOS Button Clicked', count: 127, trend: '+5.2%' },
-                  { event: 'Registration Completed', count: 89, trend: '+12.1%' },
-                  { event: 'Subscription Purchased', count: 34, trend: '+18.9%' },
-                  { event: 'Emma Chat Interaction', count: 456, trend: '+8.7%' },
-                  { event: 'Family Member Invited', count: 67, trend: '+3.4%' }
-                ].map((event, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">{event.event}</p>
-                      <p className="text-sm text-muted-foreground">{event.count} events</p>
+              {isLoadingEvents ? (
+                <p className="text-sm text-muted-foreground">Loading event data...</p>
+              ) : customEvents && customEvents.length > 0 ? (
+                <div className="space-y-4">
+                  {customEvents.map((event, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">{event.event}</p>
+                        <p className="text-sm text-muted-foreground">{event.count} events</p>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="outline" className="text-xs">
+                          {event.trend}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <Badge variant="outline" className="text-xs text-emerald-600">
-                        {event.trend}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No custom event data available yet</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -368,33 +344,34 @@ const AnalyticsPage = () => {
               <CardDescription>Live visitors and activity</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Active Users</p>
-                  <p className="text-3xl font-bold text-emerald-600">23</p>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Page Views (last hour)</p>
-                  <p className="text-3xl font-bold">142</p>
-                </div>
-              </div>
-              
-              <div className="mt-6 space-y-2">
-                <p className="text-sm font-medium">Top Active Pages</p>
-                <div className="space-y-2">
-                  {[
-                    { page: '/', users: 8 },
-                    { page: '/register', users: 5 },
-                    { page: '/member-dashboard', users: 4 },
-                    { page: '/contact', users: 3 }
-                  ].map((item, index) => (
-                    <div key={index} className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">{item.page}</span>
-                      <span className="font-medium">{item.users} users</span>
+              {isLoadingRealTime ? (
+                <p className="text-sm text-muted-foreground">Loading real-time data...</p>
+              ) : (
+                <>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Active Users</p>
+                      <p className="text-3xl font-bold text-emerald-600">{realTimeData?.activeUsers || 0}</p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Page Views (last hour)</p>
+                      <p className="text-3xl font-bold">{realTimeData?.pageViewsLastHour || 0}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6 space-y-2">
+                    <p className="text-sm font-medium">Top Active Pages</p>
+                    <div className="space-y-2">
+                      {realTimeData?.topActivePages.map((item, index) => (
+                        <div key={index} className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{item.page}</span>
+                          <span className="font-medium">{item.users} users</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
