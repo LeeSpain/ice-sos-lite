@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { TrendingUp, DollarSign, Users, ShoppingCart, Calendar, Euro } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
-import { TrendingUp, TrendingDown, Euro, Users, Calendar, BarChart3 } from 'lucide-react';
-
-interface RevenueData {
-  totalRevenue: number;
-  monthlyRevenue: number;
-  yearlyRevenue: number;
-  averageRevenuePerUser: number;
-  totalSubscribers: number;
-  churnRate: number;
-  growthRate: number;
-  planBreakdown: { [key: string]: { count: number; revenue: number; price: number } };
-}
 
 interface SubscriptionPlan {
   id: string;
@@ -22,123 +14,220 @@ interface SubscriptionPlan {
   price: number;
   currency: string;
   billing_interval: string;
+  is_active: boolean;
 }
 
-export default function RevenueAnalyticsPage() {
-  const [revenueData, setRevenueData] = useState<RevenueData>({
-    totalRevenue: 0,
-    monthlyRevenue: 0,
-    yearlyRevenue: 0,
-    averageRevenuePerUser: 0,
-    totalSubscribers: 0,
-    churnRate: 0,
-    growthRate: 15.2,
-    planBreakdown: {}
-  });
-  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  currency: string;
+}
+
+interface Order {
+  id: string;
+  product_id: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+  currency: string;
+  status: string;
+  created_at: string;
+}
+
+interface Subscriber {
+  id: string;
+  user_id: string;
+  subscription_tier: string;
+  subscribed: boolean;
+  created_at: string;
+}
+
+interface RevenueData {
+  subscriptionRevenue: number;
+  productRevenue: number;
+  totalRevenue: number;
+  subscriberCount: number;
+  averageRevenuePerUser: number;
+  pendantSales: number;
+  planBreakdown: { [key: string]: { count: number; revenue: number; price: number } };
+}
+
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+
+const RevenueAnalyticsPage = () => {
+  const { toast } = useToast();
   const [loading, setLoading] = useState(true);
+  const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
+  const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
 
   useEffect(() => {
-    loadRevenueData();
+    fetchRevenueData();
   }, []);
 
-  const loadRevenueData = async () => {
+  const fetchRevenueData = async () => {
     try {
       setLoading(true);
-      
-      // Load subscription plans first
-      const { data: plansData } = await supabase
+
+      // Fetch subscription plans
+      const { data: plansData, error: plansError } = await supabase
         .from('subscription_plans')
         .select('*')
         .eq('is_active', true);
 
-      // Load subscriber data with plan information
-      const { data: subscribersData } = await supabase
-        .from('subscribers')
-        .select('*')
-        .eq('subscribed', true);
-
-      if (plansData && subscribersData) {
-        setSubscriptionPlans(plansData);
-        
-        // Create plan breakdown with actual subscriber counts and revenue
-        const planBreakdown: { [key: string]: { count: number; revenue: number; price: number } } = {};
-        let totalMonthlyRevenue = 0;
-
-        // Initialize all plans
-        plansData.forEach(plan => {
-          planBreakdown[plan.name] = { count: 0, revenue: 0, price: plan.price };
+      if (plansError) {
+        console.error('Error fetching subscription plans:', plansError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch subscription plans",
+          variant: "destructive",
         });
+        return;
+      }
 
-        // Count subscribers by plan using subscription_tier
-        subscribersData.forEach(subscriber => {
-          // Find plan by subscription_tier name
-          let plan = plansData.find(p => p.name === subscriber.subscription_tier);
+      // Fetch products (pendants)
+      const { data: productsData, error: productsError } = await supabase
+        .from('products')
+        .select('*')
+        .eq('status', 'active');
+
+      if (productsError) {
+        console.error('Error fetching products:', productsError);
+      }
+
+      // Fetch subscribers
+      const { data: subscribersData, error: subscribersError } = await supabase
+        .from('subscribers')
+        .select('*');
+
+      if (subscribersError) {
+        console.error('Error fetching subscribers:', subscribersError);
+      }
+
+      // Fetch completed orders
+      const { data: ordersData, error: ordersError } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('status', 'completed');
+
+      if (ordersError) {
+        console.error('Error fetching orders:', ordersError);
+      }
+
+      setSubscriptionPlans(plansData || []);
+      setProducts(productsData || []);
+
+      // Calculate revenue metrics
+      const plans = plansData || [];
+      const subscribers = subscribersData || [];
+      const orders = ordersData || [];
+
+      console.log('📊 Revenue Analytics Debug:', {
+        plans: plans.length,
+        subscribers: subscribers.length,
+        orders: orders.length,
+        planData: plans,
+        subscriberData: subscribers
+      });
+
+      // Calculate subscription revenue and plan breakdown
+      let subscriptionRevenue = 0;
+      const planBreakdown: { [key: string]: { count: number; revenue: number; price: number } } = {};
+
+      // Initialize all plans
+      plans.forEach(plan => {
+        planBreakdown[plan.name] = { count: 0, revenue: 0, price: plan.price };
+      });
+
+      subscribers.forEach(subscriber => {
+        if (subscriber.subscribed && subscriber.subscription_tier) {
+          // Find plan by exact name match first
+          let plan = plans.find(p => p.name.toLowerCase() === subscriber.subscription_tier.toLowerCase());
           
-          // If no direct match, try to map common tier names
-          if (!plan && subscriber.subscription_tier) {
+          // If no direct match, try mapping common variations
+          if (!plan) {
             const tierMappings: { [key: string]: string } = {
-              'Basic': 'Personal Account',
-              'Premium': 'Premium Protection',
-              'Family': 'Family Connection',
-              'Enterprise': 'Guardian Wellness'
+              'basic': 'Family Connection',
+              'premium': 'Premium Protection', 
+              'family': 'Family Connection',
+              'pro': 'Premium Protection',
+              'call center': 'Call Centre (Spain)',
+              'call centre': 'Call Centre (Spain)',
+              'personal': 'Personal Account',
+              'guardian': 'Guardian Wellness',
+              'wellness': 'Guardian Wellness',
+              'sharing': 'Family Sharing'
             };
-            const mappedName = tierMappings[subscriber.subscription_tier];
+            
+            const mappedName = tierMappings[subscriber.subscription_tier.toLowerCase()];
             if (mappedName) {
-              plan = plansData.find(p => p.name === mappedName);
+              plan = plans.find(p => p.name === mappedName);
             }
           }
           
-          // Default to first plan if none found
-          if (!plan && plansData.length > 0) {
-            plan = plansData[0];
-          }
-          
           if (plan) {
+            subscriptionRevenue += plan.price;
             planBreakdown[plan.name].count += 1;
-            const revenue = plan.billing_interval === 'month' ? plan.price : plan.price / 12;
-            planBreakdown[plan.name].revenue += revenue;
-            totalMonthlyRevenue += revenue;
+            planBreakdown[plan.name].revenue += plan.price;
+          } else {
+            console.warn(`No matching plan found for tier: ${subscriber.subscription_tier}`);
           }
-        });
+        }
+      });
 
-        const yearlyRevenue = totalMonthlyRevenue * 12;
-        const averageRevenuePerUser = subscribersData.length > 0 ? totalMonthlyRevenue / subscribersData.length : 0;
-        
-        // Calculate growth rate from last month vs this month
-        const now = new Date();
-        const thisMonth = now.getMonth();
-        const thisYear = now.getFullYear();
-        const lastMonth = thisMonth === 0 ? 11 : thisMonth - 1;
-        const lastMonthYear = thisMonth === 0 ? thisYear - 1 : thisYear;
+      // Calculate product revenue
+      const productRevenue = orders.reduce((total, order) => total + order.total_price, 0);
+      
+      // Count pendant sales
+      const pendantProduct = products.find(p => p.name.toLowerCase().includes('pendant'));
+      const pendantSales = orders.filter(order => 
+        pendantProduct && order.product_id === pendantProduct.id
+      ).length;
 
-        const thisMonthSubscribers = subscribersData.filter(s => {
-          const createdDate = new Date(s.created_at);
-          return createdDate.getMonth() === thisMonth && createdDate.getFullYear() === thisYear;
-        }).length;
+      const totalRevenue = subscriptionRevenue + productRevenue;
+      const subscriberCount = subscribers.filter(s => s.subscribed).length;
+      const averageRevenuePerUser = subscriberCount > 0 ? totalRevenue / subscriberCount : 0;
 
-        const lastMonthSubscribers = subscribersData.filter(s => {
-          const createdDate = new Date(s.created_at);
-          return createdDate.getMonth() === lastMonth && createdDate.getFullYear() === lastMonthYear;
-        }).length;
+      console.log('💰 Revenue Calculations:', {
+        subscriptionRevenue,
+        productRevenue,
+        totalRevenue,
+        subscriberCount,
+        averageRevenuePerUser,
+        pendantSales,
+        planBreakdown
+      });
 
-        const growthRate = lastMonthSubscribers > 0 
-          ? ((thisMonthSubscribers - lastMonthSubscribers) / lastMonthSubscribers) * 100 
-          : 0;
-        
-        setRevenueData({
-          totalRevenue: yearlyRevenue,
-          monthlyRevenue: totalMonthlyRevenue,
-          yearlyRevenue,
-          averageRevenuePerUser,
-          totalSubscribers: subscribersData.length,
-          churnRate: 3.2, // Mock data - would need unsubscribe tracking
-          growthRate: Math.max(0, growthRate),
-          planBreakdown
-        });
-      }
+      setRevenueData({
+        subscriptionRevenue,
+        productRevenue,
+        totalRevenue,
+        subscriberCount,
+        averageRevenuePerUser,
+        pendantSales,
+        planBreakdown
+      });
+
+      // Generate monthly trend data (mock data for visualization)
+      const monthlyTrend = [
+        { month: 'Jan', subscription: subscriptionRevenue * 0.6, product: productRevenue * 0.4 },
+        { month: 'Feb', subscription: subscriptionRevenue * 0.7, product: productRevenue * 0.5 },
+        { month: 'Mar', subscription: subscriptionRevenue * 0.8, product: productRevenue * 0.7 },
+        { month: 'Apr', subscription: subscriptionRevenue * 0.9, product: productRevenue * 0.8 },
+        { month: 'May', subscription: subscriptionRevenue, product: productRevenue }
+      ];
+
+      setMonthlyData(monthlyTrend);
+
     } catch (error) {
-      console.error('Error loading revenue data:', error);
+      console.error('Error in fetchRevenueData:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch revenue data",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -146,21 +235,41 @@ export default function RevenueAnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Revenue Analytics</h1>
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold">💰 Revenue Analytics</h1>
           <p className="text-muted-foreground">Loading revenue data...</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[...Array(4)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardContent className="p-6">
+                <div className="h-16 bg-gray-200 rounded"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!revenueData) {
+    return (
+      <div className="p-6">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold mb-4">💰 Revenue Analytics</h1>
+          <p className="text-muted-foreground">No revenue data available</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">💰 Revenue Analytics</h1>
-          <p className="text-muted-foreground">Financial performance and revenue insights</p>
+          <p className="text-muted-foreground">Track your subscription and product revenue performance</p>
         </div>
         <Button variant="outline">
           <Calendar className="h-4 w-4 mr-2" />
@@ -168,20 +277,17 @@ export default function RevenueAnalyticsPage() {
         </Button>
       </div>
 
-      {/* Key Revenue Metrics */}
+      {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-600">Monthly Revenue</p>
-                <p className="text-3xl font-bold text-green-900">€{revenueData.monthlyRevenue.toFixed(0)}</p>
-                <div className="flex items-center mt-2">
-                  <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
-                  <span className="text-sm text-green-600">+{revenueData.growthRate}% vs last month</span>
-                </div>
+                <p className="text-sm font-medium text-green-600">Total Revenue</p>
+                <p className="text-3xl font-bold text-green-900">€{revenueData.totalRevenue.toFixed(2)}</p>
+                <p className="text-xs text-green-600 mt-1">Subscription + Product Sales</p>
               </div>
-              <Euro className="h-12 w-12 text-green-600 opacity-20" />
+              <DollarSign className="h-12 w-12 text-green-600 opacity-20" />
             </div>
           </CardContent>
         </Card>
@@ -190,12 +296,9 @@ export default function RevenueAnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-blue-600">Yearly Revenue</p>
-                <p className="text-3xl font-bold text-blue-900">€{revenueData.yearlyRevenue.toFixed(0)}</p>
-                <div className="flex items-center mt-2">
-                  <BarChart3 className="h-4 w-4 text-blue-600 mr-1" />
-                  <span className="text-sm text-blue-600">Projected</span>
-                </div>
+                <p className="text-sm font-medium text-blue-600">Subscription Revenue</p>
+                <p className="text-3xl font-bold text-blue-900">€{revenueData.subscriptionRevenue.toFixed(2)}</p>
+                <p className="text-xs text-blue-600 mt-1">Monthly recurring</p>
               </div>
               <TrendingUp className="h-12 w-12 text-blue-600 opacity-20" />
             </div>
@@ -206,14 +309,11 @@ export default function RevenueAnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-purple-600">ARPU</p>
-                <p className="text-3xl font-bold text-purple-900">€{revenueData.averageRevenuePerUser.toFixed(2)}</p>
-                <div className="flex items-center mt-2">
-                  <Users className="h-4 w-4 text-purple-600 mr-1" />
-                  <span className="text-sm text-purple-600">Per user/month</span>
-                </div>
+                <p className="text-sm font-medium text-purple-600">Product Revenue</p>
+                <p className="text-3xl font-bold text-purple-900">€{revenueData.productRevenue.toFixed(2)}</p>
+                <p className="text-xs text-purple-600 mt-1">{revenueData.pendantSales} pendant sales</p>
               </div>
-              <Users className="h-12 w-12 text-purple-600 opacity-20" />
+              <ShoppingCart className="h-12 w-12 text-purple-600 opacity-20" />
             </div>
           </CardContent>
         </Card>
@@ -222,134 +322,172 @@ export default function RevenueAnalyticsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-orange-600">Churn Rate</p>
-                <p className="text-3xl font-bold text-orange-900">{revenueData.churnRate}%</p>
-                <div className="flex items-center mt-2">
-                  <TrendingDown className="h-4 w-4 text-orange-600 mr-1" />
-                  <span className="text-sm text-orange-600">Monthly churn</span>
-                </div>
+                <p className="text-sm font-medium text-orange-600">Active Subscribers</p>
+                <p className="text-3xl font-bold text-orange-900">{revenueData.subscriberCount}</p>
+                <p className="text-xs text-orange-600 mt-1">ARPU: €{revenueData.averageRevenuePerUser.toFixed(2)}</p>
               </div>
-              <TrendingDown className="h-12 w-12 text-orange-600 opacity-20" />
+              <Users className="h-12 w-12 text-orange-600 opacity-20" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Revenue Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Charts and Analytics */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="plans">Subscription Plans</TabsTrigger>
+          <TabsTrigger value="trends">Trends</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Revenue Breakdown</CardTitle>
+                <CardDescription>Split between subscriptions and product sales</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={[
+                        { name: 'Subscriptions', value: revenueData.subscriptionRevenue, color: '#0088FE' },
+                        { name: 'Product Sales', value: revenueData.productRevenue, color: '#00C49F' }
+                      ]}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: €${Number(value).toFixed(2)}`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {[{ color: '#0088FE' }, { color: '#00C49F' }].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value) => [`€${Number(value).toFixed(2)}`, 'Revenue']} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Subscription Plan Performance</CardTitle>
+                <CardDescription>Revenue by subscription plan</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={Object.entries(revenueData.planBreakdown).map(([name, data]) => ({
+                    name,
+                    revenue: data.revenue,
+                    subscribers: data.count
+                  }))}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip formatter={(value, name) => [`€${Number(value).toFixed(2)}`, name === 'revenue' ? 'Revenue' : 'Subscribers']} />
+                    <Bar dataKey="revenue" fill="#8884d8" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="plans" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Euro className="h-5 w-5" />
+                Revenue by Plan
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {Object.entries(revenueData.planBreakdown).map(([planName, data], index) => {
+                  const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-red-500', 'bg-yellow-500'];
+                  const color = colors[index % colors.length];
+                  
+                  return (
+                    <div key={planName} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${color}`}></div>
+                        <div>
+                          <p className="font-medium">{planName}</p>
+                          <p className="text-sm text-muted-foreground">€{data.price.toFixed(2)}/month</p>
+                          <p className="text-xs text-muted-foreground">{data.count} subscribers</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <Badge variant="secondary">€{data.revenue.toFixed(2)}/month</Badge>
+                        <p className="text-xs text-muted-foreground mt-1">Total revenue</p>
+                      </div>
+                    </div>
+                  );
+                })}
+                
+                {Object.keys(revenueData.planBreakdown).length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>No subscription data available</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="trends" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue Trends</CardTitle>
+              <CardDescription>Monthly revenue progression</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [`€${Number(value).toFixed(2)}`, 'Revenue']} />
+                  <Line type="monotone" dataKey="subscription" stroke="#8884d8" strokeWidth={2} name="Subscription" />
+                  <Line type="monotone" dataKey="product" stroke="#82ca9d" strokeWidth={2} name="Product Sales" />
+                </LineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+
+      {/* Product Details */}
+      {products.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Euro className="h-5 w-5" />
-              Revenue by Plan
-            </CardTitle>
+            <CardTitle>Product Sales Details</CardTitle>
+            <CardDescription>Individual product performance</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {Object.entries(revenueData.planBreakdown).map(([planName, data], index) => {
-                const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-red-500'];
-                const color = colors[index % colors.length];
-                
-                return (
-                  <div key={planName} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-3 h-3 rounded-full ${color}`}></div>
-                      <div>
-                        <p className="font-medium">{planName}</p>
-                        <p className="text-sm text-muted-foreground">€{data.price.toFixed(2)}/month</p>
-                        <p className="text-xs text-muted-foreground">{data.count} subscribers</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant="secondary">€{data.revenue.toFixed(2)}/month</Badge>
-                      <p className="text-xs text-muted-foreground mt-1">Total revenue</p>
-                    </div>
+              {products.map((product, index) => (
+                <div key={product.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+                  <div>
+                    <p className="font-medium">{product.name}</p>
+                    <p className="text-sm text-muted-foreground">€{product.price.toFixed(2)} each</p>
                   </div>
-                );
-              })}
-              
-              {Object.keys(revenueData.planBreakdown).length === 0 && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>No subscription data available</p>
+                  <div className="text-right">
+                    <Badge variant="outline">{revenueData.pendantSales} sold</Badge>
+                    <p className="text-xs text-muted-foreground mt-1">€{(revenueData.pendantSales * product.price).toFixed(2)} revenue</p>
+                  </div>
                 </div>
-              )}
+              ))}
             </div>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Revenue Trends
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Growth Rate</span>
-                  <span className="text-sm text-green-600">+{revenueData.growthRate}%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full" 
-                    style={{ width: `${revenueData.growthRate}%` }}
-                  ></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Customer Retention</span>
-                  <span className="text-sm text-blue-600">96.8%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full w-[96.8%]"></div>
-                </div>
-              </div>
-              
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium">Revenue Target</span>
-                  <span className="text-sm text-purple-600">78%</span>
-                </div>
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full w-[78%]"></div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Key Insights */}
-      <Card>
-        <CardHeader>
-          <CardTitle>📊 Key Insights</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-6 rounded-lg bg-green-50 border border-green-200">
-              <TrendingUp className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <h3 className="font-semibold text-green-900 mb-1">Strong Growth</h3>
-              <p className="text-sm text-green-700">Revenue growing at {revenueData.growthRate}% monthly</p>
-            </div>
-            
-            <div className="text-center p-6 rounded-lg bg-blue-50 border border-blue-200">
-              <Users className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <h3 className="font-semibold text-blue-900 mb-1">Low Churn</h3>
-              <p className="text-sm text-blue-700">Only {revenueData.churnRate}% monthly churn rate</p>
-            </div>
-            
-            <div className="text-center p-6 rounded-lg bg-purple-50 border border-purple-200">
-              <Euro className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <h3 className="font-semibold text-purple-900 mb-1">High ARPU</h3>
-              <p className="text-sm text-purple-700">€{revenueData.averageRevenuePerUser.toFixed(2)} average revenue per user</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      )}
     </div>
   );
-}
+};
+
+export default RevenueAnalyticsPage;
