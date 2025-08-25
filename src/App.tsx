@@ -12,6 +12,7 @@ import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
 import { queryClient } from "@/lib/queryClient";
 import Index from "./pages/Index";
+import { usePageTracking } from '@/hooks/usePageTracking';
 
 const TestPage = lazy(() => import("./pages/TestPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
@@ -46,6 +47,12 @@ const ConditionalEmmaChat = () => {
   return <GlobalEmmaChat />;
 };
 
+// Component to track page views
+const PageTracker = () => {
+  usePageTracking();
+  return null;
+};
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -54,6 +61,7 @@ const App = () => {
         <BrowserRouter>
           <RouteChangeTracker />
           <ScrollToTop />
+          <PageTracker />
           <Suspense fallback={<div className="p-6 text-sm">Loading…</div>}>
           <Routes>
             <Route path="/test" element={<TestPage />} />

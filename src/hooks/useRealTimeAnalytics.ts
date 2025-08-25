@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
+import { useSessionMetrics } from './useEnhancedAnalytics';
 
 export interface RealTimeMetrics {
   totalUsers: number;
@@ -40,20 +41,24 @@ export interface CustomEvent {
 
 // Hook to fetch real-time analytics data
 export function useRealTimeAnalytics() {
+  const { data: sessionMetrics } = useSessionMetrics();
+  
   return useQuery({
     queryKey: ['real-time-analytics'],
     queryFn: async (): Promise<RealTimeMetrics> => {
       console.log('🔄 Fetching real-time analytics data...');
       try {
         // Get real data from database with error handling
-        const [contactsResult, ordersResult, registrationsResult] = await Promise.allSettled([
+        const [contactsResult, ordersResult, registrationsResult, profilesResult] = await Promise.allSettled([
           supabase.from('contact_submissions').select('*').throwOnError(),
           supabase.from('orders').select('total_price').eq('status', 'completed').throwOnError(),
-          supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true).throwOnError()
+          supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true).throwOnError(),
+          supabase.from('profiles').select('count', { count: 'exact', head: true }).throwOnError()
         ]);
 
-        // Use known user count (we know there's 1 user from our earlier database query)
-        const totalUsers = 1; // From our database query result
+        // Get actual user count from profiles
+        const profilesCount = profilesResult.status === 'fulfilled' ? profilesResult.value.count : 1;
+        const totalUsers = (typeof profilesCount === 'number') ? profilesCount : 1;
         const contacts = contactsResult.status === 'fulfilled' ? (contactsResult.value.data || []) : [];
         const totalContacts = contacts.length;
         
@@ -83,8 +88,8 @@ export function useRealTimeAnalytics() {
           totalOrders,
           totalRevenue,
           totalRegistrations,
-          bounceRate: 0, // Will be updated when we have page view tracking
-          avgSessionDuration: 0, // Will be updated when we have session tracking
+          bounceRate: sessionMetrics?.bounceRate || 0,
+          avgSessionDuration: sessionMetrics?.avgSessionDuration || 0,
           conversionRate: parseFloat(conversionRate.toFixed(2))
         };
       } catch (error) {
@@ -128,7 +133,7 @@ export function useLovableAnalytics() {
   return { data: analyticsData };
 }
 
-// Hook for real-time traffic sources (placeholder for now)
+// Hook for real-time traffic sources - now deprecated, use useEnhancedTrafficSources
 export function useTrafficSources(): TrafficSource[] {
   return [
     { source: 'Direct', visitors: 0, percentage: 0 },
@@ -138,7 +143,7 @@ export function useTrafficSources(): TrafficSource[] {
   ];
 }
 
-// Hook for device data (placeholder for now)
+// Hook for device data - now deprecated, use useEnhancedDeviceData
 export function useDeviceData(): DeviceData[] {
   return [
     { device: 'Mobile', sessions: 0, percentage: 0 },
@@ -257,23 +262,62 @@ export function useCustomEvents() {
   });
 }
 
-// Hook for real-time active users (placeholder)
+// Hook for real-time active users with real data
 export function useRealTimeActiveUsers() {
   return useQuery({
     queryKey: ['real-time-active-users'],
     queryFn: async () => {
-      // This would integrate with a real-time analytics service
-      // For now, return 0 as we don't have real-time tracking yet
-      return {
-        activeUsers: 0,
-        pageViewsLastHour: 0,
-        topActivePages: [
-          { page: '/', users: 0 },
-          { page: '/register', users: 0 },
-          { page: '/member-dashboard', users: 0 },
-          { page: '/contact', users: 0 }
-        ]
-      };
+      try {
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+        
+        // Get active sessions in the last hour
+        const { data: recentActivity, error } = await supabase
+          .from('homepage_analytics')
+          .select('session_id, page_context, created_at')
+          .gte('created_at', oneHourAgo.toISOString())
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Count unique active users
+        const uniqueSessions = new Set(recentActivity?.map(item => item.session_id) || []);
+        const activeUsers = uniqueSessions.size;
+
+        // Count page views in the last hour
+        const pageViewsLastHour = recentActivity?.filter(item => 
+          new Date(item.created_at) >= oneHourAgo
+        ).length || 0;
+
+        // Get top active pages
+        const pageActivity: Record<string, number> = {};
+        recentActivity?.forEach(item => {
+          const page = item.page_context || '/';
+          pageActivity[page] = (pageActivity[page] || 0) + 1;
+        });
+
+        const topActivePages = Object.entries(pageActivity)
+          .map(([page, users]) => ({ page, users }))
+          .sort((a, b) => b.users - a.users)
+          .slice(0, 4);
+
+        return {
+          activeUsers,
+          pageViewsLastHour,
+          topActivePages
+        };
+      } catch (error) {
+        console.error('Error fetching real-time active users:', error);
+        return {
+          activeUsers: 0,
+          pageViewsLastHour: 0,
+          topActivePages: [
+            { page: '/', users: 0 },
+            { page: '/register', users: 0 },
+            { page: '/member-dashboard', users: 0 },
+            { page: '/contact', users: 0 }
+          ]
+        };
+      }
     },
     refetchInterval: 10000, // Refetch every 10 seconds for real-time data
   });

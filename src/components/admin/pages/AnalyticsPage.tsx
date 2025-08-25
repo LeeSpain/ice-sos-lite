@@ -23,15 +23,17 @@ import {
 import { 
   useRealTimeAnalytics, 
   useLovableAnalytics, 
-  useTrafficSources, 
-  useDeviceData, 
   useTopPages, 
   useCustomEvents, 
   useRealTimeActiveUsers,
-  type RealTimeMetrics,
+  type RealTimeMetrics
+} from '@/hooks/useRealTimeAnalytics';
+import { 
+  useEnhancedTrafficSources, 
+  useEnhancedDeviceData,
   type TrafficSource,
   type DeviceData 
-} from '@/hooks/useRealTimeAnalytics';
+} from '@/hooks/useEnhancedAnalytics';
 import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
 const AnalyticsPage = () => {
@@ -40,13 +42,13 @@ const AnalyticsPage = () => {
   // Real-time data hooks
   const { data: realTimeMetrics, isLoading: isLoadingMetrics, refetch: refetchMetrics } = useRealTimeAnalytics();
   const { data: lovableAnalytics } = useLovableAnalytics();
-  const trafficSources = useTrafficSources();
-  const deviceData = useDeviceData();
+  const { data: trafficSources, isLoading: isLoadingTraffic } = useEnhancedTrafficSources();
+  const { data: deviceData, isLoading: isLoadingDevices } = useEnhancedDeviceData();
   const { data: topPages, isLoading: isLoadingPages } = useTopPages();
   const { data: customEvents, isLoading: isLoadingEvents } = useCustomEvents();
   const { data: realTimeData, isLoading: isLoadingRealTime } = useRealTimeActiveUsers();
 
-  const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime;
+  const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime || isLoadingTraffic || isLoadingDevices;
 
   // Refresh all data
   const refreshAllData = async () => {
@@ -251,25 +253,42 @@ const AnalyticsPage = () => {
               <CardDescription>Where your visitors are coming from</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {trafficSources.map((source, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium leading-none">{source.source}</p>
-                      <p className="text-sm text-muted-foreground">{source.visitors.toLocaleString()} visitors</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">{source.percentage}%</p>
-                      <div className="w-16 h-2 bg-secondary rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full"
-                          style={{ width: `${source.percentage}%` }}
-                        />
+              {isLoadingTraffic ? (
+                <div className="space-y-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                        <div className="h-3 w-16 bg-muted rounded animate-pulse" />
+                      </div>
+                      <div className="text-right">
+                        <div className="h-4 w-8 bg-muted rounded animate-pulse mb-1" />
+                        <div className="w-16 h-2 bg-muted rounded animate-pulse" />
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {trafficSources?.map((source, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium leading-none">{source.source}</p>
+                        <p className="text-sm text-muted-foreground">{source.visitors.toLocaleString()} visitors</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">{source.percentage}%</p>
+                        <div className="w-16 h-2 bg-secondary rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary rounded-full"
+                            style={{ width: `${source.percentage}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -281,28 +300,45 @@ const AnalyticsPage = () => {
               <CardDescription>Sessions by device type</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {deviceData.map((device, index) => {
-                  const Icon = device.device === 'Mobile' ? Smartphone : 
-                              device.device === 'Desktop' ? Monitor : 
-                              Globe;
-                  
-                  return (
-                    <div key={index} className="flex items-center justify-between">
+              {isLoadingDevices ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <Icon className="h-4 w-4 text-muted-foreground" />
+                        <div className="h-4 w-4 bg-muted rounded animate-pulse" />
                         <div className="space-y-1">
-                          <p className="text-sm font-medium leading-none">{device.device}</p>
-                          <p className="text-sm text-muted-foreground">{device.sessions.toLocaleString()} sessions</p>
+                          <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                          <div className="h-3 w-12 bg-muted rounded animate-pulse" />
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">{device.percentage}%</p>
-                      </div>
+                      <div className="h-4 w-8 bg-muted rounded animate-pulse" />
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {deviceData?.map((device, index) => {
+                    const Icon = device.device === 'Mobile' ? Smartphone : 
+                                device.device === 'Desktop' ? Monitor : 
+                                Globe;
+                    
+                    return (
+                      <div key={index} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <Icon className="h-4 w-4 text-muted-foreground" />
+                          <div className="space-y-1">
+                            <p className="text-sm font-medium leading-none">{device.device}</p>
+                            <p className="text-sm text-muted-foreground">{device.sessions.toLocaleString()} sessions</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium">{device.percentage}%</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

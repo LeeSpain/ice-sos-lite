@@ -135,7 +135,8 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
             <div className="flex justify-center px-6 pt-6">
               <div className="relative w-full max-w-2xl bg-black rounded-lg overflow-hidden shadow-2xl" style={{ paddingBottom: '56.25%' }}>
                 <iframe
-                  src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&enablejsapi=1`}
+                  id={`youtube-player-${selectedVideo.id}`}
+                  src={`https://www.youtube.com/embed/${selectedVideo.youtubeId}?autoplay=1&rel=0&showinfo=0&modestbranding=1&iv_load_policy=3&enablejsapi=1&origin=${window.location.origin}`}
                   title={selectedVideo.title}
                   className="absolute top-0 left-0 w-full h-full"
                   frameBorder="0"
@@ -143,7 +144,20 @@ export const IntroVideoModal = ({ trigger, className, defaultVideoId }: IntroVid
                   allowFullScreen
                   onLoad={() => {
                     // Track video play event when iframe loads with autoplay
-                    trackVideoEvent(selectedVideo.id, selectedVideo.title, 'play');
+                    trackVideoEvent(selectedVideo.id, selectedVideo.title, 'play', {
+                      totalDuration: 0, // Will be updated when YouTube API provides duration
+                      videoPosition: 0,
+                      watchDuration: 0
+                    });
+                    
+                    // Track video analytics in our custom analytics system
+                    if (typeof window !== 'undefined' && window.gtag) {
+                      window.gtag('event', 'video_play', {
+                        video_title: selectedVideo.title,
+                        video_id: selectedVideo.id,
+                        video_provider: 'youtube'
+                      });
+                    }
                   }}
                 />
               </div>
