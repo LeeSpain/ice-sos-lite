@@ -72,26 +72,34 @@ export function useVideoTracker() {
   useEffect(() => {
     const getUserLocation = async () => {
       try {
-        // Try to get location from geolocation API
+        // Try to get location from geolocation API first
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (position) => {
               const { latitude, longitude } = position.coords;
               
-              // Try to get location details from IP geolocation service
+              // Get country/region info via our edge function
               try {
-                const response = await fetch(`https://ipapi.co/json/`);
-                const locationData = await response.json();
+                const { data: geoData } = await supabase.functions.invoke('geo-lookup');
                 
-                setUserLocation({
-                  country: locationData.country_name,
-                  region: locationData.region,
-                  city: locationData.city,
-                  lat: latitude,
-                  lng: longitude
-                });
-              } catch {
-                // Fallback with just coordinates
+                if (geoData?.success && geoData?.data) {
+                  setUserLocation({
+                    country: geoData.data.country,
+                    region: geoData.data.region,
+                    city: geoData.data.city,
+                    lat: latitude,
+                    lng: longitude,
+                    ip: geoData.data.ip
+                  });
+                } else {
+                  // Fallback with just coordinates
+                  setUserLocation({
+                    lat: latitude,
+                    lng: longitude
+                  });
+                }
+              } catch (error) {
+                console.warn('Geo lookup failed, using coordinates only:', error);
                 setUserLocation({
                   lat: latitude,
                   lng: longitude
@@ -99,32 +107,40 @@ export function useVideoTracker() {
               }
             },
             async () => {
-              // Fallback to IP-based location
+              // Fallback to IP-based location only
               try {
-                const response = await fetch(`https://ipapi.co/json/`);
-                const locationData = await response.json();
+                const { data: geoData } = await supabase.functions.invoke('geo-lookup');
                 
-                setUserLocation({
-                  country: locationData.country_name,
-                  region: locationData.region,
-                  city: locationData.city
-                });
+                if (geoData?.success && geoData?.data) {
+                  setUserLocation({
+                    country: geoData.data.country,
+                    region: geoData.data.region,
+                    city: geoData.data.city,
+                    lat: geoData.data.latitude,
+                    lng: geoData.data.longitude,
+                    ip: geoData.data.ip
+                  });
+                }
               } catch (error) {
                 console.warn('Could not determine user location:', error);
               }
             }
           );
         } else {
-          // Fallback to IP-based location
+          // No geolocation, use IP-based location only
           try {
-            const response = await fetch(`https://ipapi.co/json/`);
-            const locationData = await response.json();
+            const { data: geoData } = await supabase.functions.invoke('geo-lookup');
             
-            setUserLocation({
-              country: locationData.country_name,
-              region: locationData.region,
-              city: locationData.city
-            });
+            if (geoData?.success && geoData?.data) {
+              setUserLocation({
+                country: geoData.data.country,
+                region: geoData.data.region,
+                city: geoData.data.city,
+                lat: geoData.data.latitude,
+                lng: geoData.data.longitude,
+                ip: geoData.data.ip
+              });
+            }
           } catch (error) {
             console.warn('Could not determine user location:', error);
           }
@@ -169,6 +185,7 @@ export function useVideoTracker() {
         video_position_seconds: options.videoPosition || 0,
         total_video_duration_seconds: options.totalDuration || null,
         user_location: userLocation,
+        ip_address: userLocation?.ip || null,
         user_agent: userAgent,
         referrer: document.referrer,
         device_type: deviceType,
