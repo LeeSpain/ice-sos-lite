@@ -568,7 +568,7 @@ const AIRegister = () => {
                           value={personalDetails.firstName}
                           onChange={(e) => handlePersonalDetailsChange('firstName', e.target.value)}
                           placeholder="Enter your first name"
-                          className="mt-2"
+                          required
                         />
                       </div>
                       <div>
@@ -578,18 +578,20 @@ const AIRegister = () => {
                           value={personalDetails.lastName}
                           onChange={(e) => handlePersonalDetailsChange('lastName', e.target.value)}
                           placeholder="Enter your last name"
-                          className="mt-2"
+                          required
                         />
                       </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="email">Email *</Label>
+                        <Label htmlFor="email">Email Address *</Label>
                         <Input
                           id="email"
                           type="email"
                           value={personalDetails.email}
                           onChange={(e) => handlePersonalDetailsChange('email', e.target.value)}
-                          placeholder="Enter your email"
-                          className="mt-2"
+                          placeholder="Enter your email address"
+                          required
                         />
                       </div>
                       <div>
@@ -599,19 +601,21 @@ const AIRegister = () => {
                           type="password"
                           value={personalDetails.password}
                           onChange={(e) => handlePersonalDetailsChange('password', e.target.value)}
-                          placeholder="Minimum 6 characters"
-                          className="mt-2"
+                          placeholder="Enter your password (min. 6 characters)"
+                          required
                         />
                       </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="phone">Phone *</Label>
+                        <Label htmlFor="phone">Phone Number *</Label>
                         <Input
                           id="phone"
                           type="tel"
                           value={personalDetails.phone}
                           onChange={(e) => handlePersonalDetailsChange('phone', e.target.value)}
                           placeholder="Enter your phone number"
-                          className="mt-2"
+                          required
                         />
                       </div>
                       <div>
@@ -621,268 +625,475 @@ const AIRegister = () => {
                           value={personalDetails.city}
                           onChange={(e) => handlePersonalDetailsChange('city', e.target.value)}
                           placeholder="Enter your city"
-                          className="mt-2"
+                          required
                         />
                       </div>
-                      <div className="md:col-span-2">
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
                         <Label htmlFor="country">Country *</Label>
                         <Input
                           id="country"
                           value={personalDetails.country}
                           onChange={(e) => handlePersonalDetailsChange('country', e.target.value)}
                           placeholder="Enter your country"
-                          className="mt-2"
+                          required
                         />
-                      </div>
-                    </div>
-                  </div>
+                       </div>
+                     </div>
 
-                  {/* Protection Plans Section */}
+                      {/* Terms and Conditions Checkbox - Enhanced Visibility */}
+                      <div className="space-y-3 mt-6">
+                        <div className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                          personalDetails.acceptTerms 
+                            ? 'border-primary/30 bg-primary/5' 
+                            : 'border-destructive/50 bg-destructive/5 shadow-sm'
+                        }`}>
+                          <div className="flex items-start space-x-4">
+                            <Checkbox
+                              id="acceptTerms"
+                              checked={personalDetails.acceptTerms}
+                              onCheckedChange={(checked) => 
+                                handlePersonalDetailsChange('acceptTerms', checked as boolean ? 'true' : 'false')
+                              }
+                              className="mt-1 h-5 w-5"
+                            />
+                            <div className="grid gap-1.5 leading-none flex-1">
+                              <Label
+                                htmlFor="acceptTerms"
+                                className="text-base font-medium leading-relaxed cursor-pointer text-black"
+                              >
+                                I agree to the{" "}
+                                <button
+                                  type="button"
+                                  onClick={() => setShowTermsDialog(true)}
+                                  className="text-primary hover:underline font-semibold underline-offset-2"
+                                >
+                                  Terms of Service
+                                </button>{" "}
+                                and{" "}
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPrivacyDialog(true)}
+                                  className="text-primary hover:underline font-semibold underline-offset-2"
+                                >
+                                  Privacy Policy
+                                </button>
+                              </Label>
+                              {!personalDetails.acceptTerms && (
+                                <p className="text-sm text-black font-medium mt-2">
+                                  ⚠️ Required: You must accept the terms to continue
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                   </div>
+
+                  {/* Protection Plans */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="p-2 bg-primary/10 rounded-full">
-                        <Shield className="h-5 w-5 text-primary" />
+                      <div className="p-2 bg-emergency/10 rounded-full">
+                        <Shield className="h-5 w-5 text-emergency" />
                       </div>
                       <h2 className="text-xl font-bold text-foreground">Protection Plans</h2>
                     </div>
                     
-                    {/* Core Protection Plan Display */}
-                    <div className="p-6 border-2 border-primary rounded-lg bg-gradient-to-r from-primary/5 to-primary/10">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-lg font-semibold text-foreground">Premium Protection Plan</h3>
-                          <p className="text-sm text-muted-foreground mt-1">Your core protection package (included)</p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">
-                            {convertedPremiumPlan?.formattedPrice || '€19.99'}/month
-                          </div>
-                          <Badge variant="default" className="mt-1">
-                            <Check className="h-3 w-3 mr-1" />
-                            Included
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Family Plan Option */}
+                    {/* Premium Protection Plan - Fixed Standard */}
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-foreground">Additional Family Protection</h3>
-                      <div className="flex items-center space-x-3">
-                        <Checkbox
-                          id="familyPlan"
-                          checked={hasFamilyPlan}
-                          onCheckedChange={handleFamilyPlanToggle}
-                        />
-                        <div className="flex-1">
-                          <Label htmlFor="familyPlan" className="text-base font-medium cursor-pointer">
-                            Family Protection Plan
-                          </Label>
-                          <p className="text-sm text-muted-foreground">
-                            Extend protection to family members
-                          </p>
+                      <h3 className="font-medium text-foreground">Standard Protection Plan:</h3>
+                      {convertedPremiumPlan && (
+                        <div className="p-4 border-2 border-primary bg-primary/5 rounded-lg">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Shield className="h-5 w-5 text-primary" />
+                                <h3 className="font-semibold text-lg">{convertedPremiumPlan.name}</h3>
+                                <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
+                                  Standard
+                                </span>
+                              </div>
+                              <p className="text-muted-foreground mb-3">{convertedPremiumPlan.description}</p>
+                              <div className="grid grid-cols-2 gap-2">
+                                {convertedPremiumPlan.features.map((feature, idx) => (
+                                  <div key={idx} className="flex items-center gap-1 text-sm">
+                                    <Check className="h-3 w-3 text-green-500" />
+                                    <span>{feature}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="text-right ml-4">
+                              <div className="space-y-1">
+                                <div className="text-sm text-muted-foreground">
+                                  Net: {convertedPremiumPlan.formattedPrice}
+                                </div>
+                                <div className="font-bold text-lg text-primary">
+                                  {convertedPremiumPlan.formattedPrice}
+                                </div>
+                                <div className="text-sm text-muted-foreground">per {convertedPremiumPlan.billing_interval}</div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-lg font-semibold text-foreground">
-                          {convertedFamilyPlan?.formattedPrice || '€9.99'}/month
-                        </div>
-                      </div>
+                      )}
                     </div>
-                  </div>
 
-                  {/* Optional Products */}
-                  {convertedProducts.length > 0 && (
+                    {/* Optional Add-ons Section */}
                     <div className="space-y-6">
-                      <div className="flex items-center gap-3 mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-secondary/10 rounded-full">
+                          <Star className="h-5 w-5 text-secondary" />
+                        </div>
+                        <h3 className="text-lg font-bold text-foreground">Optional Add-ons</h3>
+                      </div>
+
+
+                      {/* Safety Products Section */}
+                      {convertedProducts.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-foreground">Safety Products (One-time purchase):</h4>
+                          {convertedProducts.map((product) => {
+                            const priceWithIva = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
+                            return (
+                              <div key={product.id} className={`p-3 border rounded-lg transition-all ${
+                                selectedProducts.includes(product.id) ? 'border-primary bg-primary/5' : 'border-border'
+                              }`}>
+                                <div className="flex items-start gap-3">
+                                  <Checkbox
+                                    id={product.id}
+                                    checked={selectedProducts.includes(product.id)}
+                                    disabled={product.status === 'coming_soon'}
+                                    onCheckedChange={(checked) => handleProductToggle(product.id, checked as boolean)}
+                                    className="mt-1"
+                                  />
+                                  <Label htmlFor={product.id} className="flex-1 cursor-pointer">
+                                    <div className="flex justify-between items-start">
+                                      <div className="flex-1">
+                                        <h4 className="font-semibold text-base mb-1 flex items-center gap-2">{product.name}{product.status === 'coming_soon' && (
+                                          <Badge className="bg-secondary text-white">{t('common.comingSoon', { defaultValue: 'Coming Soon' })}</Badge>
+                                        )}</h4>
+                                        <p className="text-muted-foreground text-sm mb-2">{product.description}</p>
+                                        {product.features.length > 0 && (
+                                          <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                            {product.features.slice(0, 3).map((feature, idx) => (
+                                              <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <Check className="h-3 w-3 text-green-500" />
+                                                <span>{feature}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="text-right ml-4">
+                                        <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                          <div className="space-y-2">
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-muted-foreground">Net Price:</span>
+                                              <span className="font-medium">{product.formattedPrice}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-xs">
+                                              <span className="text-muted-foreground">IVA (21%):</span>
+                                              <span className="font-medium">+ {formatDisplayCurrency(product.convertedPrice * PRODUCT_IVA_RATE, currency, languageToLocale(language))}</span>
+                                            </div>
+                                            <div className="border-t border-border pt-2">
+                                              <div className="flex justify-between items-center">
+                                                <span className="font-semibold text-foreground">Total:</span>
+                                                <span className="font-bold text-lg text-primary">{formatDisplayCurrency(priceWithIva, currency, languageToLocale(language))}</span>
+                                              </div>
+                                              <div className="text-center mt-1">
+                                                <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                                                  One-time purchase
+                                                </span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Label>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      {/* Regional Services Section */}
+                      {convertedRegionalServices.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-foreground">Regional Services (Monthly subscription):</h4>
+                          {convertedRegionalServices.map((service) => {
+                            const priceWithIva = service.convertedPrice * (1 + SERVICE_IVA_RATE);
+                            return (
+                              <div key={service.id} className={`p-3 border rounded-lg transition-all ${
+                                selectedRegionalServices.includes(service.id) ? 'border-primary bg-primary/5' : 'border-border'
+                              }`}>
+                                <div className="flex items-start gap-3">
+                                  <Checkbox
+                                    id={service.id}
+                                    checked={selectedRegionalServices.includes(service.id)}
+                                    onCheckedChange={(checked) => handleRegionalServiceToggle(service.id, checked as boolean)}
+                                    className="mt-1"
+                                  />
+                                  <Label htmlFor={service.id} className="flex-1 cursor-pointer">
+                                    <div className="flex justify-between items-start">
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <h4 className="font-semibold text-base">{service.name}</h4>
+                                          <span className="bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded-full">
+                                            {service.region}
+                                          </span>
+                                        </div>
+                                        <p className="text-muted-foreground text-sm mb-2">{service.description}</p>
+                                        {service.features.length > 0 && (
+                                          <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                            {service.features.slice(0, 3).map((feature, idx) => (
+                                              <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <Check className="h-3 w-3 text-green-500" />
+                                                <span>{feature}</span>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="text-right ml-4">
+                                        <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                          <div className="space-y-2">
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-muted-foreground">Net Price:</span>
+                                              <span className="font-medium">{service.formattedPrice}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center text-sm">
+                                              <span className="text-muted-foreground">IVA (10%):</span>
+                                              <span className="font-medium">+ {formatDisplayCurrency(service.convertedPrice * SERVICE_IVA_RATE, currency, languageToLocale(language))}</span>
+                                            </div>
+                                            <div className="border-t border-border pt-2">
+                                              <div className="flex justify-between items-center">
+                                                <span className="font-semibold text-foreground">Total:</span>
+                                                <span className="font-bold text-lg text-primary">{formatDisplayCurrency(priceWithIva, currency, languageToLocale(language))}</span>
+                                              </div>
+                                              <div className="text-center mt-1">
+                                                <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                                                  Monthly subscription
+                                                </span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Label>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Enhanced Order Summary */}
+                    <div className="border-t pt-6 space-y-4 bg-gradient-to-br from-muted/20 to-muted/40 -mx-8 px-8 pb-6 mt-8 rounded-b-lg">
+                      <div className="flex items-center gap-3 mb-4">
                         <div className="p-2 bg-primary/10 rounded-full">
                           <CreditCard className="h-5 w-5 text-primary" />
                         </div>
-                        <h2 className="text-xl font-bold text-foreground">Optional Add-ons</h2>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {convertedProducts.map((product) => (
-                          <div key={product.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-start space-x-3">
-                                <Checkbox
-                                  id={`product-${product.id}`}
-                                  checked={selectedProducts.includes(product.id)}
-                                  onCheckedChange={(checked) => handleProductToggle(product.id, checked as boolean)}
-                                />
-                                <div className="space-y-1">
-                                  <Label 
-                                    htmlFor={`product-${product.id}`}
-                                    className="text-base font-medium cursor-pointer"
-                                  >
-                                    {product.name}
-                                  </Label>
-                                  <p className="text-sm text-muted-foreground">
-                                    {product.description}
-                                  </p>
-                                  {product.status === 'coming_soon' && (
-                                    <Badge variant="outline" className="text-xs">
-                                      Coming Soon
-                                    </Badge>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-lg font-semibold text-foreground">
-                                  {product.formattedPrice}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  one-time
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Regional Services */}
-                  {convertedRegionalServices.length > 0 && (
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-3 mb-6">
-                        <div className="p-2 bg-primary/10 rounded-full">
-                          <MapPin className="h-5 w-5 text-primary" />
-                        </div>
-                        <h2 className="text-xl font-bold text-foreground">Regional Services</h2>
-                      </div>
-                      <div className="grid grid-cols-1 gap-4">
-                        {convertedRegionalServices.map((service) => (
-                          <div key={service.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                            <div className="flex items-start justify-between">
-                              <div className="flex items-start space-x-3">
-                                <Checkbox
-                                  id={`service-${service.id}`}
-                                  checked={selectedRegionalServices.includes(service.id)}
-                                  onCheckedChange={(checked) => handleRegionalServiceToggle(service.id, checked as boolean)}
-                                />
-                                <div className="space-y-1">
-                                  <Label 
-                                    htmlFor={`service-${service.id}`}
-                                    className="text-base font-medium cursor-pointer"
-                                  >
-                                    {service.name}
-                                  </Label>
-                                  <p className="text-sm text-muted-foreground">
-                                    {service.description}
-                                  </p>
-                                  <Badge variant="outline" className="text-xs">
-                                    {service.region}
-                                  </Badge>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-lg font-semibold text-foreground">
-                                  {service.formattedPrice}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  per month
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Payment Summary */}
-                  <div className="bg-gradient-to-r from-primary/10 to-emergency/10 rounded-lg p-6 border-2 border-primary/20 shadow-lg">
-                    <div className="space-y-3">
-                      {/* Monthly Subscription Total */}
-                      <div className="flex justify-between items-center text-lg">
-                        <span className="font-medium text-foreground">Monthly Subscription Total:</span>
-                        <span className="font-bold text-primary text-xl">
-                          {formatDisplayCurrency(calculateSubscriptionTotal(), currency, languageToLocale(language))}
-                        </span>
+                        <h4 className="font-bold text-lg text-foreground">Order Summary</h4>
                       </div>
                       
-                      {/* One-time Products Total */}
-                      {calculateProductTotal() > 0 && (
-                        <div className="flex justify-between items-center text-lg border-t pt-3">
-                          <span className="font-medium text-foreground">One-time Products Total:</span>
-                          <span className="font-bold text-foreground text-xl">
-                            {formatDisplayCurrency(calculateProductTotal(), currency, languageToLocale(language))}
-                          </span>
+                      {/* Monthly Subscriptions Section */}
+                      <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 border border-border/30 shadow-sm">
+                        <h5 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wide">Monthly Subscriptions</h5>
+                        
+                        {/* Premium Protection Plan */}
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="font-medium text-foreground text-base">Premium Protection Plan</div>
+                              <div className="text-sm text-muted-foreground mt-1">Standard emergency protection • Monthly subscription</div>
+                            </div>
+                            <div className="text-right ml-6">
+                              <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                <div className="font-bold text-lg text-foreground">{convertedPremiumPlan?.formattedPrice || formatDisplayCurrency(0, currency, languageToLocale(language))}</div>
+                                <div className="text-xs text-muted-foreground mt-1">per month</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Family Plan */}
+                          {hasFamilyPlan && convertedFamilyPlan && (
+                            <div className="flex justify-between items-start border-t border-border/30 pt-4">
+                              <div className="flex-1">
+                                <div className="font-medium text-foreground text-base">{convertedFamilyPlan.name}</div>
+                                <div className="text-sm text-muted-foreground mt-1">Family protection add-on • Monthly subscription</div>
+                              </div>
+                              <div className="text-right ml-6">
+                                <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                  <div className="font-bold text-lg text-foreground">{convertedFamilyPlan.formattedPrice}</div>
+                                  <div className="text-xs text-muted-foreground mt-1">per month</div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Regional Services */}
+                          {selectedRegionalServices.length > 0 && selectedRegionalServices.map(serviceId => {
+                            const service = convertedRegionalServices.find(s => s.id === serviceId);
+                            if (!service) return null;
+                            const netPrice = service.convertedPrice;
+                            const ivaAmount = service.convertedPrice * SERVICE_IVA_RATE;
+                            const totalPrice = service.convertedPrice * (1 + SERVICE_IVA_RATE);
+                            return (
+                              <div key={serviceId} className="border-t border-border/30 pt-4">
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="font-medium text-foreground text-base">{service.name}</div>
+                                    <div className="text-sm text-muted-foreground mt-1">{service.region} • Regional service • Monthly subscription</div>
+                                  </div>
+                                  <div className="text-right ml-6">
+                                    <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-sm">
+                                          <span className="text-muted-foreground">Net Price:</span>
+                                          <span className="font-medium">{formatDisplayCurrency(netPrice, currency, languageToLocale(language))}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs">
+                                          <span className="text-muted-foreground">IVA (10%):</span>
+                                          <span className="font-medium">+ {formatDisplayCurrency(ivaAmount, currency, languageToLocale(language))}</span>
+                                        </div>
+                                        <div className="border-t border-border pt-2">
+                                          <div className="flex justify-between items-center">
+                                            <span className="font-semibold text-foreground">Total:</span>
+                                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(totalPrice, currency, languageToLocale(language))}</span>
+                                          </div>
+                                          <div className="text-center mt-1">
+                                            <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                                              Monthly subscription
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      
+                      {/* One-time Products Section */}
+                      {selectedProducts.length > 0 && (
+                        <div className="bg-white/95 backdrop-blur-sm rounded-lg p-6 border border-border/30 shadow-sm">
+                          <h5 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wide">Safety Products (One-time purchase)</h5>
+                          <div className="space-y-4">
+                            {selectedProducts.map(productId => {
+                              const product = convertedProducts.find(p => p.id === productId);
+                              if (!product) return null;
+                              const netPrice = product.convertedPrice;
+                              const ivaAmount = product.convertedPrice * PRODUCT_IVA_RATE;
+                              const totalPrice = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
+                              return (
+                                <div key={productId} className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <div className="font-medium text-foreground text-base">{product.name}</div>
+                                    <div className="text-sm text-muted-foreground mt-1">Safety equipment • One-time purchase</div>
+                                  </div>
+                                  <div className="text-right ml-6">
+                                    <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
+                                      <div className="space-y-2">
+                                        <div className="flex justify-between items-center text-sm">
+                                          <span className="text-muted-foreground">Net Price:</span>
+                                          <span className="font-medium">{formatDisplayCurrency(netPrice, currency, languageToLocale(language))}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-xs">
+                                          <span className="text-muted-foreground">IVA (21%):</span>
+                                          <span className="font-medium">+ {formatDisplayCurrency(ivaAmount, currency, languageToLocale(language))}</span>
+                                        </div>
+                                        <div className="border-t border-border pt-2">
+                                          <div className="flex justify-between items-center">
+                                            <span className="font-semibold text-foreground">Total:</span>
+                                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(totalPrice, currency, languageToLocale(language))}</span>
+                                          </div>
+                                          <div className="text-center mt-1">
+                                            <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
+                                              One-time purchase
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       )}
                       
-                      {/* Grand Total */}
-                      <div className="flex justify-between items-center text-xl font-bold border-t-2 pt-3 border-primary/30">
-                        <span className="text-foreground">Total Today:</span>
-                        <span className="text-emergency text-2xl">
-                          {formatDisplayCurrency(calculateGrandTotal(), currency, languageToLocale(language))}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Tax Notice */}
-                  <div className="text-xs text-muted-foreground p-3 bg-muted/50 rounded-lg border border-border/30">
-                    <strong>Tax Information:</strong> Products include 21% IVA, Regional Services include 10% IVA. All prices shown include applicable taxes.
-                  </div>
-
-                  {/* Terms and Conditions Checkbox - Enhanced Visibility */}
-                  <div className="space-y-3 mt-6">
-                    <div className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                      personalDetails.acceptTerms 
-                        ? 'border-primary/30 bg-primary/5' 
-                        : 'border-destructive/50 bg-destructive/5 shadow-sm'
-                    }`}>
-                      <div className="flex items-start space-x-4">
-                        <Checkbox
-                          id="acceptTerms"
-                          checked={personalDetails.acceptTerms}
-                          onCheckedChange={(checked) => handlePersonalDetailsChange('acceptTerms', checked)}
-                          className="mt-1 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
-                        />
-                        <div className="flex-1">
-                          <Label 
-                            htmlFor="acceptTerms" 
-                            className="text-sm font-medium leading-relaxed cursor-pointer text-foreground"
-                          >
-                            I agree to the{' '}
-                            <button
-                              type="button"
-                              onClick={() => setShowTermsDialog(true)}
-                              className="text-primary hover:text-primary/80 underline underline-offset-2 font-semibold"
-                            >
-                              Terms of Service
-                            </button>
-                            {' '}and{' '}
-                            <button
-                              type="button"
-                              onClick={() => setShowPrivacyDialog(true)}
-                              className="text-primary hover:text-primary/80 underline underline-offset-2 font-semibold"
-                            >
-                              Privacy Policy
-                            </button>
-                          </Label>
+                      {/* Payment Summary */}
+                      <div className="bg-gradient-to-r from-primary/10 to-emergency/10 rounded-lg p-6 border-2 border-primary/20 shadow-lg">
+                        <div className="space-y-3">
+                          {/* Monthly Subscription Total */}
+                          <div className="flex justify-between items-center pb-2 border-b border-border/30">
+                            <div>
+                              <span className="font-semibold text-foreground">Monthly Subscription:</span>
+                              <div className="text-sm text-muted-foreground">Recurring monthly charge</div>
+                            </div>
+                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(calculateSubscriptionTotal(), currency, languageToLocale(language))}/month</span>
+                          </div>
+                          
+                          {/* One-time Products Total */}
+                          {calculateProductTotal() > 0 && (
+                            <div className="flex justify-between items-center pb-2 border-b border-border/30">
+                              <div>
+                                <span className="font-semibold text-foreground">One-time Products:</span>
+                                <div className="text-sm text-muted-foreground">Today only charge</div>
+                              </div>
+                              <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(calculateProductTotal(), currency, languageToLocale(language))}</span>
+                            </div>
+                          )}
+                          
+                          {/* Total Payment Today */}
+                          <div className="flex justify-between items-center pt-2">
+                            <div>
+                              <span className="text-xl font-bold text-foreground">Total Payment Today:</span>
+                              <div className="text-sm text-muted-foreground">
+                                {calculateProductTotal() > 0 ? 'Monthly + one-time charges' : 'Monthly subscription charge'}
+                              </div>
+                            </div>
+                            <span className="text-3xl font-bold text-foreground">{formatDisplayCurrency(calculateGrandTotal(), currency, languageToLocale(language))}</span>
+                          </div>
                         </div>
                       </div>
+                      
+                      {/* Tax Notice */}
+                      <div className="text-xs text-muted-foreground p-3 bg-muted/50 rounded-lg border border-border/30">
+                        <strong>Tax Information:</strong> Products include 21% IVA, Regional Services include 10% IVA. All prices shown include applicable taxes.
+                      </div>
                     </div>
                   </div>
 
-                  {/* Continue to Payment Button */}
-                  <div className="flex justify-center pt-6">
+
+                  {/* Continue Button */}
+                  <div className="pt-6">
                     <Button 
                       onClick={handleContinueToPayment}
-                      disabled={!isFormValid()}
+                      className="w-full bg-emergency hover:bg-emergency/90"
                       size="lg"
-                      className="px-12 py-3 text-lg font-semibold"
+                      disabled={!isFormValid()}
                     >
-                      Continue to Payment
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      {testingMode ? 'Complete Registration (Free)' : 'Continue to Payment'}
                     </Button>
                   </div>
                 </div>
               ) : (
                 <EmbeddedPayment
                   plans={getSelectedSubscriptionPlans()}
-                  products={getAllSelections().products}
-                  regionalServices={getAllSelections().regionalServices}
+                  products={selectedProducts}
+                  regionalServices={selectedRegionalServices}
                   userEmail={personalDetails.email}
                   firstName={personalDetails.firstName}
                   lastName={personalDetails.lastName}
@@ -890,7 +1101,6 @@ const AIRegister = () => {
                   phone={personalDetails.phone}
                   city={personalDetails.city}
                   country={personalDetails.country}
-                  currency={currency}
                   onSuccess={handlePaymentSuccess}
                   onBack={() => setCurrentStep('details')}
                   testingMode={testingMode}
