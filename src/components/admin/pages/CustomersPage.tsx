@@ -1,18 +1,40 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { 
+  Users, 
+  Plus, 
+  Eye, 
+  Download,
+  RefreshCw,
+  Phone,
+  Mail,
+  MapPin,
+  TrendingUp,
+  Activity,
+  Search
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useToast } from '@/hooks/use-toast';
-import { Search, Users, Mail, Phone, Calendar, Plus, Eye, Trash2, Download, RefreshCw } from 'lucide-react';
-import CustomerDetailsModal from '@/components/admin/CustomerDetailsModal';
-import AddCustomerModal from '@/components/admin/AddCustomerModal';
 import { useCustomers } from '@/hooks/useOptimizedData';
 import { useDebounce } from '@/hooks/useDebounce';
-import { VirtualizedList, OptimizedTableRow } from '@/hooks/usePerformanceOptimizedComponents';
-import { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring';
+import CustomerDetailsModal from '@/components/admin/CustomerDetailsModal';
+import AddCustomerModal from '@/components/admin/AddCustomerModal';
+import { CustomerStatsCards } from '../CustomerStatsCards';
+import { CustomerFilters } from '../CustomerFilters';
+import { CustomerAnalytics } from '../CustomerAnalytics';
+import { VirtualizedList } from '@/hooks/usePerformanceOptimizedComponents';
+import { useToast } from '@/hooks/use-toast';
 
 interface Customer {
   id: string;
@@ -23,9 +45,15 @@ interface Customer {
   created_at: string;
   country?: string;
   subscriber?: {
+    created_at: string;
+    email: string;
+    id: string;
+    stripe_customer_id: string;
     subscribed: boolean;
-    subscription_tier?: string;
-    subscription_end?: string;
+    subscription_end: string;
+    subscription_tier: string;
+    updated_at: string;
+    user_id: string;
   };
 }
 
@@ -34,10 +62,13 @@ export default function CustomersPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [filters, setFilters] = useState({
+    country: "",
+    subscriptionStatus: "",
+    registrationDate: "",
+    orderStatus: ""
+  });
   const { toast } = useToast();
-
-  // Performance monitoring
-  usePerformanceMonitoring();
 
   // Use optimized data fetching
   const { data: customers = [], isLoading, error, refetch } = useCustomers();
@@ -45,20 +76,44 @@ export default function CustomersPage() {
   // Debounce search for better performance
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // Memoized filtered customers for performance
   const filteredCustomers = useMemo(() => {
-    if (!debouncedSearchTerm) return customers;
+    if (!customers) return [];
     
-    return customers.filter(customer => {
-      const searchLower = debouncedSearchTerm.toLowerCase();
-      return (
-        customer.first_name?.toLowerCase().includes(searchLower) ||
-        customer.last_name?.toLowerCase().includes(searchLower) ||
-        customer.phone?.includes(searchTerm) ||
-        customer.country?.toLowerCase().includes(searchLower)
-      );
+    return customers.filter((customer: Customer) => {
+      const searchFields = [
+        customer.first_name,
+        customer.last_name,
+        customer.phone,
+        customer.subscriber?.email,
+        customer.country
+      ].filter(Boolean);
+      
+      const searchString = searchFields.join(' ').toLowerCase();
+      const matchesSearch = searchString.includes(debouncedSearchTerm.toLowerCase());
+      
+      const matchesCountry = !filters.country || customer.country === filters.country;
+      const customerStatus = customer.subscriber?.subscribed ? 'active' : 'inactive';
+      const matchesSubscription = !filters.subscriptionStatus || customerStatus === filters.subscriptionStatus.toLowerCase();
+      
+      return matchesSearch && matchesCountry && matchesSubscription;
     });
-  }, [customers, debouncedSearchTerm]);
+  }, [customers, debouncedSearchTerm, filters]);
+
+  const customerMetrics = useMemo(() => {
+    if (!customers) return { total: 0, newThisMonth: 0, activeSubscriptions: 0, totalRevenue: 0 };
+    
+    const total = customers.length;
+    const newThisMonth = customers.filter((c: Customer) => {
+      const createdAt = new Date(c.created_at);
+      const now = new Date();
+      return createdAt.getMonth() === now.getMonth() && createdAt.getFullYear() === now.getFullYear();
+    }).length;
+    
+    const activeSubscriptions = customers.filter((c: Customer) => c.subscriber?.subscribed).length;
+    const totalRevenue = customers.length * 29.99;
+    
+    return { total, newThisMonth, activeSubscriptions, totalRevenue };
+  }, [customers]);
 
   const handleViewCustomer = (customer: Customer) => {
     setSelectedCustomer(customer);
@@ -101,20 +156,46 @@ export default function CustomersPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Customer Management</h1>
-          <p className="text-muted-foreground">Manage and view all customer profiles</p>
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
+            <Users className="h-8 w-8 text-primary" />
+            Customer Management
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Comprehensive customer management with advanced analytics and insights
+          </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            <span className="font-medium">{filteredCustomers.length} customers</span>
-          </div>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+          <Button variant="outline" onClick={handleExportData}>
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
           <Button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Add Customer
           </Button>
         </div>
       </div>
+
+      <CustomerStatsCards 
+        totalCustomers={customerMetrics.total}
+        newCustomersThisMonth={customerMetrics.newThisMonth}
+        activeSubscriptions={customerMetrics.activeSubscriptions}
+        totalRevenue={customerMetrics.totalRevenue}
+      />
+
+      {customers && customers.length > 0 && (
+        <CustomerAnalytics customers={customers} />
+      )}
+
+      <CustomerFilters 
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        onFiltersChange={setFilters}
+      />
 
       <Card>
         <CardContent className="p-4">
