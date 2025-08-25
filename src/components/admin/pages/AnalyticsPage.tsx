@@ -504,14 +504,14 @@ const AnalyticsPage = () => {
                       </div>
                       <div className="flex items-center space-x-2 text-sm">
                         {journey.path.map((step, stepIndex) => (
-                          <React.Fragment key={stepIndex}>
+                          <div key={stepIndex} className="flex items-center space-x-2">
                             <span className="bg-secondary px-2 py-1 rounded text-xs font-mono">
                               {step}
                             </span>
                             {stepIndex < journey.path.length - 1 && (
                               <span className="text-muted-foreground">→</span>
                             )}
-                          </React.Fragment>
+                          </div>
                         ))}
                       </div>
                     </div>
