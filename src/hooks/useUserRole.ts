@@ -23,6 +23,11 @@ export const useUserRole = () => {
       }
 
       console.log('👤 useUserRole: Fetching role for user:', user.id);
+      
+      // Keep loading true until we have a definitive result
+      if (mounted) {
+        setLoading(true);
+      }
 
       try {
         const { data, error } = await supabase
@@ -41,7 +46,7 @@ export const useUserRole = () => {
           setRole('user');
         } else {
           const userRole = (data?.role as UserRole) || 'user';
-          console.log('✅ useUserRole: Found role:', userRole);
+          console.log('✅ useUserRole: Found role:', userRole, 'isAdmin:', userRole === 'admin');
           setRole(userRole);
         }
       } catch (error) {
@@ -51,12 +56,20 @@ export const useUserRole = () => {
         }
       } finally {
         if (mounted) {
+          console.log('👤 useUserRole: Setting loading to false');
           setLoading(false);
         }
       }
     };
 
-    fetchUserRole();
+    // Reset loading state when user changes
+    if (user) {
+      setLoading(true);
+      fetchUserRole();
+    } else {
+      setRole(null);
+      setLoading(false);
+    }
 
     return () => {
       mounted = false;

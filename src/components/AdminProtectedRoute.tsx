@@ -17,11 +17,13 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
     isAdmin,
     authLoading,
     roleLoading,
-    currentPath: window.location.pathname
+    currentPath: window.location.pathname,
+    shouldRedirect: !authLoading && !roleLoading && user && !isAdmin
   });
 
   // Show loading while checking authentication and role
   if (authLoading || roleLoading) {
+    console.log('🔐 AdminProtectedRoute: Still loading, showing spinner');
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
         <div className="text-white text-center">
@@ -34,11 +36,19 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
 
   // Redirect to auth if not logged in
   if (!user) {
+    console.log('🔐 AdminProtectedRoute: No user, redirecting to auth');
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect to member dashboard if not admin
-  if (!isAdmin) {
+  // Only redirect if we have a definitive role and it's not admin
+  if (role !== null && !isAdmin) {
+    console.log('🔐 AdminProtectedRoute: User is not admin, redirecting to member dashboard');
+    return <Navigate to="/member-dashboard" replace />;
+  }
+
+  // If role is still null but loading is false, something went wrong
+  if (role === null && !roleLoading) {
+    console.warn('🔐 AdminProtectedRoute: Role is null but not loading, defaulting to member dashboard');
     return <Navigate to="/member-dashboard" replace />;
   }
 
