@@ -262,7 +262,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const grandTotal = subscriptionTotal + productTotal;
 
   const initializePayment = async (retryCount = 0) => {
-    console.log("🚀 Initializing payment...", { plans, products, regionalServices, userEmail, firstName, lastName, retryCount });
+    console.log("🚀 Initializing payment...", { plans, products, regionalServices, userEmail, firstName, lastName, retryCount, testingMode });
     setInitializationError(null);
     
     if ((!plans || plans.length === 0) && (!products || products.length === 0) && (!regionalServices || regionalServices.length === 0)) {
@@ -278,7 +278,17 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
       return;
     }
 
-    // Validate Stripe key configuration
+    // In testing mode, skip payment setup entirely
+    if (testingMode) {
+      console.log("🧪 Testing mode enabled - skipping payment initialization");
+      setClientSecret("test_mode_skip_payment");
+      setCustomerId("test_customer");
+      setInitializationError(null);
+      setLoading(false);
+      return;
+    }
+
+    // Validate Stripe key configuration for real payments
     if (!STRIPE_PUBLISHABLE_KEY) {
       const errorMsg = "Stripe publishable key is not configured";
       console.error("❌", errorMsg);
@@ -303,7 +313,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           firstName, 
           lastName,
           currency: selectedCurrency,
-          testingMode: testingMode
+          testingMode: false
         }
       });
 
@@ -311,8 +321,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         hasData: !!data, 
         hasError: !!error, 
         clientSecret: data?.client_secret?.slice(-10),
-        customerId: data?.customer_id,
-        testMode: data?.test_mode
+        customerId: data?.customer_id
       });
 
       if (error) {
@@ -330,16 +339,6 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           return;
         }
         throw error;
-      }
-
-      // Handle test mode response - skip payment processing entirely
-      if (testingMode && data?.test_mode) {
-        console.log("✅ Test mode active - skipping payment processing");
-        setCustomerId(data.customer_id);
-        setClientSecret("test_mode_skip_payment");
-        setInitializationError(null);
-        setLoading(false);
-        return;
       }
 
       if (!data?.client_secret) {
