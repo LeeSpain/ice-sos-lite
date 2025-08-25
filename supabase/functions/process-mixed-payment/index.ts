@@ -51,34 +51,24 @@ serve(async (req) => {
     const subscriptionPlans = JSON.parse(paymentIntent.metadata.subscription_plans || '[]');
     const products = JSON.parse(paymentIntent.metadata.products || '[]');
     const regionalServices = JSON.parse(paymentIntent.metadata.regional_services || '[]');
-    const subscriptionAmount = parseInt(paymentIntent.metadata.subscription_amount || '0');
-    const productAmount = parseInt(paymentIntent.metadata.product_amount || '0');
+    const subscriptionData = JSON.parse(paymentIntent.metadata.subscription_data || '[]');
+    const productData = JSON.parse(paymentIntent.metadata.product_data || '[]');
+    const regionalData = JSON.parse(paymentIntent.metadata.regional_data || '[]');
+    const subscriptionAmount = parseFloat(paymentIntent.metadata.subscription_amount || '0');
+    const productAmount = parseFloat(paymentIntent.metadata.product_amount || '0');
+    const regionalAmount = parseFloat(paymentIntent.metadata.regional_amount || '0');
 
-    logStep("Extracted payment metadata", { subscriptionPlans, products, regionalServices, subscriptionAmount, productAmount });
+    logStep("Extracted payment metadata", { 
+      subscriptionPlans, products, regionalServices, 
+      subscriptionAmount, productAmount, regionalAmount 
+    });
 
     // Process subscriptions if any
     let subscriptions = [];
-    const allSubscriptionItems = [...subscriptionPlans, ...regionalServices];
+    const allSubscriptionData = [...subscriptionData, ...regionalData];
     
-    if (allSubscriptionItems.length > 0) {
-      // Fetch plan data from database
-      const { data: dbPlans, error: planError } = await supabaseClient
-        .from('subscription_plans')
-        .select('*')
-        .in('id', subscriptionPlans);
-
-      if (planError) throw new Error(`Error fetching subscription plans: ${planError.message}`);
-
-      const { data: dbServices, error: serviceError } = await supabaseClient
-        .from('regional_services')
-        .select('*')
-        .in('id', regionalServices);
-
-      if (serviceError) throw new Error(`Error fetching regional services: ${serviceError.message}`);
-
-      const allSubscriptionData = [...(dbPlans || []), ...(dbServices || [])];
-
-      // Create subscriptions for each plan/service
+    if (allSubscriptionData.length > 0) {
+      // Create subscriptions for each plan/service using their database data
       for (const item of allSubscriptionData) {
         // Create a price for this plan/service
         const price = await stripe.prices.create({
@@ -154,15 +144,15 @@ serve(async (req) => {
       }
     }
 
-    // Save registration selections
+    // Save registration selections with correct amounts
     await supabaseClient.from('registration_selections').insert({
       user_id: user.id,
       session_id: paymentIntent.id,
       subscription_plans: subscriptionPlans,
       selected_products: products,
       selected_regional_services: regionalServices,
-      total_subscription_amount: subscriptionAmount / 100,
-      total_product_amount: productAmount / 100,
+      total_subscription_amount: subscriptionAmount + regionalAmount,
+      total_product_amount: productAmount,
       currency: 'EUR',
       registration_completed: true,
     });

@@ -10,9 +10,9 @@ import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/util
 import { usePreferences } from '@/contexts/PreferencesContext';
 import type { SupportedCurrency } from '@/contexts/PreferencesContext';
 
-// Stripe publishable key - this should match the account that has the STRIPE_SECRET_KEY in the backend
+// Stripe publishable key - updated to match the account that has the STRIPE_SECRET_KEY in the backend
 // Note: This is a public key and safe to include in frontend code
-const STRIPE_PUBLISHABLE_KEY = "pk_test_51QqZFsDjSIrwQaMA1rJTVVhFVPuFPXJPWQiGw9mH3xUnJ3YAj8hv5OA2n9EjKGtHv8tHoQhJIqIANZ7RfNSQTAar00jK0CUIZv";
+const STRIPE_PUBLISHABLE_KEY = "pk_test_51QxrG4LfQOMOQeNzEPOoW9gnNRSgzfO8LLgDhIGhZlGkCT35Q3LEEhJkv3y3SjPjhTHGrZjrpGlNaajJPPQLxXfT00lNaXoRAb";
 
 // Initialize Stripe promise - stable singleton pattern
 const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);

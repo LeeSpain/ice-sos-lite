@@ -26,7 +26,7 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const { subscriptionPlans, products, regionalServices, email, firstName, lastName, currency = 'eur', testingMode = false } = await req.json();
+    const { subscriptionPlans = [], products = [], regionalServices = [], email, firstName, lastName, currency = 'EUR', testingMode = false } = await req.json();
     
     if (!email) {
       throw new Error("Email is required for payment processing");
@@ -56,52 +56,71 @@ serve(async (req) => {
     }
 
     // Fetch subscription plans from database
-    let subscriptionTotal = 0;
-    const allSubscriptionPlans = [...(subscriptionPlans || []), ...(regionalServices || [])];
-    
-    if (allSubscriptionPlans.length > 0) {
+    let subscriptionSubtotal = 0;
+    let subscriptionData = [];
+    if (subscriptionPlans.length > 0) {
       const { data: dbPlans, error: planError } = await supabaseClient
         .from('subscription_plans')
-        .select('id, name, price, currency')
-        .in('id', subscriptionPlans || []);
+        .select('*')
+        .in('id', subscriptionPlans);
 
       if (planError) throw new Error(`Error fetching subscription plans: ${planError.message}`);
       
-      subscriptionTotal = (dbPlans || []).reduce((total, plan) => {
-        return total + Math.round(parseFloat(plan.price.toString()) * 100); // Convert to cents
+      subscriptionSubtotal = (dbPlans || []).reduce((total, plan) => {
+        return total + parseFloat(plan.price.toString());
       }, 0);
+      
+      subscriptionData = dbPlans || [];
+      logStep("Fetched subscription plans", { count: subscriptionData.length, subtotal: subscriptionSubtotal });
+    }
 
-      // Fetch regional services if any
-      if (regionalServices && regionalServices.length > 0) {
-        const { data: dbServices, error: serviceError } = await supabaseClient
-          .from('regional_services')
-          .select('id, name, price, currency')
-          .in('id', regionalServices);
+    // Fetch regional services 
+    let regionalSubtotal = 0;
+    let regionalData = [];
+    if (regionalServices.length > 0) {
+      const { data: dbServices, error: serviceError } = await supabaseClient
+        .from('regional_services')
+        .select('*')
+        .in('id', regionalServices);
 
-        if (serviceError) throw new Error(`Error fetching regional services: ${serviceError.message}`);
-        
-        subscriptionTotal += (dbServices || []).reduce((total, service) => {
-          return total + Math.round(parseFloat(service.price.toString()) * 100); // Convert to cents
-        }, 0);
-      }
+      if (serviceError) throw new Error(`Error fetching regional services: ${serviceError.message}`);
+      
+      regionalSubtotal = (dbServices || []).reduce((total, service) => {
+        return total + parseFloat(service.price.toString());
+      }, 0);
+      
+      regionalData = dbServices || [];
+      logStep("Fetched regional services", { count: regionalData.length, subtotal: regionalSubtotal });
     }
 
     // Fetch products from database for one-time purchases
-    let productTotal = 0;
-    if (products && products.length > 0) {
+    let productSubtotal = 0;
+    let productData = [];
+    if (products.length > 0) {
       const { data: dbProducts, error: productError } = await supabaseClient
         .from('products')
-        .select('id, name, price, currency')
+        .select('*')
         .in('id', products);
 
       if (productError) throw new Error(`Error fetching products: ${productError.message}`);
       
-      productTotal = (dbProducts || []).reduce((total, product) => {
-        return total + Math.round(parseFloat(product.price.toString()) * 100); // Convert to cents
+      productSubtotal = (dbProducts || []).reduce((total, product) => {
+        return total + parseFloat(product.price.toString());
       }, 0);
+      
+      productData = dbProducts || [];
+      logStep("Fetched products", { count: productData.length, subtotal: productSubtotal });
     }
 
-    let totalAmount = subscriptionTotal + productTotal;
+    // Calculate taxes (matching frontend calculation)
+    const PRODUCT_IVA_RATE = 0.21; // 21% for products
+    const SERVICE_IVA_RATE = 0.10; // 10% for regional services
+    
+    const subscriptionTotal = subscriptionSubtotal; // No tax on subscription plans
+    const regionalTotal = regionalSubtotal * (1 + SERVICE_IVA_RATE); // Add 10% IVA
+    const productTotal = productSubtotal * (1 + PRODUCT_IVA_RATE); // Add 21% IVA
+    
+    const totalAmount = subscriptionTotal + regionalTotal + productTotal;
     
     // Override amount for testing mode - return free test mode response
     if (testingMode) {
@@ -125,9 +144,9 @@ serve(async (req) => {
 
     logStep("Calculated totals", { subscriptionTotal, productTotal, totalAmount, testingMode });
 
-    // Create payment intent for the total amount
+    // Create payment intent for the total amount (convert to cents)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalAmount,
+      amount: Math.round(totalAmount * 100), // Convert to cents
       currency: currency.toLowerCase(),
       customer: customerId,
       metadata: {
@@ -135,8 +154,12 @@ serve(async (req) => {
         subscription_plans: JSON.stringify(subscriptionPlans || []),
         products: JSON.stringify(products || []),
         regional_services: JSON.stringify(regionalServices || []),
+        subscription_data: JSON.stringify(subscriptionData),
+        product_data: JSON.stringify(productData),
+        regional_data: JSON.stringify(regionalData),
         subscription_amount: subscriptionTotal.toString(),
         product_amount: productTotal.toString(),
+        regional_amount: regionalTotal.toString(),
         payment_currency: currency,
         testing_mode: testingMode.toString(),
       },
@@ -145,14 +168,15 @@ serve(async (req) => {
       },
     });
 
-    logStep("Payment intent created", { paymentIntentId: paymentIntent.id });
+    logStep("Payment intent created", { paymentIntentId: paymentIntent.id, amountCents: Math.round(totalAmount * 100) });
 
     return new Response(JSON.stringify({ 
       client_secret: paymentIntent.client_secret,
       customer_id: customerId,
-      subscription_total: subscriptionTotal / 100,
-      product_total: productTotal / 100,
-      total_amount: totalAmount / 100
+      subscription_total: subscriptionTotal,
+      product_total: productTotal,
+      regional_total: regionalTotal,
+      total_amount: totalAmount
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
