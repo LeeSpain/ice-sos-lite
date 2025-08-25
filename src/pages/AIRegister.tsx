@@ -388,6 +388,22 @@ const AIRegister = () => {
           if (profileError) {
             console.error('Error creating profile:', profileError);
           }
+
+          // Send welcome email (non-blocking)
+          try {
+            const selectedPlanName = convertedPlans.find(p => p.id === selectedMainPlan)?.name;
+            await supabase.functions.invoke('send-welcome-email', {
+              body: {
+                userId,
+                email: personalDetails.email,
+                firstName: personalDetails.firstName,
+                lastName: personalDetails.lastName,
+                subscriptionTier: selectedPlanName
+              }
+            });
+          } catch (e) {
+            console.warn('Welcome email failed:', e);
+          }
         }
       }
 

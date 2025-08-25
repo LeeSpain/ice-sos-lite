@@ -216,7 +216,7 @@ const Register = () => {
     setLoading(true);
     try {
       // Update user metadata with all collected information
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: Math.random().toString(36).slice(-8), // Temporary password
         options: {
@@ -237,6 +237,23 @@ const Register = () => {
       });
 
       if (signUpError) throw signUpError;
+
+      // Fire welcome email (non-blocking)
+      try {
+        const userId = signUpData?.user?.id;
+        if (userId) {
+          await supabase.functions.invoke('send-welcome-email', {
+            body: {
+              userId,
+              email: formData.email,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Welcome email failed:', e);
+      }
       
       toast({
         title: "Registration Complete!",
