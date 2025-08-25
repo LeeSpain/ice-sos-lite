@@ -9,6 +9,7 @@ import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import RouteChangeTracker from "@/components/RouteChangeTracker";
 import ScrollToTop from "@/components/ScrollToTop";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
+import { useAuth } from "@/contexts/AuthContext";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
 import { queryClient } from "@/lib/queryClient";
 import Index from "./pages/Index";
@@ -49,6 +50,21 @@ const ConditionalEmmaChat = () => {
   if (isAdminRoute) return null;
   
   return <GlobalEmmaChat />;
+};
+
+// Component to conditionally render Device Manager (only for authenticated dashboard users)
+const ConditionalDeviceManager = () => {
+  const location = useLocation();
+  const { user } = useAuth();
+  
+  // Only show on dashboard routes for authenticated users
+  const isDashboardRoute = location.pathname.startsWith('/full-dashboard') || 
+                          location.pathname.startsWith('/member-dashboard') ||
+                          location.pathname === '/sos';
+  
+  if (!user || !isDashboardRoute) return null;
+  
+  return <DeviceManagerButton />;
 };
 
 // Component to track page views and errors
@@ -212,8 +228,8 @@ const App = () => {
               } />
             </Routes>
             
-            {/* Global floating device/settings button */}
-            <DeviceManagerButton />
+            {/* Global floating device/settings button - Only for authenticated dashboard users */}
+            <ConditionalDeviceManager />
             
             {/* Global Emma Chat - Available on all pages except admin */}
             <ConditionalEmmaChat />
