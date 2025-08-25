@@ -175,6 +175,12 @@ export const FreeTrialPopup = ({ onClose }: FreeTrialPopupProps) => {
             </button>
           </div>
 
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800 text-center font-medium">
+              📧 After signing up, check your email to activate your trial
+            </p>
+          </div>
+
           <p className="text-xs text-gray-500 text-center mt-4">
             No credit card required. Cancel anytime during trial.
           </p>
