@@ -642,53 +642,6 @@ const AIRegister = () => {
                        </div>
                      </div>
 
-                      {/* Terms and Conditions Checkbox - Enhanced Visibility */}
-                      <div className="space-y-3 mt-6">
-                        <div className={`p-4 rounded-lg border-2 transition-all duration-200 ${
-                          personalDetails.acceptTerms 
-                            ? 'border-primary/30 bg-primary/5' 
-                            : 'border-destructive/50 bg-destructive/5 shadow-sm'
-                        }`}>
-                          <div className="flex items-start space-x-4">
-                            <Checkbox
-                              id="acceptTerms"
-                              checked={personalDetails.acceptTerms}
-                              onCheckedChange={(checked) => 
-                                handlePersonalDetailsChange('acceptTerms', checked as boolean ? 'true' : 'false')
-                              }
-                              className="mt-1 h-5 w-5"
-                            />
-                            <div className="grid gap-1.5 leading-none flex-1">
-                              <Label
-                                htmlFor="acceptTerms"
-                                className="text-base font-medium leading-relaxed cursor-pointer text-black"
-                              >
-                                I agree to the{" "}
-                                <button
-                                  type="button"
-                                  onClick={() => setShowTermsDialog(true)}
-                                  className="text-primary hover:underline font-semibold underline-offset-2"
-                                >
-                                  Terms of Service
-                                </button>{" "}
-                                and{" "}
-                                <button
-                                  type="button"
-                                  onClick={() => setShowPrivacyDialog(true)}
-                                  className="text-primary hover:underline font-semibold underline-offset-2"
-                                >
-                                  Privacy Policy
-                                </button>
-                              </Label>
-                              {!personalDetails.acceptTerms && (
-                                <p className="text-sm text-black font-medium mt-2">
-                                  ⚠️ Required: You must accept the terms to continue
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                    </div>
 
                   {/* Protection Plans */}
@@ -1028,7 +981,6 @@ const AIRegister = () => {
                                 </div>
                               );
                             })}
-                          </div>
                         </div>
                       )}
                       
@@ -1075,6 +1027,53 @@ const AIRegister = () => {
                     </div>
                   </div>
 
+                  {/* Terms and Conditions Checkbox - Enhanced Visibility */}
+                  <div className="space-y-3 mt-6">
+                    <div className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                      personalDetails.acceptTerms 
+                        ? 'border-primary/30 bg-primary/5' 
+                        : 'border-destructive/50 bg-destructive/5 shadow-sm'
+                    }`}>
+                      <div className="flex items-start space-x-4">
+                        <Checkbox
+                          id="acceptTerms"
+                          checked={personalDetails.acceptTerms}
+                          onCheckedChange={(checked) => 
+                            handlePersonalDetailsChange('acceptTerms', checked as boolean ? 'true' : 'false')
+                          }
+                          className="mt-1 h-5 w-5"
+                        />
+                        <div className="grid gap-1.5 leading-none flex-1">
+                          <Label
+                            htmlFor="acceptTerms"
+                            className="text-base font-medium leading-relaxed cursor-pointer text-black"
+                          >
+                            I agree to the{" "}
+                            <button
+                              type="button"
+                              onClick={() => setShowTermsDialog(true)}
+                              className="text-primary hover:underline font-semibold underline-offset-2"
+                            >
+                              Terms of Service
+                            </button>{" "}
+                            and{" "}
+                            <button
+                              type="button"
+                              onClick={() => setShowPrivacyDialog(true)}
+                              className="text-primary hover:underline font-semibold underline-offset-2"
+                            >
+                              Privacy Policy
+                            </button>
+                          </Label>
+                          {!personalDetails.acceptTerms && (
+                            <p className="text-sm text-black font-medium mt-2">
+                              ⚠️ Required: You must accept the terms to continue
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Continue Button */}
                   <div className="pt-6">
