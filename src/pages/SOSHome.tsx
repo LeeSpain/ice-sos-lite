@@ -94,7 +94,7 @@ const SOSHome = () => {
         </div>
 
         {/* Emergency Notice */}
-        <div className="bg-accent-red/10 backdrop-blur-sm rounded-2xl p-4 border border-accent-red/20">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/30">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center gap-2 text-emergency font-semibold text-sm">
               <Phone className="h-4 w-4" />
