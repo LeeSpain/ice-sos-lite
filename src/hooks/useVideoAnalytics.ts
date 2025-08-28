@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
-import { useUserRole } from '@/hooks/useUserRole';
 
 export interface VideoAnalytics {
   video_id: string;
@@ -36,7 +35,6 @@ export interface VideoEvent {
 
 // Hook to fetch video analytics summary with realtime updates
 export function useVideoAnalytics() {
-  const { isAdmin, loading: roleLoading } = useUserRole();
   const { data, refetch, isLoading } = useQuery({
     queryKey: ['video-analytics'],
     queryFn: async (): Promise<VideoAnalytics[]> => {
@@ -62,12 +60,10 @@ export function useVideoAnalytics() {
     },
     refetchInterval: 10000, // Refetch every 10 seconds for faster updates
     refetchOnWindowFocus: true, // Refetch when window gains focus
-    enabled: isAdmin && !roleLoading,
   });
 
-  // Subscribe to realtime updates for video_analytics table (admin only)
+  // Subscribe to realtime updates for video_analytics table
   useEffect(() => {
-    if (!isAdmin || roleLoading) return;
     const channel = supabase
       .channel('video-analytics-updates')
       .on(
@@ -87,7 +83,7 @@ export function useVideoAnalytics() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [refetch, isAdmin, roleLoading]);
+  }, [refetch]);
 
   return { data, refetch, isLoading };
 }
@@ -241,7 +237,6 @@ export function useVideoTracker() {
 
 // Hook to get recent video events with realtime updates
 export function useVideoEvents(limit: number = 50) {
-  const { isAdmin, loading: roleLoading } = useUserRole();
   const { data, refetch, isLoading } = useQuery({
     queryKey: ['video-events', limit],
     queryFn: async (): Promise<VideoEvent[]> => {
@@ -273,12 +268,10 @@ export function useVideoEvents(limit: number = 50) {
     },
     refetchInterval: 10000, // Refetch every 10 seconds
     refetchOnWindowFocus: true, // Refetch when window gains focus
-    enabled: isAdmin && !roleLoading,
   });
 
-  // Subscribe to realtime updates for video_analytics table (admin only)
+  // Subscribe to realtime updates for video_analytics table
   useEffect(() => {
-    if (!isAdmin || roleLoading) return;
     const channel = supabase
       .channel('video-events-updates')
       .on(
@@ -298,7 +291,7 @@ export function useVideoEvents(limit: number = 50) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [refetch, isAdmin, roleLoading]);
+  }, [refetch]);
 
   return { data, refetch, isLoading };
 }
