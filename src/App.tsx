@@ -96,12 +96,12 @@ const App = () => {
                   <Support />
                 </OptimizedSuspense>
               } />
-              <Route path="/device-ice-sos-pendant" element={
+              <Route path="/devices/ice-sos-pendant" element={
                 <OptimizedSuspense skeletonType="card">
                   <DeviceIceSosPendant />
                 </OptimizedSuspense>
               } />
-              <Route path="/regional-center-spain" element={
+              <Route path="/regional-center/spain" element={
                 <OptimizedSuspense skeletonType="card">
                   <RegionalCenterSpain />
                 </OptimizedSuspense>
