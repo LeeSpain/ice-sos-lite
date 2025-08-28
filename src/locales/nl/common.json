@@ -246,6 +246,118 @@
       "title": "Fout",
       "description": "Bericht verzenden mislukt. Probeer het opnieuw."
     }
+  },
+  "familyCarerAccess": {
+    "sectionBadge": "Familie & Verzorger Ondersteuning",
+    "title": "Familie & Verzorger Toegang",
+    "subtitle": "Verbind je dierbaren en zorgverleners voor uitgebreide noodhulpondersteuning en gemoedsrust",
+    "cardTitle": "Volledige Familiebescherming",
+    "cardSubtitle": "per verbinding",
+    "cardDescription": "Verbind elk familielid of professionele verzorger voor uitgebreide noodcoördinatie. Elke verbinding maakt directe waarschuwingen, locatie delen en gecoördineerde respons mogelijk tijdens kritieke situaties.",
+    "learnMore": "Meer Informatie",
+    "watchVideo": "Video Bekijken",
+    "secureNote": "Veilige toegangscontrole • Privacy beschermd • Betaal alleen voor actieve verbindingen",
+    "footerText": "Families verbinden voor sterkere noodrespons",
+    "features": {
+      "trustedContacts": {
+        "title": "Vertrouwde Contacten",
+        "description": "Voeg familieleden en verzorgers toe als noodcontacten met prioriteitstoegang"
+      },
+      "careCoordination": {
+        "title": "Zorgcoördinatie",
+        "description": "Naadloze coördinatie tussen familieleden tijdens noodsituaties"
+      },
+      "privacyControls": {
+        "title": "Privacy Controles",
+        "description": "Gedetailleerde privacy-instellingen om te bepalen welke informatie met wie wordt gedeeld"
+      },
+      "realTimeUpdates": {
+        "title": "Real-time Updates",
+        "description": "Directe meldingen en status updates voor alle geautoriseerde contacten"
+      },
+      "locationSharing": {
+        "title": "Locatie Delen",
+        "description": "Deel je locatie met vertrouwde contacten tijdens noodsituaties of wanneer verzocht door geautoriseerde verzorgers"
+      },
+      "activityTracking": {
+        "title": "Zorgactiviteit Tracking",
+        "description": "Monitor en volg zorgactiviteiten, medicatieschema's en gezondheidsstatus updates"
+      }
+    },
+    "page": {
+      "heroTag": "Familie Verbinding Platform",
+      "heroTitle": "Verbind Je",
+      "heroTitleHighlight": "Dierbaren",
+      "heroSubtitle": "Bouw een uitgebreid ondersteuningsnetwerk dat je familie verbonden en beschermd houdt tijdens noodsituaties en dagelijkse zorgmomenten",
+      "startConnecting": "Begin met Verbinden",
+      "featuresTag": "Uitgebreid Zorgnetwerk",
+      "featuresTitle": "Alles Wat Je Familie Nodig Heeft",
+      "featuresSubtitle": "Geavanceerde functies ontworpen om het sterkst mogelijke ondersteuningsnetwerk voor je dierbaren te creëren",
+      "accessLevelsTag": "Veilig Toegangsbeheer",
+      "accessLevelsTitle": "Aangepaste Toegangsniveaus",
+      "accessLevelsSubtitle": "Ken het juiste toegangsniveau toe aan elke persoon in je zorgnetwerk, van alleen-nood contacten tot volledige zorgcoördinatoren",
+      "useCasesTag": "Praktische Toepassingen",
+      "useCasesTitle": "Perfect voor Elke Zorgsituatie",
+      "useCasesSubtitle": "Van multigenerationele families tot professionele zorgteams, zie hoe ons platform zich aanpast aan jouw unieke behoeften",
+      "ctaTag": "Klaar om Je Familie te Verbinden?",
+      "ctaTitle": "Begin Vandaag met het Bouwen van Je",
+      "ctaTitleHighlight": "Zorgnetwerk",
+      "ctaTitleSuffix": "",
+      "ctaSubtitle": "Sluit je aan bij duizenden families die ICE SOS vertrouwen om hun dierbaren verbonden, beschermd en verzorgd te houden",
+      "startFamilyNetwork": "Start Je Familienetwerk",
+      "viewPricingPlans": "Bekijk Prijsplannen",
+      "accessLevels": {
+        "emergencyOnly": {
+          "title": "Alleen Noodsituaties",
+          "description": "Basis contactinformatie en noodwaarschuwingen",
+          "permissions": [
+            "Noodmeldingen",
+            "Basis profielinformatie",
+            "Noodcontact details"
+          ]
+        },
+        "familyMember": {
+          "title": "Familielid",
+          "description": "Uitgebreide familietoegang met zorgcoördinatie",
+          "permissions": [
+            "Alle noodfuncties",
+            "Locatie delen",
+            "Zorgplan toegang",
+            "Medische informatie",
+            "Activiteiten updates"
+          ]
+        },
+        "primaryCarer": {
+          "title": "Primaire Verzorger",
+          "description": "Volledige zorgcoördinatie en beheer toegang",
+          "permissions": [
+            "Volledige profiel toegang",
+            "Zorgplan beheer",
+            "Noodrespons coördinatie",
+            "Medisch dossier toegang",
+            "Communicatie hub"
+          ]
+        }
+      },
+      "useCases": {
+        "multiGenerational": {
+          "title": "Multigenerationele Families",
+          "description": "Verbind grootouders, ouders en volwassen kinderen met passende toegangsniveaus voor elke generatie."
+        },
+        "professionalCare": {
+          "title": "Professionele Zorgteams",
+          "description": "Integreer thuiszorgmedewerkers, verpleegkundigen en zorgverleners in je noodresponsnetwerk."
+        },
+        "emergencyResponse": {
+          "title": "Noodrespons",
+          "description": "Verzeker snelle respons tijdens noodsituaties met automatische meldingen naar alle geautoriseerde contacten."
+        },
+        "routineCare": {
+          "title": "Routine Zorgbeheer",
+          "description": "Coördineer dagelijkse zorgactiviteiten, medicatie herinneringen en gezondheidsmonitoring."
+        }
+      }
+    }
   }
 }
 

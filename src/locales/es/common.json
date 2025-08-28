@@ -277,5 +277,117 @@
       "title": "Error",
       "description": "Error al enviar el mensaje. Por favor, inténtalo de nuevo."
     }
+  },
+  "familyCarerAccess": {
+    "sectionBadge": "Apoyo Familiar y del Cuidador",
+    "title": "Acceso Familiar y del Cuidador",
+    "subtitle": "Conecta a tus seres queridos y proveedores de atención para apoyo integral de emergencia y tranquilidad",
+    "cardTitle": "Protección Familiar Completa",
+    "cardSubtitle": "por conexión",
+    "cardDescription": "Conecta a cada miembro de la familia o cuidador profesional para coordinación integral de emergencias. Cada conexión permite alertas instantáneas, compartir ubicación y respuesta coordinada durante situaciones críticas.",
+    "learnMore": "Saber Más",
+    "watchVideo": "Ver Video",
+    "secureNote": "Control de acceso seguro • Privacidad protegida • Paga solo por conexiones activas",
+    "footerText": "Conectando familias para una respuesta de emergencia más fuerte",
+    "features": {
+      "trustedContacts": {
+        "title": "Contactos de Confianza",
+        "description": "Agrega miembros de la familia y cuidadores como contactos de emergencia con niveles de acceso prioritario"
+      },
+      "careCoordination": {
+        "title": "Coordinación de Atención",
+        "description": "Coordinación perfecta entre miembros de la familia durante emergencias"
+      },
+      "privacyControls": {
+        "title": "Controles de Privacidad",
+        "description": "Configuraciones granulares de privacidad para controlar qué información se comparte con quién"
+      },
+      "realTimeUpdates": {
+        "title": "Actualizaciones en Tiempo Real",
+        "description": "Notificaciones instantáneas y actualizaciones de estado para todos los contactos autorizados"
+      },
+      "locationSharing": {
+        "title": "Compartir Ubicación",
+        "description": "Comparte tu ubicación con contactos de confianza durante emergencias o cuando lo soliciten cuidadores autorizados"
+      },
+      "activityTracking": {
+        "title": "Seguimiento de Actividad de Atención",
+        "description": "Monitorea y rastrea actividades de atención, horarios de medicación y actualizaciones de estado de salud"
+      }
+    },
+    "page": {
+      "heroTag": "Plataforma de Conexión Familiar",
+      "heroTitle": "Conecta a Tus",
+      "heroTitleHighlight": "Seres Queridos",
+      "heroSubtitle": "Construye una red de apoyo integral que mantenga a tu familia conectada y protegida durante emergencias y momentos de atención diaria",
+      "startConnecting": "Comenzar a Conectar",
+      "featuresTag": "Red de Atención Integral",
+      "featuresTitle": "Todo lo que Tu Familia Necesita",
+      "featuresSubtitle": "Características avanzadas diseñadas para crear la red de apoyo más sólida posible para tus seres queridos",
+      "accessLevelsTag": "Gestión de Acceso Seguro",
+      "accessLevelsTitle": "Niveles de Acceso Personalizados",
+      "accessLevelsSubtitle": "Otorga el nivel correcto de acceso a cada persona en tu red de atención, desde contactos solo de emergencia hasta coordinadores de atención completos",
+      "useCasesTag": "Aplicaciones del Mundo Real",
+      "useCasesTitle": "Perfecto para Cada Situación de Atención",
+      "useCasesSubtitle": "Desde familias multigeneracionales hasta equipos de atención profesional, ve cómo nuestra plataforma se adapta a tus necesidades únicas",
+      "ctaTag": "¿Listo para Conectar a Tu Familia?",
+      "ctaTitle": "Comienza a Construir Tu",
+      "ctaTitleHighlight": "Red de Atención",
+      "ctaTitleSuffix": "Hoy",
+      "ctaSubtitle": "Únete a miles de familias que confían en ICE SOS para mantener a sus seres queridos conectados, protegidos y atendidos",
+      "startFamilyNetwork": "Inicia Tu Red Familiar",
+      "viewPricingPlans": "Ver Planes de Precios",
+      "accessLevels": {
+        "emergencyOnly": {
+          "title": "Solo Emergencias",
+          "description": "Información básica de contacto y alertas de emergencia",
+          "permissions": [
+            "Notificaciones de emergencia",
+            "Información básica del perfil",
+            "Detalles de contacto de emergencia"
+          ]
+        },
+        "familyMember": {
+          "title": "Miembro de la Familia",
+          "description": "Acceso familiar extendido con coordinación de atención",
+          "permissions": [
+            "Todas las características de emergencia",
+            "Compartir ubicación",
+            "Acceso al plan de atención",
+            "Información médica",
+            "Actualizaciones de actividad"
+          ]
+        },
+        "primaryCarer": {
+          "title": "Cuidador Principal",
+          "description": "Acceso completo a coordinación y gestión de atención",
+          "permissions": [
+            "Acceso completo al perfil",
+            "Gestión del plan de atención",
+            "Coordinación de respuesta de emergencia",
+            "Acceso a registros médicos",
+            "Centro de comunicación"
+          ]
+        }
+      },
+      "useCases": {
+        "multiGenerational": {
+          "title": "Familias Multigeneracionales",
+          "description": "Conecta a abuelos, padres e hijos adultos con niveles de acceso apropiados para cada generación."
+        },
+        "professionalCare": {
+          "title": "Equipos de Atención Profesional",
+          "description": "Integra trabajadores de atención domiciliaria, enfermeras y proveedores de atención médica en tu red de respuesta de emergencia."
+        },
+        "emergencyResponse": {
+          "title": "Respuesta de Emergencia",
+          "description": "Asegura una respuesta rápida durante emergencias con notificaciones automáticas a todos los contactos autorizados."
+        },
+        "routineCare": {
+          "title": "Gestión de Atención Rutinaria",
+          "description": "Coordina actividades de atención diaria, recordatorios de medicación y monitoreo de salud."
+        }
+      }
+    }
   }
 }

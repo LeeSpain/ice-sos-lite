@@ -6,50 +6,44 @@ import { Users, Heart, Shield, Clock, UserCheck, CheckCircle, Play } from 'lucid
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { IntroVideoModal } from '@/components/IntroVideoModal';
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 
 const FamilyCarerAccess = () => {
   const { t } = useTranslation();
+  const { currency, language } = usePreferences();
   
   // Family pricing from subscription plans
-  const familyPrice = "€2.99";
-  const billingInterval = "month";
+  const basePriceEUR = 2.99;
+  const convertedPrice = convertCurrency(basePriceEUR, 'EUR', currency);
+  const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
+  const billingInterval = t('common.perMonth');
 
   const features = [
     {
       icon: UserCheck,
-      title: "Trusted Contacts",
-      description: "Add family members and carers as emergency contacts with priority access levels",
+      title: t('familyCarerAccess.features.trustedContacts.title'),
+      description: t('familyCarerAccess.features.trustedContacts.description'),
       color: "primary"
     },
     {
       icon: Heart,
-      title: "Care Coordination",
-      description: "Seamless coordination between family members during emergencies",
+      title: t('familyCarerAccess.features.careCoordination.title'),
+      description: t('familyCarerAccess.features.careCoordination.description'),
       color: "wellness"
     },
     {
       icon: Shield,
-      title: "Privacy Controls",
-      description: "Granular privacy settings to control what information is shared with whom",
+      title: t('familyCarerAccess.features.privacyControls.title'),
+      description: t('familyCarerAccess.features.privacyControls.description'),
       color: "guardian"
     },
     {
       icon: Clock,
-      title: "Real-time Updates",
-      description: "Instant notifications and status updates for all authorized contacts",
+      title: t('familyCarerAccess.features.realTimeUpdates.title'),
+      description: t('familyCarerAccess.features.realTimeUpdates.description'),
       color: "emergency"
     }
-  ];
-
-  const benefits = [
-    "Multi-generational family support",
-    "Professional carer integration",
-    "Emergency contact hierarchy",
-    "Location sharing permissions",
-    "Medical information access",
-    "Communication preferences",
-    "Care plan coordination",
-    "Emergency response tracking"
   ];
 
   const getIconColor = (color: string) => {
@@ -77,13 +71,13 @@ const FamilyCarerAccess = () => {
         <div className="text-center mb-8">
           <div className="inline-flex items-center bg-warning/10 rounded-full px-4 py-2 mb-4 border border-warning/20">
             <div className="w-2 h-2 bg-warning rounded-full mr-2 animate-pulse"></div>
-            <span className="text-sm font-medium text-warning">Family & Carer Support</span>
+            <span className="text-sm font-medium text-warning">{t('familyCarerAccess.sectionBadge')}</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">
-            Family & Carer Access
+            {t('familyCarerAccess.title')}
           </h2>
           <p className="text-base text-muted-foreground max-w-2xl mx-auto">
-            Connect your loved ones and care providers for comprehensive emergency support and peace of mind
+            {t('familyCarerAccess.subtitle')}
           </p>
         </div>
 
@@ -100,14 +94,14 @@ const FamilyCarerAccess = () => {
                   <Users className="h-7 w-7 text-white" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold mb-3 text-foreground">
-                  Complete Family Protection
+                  {t('familyCarerAccess.cardTitle')}
                 </h3>
                 <div className="mb-4">
-                  <span className="text-3xl font-bold text-warning">{familyPrice}</span>
-                  <span className="text-muted-foreground text-sm">/{billingInterval} per connection</span>
+                  <span className="text-3xl font-bold text-warning">{formattedPrice}</span>
+                  <span className="text-muted-foreground text-sm">{billingInterval} {t('familyCarerAccess.cardSubtitle')}</span>
                 </div>
                 <p className="text-muted-foreground text-sm mb-4">
-                  Connect each family member or professional carer for comprehensive emergency coordination. Each connection enables instant alerts, location sharing, and coordinated response during critical situations.
+                  {t('familyCarerAccess.cardDescription')}
                 </p>
                 
                 {/* CTA Buttons */}
@@ -115,7 +109,7 @@ const FamilyCarerAccess = () => {
                   <Button asChild size="lg" className="bg-warning hover:bg-warning/90 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl border-2 border-warning/30">
                     <Link to="/family-carer-access">
                       <Users className="mr-2 h-4 w-4" />
-                      Learn More
+                      {t('familyCarerAccess.learnMore')}
                     </Link>
                   </Button>
                   
@@ -128,13 +122,13 @@ const FamilyCarerAccess = () => {
                         className="border-warning text-warning hover:bg-warning hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
                       >
                         <Play className="h-4 w-4 mr-2" />
-                        Watch Video
+                        {t('familyCarerAccess.watchVideo')}
                       </Button>
                     }
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Secure access control • Privacy protected • Pay only for active connections
+                  {t('familyCarerAccess.secureNote')}
                 </p>
               </div>
 
@@ -164,7 +158,7 @@ const FamilyCarerAccess = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
             <Heart className="h-4 w-4 text-warning" />
             <span className="text-sm text-muted-foreground">
-              Connecting families for stronger emergency response
+              {t('familyCarerAccess.footerText')}
             </span>
           </div>
         </div>

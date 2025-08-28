@@ -22,87 +22,90 @@ import {
   Activity
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import SEO from '@/components/SEO';
 import OptimizedImage from "@/components/ui/optimized-image";
 import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
 
 const FamilyCarerAccessPage = () => {
+  const { t } = useTranslation();
+  
   const keyFeatures = [
     {
       icon: UserCheck,
-      title: "Trusted Contact Management",
-      description: "Add and manage family members, friends, and professional carers with customizable access levels and permissions.",
+      title: t('familyCarerAccess.features.trustedContacts.title'),
+      description: t('familyCarerAccess.features.trustedContacts.description'),
       color: "primary"
     },
     {
       icon: Heart,
-      title: "Care Coordination Hub",
-      description: "Centralized platform for coordinating care between multiple family members and healthcare providers.",
+      title: t('familyCarerAccess.features.careCoordination.title'),
+      description: t('familyCarerAccess.features.careCoordination.description'),
       color: "wellness"
     },
     {
       icon: Shield,
-      title: "Advanced Privacy Controls",
-      description: "Granular privacy settings allow you to control exactly what information each contact can access.",
+      title: t('familyCarerAccess.features.privacyControls.title'),
+      description: t('familyCarerAccess.features.privacyControls.description'),
       color: "guardian"
     },
     {
       icon: Clock,
-      title: "Real-time Communication",
-      description: "Instant notifications and updates keep everyone in the loop during emergencies and routine care.",
+      title: t('familyCarerAccess.features.realTimeUpdates.title'),
+      description: t('familyCarerAccess.features.realTimeUpdates.description'),
       color: "emergency"
     },
     {
       icon: MapPin,
-      title: "Location Sharing",
-      description: "Share your location with trusted contacts during emergencies or when requested by authorized carers.",
+      title: t('familyCarerAccess.features.locationSharing.title'),
+      description: t('familyCarerAccess.features.locationSharing.description'),
       color: "primary"
     },
     {
       icon: Activity,
-      title: "Care Activity Tracking",
-      description: "Monitor and track care activities, medication schedules, and health status updates.",
+      title: t('familyCarerAccess.features.activityTracking.title'),
+      description: t('familyCarerAccess.features.activityTracking.description'),
       color: "wellness"
     }
   ];
 
   const accessLevels = [
     {
-      level: "Emergency Only",
-      description: "Basic contact information and emergency alerts",
-      permissions: ["Emergency notifications", "Basic profile information", "Emergency contact details"]
+      level: t('familyCarerAccess.page.accessLevels.emergencyOnly.title'),
+      description: t('familyCarerAccess.page.accessLevels.emergencyOnly.description'),
+      permissions: t('familyCarerAccess.page.accessLevels.emergencyOnly.permissions', { returnObjects: true }) as string[]
     },
     {
-      level: "Family Member",
-      description: "Extended family access with care coordination",
-      permissions: ["All emergency features", "Location sharing", "Care plan access", "Medical information", "Activity updates"]
+      level: t('familyCarerAccess.page.accessLevels.familyMember.title'),
+      description: t('familyCarerAccess.page.accessLevels.familyMember.description'),
+      permissions: t('familyCarerAccess.page.accessLevels.familyMember.permissions', { returnObjects: true }) as string[]
     },
     {
-      level: "Primary Carer",
-      description: "Full care coordination and management access",
-      permissions: ["Complete profile access", "Care plan management", "Emergency response coordination", "Medical record access", "Communication hub"]
+      level: t('familyCarerAccess.page.accessLevels.primaryCarer.title'),
+      description: t('familyCarerAccess.page.accessLevels.primaryCarer.description'),
+      permissions: t('familyCarerAccess.page.accessLevels.primaryCarer.permissions', { returnObjects: true }) as string[]
     }
   ];
 
   const useCases = [
     {
-      title: "Multi-Generational Families",
-      description: "Connect grandparents, parents, and adult children with appropriate access levels for each generation.",
+      title: t('familyCarerAccess.page.useCases.multiGenerational.title'),
+      description: t('familyCarerAccess.page.useCases.multiGenerational.description'),
       icon: Users
     },
     {
-      title: "Professional Care Teams",
-      description: "Integrate home care workers, nurses, and healthcare providers into your emergency response network.",
+      title: t('familyCarerAccess.page.useCases.professionalCare.title'),
+      description: t('familyCarerAccess.page.useCases.professionalCare.description'),
       icon: UserPlus
     },
     {
-      title: "Emergency Response",
-      description: "Ensure rapid response during emergencies with automatic notifications to all authorized contacts.",
+      title: t('familyCarerAccess.page.useCases.emergencyResponse.title'),
+      description: t('familyCarerAccess.page.useCases.emergencyResponse.description'),
       icon: Phone
     },
     {
-      title: "Routine Care Management",
-      description: "Coordinate daily care activities, medication reminders, and health monitoring.",
+      title: t('familyCarerAccess.page.useCases.routineCare.title'),
+      description: t('familyCarerAccess.page.useCases.routineCare.description'),
       icon: Activity
     }
   ];
@@ -128,8 +131,8 @@ const FamilyCarerAccessPage = () => {
   return (
     <div className="min-h-screen">
       <SEO 
-        title="Family & Carer Access - ICE SOS Lite"
-        description="Connect your loved ones and care providers for comprehensive emergency support. Multi-generational family support with professional carer integration."
+        title={`${t('familyCarerAccess.title')} - ICE SOS Lite`}
+        description={t('familyCarerAccess.subtitle')}
       />
       <Navigation />
       
@@ -141,13 +144,13 @@ const FamilyCarerAccessPage = () => {
             <div className="text-center lg:text-left text-white animate-fade-in">
               <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
                 <Heart className="h-4 w-4 text-emergency-glow" />
-                <span className="text-sm font-medium text-white">Family Connection Platform</span>
+                <span className="text-sm font-medium text-white">{t('familyCarerAccess.page.heroTag')}</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Connect Your <span className="text-wellness drop-shadow-md">Loved Ones</span>
+                {t('familyCarerAccess.page.heroTitle')} <span className="text-wellness drop-shadow-md">{t('familyCarerAccess.page.heroTitleHighlight')}</span>
               </h1>
               <p className="text-xl md:text-2xl text-white/90 max-w-3xl lg:max-w-none mx-auto mb-8 leading-relaxed font-medium drop-shadow-sm">
-                Build a comprehensive support network that keeps your family connected and protected during emergencies and everyday care moments
+                {t('familyCarerAccess.page.heroSubtitle')}
               </p>
               <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
                 <Button 
@@ -157,7 +160,7 @@ const FamilyCarerAccessPage = () => {
                 >
                   <Link to="/register">
                     <UserPlus className="mr-2 h-5 w-5" />
-                    Start Connecting
+                    {t('familyCarerAccess.page.startConnecting')}
                   </Link>
                 </Button>
               </div>
@@ -186,13 +189,13 @@ const FamilyCarerAccessPage = () => {
           <div className="text-center mb-16 animate-fade-in">
             <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
               <div className="w-2 h-2 bg-wellness rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm font-medium text-wellness">Comprehensive Care Network</span>
+              <span className="text-sm font-medium text-wellness">{t('familyCarerAccess.page.featuresTag')}</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Everything Your Family Needs
+              {t('familyCarerAccess.page.featuresTitle')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Advanced features designed to create the strongest possible support network for your loved ones
+              {t('familyCarerAccess.page.featuresSubtitle')}
             </p>
           </div>
           
@@ -230,13 +233,13 @@ const FamilyCarerAccessPage = () => {
           <div className="text-center mb-16 animate-fade-in">
             <div className="inline-flex items-center bg-guardian/10 rounded-full px-4 py-2 mb-4 border border-guardian/20">
               <Shield className="h-4 w-4 text-guardian mr-2" />
-              <span className="text-sm font-medium text-guardian">Secure Access Management</span>
+              <span className="text-sm font-medium text-guardian">{t('familyCarerAccess.page.accessLevelsTag')}</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Customized Access Levels
+              {t('familyCarerAccess.page.accessLevelsTitle')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Grant the right level of access to each person in your care network, from emergency-only contacts to full care coordinators
+              {t('familyCarerAccess.page.accessLevelsSubtitle')}
             </p>
           </div>
           
@@ -280,13 +283,13 @@ const FamilyCarerAccessPage = () => {
           <div className="text-center mb-16 animate-fade-in">
             <div className="inline-flex items-center bg-primary/10 rounded-full px-4 py-2 mb-4 border border-primary/20">
               <Activity className="h-4 w-4 text-primary mr-2" />
-              <span className="text-sm font-medium text-primary">Real-World Applications</span>
+              <span className="text-sm font-medium text-primary">{t('familyCarerAccess.page.useCasesTag')}</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Perfect for Every Care Situation
+              {t('familyCarerAccess.page.useCasesTitle')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              From multi-generational families to professional care teams, see how our platform adapts to your unique needs
+              {t('familyCarerAccess.page.useCasesSubtitle')}
             </p>
           </div>
           
@@ -328,13 +331,13 @@ const FamilyCarerAccessPage = () => {
           <div className="animate-fade-in">
             <div className="inline-flex items-center bg-wellness/10 rounded-full px-6 py-3 mb-6 border border-wellness/20 shadow-lg">
               <Heart className="h-5 w-5 text-wellness mr-2 animate-pulse" />
-              <span className="text-base font-semibold text-wellness">Ready to Connect Your Family?</span>
+              <span className="text-base font-semibold text-wellness">{t('familyCarerAccess.page.ctaTag')}</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
-              Start Building Your <span className="text-wellness">Care Network</span> Today
+              {t('familyCarerAccess.page.ctaTitle')} <span className="text-wellness">{t('familyCarerAccess.page.ctaTitleHighlight')}</span> {t('familyCarerAccess.page.ctaTitleSuffix')}
             </h2>
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              Join thousands of families who trust ICE SOS to keep their loved ones connected, protected, and cared for
+              {t('familyCarerAccess.page.ctaSubtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <Button 
@@ -342,21 +345,21 @@ const FamilyCarerAccessPage = () => {
                 size="xl" 
                 className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-2xl transform hover:scale-105 transition-all duration-300 font-bold text-lg px-10 py-5 rounded-2xl border-2 border-wellness-glow/20"
               >
-                <Link to="/register">
-                  <UserPlus className="mr-3 h-6 w-6" />
-                  Start Your Family Network
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                size="xl" 
-                variant="outline" 
-                className="border-2 border-wellness text-wellness hover:bg-wellness hover:text-black shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-bold text-lg px-10 py-5 rounded-2xl"
-              >
-                <Link to="/#pricing">
-                  <Shield className="mr-3 h-6 w-6" />
-                  View Pricing Plans
-                </Link>
+                  <Link to="/register">
+                    <UserPlus className="mr-3 h-6 w-6" />
+                    {t('familyCarerAccess.page.startFamilyNetwork')}
+                  </Link>
+                </Button>
+                <Button 
+                  asChild
+                  size="xl" 
+                  variant="outline" 
+                  className="border-2 border-wellness text-wellness hover:bg-wellness hover:text-black shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-bold text-lg px-10 py-5 rounded-2xl"
+                >
+                  <Link to="/#pricing">
+                    <Shield className="mr-3 h-6 w-6" />
+                    {t('familyCarerAccess.page.viewPricingPlans')}
+                  </Link>
               </Button>
             </div>
           </div>

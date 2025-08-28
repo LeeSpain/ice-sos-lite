@@ -282,5 +282,117 @@
   "introVideo": {
     "title": "ICE SOS Introduction Videos",
     "description": "Choose a video to learn more about ICE SOS Lite"
+  },
+  "familyCarerAccess": {
+    "sectionBadge": "Family & Carer Support",
+    "title": "Family & Carer Access",
+    "subtitle": "Connect your loved ones and care providers for comprehensive emergency support and peace of mind",
+    "cardTitle": "Complete Family Protection",
+    "cardSubtitle": "per connection",
+    "cardDescription": "Connect each family member or professional carer for comprehensive emergency coordination. Each connection enables instant alerts, location sharing, and coordinated response during critical situations.",
+    "learnMore": "Learn More",
+    "watchVideo": "Watch Video",
+    "secureNote": "Secure access control • Privacy protected • Pay only for active connections",
+    "footerText": "Connecting families for stronger emergency response",
+    "features": {
+      "trustedContacts": {
+        "title": "Trusted Contacts",
+        "description": "Add family members and carers as emergency contacts with priority access levels"
+      },
+      "careCoordination": {
+        "title": "Care Coordination",
+        "description": "Seamless coordination between family members during emergencies"
+      },
+      "privacyControls": {
+        "title": "Privacy Controls",
+        "description": "Granular privacy settings to control what information is shared with whom"
+      },
+      "realTimeUpdates": {
+        "title": "Real-time Updates",
+        "description": "Instant notifications and status updates for all authorized contacts"
+      },
+      "locationSharing": {
+        "title": "Location Sharing",
+        "description": "Share your location with trusted contacts during emergencies or when requested by authorized carers"
+      },
+      "activityTracking": {
+        "title": "Care Activity Tracking",
+        "description": "Monitor and track care activities, medication schedules, and health status updates"
+      }
+    },
+    "page": {
+      "heroTag": "Family Connection Platform",
+      "heroTitle": "Connect Your",
+      "heroTitleHighlight": "Loved Ones",
+      "heroSubtitle": "Build a comprehensive support network that keeps your family connected and protected during emergencies and everyday care moments",
+      "startConnecting": "Start Connecting",
+      "featuresTag": "Comprehensive Care Network",
+      "featuresTitle": "Everything Your Family Needs",
+      "featuresSubtitle": "Advanced features designed to create the strongest possible support network for your loved ones",
+      "accessLevelsTag": "Secure Access Management",
+      "accessLevelsTitle": "Customized Access Levels",
+      "accessLevelsSubtitle": "Grant the right level of access to each person in your care network, from emergency-only contacts to full care coordinators",
+      "useCasesTag": "Real-World Applications",
+      "useCasesTitle": "Perfect for Every Care Situation",
+      "useCasesSubtitle": "From multi-generational families to professional care teams, see how our platform adapts to your unique needs",
+      "ctaTag": "Ready to Connect Your Family?",
+      "ctaTitle": "Start Building Your",
+      "ctaTitleHighlight": "Care Network",
+      "ctaTitleSuffix": "Today",
+      "ctaSubtitle": "Join thousands of families who trust ICE SOS to keep their loved ones connected, protected, and cared for",
+      "startFamilyNetwork": "Start Your Family Network",
+      "viewPricingPlans": "View Pricing Plans",
+      "accessLevels": {
+        "emergencyOnly": {
+          "title": "Emergency Only",
+          "description": "Basic contact information and emergency alerts",
+          "permissions": [
+            "Emergency notifications",
+            "Basic profile information",
+            "Emergency contact details"
+          ]
+        },
+        "familyMember": {
+          "title": "Family Member",
+          "description": "Extended family access with care coordination",
+          "permissions": [
+            "All emergency features",
+            "Location sharing",
+            "Care plan access",
+            "Medical information",
+            "Activity updates"
+          ]
+        },
+        "primaryCarer": {
+          "title": "Primary Carer",
+          "description": "Full care coordination and management access",
+          "permissions": [
+            "Complete profile access",
+            "Care plan management",
+            "Emergency response coordination",
+            "Medical record access",
+            "Communication hub"
+          ]
+        }
+      },
+      "useCases": {
+        "multiGenerational": {
+          "title": "Multi-Generational Families",
+          "description": "Connect grandparents, parents, and adult children with appropriate access levels for each generation."
+        },
+        "professionalCare": {
+          "title": "Professional Care Teams",
+          "description": "Integrate home care workers, nurses, and healthcare providers into your emergency response network."
+        },
+        "emergencyResponse": {
+          "title": "Emergency Response",
+          "description": "Ensure rapid response during emergencies with automatic notifications to all authorized contacts."
+        },
+        "routineCare": {
+          "title": "Routine Care Management",
+          "description": "Coordinate daily care activities, medication reminders, and health monitoring."
+        }
+      }
+    }
   }
 }
