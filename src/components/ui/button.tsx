@@ -9,11 +9,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary",
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary transition-all duration-300",
         emergency: "bg-gradient-emergency text-emergency-foreground hover:scale-[1.02] transform transition-all duration-300 shadow-emergency emergency-pulse font-bold",
-        guardian: "bg-gradient-guardian text-guardian-foreground hover:bg-guardian/90 shadow-guardian",
-        wellness: "bg-wellness text-wellness-foreground hover:bg-wellness/90 shadow-lg",
-        warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-lg",
+        guardian: "bg-gradient-guardian text-guardian-foreground hover:bg-guardian/90 shadow-guardian transition-all duration-300",
+        wellness: "bg-wellness text-wellness-foreground hover:bg-wellness/90 shadow-lg transition-all duration-300",
+        warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-lg transition-all duration-300",
+        accent: "bg-accent-red text-accent-red-foreground hover:bg-accent-red/90 transition-all duration-300",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",

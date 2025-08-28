@@ -47,13 +47,17 @@ export default {
 					DEFAULT: 'hsl(var(--wellness))',
 					foreground: 'hsl(var(--wellness-foreground))'
 				},
-				blue: {
-					DEFAULT: 'hsl(var(--blue))',
-					foreground: 'hsl(var(--blue-foreground))'
+				'accent-red': {
+					DEFAULT: 'hsl(var(--accent-red))',
+					foreground: 'hsl(var(--accent-red-foreground))'
+				},
+				neutral: {
+					DEFAULT: 'hsl(var(--neutral))',
+					foreground: 'hsl(var(--neutral-foreground))'
 				},
 				green: {
-					DEFAULT: 'hsl(var(--green))',
-					foreground: 'hsl(var(--green-foreground))'
+					DEFAULT: 'hsl(var(--wellness))',
+					foreground: 'hsl(var(--wellness-foreground))'
 				},
 				warning: {
 					DEFAULT: 'hsl(var(--warning))',
