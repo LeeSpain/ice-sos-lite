@@ -59,10 +59,10 @@
     --ring: 0 100% 50%;
 
     /* Professional Red Gradients */
-    --gradient-emergency: linear-gradient(135deg, hsl(var(--emergency)), hsl(var(--emergency-glow)));
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-guardian: linear-gradient(135deg, hsl(var(--guardian)), hsl(var(--guardian-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--guardian)) 0%, hsl(var(--primary)) 50%, hsl(var(--emergency)) 100%);
+    --gradient-emergency: linear-gradient(135deg, var(--emergency), var(--emergency-glow));
+    --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-glow));
+    --gradient-guardian: linear-gradient(135deg, var(--guardian), var(--guardian-glow));
+    --gradient-hero: linear-gradient(135deg, var(--guardian) 0%, var(--primary) 50%, var(--emergency) 100%);
 
     /* Professional Red Shadows */
     --shadow-emergency: 0 20px 40px -10px hsl(var(--emergency) / 0.3);
