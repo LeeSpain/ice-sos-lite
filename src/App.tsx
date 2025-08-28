@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from "@/contexts/AuthContext";
+import { EmmaChatProvider } from "@/contexts/EmmaChatContext";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import { queryClient } from "@/lib/queryClient";
 import OptimizedSuspense from '@/components/OptimizedSuspense';
@@ -41,6 +42,7 @@ const App = () => {
     <EnhancedErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <EmmaChatProvider>
           <BrowserRouter>
             <Routes>
               {/* Main Homepage */}
@@ -178,6 +180,7 @@ const App = () => {
             {/* Show device manager only in protected SOS app */}
             {window.location.pathname === '/app' && <DeviceManagerButton />}
           </BrowserRouter>
+          </EmmaChatProvider>
         </AuthProvider>
       </QueryClientProvider>
     </EnhancedErrorBoundary>
