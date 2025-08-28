@@ -253,43 +253,110 @@ Deno.serve(async (req: Request) => {
       if (updErr) console.warn("Failed to update incident emails count", updErr);
     }
 
-    // Initiate sequential calls with short spacing
+    // Determine routing path based on subscriber tier or explicit request
     let callsInitiated = 0;
     let order = 1;
-    for (const c of contacts) {
-      if (c.phone) {
+
+    // Try to detect regional call centre entitlement from subscriber record
+    let route: 'call_center' | 'contacts' = 'contacts';
+    try {
+      const { data: subscriber } = await supabaseUser
+        .from('subscribers')
+        .select('subscription_tier, subscribed')
+        .eq('user_id', authedUserId)
+        .maybeSingle();
+      const tier = (subscriber?.subscription_tier || '').toLowerCase();
+      if (tier.includes('call centre') || tier.includes('call center')) {
+        route = 'call_center';
+      }
+    } catch (e) {
+      console.warn('Subscriber lookup failed, defaulting to contacts route');
+    }
+
+    // Allow explicit override via request body (optional)
+    const bodyAny: any = body as any;
+    if (bodyAny?.route === 'call_center') route = 'call_center';
+
+    if (route === 'call_center') {
+      // Regional Call Centre path: call the call centre only (no phone calls to contacts), but still emailed above
+      const rawNumber = (bodyAny?.callCenterNumber as string) || '0034643706877';
+      const callCenterNumber = rawNumber.trim().replace(/^00/, '+').replace(/[^+\d]/g, '');
+      const callCenterContact: EmergencyContact = { name: 'Regional Call Center (Spain)', phone: callCenterNumber };
+
+      const maxRetries = 3;
+      const waitBetweenAttemptsMs = 20000; // 20 seconds between attempts
+
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          await makeTwilioCall(callCenterContact, incidentId, order, userName, body.location, supabaseUser);
+          callsInitiated++;
+          order++;
+        } catch (e) {
+          console.error('Call center Twilio call failed', e);
+          await supabaseUser.from('sos_call_attempts').insert({
+            incident_id: incidentId,
+            attempt_order: order,
+            contact_name: callCenterContact.name || null,
+            contact_phone: callCenterContact.phone || null,
+            status: 'failed',
+            error: String(e?.message || e),
+          });
+          order++;
+        }
+
+        // Wait and check if answered before retrying
+        await wait(waitBetweenAttemptsMs);
+        const { data: ccAttempts } = await supabaseUser
+          .from('sos_call_attempts')
+          .select('status')
+          .eq('incident_id', incidentId)
+          .eq('contact_phone', callCenterNumber);
+        const answered = (ccAttempts || []).some((a: any) => a.status === 'answered');
+        if (answered) break;
+      }
+    } else {
+      // Premium path: sequentially call contacts in order; stop if one answers
+      const waitBetweenCallsMs = 15000; // 15 seconds
+      for (const c of contacts) {
+        if (!c.phone) continue;
         try {
           await makeTwilioCall(c, incidentId, order, userName, body.location, supabaseUser);
           callsInitiated++;
           order++;
-          // small delay to avoid burst; adjust as needed
-          await wait(3000);
         } catch (e) {
-          console.error("Twilio call failed for", c.phone, e);
-          // record failed attempt as well
-          await supabaseUser.from("sos_call_attempts").insert({
+          console.error('Twilio call failed for', c.phone, e);
+          await supabaseUser.from('sos_call_attempts').insert({
             incident_id: incidentId,
             attempt_order: order,
             contact_name: c.name || null,
             contact_phone: c.phone || null,
             contact_email: c.email || null,
-            status: "failed",
+            status: 'failed',
             error: String(e?.message || e),
           });
           order++;
         }
+
+        // Wait and check if someone already answered to stop further calls
+        await wait(waitBetweenCallsMs);
+        const { data: attempts } = await supabaseUser
+          .from('sos_call_attempts')
+          .select('status')
+          .eq('incident_id', incidentId);
+        const anyAnswered = (attempts || []).some((a: any) => a.status === 'answered');
+        if (anyAnswered) break;
       }
     }
 
-    // Update incident with call count and mark as in_progress/completed
+    // Finalize incident with call count
     const { error: finalUpdErr } = await supabaseUser
-      .from("sos_incidents")
-      .update({ calls_initiated: callsInitiated, status: "completed", completed_at: new Date().toISOString() })
-      .eq("id", incidentId);
-    if (finalUpdErr) console.warn("Failed to finalize incident", finalUpdErr);
+      .from('sos_incidents')
+      .update({ calls_initiated: callsInitiated, status: 'completed', completed_at: new Date().toISOString() })
+      .eq('id', incidentId);
+    if (finalUpdErr) console.warn('Failed to finalize incident', finalUpdErr);
 
-    const summary = { emails_sent: emailsSent, calls_initiated: callsInitiated, incident_id: incidentId };
-    return new Response(JSON.stringify({ ok: true, summary }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    const summary = { emails_sent: emailsSent, calls_initiated: callsInitiated, incident_id: incidentId, route };
+    return new Response(JSON.stringify({ ok: true, summary }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   } catch (error) {
     console.error("Emergency SOS enhanced error:", error);
     return new Response(JSON.stringify({ error: String(error?.message || error) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
