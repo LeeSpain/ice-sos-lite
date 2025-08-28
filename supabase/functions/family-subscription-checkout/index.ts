@@ -54,7 +54,7 @@ serve(async (req) => {
       const { data: invite, error: inviteError } = await supabaseClient
         .from('family_invites')
         .select('*')
-        .eq('token', invite_token)
+        .eq('invite_token', invite_token)
         .gt('expires_at', new Date().toISOString())
         .single();
 
@@ -77,21 +77,46 @@ serve(async (req) => {
 
     logStep("Customer resolved", { customerId });
 
-    // Get Family Seat price ID (should be created by setup-family-stripe-products)
-    const prices = await stripe.prices.list({
-      limit: 10,
-      active: true,
-    });
+    // Get or ensure Family Seat price ID
+    let familySeatPrice = null as Stripe.Price | null;
 
-    const familySeatPrice = prices.data.find(price => 
-      price.metadata?.type === "family_seat_monthly"
-    );
+    // Try to find existing price by metadata
+    const prices = await stripe.prices.list({ limit: 100, active: true });
+    familySeatPrice = prices.data.find((price: any) => price.metadata?.type === "family_seat_monthly") || null;
 
     if (!familySeatPrice) {
-      throw new Error("Family seat pricing not configured. Please run setup-family-stripe-products first.");
+      logStep("Family seat price not found - ensuring product & price exist");
+      // Try to find existing product
+      const products = await stripe.products.list({ limit: 100, active: true });
+      let familySeatProduct = products.data.find((p: any) => p.metadata?.type === "family_seat" || p.name.toLowerCase().includes("family access seat"));
+
+      if (!familySeatProduct) {
+        familySeatProduct = await stripe.products.create({
+          name: "Family Access Seat",
+          description: "Family Access add-on: Live SOS alerts, map, and 'Received & On It' for trusted family members. Location only during SOS. No device/battery telemetry.",
+          type: "service",
+          metadata: {
+            type: "family_seat",
+            features: "live_sos_map,alerts,acknowledgment,privacy_focused"
+          }
+        });
+        logStep("Created Family Seat product", { productId: familySeatProduct.id });
+      } else {
+        logStep("Found existing Family Seat product", { productId: familySeatProduct.id });
+      }
+
+      // Create the monthly price
+      familySeatPrice = await stripe.prices.create({
+        product: familySeatProduct.id,
+        unit_amount: 299,
+        currency: "eur",
+        recurring: { interval: "month" },
+        metadata: { type: "family_seat_monthly", billing_model: "per_seat" }
+      });
+      logStep("Created Family Seat price", { priceId: familySeatPrice.id });
     }
 
-    logStep("Found family seat price", { priceId: familySeatPrice.id });
+    logStep("Using family seat price", { priceId: familySeatPrice.id });
 
     // Create checkout session
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {

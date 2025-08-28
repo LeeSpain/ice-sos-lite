@@ -55,9 +55,11 @@ serve(async (req) => {
 
     const { action, name, email, phone, relationship, billing_type, token: inviteToken, invite_id }: InviteRequest = await req.json();
 
+    const origin = req.headers.get("origin") || "http://localhost:5173";
+
     switch (action) {
       case 'create':
-        return await createFamilyInvite(supabaseService, user, { name, email, phone, relationship, billing_type });
+        return await createFamilyInvite(supabaseService, user, { name, email, phone, relationship, billing_type }, origin);
       
       case 'accept':
         return await acceptFamilyInvite(supabaseService, user, inviteToken);
@@ -85,7 +87,8 @@ serve(async (req) => {
 async function createFamilyInvite(
   supabase: any, 
   user: any, 
-  { name, email, phone, relationship, billing_type }: { name?: string, email?: string, phone?: string, relationship?: string, billing_type?: string }
+  { name, email, phone, relationship, billing_type }: { name?: string, email?: string, phone?: string, relationship?: string, billing_type?: string },
+  originUrl: string
 ) {
   logStep("Creating family invite", { name, email, phone, relationship, billing_type });
 
@@ -195,8 +198,6 @@ async function createFamilyInvite(
     logStep("Incremented owner seat quota", { newQuota: familyGroup.owner_seat_quota + 1 });
   }
 
-  const originUrl = req.headers.get("origin") || "https://yourapp.com";
-  
   const inviteLink = billing_type === 'self' 
     ? `${originUrl}/family-invite-payment?token=${inviteToken}`
     : `${originUrl}/family-invite-accept?token=${inviteToken}`;
@@ -255,7 +256,7 @@ async function acceptFamilyInvite(supabase: any, user: any, inviteToken?: string
         owner_seat_quota
       )
     `)
-    .eq('token', inviteToken)
+    .eq('invite_token', inviteToken)
     .gt('expires_at', new Date().toISOString())
     .single();
 
@@ -282,9 +283,9 @@ async function acceptFamilyInvite(supabase: any, user: any, inviteToken?: string
       user_id: invite.family_groups.owner_user_id,
       name: invite.name,
       phone: invite.phone || '',
-      email: invite.email_or_phone.includes('@') ? invite.email_or_phone : '',
+      email: invite.invitee_email || '',
       type: 'family',
-      relationship: 'Family Member'
+      relationship: invite.relationship || 'Family Member'
     }])
     .select()
     .single();
@@ -401,7 +402,7 @@ async function resendFamilyInvite(supabase: any, user: any, inviteId?: string) {
   const { data: invite, error: updateError } = await supabase
     .from('family_invites')
     .update({
-      token: newToken,
+      invite_token: newToken,
       expires_at: expiresAt.toISOString()
     })
     .eq('id', inviteId)
