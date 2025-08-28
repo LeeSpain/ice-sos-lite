@@ -63,6 +63,7 @@ interface PersonalDetails {
 }
 
 const AIRegister = () => {
+  console.log('🎯 AIRegister component started - checking for any cached issues');
   const [personalDetails, setPersonalDetails] = useState<PersonalDetails>({
     firstName: '',
     lastName: '',
@@ -375,8 +376,10 @@ const AIRegister = () => {
 
 
   // Helper functions using original data
+  console.log('🔍 AIRegister: Finding premium plan from dbPlans:', dbPlans.length, 'plans');
   const premiumPlan = dbPlans.find(p => p.name === 'Premium Protection');
   const familyPlan = dbPlans.find(p => p.name.includes('Family'));
+  console.log('🔍 AIRegister: Found premiumPlan:', premiumPlan?.name, 'familyPlan:', familyPlan?.name);
 
   // Tax rates
   const PRODUCT_IVA_RATE = 0.21; // 21% for products
