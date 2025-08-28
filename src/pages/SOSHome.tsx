@@ -57,26 +57,26 @@ const SOSHome = () => {
             {/* Location Permission Status */}
             <LocationPermissionPrompt />
             
-            <div className="text-center space-y-3">
+            <div className="text-center space-y-4 w-full">
               <p className="font-medium text-guardian text-sm">Quick Access Features</p>
-              <div className="flex items-center justify-center gap-8 text-xs">
-                <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-200 hover:bg-primary/10">
-                  <div className="p-2 rounded-lg bg-primary/10">
+              <div className="grid grid-cols-3 gap-3 w-full max-w-sm mx-auto">
+                <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-200 hover:bg-primary/10 min-h-[80px] justify-center">
+                  <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
                     <Phone className="h-4 w-4 text-primary" />
                   </div>
-                  <span className="text-primary font-medium">Auto Call</span>
+                  <span className="text-primary font-medium text-xs text-center leading-tight">Auto Call</span>
                 </div>
-                <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-200 hover:bg-primary/10">
-                  <div className="p-2 rounded-lg bg-primary/10">
+                <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-200 hover:bg-primary/10 min-h-[80px] justify-center">
+                  <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
                     <MapPin className="h-4 w-4 text-primary" />
                   </div>
-                  <span className="text-primary font-medium">Location Share</span>
+                  <span className="text-primary font-medium text-xs text-center leading-tight">Location Share</span>
                 </div>
-                <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-200 hover:bg-primary/10">
-                  <div className="p-2 rounded-lg bg-primary/10">
+                <div className="flex flex-col items-center gap-2 p-3 rounded-xl bg-primary/5 border border-primary/10 transition-all duration-200 hover:bg-primary/10 min-h-[80px] justify-center">
+                  <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
                     <Clock className="h-4 w-4 text-primary" />
                   </div>
-                  <span className="text-primary font-medium">Real-time</span>
+                  <span className="text-primary font-medium text-xs text-center leading-tight">Real-time</span>
                 </div>
               </div>
             </div>
