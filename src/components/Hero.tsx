@@ -46,7 +46,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
               </Button>
               <Button 
                 size="xl" 
-                className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
+                className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 onClick={onEmmaClick}
               >
                 {t('hero.ctaTalk')}

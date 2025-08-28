@@ -36,6 +36,7 @@ import DashboardRedirect from "@/components/DashboardRedirect";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
+import ScrollToTop from "@/components/ScrollToTop";
 
 
 const App = () => {
@@ -45,6 +46,7 @@ const App = () => {
         <AuthProvider>
           <EmmaChatProvider>
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               {/* Main Homepage */}
               <Route path="/" element={
