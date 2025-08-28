@@ -20,7 +20,7 @@ const SOSHome = () => {
 
       {/* Header Section */}
       <header className="w-full max-w-lg mx-auto pt-8 pb-6 relative z-10">
-        <div className="bg-white/98 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/30">
+        <div className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-200">
           <div className="text-center space-y-4">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-emergency shadow-emergency">
               <Shield className="h-8 w-8 text-white" />
@@ -28,7 +28,7 @@ const SOSHome = () => {
             <div className="space-y-2">
               <h1 className="text-3xl font-bold text-guardian tracking-tight">ICE SOS Lite</h1>
               <p className="text-neutral text-base font-medium">Emergency Protection System</p>
-              <p className="text-muted-foreground text-sm leading-relaxed px-4">
+              <p className="text-gray-600 text-sm leading-relaxed px-4">
                 Instantly alert your emergency contacts and share your precise location with one simple tap
               </p>
             </div>
@@ -67,26 +67,26 @@ const SOSHome = () => {
       {/* Bottom Info Cards */}
       <footer className="w-full max-w-lg mx-auto space-y-4 pt-6 relative z-10">
         {/* Voice Activation Card */}
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/30">
+        <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-200">
           <div className="text-center space-y-3">
             <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-primary">
               <span className="text-white text-lg font-bold">🎤</span>
             </div>
             <div className="space-y-1">
               <h3 className="font-semibold text-guardian text-base">Voice Activation</h3>
-              <p className="text-neutral text-sm">Say <span className="font-bold text-emergency">"Help Help Help"</span> to activate emergency mode</p>
+              <p className="text-gray-700 text-sm">Say <span className="font-bold text-emergency">"Help Help Help"</span> to activate emergency mode</p>
             </div>
           </div>
         </div>
 
         {/* System Status Card */}
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/30">
+        <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-wellness animate-pulse' : 'bg-warning'}`}></div>
               <span className="text-sm font-medium text-guardian">System Status</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-neutral">
+            <div className="flex items-center gap-2 text-xs text-gray-700">
               <BatteryCharging className="h-4 w-4 text-wellness" />
               <span>{isActive ? 'Active & Protected' : 'Standby Mode'}</span>
             </div>
@@ -94,13 +94,13 @@ const SOSHome = () => {
         </div>
 
         {/* Emergency Notice */}
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/30">
+        <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
           <div className="text-center space-y-2">
             <div className="inline-flex items-center gap-2 text-emergency font-semibold text-sm">
               <Phone className="h-4 w-4" />
               <span>Critical Emergency Notice</span>
             </div>
-            <p className="text-guardian text-xs leading-relaxed">
+            <p className="text-gray-700 text-xs leading-relaxed">
               For life-threatening emergencies, always call your local emergency services (911, 112, etc.) immediately
             </p>
           </div>
