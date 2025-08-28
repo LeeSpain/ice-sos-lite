@@ -72,14 +72,14 @@ const SosButton = () => {
 
       {/* Location status indicator */}
       {locationPermissionDenied && (
-        <div className="flex items-center justify-center gap-2 text-sm text-warning">
+        <div className="flex items-center justify-center gap-2 text-sm text-warning bg-warning/10 rounded-lg p-3 border border-warning/20">
           <AlertTriangle className="h-4 w-4" />
           <span className="text-xs text-center">Location access required for precise emergency alerts</span>
         </div>
       )}
 
       {locationPermissionGranted && (
-        <div className="flex items-center justify-center gap-2 text-sm text-success">
+        <div className="flex items-center justify-center gap-2 text-sm text-wellness bg-wellness/10 rounded-lg p-3 border border-wellness/20">
           <MapPin className="h-4 w-4" />
           <span className="text-xs text-center">GPS location sharing enabled</span>
         </div>
@@ -91,10 +91,10 @@ const SosButton = () => {
         size="emergency"
         onClick={handleEmergencyTrigger}
         disabled={isTriggering}
-        className="relative"
+        className="relative transition-all duration-300"
         aria-label="Emergency SOS Button"
       >
-        <Phone className="h-8 w-8" />
+        <Phone className="h-10 w-10" />
         <span className="sr-only">Emergency SOS</span>
         {isTriggering && (
           <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse" />

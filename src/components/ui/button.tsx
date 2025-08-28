@@ -10,9 +10,10 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary",
-        emergency: "bg-gradient-emergency text-emergency-foreground hover:scale-105 transform transition-all duration-200 shadow-emergency emergency-pulse",
+        emergency: "bg-gradient-emergency text-emergency-foreground hover:scale-[1.02] transform transition-all duration-300 shadow-emergency emergency-pulse font-bold",
         guardian: "bg-gradient-guardian text-guardian-foreground hover:bg-guardian/90 shadow-guardian",
-        wellness: "bg-wellness text-wellness-foreground hover:bg-wellness/90",
+        wellness: "bg-wellness text-wellness-foreground hover:bg-wellness/90 shadow-lg",
+        warning: "bg-warning text-warning-foreground hover:bg-warning/90 shadow-lg",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
@@ -24,7 +25,7 @@ const buttonVariants = cva(
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8 text-base",
         xl: "h-16 rounded-lg px-10 text-lg font-semibold",
-        emergency: "h-20 w-20 rounded-full text-xl font-bold",
+        emergency: "h-24 w-24 rounded-full text-xl font-bold shadow-2xl",
         icon: "h-10 w-10",
       },
     },

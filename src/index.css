@@ -17,27 +17,30 @@
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 27%;
 
-    /* ICE SOS Professional Brand Colors - SWAPPED */
-    --primary: 0 100% 50%; /* Bright Red #FF0000 - Status OK, Success */
+    /* ICE SOS Professional Brand Colors */
+    --primary: 220 100% 50%; /* Professional Blue #0080FF - Primary actions */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 0 100% 60%;
+    --primary-glow: 220 100% 60%;
 
-    --emergency: 140 100% 40%; /* Bright Green #00CC66 - SOS alerts, Critical */
+    --emergency: 0 84% 60%; /* Emergency Red #E53E3E - SOS alerts, Critical */
     --emergency-foreground: 0 0% 100%;
-    --emergency-glow: 140 100% 50%;
+    --emergency-glow: 0 84% 70%;
 
-    --guardian: 0 100% 35%; /* Dark Red #B30000 - AI Guardian, Professional */
+    --guardian: 220 30% 25%; /* Dark Navy #2D3748 - AI Guardian, Professional */
     --guardian-foreground: 0 0% 100%;
-    --guardian-glow: 0 100% 45%;
+    --guardian-glow: 220 30% 35%;
 
-    --wellness: 25 100% 50%; /* Orange #FF8000 - Wellness reminders */
+    --wellness: 142 71% 45%; /* Professional Green #48BB78 - Wellness, Success */
     --wellness-foreground: 0 0% 100%;
 
-    --blue: 210 100% 50%; /* Blue #0080FF - Product cards */
+    --blue: 200 100% 50%; /* Light Blue #00BFFF - Information */
     --blue-foreground: 0 0% 100%;
 
-    --green: 120 100% 40%; /* Green #00CC00 - Regional services */
+    --green: 142 71% 45%; /* Success Green #48BB78 - Status indicators */
     --green-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%; /* Professional Orange #F6AD55 - Warnings */
+    --warning-foreground: 0 0% 100%;
 
     --secondary: 0 0% 97%;
     --secondary-foreground: 215 25% 27%;
@@ -55,17 +58,17 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 0 100% 50%;
 
-    /* Emergency Gradients */
+    /* Professional Gradients */
     --gradient-emergency: linear-gradient(135deg, hsl(var(--emergency)), hsl(var(--emergency-glow)));
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-guardian: linear-gradient(135deg, hsl(var(--guardian)), hsl(var(--guardian-glow)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--guardian)) 50%, hsl(var(--primary-glow)) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--guardian)) 0%, hsl(var(--primary)) 50%, hsl(var(--guardian-glow)) 100%);
 
-    /* Emergency Shadows */
-    --shadow-emergency: 0 10px 30px -10px hsl(var(--emergency) / 0.3);
-    --shadow-primary: 0 10px 30px -10px hsl(var(--primary) / 0.3);
-    --shadow-guardian: 0 10px 30px -10px hsl(var(--guardian) / 0.3);
-    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.4);
+    /* Professional Shadows */
+    --shadow-emergency: 0 10px 30px -10px hsl(var(--emergency) / 0.25);
+    --shadow-primary: 0 10px 30px -10px hsl(var(--primary) / 0.25);
+    --shadow-guardian: 0 10px 30px -10px hsl(var(--guardian) / 0.25);
+    --shadow-glow: 0 0 40px hsl(var(--primary-glow) / 0.3);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -95,23 +98,26 @@
     --popover: 215 25% 27%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 0 100% 50%;
+    --primary: 220 100% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --emergency: 140 100% 40%;
+    --emergency: 0 84% 65%;
     --emergency-foreground: 0 0% 100%;
 
-    --guardian: 0 100% 35%;
+    --guardian: 220 30% 20%;
     --guardian-foreground: 0 0% 100%;
 
-    --wellness: 25 100% 50%;
+    --wellness: 142 71% 50%;
     --wellness-foreground: 0 0% 100%;
 
-    --blue: 210 100% 60%;
+    --blue: 200 100% 55%;
     --blue-foreground: 0 0% 100%;
 
-    --green: 120 100% 50%;
+    --green: 142 71% 50%;
     --green-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 100%;
 
     --secondary: 215 25% 35%;
     --secondary-foreground: 0 0% 98%;
