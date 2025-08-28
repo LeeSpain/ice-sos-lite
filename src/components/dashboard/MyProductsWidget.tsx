@@ -257,17 +257,37 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     }
   };
 
-  const hasFamilyActive = Boolean(
-    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.some((p: any) => p?.name === 'Family Connection')) ||
-    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.includes('Family Connection')) ||
-    subscription?.subscription_tier === 'Family Connection'
-  );
+  // Check family connection status by looking at actual family data
+  const checkFamilyStatus = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      // Check if user is part of any family group (as owner or member)
+      const [groupResponse, membershipResponse] = await Promise.all([
+        supabase.from('family_groups').select('*').eq('owner_user_id', user.id),
+        supabase.from('family_memberships').select('*').eq('user_id', user.id).eq('status', 'active')
+      ]);
+
+      return (groupResponse.data && groupResponse.data.length > 0) || 
+             (membershipResponse.data && membershipResponse.data.length > 0);
+    } catch (error) {
+      console.error('Error checking family status:', error);
+      return false;
+    }
+  };
+
+  const [hasFamilyConnection, setHasFamilyConnection] = useState(false);
+
+  useEffect(() => {
+    checkFamilyStatus().then(setHasFamilyConnection);
+  }, [subscription]);
 
   const hasPremiumActive = Boolean(
-    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.some((p: any) => /premium/i.test(p?.name || ''))) ||
-    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.some((t: string) => /premium/i.test(t))) ||
-    (typeof subscription?.subscription_tier === 'string' && /premium/i.test(subscription.subscription_tier)) ||
-    subscription?.subscribed
+    subscription?.subscribed ||
+    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.length > 0) ||
+    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.length > 0) ||
+    (typeof subscription?.subscription_tier === 'string' && subscription.subscription_tier)
   );
 
   const hasSpainCallCentre = Boolean(profile?.has_spain_call_center);
@@ -307,7 +327,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
             </div>
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
               <span className="text-sm">Family Connection</span>
-              {getStatusBadge(hasFamilyActive ? 'connected' : 'disconnected')}
+              {getStatusBadge(hasFamilyConnection ? 'connected' : 'disconnected')}
             </div>
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
               <span className="text-sm">Call Centre (Spain)</span>
@@ -402,7 +422,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
         )}
 
         {/* Family Connection Add-on */}
-        {familyPlan && !hasFamilyActive && (
+        {familyPlan && !hasFamilyConnection && (
           <div className="p-4 bg-muted/30 rounded-lg border">
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-3 flex-1">
