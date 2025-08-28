@@ -3,7 +3,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
-import DashboardOverview from '@/components/admin/pages/DashboardOverview';
+import EnhancedDashboardOverview from '@/components/admin/pages/EnhancedDashboardOverview';
 import CustomersPage from '@/components/admin/pages/CustomersPage';
 import LeadsPage from '@/components/admin/pages/LeadsPage';
 import ConversationsPage from '@/components/admin/pages/ConversationsPage';
@@ -15,6 +15,10 @@ import AIAgentPage from '@/components/admin/pages/AIAgentPage';
 import AITrainingPage from '@/components/admin/pages/AITrainingPage';
 import AIModelSettingsPage from '@/components/admin/pages/AIModelSettingsPage';
 import AIMarketingPage from '@/components/admin/pages/AIMarketingPage';
+import RivenAIConfiguration from '@/components/admin/pages/RivenAIConfiguration';
+import EnhancedCommandCenter from '@/components/admin/pages/EnhancedCommandCenter';
+import { SocialMediaIntegration } from '@/components/admin/pages/SocialMediaIntegration';
+import { ContentAutomation } from '@/components/admin/pages/ContentAutomation';
 import ProductsPage from '@/components/admin/pages/ProductsPage';
 import RegionalServicesPage from '@/components/admin/pages/RegionalServicesPage';
 import GlobalProtectionPlansPage from '@/components/admin/pages/GlobalProtectionPlansPage';
@@ -38,11 +42,14 @@ const AdminDashboard: React.FC = () => {
   return (
     <Routes>
       <Route path="/" element={<AdminLayout />}>
-        <Route index element={<DashboardOverview />} />
+        <Route index element={<EnhancedDashboardOverview />} />
         <Route path="analytics" element={<AnalyticsPage />} />
         <Route path="video-analytics" element={<VideoAnalyticsPage />} />
         <Route path="revenue" element={<RevenueAnalyticsPage />} />
         <Route path="growth" element={<UserGrowthPage />} />
+        <Route path="riven-config" element={<RivenAIConfiguration />} />
+        <Route path="command-center" element={<EnhancedCommandCenter />} />
+        <Route path="ai-marketing" element={<AIMarketingPage />} />
         <Route path="ai-agent" element={<AIAgentPage />} />
         <Route path="ai-training" element={<AITrainingPage />} />
         <Route path="ai-settings" element={<AIModelSettingsPage />} />
@@ -55,8 +62,9 @@ const AdminDashboard: React.FC = () => {
         <Route path="ai-metrics" element={<div className="p-6"><h1 className="text-3xl font-bold">AI Performance</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="contact-submissions" element={<ContactSubmissionsPage />} />
         <Route path="email-campaigns" element={<EmailCampaignsPage />} />
-        <Route path="ai-marketing" element={<AIMarketingPage />} />
         <Route path="communication" element={<CommunicationPage />} />
+        <Route path="social-media" element={<SocialMediaIntegration />} />
+        <Route path="content-automation" element={<ContentAutomation />} />
         <Route path="whatsapp" element={<div className="p-6"><h1 className="text-3xl font-bold">WhatsApp Integration</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="emergencies" element={<div className="p-6"><h1 className="text-3xl font-bold">Emergency Incidents</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="safety" element={<div className="p-6"><h1 className="text-3xl font-bold">Safety Monitoring</h1><p className="text-muted-foreground">Coming soon...</p></div>} />

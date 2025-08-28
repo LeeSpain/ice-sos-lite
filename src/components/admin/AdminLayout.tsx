@@ -50,11 +50,13 @@ const adminMenuItems = [
     ]
   },
   {
-    title: "🤖 AI Management", 
+    title: "🤖 AI & Marketing Intelligence", 
     items: [
-      { title: "AI Agent Control", url: "/admin-dashboard/ai-agent", icon: Bot },
-      { title: "Training Data", url: "/admin-dashboard/ai-training", icon: Database },
+      { title: "Riven AI Configuration", url: "/admin-dashboard/riven-config", icon: Bot },
+      { title: "Enhanced Command Center", url: "/admin-dashboard/command-center", icon: Bot },
+      { title: "AI Marketing Dashboard", url: "/admin-dashboard/ai-marketing", icon: Bot },
       { title: "Model Settings", url: "/admin-dashboard/ai-settings", icon: Settings },
+      { title: "Training Data", url: "/admin-dashboard/ai-training", icon: Database },
     ]
   },
   {
@@ -74,13 +76,13 @@ const adminMenuItems = [
     ]
   },
   {
-    title: "📧 Communication",
+    title: "📧 Communication & Marketing",
     items: [
       { title: "Contact Submissions", url: "/admin-dashboard/contact-submissions", icon: Mail },
       { title: "Email Campaigns", url: "/admin-dashboard/email-campaigns", icon: Mail },
-      { title: "AI Marketing", url: "/admin-dashboard/ai-marketing", icon: Bot },
       { title: "Communication Center", url: "/admin-dashboard/communication", icon: MessageSquare },
-      { title: "WhatsApp Integration", url: "/admin-dashboard/whatsapp", icon: MessageSquare },
+      { title: "Social Media Integration", url: "/admin-dashboard/social-media", icon: MessageSquare },
+      { title: "Content Automation", url: "/admin-dashboard/content-automation", icon: Bot },
     ]
   },
   {
