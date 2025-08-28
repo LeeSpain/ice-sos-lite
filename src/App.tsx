@@ -35,6 +35,7 @@ import ProtectedSOSRoute from "@/components/ProtectedSOSRoute";
 import DashboardRedirect from "@/components/DashboardRedirect";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import GlobalEmmaChat from "@/components/GlobalEmmaChat";
 
 
 const App = () => {
@@ -176,6 +177,9 @@ const App = () => {
                 </OptimizedSuspense>
               } />
             </Routes>
+            
+            {/* Global Emma Chat - appears on all pages except SOS app */}
+            {window.location.pathname !== '/app' && <GlobalEmmaChat />}
             
             {/* Show device manager only in protected SOS app */}
             {window.location.pathname === '/app' && <DeviceManagerButton />}
