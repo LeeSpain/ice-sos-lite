@@ -44,35 +44,33 @@ export const LocationPermissionPrompt = () => {
 
   if (permissionState.granted) {
     return (
-      <div className="w-full max-w-lg mx-auto">
-        <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
-                <MapPin className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-guardian">Location Services Active</p>
-                <p className="text-xs text-gray-600">GPS location sharing enabled</p>
-              </div>
+      <div className="w-full">
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
+              <MapPin className="h-4 w-4 text-white" />
             </div>
-            <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 text-xs">
-              <CheckCircle className="h-3 w-3 mr-1" />
-              Active
-            </Badge>
+            <div>
+              <p className="text-sm font-semibold text-guardian">Location Services Active</p>
+              <p className="text-xs text-gray-600">GPS location sharing enabled</p>
+            </div>
           </div>
+          <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 text-xs">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Active
+          </Badge>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-      <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
-        <div className="flex items-center justify-between mb-3">
+    <div className="w-full">
+      <div className="p-3 bg-gray-50 rounded-xl space-y-3">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-              <Shield className="h-5 w-5 text-gray-600" />
+            <div className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center">
+              <Shield className="h-4 w-4 text-gray-600" />
             </div>
             <div>
               <p className="text-sm font-semibold text-guardian">Location Access Required</p>
@@ -94,7 +92,7 @@ export const LocationPermissionPrompt = () => {
         )}
         
         {permissionState.denied && (
-          <div className="space-y-2 mt-3">
+          <div className="space-y-2">
             <p className="text-sm text-destructive">
               Location access was denied. To enable:
             </p>

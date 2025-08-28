@@ -19,10 +19,12 @@ const SOSHome = () => {
         <div className="absolute bottom-20 right-10 w-24 h-24 rounded-full bg-white/15 blur-xl"></div>
       </div>
 
-      {/* Header Section */}
-      <header className="w-full max-w-lg mx-auto pt-8 pb-6 relative z-10">
-        <div className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-200">
-          <div className="text-center space-y-4">
+      {/* Main Container Card */}
+      <div className="w-full max-w-lg mx-auto mt-8 mb-6 relative z-10">
+        <div className="bg-white rounded-3xl p-8 shadow-2xl border border-gray-200 space-y-8">
+          
+          {/* Header Section */}
+          <header className="text-center space-y-4">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-emergency shadow-emergency">
               <Shield className="h-8 w-8 text-white" />
             </div>
@@ -33,45 +35,46 @@ const SOSHome = () => {
                 Instantly alert your emergency contacts and share your precise location with one simple tap
               </p>
             </div>
-          </div>
-        </div>
-      </header>
+          </header>
 
-      {/* Main Action Section */}
-      <main className="flex-1 flex flex-col items-center justify-center w-full max-w-lg mx-auto space-y-8 relative z-10">
-        <div className="text-center space-y-2 mb-4">
-          <h2 className="text-white text-xl font-semibold">Ready to Help</h2>
-          <p className="text-white/80 text-sm">Tap the button below in case of emergency</p>
-        </div>
-        
-        <SosButton />
-        
-        {/* Location Permission Status */}
-        <LocationPermissionPrompt />
-        
-        <div className="text-center text-white/60 text-xs space-y-1">
-          <p className="font-medium">Quick Access Features</p>
-          <div className="flex items-center justify-center gap-6 text-xs mt-3">
-            <div className="flex items-center gap-1">
-              <Phone className="h-3 w-3" />
-              <span>Auto Call</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              <span>Location Share</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              <span>Real-time</span>
-            </div>
-          </div>
-        </div>
-      </main>
+          {/* Divider */}
+          <div className="border-t border-gray-200"></div>
 
-      {/* Bottom Info Cards */}
-      <footer className="w-full max-w-lg mx-auto space-y-4 pt-6 relative z-10">
-        {/* Voice Activation Card */}
-        <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-200">
+          {/* Main Action Section */}
+          <main className="flex flex-col items-center space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-guardian text-xl font-semibold">Ready to Help</h2>
+              <p className="text-gray-600 text-sm">Tap the button below in case of emergency</p>
+            </div>
+            
+            <SosButton />
+            
+            {/* Location Permission Status */}
+            <LocationPermissionPrompt />
+            
+            <div className="text-center text-gray-500 text-xs space-y-1">
+              <p className="font-medium">Quick Access Features</p>
+              <div className="flex items-center justify-center gap-6 text-xs mt-3">
+                <div className="flex items-center gap-1">
+                  <Phone className="h-3 w-3" />
+                  <span>Auto Call</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  <span>Location Share</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  <span>Real-time</span>
+                </div>
+              </div>
+            </div>
+          </main>
+
+          {/* Divider */}
+          <div className="border-t border-gray-200"></div>
+
+          {/* Voice Activation Section */}
           <div className="text-center space-y-3">
             <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-primary">
               <span className="text-white text-lg font-bold">🎤</span>
@@ -81,10 +84,11 @@ const SOSHome = () => {
               <p className="text-gray-700 text-sm">Say <span className="font-bold text-emergency">"Help Help Help"</span> to activate emergency mode</p>
             </div>
           </div>
-        </div>
 
-        {/* System Status Card */}
-        <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
+          {/* Divider */}
+          <div className="border-t border-gray-200"></div>
+
+          {/* System Status Section */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full ${isActive ? 'bg-wellness animate-pulse' : 'bg-warning'}`}></div>
@@ -95,10 +99,11 @@ const SOSHome = () => {
               <span>{isActive ? 'Active & Protected' : 'Standby Mode'}</span>
             </div>
           </div>
-        </div>
 
-        {/* Emergency Notice */}
-        <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
+          {/* Divider */}
+          <div className="border-t border-gray-200"></div>
+
+          {/* Emergency Notice Section */}
           <div className="text-center space-y-2">
             <div className="inline-flex items-center gap-2 text-emergency font-semibold text-sm">
               <Phone className="h-4 w-4" />
@@ -108,8 +113,9 @@ const SOSHome = () => {
               For life-threatening emergencies, always call your local emergency services (911, 112, etc.) immediately
             </p>
           </div>
+
         </div>
-      </footer>
+      </div>
     </div>
   );
 };
