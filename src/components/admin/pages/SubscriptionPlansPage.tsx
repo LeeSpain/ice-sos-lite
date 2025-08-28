@@ -120,11 +120,19 @@ export default function SubscriptionPlansPage() {
       return;
     }
 
+    if (formData.price < 0) {
+      toast.error('Price cannot be negative');
+      return;
+    }
+
     try {
       setSaving(true);
       const planData = {
         ...formData,
+        name: formData.name.trim(),
+        description: formData.description?.trim() || null,
         features: formData.features.filter(f => f.trim() !== ''),
+        stripe_price_id: formData.stripe_price_id?.trim() || null,
         updated_at: new Date().toISOString()
       };
 

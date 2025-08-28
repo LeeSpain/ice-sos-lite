@@ -47,7 +47,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="ai-settings" element={<AIModelSettingsPage />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="subscriptions" element={<SubscriptionsPage />} />
-        <Route path="protection-plans" element={<SubscriptionPlansPage />} />
+        <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />
         <Route path="families" element={<FamilyAccountsPage />} />
         <Route path="leads" element={<LeadsPage />} />
         <Route path="conversations" element={<ConversationsPage />} />

@@ -48,6 +48,29 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
     };
   }, []);
 
+  // Set up real-time subscription to subscription_plans changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('subscription_plans_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'subscription_plans'
+        },
+        () => {
+          console.log('Subscription plans updated, reloading...');
+          loadUserData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const loadUserData = async () => {
     setLoading(true);
     try {

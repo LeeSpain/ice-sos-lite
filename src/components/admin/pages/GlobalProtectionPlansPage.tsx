@@ -132,6 +132,25 @@ const GlobalProtectionPlansPage = () => {
   };
 
   const handleSubmit = async (isEdit: boolean = false) => {
+    // Validation
+    if (!formData.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Plan name is required",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!formData.price || isNaN(parseFloat(formData.price)) || parseFloat(formData.price) < 0) {
+      toast({
+        title: "Validation Error", 
+        description: "Valid price is required",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const featuresArray = formData.features
         .split('\n')
@@ -139,16 +158,17 @@ const GlobalProtectionPlansPage = () => {
         .filter(f => f.length > 0);
 
       const planData = {
-        name: formData.name,
-        description: formData.description || null,
+        name: formData.name.trim(),
+        description: formData.description?.trim() || null,
         price: parseFloat(formData.price),
         currency: formData.currency,
         billing_interval: formData.billing_interval,
-        stripe_price_id: formData.stripe_price_id || null,
+        stripe_price_id: formData.stripe_price_id?.trim() || null,
         features: featuresArray,
         is_active: formData.is_active,
         is_popular: formData.is_popular,
-        sort_order: formData.sort_order
+        sort_order: formData.sort_order,
+        updated_at: new Date().toISOString()
       };
 
       let error;
