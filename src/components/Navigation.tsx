@@ -34,14 +34,14 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Button asChild size="sm" className="bg-emergency hover:bg-emergency/90 text-black font-medium shadow-sm">
+            <Button asChild size="sm" variant="outline">
               <Link to="/contact">
                 {t('nav.contact', 'Contact Us')}
               </Link>
             </Button>
             <IntroVideoModal 
               trigger={
-                <Button size="sm" className="bg-emergency hover:bg-emergency/90 text-black font-medium shadow-sm">
+                <Button size="sm" variant="outline">
                   {t('nav.introVideo', 'Intro Video')}
                 </Button>
               }
@@ -63,7 +63,6 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
               </Button>
               <Button 
                 size="sm" 
-                className="shadow-primary bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-medium transition-all duration-200 hover:scale-105"
                 onClick={onFreeTrialClick || (() => {})}
               >
                 {t('nav.freeTrial', 'Free Trial')}
@@ -88,7 +87,7 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
               <div className="mb-4">
                 <LanguageCurrencySelector />
               </div>
-              <Button asChild size="sm" className="bg-emergency hover:bg-emergency/90 text-black font-medium shadow-sm mx-4">
+              <Button asChild size="sm" variant="outline" className="mx-4">
                 <Link to="/contact" onClick={() => setIsMenuOpen(false)}>
                   {t('nav.contact', 'Contact Us')}
                 </Link>
@@ -98,7 +97,8 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
                   trigger={
                     <Button 
                       size="sm" 
-                      className="w-full bg-emergency hover:bg-emergency/90 text-black font-medium shadow-sm"
+                      variant="outline"
+                      className="w-full"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {t('nav.introVideo', 'Intro Video')}
@@ -121,7 +121,6 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
                 </Button>
                 <Button 
                   size="sm" 
-                  className="shadow-primary bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-medium transition-all duration-200"
                   onClick={() => {
                     onFreeTrialClick?.();
                     setIsMenuOpen(false);
