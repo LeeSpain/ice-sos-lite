@@ -67,13 +67,13 @@ const FamilyCarerAccess = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-wellness/5 to-wellness/10 dark:from-wellness/10 dark:to-wellness/5">
+    <section className="py-20 bg-gradient-to-b from-warning/5 to-warning/10 dark:from-warning/10 dark:to-warning/5">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
-            <div className="w-2 h-2 bg-wellness rounded-full mr-2 animate-pulse"></div>
-            <span className="text-sm font-medium text-wellness">Family & Carer Support</span>
+          <div className="inline-flex items-center bg-warning/10 rounded-full px-4 py-2 mb-4 border border-warning/20">
+            <div className="w-2 h-2 bg-warning rounded-full mr-2 animate-pulse"></div>
+            <span className="text-sm font-medium text-warning">Family & Carer Support</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">
             Family & Carer Access
@@ -84,15 +84,15 @@ const FamilyCarerAccess = () => {
         </div>
 
         {/* Main Content Card */}
-        <Card className="relative border-2 border-wellness/20 bg-white dark:bg-slate-800 shadow-xl overflow-hidden max-w-4xl mx-auto">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-wellness to-wellness/60"></div>
+        <Card className="relative border-2 border-warning/20 bg-white dark:bg-slate-800 shadow-xl overflow-hidden max-w-4xl mx-auto">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-warning to-warning/60"></div>
           
           <CardContent className="p-6 md:p-8">
             {/* Split Layout */}
             <div className="grid md:grid-cols-2 gap-6 items-center">
               {/* Left Side - Main Info */}
               <div className="text-center md:text-left">
-                <div className="w-14 h-14 bg-gradient-to-br from-wellness to-wellness/80 shadow-lg rounded-2xl flex items-center justify-center mx-auto md:mx-0 mb-4">
+                <div className="w-14 h-14 bg-gradient-to-br from-warning to-warning/80 shadow-lg rounded-2xl flex items-center justify-center mx-auto md:mx-0 mb-4">
                   <Users className="h-7 w-7 text-white" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold mb-3 text-foreground">
@@ -104,7 +104,7 @@ const FamilyCarerAccess = () => {
                 
                 {/* CTA Buttons */}
                 <div className="flex flex-col gap-3">
-                  <Button asChild size="lg" className="bg-gradient-to-r from-wellness to-wellness/80 hover:from-wellness/90 hover:to-wellness/70 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+                  <Button asChild size="lg" className="bg-gradient-to-r from-warning to-warning/80 hover:from-warning/90 hover:to-warning/70 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
                     <Link to="/family-carer-access">
                       <Users className="mr-2 h-4 w-4" />
                       Learn More
@@ -117,7 +117,7 @@ const FamilyCarerAccess = () => {
                       <Button 
                         variant="outline"
                         size="lg"
-                        className="border-wellness text-wellness hover:bg-wellness hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                        className="border-warning text-warning hover:bg-warning hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
                       >
                         <Play className="h-4 w-4 mr-2" />
                         Watch Video
@@ -135,8 +135,8 @@ const FamilyCarerAccess = () => {
                 {features.slice(0, 3).map((feature, index) => {
                   const Icon = feature.icon;
                   return (
-                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-wellness/5 border border-wellness/10">
-                      <div className={`w-10 h-10 bg-gradient-to-br from-wellness to-wellness/80 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-warning/5 border border-warning/10">
+                      <div className={`w-10 h-10 bg-gradient-to-br from-warning to-warning/80 rounded-lg flex items-center justify-center flex-shrink-0`}>
                         <Icon className="h-5 w-5 text-white" />
                       </div>
                       <div>
@@ -154,7 +154,7 @@ const FamilyCarerAccess = () => {
         {/* Footer Note */}
         <div className="text-center mt-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
-            <Heart className="h-4 w-4 text-wellness" />
+            <Heart className="h-4 w-4 text-warning" />
             <span className="text-sm text-muted-foreground">
               Connecting families for stronger emergency response
             </span>
