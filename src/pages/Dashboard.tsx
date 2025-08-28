@@ -10,6 +10,7 @@ import EmergencyActionsWidget from "@/components/dashboard/EmergencyActionsWidge
 import MyProductsWidget from "@/components/dashboard/MyProductsWidget";
 import PersonalDetailsCard from "@/components/dashboard/PersonalDetailsCard";
 import EmergencyContactsCard from "@/components/dashboard/EmergencyContactsCard";
+import FamilyAccessPanel from "@/components/dashboard/family/FamilyAccessPanel";
 import MedicalInfoCard from "@/components/dashboard/MedicalInfoCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import MobileAppCard from "@/components/dashboard/MobileAppCard";
@@ -160,10 +161,11 @@ const Dashboard = () => {
               {/* Emergency Page */}
               <Route path="/emergency" element={
                 <div className="p-6">
-                  <EmergencyContactsCard 
-                    profile={profile} 
-                    onProfileUpdate={loadProfile}
-                  />
+            <EmergencyContactsCard 
+              profile={profile} 
+              onProfileUpdate={loadProfile} 
+            />
+            <FamilyAccessPanel />
                 </div>
               } />
 
