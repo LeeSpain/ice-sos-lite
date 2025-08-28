@@ -14,6 +14,7 @@ import UserGrowthPage from '@/components/admin/pages/UserGrowthPage';
 import AIAgentPage from '@/components/admin/pages/AIAgentPage';
 import AITrainingPage from '@/components/admin/pages/AITrainingPage';
 import AIModelSettingsPage from '@/components/admin/pages/AIModelSettingsPage';
+import AIMarketingPage from '@/components/admin/pages/AIMarketingPage';
 import ProductsPage from '@/components/admin/pages/ProductsPage';
 import RegionalServicesPage from '@/components/admin/pages/RegionalServicesPage';
 import GlobalProtectionPlansPage from '@/components/admin/pages/GlobalProtectionPlansPage';
@@ -54,6 +55,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="ai-metrics" element={<div className="p-6"><h1 className="text-3xl font-bold">AI Performance</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="contact-submissions" element={<ContactSubmissionsPage />} />
         <Route path="email-campaigns" element={<EmailCampaignsPage />} />
+        <Route path="ai-marketing" element={<AIMarketingPage />} />
         <Route path="communication" element={<CommunicationPage />} />
         <Route path="whatsapp" element={<div className="p-6"><h1 className="text-3xl font-bold">WhatsApp Integration</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
         <Route path="emergencies" element={<div className="p-6"><h1 className="text-3xl font-bold">Emergency Incidents</h1><p className="text-muted-foreground">Coming soon...</p></div>} />

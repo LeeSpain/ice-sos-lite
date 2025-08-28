@@ -78,6 +78,7 @@ const adminMenuItems = [
     items: [
       { title: "Contact Submissions", url: "/admin-dashboard/contact-submissions", icon: Mail },
       { title: "Email Campaigns", url: "/admin-dashboard/email-campaigns", icon: Mail },
+      { title: "AI Marketing", url: "/admin-dashboard/ai-marketing", icon: Bot },
       { title: "Communication Center", url: "/admin-dashboard/communication", icon: MessageSquare },
       { title: "WhatsApp Integration", url: "/admin-dashboard/whatsapp", icon: MessageSquare },
     ]

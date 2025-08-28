@@ -1183,6 +1183,135 @@ export type Database = {
         }
         Relationships: []
       }
+      marketing_analytics: {
+        Row: {
+          campaign_id: string
+          content_id: string
+          created_at: string
+          id: string
+          metric_type: string
+          metric_value: number | null
+          platform: string
+          recorded_at: string | null
+        }
+        Insert: {
+          campaign_id: string
+          content_id: string
+          created_at?: string
+          id?: string
+          metric_type: string
+          metric_value?: number | null
+          platform: string
+          recorded_at?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          content_id?: string
+          created_at?: string
+          id?: string
+          metric_type?: string
+          metric_value?: number | null
+          platform?: string
+          recorded_at?: string | null
+        }
+        Relationships: []
+      }
+      marketing_campaigns: {
+        Row: {
+          budget_estimate: number | null
+          command_input: string
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          scheduled_at: string | null
+          status: string
+          target_audience: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          budget_estimate?: number | null
+          command_input: string
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          scheduled_at?: string | null
+          status?: string
+          target_audience?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          budget_estimate?: number | null
+          command_input?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          scheduled_at?: string | null
+          status?: string
+          target_audience?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      marketing_content: {
+        Row: {
+          body_text: string | null
+          campaign_id: string
+          content_type: string
+          created_at: string
+          engagement_metrics: Json | null
+          hashtags: string[] | null
+          id: string
+          image_url: string | null
+          platform: string
+          posted_at: string | null
+          scheduled_time: string | null
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body_text?: string | null
+          campaign_id: string
+          content_type: string
+          created_at?: string
+          engagement_metrics?: Json | null
+          hashtags?: string[] | null
+          id?: string
+          image_url?: string | null
+          platform: string
+          posted_at?: string | null
+          scheduled_time?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body_text?: string | null
+          campaign_id?: string
+          content_type?: string
+          created_at?: string
+          engagement_metrics?: Json | null
+          hashtags?: string[] | null
+          id?: string
+          image_url?: string | null
+          platform?: string
+          posted_at?: string | null
+          scheduled_time?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -1735,6 +1864,42 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      social_media_accounts: {
+        Row: {
+          access_token: string | null
+          account_name: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_connected: string | null
+          platform: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          account_name: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_connected?: string | null
+          platform: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          account_name?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_connected?: string | null
+          platform?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
