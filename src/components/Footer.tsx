@@ -105,13 +105,12 @@ const { t } = useTranslation();
                   {t('footer.signOut')}
                 </Link>
               )}
-              <a 
-                href="#" 
-                onClick={(e) => handleDashboardClick(e, 'member')}
-                className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+              <Link 
+                to="/dashboard"
+                className="block text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 {loading ? 'Loading...' : t('footer.membersDashboard')}
-              </a>
+              </Link>
               <a 
                 href="#" 
                 onClick={(e) => handleDashboardClick(e, 'admin')}
