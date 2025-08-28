@@ -13,6 +13,7 @@ import { TermsDialog } from '@/components/legal/TermsDialog';
 import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import useRateLimit from '@/hooks/useRateLimit';
 import { PageSEO } from '@/components/PageSEO';
+import { validatePasswordStrength } from '@/utils/security';
 
 const AuthPage = () => {
   const { user, loading } = useAuth();
@@ -24,6 +25,7 @@ const AuthPage = () => {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   
   // Rate limiting for auth attempts
   const {
@@ -93,11 +95,24 @@ const AuthPage = () => {
     }
   }, [email, password, isRateLimited, getRemainingTime, recordAttempt, resetRateLimit]);
 
+  const handlePasswordChange = useCallback((value: string) => {
+    setPassword(value);
+    const validation = validatePasswordStrength(value);
+    setPasswordErrors(validation.errors);
+  }, []);
+
   const handleSignUp = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!acceptTerms) {
       setError('You must accept the Terms of Service and Privacy Policy to create an account.');
+      return;
+    }
+    
+    // Validate password strength before submission
+    const passwordValidation = validatePasswordStrength(password);
+    if (!passwordValidation.isValid) {
+      setError('Please fix the password requirements below.');
       return;
     }
     
@@ -146,6 +161,7 @@ const AuthPage = () => {
     setError('');
     setSuccess('');
     setAcceptTerms(false);
+    setPasswordErrors([]);
   }, []);
 
   const structuredData = {
@@ -248,13 +264,23 @@ const AuthPage = () => {
                   <div className="space-y-2">
                     <Input
                       type="password"
-                      placeholder="Password (min. 6 characters)"
+                      placeholder="Password (min. 8 characters with uppercase, lowercase, number & special character)"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => handlePasswordChange(e.target.value)}
                       required
-                      minLength={6}
+                      minLength={8}
                       disabled={isSubmitting}
                     />
+                    {passwordErrors.length > 0 && (
+                      <div className="text-sm text-destructive space-y-1">
+                        {passwordErrors.map((error, index) => (
+                          <div key={index} className="flex items-center space-x-1">
+                            <span className="text-xs">•</span>
+                            <span>{error}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Terms and Conditions Checkbox */}
@@ -306,10 +332,10 @@ const AuthPage = () => {
                     </Alert>
                   )}
                   
-                  <Button 
+                   <Button 
                     type="submit" 
                     className="w-full" 
-                    disabled={isSubmitting || isRateLimited() || !acceptTerms}
+                    disabled={isSubmitting || isRateLimited() || !acceptTerms || passwordErrors.length > 0}
                   >
                     {isSubmitting ? 'Creating Account...' : 'Create Account'}
                   </Button>

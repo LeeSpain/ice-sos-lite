@@ -1,5 +1,8 @@
 project_id = "mqroziggaalltuzoyyao"
 
+[functions.gmail-token-security]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
