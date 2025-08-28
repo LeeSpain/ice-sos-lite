@@ -4,7 +4,7 @@ import { Phone, Mic, MicOff, MapPin, AlertTriangle } from "lucide-react";
 import { useVoiceActivation } from "@/hooks/useVoiceActivation";
 import { useEmergencySOS } from "@/hooks/useEmergencySOS";
 import { useToast } from "@/hooks/use-toast";
-import { LocationPermissionPrompt } from "@/components/LocationPermissionPrompt";
+
 
 const SosButton = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
@@ -49,9 +49,6 @@ const SosButton = () => {
 
   return (
     <div className="flex flex-col items-center space-y-4 w-full max-w-md mx-auto">
-      {/* Location permission prompt */}
-      <LocationPermissionPrompt />
-      
       {/* Voice Activation Toggle */}
       <div className="flex items-center gap-2 mb-2">
         <Button

@@ -1,5 +1,6 @@
 import React from 'react';
 import SosButton from '@/components/SosButton';
+import { LocationPermissionPrompt } from '@/components/LocationPermissionPrompt';
 import { useWakeLock } from '@/hooks/useWakeLock';
 import { Shield, BatteryCharging, Phone, MapPin, Clock } from 'lucide-react';
 import SEO from '@/components/SEO';
@@ -44,6 +45,9 @@ const SOSHome = () => {
         </div>
         
         <SosButton />
+        
+        {/* Location Permission Status */}
+        <LocationPermissionPrompt />
         
         <div className="text-center text-white/60 text-xs space-y-1">
           <p className="font-medium">Quick Access Features</p>

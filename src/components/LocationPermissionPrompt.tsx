@@ -44,51 +44,42 @@ export const LocationPermissionPrompt = () => {
 
   if (permissionState.granted) {
     return (
-      <Card className="border-success/20 bg-success/5">
-        <CardHeader className="pb-3">
+      <div className="w-full max-w-lg mx-auto">
+        <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-success" />
-              <CardTitle className="text-sm text-success">Location Services Active</CardTitle>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
+                <MapPin className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-guardian">Location Services Active</p>
+                <p className="text-xs text-gray-600">GPS location sharing enabled</p>
+              </div>
             </div>
-            {getStatusBadge()}
+            <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 text-xs">
+              <CheckCircle className="h-3 w-3 mr-1" />
+              Active
+            </Badge>
           </div>
-        </CardHeader>
-        <CardContent>
-          <CardDescription className="text-sm">
-            ✅ Emergency SOS can share your precise GPS location with contacts
-          </CardDescription>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="border-warning/20 bg-warning/5">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-warning" />
-            <CardTitle className="text-base">Location Access Required</CardTitle>
+    <div className="w-full max-w-lg mx-auto">
+      <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+              <Shield className="h-5 w-5 text-gray-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-guardian">Location Access Required</p>
+              <p className="text-xs text-gray-600">Enable GPS for emergency alerts</p>
+            </div>
           </div>
           {getStatusBadge()}
-        </div>
-        <CardDescription>
-          Enable location access to share your precise GPS coordinates during emergencies
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="bg-muted/50 p-3 rounded-lg">
-          <p className="text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 inline mr-1" />
-            When you activate Emergency SOS, contacts will receive:
-          </p>
-          <ul className="text-xs text-muted-foreground mt-2 space-y-1 ml-5">
-            <li>• Your exact GPS coordinates</li>
-            <li>• Clickable Google Maps link</li>
-            <li>• Location accuracy information</li>
-            <li>• Human-readable address (when available)</li>
-          </ul>
         </div>
         
         {!permissionState.denied && (
@@ -103,18 +94,18 @@ export const LocationPermissionPrompt = () => {
         )}
         
         {permissionState.denied && (
-          <div className="space-y-2">
+          <div className="space-y-2 mt-3">
             <p className="text-sm text-destructive">
               Location access was denied. To enable:
             </p>
-            <ul className="text-xs text-muted-foreground space-y-1">
-              <li>1. Click the location icon in your browser's address bar</li>
-              <li>2. Select "Allow" for location access</li>
-              <li>3. Refresh this page</li>
+            <ul className="text-xs text-gray-600 space-y-1 ml-4">
+              <li>• Click the location icon in your browser's address bar</li>
+              <li>• Select "Allow" for location access</li>
+              <li>• Refresh this page</li>
             </ul>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
