@@ -106,7 +106,7 @@ const { t } = useTranslation();
                 </Link>
               )}
               <Link 
-                to="/dashboard"
+                to="/full-dashboard"
                 className="block text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 {loading ? 'Loading...' : t('footer.membersDashboard')}
