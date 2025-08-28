@@ -4,18 +4,12 @@ import { Phone, Mic, MicOff, MapPin, AlertTriangle } from "lucide-react";
 import { useVoiceActivation } from "@/hooks/useVoiceActivation";
 import { useEmergencySOS } from "@/hooks/useEmergencySOS";
 import { useToast } from "@/hooks/use-toast";
-import { useSiteContent } from "@/hooks/useSiteContent";
-import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
 import { LocationPermissionPrompt } from "@/components/LocationPermissionPrompt";
-
-const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const SosButton = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const { triggerEmergencySOS, isTriggering, locationPermissionGranted, locationPermissionDenied } = useEmergencySOS();
   const { toast } = useToast();
-  const defaults = getDefaultAppPreview();
-  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
 
   const handleEmergencyTrigger = async () => {
     try {
@@ -98,10 +92,10 @@ const SosButton = () => {
         onClick={handleEmergencyTrigger}
         disabled={isTriggering}
         className="relative"
-        aria-label={`Emergency Button - ${((value ?? defaults).sosLabel)}`}
+        aria-label="Emergency SOS Button"
       >
         <Phone className="h-8 w-8" />
-        <span className="sr-only">{(value ?? defaults).sosLabel}</span>
+        <span className="sr-only">Emergency SOS</span>
         {isTriggering && (
           <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse" />
         )}
@@ -109,10 +103,10 @@ const SosButton = () => {
       
       <div className="text-center">
         <p className="text-sm font-medium text-emergency">
-          {isTriggering ? "Activating Emergency..." : (value ?? defaults).sosLabel}
+          {isTriggering ? "Activating Emergency..." : "Emergency SOS"}
         </p>
         <p className="text-xs text-muted-foreground">
-          {(value ?? defaults).sosSubLabel}
+          Tap to alert emergency contacts with GPS location
           {voiceEnabled && <span className="block">or say "Help Help Help"</span>}
         </p>
       </div>
