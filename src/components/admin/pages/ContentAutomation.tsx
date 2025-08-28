@@ -581,3 +581,5 @@ export function ContentAutomation() {
     </div>
   );
 }
+
+export default ContentAutomation;

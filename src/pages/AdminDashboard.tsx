@@ -18,7 +18,7 @@ import AIMarketingPage from '@/components/admin/pages/AIMarketingPage';
 import RivenAIConfiguration from '@/components/admin/pages/RivenAIConfiguration';
 import EnhancedCommandCenter from '@/components/admin/pages/EnhancedCommandCenter';
 import { SocialMediaIntegration } from '@/components/admin/pages/SocialMediaIntegration';
-import { ContentAutomation } from '@/components/admin/pages/ContentAutomation';
+import ContentAutomation from '@/components/admin/pages/ContentAutomation';
 import ProductsPage from '@/components/admin/pages/ProductsPage';
 import RegionalServicesPage from '@/components/admin/pages/RegionalServicesPage';
 import GlobalProtectionPlansPage from '@/components/admin/pages/GlobalProtectionPlansPage';
