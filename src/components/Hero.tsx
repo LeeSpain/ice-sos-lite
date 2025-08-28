@@ -40,13 +40,13 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
               <Button 
                 asChild 
                 size="xl" 
-                className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
               >
                 <Link to="/ai-register">{t('hero.ctaJoin')}</Link>
               </Button>
               <Button 
                 size="xl" 
-                className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 onClick={onEmmaClick}
               >
                 {t('hero.ctaTalk')}
@@ -56,7 +56,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                 trigger={
                   <Button 
                     size="xl" 
-                    className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
                     <Play className="h-5 w-5 mr-2" />
                     Meet Emma

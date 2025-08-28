@@ -34,14 +34,14 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Button asChild size="sm" className="bg-wellness hover:bg-wellness/90 text-white font-medium shadow-sm">
+            <Button asChild size="sm" className="bg-wellness hover:bg-wellness/90 text-black font-medium shadow-sm">
               <Link to="/contact">
                 {t('nav.contact', 'Contact Us')}
               </Link>
             </Button>
             <IntroVideoModal 
               trigger={
-                <Button size="sm" className="bg-wellness hover:bg-wellness/90 text-white font-medium shadow-sm">
+                <Button size="sm" className="bg-wellness hover:bg-wellness/90 text-black font-medium shadow-sm">
                   {t('nav.introVideo', 'Intro Video')}
                 </Button>
               }
@@ -63,7 +63,7 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
               </Button>
               <Button 
                 size="sm" 
-                className="bg-wellness text-white hover:bg-wellness/90 font-medium transition-all duration-200 hover:scale-105 shadow-lg"
+                className="bg-wellness text-black hover:bg-wellness/90 font-medium transition-all duration-200 hover:scale-105 shadow-lg"
                 onClick={onFreeTrialClick || (() => {})}
               >
                 {t('nav.freeTrial', 'Free Trial')}
