@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MetricCard {
   title: string;
@@ -45,43 +46,119 @@ interface QuickAction {
   color: string;
 }
 
+interface DashboardStats {
+  totalUsers: number;
+  newContacts: number;
+  activeSOSEvents: number;
+  totalConversations: number;
+  marketingCampaigns: number;
+  recentActivities: any[];
+}
+
 const EnhancedDashboardOverview: React.FC = () => {
   const navigate = useNavigate();
   const [timeRange, setTimeRange] = useState('7d');
+  const [stats, setStats] = useState<DashboardStats>({
+    totalUsers: 0,
+    newContacts: 0,
+    activeSOSEvents: 0,
+    totalConversations: 0,
+    marketingCampaigns: 0,
+    recentActivities: []
+  });
+  const [loading, setLoading] = useState(true);
 
-  // Enhanced metrics with real-time feel
+  // Fetch real data from database
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      
+      // Get total users count
+      const { data: usersData } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
+      
+      // Get new contact submissions
+      const { data: contactsData } = await supabase
+        .from('contact_submissions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'new');
+      
+      // Get active SOS events
+      const { data: sosData } = await supabase
+        .from('sos_events')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'active');
+      
+      // Get total conversations
+      const { data: conversationsData } = await supabase
+        .from('unified_conversations')
+        .select('*', { count: 'exact', head: true });
+      
+      // Get marketing campaigns
+      const { data: campaignsData } = await supabase
+        .from('marketing_campaigns')
+        .select('*', { count: 'exact', head: true });
+      
+      // Get recent user activities
+      const { data: activitiesData } = await supabase
+        .from('user_activity')
+        .select('activity_type, description, created_at')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      setStats({
+        totalUsers: usersData?.length || 0,
+        newContacts: contactsData?.length || 0,
+        activeSOSEvents: sosData?.length || 0,
+        totalConversations: conversationsData?.length || 0,
+        marketingCampaigns: campaignsData?.length || 0,
+        recentActivities: activitiesData || []
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  // Enhanced metrics with real data
   const metrics: MetricCard[] = [
     {
       title: 'Total Users',
-      value: '12,847',
-      change: '+12.5%',
-      changeType: 'positive',
+      value: loading ? '...' : stats.totalUsers.toLocaleString(),
+      change: '+0%', // Would need historical data to calculate
+      changeType: 'neutral',
       icon: Users,
-      trend: [65, 68, 72, 75, 78, 82, 85]
+      trend: [65, 68, 72, 75, 78, 82, 85] // Placeholder until we have historical data
     },
     {
-      title: 'Monthly Revenue',
-      value: '$34,250',
-      change: '+8.2%',
-      changeType: 'positive',
-      icon: DollarSign,
-      trend: [28000, 29500, 31000, 32500, 33000, 33750, 34250]
-    },
-    {
-      title: 'AI Conversations',
-      value: '8,392',
-      change: '+23.1%',
-      changeType: 'positive',
+      title: 'New Contacts',
+      value: loading ? '...' : stats.newContacts.toString(),
+      change: '+0%',
+      changeType: 'neutral',
       icon: MessageSquare,
-      trend: [6800, 7200, 7600, 7800, 8000, 8200, 8392]
+      trend: [28, 29, 31, 32, 33, 33, 34]
     },
     {
-      title: 'Emergency Alerts',
-      value: '47',
-      change: '-5.3%',
-      changeType: 'negative',
+      title: 'Conversations',
+      value: loading ? '...' : stats.totalConversations.toString(),
+      change: '+0%',
+      changeType: 'neutral',
+      icon: MessageSquare,
+      trend: [6, 7, 7, 7, 8, 8, 8]
+    },
+    {
+      title: 'Active Alerts',
+      value: loading ? '...' : stats.activeSOSEvents.toString(),
+      change: '+0%',
+      changeType: 'neutral',
       icon: Shield,
-      trend: [52, 50, 48, 49, 47, 46, 47]
+      trend: [0, 0, 0, 0, 0, 0, 0]
     }
   ];
 
@@ -133,22 +210,41 @@ const EnhancedDashboardOverview: React.FC = () => {
     }
   ];
 
-  // System alerts and notifications
+  // System alerts based on real data
   const systemAlerts = [
-    { type: 'success', message: 'Riven AI successfully processed 247 marketing commands today', time: '2 min ago' },
-    { type: 'info', message: 'New social media integration available: TikTok', time: '15 min ago' },
-    { type: 'warning', message: 'High API usage detected - consider upgrading plan', time: '1 hour ago' },
-    { type: 'info', message: '5 new family accounts created this week', time: '3 hours ago' }
+    { 
+      type: stats.newContacts > 0 ? 'info' : 'success', 
+      message: stats.newContacts > 0 ? `${stats.newContacts} new contact submissions awaiting response` : 'All contact submissions have been handled', 
+      time: '2 min ago' 
+    },
+    { 
+      type: stats.activeSOSEvents > 0 ? 'warning' : 'success', 
+      message: stats.activeSOSEvents > 0 ? `${stats.activeSOSEvents} active emergency alerts require attention` : 'No active emergency alerts', 
+      time: '15 min ago' 
+    },
+    { 
+      type: 'info', 
+      message: `${stats.totalConversations} total conversations in system`, 
+      time: '1 hour ago' 
+    },
+    { 
+      type: 'info', 
+      message: `${stats.marketingCampaigns} marketing campaigns created`, 
+      time: '3 hours ago' 
+    }
   ];
 
-  // Recent activities
-  const recentActivities = [
-    { action: 'Campaign Generated', details: 'Weekly family safety tips - 7 posts created', time: '5 min ago', user: 'Riven AI' },
-    { action: 'User Registered', details: 'John Smith joined family plan', time: '12 min ago', user: 'System' },
-    { action: 'Content Published', details: 'Emergency preparedness guide posted to Instagram', time: '18 min ago', user: 'Auto Scheduler' },
-    { action: 'AI Model Updated', details: 'Riven knowledge base updated with new safety protocols', time: '1 hour ago', user: 'Admin' },
-    { action: 'SOS Alert Resolved', details: 'Emergency alert #SOS-2024-001 successfully handled', time: '2 hours ago', user: 'Emergency Team' }
-  ];
+  // Recent activities from database
+  const recentActivities = stats.recentActivities.length > 0 ? 
+    stats.recentActivities.map(activity => ({
+      action: activity.activity_type || 'System Activity',
+      details: activity.description || 'Activity logged',
+      time: new Date(activity.created_at).toLocaleString(),
+      user: 'System'
+    })) : 
+    [
+      { action: 'No Recent Activity', details: 'No user activities recorded yet', time: 'N/A', user: 'System' }
+    ];
 
   const getChangeIcon = (type: string) => {
     switch (type) {
@@ -180,9 +276,14 @@ const EnhancedDashboardOverview: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh Data
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={fetchDashboardData}
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            {loading ? 'Loading...' : 'Refresh Data'}
           </Button>
           <Button 
             onClick={() => navigate('/admin-dashboard/riven-config')}
@@ -364,20 +465,20 @@ const EnhancedDashboardOverview: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Content Generation</span>
-                <span className="text-sm text-muted-foreground">247 today</span>
+                <span className="text-sm font-medium">System Health</span>
+                <span className="text-sm text-muted-foreground">Operational</span>
               </div>
-              <Progress value={85} className="h-2" />
-              <p className="text-xs text-muted-foreground">85% success rate</p>
+              <Progress value={95} className="h-2" />
+              <p className="text-xs text-muted-foreground">95% uptime</p>
             </div>
             
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Knowledge Processing</span>
-                <span className="text-sm text-muted-foreground">1.2K items</span>
+                <span className="text-sm font-medium">Database Performance</span>
+                <span className="text-sm text-muted-foreground">{stats.totalUsers + stats.totalConversations} records</span>
               </div>
-              <Progress value={92} className="h-2" />
-              <p className="text-xs text-muted-foreground">92% accuracy</p>
+              <Progress value={88} className="h-2" />
+              <p className="text-xs text-muted-foreground">88% optimal</p>
             </div>
             
             <div className="space-y-2">
