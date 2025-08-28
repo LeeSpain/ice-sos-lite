@@ -29,7 +29,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
               {t('hero.titlePart1')} 
-              <span className="text-emergency-glow drop-shadow-md">{t('hero.titleEmphasis')}</span> {t('hero.titlePart2')}
+              <span className="text-wellness drop-shadow-md">{t('hero.titleEmphasis')}</span> {t('hero.titlePart2')}
             </h1>
             
             <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
@@ -42,7 +42,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                 size="xl" 
                 className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
               >
-                <Link to="/register">{t('hero.ctaJoin')}</Link>
+                <Link to="/ai-register">{t('hero.ctaJoin')}</Link>
               </Button>
               <Button 
                 size="xl" 

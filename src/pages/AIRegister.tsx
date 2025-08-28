@@ -15,7 +15,7 @@ import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { usePreferences } from '@/contexts/PreferencesContext';
-import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
+
 import SEO from '@/components/SEO';
 
 
@@ -87,74 +87,8 @@ const AIRegister = () => {
   const [testingMode, setTestingMode] = useState(false);
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { currency, language } = usePreferences();
+  const { language } = usePreferences();
 
-  // Debug log for component renders and currency changes
-  console.log('🎯 AIRegister component render - Currency:', currency, 'Language:', language);
-
-  // Convert all data based on current currency using useMemo for proper re-rendering
-  const convertedPlans = useMemo(() => {
-    console.log('🔄 [RECALCULATING] Converting plans, currency:', currency, 'plans:', dbPlans.length);
-    if (dbPlans.length === 0) {
-      console.log('⚠️ No plans to convert yet');
-      return [];
-    }
-    const converted = dbPlans.map(plan => {
-      const originalPrice = parseFloat(plan.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`📋 Plan "${plan.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
-      return {
-        ...plan,
-        convertedPrice,
-        formattedPrice
-      };
-    });
-    console.log('✅ Final converted plans:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
-    return converted;
-  }, [dbPlans, currency, language]);
-
-  const convertedProducts = useMemo(() => {
-    console.log('🔄 [RECALCULATING] Converting products, currency:', currency, 'products:', products.length);
-    if (products.length === 0) {
-      console.log('⚠️ No products to convert yet');
-      return [];
-    }
-    const converted = products.map(product => {
-      const originalPrice = parseFloat(product.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`📦 Product "${product.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
-      return {
-        ...product,
-        convertedPrice,
-        formattedPrice
-      };
-    });
-    console.log('✅ Final converted products:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
-    return converted;
-  }, [products, currency, language]);
-
-  const convertedRegionalServices = useMemo(() => {
-    console.log('🔄 [RECALCULATING] Converting regional services, currency:', currency, 'services:', regionalServices.length);
-    if (regionalServices.length === 0) {
-      console.log('⚠️ No regional services to convert yet');
-      return [];
-    }
-    const converted = regionalServices.map(service => {
-      const originalPrice = parseFloat(service.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`🌍 Service "${service.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
-      return {
-        ...service,
-        convertedPrice,
-        formattedPrice
-      };
-    });
-    console.log('✅ Final converted regional services:', converted.map(s => ({ name: s.name, formatted: s.formattedPrice })));
-    return converted;
-  }, [regionalServices, currency, language]);
 
   // Fetch plans, products, and regional services from database
   useEffect(() => {
@@ -389,21 +323,21 @@ const AIRegister = () => {
             console.error('Error creating profile:', profileError);
           }
 
-          // Send welcome email (non-blocking)
-          try {
-            const selectedPlanName = convertedPlans.find(p => p.id === selectedMainPlan)?.name;
-            await supabase.functions.invoke('send-welcome-email', {
-              body: {
-                userId,
-                email: personalDetails.email,
-                firstName: personalDetails.firstName,
-                lastName: personalDetails.lastName,
-                subscriptionTier: selectedPlanName
-              }
-            });
-          } catch (e) {
-            console.warn('Welcome email failed:', e);
-          }
+        // Send welcome email (non-blocking)
+        try {
+          const selectedPlanName = dbPlans.find(p => p.id === selectedMainPlan)?.name;
+          await supabase.functions.invoke('send-welcome-email', {
+            body: {
+              userId,
+              email: personalDetails.email,
+              firstName: personalDetails.firstName,
+              lastName: personalDetails.lastName,
+              subscriptionTier: selectedPlanName
+            }
+          });
+        } catch (e) {
+          console.warn('Welcome email failed:', e);
+        }
         }
       }
 
@@ -440,24 +374,24 @@ const AIRegister = () => {
   };
 
 
-  // Helper functions using converted data
-  const convertedPremiumPlan = convertedPlans.find(p => p.name === 'Premium Protection');
-  const convertedFamilyPlan = convertedPlans.find(p => p.name.includes('Family'));
+  // Helper functions using original data
+  const premiumPlan = dbPlans.find(p => p.name === 'Premium Protection');
+  const familyPlan = dbPlans.find(p => p.name.includes('Family'));
 
   // Tax rates
   const PRODUCT_IVA_RATE = 0.21; // 21% for products
   const SERVICE_IVA_RATE = 0.10; // 10% for regional services
 
   const calculateSubscriptionTotal = () => {
-    let total = convertedPremiumPlan ? convertedPremiumPlan.convertedPrice : 0;
-    if (hasFamilyPlan && convertedFamilyPlan) {
-      total += convertedFamilyPlan.convertedPrice;
+    let total = premiumPlan ? premiumPlan.price : 0;
+    if (hasFamilyPlan && familyPlan) {
+      total += familyPlan.price;
     }
     // Add regional services (subscription-based) with IVA
     selectedRegionalServices.forEach(serviceId => {
-      const service = convertedRegionalServices.find(s => s.id === serviceId);
+      const service = regionalServices.find(s => s.id === serviceId);
       if (service) {
-        const priceWithIva = service.convertedPrice * (1 + SERVICE_IVA_RATE);
+        const priceWithIva = service.price * (1 + SERVICE_IVA_RATE);
         total += priceWithIva;
       }
     });
@@ -467,9 +401,9 @@ const AIRegister = () => {
   const calculateProductTotal = () => {
     let total = 0;
     selectedProducts.forEach(productId => {
-      const product = convertedProducts.find(p => p.id === productId);
+      const product = products.find(p => p.id === productId);
       if (product) {
-        const priceWithIva = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
+        const priceWithIva = product.price * (1 + PRODUCT_IVA_RATE);
         total += priceWithIva;
       }
     });
@@ -500,8 +434,8 @@ const AIRegister = () => {
 
   const getSelectedSubscriptionPlans = (): string[] => {
     const planIds: string[] = [];
-    if (convertedPremiumPlan) planIds.push(convertedPremiumPlan.id);
-    if (hasFamilyPlan && convertedFamilyPlan) planIds.push(convertedFamilyPlan.id);
+    if (premiumPlan) planIds.push(premiumPlan.id);
+    if (hasFamilyPlan && familyPlan) planIds.push(familyPlan.id);
     // Add selected regional services as they are subscription-based
     planIds.push(...selectedRegionalServices);
     return planIds;
@@ -672,20 +606,20 @@ const AIRegister = () => {
                     {/* Premium Protection Plan - Fixed Standard */}
                     <div className="space-y-4">
                       <h3 className="font-medium text-foreground">Standard Protection Plan:</h3>
-                      {convertedPremiumPlan && (
+                      {premiumPlan && (
                         <div className="p-4 border-2 border-primary bg-primary/5 rounded-lg">
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <Shield className="h-5 w-5 text-primary" />
-                                <h3 className="font-semibold text-lg">{convertedPremiumPlan.name}</h3>
+                                <h3 className="font-semibold text-lg">{premiumPlan.name}</h3>
                                 <span className="bg-primary text-primary-foreground text-xs px-2 py-1 rounded-full">
                                   Standard
                                 </span>
                               </div>
-                              <p className="text-muted-foreground mb-3">{convertedPremiumPlan.description}</p>
+                              <p className="text-muted-foreground mb-3">{premiumPlan.description}</p>
                               <div className="grid grid-cols-2 gap-2">
-                                {convertedPremiumPlan.features.map((feature, idx) => (
+                                {premiumPlan.features.map((feature, idx) => (
                                   <div key={idx} className="flex items-center gap-1 text-sm">
                                     <Check className="h-3 w-3 text-green-500" />
                                     <span>{feature}</span>
@@ -696,12 +630,12 @@ const AIRegister = () => {
                             <div className="text-right ml-4">
                               <div className="space-y-1">
                                 <div className="text-sm text-muted-foreground">
-                                  Net: {convertedPremiumPlan.formattedPrice}
+                                  Net: €{premiumPlan.price}
                                 </div>
                                 <div className="font-bold text-lg text-primary">
-                                  {convertedPremiumPlan.formattedPrice}
+                                  €{premiumPlan.price}
                                 </div>
-                                <div className="text-sm text-muted-foreground">per {convertedPremiumPlan.billing_interval}</div>
+                                <div className="text-sm text-muted-foreground">per {premiumPlan.billing_interval}</div>
                               </div>
                             </div>
                           </div>
@@ -720,11 +654,11 @@ const AIRegister = () => {
 
 
                       {/* Safety Products Section */}
-                      {convertedProducts.length > 0 && (
+                      {products.length > 0 && (
                         <div className="space-y-3">
                           <h4 className="font-medium text-foreground">Safety Products (One-time purchase):</h4>
-                          {convertedProducts.map((product) => {
-                            const priceWithIva = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
+                          {products.map((product) => {
+                            const priceWithIva = product.price * (1 + PRODUCT_IVA_RATE);
                             return (
                               <div key={product.id} className={`p-3 border rounded-lg transition-all ${
                                 selectedProducts.includes(product.id) ? 'border-primary bg-primary/5' : 'border-border'
@@ -760,16 +694,16 @@ const AIRegister = () => {
                                           <div className="space-y-2">
                                             <div className="flex justify-between items-center text-sm">
                                               <span className="text-muted-foreground">Net Price:</span>
-                                              <span className="font-medium">{product.formattedPrice}</span>
+                                              <span className="font-medium">€{product.price}</span>
                                             </div>
                                             <div className="flex justify-between items-center text-xs">
                                               <span className="text-muted-foreground">IVA (21%):</span>
-                                              <span className="font-medium">+ {formatDisplayCurrency(product.convertedPrice * PRODUCT_IVA_RATE, currency, languageToLocale(language))}</span>
+                                              <span className="font-medium">+ €{(product.price * PRODUCT_IVA_RATE).toFixed(2)}</span>
                                             </div>
                                             <div className="border-t border-border pt-2">
                                               <div className="flex justify-between items-center">
                                                 <span className="font-semibold text-foreground">Total:</span>
-                                                <span className="font-bold text-lg text-primary">{formatDisplayCurrency(priceWithIva, currency, languageToLocale(language))}</span>
+                                                <span className="font-bold text-lg text-primary">€{priceWithIva.toFixed(2)}</span>
                                               </div>
                                               <div className="text-center mt-1">
                                                 <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
@@ -790,11 +724,11 @@ const AIRegister = () => {
                       )}
 
                       {/* Regional Services Section */}
-                      {convertedRegionalServices.length > 0 && (
+                      {regionalServices.length > 0 && (
                         <div className="space-y-3">
                           <h4 className="font-medium text-foreground">Regional Services (Monthly subscription):</h4>
-                          {convertedRegionalServices.map((service) => {
-                            const priceWithIva = service.convertedPrice * (1 + SERVICE_IVA_RATE);
+                          {regionalServices.map((service) => {
+                            const priceWithIva = service.price * (1 + SERVICE_IVA_RATE);
                             return (
                               <div key={service.id} className={`p-3 border rounded-lg transition-all ${
                                 selectedRegionalServices.includes(service.id) ? 'border-primary bg-primary/5' : 'border-border'
@@ -832,16 +766,16 @@ const AIRegister = () => {
                                           <div className="space-y-2">
                                             <div className="flex justify-between items-center text-sm">
                                               <span className="text-muted-foreground">Net Price:</span>
-                                              <span className="font-medium">{service.formattedPrice}</span>
+                                              <span className="font-medium">€{service.price}</span>
                                             </div>
                                             <div className="flex justify-between items-center text-sm">
                                               <span className="text-muted-foreground">IVA (10%):</span>
-                                              <span className="font-medium">+ {formatDisplayCurrency(service.convertedPrice * SERVICE_IVA_RATE, currency, languageToLocale(language))}</span>
+                                              <span className="font-medium">+ €{(service.price * SERVICE_IVA_RATE).toFixed(2)}</span>
                                             </div>
                                             <div className="border-t border-border pt-2">
                                               <div className="flex justify-between items-center">
                                                 <span className="font-semibold text-foreground">Total:</span>
-                                                <span className="font-bold text-lg text-primary">{formatDisplayCurrency(priceWithIva, currency, languageToLocale(language))}</span>
+                                                <span className="font-bold text-lg text-primary">€{priceWithIva.toFixed(2)}</span>
                                               </div>
                                               <div className="text-center mt-1">
                                                 <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
@@ -884,22 +818,22 @@ const AIRegister = () => {
                             </div>
                             <div className="text-right ml-6">
                               <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                <div className="font-bold text-lg text-foreground">{convertedPremiumPlan?.formattedPrice || formatDisplayCurrency(0, currency, languageToLocale(language))}</div>
+                                <div className="font-bold text-lg text-foreground">€{premiumPlan?.price || 0}</div>
                                 <div className="text-xs text-muted-foreground mt-1">per month</div>
                               </div>
                             </div>
                           </div>
                           
                           {/* Family Plan */}
-                          {hasFamilyPlan && convertedFamilyPlan && (
+                          {hasFamilyPlan && familyPlan && (
                             <div className="flex justify-between items-start border-t border-border/30 pt-4">
                               <div className="flex-1">
-                                <div className="font-medium text-foreground text-base">{convertedFamilyPlan.name}</div>
+                                <div className="font-medium text-foreground text-base">{familyPlan.name}</div>
                                 <div className="text-sm text-muted-foreground mt-1">Family protection add-on • Monthly subscription</div>
                               </div>
                               <div className="text-right ml-6">
                                 <div className="bg-gradient-to-br from-background to-muted/20 rounded-lg p-3 border border-border/50 shadow-sm">
-                                  <div className="font-bold text-lg text-foreground">{convertedFamilyPlan.formattedPrice}</div>
+                                  <div className="font-bold text-lg text-foreground">€{familyPlan.price}</div>
                                   <div className="text-xs text-muted-foreground mt-1">per month</div>
                                 </div>
                               </div>
@@ -908,11 +842,11 @@ const AIRegister = () => {
                           
                           {/* Regional Services */}
                           {selectedRegionalServices.length > 0 && selectedRegionalServices.map(serviceId => {
-                            const service = convertedRegionalServices.find(s => s.id === serviceId);
+                            const service = regionalServices.find(s => s.id === serviceId);
                             if (!service) return null;
-                            const netPrice = service.convertedPrice;
-                            const ivaAmount = service.convertedPrice * SERVICE_IVA_RATE;
-                            const totalPrice = service.convertedPrice * (1 + SERVICE_IVA_RATE);
+                            const netPrice = service.price;
+                            const ivaAmount = service.price * SERVICE_IVA_RATE;
+                            const totalPrice = service.price * (1 + SERVICE_IVA_RATE);
                             return (
                               <div key={serviceId} className="border-t border-border/30 pt-4">
                                 <div className="flex justify-between items-start">
@@ -925,16 +859,16 @@ const AIRegister = () => {
                                       <div className="space-y-2">
                                         <div className="flex justify-between items-center text-sm">
                                           <span className="text-muted-foreground">Net Price:</span>
-                                          <span className="font-medium">{formatDisplayCurrency(netPrice, currency, languageToLocale(language))}</span>
+                                          <span className="font-medium">€{netPrice.toFixed(2)}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-xs">
                                           <span className="text-muted-foreground">IVA (10%):</span>
-                                          <span className="font-medium">+ {formatDisplayCurrency(ivaAmount, currency, languageToLocale(language))}</span>
+                                          <span className="font-medium">+ €{ivaAmount.toFixed(2)}</span>
                                         </div>
                                         <div className="border-t border-border pt-2">
                                           <div className="flex justify-between items-center">
                                             <span className="font-semibold text-foreground">Total:</span>
-                                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(totalPrice, currency, languageToLocale(language))}</span>
+                                            <span className="font-bold text-lg text-foreground">€{totalPrice.toFixed(2)}</span>
                                           </div>
                                           <div className="text-center mt-1">
                                             <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
@@ -958,11 +892,11 @@ const AIRegister = () => {
                           <h5 className="font-semibold text-foreground mb-4 text-sm uppercase tracking-wide">Safety Products (One-time purchase)</h5>
                           <div className="space-y-4">
                             {selectedProducts.map(productId => {
-                              const product = convertedProducts.find(p => p.id === productId);
+                              const product = products.find(p => p.id === productId);
                               if (!product) return null;
-                              const netPrice = product.convertedPrice;
-                              const ivaAmount = product.convertedPrice * PRODUCT_IVA_RATE;
-                              const totalPrice = product.convertedPrice * (1 + PRODUCT_IVA_RATE);
+                              const netPrice = product.price;
+                              const ivaAmount = product.price * PRODUCT_IVA_RATE;
+                              const totalPrice = product.price * (1 + PRODUCT_IVA_RATE);
                               return (
                                 <div key={productId} className="flex justify-between items-start">
                                   <div className="flex-1">
@@ -974,16 +908,16 @@ const AIRegister = () => {
                                       <div className="space-y-2">
                                         <div className="flex justify-between items-center text-sm">
                                           <span className="text-muted-foreground">Net Price:</span>
-                                          <span className="font-medium">{formatDisplayCurrency(netPrice, currency, languageToLocale(language))}</span>
+                                          <span className="font-medium">€{netPrice.toFixed(2)}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-xs">
                                           <span className="text-muted-foreground">IVA (21%):</span>
-                                          <span className="font-medium">+ {formatDisplayCurrency(ivaAmount, currency, languageToLocale(language))}</span>
+                                          <span className="font-medium">+ €{ivaAmount.toFixed(2)}</span>
                                         </div>
                                         <div className="border-t border-border pt-2">
                                           <div className="flex justify-between items-center">
                                             <span className="font-semibold text-foreground">Total:</span>
-                                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(totalPrice, currency, languageToLocale(language))}</span>
+                                            <span className="font-bold text-lg text-foreground">€{totalPrice.toFixed(2)}</span>
                                           </div>
                                           <div className="text-center mt-1">
                                             <span className="text-xs bg-secondary/50 text-secondary-foreground px-2 py-1 rounded-full">
@@ -1010,7 +944,7 @@ const AIRegister = () => {
                               <span className="font-semibold text-foreground">Monthly Subscription:</span>
                               <div className="text-sm text-muted-foreground">Recurring monthly charge</div>
                             </div>
-                            <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(calculateSubscriptionTotal(), currency, languageToLocale(language))}/month</span>
+                            <span className="font-bold text-lg text-foreground">€{calculateSubscriptionTotal().toFixed(2)}/month</span>
                           </div>
                           
                           {/* One-time Products Total */}
@@ -1020,7 +954,7 @@ const AIRegister = () => {
                                 <span className="font-semibold text-foreground">One-time Products:</span>
                                 <div className="text-sm text-muted-foreground">Today only charge</div>
                               </div>
-                              <span className="font-bold text-lg text-foreground">{formatDisplayCurrency(calculateProductTotal(), currency, languageToLocale(language))}</span>
+                              <span className="font-bold text-lg text-foreground">€{calculateProductTotal().toFixed(2)}</span>
                             </div>
                           )}
                           
@@ -1032,7 +966,7 @@ const AIRegister = () => {
                                 {calculateProductTotal() > 0 ? 'Monthly + one-time charges' : 'Monthly subscription charge'}
                               </div>
                             </div>
-                            <span className="text-3xl font-bold text-foreground">{formatDisplayCurrency(calculateGrandTotal(), currency, languageToLocale(language))}</span>
+                            <span className="text-3xl font-bold text-foreground">€{calculateGrandTotal().toFixed(2)}</span>
                           </div>
                         </div>
                       </div>

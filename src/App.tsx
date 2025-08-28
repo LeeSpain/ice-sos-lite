@@ -11,7 +11,7 @@ import EnhancedErrorBoundary from '@/components/EnhancedErrorBoundary';
 // Import all pages
 import Index from "./pages/Index";
 import AuthPage from "./pages/AuthPage";
-import Register from "./pages/Register";
+
 import AIRegister from "./pages/AIRegister";
 import Contact from "./pages/Contact";
 import Videos from "./pages/Videos";
@@ -57,11 +57,6 @@ const App = () => {
               <Route path="/auth" element={
                 <OptimizedSuspense skeletonType="card">
                   <AuthPage />
-                </OptimizedSuspense>
-              } />
-              <Route path="/register" element={
-                <OptimizedSuspense skeletonType="card">
-                  <Register />
                 </OptimizedSuspense>
               } />
               <Route path="/ai-register" element={

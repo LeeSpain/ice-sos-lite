@@ -45,7 +45,7 @@ const AppDownload = () => {
                 
                 {/* CTA Button */}
                 <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
-                  <Link to="/register" className="flex items-center justify-center">
+                  <Link to="/ai-register" className="flex items-center justify-center">
                     <Download className="mr-2 h-4 w-4" />
                     {t('appDownload.cta')}
                   </Link>
