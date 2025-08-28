@@ -104,7 +104,7 @@ const FamilyCarerAccess = () => {
                 
                 {/* CTA Buttons */}
                 <div className="flex flex-col gap-3">
-                  <Button asChild size="lg" className="bg-gradient-to-r from-warning to-warning/80 hover:from-warning/90 hover:to-warning/70 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
+                  <Button asChild size="lg" className="bg-warning hover:bg-warning/90 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl border-2 border-warning/30">
                     <Link to="/family-carer-access">
                       <Users className="mr-2 h-4 w-4" />
                       Learn More

@@ -39,8 +39,9 @@
     --neutral: 0 0% 45%; /* Professional Gray #737373 - Secondary text */
     --neutral-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%; /* Amber Warning #F59E0B */
+    --warning: 38 92% 58%; /* Brighter Amber Warning #FF9F00 */
     --warning-foreground: 0 0% 100%;
+    --warning-bright: 38 95% 65%; /* Extra bright orange for highlights */
 
     --secondary: 0 0% 97%;
     --secondary-foreground: 215 25% 27%;
