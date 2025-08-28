@@ -398,7 +398,7 @@ const GlobalProtectionPlansPage = () => {
               Add Plan
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border border-border shadow-2xl z-50">
             <DialogHeader>
               <DialogTitle>Create New Protection Plan</DialogTitle>
               <DialogDescription>
@@ -541,7 +541,7 @@ const GlobalProtectionPlansPage = () => {
                             <Edit className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border border-border shadow-2xl z-50">
                           <DialogHeader>
                             <DialogTitle>Edit Protection Plan</DialogTitle>
                             <DialogDescription>
