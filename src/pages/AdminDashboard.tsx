@@ -35,6 +35,8 @@ import AnalyticsPage from '@/components/admin/pages/AnalyticsPage';
 import VideoAnalyticsPage from '@/components/admin/pages/VideoAnalyticsPage';
 import EmergencyIncidentsPage from '@/components/admin/pages/EmergencyIncidentsPage';
 import SafetyMonitoringPage from '@/components/admin/pages/SafetyMonitoringPage';
+import WhatsAppIntegrationPage from '@/components/admin/pages/WhatsAppIntegrationPage';
+import AIPerformancePage from '@/components/admin/pages/AIPerformancePage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -61,13 +63,13 @@ const AdminDashboard: React.FC = () => {
         <Route path="families" element={<FamilyAccountsPage />} />
         <Route path="leads" element={<LeadsPage />} />
         <Route path="conversations" element={<ConversationsPage />} />
-        <Route path="ai-metrics" element={<div className="p-6"><h1 className="text-3xl font-bold">AI Performance</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
+        <Route path="ai-metrics" element={<AIPerformancePage />} />
         <Route path="contact-submissions" element={<ContactSubmissionsPage />} />
         <Route path="email-campaigns" element={<EmailCampaignsPage />} />
         <Route path="communication" element={<CommunicationPage />} />
         <Route path="social-media" element={<SocialMediaIntegration />} />
         <Route path="content-automation" element={<ContentAutomation />} />
-        <Route path="whatsapp" element={<div className="p-6"><h1 className="text-3xl font-bold">WhatsApp Integration</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
+        <Route path="whatsapp" element={<WhatsAppIntegrationPage />} />
         <Route path="emergencies" element={<EmergencyIncidentsPage />} />
         <Route path="safety" element={<SafetyMonitoringPage />} />
         <Route path="products" element={<ProductsPage />} />
