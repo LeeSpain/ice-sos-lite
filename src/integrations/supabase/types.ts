@@ -816,50 +816,184 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_contacts: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string
+          priority: number
+          relationship: string | null
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone: string
+          priority?: number
+          relationship?: string | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string
+          priority?: number
+          relationship?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      family_groups: {
+        Row: {
+          created_at: string | null
+          id: string
+          owner_seat_quota: number
+          owner_user_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          owner_seat_quota?: number
+          owner_user_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          owner_seat_quota?: number
+          owner_user_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       family_invites: {
         Row: {
           accepted_at: string | null
+          billing_type: string
+          contact_id: string | null
           created_at: string
           expires_at: string
+          group_id: string | null
           id: string
           invite_token: string
           invitee_email: string
           invitee_name: string
           inviter_email: string
           inviter_user_id: string
+          name: string | null
+          phone: string | null
           relationship: string | null
           status: string
           updated_at: string
         }
         Insert: {
           accepted_at?: string | null
+          billing_type?: string
+          contact_id?: string | null
           created_at?: string
           expires_at: string
+          group_id?: string | null
           id?: string
           invite_token?: string
           invitee_email: string
           invitee_name: string
           inviter_email: string
           inviter_user_id: string
+          name?: string | null
+          phone?: string | null
           relationship?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
           accepted_at?: string | null
+          billing_type?: string
+          contact_id?: string | null
           created_at?: string
           expires_at?: string
+          group_id?: string | null
           id?: string
           invite_token?: string
           invitee_email?: string
           invitee_name?: string
           inviter_email?: string
           inviter_user_id?: string
+          name?: string | null
+          phone?: string | null
           relationship?: string | null
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "family_invites_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "emergency_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_invites_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_memberships: {
+        Row: {
+          billing_type: string
+          created_at: string | null
+          group_id: string
+          id: string
+          status: string
+          stripe_subscription_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          billing_type: string
+          created_at?: string | null
+          group_id: string
+          id?: string
+          status: string
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          billing_type?: string
+          created_at?: string | null
+          group_id?: string
+          id?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_memberships_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gmail_token_access_log: {
         Row: {
@@ -1560,6 +1694,38 @@ export type Database = {
         }
         Relationships: []
       }
+      sos_acknowledgements: {
+        Row: {
+          acknowledged_at: string | null
+          event_id: string
+          family_user_id: string
+          id: string
+          message: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          event_id: string
+          family_user_id: string
+          id?: string
+          message?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          event_id?: string
+          family_user_id?: string
+          id?: string
+          message?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_acknowledgements_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "sos_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sos_call_attempts: {
         Row: {
           attempt_order: number
@@ -1619,6 +1785,50 @@ export type Database = {
           },
         ]
       }
+      sos_events: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          group_id: string | null
+          id: string
+          metadata: Json | null
+          resolved_at: string | null
+          status: string
+          trigger_location: Json | null
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          status?: string
+          trigger_location?: Json | null
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          metadata?: Json | null
+          resolved_at?: string | null
+          status?: string
+          trigger_location?: Json | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_events_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sos_incidents: {
         Row: {
           calls_initiated: number
@@ -1663,6 +1873,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      sos_locations: {
+        Row: {
+          accuracy: number | null
+          address: string | null
+          created_at: string | null
+          event_id: string
+          id: string
+          lat: number
+          lng: number
+        }
+        Insert: {
+          accuracy?: number | null
+          address?: string | null
+          created_at?: string | null
+          event_id: string
+          id?: string
+          lat: number
+          lng: number
+        }
+        Update: {
+          accuracy?: number | null
+          address?: string | null
+          created_at?: string | null
+          event_id?: string
+          id?: string
+          lat?: number
+          lng?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_locations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "sos_events"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscribers: {
         Row: {
