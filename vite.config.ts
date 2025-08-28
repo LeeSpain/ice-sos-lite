@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: 'ICE SOS Lite',
         short_name: 'ICESOS',
-        start_url: '/',
+        start_url: '/app',
         display: 'standalone',
         background_color: '#0b0b0f',
         theme_color: '#ef4444',
