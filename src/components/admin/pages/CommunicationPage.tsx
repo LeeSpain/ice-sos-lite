@@ -64,7 +64,7 @@ interface CommunicationMetrics {
   channel_breakdown: Record<string, number>;
 }
 
-const CommunicationPage: React.FC = () => {
+export default function CommunicationPage() {
   const { toast } = useToast();
   const { user } = useAuth();
   
@@ -509,22 +509,27 @@ const CommunicationPage: React.FC = () => {
             {/* Message View */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                {selectedConversation ? (
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle>
+                    {selectedConversation ? (
+                      <div className="flex items-center gap-2">
                         {getChannelIcon(selectedConversation.channel)}
-                        {selectedConversation.contact_name || selectedConversation.contact_email || 'Unknown Contact'}
-                      </CardTitle>
-                      {selectedConversation.subject && (
-                        <p className="text-sm text-muted-foreground">{selectedConversation.subject}</p>
-                      )}
-                    </div>
+                        <span>{selectedConversation.contact_name || selectedConversation.contact_email || selectedConversation.contact_phone}</span>
+                        <Badge variant={getStatusColor(selectedConversation.status)}>
+                          {selectedConversation.status}
+                        </Badge>
+                      </div>
+                    ) : (
+                      'Select a conversation'
+                    )}
+                  </CardTitle>
+                  
+                  {selectedConversation && (
                     <div className="flex gap-2">
                       <Dialog open={showHandoverDialog} onOpenChange={setShowHandoverDialog}>
                         <DialogTrigger asChild>
-                          <Button size="sm" variant="outline">
-                            <UserPlus className="h-4 w-4 mr-1" />
+                          <Button variant="outline" size="sm">
+                            <UserPlus className="h-4 w-4 mr-2" />
                             Handover
                           </Button>
                         </DialogTrigger>
@@ -534,12 +539,16 @@ const CommunicationPage: React.FC = () => {
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
-                              <label className="text-sm font-medium">Assign To User ID</label>
-                              <Input
-                                value={handoverData.to_user_id}
-                                onChange={(e) => setHandoverData(prev => ({ ...prev, to_user_id: e.target.value }))}
-                                placeholder="Enter user ID"
-                              />
+                              <label className="text-sm font-medium">Handover to</label>
+                              <Select value={handoverData.to_user_id} onValueChange={(value) => setHandoverData(prev => ({ ...prev, to_user_id: value }))}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select team member" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="user1">John Doe</SelectItem>
+                                  <SelectItem value="user2">Jane Smith</SelectItem>
+                                </SelectContent>
+                              </Select>
                             </div>
                             <div>
                               <label className="text-sm font-medium">Reason</label>
@@ -554,65 +563,55 @@ const CommunicationPage: React.FC = () => {
                               <Textarea
                                 value={handoverData.notes}
                                 onChange={(e) => setHandoverData(prev => ({ ...prev, notes: e.target.value }))}
-                                placeholder="Additional notes"
+                                placeholder="Additional notes..."
                               />
                             </div>
-                            <div className="flex justify-end gap-2">
-                              <Button variant="outline" onClick={() => setShowHandoverDialog(false)}>
-                                Cancel
-                              </Button>
-                              <Button onClick={handoverConversation}>
-                                Handover
-                              </Button>
-                            </div>
+                            <Button onClick={handoverConversation} className="w-full">
+                              Complete Handover
+                            </Button>
                           </div>
                         </DialogContent>
                       </Dialog>
-                      
-                      <Button size="sm" variant="outline">
-                        <Settings className="h-4 w-4" />
-                      </Button>
                     </div>
-                  </div>
-                ) : (
-                  <CardTitle>Select a conversation</CardTitle>
-                )}
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {selectedConversation ? (
                   <div className="space-y-4">
                     {/* Messages */}
-                    <ScrollArea className="h-64 border rounded p-3">
-                      <div className="space-y-3">
-                        {messages.map((message) => (
-                          <div 
-                            key={message.id}
-                            className={`flex ${message.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}
-                          >
-                            <div className={`max-w-[70%] p-3 rounded-lg ${
+                    <ScrollArea className="h-96 border rounded-lg p-4">
+                      <div className="space-y-4">
+                        {messages.map((message, index) => (
+                          <div key={index} className={`flex ${message.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[70%] rounded-lg p-3 ${
                               message.direction === 'outbound' 
                                 ? 'bg-primary text-primary-foreground' 
                                 : 'bg-muted'
                             }`}>
-                              <div className="text-sm mb-1">
-                                <strong>{message.sender_name || 'Unknown'}</strong>
-                                <span className="text-xs ml-2 opacity-75">
-                                  {new Date(message.created_at).toLocaleTimeString()}
-                                </span>
-                              </div>
                               <p className="text-sm">{message.content}</p>
+                              <div className="flex justify-between items-center mt-2 text-xs opacity-70">
+                                <span>{message.sender_name}</span>
+                                <span>{new Date(message.created_at).toLocaleString()}</span>
+                              </div>
                             </div>
                           </div>
                         ))}
+                        
+                        {messages.length === 0 && (
+                          <div className="text-center py-8 text-muted-foreground">
+                            No messages in this conversation
+                          </div>
+                        )}
                       </div>
                     </ScrollArea>
-                    
-                    {/* Reply */}
+
+                    {/* Message Input */}
                     <div className="flex gap-2">
                       <Textarea
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type your reply..."
+                        placeholder="Type your message..."
                         className="flex-1"
                         rows={3}
                       />
@@ -622,8 +621,9 @@ const CommunicationPage: React.FC = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-64 text-muted-foreground">
-                    Select a conversation to view messages
+                  <div className="text-center py-16 text-muted-foreground">
+                    <MessageSquare className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                    <p>Select a conversation to view messages</p>
                   </div>
                 )}
               </CardContent>
@@ -631,46 +631,49 @@ const CommunicationPage: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-6">
-          {/* Metrics Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <TabsContent value="analytics" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Total Conversations</span>
-                </div>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Conversations</CardTitle>
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
                 <div className="text-2xl font-bold">{metrics?.total_conversations || 0}</div>
+                <p className="text-xs text-muted-foreground">Last 7 days</p>
               </CardContent>
             </Card>
-            
+
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <Send className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Total Messages</span>
-                </div>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Messages</CardTitle>
+                <Mail className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
                 <div className="text-2xl font-bold">{metrics?.total_messages || 0}</div>
+                <p className="text-xs text-muted-foreground">Last 7 days</p>
               </CardContent>
             </Card>
-            
+
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Avg Response Time</span>
-                </div>
-                <div className="text-2xl font-bold">{metrics?.avg_response_time || 0}min</div>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Avg Response Time</CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics?.avg_response_time || 0}m</div>
+                <p className="text-xs text-muted-foreground">Minutes</p>
               </CardContent>
             </Card>
-            
+
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center space-x-2">
-                  <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Avg Resolution Time</span>
-                </div>
-                <div className="text-2xl font-bold">{metrics?.avg_resolution_time || 0}min</div>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Avg Resolution Time</CardTitle>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics?.avg_resolution_time || 0}h</div>
+                <p className="text-xs text-muted-foreground">Hours</p>
               </CardContent>
             </Card>
           </div>
@@ -678,17 +681,27 @@ const CommunicationPage: React.FC = () => {
           {/* Channel Breakdown */}
           <Card>
             <CardHeader>
-              <CardTitle>Channel Distribution</CardTitle>
+              <CardTitle>Conversations by Channel</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {Object.entries(metrics?.channel_breakdown || {}).map(([channel, count]) => (
                   <div key={channel} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {getChannelIcon(channel)}
-                      <span className="capitalize">{channel}</span>
+                      <span className="capitalize">{channel.replace('_', ' ')}</span>
                     </div>
-                    <Badge variant="outline">{count}</Badge>
+                    <div className="flex items-center gap-2">
+                      <div className="w-32 bg-muted rounded-full h-2">
+                        <div 
+                          className="bg-primary h-2 rounded-full" 
+                          style={{ 
+                            width: `${(count / (metrics?.total_conversations || 1)) * 100}%` 
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium">{count}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -696,14 +709,18 @@ const CommunicationPage: React.FC = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="campaigns" className="space-y-6">
+        <TabsContent value="campaigns" className="space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">Bulk Messaging Campaigns</h3>
+            <div>
+              <h3 className="text-lg font-medium">Bulk Messaging Campaigns</h3>
+              <p className="text-sm text-muted-foreground">Create and manage bulk messaging campaigns</p>
+            </div>
+            
             <Dialog open={showBulkDialog} onOpenChange={setShowBulkDialog}>
               <DialogTrigger asChild>
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Campaign
+                  New Campaign
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl">
@@ -722,12 +739,7 @@ const CommunicationPage: React.FC = () => {
                     </div>
                     <div>
                       <label className="text-sm font-medium">Channel</label>
-                      <Select 
-                        value={bulkCampaign.channel} 
-                        onValueChange={(value: 'email' | 'whatsapp' | 'both') => 
-                          setBulkCampaign(prev => ({ ...prev, channel: value }))
-                        }
-                      >
+                      <Select value={bulkCampaign.channel} onValueChange={(value: any) => setBulkCampaign(prev => ({ ...prev, channel: value }))}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -742,53 +754,54 @@ const CommunicationPage: React.FC = () => {
                   
                   <div>
                     <label className="text-sm font-medium">Description</label>
-                    <Input
+                    <Textarea
                       value={bulkCampaign.description}
                       onChange={(e) => setBulkCampaign(prev => ({ ...prev, description: e.target.value }))}
                       placeholder="Campaign description"
                     />
                   </div>
                   
-                  {(bulkCampaign.channel === 'email' || bulkCampaign.channel === 'both') && (
+                  {bulkCampaign.channel !== 'whatsapp' && (
                     <div>
-                      <label className="text-sm font-medium">Email Subject</label>
+                      <label className="text-sm font-medium">Subject Template</label>
                       <Input
                         value={bulkCampaign.subject_template}
                         onChange={(e) => setBulkCampaign(prev => ({ ...prev, subject_template: e.target.value }))}
-                        placeholder="Hello {{first_name}}!"
+                        placeholder="Email subject (use {{name}} for personalization)"
                       />
                     </div>
                   )}
                   
                   <div>
-                    <label className="text-sm font-medium">Message Content</label>
+                    <label className="text-sm font-medium">Message Template</label>
                     <Textarea
                       value={bulkCampaign.content_template}
                       onChange={(e) => setBulkCampaign(prev => ({ ...prev, content_template: e.target.value }))}
-                      placeholder="Hi {{first_name}}, this is a message from our team..."
-                      rows={6}
+                      placeholder="Message content (use {{name}}, {{email}} for personalization)"
+                      rows={4}
                     />
                   </div>
                   
-                  <div className="border rounded p-4">
+                  <div className="border-t pt-4">
                     <h4 className="font-medium mb-3">Target Criteria</h4>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-3 gap-4">
                       <div>
                         <label className="text-sm font-medium">Subscription Status</label>
                         <Select 
-                          value={bulkCampaign.target_criteria.subscription_status}
-                          onValueChange={(value) => setBulkCampaign(prev => ({
-                            ...prev,
+                          value={bulkCampaign.target_criteria.subscription_status} 
+                          onValueChange={(value) => setBulkCampaign(prev => ({ 
+                            ...prev, 
                             target_criteria: { ...prev.target_criteria, subscription_status: value }
                           }))}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="All users" />
+                            <SelectValue placeholder="Any" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Users</SelectItem>
-                            <SelectItem value="active">Active Subscribers</SelectItem>
-                            <SelectItem value="inactive">Inactive Users</SelectItem>
+                            <SelectItem value="">Any</SelectItem>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="trial">Trial</SelectItem>
+                            <SelectItem value="expired">Expired</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -797,100 +810,105 @@ const CommunicationPage: React.FC = () => {
                         <label className="text-sm font-medium">Country</label>
                         <Input
                           value={bulkCampaign.target_criteria.country}
-                          onChange={(e) => setBulkCampaign(prev => ({
-                            ...prev,
+                          onChange={(e) => setBulkCampaign(prev => ({ 
+                            ...prev, 
                             target_criteria: { ...prev.target_criteria, country: e.target.value }
                           }))}
-                          placeholder="e.g., Spain"
+                          placeholder="Country code (e.g., US)"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-sm font-medium">Registered After</label>
+                        <Input
+                          type="date"
+                          value={bulkCampaign.target_criteria.created_after}
+                          onChange={(e) => setBulkCampaign(prev => ({ 
+                            ...prev, 
+                            target_criteria: { ...prev.target_criteria, created_after: e.target.value }
+                          }))}
                         />
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex justify-end gap-2">
-                    <Button variant="outline" onClick={() => setShowBulkDialog(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={createBulkCampaign}>
-                      Create Campaign
-                    </Button>
-                  </div>
+                  <Button onClick={createBulkCampaign} className="w-full">
+                    Create Campaign
+                  </Button>
                 </div>
               </DialogContent>
             </Dialog>
           </div>
 
           {/* Campaigns List */}
-          <div className="space-y-4">
+          <div className="grid gap-4">
             {campaigns.map((campaign) => (
               <Card key={campaign.id}>
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-semibold">{campaign.name}</h3>
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium">{campaign.name}</h4>
+                        <Badge variant={campaign.status === 'sent' ? 'default' : 'secondary'}>
+                          {campaign.status}
+                        </Badge>
+                        <Badge variant="outline">
+                          {campaign.channel}
+                        </Badge>
+                      </div>
                       <p className="text-sm text-muted-foreground">{campaign.description}</p>
+                      <div className="flex gap-4 text-sm">
+                        <span>Recipients: {campaign.recipient_count}</span>
+                        <span>Sent: {campaign.sent_count || 0}</span>
+                        <span>Opened: {campaign.opened_count || 0}</span>
+                        <span>Clicked: {campaign.clicked_count || 0}</span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={campaign.status === 'completed' ? 'default' : 'outline'}>
-                        {campaign.status}
-                      </Badge>
-                      <Badge variant="secondary">{campaign.channel}</Badge>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-4 gap-4 mb-4">
-                    <div>
-                      <div className="text-sm text-muted-foreground">Recipients</div>
-                      <div className="font-medium">{campaign.total_recipients}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground">Sent</div>
-                      <div className="font-medium">{campaign.sent_count}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground">Delivered</div>
-                      <div className="font-medium">{campaign.delivered_count}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-muted-foreground">Failed</div>
-                      <div className="font-medium">{campaign.failed_count}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-end gap-2">
-                    {campaign.status === 'draft' && (
-                      <Button size="sm" onClick={() => sendCampaign(campaign.id)}>
-                        <Send className="h-4 w-4 mr-1" />
-                        Send Campaign
+                    
+                    <div className="flex gap-2">
+                      {campaign.status === 'draft' && (
+                        <Button onClick={() => sendCampaign(campaign.id)} size="sm">
+                          <Send className="h-4 w-4 mr-2" />
+                          Send
+                        </Button>
+                      )}
+                      <Button variant="outline" size="sm">
+                        <Eye className="h-4 w-4 mr-2" />
+                        View
                       </Button>
-                    )}
-                    <Button size="sm" variant="outline">
-                      <Eye className="h-4 w-4 mr-1" />
-                      View Details
-                    </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             ))}
             
             {campaigns.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                No campaigns created yet
-              </div>
+              <Card>
+                <CardContent className="p-12 text-center">
+                  <Target className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <h3 className="font-medium mb-2">No campaigns yet</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Create your first bulk messaging campaign</p>
+                  <Button onClick={() => setShowBulkDialog(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Campaign
+                  </Button>
+                </CardContent>
+              </Card>
             )}
           </div>
         </TabsContent>
 
-        <TabsContent value="settings" className="space-y-6">
+        <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Communication Settings</CardTitle>
+              <p className="text-sm text-muted-foreground">Configure communication preferences and automation rules</p>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               <div className="space-y-4">
                 <div>
                   <h4 className="font-medium mb-2">Auto-Assignment Rules</h4>
-                  <p className="text-sm text-muted-foreground">Configure automatic conversation assignment based on criteria</p>
+                  <p className="text-sm text-muted-foreground">Configure how conversations are automatically assigned to team members</p>
                 </div>
                 
                 <div>
@@ -909,6 +927,4 @@ const CommunicationPage: React.FC = () => {
       </Tabs>
     </div>
   );
-};
-
-export default CommunicationPage;
+}
