@@ -322,6 +322,51 @@ export type Database = {
         }
         Relationships: []
       }
+      competitor_analysis: {
+        Row: {
+          analysis_date: string | null
+          avg_engagement_rate: number | null
+          competitor_handle: string
+          competitor_name: string
+          created_at: string | null
+          follower_count: number | null
+          id: string
+          metadata: Json | null
+          platform: string
+          posting_frequency: number | null
+          top_content_types: string[] | null
+          trending_hashtags: string[] | null
+        }
+        Insert: {
+          analysis_date?: string | null
+          avg_engagement_rate?: number | null
+          competitor_handle: string
+          competitor_name: string
+          created_at?: string | null
+          follower_count?: number | null
+          id?: string
+          metadata?: Json | null
+          platform: string
+          posting_frequency?: number | null
+          top_content_types?: string[] | null
+          trending_hashtags?: string[] | null
+        }
+        Update: {
+          analysis_date?: string | null
+          avg_engagement_rate?: number | null
+          competitor_handle?: string
+          competitor_name?: string
+          created_at?: string | null
+          follower_count?: number | null
+          id?: string
+          metadata?: Json | null
+          platform?: string
+          posting_frequency?: number | null
+          top_content_types?: string[] | null
+          trending_hashtags?: string[] | null
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           admin_response: string | null
@@ -373,6 +418,76 @@ export type Database = {
         }
         Relationships: []
       }
+      content_ab_tests: {
+        Row: {
+          campaign_id: string | null
+          confidence_level: number | null
+          ended_at: string | null
+          id: string
+          metadata: Json | null
+          started_at: string | null
+          statistical_significance: boolean | null
+          status: string | null
+          test_name: string
+          traffic_split: number | null
+          variant_a_content_id: string | null
+          variant_b_content_id: string | null
+          winner_variant: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          confidence_level?: number | null
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string | null
+          statistical_significance?: boolean | null
+          status?: string | null
+          test_name: string
+          traffic_split?: number | null
+          variant_a_content_id?: string | null
+          variant_b_content_id?: string | null
+          winner_variant?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          confidence_level?: number | null
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string | null
+          statistical_significance?: boolean | null
+          status?: string | null
+          test_name?: string
+          traffic_split?: number | null
+          variant_a_content_id?: string | null
+          variant_b_content_id?: string | null
+          winner_variant?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_ab_tests_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_ab_tests_variant_a_content_id_fkey"
+            columns: ["variant_a_content_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_content"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_ab_tests_variant_b_content_id_fkey"
+            columns: ["variant_b_content_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_approval_workflow: {
         Row: {
           approval_status: string
@@ -408,6 +523,106 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      content_generation_requests: {
+        Row: {
+          campaign_id: string | null
+          completed_at: string | null
+          content_type: string
+          created_at: string | null
+          error_message: string | null
+          generated_content: string | null
+          generated_image_url: string | null
+          generation_metadata: Json | null
+          id: string
+          platform: string
+          prompt: string
+          status: string | null
+        }
+        Insert: {
+          campaign_id?: string | null
+          completed_at?: string | null
+          content_type: string
+          created_at?: string | null
+          error_message?: string | null
+          generated_content?: string | null
+          generated_image_url?: string | null
+          generation_metadata?: Json | null
+          id?: string
+          platform: string
+          prompt: string
+          status?: string | null
+        }
+        Update: {
+          campaign_id?: string | null
+          completed_at?: string | null
+          content_type?: string
+          created_at?: string | null
+          error_message?: string | null
+          generated_content?: string | null
+          generated_image_url?: string | null
+          generation_metadata?: Json | null
+          id?: string
+          platform?: string
+          prompt?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_generation_requests_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_moderation: {
+        Row: {
+          ai_analysis: Json | null
+          confidence_score: number | null
+          content_id: string | null
+          created_at: string | null
+          flagged_reasons: string[] | null
+          id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          moderation_type: string
+          status: string | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          confidence_score?: number | null
+          content_id?: string | null
+          created_at?: string | null
+          flagged_reasons?: string[] | null
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_type: string
+          status?: string | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          confidence_score?: number | null
+          content_id?: string | null
+          created_at?: string | null
+          flagged_reasons?: string[] | null
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          moderation_type?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_moderation_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_content"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       conversation_assignments: {
         Row: {
@@ -2034,12 +2249,20 @@ export type Database = {
           client_id: string | null
           client_secret: string | null
           created_at: string
+          follower_count: number | null
           id: string
           is_active: boolean | null
           last_connected: string | null
+          last_sync_at: string | null
+          oauth_state: string | null
+          page_id: string | null
+          page_name: string | null
           platform: string
+          platform_user_id: string | null
           posting_permissions: Json | null
           rate_limits: Json | null
+          refresh_token: string | null
+          token_expires_at: string | null
           updated_at: string
           user_id: string
           webhook_url: string | null
@@ -2051,12 +2274,20 @@ export type Database = {
           client_id?: string | null
           client_secret?: string | null
           created_at?: string
+          follower_count?: number | null
           id?: string
           is_active?: boolean | null
           last_connected?: string | null
+          last_sync_at?: string | null
+          oauth_state?: string | null
+          page_id?: string | null
+          page_name?: string | null
           platform: string
+          platform_user_id?: string | null
           posting_permissions?: Json | null
           rate_limits?: Json | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
           updated_at?: string
           user_id: string
           webhook_url?: string | null
@@ -2068,14 +2299,135 @@ export type Database = {
           client_id?: string | null
           client_secret?: string | null
           created_at?: string
+          follower_count?: number | null
           id?: string
           is_active?: boolean | null
           last_connected?: string | null
+          last_sync_at?: string | null
+          oauth_state?: string | null
+          page_id?: string | null
+          page_name?: string | null
           platform?: string
+          platform_user_id?: string | null
           posting_permissions?: Json | null
           rate_limits?: Json | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
           updated_at?: string
           user_id?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      social_media_analytics: {
+        Row: {
+          clicks: number | null
+          comments: number | null
+          content_id: string | null
+          cost_per_engagement: number | null
+          ctr: number | null
+          data_date: string | null
+          engagement: number | null
+          engagement_rate: number | null
+          id: string
+          impressions: number | null
+          likes: number | null
+          platform: string
+          platform_post_id: string | null
+          raw_analytics_data: Json | null
+          reach: number | null
+          saves: number | null
+          shares: number | null
+          synced_at: string | null
+          video_views: number | null
+        }
+        Insert: {
+          clicks?: number | null
+          comments?: number | null
+          content_id?: string | null
+          cost_per_engagement?: number | null
+          ctr?: number | null
+          data_date?: string | null
+          engagement?: number | null
+          engagement_rate?: number | null
+          id?: string
+          impressions?: number | null
+          likes?: number | null
+          platform: string
+          platform_post_id?: string | null
+          raw_analytics_data?: Json | null
+          reach?: number | null
+          saves?: number | null
+          shares?: number | null
+          synced_at?: string | null
+          video_views?: number | null
+        }
+        Update: {
+          clicks?: number | null
+          comments?: number | null
+          content_id?: string | null
+          cost_per_engagement?: number | null
+          ctr?: number | null
+          data_date?: string | null
+          engagement?: number | null
+          engagement_rate?: number | null
+          id?: string
+          impressions?: number | null
+          likes?: number | null
+          platform?: string
+          platform_post_id?: string | null
+          raw_analytics_data?: Json | null
+          reach?: number | null
+          saves?: number | null
+          shares?: number | null
+          synced_at?: string | null
+          video_views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_media_analytics_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_platform_configs: {
+        Row: {
+          api_version: string | null
+          client_id: string | null
+          client_secret: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          platform: string
+          rate_limits: Json | null
+          updated_at: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          api_version?: string | null
+          client_id?: string | null
+          client_secret?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          platform: string
+          rate_limits?: Json | null
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          api_version?: string | null
+          client_id?: string | null
+          client_secret?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          platform?: string
+          rate_limits?: Json | null
+          updated_at?: string | null
           webhook_url?: string | null
         }
         Relationships: []
