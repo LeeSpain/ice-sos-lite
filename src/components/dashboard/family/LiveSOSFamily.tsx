@@ -56,10 +56,16 @@ const LiveSOSFamily = () => {
         (payload) => {
           console.log('SOS event change:', payload);
           if (payload.eventType === 'INSERT' && payload.new.status === 'active') {
-            setActiveEvent(payload.new as SOSEvent);
+            setActiveEvent({
+              ...payload.new,
+              status: payload.new.status as 'active' | 'resolved' | 'canceled'
+            } as SOSEvent);
             loadEventData(payload.new.id);
           } else if (payload.eventType === 'UPDATE') {
-            setActiveEvent(payload.new as SOSEvent);
+            setActiveEvent({
+              ...payload.new,
+              status: payload.new.status as 'active' | 'resolved' | 'canceled'
+            } as SOSEvent);
           }
         }
       )
@@ -121,7 +127,10 @@ const LiveSOSFamily = () => {
 
       if (events && events.length > 0) {
         const event = events[0];
-        setActiveEvent(event);
+            setActiveEvent({
+              ...event,
+              status: event.status as 'active' | 'resolved' | 'canceled'
+            });
         loadEventData(event.id);
       }
 

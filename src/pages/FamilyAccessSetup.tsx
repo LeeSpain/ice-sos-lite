@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Package, CheckCircle, AlertCircle, Users } from "lucide-react";
 import SetupFamilyProducts from "@/components/dashboard/family/SetupFamilyProducts";
+import TestFamilySOSSystem from "@/components/dashboard/family/TestFamilySOSSystem";
 
 const FamilyAccessSetupPage = () => {
   const [setupStage, setSetupStage] = useState<'initial' | 'products' | 'testing' | 'complete'>('initial');
@@ -229,6 +230,9 @@ const FamilyAccessSetupPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Test System */}
+      <TestFamilySOSSystem />
 
       {/* Additional Setup Info */}
       <Card>

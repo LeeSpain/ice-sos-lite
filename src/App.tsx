@@ -25,6 +25,7 @@ import TestPage from "./pages/TestPage";
 import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
 import RegionalCenterSpain from "./pages/RegionalCenterSpain";
 import FamilyCarerAccess from "./pages/FamilyCarerAccess";
+import FamilyAccessSetup from "./pages/FamilyAccessSetup";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import SOSHome from "./pages/SOSHome";
 
@@ -157,6 +158,13 @@ const App = () => {
                   <ProtectedSOSRoute>
                     <SOSHome />
                   </ProtectedSOSRoute>
+                </OptimizedSuspense>
+              } />
+
+              {/* Family Access Setup */}
+              <Route path="/family-access-setup" element={
+                <OptimizedSuspense skeletonType="card">
+                  <FamilyAccessSetup />
                 </OptimizedSuspense>
               } />
 

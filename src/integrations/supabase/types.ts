@@ -855,6 +855,50 @@ export type Database = {
         }
         Relationships: []
       }
+      family_alerts: {
+        Row: {
+          alert_data: Json | null
+          alert_type: string
+          created_at: string | null
+          delivered_at: string | null
+          event_id: string
+          family_user_id: string
+          id: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          alert_data?: Json | null
+          alert_type?: string
+          created_at?: string | null
+          delivered_at?: string | null
+          event_id: string
+          family_user_id: string
+          id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          alert_data?: Json | null
+          alert_type?: string
+          created_at?: string | null
+          delivered_at?: string | null
+          event_id?: string
+          family_user_id?: string
+          id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_alerts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "sos_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_groups: {
         Row: {
           created_at: string | null

@@ -11,6 +11,7 @@ import MyProductsWidget from "@/components/dashboard/MyProductsWidget";
 import PersonalDetailsCard from "@/components/dashboard/PersonalDetailsCard";
 import EmergencyContactsCard from "@/components/dashboard/EmergencyContactsCard";
 import FamilyAccessPanel from "@/components/dashboard/family/FamilyAccessPanel";
+import LiveSOSFamily from "@/components/dashboard/family/LiveSOSFamily";
 import MedicalInfoCard from "@/components/dashboard/MedicalInfoCard";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import MobileAppCard from "@/components/dashboard/MobileAppCard";
@@ -22,6 +23,7 @@ import { SecurityPage } from "@/components/dashboard/pages/SecurityPage";
 import { SettingsPage } from "@/components/dashboard/pages/SettingsPage";
 import { SupportPage } from "@/components/dashboard/pages/SupportPage";
 import { FlicControlPage } from "@/components/dashboard/pages/FlicControlPage";
+import FamilyAccessSetup from "@/pages/FamilyAccessSetup";
 import { useTranslation } from 'react-i18next';
 const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
@@ -160,12 +162,19 @@ const Dashboard = () => {
 
               {/* Emergency Page */}
               <Route path="/emergency" element={
+                <div className="p-6 space-y-6">
+                  <EmergencyContactsCard 
+                    profile={profile} 
+                    onProfileUpdate={loadProfile}
+                  />
+                  <FamilyAccessPanel />
+                </div>
+              } />
+
+              {/* Family SOS Live View */}
+              <Route path="/family-sos" element={
                 <div className="p-6">
-            <EmergencyContactsCard 
-              profile={profile} 
-              onProfileUpdate={loadProfile} 
-            />
-            <FamilyAccessPanel />
+                  <LiveSOSFamily />
                 </div>
               } />
 
@@ -202,6 +211,13 @@ const Dashboard = () => {
 
               {/* Dashboard pages with proper container spacing */}
               <Route path="/family" element={<FamilyPage />} />
+              <Route path="/family-setup" element={
+                <div className="p-6">
+                  <div className="max-w-4xl mx-auto">
+                    <FamilyAccessSetup />
+                  </div>
+                </div>
+              } />
               <Route path="/location" element={<LocationPage />} />
               <Route path="/notifications" element={
                 <div className="p-6">
