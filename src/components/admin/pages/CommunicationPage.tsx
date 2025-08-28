@@ -64,7 +64,7 @@ interface CommunicationMetrics {
   channel_breakdown: Record<string, number>;
 }
 
-export default function CommunicationPage() {
+const CommunicationPage: React.FC = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   
@@ -909,4 +909,6 @@ export default function CommunicationPage() {
       </Tabs>
     </div>
   );
-}
+};
+
+export default CommunicationPage;
