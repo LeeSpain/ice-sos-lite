@@ -398,177 +398,21 @@ const AIMarketingPage: React.FC = () => {
           </p>
         </div>
         
-        <Dialog open={showRivenSettings} onOpenChange={setShowRivenSettings}>
-          <DialogTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10">
-              <Brain className="h-6 w-6 text-primary animate-pulse" />
-              <span className="font-medium">Riven Brain</span>
-              <Settings className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-primary" />
-                Riven AI Configuration
-              </DialogTitle>
-              <DialogDescription>
-                Configure Riven's AI settings, brand voice, and automation preferences
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-6">
-              {/* AI Model Settings */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">AI Model Configuration</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="ai-model">AI Model</Label>
-                    <Select 
-                      value={rivenSettings.ai_model} 
-                      onValueChange={(value) => setRivenSettings({...rivenSettings, ai_model: value})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="gpt-5-2025-08-07">GPT-5 (Latest)</SelectItem>
-                        <SelectItem value="gpt-4.1-2025-04-14">GPT-4.1 (Reliable)</SelectItem>
-                        <SelectItem value="gpt-5-mini-2025-08-07">GPT-5 Mini (Fast)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="max-tokens">Max Tokens</Label>
-                    <Input 
-                      id="max-tokens"
-                      type="number"
-                      value={rivenSettings.max_tokens}
-                      onChange={(e) => setRivenSettings({...rivenSettings, max_tokens: parseInt(e.target.value)})}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="brand-voice">Brand Voice & Personality</Label>
-                  <Textarea 
-                    id="brand-voice"
-                    value={rivenSettings.brand_voice}
-                    onChange={(e) => setRivenSettings({...rivenSettings, brand_voice: e.target.value})}
-                    placeholder="Describe your brand's voice, tone, and personality..."
-                    rows={3}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Content Settings */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Content & Automation</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="default-budget">Default Campaign Budget ($)</Label>
-                    <Input 
-                      id="default-budget"
-                      type="number"
-                      value={rivenSettings.default_budget}
-                      onChange={(e) => setRivenSettings({...rivenSettings, default_budget: parseFloat(e.target.value)})}
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2 pt-6">
-                    <Switch 
-                      id="auto-approve"
-                      checked={rivenSettings.auto_approve_content}
-                      onCheckedChange={(checked) => setRivenSettings({...rivenSettings, auto_approve_content: checked})}
-                    />
-                    <Label htmlFor="auto-approve">Auto-approve content</Label>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="content-guidelines">Content Guidelines & Restrictions</Label>
-                  <Textarea 
-                    id="content-guidelines"
-                    value={rivenSettings.content_guidelines}
-                    onChange={(e) => setRivenSettings({...rivenSettings, content_guidelines: e.target.value})}
-                    placeholder="Specify any content restrictions, compliance requirements, or style guidelines..."
-                    rows={4}
-                  />
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Posting Schedule */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Preferred Posting Times</h3>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label>Morning</Label>
-                    <Input 
-                      type="time"
-                      value={rivenSettings.preferred_posting_times?.morning || '09:00'}
-                      onChange={(e) => setRivenSettings({
-                        ...rivenSettings, 
-                        preferred_posting_times: {
-                          ...rivenSettings.preferred_posting_times,
-                          morning: e.target.value
-                        }
-                      })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Afternoon</Label>
-                    <Input 
-                      type="time"
-                      value={rivenSettings.preferred_posting_times?.afternoon || '14:00'}
-                      onChange={(e) => setRivenSettings({
-                        ...rivenSettings, 
-                        preferred_posting_times: {
-                          ...rivenSettings.preferred_posting_times,
-                          afternoon: e.target.value
-                        }
-                      })}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Evening</Label>
-                    <Input 
-                      type="time"
-                      value={rivenSettings.preferred_posting_times?.evening || '19:00'}
-                      onChange={(e) => setRivenSettings({
-                        ...rivenSettings, 
-                        preferred_posting_times: {
-                          ...rivenSettings.preferred_posting_times,
-                          evening: e.target.value
-                        }
-                      })}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setShowRivenSettings(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={saveRivenSettings}>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Save Configuration
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        {/* Link to new Riven Configuration page */}
+        <Button variant="outline" className="flex items-center gap-2 hover:bg-primary/10">
+          <Brain className="h-6 w-6 text-primary animate-pulse" />
+          <span className="font-medium">Riven Configuration</span>
+          <Settings className="h-4 w-4" />
+        </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="command-center">Command Center</TabsTrigger>
-          <TabsTrigger value="social-accounts">Social Accounts</TabsTrigger>
-          <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
-          <TabsTrigger value="content">Content Library</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="social-accounts">Social Accounts</TabsTrigger>
+            <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+            <TabsTrigger value="content">Content Library</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          </TabsList>
 
         {/* Enhanced Command Center */}
         <TabsContent value="command-center" className="space-y-4">
