@@ -5,7 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
-import DashboardOverview from "@/components/dashboard/DashboardOverview";
+import MetricsDashboard from "@/components/dashboard/MetricsDashboard";
 import EmergencyActionsWidget from "@/components/dashboard/EmergencyActionsWidget";
 import MyProductsWidget from "@/components/dashboard/MyProductsWidget";
 import PersonalDetailsCard from "@/components/dashboard/PersonalDetailsCard";
@@ -145,22 +145,17 @@ const Dashboard = () => {
           {/* Dashboard Content */}
           <div className="flex-1 overflow-auto">
             <Routes>
-              {/* Main Dashboard Overview */}
+              {/* Main Dashboard Overview - Metrics Only */}
               <Route path="/" element={
                 <div className="container mx-auto px-4 py-6">
                   <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-                      {/* Main Content */}
-                      <div className="xl:col-span-3 space-y-6">
-                        <DashboardOverview 
+                      {/* Main Content - Metrics Dashboard */}
+                      <div className="xl:col-span-3">
+                        <MetricsDashboard 
                           profile={profile} 
                           subscription={subscription}
-                          onProfileUpdate={loadProfile}
                         />
-                        {/* Products moved to bottom */}
-                        <div className="mt-8">
-                          <MyProductsWidget profile={profile} />
-                        </div>
                       </div>
                       
                       {/* Sidebar Widgets */}
