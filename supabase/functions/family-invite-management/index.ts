@@ -160,6 +160,28 @@ async function createFamilyInvite(
 
   if (inviteError) throw new Error(`Failed to create invite: ${inviteError.message}`);
 
+  // Create emergency contact immediately for all billing types
+  const { data: contact, error: contactError } = await supabase
+    .from('emergency_contacts')
+    .insert([{
+      user_id: user.id,
+      name,
+      phone,
+      email,
+      type: 'family',
+      relationship,
+      priority: 1
+    }])
+    .select()
+    .single();
+
+  if (contactError) {
+    logStep("Warning: Failed to create emergency contact", { error: contactError });
+    // Don't fail the invite if contact creation fails
+  } else {
+    logStep("Created emergency contact", { contactId: contact.id });
+  }
+
   // If owner-paid, increment seat quota
   if (billing_type === 'owner') {
     const { error: quotaError } = await supabase

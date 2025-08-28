@@ -17,6 +17,12 @@ interface CheckoutRequest {
   billing_type: 'owner' | 'self';
   invite_token?: string;
   seat_quantity?: number;
+  invite_data?: {
+    name: string;
+    email: string;
+    phone: string;
+    relationship: string;
+  };
 }
 
 serve(async (req) => {
@@ -38,9 +44,9 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
-    const { email, billing_type, invite_token, seat_quantity = 1 }: CheckoutRequest = await req.json();
+    const { email, billing_type, invite_token, seat_quantity = 1, invite_data }: CheckoutRequest = await req.json();
 
-    logStep("Processing checkout request", { email, billing_type, invite_token, seat_quantity });
+    logStep("Processing checkout request", { email, billing_type, invite_token, seat_quantity, invite_data });
 
     // Validate invite token if provided
     let familyInvite = null;
@@ -103,12 +109,22 @@ serve(async (req) => {
         billing_type,
         invite_token: invite_token || "",
         email,
+        ...(invite_data && {
+          invitee_name: invite_data.name,
+          invitee_phone: invite_data.phone,
+          invitee_relationship: invite_data.relationship
+        })
       },
       subscription_data: {
         metadata: {
           billing_type,
           invite_token: invite_token || "",
           email,
+          ...(invite_data && {
+            invitee_name: invite_data.name,
+            invitee_phone: invite_data.phone,
+            invitee_relationship: invite_data.relationship
+          })
         },
       },
     };

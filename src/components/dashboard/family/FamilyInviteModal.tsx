@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,16 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
     billing_type: "owner" as "owner" | "self"
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
+    };
+    getCurrentUser();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,42 +44,108 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
         throw new Error("Name, email, phone, and relationship are all required");
       }
 
-      const { data, error } = await supabase.functions.invoke('family-invite-management', {
-        body: {
-          action: 'create',
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          relationship: formData.relationship,
-          billing_type: formData.billing_type
+      if (formData.billing_type === 'owner') {
+        // For "You Pay" - redirect to Stripe checkout
+        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('family-subscription-checkout', {
+          body: {
+            email: formData.email,
+            billing_type: 'owner',
+            invite_data: {
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              relationship: formData.relationship
+            }
+          }
+        });
+
+        if (checkoutError) throw checkoutError;
+        if (checkoutData.error) throw new Error(checkoutData.error);
+
+        // Create emergency contact immediately for owner-paid
+        if (currentUser?.id) {
+          await supabase.from('emergency_contacts').insert({
+            user_id: currentUser.id,
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            type: 'family',
+            relationship: formData.relationship,
+            priority: 1
+          });
         }
-      });
 
-      if (error) throw error;
-      if (data.error) throw new Error(data.error);
+        toast({
+          title: "Redirecting to Payment",
+          description: `Taking you to secure payment for ${formData.name}'s family access.`
+        });
 
-      toast({
-        title: "Family Invite Sent",
-        description: `Invite sent to ${formData.name}. ${formData.billing_type === 'owner' ? 'You will be billed €2.99/month.' : 'They will be billed €2.99/month.'}`
-      });
+        // Redirect to Stripe
+        window.open(checkoutData.url, '_blank');
+        
+        // Reset form and close modal
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          relationship: "",
+          billing_type: "owner"
+        });
+        onInviteCreated();
+        onOpenChange(false);
 
-      // Reset form
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        relationship: "",
-        billing_type: "owner"
-      });
+      } else {
+        // For "They Pay" - send invite email
+        const { data, error } = await supabase.functions.invoke('family-invite-management', {
+          body: {
+            action: 'create',
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            relationship: formData.relationship,
+            billing_type: formData.billing_type
+          }
+        });
 
-      onInviteCreated();
-      onOpenChange(false);
+        if (error) throw error;
+        if (data.error) throw new Error(data.error);
+
+        // Create emergency contact immediately with pending status
+        if (currentUser?.id) {
+          await supabase.from('emergency_contacts').insert({
+            user_id: currentUser.id,
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            type: 'family',
+            relationship: formData.relationship,
+            priority: 1
+          });
+        }
+
+        toast({
+          title: "Invite Sent",
+          description: `Invite sent to ${formData.name}. They will receive payment instructions via email.`
+        });
+
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          relationship: "",
+          billing_type: "owner"
+        });
+
+        onInviteCreated();
+        onOpenChange(false);
+      }
 
     } catch (error) {
       console.error('Error creating family invite:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send family invite",
+        description: error instanceof Error ? error.message : "Failed to process family invite",
         variant: "destructive"
       });
     } finally {
@@ -80,15 +155,15 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="sticky top-0 bg-background border-b pb-4 mb-4">
           <DialogTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5 text-primary" />
             Invite Family Member
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 px-1">
           {/* Benefits Section */}
           <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-4 rounded-lg border">
             <h4 className="font-medium mb-3 text-foreground">Family gets SOS alerts and a live map with a single "Received & On It."</h4>
@@ -189,7 +264,7 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
               </RadioGroup>
             </div>
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-3 pt-4 sticky bottom-0 bg-background border-t pt-4 mt-6">
               <Button
                 type="button"
                 variant="outline"
@@ -204,7 +279,10 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
                 className="flex-1"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Sending..." : "Send Invite"}
+                {isSubmitting 
+                  ? (formData.billing_type === 'owner' ? "Processing..." : "Sending...") 
+                  : (formData.billing_type === 'owner' ? "Pay Now" : "Send Invite")
+                }
               </Button>
             </div>
           </form>
