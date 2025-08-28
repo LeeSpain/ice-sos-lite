@@ -108,7 +108,7 @@ const DeviceIceSosPendant = () => {
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Get Emergency Help in 30 Seconds - <span className="text-emergency">Even When You Can't Speak or Dial</span>
+                Get Emergency Help in 30 Seconds - <span className="text-wellness">Even When You Can't Speak or Dial</span>
               </h1>
               
               <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
@@ -122,7 +122,7 @@ const DeviceIceSosPendant = () => {
                   <Button 
                     asChild 
                     size="xl" 
-                    className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
+                    className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
                     <Link to="/ai-register">Order Now - €59.99</Link>
                   </Button>
