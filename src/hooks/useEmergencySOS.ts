@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useLocationServices } from '@/hooks/useLocationServices';
+import { withNetworkErrorHandling } from '@/utils/networkErrorHandler';
 
 interface EmergencyContact {
   name: string;
@@ -138,22 +139,33 @@ export const useEmergencySOS = () => {
         timestamp: new Date().toISOString()
       };
 
-      // Call enhanced emergency SOS function
-      const { data, error } = await supabase.functions.invoke('emergency-sos-enhanced', {
-        body: emergencyData
-      });
+      // Call enhanced emergency SOS function with error handling
+      const result = await withNetworkErrorHandling(async () => {
+        const { data, error } = await supabase.functions.invoke('emergency-sos-enhanced', {
+          body: emergencyData
+        });
 
-      if (error) throw error;
+        if (error) {
+          console.error('Emergency SOS Error:', error);
+          throw error;
+        }
 
-      console.log('✅ Emergency SOS triggered successfully:', data);
+        return data;
+      }, 'Emergency SOS');
+
+      if (!result) {
+        throw new Error('Emergency SOS failed - please try again or call emergency services directly');
+      }
+
+      console.log('✅ Emergency SOS triggered successfully:', result);
       
       toast({
         title: "🚨 Emergency SOS Activated",
-        description: `Emergency notifications sent to ${data.summary?.emails_sent || 0} contacts. ${data.summary?.calls_initiated || 0} calls initiated.`,
+        description: `Emergency notifications sent to ${result.summary?.emails_sent || 0} contacts. ${result.summary?.calls_initiated || 0} calls initiated.`,
         variant: "destructive"
       });
 
-      return data;
+      return result;
 
     } catch (error: any) {
       console.error('❌ Emergency SOS failed:', error);

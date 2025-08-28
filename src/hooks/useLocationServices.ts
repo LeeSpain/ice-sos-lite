@@ -57,9 +57,16 @@ export const useLocationServices = () => {
 
   const reverseGeocode = async (lat: number, lng: number): Promise<string | undefined> => {
     try {
-      // Using a free geocoding service
+      // Using a free geocoding service with better error handling
       const response = await fetch(
-        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`,
+        {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          signal: AbortSignal.timeout(10000) // 10 second timeout
+        }
       );
       
       if (response.ok) {
@@ -67,9 +74,13 @@ export const useLocationServices = () => {
         return data.locality && data.countryName 
           ? `${data.locality}, ${data.countryName}`
           : data.city || data.countryName || undefined;
+      } else {
+        console.warn(`Geocoding API returned ${response.status}: ${response.statusText}`);
       }
     } catch (error) {
       console.warn('Reverse geocoding failed:', error);
+      // Fallback to coordinate string if geocoding fails
+      return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
     }
     return undefined;
   };
