@@ -63,7 +63,7 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
               </Button>
               <Button 
                 size="sm" 
-                className="shadow-primary bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-medium transition-all duration-200 hover:scale-105"
+                className="bg-wellness text-white hover:bg-wellness/90 font-medium transition-all duration-200 hover:scale-105 shadow-lg"
                 onClick={onFreeTrialClick || (() => {})}
               >
                 {t('nav.freeTrial', 'Free Trial')}
@@ -121,7 +121,7 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
                 </Button>
                 <Button 
                   size="sm" 
-                  className="shadow-primary bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-medium transition-all duration-200"
+                  className="bg-wellness text-white hover:bg-wellness/90 font-medium transition-all duration-200 shadow-lg"
                   onClick={() => {
                     onFreeTrialClick?.();
                     setIsMenuOpen(false);
