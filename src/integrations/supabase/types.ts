@@ -2304,6 +2304,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_sales: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       log_security_event: {
         Args: { p_event_type: string; p_metadata?: Json; p_user_id: string }
         Returns: undefined
