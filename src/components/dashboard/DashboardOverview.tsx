@@ -5,21 +5,18 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
   Shield, 
-  Heart, 
   Users, 
-  MapPin, 
-  Phone, 
-  Clock,
   CheckCircle,
   AlertTriangle,
   TrendingUp,
   Activity,
-  Bell,
-  Settings
+  Settings,
+  MapPin
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from 'react-i18next';
+import { useRealTimeUpdates } from "@/hooks/useRealTimeUpdates";
 
 interface DashboardOverviewProps {
   profile: any;
@@ -32,6 +29,9 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
+
+  // Enable real-time updates
+  useRealTimeUpdates();
 
   useEffect(() => {
     loadRecentActivity();
@@ -120,49 +120,44 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
     }
   };
 
-  const emergencyContactsCount = profile?.emergency_contacts ? 
-    (Array.isArray(profile.emergency_contacts) ? profile.emergency_contacts.length : 0) : 0;
+  // Get actual emergency contacts count from the emergency_contacts table
+  const [emergencyContactsCount, setEmergencyContactsCount] = useState(0);
+  const [familyConnectionStatus, setFamilyConnectionStatus] = useState(false);
   
   const profileCompletion = profile?.profile_completion_percentage || 0;
   const protectionActive = subscription?.subscribed;
 
-  const hasPremiumActive = Boolean(
-    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.some((p: any) => /premium/i.test(p?.name || ''))) ||
-    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.some((t: string) => /premium/i.test(t))) ||
-    (typeof subscription?.subscription_tier === 'string' && /premium/i.test(subscription.subscription_tier)) ||
-    subscription?.subscribed
-  );
-
-  const hasFamilyActive = Boolean(
-    (subscription?.plans && Array.isArray(subscription.plans) && subscription.plans.some((p: any) => p?.name === 'Family Connection')) ||
-    (Array.isArray(subscription?.subscription_tiers) && subscription.subscription_tiers.includes('Family Connection')) ||
-    subscription?.subscription_tier === 'Family Connection'
-  );
-
-  const hasSpainCallCentre = Boolean(profile?.has_spain_call_center);
-  const [hasFlicConnected, setHasFlicConnected] = useState(false);
-
+  // Load real emergency contacts count and family status
   useEffect(() => {
-    (async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data: orders } = await supabase
-          .from('orders')
-          .select('id, product:products(name, sku)')
-          .eq('user_id', user.id)
-          .eq('status', 'paid')
-          .limit(50);
-        const connected = (orders || []).some((o: any) =>
-          (o.product?.sku === 'ICE-PENDANT-001') ||
-          /ice\s*sos|pendant|flic/i.test(o.product?.name || '')
-        );
-        setHasFlicConnected(connected);
-      } catch (e) {
-        console.error('Failed loading product connections', e);
-      }
-    })();
-  }, []);
+    loadEmergencyData();
+  }, [profile, subscription]);
+
+  const loadEmergencyData = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get actual emergency contacts count
+      const { data: emergencyContacts } = await supabase
+        .from('emergency_contacts')
+        .select('id')
+        .eq('user_id', user.id);
+
+      setEmergencyContactsCount(emergencyContacts?.length || 0);
+
+      // Check family connection status
+      const [groupResponse, membershipResponse] = await Promise.all([
+        supabase.from('family_groups').select('id').eq('owner_user_id', user.id),
+        supabase.from('family_memberships').select('id').eq('user_id', user.id).eq('status', 'active')
+      ]);
+
+      const hasFamily = (groupResponse.data && groupResponse.data.length > 0) || 
+                       (membershipResponse.data && membershipResponse.data.length > 0);
+      setFamilyConnectionStatus(hasFamily);
+    } catch (error) {
+      console.error('Error loading emergency data:', error);
+    }
+  };
   const quickActions = [
     {
       title: t('dashboardOverview.actions.testEmergency.title', { defaultValue: 'Test Emergency System' }),
@@ -259,62 +254,68 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
         ))}
       </div>
 
-      {/* Connected Products & Subscriptions */}
+      {/* Emergency Summary Card - Simplified for overview */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            Connected Products & Subscriptions
+            Emergency Protection Summary
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-              <span className="text-sm">Premium Protection</span>
-              {hasPremiumActive ? (
-                <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
-              ) : (
-                <Badge variant="secondary">Not connected</Badge>
-              )}
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-              <span className="text-sm">Family Connection</span>
-              {hasFamilyActive ? (
-                <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
-              ) : (
-                <Badge variant="secondary">Not connected</Badge>
-              )}
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-              <span className="text-sm">Call Centre (Spain)</span>
-              {hasSpainCallCentre ? (
-                <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
-              ) : (
-                <Badge variant="secondary">Not connected</Badge>
-              )}
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-              <span className="text-sm">Flic 2 Devices</span>
-              <div className="flex items-center gap-2">
-                {hasFlicConnected ? (
-                  <>
-                    <Badge className="bg-emergency/10 text-emergency">Connected</Badge>
-                    <Button size="sm" variant="outline" onClick={() => (window.location.href = '/full-dashboard/flic')}>Manage</Button>
-                  </>
-                ) : (
-                  <>
-                    <Badge variant="secondary">Not connected</Badge>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => window.dispatchEvent(new Event('open-device-settings'))}
-                    >
-                      Connect
-                    </Button>
-                  </>
-                )}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+              <div>
+                <p className="font-medium">Protection Status</p>
+                <p className="text-sm text-muted-foreground">
+                  {protectionActive ? 'Active protection plan' : 'No active protection'}
+                </p>
               </div>
+              {protectionActive ? (
+                <Badge className="bg-emergency/10 text-emergency">Active</Badge>
+              ) : (
+                <Badge variant="destructive">Inactive</Badge>
+              )}
             </div>
+            
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+              <div>
+                <p className="font-medium">Emergency Contacts</p>
+                <p className="text-sm text-muted-foreground">
+                  {emergencyContactsCount} of 5 contacts configured
+                </p>
+              </div>
+              <Badge variant={emergencyContactsCount >= 5 ? "default" : "secondary"}>
+                {emergencyContactsCount >= 5 ? 'Complete' : 'Incomplete'}
+              </Badge>
+            </div>
+
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted/30">
+              <div>
+                <p className="font-medium">Family Connection</p>
+                <p className="text-sm text-muted-foreground">
+                  {familyConnectionStatus ? 'Family members connected' : 'No family connections'}
+                </p>
+              </div>
+              <Badge variant={familyConnectionStatus ? "default" : "secondary"}>
+                {familyConnectionStatus ? 'Connected' : 'Not connected'}
+              </Badge>
+            </div>
+
+            {(!protectionActive || emergencyContactsCount < 5) && (
+              <div className="mt-4 p-4 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
+                <p className="text-sm font-medium text-orange-800 dark:text-orange-200">
+                  Complete your emergency setup for full protection
+                </p>
+                <Button 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => window.location.href = '/full-dashboard/products'}
+                >
+                  View Products & Setup
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -373,7 +374,7 @@ const DashboardOverview = ({ profile, subscription, onProfileUpdate }: Dashboard
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className={`h-4 w-4 ${emergencyContactsCount >= 5 ? 'text-emergency' : 'text-muted-foreground'}`} />
-                  <span className="text-sm">{t('dashboardOverview.checklist.emergencyContacts', { defaultValue: 'Emergency Contacts' })}</span>
+                  <span className="text-sm">{t('dashboardOverview.checklist.emergencyContacts', { defaultValue: 'Emergency Contacts' })} ({emergencyContactsCount}/5)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className={`h-4 w-4 ${profile?.medical_conditions?.length > 0 ? 'text-emergency' : 'text-muted-foreground'}`} />
