@@ -20,6 +20,7 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
     name: "",
     email: "",
     phone: "",
+    relationship: "",
     billing_type: "owner" as "owner" | "self"
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,16 +31,17 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
     setIsSubmitting(true);
 
     try {
-      if (!formData.name || (!formData.email && !formData.phone)) {
-        throw new Error("Name and either email or phone are required");
+      if (!formData.name || !formData.email || !formData.phone || !formData.relationship) {
+        throw new Error("Name, email, phone, and relationship are all required");
       }
 
       const { data, error } = await supabase.functions.invoke('family-invite-management', {
         body: {
           action: 'create',
           name: formData.name,
-          email: formData.email || undefined,
-          phone: formData.phone || undefined,
+          email: formData.email,
+          phone: formData.phone,
+          relationship: formData.relationship,
           billing_type: formData.billing_type
         }
       });
@@ -57,6 +59,7 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
         name: "",
         email: "",
         phone: "",
+        relationship: "",
         billing_type: "owner"
       });
 
@@ -118,24 +121,37 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
             </div>
 
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email *</Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 placeholder="Enter email address"
+                required
               />
             </div>
 
             <div>
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">Phone *</Label>
               <Input
                 id="phone"
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                 placeholder="Enter phone number"
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="relationship">Relationship *</Label>
+              <Input
+                id="relationship"
+                value={formData.relationship}
+                onChange={(e) => setFormData(prev => ({ ...prev, relationship: e.target.value }))}
+                placeholder="e.g., Spouse, Parent, Child, Sibling"
+                required
               />
             </div>
 

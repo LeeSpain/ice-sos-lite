@@ -19,6 +19,8 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import FamilyCheckoutSuccess from "./pages/FamilyCheckoutSuccess";
+import FamilyCheckoutCanceled from "./pages/FamilyCheckoutCanceled";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import Support from "./pages/Support";
 import TestPage from "./pages/TestPage";
@@ -114,6 +116,16 @@ const App = () => {
               <Route path="/payment-success" element={
                 <OptimizedSuspense skeletonType="card">
                   <PaymentSuccess />
+                </OptimizedSuspense>
+              } />
+              <Route path="/family-checkout-success" element={
+                <OptimizedSuspense skeletonType="card">
+                  <FamilyCheckoutSuccess />
+                </OptimizedSuspense>
+              } />
+              <Route path="/family-checkout-canceled" element={
+                <OptimizedSuspense skeletonType="card">
+                  <FamilyCheckoutCanceled />
                 </OptimizedSuspense>
               } />
               <Route path="/registration-success" element={

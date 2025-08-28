@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,6 +17,7 @@ interface InviteRequest {
   name?: string;
   email?: string;
   phone?: string;
+  relationship?: string;
   billing_type?: 'owner' | 'self';
   token?: string;
   invite_id?: string;
@@ -51,11 +53,11 @@ serve(async (req) => {
 
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { action, name, email, phone, billing_type, token: inviteToken, invite_id }: InviteRequest = await req.json();
+    const { action, name, email, phone, relationship, billing_type, token: inviteToken, invite_id }: InviteRequest = await req.json();
 
     switch (action) {
       case 'create':
-        return await createFamilyInvite(supabaseService, user, { name, email, phone, billing_type });
+        return await createFamilyInvite(supabaseService, user, { name, email, phone, relationship, billing_type });
       
       case 'accept':
         return await acceptFamilyInvite(supabaseService, user, inviteToken);
@@ -83,12 +85,12 @@ serve(async (req) => {
 async function createFamilyInvite(
   supabase: any, 
   user: any, 
-  { name, email, phone, billing_type }: { name?: string, email?: string, phone?: string, billing_type?: string }
+  { name, email, phone, relationship, billing_type }: { name?: string, email?: string, phone?: string, relationship?: string, billing_type?: string }
 ) {
-  logStep("Creating family invite", { name, email, phone, billing_type });
+  logStep("Creating family invite", { name, email, phone, relationship, billing_type });
 
-  if (!name || (!email && !phone)) {
-    throw new Error("Name and either email or phone are required");
+  if (!name || !email || !phone || !relationship) {
+    throw new Error("Name, email, phone, and relationship are all required");
   }
 
   if (!billing_type || !['owner', 'self'].includes(billing_type)) {
@@ -142,10 +144,14 @@ async function createFamilyInvite(
     .from('family_invites')
     .insert([{
       group_id: familyGroup.id,
-      email_or_phone: email || phone,
+      inviter_user_id: user.id,
+      inviter_email: user.email,
+      invitee_email: email,
+      invitee_name: name,
       name,
       phone,
-      token: inviteToken,
+      relationship,
+      invite_token: inviteToken,
       expires_at: expiresAt.toISOString(),
       billing_type
     }])
@@ -167,7 +173,30 @@ async function createFamilyInvite(
     logStep("Incremented owner seat quota", { newQuota: familyGroup.owner_seat_quota + 1 });
   }
 
-  const inviteLink = `${Deno.env.get("SUPABASE_URL")?.replace('//', '//app.')}/family-invite/${inviteToken}`;
+  const originUrl = req.headers.get("origin") || "https://yourapp.com";
+  
+  const inviteLink = billing_type === 'self' 
+    ? `${originUrl}/family-invite-payment?token=${inviteToken}`
+    : `${originUrl}/family-invite-accept?token=${inviteToken}`;
+
+  // Send email notification
+  if (email) {
+    try {
+      await sendInviteEmail({
+        invitee_email: email,
+        invitee_name: name,
+        inviter_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'A family member',
+        relationship,
+        billing_type,
+        invite_link: inviteLink,
+        origin_url: originUrl
+      });
+      logStep("Invite email sent successfully");
+    } catch (emailError) {
+      logStep("Warning: Failed to send invite email", { error: emailError });
+      // Don't fail the invite creation if email fails
+    }
+  }
   
   logStep("Family invite created successfully", { inviteId: invite.id, token: inviteToken });
 
@@ -384,5 +413,91 @@ async function resendFamilyInvite(supabase: any, user: any, inviteId?: string) {
   }), {
     headers: { "Content-Type": "application/json", ...corsHeaders },
     status: 200,
+  });
+}
+
+async function sendInviteEmail({
+  invitee_email,
+  invitee_name,
+  inviter_name,
+  relationship,
+  billing_type,
+  invite_link,
+  origin_url
+}: {
+  invitee_email: string;
+  invitee_name: string;
+  inviter_name: string;
+  relationship: string;
+  billing_type: string;
+  invite_link: string;
+  origin_url: string;
+}) {
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) {
+    throw new Error("RESEND_API_KEY not configured");
+  }
+
+  const resend = new Resend(resendKey);
+
+  const subject = `Family Emergency Access Invitation from ${inviter_name}`;
+  
+  const emailContent = billing_type === 'self' 
+    ? `
+      <h1>You're Invited to Join Emergency Family Access</h1>
+      <p>Hello ${invitee_name},</p>
+      <p><strong>${inviter_name}</strong> has invited you to join their emergency family access system as their <strong>${relationship}</strong>.</p>
+      
+      <h3>What this means:</h3>
+      <ul>
+        <li>📍 You'll receive their live location during emergency situations</li>
+        <li>🚨 Get instant SOS alerts when they need help</li>
+        <li>👥 Coordinate family response with other members</li>
+        <li>🛡️ Privacy protected - only emergency location sharing</li>
+      </ul>
+      
+      <h3>Your Subscription (€2.99/month)</h3>
+      <p>Since you'll be managing your own subscription, you'll need to set up payment to activate your family access.</p>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${invite_link}" style="background: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+          Accept Invite & Set Up Payment
+        </a>
+      </div>
+      
+      <p><small>This invitation expires in 72 hours.</small></p>
+      <p>Questions? Contact support at ${origin_url}/contact</p>
+    `
+    : `
+      <h1>You're Invited to Join Emergency Family Access</h1>
+      <p>Hello ${invitee_name},</p>
+      <p><strong>${inviter_name}</strong> has invited you to join their emergency family access system as their <strong>${relationship}</strong>.</p>
+      
+      <h3>What this means:</h3>
+      <ul>
+        <li>📍 You'll receive their live location during emergency situations</li>
+        <li>🚨 Get instant SOS alerts when they need help</li>
+        <li>👥 Coordinate family response with other members</li>
+        <li>🛡️ Privacy protected - only emergency location sharing</li>
+      </ul>
+      
+      <h3>Already Paid For</h3>
+      <p>${inviter_name} is covering your monthly subscription, so you just need to accept the invitation.</p>
+      
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="${invite_link}" style="background: #007bff; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+          Accept Family Invitation
+        </a>
+      </div>
+      
+      <p><small>This invitation expires in 72 hours.</small></p>
+      <p>Questions? Contact support at ${origin_url}/contact</p>
+    `;
+
+  await resend.emails.send({
+    from: "Family Emergency Access <noreply@yourdomain.com>",
+    to: [invitee_email],
+    subject: subject,
+    html: emailContent,
   });
 }
