@@ -144,7 +144,7 @@ const FamilyCarerAccessPage = () => {
                 <span className="text-sm font-medium text-white">Family Connection Platform</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Connect Your <span className="text-emergency-glow drop-shadow-md">Loved Ones</span>
+                Connect Your <span className="text-wellness drop-shadow-md">Loved Ones</span>
               </h1>
               <p className="text-xl md:text-2xl text-white/90 max-w-3xl lg:max-w-none mx-auto mb-8 leading-relaxed font-medium drop-shadow-sm">
                 Build a comprehensive support network that keeps your family connected and protected during emergencies and everyday care moments
@@ -153,7 +153,7 @@ const FamilyCarerAccessPage = () => {
                 <Button 
                   asChild 
                   size="xl" 
-                  className="bg-emergency text-black hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-emergency-glow/20"
+                  className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 >
                   <Link to="/register">
                     <UserPlus className="mr-2 h-5 w-5" />
