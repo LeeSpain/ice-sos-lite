@@ -28,14 +28,14 @@ serve(async (req) => {
       throw new Error('Authentication required');
     }
 
-    const { command, action, campaign_id } = await req.json();
+    const { command, action, campaign_id, workflow_id, settings } = await req.json();
 
     let response = '';
     let campaign_created = false;
 
     switch (action) {
       case 'process_command':
-        const result = await processMarketingCommand(command, user.id, supabase);
+        const result = await processMarketingCommand(command, user.id, supabase, workflow_id, settings);
         response = result.response;
         campaign_created = result.campaign_created;
         break;
@@ -69,22 +69,46 @@ serve(async (req) => {
   }
 });
 
-async function processMarketingCommand(command: string, userId: string, supabase: any) {
+async function processMarketingCommand(command: string, userId: string, supabase: any, workflowId?: string, settings?: any) {
   console.log('Processing marketing command:', command);
 
-  // Get company info from Emma AI
-  const companyInfo = await getCompanyInfo(supabase);
-  
-  // Analyze command with Riven AI
-  const analysis = await analyzeCommandWithRiven(command, companyInfo);
-  
-  // Create campaign based on analysis
-  const campaign = await createMarketingCampaign(analysis, command, userId, supabase);
-  
-  return {
-    response: analysis.response,
-    campaign_created: !!campaign
-  };
+  // Create workflow tracking if ID provided
+  if (workflowId) {
+    await createWorkflowSteps(workflowId, supabase);
+    await updateWorkflowStep(workflowId, 'command_received', 'completed', supabase);
+  }
+
+  try {
+    // Get company info from Emma AI
+    if (workflowId) await updateWorkflowStep(workflowId, 'retrieving_company_data', 'in_progress', supabase);
+    const companyInfo = await getCompanyInfo(supabase);
+    if (workflowId) await updateWorkflowStep(workflowId, 'retrieving_company_data', 'completed', supabase);
+    
+    // Analyze command with Riven AI
+    if (workflowId) await updateWorkflowStep(workflowId, 'ai_analysis', 'in_progress', supabase);
+    const analysis = await analyzeCommandWithRiven(command, companyInfo, settings);
+    if (workflowId) await updateWorkflowStep(workflowId, 'ai_analysis', 'completed', supabase);
+    
+    // Create campaign based on analysis
+    if (workflowId) await updateWorkflowStep(workflowId, 'creating_campaign', 'in_progress', supabase);
+    const campaign = await createMarketingCampaign(analysis, command, userId, supabase);
+    if (workflowId) await updateWorkflowStep(workflowId, 'creating_campaign', 'completed', supabase);
+    
+    return {
+      response: analysis.response,
+      campaign_created: !!campaign
+    };
+  } catch (error) {
+    console.error('Error in processMarketingCommand:', error);
+    if (workflowId) {
+      // Mark current step as failed
+      const steps = ['command_received', 'retrieving_company_data', 'ai_analysis', 'creating_campaign'];
+      for (const step of steps) {
+        await updateWorkflowStep(workflowId, step, 'failed', supabase, error.message);
+      }
+    }
+    throw error;
+  }
 }
 
 async function getCompanyInfo(supabase: any) {
@@ -117,7 +141,7 @@ async function getCompanyInfo(supabase: any) {
   }
 }
 
-async function analyzeCommandWithRiven(command: string, companyInfo: any) {
+async function analyzeCommandWithRiven(command: string, companyInfo: any, settings?: any) {
   if (!openaiApiKey) {
     throw new Error('OpenAI API key not configured');
   }
@@ -125,9 +149,11 @@ async function analyzeCommandWithRiven(command: string, companyInfo: any) {
   const systemPrompt = `You are Riven, an expert AI marketing automation specialist for ${companyInfo.company_name}, a ${companyInfo.industry} company.
 
 Company Information:
-- Brand Voice: ${companyInfo.brand_voice}
+- Brand Voice: ${settings?.brand_voice || companyInfo.brand_voice}
 - Target Audience: ${companyInfo.target_audience}
 - Products: ${JSON.stringify(companyInfo.products)}
+- Default Budget: $${settings?.default_budget || 500}
+- Content Guidelines: ${settings?.content_guidelines || 'Standard professional guidelines'}
 
 Your role is to:
 1. Analyze marketing commands and break them down into actionable campaigns
@@ -135,15 +161,17 @@ Your role is to:
 3. Create comprehensive campaign strategies
 4. Suggest content types and platforms
 5. Recommend budget allocation
+6. Follow the specified brand voice and guidelines
 
 Always respond with:
 - Campaign analysis and breakdown
-- Estimated costs and timeline
+- Estimated costs and timeline (consider default budget: $${settings?.default_budget || 500})
 - Platform recommendations
 - Content strategy suggestions
 - Target audience refinement
+- Compliance with brand voice: "${settings?.brand_voice || companyInfo.brand_voice}"
 
-Be specific, professional, and focus on ROI and measurable outcomes.`;
+Be specific, professional, and focus on ROI and measurable outcomes. Follow all content guidelines provided.`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -153,12 +181,12 @@ Be specific, professional, and focus on ROI and measurable outcomes.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: settings?.ai_model || 'gpt-5-2025-08-07',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: command }
         ],
-        max_completion_tokens: 1000,
+        max_completion_tokens: settings?.max_tokens || 1000,
       }),
     });
 
@@ -334,4 +362,42 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
       hashtags: ['#EmergencySafety', '#FamilyProtection']
     };
   }
+}
+
+// Workflow tracking functions
+async function createWorkflowSteps(workflowId: string, supabase: any) {
+  const steps = [
+    { step_name: 'Command received', step_order: 1 },
+    { step_name: 'Retrieving company data', step_order: 2 },
+    { step_name: 'AI analysis in progress', step_order: 3 },
+    { step_name: 'Creating campaign', step_order: 4 },
+  ];
+
+  for (const step of steps) {
+    await supabase
+      .from('workflow_steps')
+      .insert({
+        workflow_id: workflowId,
+        step_name: step.step_name,
+        step_order: step.step_order,
+        status: 'pending'
+      });
+  }
+}
+
+async function updateWorkflowStep(workflowId: string, stepName: string, status: string, supabase: any, errorMessage?: string) {
+  const updateData: any = {
+    status,
+    [status === 'in_progress' ? 'started_at' : 'completed_at']: new Date().toISOString()
+  };
+
+  if (errorMessage) {
+    updateData.error_message = errorMessage;
+  }
+
+  await supabase
+    .from('workflow_steps')
+    .update(updateData)
+    .eq('workflow_id', workflowId)
+    .eq('step_name', stepName);
 }

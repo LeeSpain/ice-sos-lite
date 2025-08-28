@@ -167,6 +167,39 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_analytics: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          date: string
+          id: string
+          metadata: Json | null
+          metric_name: string
+          metric_value: number
+          platform: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          date?: string
+          id?: string
+          metadata?: Json | null
+          metric_name: string
+          metric_value: number
+          platform: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          date?: string
+          id?: string
+          metadata?: Json | null
+          metric_name?: string
+          metric_value?: number
+          platform?: string
+        }
+        Relationships: []
+      }
       campaign_recipients: {
         Row: {
           campaign_id: string
@@ -337,6 +370,42 @@ export type Database = {
           subject?: string
           updated_at?: string
           user_agent?: string | null
+        }
+        Relationships: []
+      }
+      content_approval_workflow: {
+        Row: {
+          approval_status: string
+          approved_at: string | null
+          assigned_to: string | null
+          content_id: string
+          created_at: string
+          id: string
+          rejected_at: string | null
+          reviewer_notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          approval_status?: string
+          approved_at?: string | null
+          assigned_to?: string | null
+          content_id: string
+          created_at?: string
+          id?: string
+          rejected_at?: string | null
+          reviewer_notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approval_status?: string
+          approved_at?: string | null
+          assigned_to?: string | null
+          content_id?: string
+          created_at?: string
+          id?: string
+          rejected_at?: string | null
+          reviewer_notes?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1404,6 +1473,51 @@ export type Database = {
         }
         Relationships: []
       }
+      posting_queue: {
+        Row: {
+          content_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          platform: string
+          platform_post_id: string | null
+          posted_at: string | null
+          retry_count: number | null
+          scheduled_time: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          platform: string
+          platform_post_id?: string | null
+          posted_at?: string | null
+          retry_count?: number | null
+          scheduled_time: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          platform?: string
+          platform_post_id?: string | null
+          posted_at?: string | null
+          retry_count?: number | null
+          scheduled_time?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           created_at: string
@@ -1706,6 +1820,51 @@ export type Database = {
         }
         Relationships: []
       }
+      riven_settings: {
+        Row: {
+          ai_model: string
+          auto_approve_content: boolean | null
+          brand_voice: string | null
+          content_guidelines: string | null
+          created_at: string
+          default_budget: number | null
+          id: string
+          max_tokens: number | null
+          preferred_posting_times: Json | null
+          temperature: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_model?: string
+          auto_approve_content?: boolean | null
+          brand_voice?: string | null
+          content_guidelines?: string | null
+          created_at?: string
+          default_budget?: number | null
+          id?: string
+          max_tokens?: number | null
+          preferred_posting_times?: Json | null
+          temperature?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_model?: string
+          auto_approve_content?: boolean | null
+          brand_voice?: string | null
+          content_guidelines?: string | null
+          created_at?: string
+          default_budget?: number | null
+          id?: string
+          max_tokens?: number | null
+          preferred_posting_times?: Json | null
+          temperature?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       routing_rules: {
         Row: {
           action_config: Json
@@ -1871,35 +2030,53 @@ export type Database = {
         Row: {
           access_token: string | null
           account_name: string
+          account_status: string | null
+          client_id: string | null
+          client_secret: string | null
           created_at: string
           id: string
           is_active: boolean | null
           last_connected: string | null
           platform: string
+          posting_permissions: Json | null
+          rate_limits: Json | null
           updated_at: string
           user_id: string
+          webhook_url: string | null
         }
         Insert: {
           access_token?: string | null
           account_name: string
+          account_status?: string | null
+          client_id?: string | null
+          client_secret?: string | null
           created_at?: string
           id?: string
           is_active?: boolean | null
           last_connected?: string | null
           platform: string
+          posting_permissions?: Json | null
+          rate_limits?: Json | null
           updated_at?: string
           user_id: string
+          webhook_url?: string | null
         }
         Update: {
           access_token?: string | null
           account_name?: string
+          account_status?: string | null
+          client_id?: string | null
+          client_secret?: string | null
           created_at?: string
           id?: string
           is_active?: boolean | null
           last_connected?: string | null
           platform?: string
+          posting_permissions?: Json | null
+          rate_limits?: Json | null
           updated_at?: string
           user_id?: string
+          webhook_url?: string | null
         }
         Relationships: []
       }
@@ -2688,6 +2865,45 @@ export type Database = {
           user_id?: string | null
           variables_used?: Json | null
           workflow_trigger_id?: string
+        }
+        Relationships: []
+      }
+      workflow_steps: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          started_at: string | null
+          status: string
+          step_name: string
+          step_order: number
+          workflow_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string | null
+          status?: string
+          step_name: string
+          step_order: number
+          workflow_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string | null
+          status?: string
+          step_name?: string
+          step_order?: number
+          workflow_id?: string
         }
         Relationships: []
       }
