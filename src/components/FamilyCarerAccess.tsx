@@ -9,6 +9,10 @@ import { IntroVideoModal } from '@/components/IntroVideoModal';
 
 const FamilyCarerAccess = () => {
   const { t } = useTranslation();
+  
+  // Family pricing from subscription plans
+  const familyPrice = "€2.99";
+  const billingInterval = "month";
 
   const features = [
     {
@@ -98,8 +102,12 @@ const FamilyCarerAccess = () => {
                 <h3 className="text-xl md:text-2xl font-bold mb-3 text-foreground">
                   Complete Family Protection
                 </h3>
+                <div className="mb-4">
+                  <span className="text-3xl font-bold text-warning">{familyPrice}</span>
+                  <span className="text-muted-foreground text-sm">/{billingInterval} per connection</span>
+                </div>
                 <p className="text-muted-foreground text-sm mb-4">
-                  Enable trusted family members and professional carers to access your emergency profile, receive instant alerts, and coordinate rapid response during critical situations.
+                  Connect each family member or professional carer for comprehensive emergency coordination. Each connection enables instant alerts, location sharing, and coordinated response during critical situations.
                 </p>
                 
                 {/* CTA Buttons */}
@@ -126,7 +134,7 @@ const FamilyCarerAccess = () => {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Secure access control • Privacy protected
+                  Secure access control • Privacy protected • Pay only for active connections
                 </p>
               </div>
 
