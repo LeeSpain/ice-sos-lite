@@ -115,6 +115,23 @@ const FamilyAccessPanel = () => {
 
   useEffect(() => {
     loadFamilyData();
+    
+    // Auto-refresh every 45 seconds
+    const interval = setInterval(() => {
+      loadFamilyData();
+    }, 45000);
+
+    // Listen for custom events from invite modal
+    const handleInviteUpdate = () => {
+      loadFamilyData();
+    };
+    
+    window.addEventListener('family-invite-updated', handleInviteUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('family-invite-updated', handleInviteUpdate);
+    };
   }, []);
 
   const handleRevokeInvite = async (inviteId: string) => {

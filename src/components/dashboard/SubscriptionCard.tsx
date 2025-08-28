@@ -28,6 +28,14 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
     if (subscription?.subscribed) {
       loadInvoices();
       loadFamilyMembers();
+      
+      // Auto-refresh every 60 seconds
+      const interval = setInterval(() => {
+        loadInvoices();
+        loadFamilyMembers();
+      }, 60000);
+
+      return () => clearInterval(interval);
     }
   }, [subscription]);
 
@@ -232,52 +240,60 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
                   <h4 className="font-semibold mb-3">Payment Summary</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <span className="text-muted-foreground">Total Paid This Month:</span>
-                      <span className="ml-2 font-semibold">€{
-                        subscription.subscription_tier === 'spain_plan' ? '24.99' :
-                        subscription.subscription_tier === 'premium_protection' ? '4.99' : '1.99'
-                      }</span>
+                      <span className="text-muted-foreground">Current Status:</span>
+                      <span className="ml-2 font-semibold text-green-600">
+                        {subscription.subscribed ? 'Active' : 'Inactive'}
+                      </span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Payment Method:</span>
-                      <span className="ml-2 font-semibold">•••• 4242</span>
+                      <span className="text-muted-foreground">Subscription End:</span>
+                      <span className="ml-2 font-semibold">
+                        {subscription.subscription_end 
+                          ? new Date(subscription.subscription_end).toLocaleDateString()
+                          : 'Not available'
+                        }
+                      </span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Billing Cycle:</span>
-                      <span className="ml-2 font-semibold">Monthly</span>
+                      <span className="text-muted-foreground">Plan Type:</span>
+                      <span className="ml-2 font-semibold capitalize">
+                        {subscription.subscription_tier?.replace('_', ' ') || 'Basic'}
+                      </span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Auto-Renewal:</span>
-                      <span className="ml-2 font-semibold text-green-600">Enabled</span>
+                      <span className="text-muted-foreground">Billing:</span>
+                      <span className="ml-2 font-semibold">
+                        {subscription.subscription_end ? 'Auto-Renewal Active' : 'Manage via Stripe'}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Plan Features */}
                 <div className="border-t pt-4">
-                  <h4 className="font-medium mb-3">Your Plan Features</h4>
+                  <h4 className="font-medium mb-3">Available Features</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">24/7 Emergency Support</span>
+                      <span className="text-sm">Emergency SOS Button</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Location Tracking</span>
+                      <span className="text-sm">Emergency Contact Management</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Emergency Contacts</span>
+                      <span className="text-sm">Profile & Medical Info</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Mobile App Access</span>
+                      <span className="text-sm">Dashboard Access</span>
                     </div>
-                    {subscription.subscription_tier === 'spain_plan' && (
+                    {subscription.subscription_tier?.includes('spain') && (
                       <>
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span className="text-sm">Spanish Call Center</span>
+                          <span className="text-sm">Spanish Call Center (€24.99/month)</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-500" />
@@ -285,15 +301,15 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
                         </div>
                       </>
                     )}
-                    {subscription.subscription_tier === 'premium_protection' && (
+                    {(subscription.subscription_tier?.includes('premium') || subscription.subscription_tier?.includes('family')) && (
                       <>
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span className="text-sm">AI Health Monitoring</span>
+                          <span className="text-sm">Family Connection Features</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-500" />
-                          <span className="text-sm">Premium Product Access</span>
+                          <span className="text-sm">Enhanced Protection</span>
                         </div>
                       </>
                     )}
@@ -344,27 +360,27 @@ const SubscriptionCard = ({ subscription }: SubscriptionCardProps) => {
 
             {/* Billing Summary */}
             {subscription?.subscribed && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                  <h5 className="font-semibold text-green-800 mb-1">Total Paid</h5>
-                  <p className="text-2xl font-bold text-green-900">€{
-                    subscription.subscription_tier === 'spain_plan' ? '74.97' :
-                    subscription.subscription_tier === 'premium_protection' ? '14.97' : '5.97'
-                  }</p>
-                  <p className="text-xs text-green-600">Last 3 months</p>
+                  <h5 className="font-semibold text-green-800 mb-1">Total Invoices</h5>
+                  <p className="text-2xl font-bold text-green-900">{invoices.length}</p>
+                  <p className="text-xs text-green-600">Available invoices</p>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h5 className="font-semibold text-blue-800 mb-1">Next Payment</h5>
-                  <p className="text-2xl font-bold text-blue-900">€{
-                    subscription.subscription_tier === 'spain_plan' ? '24.99' :
-                    subscription.subscription_tier === 'premium_protection' ? '4.99' : '1.99'
-                  }</p>
-                  <p className="text-xs text-blue-600">Due {new Date(subscription.subscription_end).toLocaleDateString()}</p>
+                  <h5 className="font-semibold text-blue-800 mb-1">Latest Invoice</h5>
+                  <p className="text-2xl font-bold text-blue-900">
+                    {invoices.length > 0 ? formatCurrency(invoices[0].amount_paid, invoices[0].currency) : '€0.00'}
+                  </p>
+                  <p className="text-xs text-blue-600">
+                    {invoices.length > 0 ? new Date(invoices[0].created * 1000).toLocaleDateString() : 'No invoices yet'}
+                  </p>
                 </div>
                 <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                  <h5 className="font-semibold text-purple-800 mb-1">Payment Method</h5>
-                  <p className="text-lg font-bold text-purple-900">•••• 4242</p>
-                  <p className="text-xs text-purple-600">Visa ending in 4242</p>
+                  <h5 className="font-semibold text-purple-800 mb-1">Status</h5>
+                  <p className="text-lg font-bold text-purple-900">
+                    {subscription.subscribed ? 'Active' : 'Inactive'}
+                  </p>
+                  <p className="text-xs text-purple-600">Subscription status</p>
                 </div>
               </div>
             )}

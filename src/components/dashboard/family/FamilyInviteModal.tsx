@@ -138,6 +138,10 @@ const FamilyInviteModal = ({ onInviteCreated, isOpen, onOpenChange }: FamilyInvi
         });
 
         onInviteCreated();
+        
+        // Dispatch custom event for real-time updates
+        window.dispatchEvent(new CustomEvent('family-invite-updated'));
+        
         onOpenChange(false);
       }
 

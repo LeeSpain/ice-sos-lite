@@ -25,6 +25,8 @@ import { SupportPage } from "@/components/dashboard/pages/SupportPage";
 import { FlicControlPage } from "@/components/dashboard/pages/FlicControlPage";
 import FamilyAccessSetup from "@/pages/FamilyAccessSetup";
 import { useTranslation } from 'react-i18next';
+import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
+
 const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -34,8 +36,42 @@ const Dashboard = () => {
   useScrollToTop();
   const { t } = useTranslation();
 
+  // Setup real-time updates
+  useRealTimeUpdates({
+    onSubscriptionUpdate: () => checkSubscription(),
+    onFamilyUpdate: () => loadDashboardData(),
+    onOrderUpdate: () => loadDashboardData()
+  });
+
   useEffect(() => {
     loadDashboardData();
+    
+    // Auto-refresh every 2 minutes
+    const interval = setInterval(() => {
+      loadDashboardData();
+    }, 120000);
+
+    // Listen for page visibility changes
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadDashboardData();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Listen for storage events (when user completes payment in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'subscription-updated') {
+        loadDashboardData();
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const loadDashboardData = async () => {

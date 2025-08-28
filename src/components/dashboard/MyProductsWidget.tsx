@@ -28,6 +28,24 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
 
   useEffect(() => {
     loadUserData();
+    
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      loadUserData();
+    }, 30000);
+
+    // Listen for page visibility changes to refresh when user returns
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        loadUserData();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const loadUserData = async () => {
@@ -122,19 +140,30 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       const { data: subscriptionData, error } = await supabase.functions.invoke('check-subscription');
       
       if (error) {
+        console.error('Subscription check error:', error);
         setSubscription({ error: true });
         return;
       }
 
-      if (subscriptionData?.subscribed && subscriptionData.subscription_tiers?.length > 0) {
+      console.log('Subscription data received:', subscriptionData);
+
+      // Handle both single tier and multiple tiers
+      if (subscriptionData?.subscribed) {
         const { data: allPlans } = await supabase
           .from('subscription_plans')
           .select('*')
           .eq('is_active', true);
         
-        const userPlans = allPlans?.filter(plan => 
-          subscriptionData.subscription_tiers.includes(plan.name)
-        ) || [];
+        let userPlans = [];
+        if (subscriptionData.subscription_tiers?.length > 0) {
+          userPlans = allPlans?.filter(plan => 
+            subscriptionData.subscription_tiers.includes(plan.name)
+          ) || [];
+        } else if (subscriptionData.subscription_tier) {
+          userPlans = allPlans?.filter(plan => 
+            plan.name === subscriptionData.subscription_tier
+          ) || [];
+        }
         
         setSubscription({
           ...subscriptionData,
@@ -142,7 +171,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
           subscribed: true
         });
       } else {
-        setSubscription({ subscribed: false });
+        setSubscription({ subscribed: false, ...subscriptionData });
       }
     } catch (error) {
       console.error('Error loading subscription:', error);
