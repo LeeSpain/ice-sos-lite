@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import FamilyInviteModal from "@/components/dashboard/family/FamilyInviteModal";
 
 interface PersonalDetailsCardProps {
   profile: any;
@@ -53,6 +54,7 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
   });
   const [familyMembers, setFamilyMembers] = useState([]);
   const [editingContact, setEditingContact] = useState<number | null>(null);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -228,43 +230,12 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
   };
 
   // Family Functions
-  const inviteFamily = async () => {
-    const name = prompt("Enter family member name:");
-    const email = prompt("Enter family member email:");
-    const relationship = prompt("Enter relationship:");
-    
-    if (name && email && relationship) {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+  const handleInviteFamily = () => {
+    setIsInviteModalOpen(true);
+  };
 
-        const { error } = await supabase
-          .from('family_invites')
-          .insert({
-            inviter_user_id: user.id,
-            inviter_email: user.email || '',
-            invitee_name: name,
-            invitee_email: email,
-            relationship: relationship,
-            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 30 days
-          });
-
-        if (error) throw error;
-
-        toast({
-          title: "Success",
-          description: "Family invitation sent successfully."
-        });
-        loadFamilyMembers();
-      } catch (error) {
-        console.error('Error inviting family:', error);
-        toast({
-          title: "Error",
-          description: "Failed to send family invitation.",
-          variant: "destructive"
-        });
-      }
-    }
+  const handleInviteCreated = () => {
+    loadFamilyMembers();
   };
 
   const removeFamilyMember = async (memberId: string) => {
@@ -769,7 +740,7 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={inviteFamily}
+                onClick={handleInviteFamily}
               >
                 <UserPlus className="h-4 w-4 mr-2" />
                 Invite Family
@@ -783,7 +754,7 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={inviteFamily}
+                    onClick={handleInviteFamily}
                     className="mt-4"
                   >
                     <UserPlus className="h-4 w-4 mr-2" />
@@ -828,6 +799,12 @@ const PersonalDetailsCard = ({ profile, onProfileUpdate }: PersonalDetailsCardPr
           </div>
         )}
       </CardContent>
+      
+      <FamilyInviteModal
+        isOpen={isInviteModalOpen}
+        onOpenChange={setIsInviteModalOpen}
+        onInviteCreated={handleInviteCreated}
+      />
     </Card>
   );
 };

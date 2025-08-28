@@ -27,6 +27,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import FamilyInviteModal from "@/components/dashboard/family/FamilyInviteModal";
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -52,6 +53,7 @@ export default function ProfilePage() {
     emergencyMedicalInfo: ""
   });
   const [familyMembers, setFamilyMembers] = useState<any[]>([]);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   useEffect(() => {
     loadProfileData();
@@ -238,18 +240,12 @@ export default function ProfilePage() {
   };
 
   // Family Functions
-  const inviteFamily = () => {
-    const name = prompt("Enter family member name:");
-    const email = prompt("Enter family member email:");
-    const relationship = prompt("Enter relationship:");
-    
-    if (name && email && relationship) {
-      // Here you would typically call a family invite function
-      toast({
-        title: "Family Invite",
-        description: "Family invitation functionality will be implemented soon."
-      });
-    }
+  const handleInviteFamily = () => {
+    setIsInviteModalOpen(true);
+  };
+
+  const handleInviteCreated = () => {
+    loadProfileData(); // Reload data including family members
   };
 
   const removeFamilyMember = async (memberId: string) => {
@@ -606,7 +602,7 @@ export default function ProfilePage() {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => inviteFamily()}
+                onClick={handleInviteFamily}
               >
                 <UserPlus className="h-4 w-4 mr-2" />
                 Invite Family
@@ -657,6 +653,12 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
+      
+      <FamilyInviteModal
+        isOpen={isInviteModalOpen}
+        onOpenChange={setIsInviteModalOpen}
+        onInviteCreated={handleInviteCreated}
+      />
     </div>
   );
 }
