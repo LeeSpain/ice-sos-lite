@@ -129,7 +129,7 @@ const App = () => {
                   </ProtectedRoute>
                 </OptimizedSuspense>
               } />
-              <Route path="/member-dashboard" element={
+              <Route path="/full-dashboard/*" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedRoute>
                     <SimpleDashboard />
@@ -143,7 +143,7 @@ const App = () => {
                   <AdminSetupPage />
                 </OptimizedSuspense>
               } />
-              <Route path="/admin-dashboard" element={
+              <Route path="/admin-dashboard/*" element={
                 <OptimizedSuspense skeletonType="card">
                   <AdminProtectedRoute>
                     <AdminDashboard />

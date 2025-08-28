@@ -39,7 +39,7 @@ const DashboardRedirect = () => {
   if (isAdmin) {
     return <Navigate to="/admin-dashboard" replace />;
   } else {
-    return <Navigate to="/member-dashboard" replace />;
+    return <Navigate to="/full-dashboard" replace />;
   }
 };
 
