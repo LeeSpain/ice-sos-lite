@@ -49,8 +49,9 @@ export function useRealTimeAnalytics() {
       console.log('🔄 Fetching real-time analytics data...');
       try {
         // Get real data from database with error handling
+        // Note: contact_submissions now requires admin access, so we handle gracefully
         const [contactsResult, ordersResult, registrationsResult, profilesResult] = await Promise.allSettled([
-          supabase.from('contact_submissions').select('*').throwOnError(),
+          supabase.from('contact_submissions').select('*'),
           supabase.from('orders').select('total_price').eq('status', 'completed').throwOnError(),
           supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true).throwOnError(),
           supabase.from('profiles').select('count', { count: 'exact', head: true }).throwOnError()
