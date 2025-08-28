@@ -74,11 +74,15 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
       setAvailableProducts(productsData);
       setRegionalServices(servicesData);
 
-      // Find family plan from admin-configured plans
+      // Find family plan from admin-configured plans - prioritize exact matches
       const familyPlanFromAdmin = plansData.find(plan => 
+        plan.name.toLowerCase().includes('family') && plan.name.toLowerCase().includes('connection')
+      ) || plansData.find(plan => 
         plan.name.toLowerCase().includes('family') || 
         plan.name.toLowerCase().includes('connection')
       );
+      
+      console.log('Family plan loaded from admin:', familyPlanFromAdmin);
       setFamilyPlan(familyPlanFromAdmin);
 
     } catch (error) {
@@ -443,8 +447,8 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
           </div>
         )}
 
-        {/* Family Connection Add-on */}
-        {familyPlan && !hasFamilyConnection && (
+        {/* Family Connection Add-on - Only show if plan exists and user doesn't have family connection */}
+        {familyPlan && familyPlan.price && !hasFamilyConnection && (
           <div className="p-4 bg-muted/30 rounded-lg border">
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-3 flex-1">
@@ -458,7 +462,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                   </p>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="font-semibold text-primary">
-                      {familyPlan.currency || 'EUR'} {Number(familyPlan.price || 1.99).toFixed(2)}/month
+                      {familyPlan.currency || 'EUR'} {Number(familyPlan.price).toFixed(2)}/month
                     </span>
                     <span>• Add-on</span>
                   </div>
