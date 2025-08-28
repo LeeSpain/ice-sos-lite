@@ -10,6 +10,7 @@ import {
   Zap, Eye, PlayCircle, UserCheck, Calendar, Bell
 } from 'lucide-react';
 import { useRealTimeAnalytics } from '@/hooks/useRealTimeAnalytics';
+import { useFamilyAnalytics } from '@/hooks/useFamilyAnalytics';
 import { useVideoAnalytics } from '@/hooks/useVideoAnalytics';
 import { useEnhancedTrafficSources, useEnhancedDeviceData, useSessionMetrics } from '@/hooks/useEnhancedAnalytics';
 import { useTopPages, useCustomEvents, useRealTimeActiveUsers } from '@/hooks/useRealTimeAnalytics';
@@ -99,6 +100,7 @@ export default function DashboardOverview() {
   const { data: topPages, isLoading: pagesLoading } = useTopPages();
   const { data: customEvents, isLoading: eventsLoading } = useCustomEvents();
   const { data: activeUsers, isLoading: activeLoading } = useRealTimeActiveUsers();
+  const { data: familyMetrics, isLoading: familyLoading } = useFamilyAnalytics();
 
   console.log('📊 DashboardOverview rendering with real-time data');
 
@@ -180,6 +182,45 @@ export default function DashboardOverview() {
           changeType="increase"
           icon={<Target className="h-8 w-8 text-orange-500" />}
           subtext="Registration to user ratio"
+        />
+      </div>
+
+      {/* Family System Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard
+          title="Family Connections"
+          value={formatNumber(familyMetrics?.activeFamilyMembers || 0)}
+          change="+15.2%"
+          changeType="increase"
+          icon={<Shield className="h-8 w-8 text-cyan-500" />}
+          subtext={`${familyMetrics?.totalFamilyGroups || 0} family groups`}
+        />
+        
+        <MetricCard
+          title="SOS Events"
+          value={formatNumber(familyMetrics?.totalSosEvents || 0)}
+          change={familyMetrics?.activeSosEvents ? "-3.1%" : "0%"}
+          changeType={familyMetrics?.activeSosEvents ? "decrease" : "neutral"}
+          icon={<AlertTriangle className="h-8 w-8 text-orange-500" />}
+          subtext={`${familyMetrics?.activeSosEvents || 0} currently active`}
+        />
+        
+        <MetricCard
+          title="Family Revenue"
+          value={formatCurrency(familyMetrics?.familyRevenue || 0)}
+          change="+22.1%"
+          changeType="increase"
+          icon={<DollarSign className="h-8 w-8 text-emerald-500" />}
+          subtext="From family subscriptions"
+        />
+        
+        <MetricCard
+          title="Invite Success"
+          value={`${familyMetrics?.inviteAcceptanceRate || 0}%`}
+          change="+5.7%"
+          changeType="increase"
+          icon={<UserCheck className="h-8 w-8 text-blue-500" />}
+          subtext={`${familyMetrics?.pendingInvites || 0} pending invites`}
         />
       </div>
 

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import { useSessionMetrics } from './useEnhancedAnalytics';
+import { useFamilyAnalytics } from './useFamilyAnalytics';
 
 export interface RealTimeMetrics {
   totalUsers: number;
@@ -13,6 +14,10 @@ export interface RealTimeMetrics {
   bounceRate: number;
   avgSessionDuration: number;
   conversionRate: number;
+  // Family system metrics
+  familyConnections: number;
+  activeSosEvents: number;
+  familyRevenue: number;
 }
 
 export interface TrafficSource {
@@ -42,6 +47,7 @@ export interface CustomEvent {
 // Hook to fetch real-time analytics data
 export function useRealTimeAnalytics() {
   const { data: sessionMetrics } = useSessionMetrics();
+  const { data: familyMetrics } = useFamilyAnalytics();
   
   return useQuery({
     queryKey: ['real-time-analytics'],
@@ -90,7 +96,11 @@ export function useRealTimeAnalytics() {
           totalRegistrations,
           bounceRate: sessionMetrics?.bounceRate || 0,
           avgSessionDuration: sessionMetrics?.avgSessionDuration || 0,
-          conversionRate: parseFloat(conversionRate.toFixed(2))
+          conversionRate: parseFloat(conversionRate.toFixed(2)),
+          // Family system metrics
+          familyConnections: familyMetrics?.activeFamilyMembers || 0,
+          activeSosEvents: familyMetrics?.activeSosEvents || 0,
+          familyRevenue: familyMetrics?.familyRevenue || 0
         };
       } catch (error) {
         console.error('Error fetching real-time analytics:', error);
@@ -103,7 +113,10 @@ export function useRealTimeAnalytics() {
           totalRegistrations: 0,
           bounceRate: 0,
           avgSessionDuration: 0,
-          conversionRate: 0
+          conversionRate: 0,
+          familyConnections: 0,
+          activeSosEvents: 0,
+          familyRevenue: 0
         };
       }
     },

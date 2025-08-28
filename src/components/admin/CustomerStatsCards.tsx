@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Users, TrendingUp, DollarSign, Globe, UserCheck, UserX } from "lucide-react";
+import { Users, TrendingUp, DollarSign, Globe, UserCheck, UserX, Shield, AlertTriangle } from "lucide-react";
 import { useRealTimeAnalytics } from "@/hooks/useRealTimeAnalytics";
+import { useFamilyAnalytics } from "@/hooks/useFamilyAnalytics";
 
 interface CustomerStatsCardsProps {
   totalCustomers: number;
@@ -18,6 +19,7 @@ export function CustomerStatsCards({
   totalRevenue 
 }: CustomerStatsCardsProps) {
   const { data: metrics } = useRealTimeAnalytics();
+  const { data: familyMetrics } = useFamilyAnalytics();
   
   const customerGrowthRate = newCustomersThisMonth > 0 ? 
     ((newCustomersThisMonth / totalCustomers) * 100).toFixed(1) : "0.0";
@@ -73,11 +75,27 @@ export function CustomerStatsCards({
       trend: `${(100 - parseFloat(subscriptionRate)).toFixed(1)}% inactive`,
       trendUp: false,
       gradient: "from-red-500/20 to-red-500/5"
+    },
+    {
+      title: "Family Connections",
+      value: (familyMetrics?.activeFamilyMembers || 0).toLocaleString(),
+      icon: Shield,
+      trend: `${familyMetrics?.totalFamilyGroups || 0} family groups`,
+      trendUp: true,
+      gradient: "from-cyan-500/20 to-cyan-500/5"
+    },
+    {
+      title: "Active SOS Events",
+      value: (familyMetrics?.activeSosEvents || 0).toLocaleString(),
+      icon: AlertTriangle,
+      trend: `${familyMetrics?.totalSosEvents || 0} total events`,
+      trendUp: false,
+      gradient: "from-orange-500/20 to-orange-500/5"
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-8 gap-6 mb-8">
       {stats.map((stat, index) => {
         const Icon = stat.icon;
         return (
