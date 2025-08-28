@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useEffect, useState } from 'react';
 import { useSessionMetrics } from './useEnhancedAnalytics';
-import { useFamilyAnalytics } from './useFamilyAnalytics';
+// Removed circular import - useFamilyAnalytics should be imported directly where needed
 
 export interface RealTimeMetrics {
   totalUsers: number;
@@ -47,7 +47,6 @@ export interface CustomEvent {
 // Hook to fetch real-time analytics data
 export function useRealTimeAnalytics() {
   const { data: sessionMetrics } = useSessionMetrics();
-  const { data: familyMetrics } = useFamilyAnalytics();
   
   return useQuery({
     queryKey: ['real-time-analytics'],
@@ -97,10 +96,10 @@ export function useRealTimeAnalytics() {
           bounceRate: sessionMetrics?.bounceRate || 0,
           avgSessionDuration: sessionMetrics?.avgSessionDuration || 0,
           conversionRate: parseFloat(conversionRate.toFixed(2)),
-          // Family system metrics
-          familyConnections: familyMetrics?.activeFamilyMembers || 0,
-          activeSosEvents: familyMetrics?.activeSosEvents || 0,
-          familyRevenue: familyMetrics?.familyRevenue || 0
+          // Family system metrics - set to 0 since we removed the circular dependency
+          familyConnections: 0,
+          activeSosEvents: 0,
+          familyRevenue: 0
         };
       } catch (error) {
         console.error('Error fetching real-time analytics:', error);
