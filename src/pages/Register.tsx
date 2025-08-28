@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,8 +12,6 @@ import { supabase } from "@/integrations/supabase/client";
 import Navigation from "@/components/Navigation";
 import EmbeddedPayment from "@/components/EmbeddedPayment";
 import { useTranslation } from 'react-i18next';
-import { usePreferences } from '@/contexts/PreferencesContext';
-import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { PageSEO } from '@/components/PageSEO';
 
@@ -24,13 +22,9 @@ const Register = () => {
     firstName: "",
     lastName: "",
     phoneNumber: "",
-    password: "",
     plans: [] as string[],
     products: [] as string[],
     regionalServices: [] as string[],
-    // Payment step
-    paymentMethod: "",
-    // Questionnaire step
     emergencyContacts: [{ name: "", phone: "", relationship: "" }] as Array<{name: string, phone: string, relationship: string}>,
     medicalConditions: "",
     allergies: "",
@@ -44,80 +38,6 @@ const Register = () => {
   const [regionalServices, setRegionalServices] = useState<any[]>([]);
   const { toast } = useToast();
   const { t } = useTranslation();
-  const { currency, language } = usePreferences();
-  
-  // Debug log for component renders and currency changes
-  console.log('🎯 Register component render - Currency:', currency, 'Language:', language);
-  
-  // Add useEffect to track currency changes and force re-renders
-  useEffect(() => {
-    console.log('💰 Currency changed to:', currency, 'Language:', language);
-    console.log('📊 Current data lengths - Plans:', subscriptionPlans.length, 'Products:', products.length, 'Services:', regionalServices.length);
-  }, [currency, language, subscriptionPlans.length, products.length, regionalServices.length]);
-
-  // Convert all data based on current currency using useMemo for proper re-rendering
-  const convertedSubscriptionPlans = useMemo(() => {
-    console.log('🔄 [RECALCULATING] Converting subscription plans, currency:', currency, 'plans:', subscriptionPlans.length);
-    if (subscriptionPlans.length === 0) {
-      console.log('⚠️ No subscription plans to convert yet');
-      return [];
-    }
-    const converted = subscriptionPlans.map(plan => {
-      const originalPrice = parseFloat(plan.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`📋 Plan "${plan.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
-      return {
-        ...plan,
-        convertedPrice,
-        formattedPrice
-      };
-    });
-    console.log('✅ Final converted subscription plans:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
-    return converted;
-  }, [subscriptionPlans, currency, language]);
-
-  const convertedProducts = useMemo(() => {
-    console.log('🔄 [RECALCULATING] Converting products, currency:', currency, 'products:', products.length);
-    if (products.length === 0) {
-      console.log('⚠️ No products to convert yet');
-      return [];
-    }
-    const converted = products.map(product => {
-      const originalPrice = parseFloat(product.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`📦 Product "${product.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
-      return {
-        ...product,
-        convertedPrice,
-        formattedPrice
-      };
-    });
-    console.log('✅ Final converted products:', converted.map(p => ({ name: p.name, formatted: p.formattedPrice })));
-    return converted;
-  }, [products, currency, language]);
-
-  const convertedRegionalServices = useMemo(() => {
-    console.log('🔄 [RECALCULATING] Converting regional services, currency:', currency, 'services:', regionalServices.length);
-    if (regionalServices.length === 0) {
-      console.log('⚠️ No regional services to convert yet');
-      return [];
-    }
-    const converted = regionalServices.map(service => {
-      const originalPrice = parseFloat(service.price.toString());
-      const convertedPrice = convertCurrency(originalPrice, 'EUR', currency);
-      const formattedPrice = formatDisplayCurrency(convertedPrice, currency, languageToLocale(language));
-      console.log(`🌍 Service "${service.name}": ${originalPrice} EUR → ${convertedPrice} ${currency} → ${formattedPrice}`);
-      return {
-        ...service,
-        convertedPrice,
-        formattedPrice
-      };
-    });
-    console.log('✅ Final converted regional services:', converted.map(s => ({ name: s.name, formatted: s.formattedPrice })));
-    return converted;
-  }, [regionalServices, currency, language]);
 
   // Fetch data from database on component mount
   useEffect(() => {
@@ -164,7 +84,7 @@ const Register = () => {
     };
 
     fetchData();
-  }, []); // Only fetch once on mount
+  }, []);
 
   const handleNextStep = () => {
     if (step === 1) {
@@ -215,7 +135,7 @@ const Register = () => {
 
     setLoading(true);
     try {
-      // Update user metadata with all collected information
+      // Create user account with all collected information
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: Math.random().toString(36).slice(-8), // Temporary password
@@ -224,7 +144,6 @@ const Register = () => {
             first_name: formData.firstName,
             last_name: formData.lastName,
             phone_number: formData.phoneNumber,
-            phone: formData.phoneNumber, // Add both formats for consistency
             emergency_contacts: JSON.stringify(formData.emergencyContacts.filter(contact => 
               contact.name.trim() && contact.phone.trim()
             )),
@@ -238,7 +157,7 @@ const Register = () => {
 
       if (signUpError) throw signUpError;
 
-      // Fire welcome email (non-blocking)
+      // Send welcome email with app download link
       try {
         const userId = signUpData?.user?.id;
         if (userId) {
@@ -257,7 +176,7 @@ const Register = () => {
       
       toast({
         title: "Registration Complete!",
-        description: "Your account has been created successfully.",
+        description: "Check your email for the app download link.",
       });
 
       // Redirect to dashboard
@@ -402,10 +321,10 @@ const Register = () => {
                   </div>
 
                    {/* Subscription Plans */}
-                   {convertedSubscriptionPlans.length > 0 && (
-                     <div key={`plans-${currency}`} className="space-y-4">
+                   {subscriptionPlans.length > 0 && (
+                     <div className="space-y-4">
                        <h4 className="font-medium text-lg">Monthly Subscription Plans</h4>
-                       {convertedSubscriptionPlans.map((plan) => (
+                       {subscriptionPlans.map((plan) => (
                          <div key={plan.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
                            <Checkbox
                              id={plan.id}
@@ -425,7 +344,7 @@ const Register = () => {
                              }}
                            />
                            <div className="flex-1">
-                             <Label htmlFor={plan.id} className="font-medium">{plan.name} - {plan.formattedPrice}/month</Label>
+                             <Label htmlFor={plan.id} className="font-medium">{plan.name} - €{plan.price}/month</Label>
                              <p className="text-sm text-muted-foreground">{plan.description}</p>
                            </div>
                          </div>
@@ -434,10 +353,10 @@ const Register = () => {
                    )}
 
                    {/* Products */}
-                   {convertedProducts.length > 0 && (
-                     <div key={`products-${currency}`} className="space-y-4">
+                   {products.length > 0 && (
+                     <div className="space-y-4">
                        <h4 className="font-medium text-lg">Safety Products (One-time purchase)</h4>
-                       {convertedProducts.map((product) => (
+                       {products.map((product) => (
                          <div key={product.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
                            <Checkbox
                              id={product.id}
@@ -457,7 +376,7 @@ const Register = () => {
                              }}
                            />
                            <div className="flex-1">
-                             <Label htmlFor={product.id} className="font-medium">{product.name} - {product.formattedPrice}</Label>
+                             <Label htmlFor={product.id} className="font-medium">{product.name} - €{product.price}</Label>
                              <p className="text-sm text-muted-foreground">{product.description}</p>
                            </div>
                          </div>
@@ -466,10 +385,10 @@ const Register = () => {
                    )}
 
                    {/* Regional Services */}
-                   {convertedRegionalServices.length > 0 && (
-                     <div key={`services-${currency}`} className="space-y-4">
+                   {regionalServices.length > 0 && (
+                     <div className="space-y-4">
                        <h4 className="font-medium text-lg">Regional Services</h4>
-                       {convertedRegionalServices.map((service) => (
+                       {regionalServices.map((service) => (
                          <div key={service.id} className="flex items-center space-x-3 p-4 border rounded-lg hover:bg-muted/50">
                            <Checkbox
                              id={service.id}
@@ -489,7 +408,7 @@ const Register = () => {
                              }}
                            />
                             <div className="flex-1">
-                              <Label htmlFor={service.id} className="font-medium">{service.name} ({service.region}) - {service.formattedPrice}/month</Label>
+                              <Label htmlFor={service.id} className="font-medium">{service.name} ({service.region}) - €{service.price}/month</Label>
                               <p className="text-sm text-muted-foreground">{service.description}</p>
                             </div>
                           </div>
@@ -523,8 +442,8 @@ const Register = () => {
                     userEmail={formData.email}
                     firstName={formData.firstName}
                     lastName={formData.lastName}
-                    password={formData.password || Math.random().toString(36).slice(-8)}
-                    currency={currency}
+                    password={Math.random().toString(36).slice(-8)}
+                    currency="EUR"
                     onSuccess={handlePaymentSuccess}
                     onBack={() => setStep(2)}
                   />
