@@ -195,8 +195,12 @@ const App = () => {
               } />
             </Routes>
             
-            {/* Global Emma Chat - appears on all pages except SOS app and admin dashboard */}
-            {window.location.pathname !== '/app' && !window.location.pathname.startsWith('/admin-dashboard') && <GlobalEmmaChat />}
+            {/* Global Emma Chat - appears on all pages except SOS app, admin dashboard, and members dashboard */}
+            {window.location.pathname !== '/app' && 
+             !window.location.pathname.startsWith('/admin-dashboard') && 
+             !window.location.pathname.startsWith('/dashboard') && 
+             !window.location.pathname.startsWith('/full-dashboard') && 
+             <GlobalEmmaChat />}
             
             {/* Show device manager only in protected SOS app */}
             {window.location.pathname === '/app' && <DeviceManagerButton />}
