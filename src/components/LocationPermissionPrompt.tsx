@@ -44,68 +44,64 @@ export const LocationPermissionPrompt = () => {
 
   if (permissionState.granted) {
     return (
-      <div className="w-full max-w-lg mx-auto">
-        <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
-                <MapPin className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-guardian">Location Services Active</p>
-                <p className="text-xs text-gray-600">GPS location sharing enabled</p>
-              </div>
+      <div className="w-full py-4 border-t border-gray-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center">
+              <MapPin className="h-5 w-5 text-white" />
             </div>
-            <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 text-xs">
-              <CheckCircle className="h-3 w-3 mr-1" />
-              Active
-            </Badge>
+            <div>
+              <p className="text-sm font-semibold text-guardian">Location Services Active</p>
+              <p className="text-xs text-gray-600">GPS location sharing enabled</p>
+            </div>
           </div>
+          <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 text-xs">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Active
+          </Badge>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto">
-      <div className="bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-              <Shield className="h-5 w-5 text-gray-600" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-guardian">Location Access Required</p>
-              <p className="text-xs text-gray-600">Enable GPS for emergency alerts</p>
-            </div>
+    <div className="w-full py-4 border-t border-gray-100">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+            <Shield className="h-5 w-5 text-gray-600" />
           </div>
-          {getStatusBadge()}
+          <div>
+            <p className="text-sm font-semibold text-guardian">Location Access Required</p>
+            <p className="text-xs text-gray-600">Enable GPS for emergency alerts</p>
+          </div>
         </div>
-        
-        {!permissionState.denied && (
-          <Button 
-            onClick={handleRequestPermission}
-            disabled={isRequesting}
-            className="w-full"
-            size="sm"
-          >
-            {isRequesting ? 'Requesting Permission...' : 'Enable Location Access'}
-          </Button>
-        )}
-        
-        {permissionState.denied && (
-          <div className="space-y-2 mt-3">
-            <p className="text-sm text-destructive">
-              Location access was denied. To enable:
-            </p>
-            <ul className="text-xs text-gray-600 space-y-1 ml-4">
-              <li>• Click the location icon in your browser's address bar</li>
-              <li>• Select "Allow" for location access</li>
-              <li>• Refresh this page</li>
-            </ul>
-          </div>
-        )}
+        {getStatusBadge()}
       </div>
+      
+      {!permissionState.denied && (
+        <Button 
+          onClick={handleRequestPermission}
+          disabled={isRequesting}
+          className="w-full"
+          size="sm"
+        >
+          {isRequesting ? 'Requesting Permission...' : 'Enable Location Access'}
+        </Button>
+      )}
+      
+      {permissionState.denied && (
+        <div className="space-y-2 mt-3">
+          <p className="text-sm text-destructive">
+            Location access was denied. To enable:
+          </p>
+          <ul className="text-xs text-gray-600 space-y-1 ml-4">
+            <li>• Click the location icon in your browser's address bar</li>
+            <li>• Select "Allow" for location access</li>
+            <li>• Refresh this page</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
