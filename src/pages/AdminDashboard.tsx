@@ -33,6 +33,8 @@ import FlicControlAdminPage from '@/components/admin/pages/FlicControlAdminPage'
 import ContactSubmissionsPage from '@/components/admin/pages/ContactSubmissionsPage';
 import AnalyticsPage from '@/components/admin/pages/AnalyticsPage';
 import VideoAnalyticsPage from '@/components/admin/pages/VideoAnalyticsPage';
+import EmergencyIncidentsPage from '@/components/admin/pages/EmergencyIncidentsPage';
+import SafetyMonitoringPage from '@/components/admin/pages/SafetyMonitoringPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -66,8 +68,8 @@ const AdminDashboard: React.FC = () => {
         <Route path="social-media" element={<SocialMediaIntegration />} />
         <Route path="content-automation" element={<ContentAutomation />} />
         <Route path="whatsapp" element={<div className="p-6"><h1 className="text-3xl font-bold">WhatsApp Integration</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
-        <Route path="emergencies" element={<div className="p-6"><h1 className="text-3xl font-bold">Emergency Incidents</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
-        <Route path="safety" element={<div className="p-6"><h1 className="text-3xl font-bold">Safety Monitoring</h1><p className="text-muted-foreground">Coming soon...</p></div>} />
+        <Route path="emergencies" element={<EmergencyIncidentsPage />} />
+        <Route path="safety" element={<SafetyMonitoringPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="regional-services" element={<RegionalServicesPage />} />
         <Route path="activity" element={<ActivityPage />} />
