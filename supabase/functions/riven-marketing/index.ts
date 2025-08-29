@@ -74,7 +74,7 @@ serve(async (req) => {
 
     console.log('✅ Admin verified:', user.id);
 
-    const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls } = await req.json();
+    const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls, prompt, contentId } = await req.json();
     const aiConfig = await loadAiConfig(userSupabase);
 
     let response = '';
@@ -100,6 +100,65 @@ serve(async (req) => {
             xai: !!xaiApiKey,
           }
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      
+      case 'generate_image':
+        try {
+          if (!openaiApiKey) throw new Error('OpenAI API key not configured');
+          const basePrompt = prompt || 'Generate an on-brand marketing image for ICE SOS.';
+          // Improve prompt using configured provider for the image stage
+          let improvedPrompt = basePrompt;
+          try {
+            improvedPrompt = await callLLM(aiConfig, 'image', [
+              { role: 'system', content: 'Return a concise, vivid prompt for photorealistic marketing image generation. Avoid quotes.' },
+              { role: 'user', content: basePrompt }
+            ], { maxTokens: 200 });
+            improvedPrompt = (improvedPrompt || basePrompt).toString().trim();
+          } catch (_e) {
+            improvedPrompt = basePrompt;
+          }
+
+          const imgRes = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${openaiApiKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: 'gpt-image-1',
+              prompt: improvedPrompt,
+              n: 1,
+              size: '1024x1024',
+              response_format: 'b64_json',
+              background: 'transparent',
+            })
+          });
+          const imgData = await imgRes.json();
+          if (!imgRes.ok) {
+            console.error('Image API error', imgData);
+            throw new Error(imgData?.error?.message || 'Failed to generate image');
+          }
+          const b64 = imgData?.data?.[0]?.b64_json;
+          const dataUrl = b64 ? `data:image/png;base64,${b64}` : null;
+
+          // Record the generation
+          await userSupabase.from('content_generation_requests').insert({
+            campaign_id: campaign_id || null,
+            content_type: 'image',
+            platform: 'generic',
+            prompt: improvedPrompt,
+            generated_image_url: dataUrl,
+            status: 'completed',
+            generation_metadata: { model: 'gpt-image-1', size: '1024x1024', provider: 'openai' }
+          });
+
+          return new Response(JSON.stringify({
+            success: true,
+            prompt: improvedPrompt,
+            image_url: dataUrl
+          }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        } catch (e) {
+          return new Response(JSON.stringify({ success: false, error: e?.message || String(e) }), {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
       
       case 'test_campaign':
         // Simple test that just creates a campaign without AI
@@ -200,7 +259,7 @@ async function callLLM(
   const provider = chooseProviderForStage(aiConfig, stage);
   let model = options?.model || aiConfig?.providers?.[provider]?.model || (provider === 'openai' ? 'gpt-4o-mini' : 'grok-beta');
   const maxTokens = options?.maxTokens ?? (stage === 'text' ? 500 : 1000);
-
+  console.log(`🤖 AI routing -> stage=${stage} provider=${provider} model=${model}`);
   // Sanitize/normalize model for OpenAI to avoid unsupported IDs
   if (provider === 'openai') {
     const unsafeModels = ['gpt-5-2025-08-07', 'gpt-5-mini-2025-08-07'];
@@ -601,12 +660,10 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
       { role: 'user', content: prompt }
     ], { maxTokens: 500 });
 
-
-    const contentStr = content || '';
+    const contentStr = (content || '').toString();
     if (!contentStr) {
       throw new Error('LLM returned empty content');
     }
-
 
     if (platform === 'blog') {
       try {
@@ -640,14 +697,27 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
         };
       }
     } else {
-      // Parse the generated content (simplified parsing)
-      const titleLine = contentStr.split('\n').find(line => /Title|Headline/i.test(line)) || 
+      // Optional finalize step using configured provider (e.g., xAI)
+      let finalText = contentStr;
+      try {
+        const finalized = await callLLM(aiConfig, 'finalize', [
+          { role: 'system', content: 'Polish and finalize this marketing copy. Keep the same meaning, improve clarity and the call-to-action. Return only the refined text.' },
+          { role: 'user', content: contentStr }
+        ], { maxTokens: 500 });
+        if (finalized && typeof finalized === 'string') {
+          finalText = finalized.trim();
+        }
+      } catch (_e) {
+        // Fallback to original text
+      }
+
+      const titleLine = finalText.split('\n').find(line => /Title|Headline/i.test(line)) || 
                    `${platform} ${contentType} for ${campaign.title}`;
-      const hashtags = contentStr.match(/#\w+/g) || ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'];
+      const hashtags = finalText.match(/#\w+/g) || ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'];
 
       return {
         title: titleLine.replace(/^.*?[:]\s*/, '').trim(),
-        body: contentStr,
+        body: finalText,
         hashtags
       };
     }
