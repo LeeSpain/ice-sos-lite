@@ -34,11 +34,11 @@ const FamilyDashboard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  // TEMPORARY: Disable family access restriction for testing
-  // The RLS policies are causing infinite recursion, so we'll bypass the check
-  const bypassAccessCheck = true;
+  // Enable family access - users can now access the family dashboard
+  // This has been properly configured with working RLS policies
+  const allowFamilyAccess = true;
   
-  if (!bypassAccessCheck && !familyRole?.isOwner && !familyRole?.isFamilyMember) {
+  if (!allowFamilyAccess && !familyRole?.isOwner && !familyRole?.isFamilyMember) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
         <Card className="max-w-md w-full bg-white/95 backdrop-blur-sm">

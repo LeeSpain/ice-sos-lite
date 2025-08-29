@@ -87,6 +87,9 @@ const { t } = useTranslation();
               <Link to="/family-carer-access" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Family & Carer Access
               </Link>
+              <Link to="/family-dashboard" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Family Dashboard
+              </Link>
             </div>
           </div>
 

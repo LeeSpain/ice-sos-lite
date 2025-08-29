@@ -29,6 +29,7 @@ import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
 import RegionalCenterSpain from "./pages/RegionalCenterSpain";
 import FamilyCarerAccess from "./pages/FamilyCarerAccess";
 import FamilyAccessSetup from "./pages/FamilyAccessSetup";
+import FamilyInviteAccept from "./pages/FamilyInviteAccept";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import SOSHome from "./pages/SOSHome";
 import FamilyDashboard from "./pages/FamilyDashboard";
@@ -195,6 +196,13 @@ const App = () => {
               <Route path="/family-access-setup" element={
                 <OptimizedSuspense skeletonType="card">
                   <FamilyAccessSetup />
+                </OptimizedSuspense>
+              } />
+
+              {/* Family Invite Accept */}
+              <Route path="/family-invite/:token" element={
+                <OptimizedSuspense skeletonType="card">
+                  <FamilyInviteAccept />
                 </OptimizedSuspense>
               } />
 
