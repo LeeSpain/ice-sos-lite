@@ -45,6 +45,8 @@ export default function SystemSettingsPage() {
       setProviderStatus({}); // Clear previous status
       toast.info('Testing AI provider connections...');
       
+      console.log('🔍 Testing providers with session:', !!session?.access_token);
+      
       const { data, error } = await supabase.functions.invoke('riven-marketing', {
         body: { action: 'provider_status' },
         headers: {
@@ -52,7 +54,17 @@ export default function SystemSettingsPage() {
         }
       });
       
-      if (error) throw error;
+      console.log('📡 Provider test response:', { data, error });
+      
+      if (error) {
+        console.error('❌ Provider test error:', error);
+        throw error;
+      }
+      
+      if (!data || data.success === false) {
+        console.error('❌ Provider test failed:', data);
+        throw new Error(data?.error || 'Provider test returned no data');
+      }
       
       setProviderStatus(data?.providers || {});
       
@@ -63,7 +75,8 @@ export default function SystemSettingsPage() {
       toast.success(`Provider Status: OpenAI: ${openaiStatus}, xAI: ${xaiStatus}`);
     } catch (err) {
       console.error('Provider status error:', err);
-      toast.error('Failed to check provider connections');
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Failed to check provider connections: ${errorMsg}`);
       setProviderStatus({});
     }
   };

@@ -98,6 +98,12 @@ serve(async (req) => {
           providers: {
             openai: !!openaiApiKey,
             xai: !!xaiApiKey,
+          },
+          debug: {
+            openai_configured: !!openaiApiKey,
+            xai_configured: !!xaiApiKey,
+            user_id: user.id,
+            is_admin: isAdmin
           }
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       
