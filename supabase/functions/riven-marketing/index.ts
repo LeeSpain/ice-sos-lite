@@ -30,6 +30,21 @@ serve(async (req) => {
       throw new Error('Authentication required');
     }
 
+    // Enforce admin-only access for marketing operations for security
+    const { data: isAdmin, error: adminCheckError } = await supabase.rpc('is_admin');
+    if (adminCheckError) {
+      console.error('is_admin RPC error:', adminCheckError);
+    }
+    if (!isAdmin) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Admin privileges required'
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls } = await req.json();
     const aiConfig = await loadAiConfig(supabase);
 
@@ -214,7 +229,9 @@ async function processMarketingCommand(command: string, userId: string, supabase
     
     return {
       response: analysis.response,
-      campaign_created: !!campaign
+      campaign_created: !!campaign,
+      campaign_id: campaign?.id ?? null,
+      campaign_title: campaign?.title ?? null
     };
   } catch (error) {
     console.error('Error in processMarketingCommand:', error);
@@ -363,7 +380,7 @@ async function createMarketingCampaign(analysis: any, command: string, userId: s
     return data;
   } catch (error) {
     console.error('Error creating marketing campaign:', error);
-    return null;
+    throw error;
   }
 }
 
