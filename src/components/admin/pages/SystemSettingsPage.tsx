@@ -6,9 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { Settings, Database, Shield, Mail, Zap, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 interface SystemSetting {
   id: string;
@@ -33,6 +35,37 @@ export default function SystemSettingsPage() {
   const [newSetting, setNewSetting] = useState({ key: '', value: '', description: '' });
   const [healthChecks, setHealthChecks] = useState<HealthCheck[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
+
+  // AI Providers configuration stored in site_content for flexibility
+  const { value: aiProvidersConfig, save: saveAiProvidersConfig, isLoading: aiConfigLoading } = useSiteContent('ai_providers_config', {
+    providers: {
+      openai: { enabled: true, model: 'gpt-5' },
+      xai: { enabled: false, model: 'grok-beta' },
+      deepseek: { enabled: false, model: 'deepseek-chat' }
+    },
+    stages: {
+      overview: { provider: 'openai' },
+      text: { provider: 'openai' },
+      image: { provider: 'openai' },
+      finalize: { provider: 'openai' }
+    }
+  });
+
+  const [providerStatus, setProviderStatus] = useState<Record<string, boolean>>({});
+
+  const testProviders = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('riven-marketing', {
+        body: { action: 'provider_status' }
+      });
+      if (error) throw error;
+      setProviderStatus(data?.providers || {});
+      toast.success('Checked AI provider connections');
+    } catch (err) {
+      console.error('Provider status error', err);
+      toast.error('Failed to check providers');
+    }
+  };
 
   useEffect(() => {
     loadSettings();
@@ -236,6 +269,207 @@ export default function SystemSettingsPage() {
                 </Badge>
               </div>
             ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* AI Providers & Models */}
+      <Card>
+        <CardHeader>
+          <CardTitle>AI Providers & Models</CardTitle>
+          <CardDescription>
+            Enable providers, pick default models, and assign which provider powers each stage. You can add keys later.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="font-medium">Connections</p>
+              <p className="text-sm text-muted-foreground">Check which API keys are configured on the server</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={testProviders} disabled={aiConfigLoading}>
+              Test Connections
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* OpenAI */}
+            <div className="p-4 border rounded-lg space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">OpenAI</span>
+                  {providerStatus.openai !== undefined && (
+                    <Badge variant="outline" className={providerStatus.openai ? 'border-green-500 text-green-600' : 'border-red-500 text-red-600'}>
+                      {providerStatus.openai ? 'Connected' : 'Missing Key'}
+                    </Badge>
+                  )}
+                </div>
+                <Switch
+                  checked={!!aiProvidersConfig?.providers?.openai?.enabled}
+                  onCheckedChange={(val) => {
+                    const next = {
+                      ...aiProvidersConfig!,
+                      providers: {
+                        ...aiProvidersConfig!.providers,
+                        openai: { ...aiProvidersConfig!.providers.openai, enabled: val }
+                      }
+                    } as any;
+                    saveAiProvidersConfig(next);
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Model</Label>
+                <Select
+                  value={aiProvidersConfig?.providers?.openai?.model || 'gpt-5'}
+                  onValueChange={(value) => {
+                    const next = {
+                      ...aiProvidersConfig!,
+                      providers: {
+                        ...aiProvidersConfig!.providers,
+                        openai: { ...aiProvidersConfig!.providers.openai, model: value }
+                      }
+                    } as any;
+                    saveAiProvidersConfig(next);
+                  }}
+                >
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-5">GPT-5</SelectItem>
+                    <SelectItem value="gpt-4.1-2025-04-14">GPT-4.1</SelectItem>
+                    <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* xAI Grok */}
+            <div className="p-4 border rounded-lg space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">xAI (Grok)</span>
+                  {providerStatus.xai !== undefined && (
+                    <Badge variant="outline" className={providerStatus.xai ? 'border-green-500 text-green-600' : 'border-yellow-500 text-yellow-600'}>
+                      {providerStatus.xai ? 'Connected' : 'Add Key Later'}
+                    </Badge>
+                  )}
+                </div>
+                <Switch
+                  checked={!!aiProvidersConfig?.providers?.xai?.enabled}
+                  onCheckedChange={(val) => {
+                    const next = {
+                      ...aiProvidersConfig!,
+                      providers: {
+                        ...aiProvidersConfig!.providers,
+                        xai: { ...aiProvidersConfig!.providers.xai, enabled: val }
+                      }
+                    } as any;
+                    saveAiProvidersConfig(next);
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Model</Label>
+                <Select
+                  value={aiProvidersConfig?.providers?.xai?.model || 'grok-beta'}
+                  onValueChange={(value) => {
+                    const next = {
+                      ...aiProvidersConfig!,
+                      providers: {
+                        ...aiProvidersConfig!.providers,
+                        xai: { ...aiProvidersConfig!.providers.xai, model: value }
+                      }
+                    } as any;
+                    saveAiProvidersConfig(next);
+                  }}
+                >
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="grok-beta">grok-beta</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* DeepSeek */}
+            <div className="p-4 border rounded-lg space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">DeepSeek</span>
+                  {providerStatus.deepseek !== undefined && (
+                    <Badge variant="outline" className={providerStatus.deepseek ? 'border-green-500 text-green-600' : 'border-yellow-500 text-yellow-600'}>
+                      {providerStatus.deepseek ? 'Connected' : 'Add Key Later'}
+                    </Badge>
+                  )}
+                </div>
+                <Switch
+                  checked={!!aiProvidersConfig?.providers?.deepseek?.enabled}
+                  onCheckedChange={(val) => {
+                    const next = {
+                      ...aiProvidersConfig!,
+                      providers: {
+                        ...aiProvidersConfig!.providers,
+                        deepseek: { ...aiProvidersConfig!.providers.deepseek, enabled: val }
+                      }
+                    } as any;
+                    saveAiProvidersConfig(next);
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Model</Label>
+                <Select
+                  value={aiProvidersConfig?.providers?.deepseek?.model || 'deepseek-chat'}
+                  onValueChange={(value) => {
+                    const next = {
+                      ...aiProvidersConfig!,
+                      providers: {
+                        ...aiProvidersConfig!.providers,
+                        deepseek: { ...aiProvidersConfig!.providers.deepseek, model: value }
+                      }
+                    } as any;
+                    saveAiProvidersConfig(next);
+                  }}
+                >
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="deepseek-chat">deepseek-chat</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          {/* Stage Mapping */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {(['overview','text','image','finalize'] as const).map((stage) => (
+              <div key={stage} className="space-y-2">
+                <Label className="capitalize">{stage} Provider</Label>
+                <Select
+                  value={aiProvidersConfig?.stages?.[stage]?.provider || 'openai'}
+                  onValueChange={(value) => {
+                    const next: any = {
+                      ...aiProvidersConfig!,
+                      stages: { ...aiProvidersConfig!.stages, [stage]: { provider: value } }
+                    };
+                    saveAiProvidersConfig(next);
+                  }}
+                >
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="openai">OpenAI</SelectItem>
+                    <SelectItem value="xai">xAI (Grok)</SelectItem>
+                    <SelectItem value="deepseek">DeepSeek</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-end">
+            <Button onClick={() => saveAiProvidersConfig(aiProvidersConfig!)} disabled={aiConfigLoading}>
+              Save Provider Settings
+            </Button>
           </div>
         </CardContent>
       </Card>
