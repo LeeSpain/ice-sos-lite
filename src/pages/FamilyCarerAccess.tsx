@@ -308,30 +308,23 @@ const FamilyCarerAccessPage = () => {
             </p>
           </div>
           
-          {/* Single Centered Family Access Card */}
-          <div className="max-w-2xl mx-auto">
-            <Card className="relative border-3 border-warning/30 hover:border-warning/50 transition-all duration-500 bg-white dark:bg-slate-800 shadow-xl hover:shadow-2xl overflow-hidden group">
-              {/* Top accent bar */}
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-warning to-warning/60"></div>
-              
-              {/* Popular badge */}
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                <Badge className="bg-warning text-white px-4 py-1 font-semibold shadow-lg">
-                  Most Popular
-                </Badge>
-              </div>
-              
-              <CardHeader className="text-center pt-10 pb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-warning to-warning/80 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
-                  <Users className="h-10 w-10 text-white" />
+          {/* Professional Family Access Card */}
+          <div className="max-w-xl mx-auto">
+            <Card className="relative border-2 border-primary/20 hover:border-primary/30 transition-all duration-300 bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl overflow-hidden">
+              <CardHeader className="text-center pb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <Users className="h-6 w-6 text-white" />
                 </div>
-                <CardTitle className="text-3xl md:text-4xl font-bold text-foreground mb-2">Family Access Seats</CardTitle>
-                <div className="text-5xl md:text-6xl font-bold text-warning mb-2">{formattedSeatPrice}</div>
-                <p className="text-lg text-muted-foreground">per family member per month</p>
+                <CardTitle className="text-2xl font-bold text-foreground mb-3">Family Access Seats</CardTitle>
+                <div className="flex items-baseline justify-center gap-1 mb-2">
+                  <span className="text-3xl font-bold text-primary">{formattedSeatPrice}</span>
+                  <span className="text-sm text-muted-foreground">/month per member</span>
+                </div>
+                <p className="text-sm text-muted-foreground">Connect unlimited family members</p>
               </CardHeader>
               
-              <CardContent className="px-8 pb-8">
-                <div className="grid md:grid-cols-2 gap-4 mb-8">
+              <CardContent className="px-6 pb-6">
+                <div className="space-y-3 mb-6">
                   {[
                     "Instant SOS alert notifications", 
                     "Live emergency location access", 
@@ -341,25 +334,25 @@ const FamilyCarerAccessPage = () => {
                     "Owner or invitee pays option"
                   ].map((feature, index) => (
                     <div key={index} className="flex items-center gap-3">
-                      <Check className="h-6 w-6 text-warning flex-shrink-0" />
-                      <span className="text-base font-medium text-foreground">{feature}</span>
+                      <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                      <span className="text-sm text-foreground">{feature}</span>
                     </div>
                   ))}
                 </div>
                 
-                <div className="text-center space-y-4">
+                <div className="space-y-3">
                   <Button 
                     asChild 
-                    size="xl" 
-                    className="w-full bg-warning hover:bg-warning/90 text-white font-bold text-lg py-4 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl border-2 border-warning/20"
+                    size="lg" 
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     <Link to="/ai-register">
-                      <Users className="mr-3 h-6 w-6" />
-                      Start Family Emergency Access
+                      <Users className="mr-2 h-4 w-4" />
+                      Start Family Access
                     </Link>
                   </Button>
-                  <p className="text-sm text-muted-foreground">
-                    No setup fees • Cancel anytime • 30-day money-back guarantee
+                  <p className="text-xs text-center text-muted-foreground">
+                    No setup fees • Cancel anytime • 30-day guarantee
                   </p>
                 </div>
               </CardContent>
