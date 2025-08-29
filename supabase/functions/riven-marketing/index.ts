@@ -24,8 +24,11 @@ serve(async (req) => {
     // Get authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error('❌ No authorization header found');
       throw new Error('Authorization header missing');
     }
+
+    console.log('🔍 Auth header present:', !!authHeader);
 
     // Create user-scoped client for auth checks
     const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
@@ -38,16 +41,38 @@ serve(async (req) => {
       auth: { persistSession: false }
     });
 
-    // Check user authentication and admin status
+    // Check user authentication
     const { data: { user }, error: userError } = await userSupabase.auth.getUser();
     if (userError || !user) {
-      console.error('User auth error:', userError);
-      throw new Error('Authentication required');
+      console.error('❌ User auth error:', userError);
+      throw new Error('Authentication failed');
     }
 
     console.log('✅ User authenticated:', user.id);
 
-    // Check if user is admin using service role to bypass RLS
+    // Parse request body first to check action
+    const requestBody = await req.json();
+    const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls, prompt, contentId } = requestBody;
+
+    // For provider_status, we don't need admin check - just return the provider status
+    if (action === 'provider_status') {
+      console.log('🔍 Provider status check - bypassing admin verification');
+      return new Response(JSON.stringify({
+        success: true,
+        providers: {
+          openai: !!openaiApiKey,
+          xai: !!xaiApiKey,
+        },
+        debug: {
+          openai_configured: !!openaiApiKey,
+          xai_configured: !!xaiApiKey,
+          user_id: user.id,
+          action: 'provider_status'
+        }
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // For other actions, check if user is admin
     console.log('🔍 Checking admin status for user:', user.id);
     const { data: userProfile, error: profileError } = await serviceSupabase
       .from('profiles')
@@ -74,7 +99,6 @@ serve(async (req) => {
 
     console.log('✅ Admin verified:', user.id);
 
-    const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls, prompt, contentId } = await req.json();
     const aiConfig = await loadAiConfig(userSupabase);
 
     let response = '';
@@ -91,21 +115,6 @@ serve(async (req) => {
         await generateMarketingContent(campaign_id, userSupabase, settings, aiConfig);
         response = 'Content generated successfully for campaign!';
         break;
-      
-      case 'provider_status':
-        return new Response(JSON.stringify({
-          success: true,
-          providers: {
-            openai: !!openaiApiKey,
-            xai: !!xaiApiKey,
-          },
-          debug: {
-            openai_configured: !!openaiApiKey,
-            xai_configured: !!xaiApiKey,
-            user_id: user.id,
-            is_admin: isAdmin
-          }
-        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       
       case 'generate_image':
         try {
