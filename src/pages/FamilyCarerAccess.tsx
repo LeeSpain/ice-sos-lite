@@ -155,19 +155,9 @@ const FamilyCarerAccessPage = () => {
                   size="xl" 
                   className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 >
-                  <Link to="/family-access-setup">
+                  <Link to="/ai-register">
                     <UserPlus className="mr-2 h-5 w-5" />
-                    Setup Family Access
-                  </Link>
-                </Button>
-                <Button 
-                  asChild 
-                  size="xl" 
-                  className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
-                >
-                  <Link to="/dashboard/family">
-                    <Shield className="mr-2 h-5 w-5" />
-                    Manage Family
+                    Join ICE SOS
                   </Link>
                 </Button>
               </div>
@@ -339,7 +329,7 @@ const FamilyCarerAccessPage = () => {
                   ))}
                 </div>
                 <Button asChild variant="outline" className="w-full border-warning text-warning hover:bg-warning hover:text-white">
-                  <Link to="/family-access-setup">Setup Family Access</Link>
+                  <Link to="/ai-register">Join ICE SOS</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -372,20 +362,9 @@ const FamilyCarerAccessPage = () => {
                 size="lg" 
                 className="bg-emergency text-white hover:bg-emergency/90 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
               >
-                <Link to="/family-access-setup">
+                <Link to="/ai-register">
                   <UserPlus className="mr-2 h-5 w-5" />
-                  Start Family Setup
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                size="lg" 
-                variant="outline" 
-                className="border-emergency text-emergency hover:bg-emergency hover:text-white"
-              >
-                <Link to="/dashboard/family">
-                  <Users className="mr-2 h-5 w-5" />
-                  Manage Family Access
+                  Join ICE SOS
                 </Link>
               </Button>
             </div>
