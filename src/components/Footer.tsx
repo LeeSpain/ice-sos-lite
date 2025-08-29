@@ -75,6 +75,9 @@ const { t } = useTranslation();
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.quickLinks')}</h3>
             <div className="space-y-2">
+              <Link to="/blog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Blog
+              </Link>
               <Link to="/devices/ice-sos-pendant" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 Safety Products
               </Link>
