@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ABTest {
   id: string;
@@ -70,6 +71,7 @@ interface ContentGeneration {
 }
 
 export function ContentAutomation() {
+  const { session } = useAuth();
   const [abTests, setAbTests] = useState<ABTest[]>([]);
   const [queueItems, setQueueItems] = useState<QueueItem[]>([]);
   const [generations, setGenerations] = useState<ContentGeneration[]>([]);
@@ -143,6 +145,9 @@ export function ContentAutomation() {
           action: 'generate_image',
           prompt,
           contentId
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
         }
       });
 

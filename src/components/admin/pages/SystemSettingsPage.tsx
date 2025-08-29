@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Settings, Database, Shield, Mail, Zap, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSiteContent } from '@/hooks/useSiteContent';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HealthCheck {
   component: string;
@@ -18,6 +19,7 @@ interface HealthCheck {
 }
 
 export default function SystemSettingsPage() {
+  const { session } = useAuth();
   const [loading, setLoading] = useState(true);
   const [healthChecks, setHealthChecks] = useState<HealthCheck[]>([]);
   const [healthLoading, setHealthLoading] = useState(false);
@@ -44,7 +46,10 @@ export default function SystemSettingsPage() {
       toast.info('Testing AI provider connections...');
       
       const { data, error } = await supabase.functions.invoke('riven-marketing', {
-        body: { action: 'provider_status' }
+        body: { action: 'provider_status' },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        }
       });
       
       if (error) throw error;

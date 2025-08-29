@@ -63,6 +63,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useSiteContent } from '@/hooks/useSiteContent';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Unified interfaces for all Riven functionality
 interface Campaign {
@@ -154,6 +155,7 @@ interface RivenConfiguration {
 
 const RivenMarketingAI: React.FC = () => {
   const { toast } = useToast();
+  const { session } = useAuth();
   
   // Unified state management
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -347,6 +349,8 @@ const RivenMarketingAI: React.FC = () => {
     );
 
     try {
+      console.log('🚀 Sending command to Riven:', commandToUse);
+      
       const { data, error } = await supabase.functions.invoke('riven-marketing', {
         body: {
           command: commandToUse,
@@ -356,11 +360,20 @@ const RivenMarketingAI: React.FC = () => {
           publishing_controls: publishingControls,
           settings: rivenConfig,
           campaign_config: config
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
         }
       });
 
-      if (error) throw error;
+      console.log('📡 Riven response:', { data, error });
+
+      if (error) {
+        console.error('❌ Riven function error:', error);
+        throw error;
+      }
       if (!data || data.success === false) {
+        console.error('❌ Riven returned error:', data);
         throw new Error(data?.error || 'Riven returned no data');
       }
 
@@ -403,12 +416,24 @@ const RivenMarketingAI: React.FC = () => {
         description: "Campaign strategy created successfully!",
       });
     } catch (error) {
-      console.error('Error processing command:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process command. Please try again.",
-        variant: "destructive",
-      });
+      console.error('❌ Error processing command:', error);
+      
+      const errorMessage = error instanceof Error ? error.message : "Failed to process command. Please try again.";
+      
+      // Special handling for authentication errors
+      if (errorMessage.includes('Authentication required') || errorMessage.includes('not authenticated')) {
+        toast({
+          title: "Authentication Error",
+          description: "Your session has expired. Please refresh the page and try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
       
       // Create error notification
       await createNotification(
@@ -424,11 +449,16 @@ const RivenMarketingAI: React.FC = () => {
 
   const generateContent = async (campaignId: string) => {
     try {
+      console.log('🎨 Generating content for campaign:', campaignId);
+      
       const { data, error } = await supabase.functions.invoke('riven-marketing', {
         body: {
           action: 'generate_content',
           campaign_id: campaignId,
           settings: rivenConfig
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
         }
       });
 
