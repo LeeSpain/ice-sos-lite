@@ -121,7 +121,7 @@ serve(async (req) => {
 async function loadAiConfig(supabase: any) {
   const fallback = {
     providers: {
-      openai: { enabled: true, model: 'gpt-5-2025-08-07' },
+      openai: { enabled: true, model: 'gpt-4o-mini' },
       xai: { enabled: false, model: 'grok-beta' }
     },
     stages: {
@@ -165,10 +165,13 @@ async function callLLM(
   options?: { model?: string; maxTokens?: number }
 ) {
   const provider = chooseProviderForStage(aiConfig, stage);
-  const model = options?.model || aiConfig?.providers?.[provider]?.model || (provider === 'openai' ? 'gpt-5-2025-08-07' : 'grok-beta');
+  let model = options?.model || aiConfig?.providers?.[provider]?.model || (provider === 'openai' ? 'gpt-4o-mini' : 'grok-beta');
   const maxTokens = options?.maxTokens ?? (stage === 'text' ? 500 : 1000);
 
+  // Sanitize/normalize model for OpenAI to avoid unsupported IDs
   if (provider === 'openai') {
+    const unsafeModels = ['gpt-5-2025-08-07', 'gpt-5-mini-2025-08-07'];
+    if (unsafeModels.includes(model)) model = 'gpt-4o-mini';
     return await openAIChat(messages, model, maxTokens);
   }
   if (provider === 'xai') {
