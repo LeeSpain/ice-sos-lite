@@ -82,13 +82,13 @@ serve(async (req) => {
 
     switch (action) {
       case 'process_command':
-        const result = await processMarketingCommand(command, user.id, serviceSupabase, workflow_id, settings, scheduling_options, publishing_controls, aiConfig);
+        const result = await processMarketingCommand(command, user.id, userSupabase, workflow_id, settings, scheduling_options, publishing_controls, aiConfig);
         response = result.response;
         campaign_created = result.campaign_created;
         break;
       
       case 'generate_content':
-        await generateMarketingContent(campaign_id, serviceSupabase, settings, aiConfig);
+        await generateMarketingContent(campaign_id, userSupabase, settings, aiConfig);
         response = 'Content generated successfully for campaign!';
         break;
       
@@ -109,7 +109,7 @@ serve(async (req) => {
           description: 'Test campaign created without AI processing',
           budget_estimate: 500,
           target_audience: { demographics: 'Test audience', platforms: ['Facebook'] }
-        }, command, user.id, serviceSupabase);
+        }, command, user.id, userSupabase);
         
         return new Response(JSON.stringify({
           success: true,
