@@ -48,3 +48,6 @@ verify_jwt = false
 
 [functions.geo-lookup]
 verify_jwt = false
+
+[functions.riven-marketing]
+verify_jwt = true

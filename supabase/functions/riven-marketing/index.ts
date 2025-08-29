@@ -502,15 +502,16 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
         const content = await generatePlatformContent(campaign, platform, contentType, supabase, aiConfig);
         
         // Create insert data with common fields
-        const insertData: any = {
-          campaign_id: campaignId,
-          platform,
-          content_type: contentType,
-          title: content.title,
-          content: content.body || content.content,
-          hashtags: content.hashtags,
-          status: 'draft'
-        };
+          const platformNormalized = platform === 'blog' ? 'Blog' : platform;
+          const insertData: any = {
+            campaign_id: campaignId,
+            platform: platformNormalized,
+            content_type: contentType,
+            title: content.title,
+            body_text: content.body || content.content,
+            hashtags: content.hashtags,
+            status: 'draft'
+          };
 
         // Add blog-specific fields if it's a blog post
         if (platform === 'blog' && content.blogData) {
@@ -667,7 +668,7 @@ async function publishGeneratedContent(campaignId: string, supabase: any) {
     // Mark all content as published
     const { error } = await supabase
       .from('marketing_content')
-      .update({ status: 'published', scheduled_time: new Date().toISOString() })
+      .update({ status: 'published', scheduled_time: new Date().toISOString(), published_at: new Date().toISOString() })
       .eq('campaign_id', campaignId)
       .eq('status', 'draft');
 
