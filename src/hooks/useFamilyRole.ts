@@ -24,19 +24,18 @@ export function useFamilyRole() {
 
         // Check if user is a family group owner
         console.log('🏠 Checking for owned family groups...');
-        const { data: ownedGroup, error: ownerError } = await supabase
+        const { data: ownedGroups, error: ownerError } = await supabase
           .from('family_groups')
           .select('id')
-          .eq('owner_user_id', user.id)
-          .single();
+          .eq('owner_user_id', user.id);
 
-        console.log('🏠 Owner check result:', { ownedGroup, ownerError });
+        console.log('🏠 Owner check result:', { ownedGroups, ownerError });
 
-        if (ownedGroup) {
+        if (ownedGroups && ownedGroups.length > 0) {
           console.log('✅ User is family group owner');
           return {
             role: 'owner',
-            familyGroupId: ownedGroup.id,
+            familyGroupId: ownedGroups[0].id,
             isOwner: true,
             isFamilyMember: false
           };
@@ -44,20 +43,19 @@ export function useFamilyRole() {
 
         // Check if user is a family member
         console.log('👨‍👩‍👧‍👦 Checking for family memberships...');
-        const { data: membership, error: memberError } = await supabase
+        const { data: memberships, error: memberError } = await supabase
           .from('family_memberships')
           .select('group_id')
           .eq('user_id', user.id)
-          .eq('status', 'active')
-          .single();
+          .eq('status', 'active');
 
-        console.log('👨‍👩‍👧‍👦 Membership check result:', { membership, memberError });
+        console.log('👨‍👩‍👧‍👦 Membership check result:', { memberships, memberError });
 
-        if (membership) {
+        if (memberships && memberships.length > 0) {
           console.log('✅ User is family member');
           return {
             role: 'family_member',
-            familyGroupId: membership.group_id,
+            familyGroupId: memberships[0].group_id,
             isOwner: false,
             isFamilyMember: true
           };

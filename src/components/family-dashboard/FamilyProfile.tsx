@@ -87,19 +87,26 @@ const FamilyProfile = () => {
     if (!user || !familyRole?.familyGroupId) return;
 
     try {
-      // Load family group and owner details
+      // Load family group data
       const { data: groupData } = await supabase
         .from('family_groups')
-        .select(`
-          *,
-          owner_profile:profiles!family_groups_owner_user_id_fkey(*)
-        `)
+        .select('*')
         .eq('id', familyRole.familyGroupId)
         .single();
 
       if (groupData) {
         setFamilyGroup(groupData);
-        setOwnerProfile(groupData.owner_profile);
+        
+        // Load owner profile separately
+        if (groupData.owner_user_id) {
+          const { data: ownerData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', groupData.owner_user_id)
+            .single();
+
+          setOwnerProfile(ownerData);
+        }
       }
 
       // Load owner's emergency contacts

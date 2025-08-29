@@ -45,13 +45,10 @@ const FamilyDashboardHome = () => {
     if (!familyRole?.familyGroupId) return;
 
     try {
-      // Load family group and owner details
+      // Load family group data
       const { data: groupData, error: groupError } = await supabase
         .from('family_groups')
-        .select(`
-          *,
-          owner_profile:profiles!family_groups_owner_user_id_fkey(*)
-        `)
+        .select('*')
         .eq('id', familyRole.familyGroupId)
         .single();
 
@@ -62,7 +59,21 @@ const FamilyDashboardHome = () => {
 
       if (groupData) {
         setFamilyGroup(groupData);
-        setOwnerProfile(groupData.owner_profile);
+        
+        // Load owner profile separately
+        if (groupData.owner_user_id) {
+          const { data: ownerData, error: ownerError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', groupData.owner_user_id)
+            .single();
+
+          if (ownerError) {
+            console.error('Error loading owner profile:', ownerError);
+          } else {
+            setOwnerProfile(ownerData);
+          }
+        }
       }
 
       // Load active SOS events for the family group
