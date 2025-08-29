@@ -225,16 +225,16 @@ const FamilyProfile = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">
-            {ownerProfile ? `${ownerProfile.first_name}'s Emergency Information` : 
-             familyRole?.role === 'owner' ? 'My Emergency Information' : 
-             'Family Emergency Information'}
+            {familyRole?.role === 'owner' ? 'My Emergency Information' : 
+             ownerProfile ? `${ownerProfile.first_name}'s Emergency Information` : 
+             'Emergency Information'}
           </h1>
           <p className="text-muted-foreground">
             {familyRole?.role === 'owner' 
-              ? 'Manage your emergency information and family settings'
+              ? 'Manage your emergency information and medical details'
               : familyRole?.role === 'none' || !familyRole?.familyGroupId
                 ? 'Basic profile information - no family emergency access'
-                : `Emergency contact details for ${ownerProfile?.first_name || 'your family member'}`
+                : `View emergency contact and medical information for ${ownerProfile?.first_name || 'your family member'}`
             }
           </p>
         </div>
@@ -346,6 +346,22 @@ const FamilyProfile = () => {
                   </div>
                 </div>
               )}
+
+              {/* Quick Actions for Family Members */}
+              <div className="grid grid-cols-2 gap-3 pt-4">
+                <Button variant="outline" className="gap-2" asChild>
+                  <a href={`tel:${ownerProfile.phone}`}>
+                    <Phone className="h-4 w-4" />
+                    Call {ownerProfile.first_name}
+                  </a>
+                </Button>
+                <Button variant="outline" className="gap-2" asChild>
+                  <a href="/family-dashboard/emergency-map">
+                    <MapPin className="h-4 w-4" />
+                    View Location
+                  </a>
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}

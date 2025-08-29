@@ -43,7 +43,7 @@ const FamilyDashboardSidebar = () => {
       current: location.pathname === '/family-dashboard/notifications'
     },
     {
-      name: 'My Profile',
+      name: 'Emergency Information',
       href: '/family-dashboard/profile',
       icon: User,
       current: location.pathname === '/family-dashboard/profile'
