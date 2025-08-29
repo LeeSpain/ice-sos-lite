@@ -31,19 +31,20 @@ serve(async (req) => {
     }
 
     const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls } = await req.json();
+    const aiConfig = await loadAiConfig(supabase);
 
     let response = '';
     let campaign_created = false;
 
     switch (action) {
       case 'process_command':
-        const result = await processMarketingCommand(command, user.id, supabase, workflow_id, settings, scheduling_options, publishing_controls);
+        const result = await processMarketingCommand(command, user.id, supabase, workflow_id, settings, scheduling_options, publishing_controls, aiConfig);
         response = result.response;
         campaign_created = result.campaign_created;
         break;
       
       case 'generate_content':
-        await generateMarketingContent(campaign_id, supabase);
+        await generateMarketingContent(campaign_id, supabase, settings, aiConfig);
         response = 'Content generated successfully for campaign!';
         break;
       
@@ -80,7 +81,99 @@ serve(async (req) => {
   }
 });
 
-async function processMarketingCommand(command: string, userId: string, supabase: any, workflowId?: string, settings?: any, schedulingOptions?: any, publishingControls?: any) {
+// AI provider routing helpers
+async function loadAiConfig(supabase: any) {
+  const fallback = {
+    providers: {
+      openai: { enabled: true, model: 'gpt-5' },
+      xai: { enabled: false, model: 'grok-beta' }
+    },
+    stages: {
+      overview: { provider: 'openai' },
+      text: { provider: 'openai' },
+      image: { provider: 'openai' },
+      finalize: { provider: 'openai' }
+    }
+  };
+  try {
+    const { data, error } = await supabase
+      .from('site_content')
+      .select('value')
+      .eq('key', 'ai_providers_config')
+      .maybeSingle();
+    if (error) {
+      console.error('loadAiConfig error', error);
+      return fallback;
+    }
+    return data?.value ?? fallback;
+  } catch (e) {
+    console.error('loadAiConfig exception', e);
+    return fallback;
+  }
+}
+
+function chooseProviderForStage(aiConfig: any, stage: 'overview'|'text'|'image'|'finalize') {
+  const configured = aiConfig?.stages?.[stage]?.provider || 'openai';
+  const enabled = aiConfig?.providers?.[configured]?.enabled !== false;
+  const hasKey = configured === 'openai' ? !!openaiApiKey : !!xaiApiKey;
+  if (enabled && hasKey) return configured;
+  if (!!openaiApiKey && aiConfig?.providers?.openai?.enabled !== false) return 'openai';
+  if (!!xaiApiKey && aiConfig?.providers?.xai?.enabled) return 'xai';
+  throw new Error('No AI provider configured or API key missing');
+}
+
+async function callLLM(
+  aiConfig: any,
+  stage: 'overview'|'text'|'image'|'finalize',
+  messages: Array<{ role: 'system'|'user'|'assistant'; content: string }>,
+  options?: { model?: string; maxTokens?: number }
+) {
+  const provider = chooseProviderForStage(aiConfig, stage);
+  const model = options?.model || aiConfig?.providers?.[provider]?.model || (provider === 'openai' ? 'gpt-5' : 'grok-beta');
+  const maxTokens = options?.maxTokens ?? (stage === 'text' ? 500 : 1000);
+
+  if (provider === 'openai') {
+    return await openAIChat(messages, model, maxTokens);
+  }
+  if (provider === 'xai') {
+    return await xaiChat(messages, model, maxTokens);
+  }
+  throw new Error('Unsupported provider');
+}
+
+async function openAIChat(
+  messages: Array<{ role: 'system'|'user'|'assistant'; content: string }>,
+  model: string,
+  maxTokens: number
+) {
+  if (!openaiApiKey) throw new Error('OpenAI API key not configured');
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${openaiApiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages, max_completion_tokens: maxTokens })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(`OpenAI API error: ${data.error?.message || res.status}`);
+  return data.choices?.[0]?.message?.content ?? '';
+}
+
+async function xaiChat(
+  messages: Array<{ role: 'system'|'user'|'assistant'; content: string }>,
+  model: string,
+  maxTokens: number
+) {
+  if (!xaiApiKey) throw new Error('xAI API key not configured');
+  const res = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${xaiApiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages, max_tokens: maxTokens })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(`xAI API error: ${data.error?.message || res.status}`);
+  return data.choices?.[0]?.message?.content ?? '';
+}
+
+async function processMarketingCommand(command: string, userId: string, supabase: any, workflowId?: string, settings?: any, schedulingOptions?: any, publishingControls?: any, aiConfig?: any) {
   console.log('Processing marketing command:', command);
 
   // Create workflow tracking if ID provided
@@ -97,7 +190,7 @@ async function processMarketingCommand(command: string, userId: string, supabase
     
     // Analyze command with Riven AI
     if (workflowId) await updateWorkflowStep(workflowId, 'ai_analysis', 'in_progress', supabase);
-    const analysis = await analyzeCommandWithRiven(command, companyInfo, settings, schedulingOptions, publishingControls);
+    const analysis = await analyzeCommandWithRiven(command, companyInfo, aiConfig, settings, schedulingOptions, publishingControls);
     if (workflowId) await updateWorkflowStep(workflowId, 'ai_analysis', 'completed', supabase);
     
     // Create campaign based on analysis
@@ -108,7 +201,7 @@ async function processMarketingCommand(command: string, userId: string, supabase
     // Auto-generate content if enabled and immediate/optimal scheduling
     if (settings?.auto_approve_content && campaign && (schedulingOptions?.mode === 'immediate' || schedulingOptions?.mode === 'optimal')) {
       if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'in_progress', supabase);
-      await generateMarketingContent(campaign.id, supabase, settings);
+      await generateMarketingContent(campaign.id, supabase, settings, aiConfig);
       if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'completed', supabase);
       
       // Auto-publish for immediate mode
@@ -166,11 +259,7 @@ async function getCompanyInfo(supabase: any) {
   }
 }
 
-async function analyzeCommandWithRiven(command: string, companyInfo: any, settings?: any, schedulingOptions?: any, publishingControls?: any) {
-  if (!openaiApiKey) {
-    throw new Error('OpenAI API key not configured');
-  }
-
+async function analyzeCommandWithRiven(command: string, companyInfo: any, aiConfig: any, settings?: any, schedulingOptions?: any, publishingControls?: any) {
   const systemPrompt = `You are Riven, an expert AI marketing automation specialist for ${companyInfo.company_name}, a ${companyInfo.industry} company.
 
 Company Information:
@@ -208,40 +297,21 @@ Always respond with:
 Be specific, professional, and focus on end-to-end automation and measurable outcomes.`;
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: settings?.ai_model || 'gpt-5',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: command }
-        ],
-        max_completion_tokens: settings?.max_tokens || 1000,
-      }),
+    const messages = [
+      { role: 'system' as const, content: systemPrompt },
+      { role: 'user' as const, content: command }
+    ];
+
+    const rivenResponse = await callLLM(aiConfig, 'overview', messages, {
+      model: settings?.ai_model,
+      maxTokens: settings?.max_tokens || 1000
     });
 
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
-    }
-
-    const rivenResponse = data.choices[0].message.content;
-    
-    // Parse the response to extract campaign details
     const campaignData = extractCampaignData(rivenResponse, command);
-    
-    return {
-      response: rivenResponse,
-      ...campaignData
-    };
+    return { response: rivenResponse, ...campaignData };
   } catch (error) {
-    console.error('Error calling OpenAI:', error);
-    throw new Error(`Failed to analyze command with Riven AI: ${error?.message || String(error)}`);
+    console.error('Error in analyzeCommandWithRiven:', error);
+    throw new Error(`Failed to analyze command: ${error?.message || String(error)}`);
   }
 }
 
@@ -282,7 +352,7 @@ async function createMarketingCampaign(analysis: any, command: string, userId: s
         status: 'draft'
       })
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Error creating campaign:', error);
@@ -297,10 +367,7 @@ async function createMarketingCampaign(analysis: any, command: string, userId: s
   }
 }
 
-async function generateMarketingContent(campaignId: string, supabase: any) {
-  if (!openaiApiKey) {
-    throw new Error('OpenAI API key not configured');
-  }
+async function generateMarketingContent(campaignId: string, supabase: any, settings?: any, aiConfig?: any) {
 
   try {
     // Get campaign details
@@ -308,7 +375,7 @@ async function generateMarketingContent(campaignId: string, supabase: any) {
       .from('marketing_campaigns')
       .select('*')
       .eq('id', campaignId)
-      .single();
+      .maybeSingle();
 
     if (error || !campaign) {
       throw new Error('Campaign not found');
@@ -320,7 +387,7 @@ async function generateMarketingContent(campaignId: string, supabase: any) {
 
     for (const platform of platforms) {
       for (const contentType of contentTypes) {
-        const content = await generatePlatformContent(campaign, platform, contentType, supabase);
+        const content = await generatePlatformContent(campaign, platform, contentType, supabase, aiConfig);
         
         // Create insert data with common fields
         const insertData: any = {
@@ -358,7 +425,7 @@ async function generateMarketingContent(campaignId: string, supabase: any) {
   }
 }
 
-async function generatePlatformContent(campaign: any, platform: string, contentType: string, supabase: any) {
+async function generatePlatformContent(campaign: any, platform: string, contentType: string, supabase: any, aiConfig: any) {
   let prompt = '';
   
   if (platform === 'blog') {
@@ -417,34 +484,21 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
   }
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-5',
-        messages: [
-          { role: 'user', content: prompt }
-        ],
-        max_completion_tokens: 500,
-      }),
-    });
+    const content = await callLLM(aiConfig, 'text', [
+      { role: 'user', content: prompt }
+    ], { maxTokens: 500 });
 
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+
+    const contentStr = content || '';
+    if (!contentStr) {
+      throw new Error('LLM returned empty content');
     }
-    const content = data.choices?.[0]?.message?.content || '';
-    if (!content) {
-      throw new Error('OpenAI returned empty content');
-    }
+
 
     if (platform === 'blog') {
       try {
         // Try to parse as JSON for blog content
-        const blogData = JSON.parse(content);
+        const blogData = JSON.parse(contentStr);
         return {
           title: blogData.title,
           content: blogData.content,
@@ -457,8 +511,8 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
         // Fallback for non-JSON response
         return {
           title: `${contentType} Blog Post - ${campaign.title}`,
-          content: content,
-          body: content,
+          content: contentStr,
+          body: contentStr,
           hashtags: ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'],
           blogData: {
             seo_title: `${contentType} - Emergency Safety Tips`,
@@ -466,30 +520,30 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
             slug: `${contentType.toLowerCase().replace(/\s+/g, '-')}-emergency-safety-tips`,
             keywords: ['emergency safety', 'family protection', 'safety tips'],
             featured_image_alt: 'Family emergency safety illustration',
-            content_sections: { introduction: content.substring(0, 200), main_content: content, conclusion: 'Stay safe with ICE SOS.' },
-            reading_time: Math.ceil(content.length / 250),
+            content_sections: { introduction: contentStr.substring(0, 200), main_content: contentStr, conclusion: 'Stay safe with ICE SOS.' },
+            reading_time: Math.ceil(contentStr.length / 250),
             seo_score: 75
           }
         };
       }
     } else {
       // Parse the generated content (simplified parsing)
-      const lines = content.split('\n').filter(line => line.trim());
-      const title = lines.find(line => line.includes('Title') || line.includes('Headline')) || 
+      const titleLine = contentStr.split('\n').find(line => /Title|Headline/i.test(line)) || 
                    `${platform} ${contentType} for ${campaign.title}`;
-      const hashtags = content.match(/#\w+/g) || ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'];
+      const hashtags = contentStr.match(/#\w+/g) || ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'];
 
       return {
-        title: title.replace(/^.*?[:]\s*/, '').trim(),
-        body: content,
+        title: titleLine.replace(/^.*?[:]\s*/, '').trim(),
+        body: contentStr,
         hashtags
       };
     }
   } catch (error) {
     console.error('Error generating platform content:', error);
+    const fallback = `Content suggestion for ${platform} ${contentType} about ${campaign.title}.`;
     return {
       title: `${platform} ${contentType}`,
-      body: `Content for ${campaign.title}`,
+      body: fallback,
       hashtags: ['#EmergencySafety', '#FamilyProtection']
     };
   }
