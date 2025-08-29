@@ -47,14 +47,22 @@ serve(async (req) => {
 
     console.log('✅ User authenticated:', user.id);
 
-    // Check if user is admin using user-scoped client
-    const { data: isAdmin, error: adminCheckError } = await userSupabase.rpc('is_admin');
-    if (adminCheckError) {
-      console.error('❌ Admin check error:', adminCheckError);
-      throw new Error('Failed to verify admin status');
+    // Check if user is admin using service role to bypass RLS
+    console.log('🔍 Checking admin status for user:', user.id);
+    const { data: userProfile, error: profileError } = await serviceSupabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
+    
+    if (profileError) {
+      console.error('❌ Profile check error:', profileError);
+      throw new Error('Failed to verify user profile');
     }
+    
+    const isAdmin = userProfile?.role === 'admin';
     if (!isAdmin) {
-      console.log('❌ User is not admin:', user.id);
+      console.log('❌ User is not admin:', user.id, 'Role:', userProfile?.role);
       return new Response(JSON.stringify({
         success: false,
         error: 'Admin privileges required'
