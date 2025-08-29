@@ -68,21 +68,19 @@ const FamilyDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        {/* Sidebar */}
-        <FamilyDashboardSidebar />
-        
-        {/* Main Content */}
-        <div className="flex-1 ml-64">
-          <Routes>
-            <Route path="/" element={<FamilyDashboardHome />} />
-            <Route path="/emergency-map" element={<FamilyEmergencyMap />} />
-            <Route path="/notifications" element={<FamilyNotifications />} />
-            <Route path="/profile" element={<FamilyProfile />} />
-          </Routes>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background flex w-full">
+      {/* Sidebar */}
+      <FamilyDashboardSidebar />
+      
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto">
+        <Routes>
+          <Route path="/" element={<FamilyDashboardHome />} />
+          <Route path="/emergency-map" element={<FamilyEmergencyMap />} />
+          <Route path="/notifications" element={<FamilyNotifications />} />
+          <Route path="/profile" element={<FamilyProfile />} />
+        </Routes>
+      </main>
     </div>
   );
 };

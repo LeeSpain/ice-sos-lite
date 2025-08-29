@@ -49,7 +49,7 @@ const FamilyDashboardSidebar = () => {
   ];
 
   return (
-    <div className="fixed inset-y-0 left-0 w-64 bg-white border-r border-border z-30">
+    <div className="w-64 bg-white border-r border-border flex-shrink-0">
       <div className="flex h-full flex-col">
         {/* Header */}
         <div className="flex items-center h-16 px-6 border-b border-border">
