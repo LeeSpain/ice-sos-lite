@@ -356,13 +356,12 @@ const RivenMarketingAI: React.FC = () => {
           command: commandToUse,
           action: 'process_command',
           workflow_id: workflowId,
-          scheduling_options: schedulingOptions,
-          publishing_controls: publishingControls,
           settings: rivenConfig,
-          campaign_config: config
-        },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
+          scheduling_options: schedulingOptions,
+          publishing_controls: {
+            platforms: ['facebook', 'instagram', 'linkedin'],
+            approval_required: !rivenConfig?.auto_approve_content
+          }
         }
       });
 
