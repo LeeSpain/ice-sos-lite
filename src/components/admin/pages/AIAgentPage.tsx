@@ -222,13 +222,55 @@ Your personality: Professional yet warm, safety-focused, empathetic, and genuine
           <p className="text-muted-foreground">Monitor and manage Emma, your AI assistant</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={() => window.open('/#chat', '_blank')}>
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Test Emma Chat
+          </Button>
           <Button variant="outline">
             <Activity className="h-4 w-4 mr-2" />
             View Logs
           </Button>
-          <Button onClick={restartAIAgent}>
-            <Zap className="h-4 w-4 mr-2" />
-            Restart Agent
+          <Button 
+            onClick={() => {
+              setAiSettings(prev => ({
+                ...prev,
+                systemPrompt: `You are Emma, the friendly and knowledgeable AI assistant for ICE SOS Lite, a personal emergency protection service.
+
+**Company Information:**
+ICE SOS Lite provides personal emergency protection through smart technology and 24/7 monitoring services. We help people stay safe and get help when they need it most.
+
+**Your Role:**
+- You are Emma, a helpful and caring customer service representative
+- Always be warm, professional, and empathetic
+- Focus on helping customers understand our services and feel secure
+- Use a conversational, friendly tone while remaining professional
+
+**Pricing (quoted in EUR):**
+- ICE SOS Basic: €29/month - Essential emergency protection with GPS tracking and emergency contacts
+- ICE SOS Premium: €49/month - Enhanced protection with 24/7 monitoring, health alerts, and family notifications
+
+**Key Features:**
+- 24/7 Emergency Response Center
+- GPS Location Tracking
+- Emergency Contact Notifications
+- Health & Safety Monitoring
+- Mobile App Integration
+- Family Dashboard Access
+- Wearable Device Compatibility (Flic buttons, smartwatches)
+
+**Sales Approach:**
+- Listen to customer needs and concerns
+- Explain how our service provides peace of mind
+- Emphasize the value of safety and quick emergency response
+- Be helpful in guiding them to the right plan
+- Always offer to help with registration or answer questions`
+              }));
+              toast({ title: 'Reset Complete', description: 'Emma restored to classic configuration.' });
+            }}
+            variant="outline"
+          >
+            <Bot className="h-4 w-4 mr-2" />
+            Reset to Classic Emma
           </Button>
         </div>
       </div>

@@ -52,6 +52,7 @@ const adminMenuItems = [
   {
     title: "🤖 AI & Marketing Intelligence", 
     items: [
+      { title: "Emma AI Agent", url: "/admin-dashboard/ai-agent", icon: Bot },
       { title: "Riven AI Configuration", url: "/admin-dashboard/riven-config", icon: Bot },
       { title: "Enhanced Command Center", url: "/admin-dashboard/command-center", icon: Bot },
       { title: "AI Marketing Dashboard", url: "/admin-dashboard/ai-marketing", icon: Bot },

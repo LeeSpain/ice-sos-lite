@@ -264,7 +264,27 @@ serve(async (req) => {
       }
     ];
 
-    // Call OpenAI
+    // Get Emma's AI settings from database
+    const { data: aiSettings } = await supabase
+      .from('ai_model_settings')
+      .select('setting_key, setting_value');
+    
+    // Parse settings with defaults
+    const settings = aiSettings?.reduce((acc, setting) => {
+      acc[setting.setting_key] = setting.setting_value;
+      return acc;
+    }, {} as any) || {};
+    
+    const temperature = Number(settings.temperature) || 0.7;
+    const maxTokens = Number(settings.max_tokens) || 500;
+    const model = settings.model || 'gpt-4o-mini';
+    
+    // If custom system prompt exists, replace the enhanced knowledge with it
+    if (settings.system_prompt && typeof settings.system_prompt === 'string') {
+      messages[0].content = settings.system_prompt;
+    }
+
+    // Call OpenAI with dynamic settings
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -272,10 +292,10 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model,
         messages,
-        temperature: 0.7,
-        max_tokens: 500,
+        temperature,
+        max_tokens: maxTokens,
       }),
     });
 
