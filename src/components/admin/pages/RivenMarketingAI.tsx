@@ -358,7 +358,7 @@ const RivenMarketingAI: React.FC = () => {
       const { data, error } = await supabase.functions.invoke('riven-marketing', {
         body: {
           command: commandToUse,
-          action: 'process_command',
+          action: 'test_campaign', // Use test endpoint first
           workflow_id: workflowId,
           settings: rivenConfig,
           scheduling_options: schedulingOptions,

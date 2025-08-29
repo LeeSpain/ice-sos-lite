@@ -93,6 +93,23 @@ serve(async (req) => {
           }
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       
+      case 'test_campaign':
+        // Simple test that just creates a campaign without AI
+        console.log('Creating test campaign...');
+        const testCampaign = await createMarketingCampaign({
+          title: 'Test Campaign: ' + command,
+          description: 'Test campaign created without AI processing',
+          budget_estimate: 500,
+          target_audience: { demographics: 'Test audience', platforms: ['Facebook'] }
+        }, command, user.id, serviceSupabase);
+        
+        return new Response(JSON.stringify({
+          success: true,
+          campaign_created: true,
+          campaign_id: testCampaign?.id,
+          response: 'Test campaign created successfully!'
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      
       default:
         throw new Error('Invalid action specified');
     }
@@ -107,9 +124,17 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in riven-marketing function:', error);
+    console.error('Error stack:', error?.stack);
+    console.error('Error name:', error?.name);
+    console.error('Error message:', error?.message);
+    
+    // Return detailed error for debugging
     return new Response(JSON.stringify({ 
-      error: error.message,
-      success: false 
+      error: error?.message || String(error),
+      errorType: error?.name || 'Unknown',
+      errorStack: error?.stack || 'No stack trace',
+      success: false,
+      debug: 'riven-marketing-error'
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
