@@ -1594,15 +1594,23 @@ export type Database = {
         Row: {
           body_text: string | null
           campaign_id: string
+          content_sections: Json | null
           content_type: string
           created_at: string
           engagement_metrics: Json | null
+          featured_image_alt: string | null
           hashtags: string[] | null
           id: string
           image_url: string | null
+          keywords: string[] | null
+          meta_description: string | null
           platform: string
           posted_at: string | null
+          reading_time: number | null
           scheduled_time: string | null
+          seo_score: number | null
+          seo_title: string | null
+          slug: string | null
           status: string
           title: string | null
           updated_at: string
@@ -1610,15 +1618,23 @@ export type Database = {
         Insert: {
           body_text?: string | null
           campaign_id: string
+          content_sections?: Json | null
           content_type: string
           created_at?: string
           engagement_metrics?: Json | null
+          featured_image_alt?: string | null
           hashtags?: string[] | null
           id?: string
           image_url?: string | null
+          keywords?: string[] | null
+          meta_description?: string | null
           platform: string
           posted_at?: string | null
+          reading_time?: number | null
           scheduled_time?: string | null
+          seo_score?: number | null
+          seo_title?: string | null
+          slug?: string | null
           status?: string
           title?: string | null
           updated_at?: string
@@ -1626,15 +1642,23 @@ export type Database = {
         Update: {
           body_text?: string | null
           campaign_id?: string
+          content_sections?: Json | null
           content_type?: string
           created_at?: string
           engagement_metrics?: Json | null
+          featured_image_alt?: string | null
           hashtags?: string[] | null
           id?: string
           image_url?: string | null
+          keywords?: string[] | null
+          meta_description?: string | null
           platform?: string
           posted_at?: string | null
+          reading_time?: number | null
           scheduled_time?: string | null
+          seo_score?: number | null
+          seo_title?: string | null
+          slug?: string | null
           status?: string
           title?: string | null
           updated_at?: string

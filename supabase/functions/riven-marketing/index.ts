@@ -304,24 +304,39 @@ async function generateMarketingContent(campaignId: string, supabase: any) {
     }
 
     // Generate content for different platforms
-    const platforms = ['Facebook', 'Instagram', 'LinkedIn', 'Twitter'];
+    const platforms = campaign.target_audience?.platforms || ['Facebook', 'Instagram', 'LinkedIn', 'Twitter'];
     const contentTypes = ['post', 'story', 'article'];
 
     for (const platform of platforms) {
       for (const contentType of contentTypes) {
-        const content = await generatePlatformContent(campaign, platform, contentType);
+        const content = await generatePlatformContent(campaign, platform, contentType, supabase);
+        
+        // Create insert data with common fields
+        const insertData: any = {
+          campaign_id: campaignId,
+          platform,
+          content_type: contentType,
+          title: content.title,
+          content: content.body || content.content,
+          hashtags: content.hashtags,
+          status: 'draft'
+        };
+
+        // Add blog-specific fields if it's a blog post
+        if (platform === 'blog' && content.blogData) {
+          insertData.seo_title = content.blogData.seo_title;
+          insertData.meta_description = content.blogData.meta_description;
+          insertData.slug = content.blogData.slug;
+          insertData.keywords = content.blogData.keywords;
+          insertData.featured_image_alt = content.blogData.featured_image_alt;
+          insertData.content_sections = content.blogData.content_sections;
+          insertData.reading_time = content.blogData.reading_time;
+          insertData.seo_score = content.blogData.seo_score;
+        }
         
         await supabase
           .from('marketing_content')
-          .insert({
-            campaign_id: campaignId,
-            platform,
-            content_type: contentType,
-            title: content.title,
-            body_text: content.body,
-            hashtags: content.hashtags,
-            status: 'draft'
-          });
+          .insert(insertData);
       }
     }
 
@@ -332,8 +347,50 @@ async function generateMarketingContent(campaignId: string, supabase: any) {
   }
 }
 
-async function generatePlatformContent(campaign: any, platform: string, contentType: string) {
-  const prompt = `Create a ${contentType} for ${platform} based on this marketing campaign:
+async function generatePlatformContent(campaign: any, platform: string, contentType: string, supabase: any) {
+  let prompt = '';
+  
+  if (platform === 'blog') {
+    const wordCount = campaign.target_audience?.wordCount || 1000;
+    const seoDifficulty = campaign.target_audience?.seoDifficulty || 'intermediate';
+    const contentDepth = campaign.target_audience?.contentDepth || 'detailed';
+    
+    prompt = `Create a comprehensive, SEO-optimized blog post for ICE SOS emergency safety services.
+
+Campaign: ${campaign.title}
+Description: ${campaign.description}
+Content Type: ${contentType}
+Target Word Count: ${wordCount} words
+SEO Difficulty: ${seoDifficulty}
+Content Depth: ${contentDepth}
+
+Requirements:
+- Write a professional, engaging blog post about family emergency preparedness and safety
+- Structure with clear headings (H1, H2, H3)
+- Include SEO optimization elements
+- Focus on educational content that builds trust
+- Include practical tips and actionable advice
+- Maintain a caring, professional tone
+
+Return ONLY a JSON object with this exact structure:
+{
+  "title": "Main blog title (under 60 characters)",
+  "seo_title": "SEO optimized title (under 60 characters)",
+  "meta_description": "Compelling meta description (under 160 characters)",
+  "slug": "url-friendly-slug-here",
+  "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"],
+  "content": "Full blog post content with proper HTML headings and paragraphs",
+  "featured_image_alt": "Alt text for featured image",
+  "content_sections": {
+    "introduction": "Introduction paragraph",
+    "main_content": "Main content body",
+    "conclusion": "Conclusion with call-to-action"
+  },
+  "reading_time": 5,
+  "seo_score": 85
+}`;
+  } else {
+    prompt = `Create a ${contentType} for ${platform} based on this marketing campaign:
 
 Campaign: ${campaign.title}
 Description: ${campaign.description}
@@ -346,6 +403,7 @@ Generate:
 3. Relevant hashtags (5-10)
 
 Make it compelling, action-oriented, and suitable for ICE SOS emergency safety products.`;
+  }
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -366,17 +424,50 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
     const data = await response.json();
     const content = data.choices[0].message.content;
 
-    // Parse the generated content (simplified parsing)
-    const lines = content.split('\n').filter(line => line.trim());
-    const title = lines.find(line => line.includes('Title') || line.includes('Headline')) || 
-                 `${platform} ${contentType} for ${campaign.title}`;
-    const hashtags = content.match(/#\w+/g) || ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'];
+    if (platform === 'blog') {
+      try {
+        // Try to parse as JSON for blog content
+        const blogData = JSON.parse(content);
+        return {
+          title: blogData.title,
+          content: blogData.content,
+          body: blogData.content,
+          hashtags: blogData.keywords || ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'],
+          blogData: blogData
+        };
+      } catch (e) {
+        console.error('Failed to parse blog JSON, using fallback:', e);
+        // Fallback for non-JSON response
+        return {
+          title: `${contentType} Blog Post - ${campaign.title}`,
+          content: content,
+          body: content,
+          hashtags: ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'],
+          blogData: {
+            seo_title: `${contentType} - Emergency Safety Tips`,
+            meta_description: 'Learn essential emergency safety tips to protect your family.',
+            slug: `${contentType.toLowerCase().replace(/\s+/g, '-')}-emergency-safety-tips`,
+            keywords: ['emergency safety', 'family protection', 'safety tips'],
+            featured_image_alt: 'Family emergency safety illustration',
+            content_sections: { introduction: content.substring(0, 200), main_content: content, conclusion: 'Stay safe with ICE SOS.' },
+            reading_time: Math.ceil(content.length / 250),
+            seo_score: 75
+          }
+        };
+      }
+    } else {
+      // Parse the generated content (simplified parsing)
+      const lines = content.split('\n').filter(line => line.trim());
+      const title = lines.find(line => line.includes('Title') || line.includes('Headline')) || 
+                   `${platform} ${contentType} for ${campaign.title}`;
+      const hashtags = content.match(/#\w+/g) || ['#EmergencySafety', '#FamilyProtection', '#ICE_SOS'];
 
-    return {
-      title: title.replace(/^.*?[:]\s*/, '').trim(),
-      body: content,
-      hashtags
-    };
+      return {
+        title: title.replace(/^.*?[:]\s*/, '').trim(),
+        body: content,
+        hashtags
+      };
+    }
   } catch (error) {
     console.error('Error generating platform content:', error);
     return {

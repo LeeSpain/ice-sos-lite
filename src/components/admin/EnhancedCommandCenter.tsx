@@ -26,7 +26,8 @@ import {
   Info,
   Timer,
   BarChart3,
-  Globe
+  Globe,
+  BookOpen
 } from 'lucide-react';
 
 interface CommandCenterProps {
@@ -50,6 +51,9 @@ interface CommandConfiguration {
   schedulingMode: string;
   targetAudience: string;
   urgency: string;
+  wordCount?: number;
+  seoDifficulty?: string;
+  contentDepth?: string;
 }
 
 export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
@@ -71,20 +75,29 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   const [targetAudience, setTargetAudience] = useState('family_safety');
   const [urgency, setUrgency] = useState('normal');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [wordCount, setWordCount] = useState([1000]);
+  const [seoDifficulty, setSeoDifficulty] = useState('intermediate');
+  const [contentDepth, setContentDepth] = useState('detailed');
 
   const platforms = [
     { id: 'facebook', name: 'Facebook', icon: Facebook, color: '#1877F2' },
     { id: 'instagram', name: 'Instagram', icon: Instagram, color: '#E4405F' },
     { id: 'twitter', name: 'Twitter', icon: Twitter, color: '#1DA1F2' },
     { id: 'linkedin', name: 'LinkedIn', icon: Linkedin, color: '#0A66C2' },
-    { id: 'youtube', name: 'YouTube', icon: Youtube, color: '#FF0000' }
+    { id: 'youtube', name: 'YouTube', icon: Youtube, color: '#FF0000' },
+    { id: 'blog', name: 'Blog', icon: BookOpen, color: '#10B981' }
   ];
 
   const contentTypes = [
     { id: 'post', name: 'Social Post', description: 'Regular social media posts' },
     { id: 'story', name: 'Story', description: 'Instagram/Facebook stories' },
     { id: 'reel', name: 'Reel/Video', description: 'Short-form video content' },
-    { id: 'article', name: 'Article', description: 'Long-form content' }
+    { id: 'article', name: 'Article', description: 'Long-form content' },
+    { id: 'how-to-guide', name: 'How-to Guide', description: 'Step-by-step educational content' },
+    { id: 'case-study', name: 'Case Study', description: 'Customer success stories' },
+    { id: 'industry-insights', name: 'Industry Insights', description: 'Thought leadership articles' },
+    { id: 'product-features', name: 'Product Features', description: 'Detailed product explanations' },
+    { id: 'safety-tips', name: 'Safety Tips', description: 'Emergency preparedness content' }
   ];
 
   const audiences = [
@@ -133,7 +146,10 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
       budget: budget[0],
       schedulingMode,
       targetAudience,
-      urgency
+      urgency,
+      wordCount: selectedPlatforms.includes('blog') ? wordCount[0] : undefined,
+      seoDifficulty: selectedPlatforms.includes('blog') ? seoDifficulty : undefined,
+      contentDepth: selectedPlatforms.includes('blog') ? contentDepth : undefined
     };
     
     onSendCommand(config);
@@ -273,6 +289,61 @@ Example: Create a week-long campaign about family emergency preparedness for Ins
               <div className="text-sm text-muted-foreground">Est. Cost</div>
             </div>
           </div>
+
+          {/* Blog-Specific Settings */}
+          {selectedPlatforms.includes('blog') && (
+            <Card className="p-4 bg-green-50 border-green-200">
+              <h4 className="text-lg font-semibold mb-4 flex items-center gap-2 text-green-800">
+                <BookOpen className="h-5 w-5" />
+                Blog SEO Settings
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Target Word Count: {wordCount[0]}</Label>
+                  <Slider
+                    value={wordCount}
+                    onValueChange={setWordCount}
+                    min={500}
+                    max={3000}
+                    step={100}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>500</span>
+                    <span>3000</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">SEO Difficulty</Label>
+                  <Select value={seoDifficulty} onValueChange={setSeoDifficulty}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="beginner">Beginner - Basic SEO</SelectItem>
+                      <SelectItem value="intermediate">Intermediate - Standard SEO</SelectItem>
+                      <SelectItem value="advanced">Advanced - Complex SEO</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Content Depth</Label>
+                  <Select value={contentDepth} onValueChange={setContentDepth}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="overview">Overview - High-level content</SelectItem>
+                      <SelectItem value="detailed">Detailed - In-depth content</SelectItem>
+                      <SelectItem value="comprehensive">Comprehensive - Complete guide</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Advanced Settings */}
           <Dialog open={showAdvanced} onOpenChange={setShowAdvanced}>

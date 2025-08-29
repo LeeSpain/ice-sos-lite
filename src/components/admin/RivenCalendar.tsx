@@ -20,7 +20,8 @@ import {
   Trash2,
   CheckCircle,
   Clock,
-  Eye
+  Eye,
+  BookOpen
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -124,6 +125,7 @@ export const RivenCalendar: React.FC = () => {
       case 'twitter': return <Twitter className="h-4 w-4" />;
       case 'linkedin': return <Linkedin className="h-4 w-4" />;
       case 'youtube': return <Youtube className="h-4 w-4" />;
+      case 'blog': return <BookOpen className="h-4 w-4" />;
       default: return <CalendarIcon className="h-4 w-4" />;
     }
   };
@@ -135,6 +137,7 @@ export const RivenCalendar: React.FC = () => {
       case 'twitter': return '#1DA1F2';
       case 'linkedin': return '#0A66C2';
       case 'youtube': return '#FF0000';
+      case 'blog': return '#10B981';
       default: return '#6B7280';
     }
   };
@@ -317,6 +320,7 @@ export const RivenCalendar: React.FC = () => {
                   <SelectItem value="twitter">Twitter</SelectItem>
                   <SelectItem value="linkedin">LinkedIn</SelectItem>
                   <SelectItem value="youtube">YouTube</SelectItem>
+                  <SelectItem value="blog">Blog</SelectItem>
                 </SelectContent>
               </Select>
               
