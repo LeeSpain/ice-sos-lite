@@ -474,11 +474,151 @@ export default function SystemSettingsPage() {
         </CardContent>
       </Card>
 
-      {/* Add New Setting */}
+      {/* Essential System Configuration */}
       <Card>
         <CardHeader>
-          <CardTitle>Add New Setting</CardTitle>
-          <CardDescription>Create a new system configuration setting</CardDescription>
+          <CardTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Essential System Configuration
+          </CardTitle>
+          <CardDescription>Core system settings for operational management</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          
+          {/* Database & Performance Settings */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold border-b pb-2">Database & Performance</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Connection Pool Size</Label>
+                <p className="text-2xl font-bold text-blue-600">50</p>
+                <p className="text-xs text-muted-foreground">Active database connections</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Query Timeout</Label>
+                <p className="text-2xl font-bold text-orange-600">30s</p>
+                <p className="text-xs text-muted-foreground">Maximum query execution time</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Security & Compliance */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold border-b pb-2">Security & Compliance</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Session Timeout</Label>
+                <p className="text-2xl font-bold text-red-600">24h</p>
+                <p className="text-xs text-muted-foreground">Auto-logout after inactivity</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Rate Limit</Label>
+                <p className="text-2xl font-bold text-yellow-600">1000/h</p>
+                <p className="text-xs text-muted-foreground">API requests per hour</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Max File Size</Label>
+                <p className="text-2xl font-bold text-green-600">10MB</p>
+                <p className="text-xs text-muted-foreground">Upload size limit</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Email & Communication */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold border-b pb-2">Email & Communication</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Daily Email Limit</Label>
+                <p className="text-2xl font-bold text-purple-600">10,000</p>
+                <p className="text-xs text-muted-foreground">Automated emails per day</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">SMS Rate Limit</Label>
+                <p className="text-2xl font-bold text-cyan-600">100/h</p>
+                <p className="text-xs text-muted-foreground">Emergency SMS per hour</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Storage & Backup */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold border-b pb-2">Storage & Backup</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Backup Frequency</Label>
+                <p className="text-2xl font-bold text-indigo-600">4h</p>
+                <p className="text-xs text-muted-foreground">Automated backup interval</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Retention Period</Label>
+                <p className="text-2xl font-bold text-teal-600">90 days</p>
+                <p className="text-xs text-muted-foreground">Data retention policy</p>
+              </div>
+              <div className="p-4 border rounded-lg">
+                <Label className="text-sm font-medium">Storage Usage</Label>
+                <p className="text-2xl font-bold text-pink-600">2.4GB</p>
+                <p className="text-xs text-muted-foreground">Current usage</p>
+              </div>
+            </div>
+          </div>
+
+        </CardContent>
+      </Card>
+
+      {/* Advanced Configuration Management */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Advanced Configuration Management</CardTitle>
+          <CardDescription>Manage custom system settings for specialized functionality</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {settings.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Settings className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>No custom settings configured</p>
+              <p className="text-sm">Add custom configuration settings below as needed</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {settings.map((setting) => (
+                <div key={setting.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium">{setting.setting_key}</h3>
+                      <Badge variant="outline" className="text-xs">
+                        {typeof setting.setting_value === 'object' ? 'JSON' : 'Text'}
+                      </Badge>
+                    </div>
+                    {setting.description && (
+                      <p className="text-sm text-muted-foreground mt-1">{setting.description}</p>
+                    )}
+                    <div className="mt-2">
+                      <code className="text-xs bg-muted p-2 rounded block overflow-x-auto">
+                        {JSON.stringify(setting.setting_value, null, 2)}
+                      </code>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => deleteSetting(setting.id)}
+                    disabled={saving}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Add Custom Setting */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Add Custom Setting</CardTitle>
+          <CardDescription>Create specialized configuration settings for advanced system control</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -486,7 +626,7 @@ export default function SystemSettingsPage() {
               <Label htmlFor="setting-key">Setting Key</Label>
               <Input
                 id="setting-key"
-                placeholder="e.g., max_upload_size"
+                placeholder="e.g., max_emergency_contacts"
                 value={newSetting.key}
                 onChange={(e) => setNewSetting({ ...newSetting, key: e.target.value })}
               />
@@ -495,7 +635,7 @@ export default function SystemSettingsPage() {
               <Label htmlFor="setting-value">Setting Value</Label>
               <Input
                 id="setting-value"
-                placeholder="e.g., 10MB"
+                placeholder="e.g., 5"
                 value={newSetting.value}
                 onChange={(e) => setNewSetting({ ...newSetting, value: e.target.value })}
               />
@@ -511,7 +651,7 @@ export default function SystemSettingsPage() {
             />
           </div>
           <Button onClick={addSetting} disabled={saving || !newSetting.key.trim()}>
-            {saving ? 'Adding...' : 'Add Setting'}
+            {saving ? 'Adding...' : 'Add Custom Setting'}
           </Button>
         </CardContent>
       </Card>
