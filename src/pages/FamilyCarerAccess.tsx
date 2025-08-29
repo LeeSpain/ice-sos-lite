@@ -69,31 +69,35 @@ const FamilyCarerAccessPage = () => {
     }
   ];
 
-  // How it actually works - step by step
+  // Clean process flow without pricing details
   const howItWorks = [
     {
       step: "1",
-      title: "Subscribe to Member Plan",
-      description: `Get the ${formattedMemberPrice}/month Member plan with 5 call-only emergency contacts included.`,
-      icon: CreditCard
+      title: "Join ICE SOS",
+      description: "Sign up for your ICE SOS emergency system and set up your personal safety profile.",
+      icon: UserPlus,
+      color: "primary"
     },
     {
       step: "2", 
-      title: "Add Family Access Seats",
-      description: `Purchase ${formattedSeatPrice}/month per family member you want to invite (max 5 seats).`,
-      icon: UserPlus
+      title: "Add Family Members",
+      description: "Invite your family members from your dashboard to join your emergency network.",
+      icon: Users,
+      color: "wellness"
     },
     {
       step: "3",
-      title: "Send Family Invites", 
-      description: "Invite family members via email. They can either accept (you pay) or pay for their own seat.",
-      icon: Send
+      title: "Family Accepts Invites", 
+      description: "Family members receive secure invitations and join your emergency coordination system.",
+      icon: Send,
+      color: "guardian"
     },
     {
       step: "4",
       title: "Emergency Coordination",
-      description: "When you trigger SOS, family gets instant alerts with your location and can acknowledge they're responding.",
-      icon: AlertTriangle
+      description: "When you trigger SOS, family instantly receives alerts with your location and can coordinate response.",
+      icon: AlertTriangle,
+      color: "emergency"
     }
   ];
 
@@ -223,48 +227,67 @@ const FamilyCarerAccessPage = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-gradient-to-b from-muted/30 to-background">
+      <section className="py-20 bg-gradient-to-br from-muted/20 via-background to-primary/5">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
-              <Play className="h-4 w-4 text-wellness mr-2" />
-              <span className="text-sm font-medium text-wellness">Simple Setup Process</span>
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center bg-wellness/10 rounded-full px-6 py-3 mb-6 border border-wellness/20 shadow-sm">
+              <Play className="h-5 w-5 text-wellness mr-3" />
+              <span className="text-base font-semibold text-wellness">Simple Setup Process</span>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              How Family Access Works
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
+              How Family Access <span className="text-wellness">Works</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Set up emergency family coordination in 4 simple steps. Privacy-first design with access only during emergencies.
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+              Connect your family to your emergency system in four simple steps. Privacy-first design ensures family access only during actual emergencies.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {howItWorks.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <Card key={index} className="relative border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg bg-white dark:bg-slate-800">
-                  <CardHeader>
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                        {step.step}
+          <div className="relative">
+            {/* Process Flow Line */}
+            <div className="hidden lg:block absolute top-24 left-1/2 transform -translate-x-1/2 w-3/4 h-0.5 bg-gradient-to-r from-primary via-wellness to-emergency opacity-30"></div>
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+              {howItWorks.map((step, index) => {
+                const Icon = step.icon;
+                const colorClass = step.color === 'emergency' ? 'from-emergency to-emergency/80' : 
+                                 step.color === 'guardian' ? 'from-guardian to-guardian/80' : 
+                                 step.color === 'wellness' ? 'from-wellness to-wellness/80' : 
+                                 'from-primary to-primary/80';
+                const textColor = step.color === 'emergency' ? 'text-emergency' : 
+                                step.color === 'guardian' ? 'text-guardian' : 
+                                step.color === 'wellness' ? 'text-wellness' : 
+                                'text-primary';
+                
+                return (
+                  <div key={index} className="relative group">
+                    <Card className="relative border-2 border-muted/20 hover:border-wellness/30 transition-all duration-500 hover:shadow-xl bg-white dark:bg-slate-800 group-hover:scale-105 overflow-hidden">
+                      {/* Step Number Circle */}
+                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
+                        <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-4 border-background group-hover:scale-110 transition-transform duration-300`}>
+                          {step.step}
+                        </div>
                       </div>
-                      <Icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle className="text-lg font-bold text-foreground">{step.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-sm leading-relaxed text-muted-foreground">
-                      {step.description}
-                    </CardDescription>
-                  </CardContent>
-                  {index < howItWorks.length - 1 && (
-                    <div className="hidden lg:block absolute -right-3 top-1/2 transform -translate-y-1/2 z-10">
-                      <ArrowRight className="h-6 w-6 text-primary/60" />
-                    </div>
-                  )}
-                </Card>
-              );
-            })}
+                      
+                      <CardHeader className="pt-10 pb-4">
+                        <div className="flex justify-center mb-4">
+                          <div className={`w-16 h-16 bg-gradient-to-br ${colorClass} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                            <Icon className="h-8 w-8 text-white" />
+                          </div>
+                        </div>
+                        <CardTitle className={`text-xl font-bold text-center ${textColor} group-hover:scale-105 transition-transform duration-300`}>
+                          {step.title}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="text-center pb-8">
+                        <CardDescription className="text-base leading-relaxed text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                          {step.description}
+                        </CardDescription>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
