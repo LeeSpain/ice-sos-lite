@@ -34,8 +34,8 @@ const FamilyDashboard = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Redirect if not a family member
-  if (!familyRole?.isFamilyMember) {
+  // Allow access to family group owners and family members
+  if (!familyRole?.isOwner && !familyRole?.isFamilyMember) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
         <Card className="max-w-md w-full bg-white/95 backdrop-blur-sm">

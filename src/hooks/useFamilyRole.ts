@@ -16,18 +16,24 @@ export function useFamilyRole() {
     queryFn: async (): Promise<FamilyRoleData> => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
+        console.log('🔍 Family Role Check - User:', user?.id);
         if (!user) {
+          console.log('❌ No user found');
           return { role: 'none', isOwner: false, isFamilyMember: false };
         }
 
         // Check if user is a family group owner
-        const { data: ownedGroup } = await supabase
+        console.log('🏠 Checking for owned family groups...');
+        const { data: ownedGroup, error: ownerError } = await supabase
           .from('family_groups')
           .select('id')
           .eq('owner_user_id', user.id)
           .single();
 
+        console.log('🏠 Owner check result:', { ownedGroup, ownerError });
+
         if (ownedGroup) {
+          console.log('✅ User is family group owner');
           return {
             role: 'owner',
             familyGroupId: ownedGroup.id,
@@ -37,14 +43,18 @@ export function useFamilyRole() {
         }
 
         // Check if user is a family member
-        const { data: membership } = await supabase
+        console.log('👨‍👩‍👧‍👦 Checking for family memberships...');
+        const { data: membership, error: memberError } = await supabase
           .from('family_memberships')
           .select('group_id')
           .eq('user_id', user.id)
           .eq('status', 'active')
           .single();
 
+        console.log('👨‍👩‍👧‍👦 Membership check result:', { membership, memberError });
+
         if (membership) {
+          console.log('✅ User is family member');
           return {
             role: 'family_member',
             familyGroupId: membership.group_id,
@@ -53,6 +63,7 @@ export function useFamilyRole() {
           };
         }
 
+        console.log('❌ User has no family role');
         return { role: 'none', isOwner: false, isFamilyMember: false };
 
       } catch (error) {
