@@ -411,10 +411,18 @@ const RivenMarketingAI: React.FC = () => {
         );
       }
 
-      toast({
-        title: "Riven Processing Complete",
-        description: "Campaign strategy created successfully!",
-      });
+      if (data.campaign_created) {
+        toast({
+          title: "Campaign Created",
+          description: "Campaign strategy created successfully!",
+        });
+      } else {
+        toast({
+          title: "Strategy Generated, No Campaign",
+          description: data?.error || "You might lack admin permissions to create campaigns.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       console.error('❌ Error processing command:', error);
       
