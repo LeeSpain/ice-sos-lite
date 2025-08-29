@@ -351,6 +351,10 @@ const RivenMarketingAI: React.FC = () => {
     try {
       console.log('🚀 Sending command to Riven:', commandToUse);
       
+      if (!session?.access_token) {
+        throw new Error('Authentication required. Please log in again.');
+      }
+      
       const { data, error } = await supabase.functions.invoke('riven-marketing', {
         body: {
           command: commandToUse,
@@ -362,6 +366,9 @@ const RivenMarketingAI: React.FC = () => {
             platforms: ['facebook', 'instagram', 'linkedin'],
             approval_required: !rivenConfig?.auto_approve_content
           }
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
         }
       });
 
