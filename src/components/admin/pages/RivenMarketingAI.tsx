@@ -169,7 +169,7 @@ const RivenMarketingAI: React.FC = () => {
   
   // Configuration state using site_content
   const { value: rivenConfig, save: saveRivenConfig, isLoading: configLoading } = useSiteContent('riven_ai_configuration', {
-    ai_model: 'gpt-5-2025-08-07',
+    ai_model: 'gpt-5',
     temperature: 0.7,
     max_tokens: 1000,
     brand_voice: 'Professional, caring, safety-focused',
@@ -360,8 +360,11 @@ const RivenMarketingAI: React.FC = () => {
       });
 
       if (error) throw error;
+      if (!data || data.success === false) {
+        throw new Error(data?.error || 'Riven returned no data');
+      }
 
-      setRivenResponse(data.response);
+      setRivenResponse(data.response || '');
       
       if (data.campaign_created) {
         await loadCampaigns();
@@ -403,7 +406,7 @@ const RivenMarketingAI: React.FC = () => {
       console.error('Error processing command:', error);
       toast({
         title: "Error",
-        description: "Failed to process command. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to process command. Please try again.",
         variant: "destructive",
       });
       
@@ -430,6 +433,9 @@ const RivenMarketingAI: React.FC = () => {
       });
 
       if (error) throw error;
+      if (!data || data.success === false) {
+        throw new Error(data?.error || 'Content generation failed');
+      }
 
       await loadContents();
       
@@ -721,7 +727,7 @@ const RivenMarketingAI: React.FC = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="gpt-5-2025-08-07">GPT-5 (Recommended)</SelectItem>
+                          <SelectItem value="gpt-5">GPT-5 (Recommended)</SelectItem>
                           <SelectItem value="gpt-4.1-2025-04-14">GPT-4.1</SelectItem>
                           <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
                         </SelectContent>

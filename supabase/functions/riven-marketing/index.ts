@@ -204,7 +204,7 @@ Be specific, professional, and focus on end-to-end automation and measurable out
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: settings?.ai_model || 'gpt-5-2025-08-07',
+        model: settings?.ai_model || 'gpt-5',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: command }
@@ -230,7 +230,7 @@ Be specific, professional, and focus on end-to-end automation and measurable out
     };
   } catch (error) {
     console.error('Error calling OpenAI:', error);
-    throw new Error('Failed to analyze command with Riven AI');
+    throw new Error(`Failed to analyze command with Riven AI: ${error?.message || String(error)}`);
   }
 }
 
@@ -413,7 +413,7 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: 'gpt-5',
         messages: [
           { role: 'user', content: prompt }
         ],
@@ -422,7 +422,13 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
     });
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+    }
+    const content = data.choices?.[0]?.message?.content || '';
+    if (!content) {
+      throw new Error('OpenAI returned empty content');
+    }
 
     if (platform === 'blog') {
       try {

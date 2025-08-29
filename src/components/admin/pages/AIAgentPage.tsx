@@ -315,7 +315,7 @@ const AIAgentPage: React.FC = () => {
                       <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
                       <SelectItem value="gpt-4o">GPT-4o</SelectItem>
                       <SelectItem value="gpt-4.1-2025-04-14">GPT-4.1</SelectItem>
-                      <SelectItem value="gpt-5-2025-08-07">GPT-5</SelectItem>
+                      <SelectItem value="gpt-5">GPT-5</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
