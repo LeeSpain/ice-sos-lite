@@ -9,6 +9,7 @@ const corsHeaders = {
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
 const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
 const xaiApiKey = Deno.env.get('XAI_API_KEY');
 
@@ -20,22 +21,40 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    // Get authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Authorization header missing');
+    }
+
+    // Create user-scoped client for auth checks
+    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false },
-      global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } }
+      global: { headers: { Authorization: authHeader } }
     });
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    // Create service client for database operations
+    const serviceSupabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: { persistSession: false }
+    });
+
+    // Check user authentication and admin status
+    const { data: { user }, error: userError } = await userSupabase.auth.getUser();
+    if (userError || !user) {
+      console.error('User auth error:', userError);
       throw new Error('Authentication required');
     }
 
-    // Enforce admin-only access for marketing operations for security
-    const { data: isAdmin, error: adminCheckError } = await supabase.rpc('is_admin');
+    console.log('✅ User authenticated:', user.id);
+
+    // Check if user is admin using user-scoped client
+    const { data: isAdmin, error: adminCheckError } = await userSupabase.rpc('is_admin');
     if (adminCheckError) {
-      console.error('is_admin RPC error:', adminCheckError);
+      console.error('❌ Admin check error:', adminCheckError);
+      throw new Error('Failed to verify admin status');
     }
     if (!isAdmin) {
+      console.log('❌ User is not admin:', user.id);
       return new Response(JSON.stringify({
         success: false,
         error: 'Admin privileges required'
@@ -45,21 +64,23 @@ serve(async (req) => {
       });
     }
 
+    console.log('✅ Admin verified:', user.id);
+
     const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls } = await req.json();
-    const aiConfig = await loadAiConfig(supabase);
+    const aiConfig = await loadAiConfig(userSupabase);
 
     let response = '';
     let campaign_created = false;
 
     switch (action) {
       case 'process_command':
-        const result = await processMarketingCommand(command, user.id, supabase, workflow_id, settings, scheduling_options, publishing_controls, aiConfig);
+        const result = await processMarketingCommand(command, user.id, serviceSupabase, workflow_id, settings, scheduling_options, publishing_controls, aiConfig);
         response = result.response;
         campaign_created = result.campaign_created;
         break;
       
       case 'generate_content':
-        await generateMarketingContent(campaign_id, supabase, settings, aiConfig);
+        await generateMarketingContent(campaign_id, serviceSupabase, settings, aiConfig);
         response = 'Content generated successfully for campaign!';
         break;
       
