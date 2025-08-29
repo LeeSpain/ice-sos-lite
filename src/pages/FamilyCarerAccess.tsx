@@ -242,11 +242,11 @@ const FamilyCarerAccessPage = () => {
             </p>
           </div>
           
-          <div className="relative">
+          <div className="relative pt-8">
             {/* Process Flow Line */}
-            <div className="hidden lg:block absolute top-24 left-1/2 transform -translate-x-1/2 w-3/4 h-0.5 bg-gradient-to-r from-primary via-wellness to-emergency opacity-30"></div>
+            <div className="hidden lg:block absolute top-32 left-1/2 transform -translate-x-1/2 w-3/4 h-0.5 bg-gradient-to-r from-primary via-wellness to-emergency opacity-30"></div>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mt-4">
               {howItWorks.map((step, index) => {
                 const Icon = step.icon;
                 const colorClass = step.color === 'emergency' ? 'from-emergency to-emergency/80' : 
@@ -259,16 +259,16 @@ const FamilyCarerAccessPage = () => {
                                 'text-primary';
                 
                 return (
-                  <div key={index} className="relative group">
-                    <Card className="relative border-2 border-muted/20 hover:border-wellness/30 transition-all duration-500 hover:shadow-xl bg-white dark:bg-slate-800 group-hover:scale-105 overflow-hidden">
+                  <div key={index} className="relative group mt-8">
+                    <Card className="relative border-2 border-muted/20 hover:border-wellness/30 transition-all duration-500 hover:shadow-xl bg-white dark:bg-slate-800 group-hover:scale-105 overflow-visible">
                       {/* Step Number Circle */}
-                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
+                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
                         <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-4 border-background group-hover:scale-110 transition-transform duration-300`}>
                           {step.step}
                         </div>
                       </div>
                       
-                      <CardHeader className="pt-10 pb-4">
+                      <CardHeader className="pt-12 pb-4">
                         <div className="flex justify-center mb-4">
                           <div className={`w-16 h-16 bg-gradient-to-br ${colorClass} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
                             <Icon className="h-8 w-8 text-white" />
