@@ -3404,6 +3404,14 @@ export type Database = {
           total_messages: number
         }[]
       }
+      get_user_family_group_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_user_family_membership_group_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -3423,6 +3431,14 @@ export type Database = {
       }
       is_admin: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_family_group_owner: {
+        Args: { group_id: string }
+        Returns: boolean
+      }
+      is_family_member_of_group: {
+        Args: { group_id: string }
         Returns: boolean
       }
       is_sales: {

@@ -32,7 +32,8 @@ const FamilyDashboardHome = () => {
   useEffect(() => {
     if (familyRole?.familyGroupId) {
       loadDashboardData();
-    } else {
+    } else if (familyRole && !familyRole.familyGroupId) {
+      // User is authenticated but has no family role - show empty state
       setIsLoading(false);
     }
   }, [familyRole]);
@@ -42,7 +43,7 @@ const FamilyDashboardHome = () => {
 
     try {
       // Load family group and owner details
-      const { data: groupData } = await supabase
+      const { data: groupData, error: groupError } = await supabase
         .from('family_groups')
         .select(`
           *,
@@ -50,6 +51,11 @@ const FamilyDashboardHome = () => {
         `)
         .eq('id', familyRole.familyGroupId)
         .single();
+
+      if (groupError) {
+        console.error('Error loading family group:', groupError);
+        throw groupError;
+      }
 
       if (groupData) {
         setFamilyGroup(groupData);
@@ -125,6 +131,31 @@ const FamilyDashboardHome = () => {
     );
   }
 
+  // Show empty state if user has no family role
+  if (familyRole && !familyRole.familyGroupId) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <Card className="p-8 text-center max-w-md">
+            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <Users className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No Family Access</h3>
+            <p className="text-muted-foreground mb-4">
+              You don't have access to any family emergency systems yet.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.href = '/dashboard'}
+            >
+              Go to Main Dashboard
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -134,7 +165,12 @@ const FamilyDashboardHome = () => {
             {ownerProfile ? `${ownerProfile.first_name}'s Emergency Dashboard` : 'Family Emergency Dashboard'}
           </h1>
           <p className="text-muted-foreground">
-            {ownerProfile ? `Connected to ${ownerProfile.first_name} ${ownerProfile.last_name}'s emergency system` : 'Stay connected with your family\'s safety'}
+            {familyRole?.role === 'owner' 
+              ? 'Manage your family emergency protection system'
+              : ownerProfile 
+                ? `Connected to ${ownerProfile.first_name} ${ownerProfile.last_name}'s emergency system` 
+                : 'Stay connected with your family\'s safety'
+            }
           </p>
         </div>
         <div className="flex items-center gap-2">

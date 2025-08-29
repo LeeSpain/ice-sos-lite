@@ -14,11 +14,13 @@ import {
   LogOut 
 } from 'lucide-react';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
+import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { cn } from '@/lib/utils';
 
 const FamilyDashboardSidebar = () => {
   const location = useLocation();
   const { signOut } = useOptimizedAuth();
+  const { data: familyRole } = useFamilyRole();
 
   const navigation = [
     {
@@ -102,8 +104,12 @@ const FamilyDashboardSidebar = () => {
                 <Heart className="h-4 w-4 text-emerald-600" />
               </div>
               <div>
-                <p className="font-medium text-sm">Family Member</p>
-                <p className="text-xs text-muted-foreground">Protected & Connected</p>
+                <p className="font-medium text-sm">
+                  {familyRole?.role === 'owner' ? 'Account Owner' : 'Family Member'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {familyRole?.role === 'owner' ? 'Emergency System Manager' : 'Protected & Connected'}
+                </p>
               </div>
             </div>
             <div className="space-y-2 text-xs text-muted-foreground">
@@ -113,7 +119,9 @@ const FamilyDashboardSidebar = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-3 w-3" />
-                <span>Quick SOS response</span>
+                <span>
+                  {familyRole?.role === 'owner' ? 'Full SOS control' : 'Quick SOS response'}
+                </span>
               </div>
             </div>
           </Card>

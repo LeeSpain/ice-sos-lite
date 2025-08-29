@@ -47,6 +47,9 @@ const FamilyProfile = () => {
   useEffect(() => {
     if (user && familyRole?.familyGroupId) {
       loadProfileData();
+    } else if (user && familyRole && !familyRole.familyGroupId) {
+      // User is authenticated but has no family role - still load their profile
+      setIsLoading(false);
     }
   }, [user, familyRole]);
 
