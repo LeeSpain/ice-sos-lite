@@ -40,8 +40,7 @@ export default function SystemSettingsPage() {
   const { value: aiProvidersConfig, save: saveAiProvidersConfig, isLoading: aiConfigLoading } = useSiteContent('ai_providers_config', {
     providers: {
       openai: { enabled: true, model: 'gpt-5' },
-      xai: { enabled: false, model: 'grok-beta' },
-      deepseek: { enabled: false, model: 'deepseek-chat' }
+      xai: { enabled: false, model: 'grok-beta' }
     },
     stages: {
       overview: { provider: 'openai' },
@@ -292,7 +291,7 @@ export default function SystemSettingsPage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* OpenAI */}
             <div className="p-4 border rounded-lg space-y-3">
               <div className="flex items-center justify-between">
@@ -390,55 +389,8 @@ export default function SystemSettingsPage() {
                 </Select>
               </div>
             </div>
-
-            {/* DeepSeek */}
-            <div className="p-4 border rounded-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">DeepSeek</span>
-                  {providerStatus.deepseek !== undefined && (
-                    <Badge variant="outline" className={providerStatus.deepseek ? 'border-green-500 text-green-600' : 'border-yellow-500 text-yellow-600'}>
-                      {providerStatus.deepseek ? 'Connected' : 'Add Key Later'}
-                    </Badge>
-                  )}
-                </div>
-                <Switch
-                  checked={!!aiProvidersConfig?.providers?.deepseek?.enabled}
-                  onCheckedChange={(val) => {
-                    const next = {
-                      ...aiProvidersConfig!,
-                      providers: {
-                        ...aiProvidersConfig!.providers,
-                        deepseek: { ...aiProvidersConfig!.providers.deepseek, enabled: val }
-                      }
-                    } as any;
-                    saveAiProvidersConfig(next);
-                  }}
-                />
-              </div>
-              <div>
-                <Label>Model</Label>
-                <Select
-                  value={aiProvidersConfig?.providers?.deepseek?.model || 'deepseek-chat'}
-                  onValueChange={(value) => {
-                    const next = {
-                      ...aiProvidersConfig!,
-                      providers: {
-                        ...aiProvidersConfig!.providers,
-                        deepseek: { ...aiProvidersConfig!.providers.deepseek, model: value }
-                      }
-                    } as any;
-                    saveAiProvidersConfig(next);
-                  }}
-                >
-                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="deepseek-chat">deepseek-chat</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
           </div>
+
 
           {/* Stage Mapping */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -459,7 +411,6 @@ export default function SystemSettingsPage() {
                   <SelectContent>
                     <SelectItem value="openai">OpenAI</SelectItem>
                     <SelectItem value="xai">xAI (Grok)</SelectItem>
-                    <SelectItem value="deepseek">DeepSeek</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
