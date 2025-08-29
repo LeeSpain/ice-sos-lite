@@ -29,6 +29,7 @@ import {
   Shield,
   Database,
   Bot,
+  Brain,
   Package,
   MapPin,
   Mail,
@@ -53,10 +54,8 @@ const adminMenuItems = [
     title: "🤖 AI & Marketing Intelligence", 
     items: [
       { title: "Emma AI Agent", url: "/admin-dashboard/ai-agent", icon: Bot },
-      { title: "Riven AI Configuration", url: "/admin-dashboard/riven-config", icon: Bot },
-      { title: "Enhanced Command Center", url: "/admin-dashboard/command-center", icon: Bot },
-      { title: "AI Marketing Dashboard", url: "/admin-dashboard/ai-marketing", icon: Bot },
-      { title: "Model Settings", url: "/admin-dashboard/ai-settings", icon: Settings },
+      { title: "Riven Marketing AI", url: "/admin-dashboard/riven-marketing", icon: Brain },
+      { title: "AI Model Settings", url: "/admin-dashboard/ai-model-settings", icon: Settings },
       { title: "Training Data", url: "/admin-dashboard/ai-training", icon: Database },
     ]
   },

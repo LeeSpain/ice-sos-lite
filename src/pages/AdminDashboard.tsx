@@ -14,9 +14,7 @@ import UserGrowthPage from '@/components/admin/pages/UserGrowthPage';
 import AIAgentPage from '@/components/admin/pages/AIAgentPage';
 import AITrainingPage from '@/components/admin/pages/AITrainingPage';
 import AIModelSettingsPage from '@/components/admin/pages/AIModelSettingsPage';
-import AIMarketingPage from '@/components/admin/pages/AIMarketingPage';
-import RivenAIConfiguration from '@/components/admin/pages/RivenAIConfiguration';
-import EnhancedCommandCenter from '@/components/admin/pages/EnhancedCommandCenter';
+import RivenMarketingAI from '@/components/admin/pages/RivenMarketingAI';
 import { SocialMediaIntegration } from '@/components/admin/pages/SocialMediaIntegration';
 import ContentAutomation from '@/components/admin/pages/ContentAutomation';
 import ProductsPage from '@/components/admin/pages/ProductsPage';
@@ -51,12 +49,10 @@ const AdminDashboard: React.FC = () => {
         <Route path="video-analytics" element={<VideoAnalyticsPage />} />
         <Route path="revenue" element={<RevenueAnalyticsPage />} />
         <Route path="growth" element={<UserGrowthPage />} />
-        <Route path="riven-config" element={<RivenAIConfiguration />} />
-        <Route path="command-center" element={<EnhancedCommandCenter />} />
-        <Route path="ai-marketing" element={<AIMarketingPage />} />
         <Route path="ai-agent" element={<AIAgentPage />} />
+        <Route path="ai-model-settings" element={<AIModelSettingsPage />} />
         <Route path="ai-training" element={<AITrainingPage />} />
-        <Route path="ai-settings" element={<AIModelSettingsPage />} />
+        <Route path="riven-marketing" element={<RivenMarketingAI />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="subscriptions" element={<SubscriptionsPage />} />
         <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />

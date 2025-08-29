@@ -28,14 +28,14 @@ serve(async (req) => {
       throw new Error('Authentication required');
     }
 
-    const { command, action, campaign_id, workflow_id, settings } = await req.json();
+    const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls } = await req.json();
 
     let response = '';
     let campaign_created = false;
 
     switch (action) {
       case 'process_command':
-        const result = await processMarketingCommand(command, user.id, supabase, workflow_id, settings);
+        const result = await processMarketingCommand(command, user.id, supabase, workflow_id, settings, scheduling_options, publishing_controls);
         response = result.response;
         campaign_created = result.campaign_created;
         break;
@@ -69,7 +69,7 @@ serve(async (req) => {
   }
 });
 
-async function processMarketingCommand(command: string, userId: string, supabase: any, workflowId?: string, settings?: any) {
+async function processMarketingCommand(command: string, userId: string, supabase: any, workflowId?: string, settings?: any, schedulingOptions?: any, publishingControls?: any) {
   console.log('Processing marketing command:', command);
 
   // Create workflow tracking if ID provided
@@ -86,13 +86,27 @@ async function processMarketingCommand(command: string, userId: string, supabase
     
     // Analyze command with Riven AI
     if (workflowId) await updateWorkflowStep(workflowId, 'ai_analysis', 'in_progress', supabase);
-    const analysis = await analyzeCommandWithRiven(command, companyInfo, settings);
+    const analysis = await analyzeCommandWithRiven(command, companyInfo, settings, schedulingOptions, publishingControls);
     if (workflowId) await updateWorkflowStep(workflowId, 'ai_analysis', 'completed', supabase);
     
     // Create campaign based on analysis
     if (workflowId) await updateWorkflowStep(workflowId, 'creating_campaign', 'in_progress', supabase);
     const campaign = await createMarketingCampaign(analysis, command, userId, supabase);
     if (workflowId) await updateWorkflowStep(workflowId, 'creating_campaign', 'completed', supabase);
+    
+    // Auto-generate content if enabled and immediate/optimal scheduling
+    if (settings?.auto_approve_content && campaign && (schedulingOptions?.mode === 'immediate' || schedulingOptions?.mode === 'optimal')) {
+      if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'in_progress', supabase);
+      await generateMarketingContent(campaign.id, supabase, settings);
+      if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'completed', supabase);
+      
+      // Auto-publish for immediate mode
+      if (schedulingOptions?.mode === 'immediate' && !publishingControls?.approval_required) {
+        if (workflowId) await updateWorkflowStep(workflowId, 'publishing_content', 'in_progress', supabase);
+        await publishGeneratedContent(campaign.id, supabase);
+        if (workflowId) await updateWorkflowStep(workflowId, 'publishing_content', 'completed', supabase);
+      }
+    }
     
     return {
       response: analysis.response,
@@ -141,7 +155,7 @@ async function getCompanyInfo(supabase: any) {
   }
 }
 
-async function analyzeCommandWithRiven(command: string, companyInfo: any, settings?: any) {
+async function analyzeCommandWithRiven(command: string, companyInfo: any, settings?: any, schedulingOptions?: any, publishingControls?: any) {
   if (!openaiApiKey) {
     throw new Error('OpenAI API key not configured');
   }
@@ -155,23 +169,32 @@ Company Information:
 - Default Budget: $${settings?.default_budget || 500}
 - Content Guidelines: ${settings?.content_guidelines || 'Standard professional guidelines'}
 
+Scheduling Configuration:
+- Mode: ${schedulingOptions?.mode || 'optimal'}
+- Platforms: ${publishingControls?.platforms?.join(', ') || 'Facebook, Instagram'}
+- Auto-Approval: ${settings?.auto_approve_content ? 'Enabled' : 'Disabled'}
+- Spread Days: ${schedulingOptions?.spread_days || 'N/A'}
+- Test Audience: ${schedulingOptions?.test_percentage || 'N/A'}%
+
 Your role is to:
 1. Analyze marketing commands and break them down into actionable campaigns
-2. Provide detailed cost estimates and timelines
-3. Create comprehensive campaign strategies
-4. Suggest content types and platforms
-5. Recommend budget allocation
+2. Provide detailed cost estimates and timelines based on scheduling preferences
+3. Create comprehensive campaign strategies with platform-specific content
+4. Suggest optimal posting times and content distribution
+5. Recommend budget allocation across platforms and time periods
 6. Follow the specified brand voice and guidelines
+7. Consider the scheduling mode and adapt strategy accordingly
 
 Always respond with:
-- Campaign analysis and breakdown
-- Estimated costs and timeline (consider default budget: $${settings?.default_budget || 500})
-- Platform recommendations
-- Content strategy suggestions
-- Target audience refinement
+- Campaign analysis and breakdown considering scheduling mode: ${schedulingOptions?.mode || 'optimal'}
+- Estimated costs and timeline (budget: $${settings?.default_budget || 500})
+- Platform-specific recommendations for: ${publishingControls?.platforms?.join(', ') || 'Facebook, Instagram'}
+- Content strategy with posting schedule
+- Target audience refinement and platform optimization
 - Compliance with brand voice: "${settings?.brand_voice || companyInfo.brand_voice}"
+- ROI predictions and performance expectations
 
-Be specific, professional, and focus on ROI and measurable outcomes. Follow all content guidelines provided.`;
+Be specific, professional, and focus on end-to-end automation and measurable outcomes.`;
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -364,6 +387,24 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
   }
 }
 
+// New publishing function
+async function publishGeneratedContent(campaignId: string, supabase: any) {
+  try {
+    // Mark all content as published
+    const { error } = await supabase
+      .from('marketing_content')
+      .update({ status: 'published', scheduled_time: new Date().toISOString() })
+      .eq('campaign_id', campaignId)
+      .eq('status', 'draft');
+
+    if (error) throw error;
+    console.log('Content published for campaign:', campaignId);
+  } catch (error) {
+    console.error('Error publishing content:', error);
+    throw error;
+  }
+}
+
 // Workflow tracking functions
 async function createWorkflowSteps(workflowId: string, supabase: any) {
   const steps = [
@@ -371,6 +412,8 @@ async function createWorkflowSteps(workflowId: string, supabase: any) {
     { step_name: 'Retrieving company data', step_order: 2 },
     { step_name: 'AI analysis in progress', step_order: 3 },
     { step_name: 'Creating campaign', step_order: 4 },
+    { step_name: 'Generating content', step_order: 5 },
+    { step_name: 'Publishing content', step_order: 6 },
   ];
 
   for (const step of steps) {
