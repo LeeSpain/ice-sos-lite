@@ -47,11 +47,41 @@ const FamilyProfile = () => {
   useEffect(() => {
     if (user && familyRole?.familyGroupId) {
       loadProfileData();
-    } else if (user && familyRole && !familyRole.familyGroupId) {
-      // User is authenticated but has no family role - still load their profile
-      setIsLoading(false);
+    } else if (user && familyRole && (familyRole.role === 'none' || !familyRole.familyGroupId)) {
+      // User is authenticated but has no family role - still load their basic profile
+      loadBasicProfile();
     }
   }, [user, familyRole]);
+
+  const loadBasicProfile = async () => {
+    if (!user) return;
+    
+    try {
+      const { data: userProfileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      setUserProfile(userProfileData);
+      
+      if (userProfileData) {
+        setProfileData({
+          first_name: userProfileData.first_name || '',
+          last_name: userProfileData.last_name || '',
+          phone: userProfileData.phone || '',
+          medical_conditions: userProfileData.medical_conditions || [],
+          allergies: userProfileData.allergies || [],
+          address: userProfileData.address || '',
+          date_of_birth: userProfileData.date_of_birth || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error loading basic profile:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const loadProfileData = async () => {
     if (!user || !familyRole?.familyGroupId) return;
@@ -188,19 +218,24 @@ const FamilyProfile = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">
-            {ownerProfile ? `${ownerProfile.first_name}'s Emergency Information` : 'Family Emergency Information'}
+            {ownerProfile ? `${ownerProfile.first_name}'s Emergency Information` : 
+             familyRole?.role === 'owner' ? 'My Emergency Information' : 
+             'Family Emergency Information'}
           </h1>
           <p className="text-muted-foreground">
             {familyRole?.role === 'owner' 
               ? 'Manage your emergency information and family settings'
-              : `Emergency contact details for ${ownerProfile?.first_name || 'your family member'}`
+              : familyRole?.role === 'none' || !familyRole?.familyGroupId
+                ? 'Basic profile information - no family emergency access'
+                : `Emergency contact details for ${ownerProfile?.first_name || 'your family member'}`
             }
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="gap-2">
             <Heart className="h-3 w-3" />
-            {familyRole?.role === 'owner' ? 'Account Owner' : 'Family Access'}
+            {familyRole?.role === 'owner' ? 'Account Owner' : 
+             familyRole?.role === 'none' ? 'No Access' : 'Family Access'}
           </Badge>
           {ownerProfile && familyRole?.role !== 'owner' && (
             <Badge variant="secondary" className="gap-2">

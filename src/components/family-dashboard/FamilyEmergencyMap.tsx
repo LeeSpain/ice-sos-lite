@@ -63,8 +63,11 @@ const FamilyEmergencyMap = () => {
         supabase.removeChannel(locationChannel);
         clearInterval(interval);
       };
+    } else if (familyRole && (familyRole.role === 'none' || !familyRole.familyGroupId)) {
+      // No family access - stop loading
+      setIsLoading(false);
     }
-  }, [familyRole?.familyGroupId]);
+  }, [familyRole?.familyGroupId, familyRole?.role]);
 
   const loadEmergencyData = async () => {
     if (!familyRole?.familyGroupId) return;
@@ -132,6 +135,31 @@ const FamilyEmergencyMap = () => {
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show no access state if user has no family role
+  if (familyRole && (familyRole.role === 'none' || !familyRole.familyGroupId)) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <Card className="p-8 text-center max-w-md">
+            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+              <MapPin className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-semibold mb-2">No Emergency Access</h3>
+            <p className="text-muted-foreground mb-4">
+              You need family access to view emergency locations and live tracking.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => window.location.href = '/dashboard'}
+            >
+              Return to Dashboard
+            </Button>
+          </Card>
         </div>
       </div>
     );

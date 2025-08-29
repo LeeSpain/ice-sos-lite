@@ -32,8 +32,11 @@ const FamilyDashboardHome = () => {
   useEffect(() => {
     if (familyRole?.familyGroupId) {
       loadDashboardData();
-    } else if (familyRole && !familyRole.familyGroupId) {
+    } else if (familyRole && familyRole.role === 'none') {
       // User is authenticated but has no family role - show empty state
+      setIsLoading(false);
+    } else if (familyRole && !familyRole.familyGroupId) {
+      // Handle cases where family role exists but no group ID
       setIsLoading(false);
     }
   }, [familyRole]);
@@ -131,8 +134,8 @@ const FamilyDashboardHome = () => {
     );
   }
 
-  // Show empty state if user has no family role
-  if (familyRole && !familyRole.familyGroupId) {
+  // Show empty state if user has no family role or access
+  if (familyRole && (familyRole.role === 'none' || !familyRole.familyGroupId)) {
     return (
       <div className="p-6">
         <div className="flex items-center justify-center h-64">
@@ -142,7 +145,7 @@ const FamilyDashboardHome = () => {
             </div>
             <h3 className="text-lg font-semibold mb-2">No Family Access</h3>
             <p className="text-muted-foreground mb-4">
-              You don't have access to any family emergency systems yet.
+              You don't have access to any family emergency systems yet. Contact the emergency plan owner to get invited.
             </p>
             <Button 
               variant="outline" 
