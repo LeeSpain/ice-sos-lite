@@ -30,6 +30,7 @@ import FamilyCarerAccess from "./pages/FamilyCarerAccess";
 import FamilyAccessSetup from "./pages/FamilyAccessSetup";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import SOSHome from "./pages/SOSHome";
+import FamilyDashboard from "./pages/FamilyDashboard";
 
 // Import protected routes and components
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -170,6 +171,15 @@ const App = () => {
                   <ProtectedSOSRoute>
                     <SOSHome />
                   </ProtectedSOSRoute>
+                </OptimizedSuspense>
+              } />
+
+              {/* Family Dashboard Routes */}
+              <Route path="/family-dashboard/*" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <FamilyDashboard />
+                  </ProtectedRoute>
                 </OptimizedSuspense>
               } />
 
