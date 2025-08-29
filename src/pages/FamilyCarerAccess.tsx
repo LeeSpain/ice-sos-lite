@@ -158,7 +158,7 @@ const FamilyCarerAccessPage = () => {
                   size="xl" 
                   className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 >
-                  <Link to="/register">
+                  <Link to="/ai-register">
                     <UserPlus className="mr-2 h-5 w-5" />
                     {t('familyCarerAccess.page.startConnecting')}
                   </Link>
@@ -345,7 +345,7 @@ const FamilyCarerAccessPage = () => {
                 size="xl" 
                 className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-2xl transform hover:scale-105 transition-all duration-300 font-bold text-lg px-10 py-5 rounded-2xl border-2 border-wellness-glow/20"
               >
-                  <Link to="/register">
+                  <Link to="/ai-register">
                     <UserPlus className="mr-3 h-6 w-6" />
                     {t('familyCarerAccess.page.startFamilyNetwork')}
                   </Link>

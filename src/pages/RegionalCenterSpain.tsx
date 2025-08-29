@@ -73,7 +73,7 @@ const RegionalCenterSpain: React.FC = () => {
                     size="xl" 
                     className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
-                    <Link to="/register">Join Now</Link>
+                    <Link to="/ai-register">Join Now</Link>
                   </Button>
                 </div>
               </div>

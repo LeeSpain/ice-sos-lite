@@ -99,7 +99,7 @@ const { t } = useTranslation();
                   <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                     {t('footer.signIn')}
                   </Link>
-                  <Link to="/register" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link to="/ai-register" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                     {t('footer.subscribe')}
                   </Link>
                 </>
@@ -108,12 +108,13 @@ const { t } = useTranslation();
                   {t('footer.signOut')}
                 </Link>
               )}
-              <Link 
-                to="/full-dashboard"
-                className="block text-sm text-muted-foreground hover:text-primary transition-colors"
+              <a 
+                href="#" 
+                onClick={(e) => handleDashboardClick(e, 'member')}
+                className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
               >
                 {loading ? 'Loading...' : t('footer.membersDashboard')}
-              </Link>
+              </a>
               <a 
                 href="#" 
                 onClick={(e) => handleDashboardClick(e, 'admin')}
