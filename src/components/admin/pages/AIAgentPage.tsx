@@ -102,8 +102,19 @@ const AIAgentPage: React.FC = () => {
   };
 
   const loadTrainingData = async () => {
-    // Training data management placeholder - database table not yet created
-    setTrainingData([]);
+    try {
+      const { data, error } = await supabase
+        .from('training_data')
+        .select('*')
+        .eq('is_active', true)
+        .order('confidence_score', { ascending: false });
+      
+      if (error) throw error;
+      setTrainingData(data || []);
+    } catch (error) {
+      console.error('Error loading training data:', error);
+      setTrainingData([]);
+    }
   };
 
   const saveAISettings = async () => {
@@ -301,12 +312,92 @@ const AIAgentPage: React.FC = () => {
                 <Database className="h-5 w-5" />
                 Emma's Training Data & Knowledge Base
               </CardTitle>
+              <CardDescription>
+                Manage Emma's knowledge base with {trainingData.length} active training entries
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Database className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Training Data Management</h3>
-                <p className="text-muted-foreground">Training data management interface coming soon</p>
+            <CardContent className="space-y-6">
+              {/* Add New Training Data */}
+              <div className="border-2 border-dashed border-border rounded-lg p-6">
+                <h3 className="text-sm font-medium mb-4">Add New Training Data</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <Label>Category</Label>
+                    <Select value={newTrainingItem.content_type} onValueChange={(value) => setNewTrainingItem({...newTrainingItem, content_type: value})}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="product_info">Product Information</SelectItem>
+                        <SelectItem value="pricing">Pricing & Plans</SelectItem>
+                        <SelectItem value="emergency_response">Emergency Response</SelectItem>
+                        <SelectItem value="family_features">Family Features</SelectItem>
+                        <SelectItem value="support">Technical Support</SelectItem>
+                        <SelectItem value="regional">Regional Services</SelectItem>
+                        <SelectItem value="health">Health Monitoring</SelectItem>
+                        <SelectItem value="business">Business Solutions</SelectItem>
+                        <SelectItem value="privacy">Privacy & Security</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Question/Topic</Label>
+                    <Input
+                      value={newTrainingItem.title}
+                      onChange={(e) => setNewTrainingItem({...newTrainingItem, title: e.target.value})}
+                      placeholder="Enter the question or topic"
+                      className="mt-2"
+                    />
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <Label>Answer/Content</Label>
+                  <Textarea
+                    value={newTrainingItem.content}
+                    onChange={(e) => setNewTrainingItem({...newTrainingItem, content: e.target.value})}
+                    rows={4}
+                    placeholder="Enter Emma's response or knowledge content"
+                    className="mt-2"
+                  />
+                </div>
+                <Button onClick={() => console.log('Add training data')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Training Data
+                </Button>
+              </div>
+
+              {/* Training Data List */}
+              <div>
+                <h3 className="text-sm font-medium mb-4">Current Training Data</h3>
+                <ScrollArea className="h-64">
+                  <div className="space-y-3">
+                    {trainingData.map((item, index) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="secondary">{item.category}</Badge>
+                              <Badge variant="outline">Score: {item.confidence_score}</Badge>
+                              {item.usage_count > 0 && (
+                                <Badge variant="outline">Used: {item.usage_count}x</Badge>
+                              )}
+                            </div>
+                            <h4 className="font-medium text-sm mb-2">{item.question}</h4>
+                            <p className="text-sm text-muted-foreground">{item.answer.substring(0, 150)}...</p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" size="sm">
+                              <Edit3 className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-destructive">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
               </div>
             </CardContent>
           </Card>

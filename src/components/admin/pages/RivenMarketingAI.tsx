@@ -393,38 +393,48 @@ const RivenMarketingAI: React.FC = () => {
 
   const connectSocialAccount = async (platform: string) => {
     try {
-      // This would typically redirect to OAuth flow
-      toast({
-        title: "Connect " + platform,
-        description: "OAuth integration will redirect you to authorize account access.",
+      // Real OAuth integration
+      const { data, error } = await supabase.functions.invoke('social-media-oauth', {
+        body: { action: 'initiate', platform }
       });
-      
-      // Get current user for social account creation
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Authentication required');
-      
-      // Simulate connection for demo
-      const mockAccount = {
-        user_id: user.id,
-        platform,
-        account_name: `@icesoslite_${platform}`,
-        account_status: 'pending',
-        is_active: false,
-        posting_permissions: { post: true, story: false },
-        rate_limits: { daily: 100, hourly: 10 },
-        follower_count: 0,
-        last_sync_at: new Date().toISOString()
-      };
 
-      const { error } = await supabase
-        .from('social_media_accounts')
-        .insert(mockAccount);
+      if (error) throw error;
 
-      if (!error) {
-        await loadSocialAccounts();
+      if (data.authUrl) {
+        // Redirect to OAuth authorization URL
+        window.open(data.authUrl, '_blank', 'width=500,height=600');
+        
+        toast({
+          title: `Connecting to ${platform}`,
+          description: "Please complete the authorization in the popup window.",
+        });
+
+        // Poll for connection status
+        const pollConnection = setInterval(async () => {
+          await loadSocialAccounts();
+          const connected = socialAccounts.find(acc => 
+            acc.platform === platform && acc.account_status === 'connected'
+          );
+          
+          if (connected) {
+            clearInterval(pollConnection);
+            toast({
+              title: "Account Connected!",
+              description: `${platform} account connected successfully.`,
+            });
+          }
+        }, 3000);
+
+        // Stop polling after 2 minutes
+        setTimeout(() => clearInterval(pollConnection), 120000);
       }
     } catch (error) {
       console.error('Error connecting social account:', error);
+      toast({
+        title: "Connection Failed",
+        description: `Failed to connect ${platform} account. Please try again.`,
+        variant: "destructive",
+      });
     }
   };
 
