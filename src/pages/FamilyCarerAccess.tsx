@@ -4,7 +4,6 @@ import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Users, 
   Heart, 
@@ -14,100 +13,98 @@ import {
   MapPin, 
   Clock, 
   CheckCircle, 
-  ArrowLeft,
+  ArrowRight,
   UserPlus,
-  Settings,
   Bell,
-  Lock,
-  Activity
+  Send,
+  AlertTriangle,
+  Euro,
+  CreditCard,
+  Play,
+  Check
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import SEO from '@/components/SEO';
 import OptimizedImage from "@/components/ui/optimized-image";
 import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
+import { usePreferences } from '@/contexts/PreferencesContext';
+import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 
 const FamilyCarerAccessPage = () => {
   const { t } = useTranslation();
+  const { currency, language } = usePreferences();
   
-  const keyFeatures = [
+  // Accurate pricing from our family access system
+  const memberPlanPrice = convertCurrency(9.99, 'EUR', currency);
+  const familySeatPrice = convertCurrency(2.99, 'EUR', currency);
+  const formattedMemberPrice = formatDisplayCurrency(memberPlanPrice, currency, languageToLocale(language));
+  const formattedSeatPrice = formatDisplayCurrency(familySeatPrice, currency, languageToLocale(language));
+
+  // Actual features we offer
+  const actualFeatures = [
     {
-      icon: UserCheck,
-      title: t('familyCarerAccess.features.trustedContacts.title'),
-      description: t('familyCarerAccess.features.trustedContacts.description'),
-      color: "primary"
-    },
-    {
-      icon: Heart,
-      title: t('familyCarerAccess.features.careCoordination.title'),
-      description: t('familyCarerAccess.features.careCoordination.description'),
-      color: "wellness"
-    },
-    {
-      icon: Shield,
-      title: t('familyCarerAccess.features.privacyControls.title'),
-      description: t('familyCarerAccess.features.privacyControls.description'),
-      color: "guardian"
-    },
-    {
-      icon: Clock,
-      title: t('familyCarerAccess.features.realTimeUpdates.title'),
-      description: t('familyCarerAccess.features.realTimeUpdates.description'),
+      icon: Bell,
+      title: "Instant SOS Alerts",
+      description: "Family members receive immediate notifications when you trigger an SOS emergency with your location and situation details.",
       color: "emergency"
     },
     {
       icon: MapPin,
-      title: t('familyCarerAccess.features.locationSharing.title'),
-      description: t('familyCarerAccess.features.locationSharing.description'),
+      title: "Emergency Location Sharing",
+      description: "Your exact location is shared with family ONLY during active SOS emergencies - complete privacy otherwise.",
       color: "primary"
     },
     {
-      icon: Activity,
-      title: t('familyCarerAccess.features.activityTracking.title'),
-      description: t('familyCarerAccess.features.activityTracking.description'),
+      icon: UserCheck,
+      title: "'Received & On It' System",
+      description: "Family members can acknowledge they've received your SOS and are responding, coordinating help effectively.",
       color: "wellness"
+    },
+    {
+      icon: Shield,
+      title: "Privacy-First Design",
+      description: "No location tracking, device monitoring, or activity sharing. Family access is limited to SOS emergencies only.",
+      color: "guardian"
     }
   ];
 
-  const accessLevels = [
+  // How it actually works - step by step
+  const howItWorks = [
     {
-      level: t('familyCarerAccess.page.accessLevels.emergencyOnly.title'),
-      description: t('familyCarerAccess.page.accessLevels.emergencyOnly.description'),
-      permissions: t('familyCarerAccess.page.accessLevels.emergencyOnly.permissions', { returnObjects: true }) as string[]
+      step: "1",
+      title: "Subscribe to Member Plan",
+      description: `Get the ${formattedMemberPrice}/month Member plan with 5 call-only emergency contacts included.`,
+      icon: CreditCard
     },
     {
-      level: t('familyCarerAccess.page.accessLevels.familyMember.title'),
-      description: t('familyCarerAccess.page.accessLevels.familyMember.description'),
-      permissions: t('familyCarerAccess.page.accessLevels.familyMember.permissions', { returnObjects: true }) as string[]
-    },
-    {
-      level: t('familyCarerAccess.page.accessLevels.primaryCarer.title'),
-      description: t('familyCarerAccess.page.accessLevels.primaryCarer.description'),
-      permissions: t('familyCarerAccess.page.accessLevels.primaryCarer.permissions', { returnObjects: true }) as string[]
-    }
-  ];
-
-  const useCases = [
-    {
-      title: t('familyCarerAccess.page.useCases.multiGenerational.title'),
-      description: t('familyCarerAccess.page.useCases.multiGenerational.description'),
-      icon: Users
-    },
-    {
-      title: t('familyCarerAccess.page.useCases.professionalCare.title'),
-      description: t('familyCarerAccess.page.useCases.professionalCare.description'),
+      step: "2", 
+      title: "Add Family Access Seats",
+      description: `Purchase ${formattedSeatPrice}/month per family member you want to invite (max 5 seats).`,
       icon: UserPlus
     },
     {
-      title: t('familyCarerAccess.page.useCases.emergencyResponse.title'),
-      description: t('familyCarerAccess.page.useCases.emergencyResponse.description'),
-      icon: Phone
+      step: "3",
+      title: "Send Family Invites", 
+      description: "Invite family members via email. They can either accept (you pay) or pay for their own seat.",
+      icon: Send
     },
     {
-      title: t('familyCarerAccess.page.useCases.routineCare.title'),
-      description: t('familyCarerAccess.page.useCases.routineCare.description'),
-      icon: Activity
+      step: "4",
+      title: "Emergency Coordination",
+      description: "When you trigger SOS, family gets instant alerts with your location and can acknowledge they're responding.",
+      icon: AlertTriangle
     }
+  ];
+
+  // Real benefits, not overstated claims
+  const realBenefits = [
+    "Family knows immediately when you're in trouble",
+    "Your exact emergency location shared instantly", 
+    "Coordinate who's responding to avoid confusion",
+    "Complete privacy - no tracking outside emergencies",
+    "Simple €2.99/month per family member",
+    "Max 5 family members per account"
   ];
 
   const getIconColor = (color: string) => {
@@ -131,36 +128,47 @@ const FamilyCarerAccessPage = () => {
   return (
     <div className="min-h-screen">
       <SEO 
-        title={`${t('familyCarerAccess.title')} - ICE SOS Lite`}
-        description={t('familyCarerAccess.subtitle')}
+        title="Family Emergency Access - ICE SOS Lite"
+        description="Connect your family to your emergency system. Get instant SOS alerts with location sharing during emergencies only. Privacy-first family coordination."
       />
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
-        <div className="container mx-auto px-4 py-20 relative z-10">
+      <section className="relative pt-20 pb-16 bg-gradient-to-br from-emergency/5 via-primary/5 to-wellness/10 overflow-hidden">
+        <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Content */}
-            <div className="text-center lg:text-left text-white animate-fade-in">
-              <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
-                <Heart className="h-4 w-4 text-emergency-glow" />
-                <span className="text-sm font-medium text-white">{t('familyCarerAccess.page.heroTag')}</span>
+            <div className="text-center lg:text-left animate-fade-in">
+              <div className="inline-flex items-center space-x-2 bg-emergency/10 rounded-full px-4 py-2 mb-6 border border-emergency/20">
+                <Users className="h-4 w-4 text-emergency" />
+                <span className="text-sm font-medium text-emergency">Family Emergency Access</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                {t('familyCarerAccess.page.heroTitle')} <span className="text-wellness drop-shadow-md">{t('familyCarerAccess.page.heroTitleHighlight')}</span>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-foreground">
+                Connect Your <span className="text-emergency">Family</span> to Your Emergency System
               </h1>
-              <p className="text-xl md:text-2xl text-white/90 max-w-3xl lg:max-w-none mx-auto mb-8 leading-relaxed font-medium drop-shadow-sm">
-                {t('familyCarerAccess.page.heroSubtitle')}
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                Give your family instant access to your emergency alerts with location sharing during SOS events only. Complete privacy with emergency coordination when it matters most.
               </p>
-              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button 
                   asChild 
-                  size="xl" 
-                  className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                  size="lg" 
+                  className="bg-emergency text-white hover:bg-emergency/90 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
                 >
-                  <Link to="/ai-register">
+                  <Link to="/family-access-setup">
                     <UserPlus className="mr-2 h-5 w-5" />
-                    {t('familyCarerAccess.page.startConnecting')}
+                    Setup Family Access
+                  </Link>
+                </Button>
+                <Button 
+                  asChild 
+                  size="lg" 
+                  variant="outline"
+                  className="border-emergency text-emergency hover:bg-emergency hover:text-white"
+                >
+                  <Link to="/dashboard/family">
+                    <Shield className="mr-2 h-5 w-5" />
+                    Manage Family
                   </Link>
                 </Button>
               </div>
@@ -168,52 +176,48 @@ const FamilyCarerAccessPage = () => {
             
             {/* Hero Image */}
             <div className="relative animate-scale-in">
-              <div className="relative z-10">
-                <OptimizedImage 
-                  src="/lovable-uploads/0365334e-7587-4cf4-96a6-5744399b84b2.png" 
-                  alt="Family using ICE SOS for emergency coordination and care support"
-                  className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl hover-scale"
-                  priority={true}
-                  sizes={getImageSizes('hero')}
-                  blurDataURL={generateBlurPlaceholder(400, 600)}
-                />
-              </div>
+              <OptimizedImage 
+                src="/lovable-uploads/0365334e-7587-4cf4-96a6-5744399b84b2.png" 
+                alt="Family emergency coordination system showing real-time alerts and location sharing"
+                className="w-full max-w-lg mx-auto rounded-2xl shadow-2xl"
+                priority={true}
+                sizes={getImageSizes('hero')}
+                blurDataURL={generateBlurPlaceholder(400, 600)}
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Key Features Section */}
-      <section className="py-20 bg-gradient-to-b from-wellness/5 to-wellness/10 dark:from-wellness/10 dark:to-wellness/5">
+      {/* What You Actually Get */}
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
-              <div className="w-2 h-2 bg-wellness rounded-full mr-2 animate-pulse"></div>
-              <span className="text-sm font-medium text-wellness">{t('familyCarerAccess.page.featuresTag')}</span>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-primary/10 rounded-full px-4 py-2 mb-4 border border-primary/20">
+              <CheckCircle className="h-4 w-4 text-primary mr-2" />
+              <span className="text-sm font-medium text-primary">What You Actually Get</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {t('familyCarerAccess.page.featuresTitle')}
+              Emergency Family Coordination
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              {t('familyCarerAccess.page.featuresSubtitle')}
+              Simple, privacy-first emergency alerts that keep your family informed when you need help most.
             </p>
           </div>
           
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {keyFeatures.map((feature, index) => {
+          <div className="grid md:grid-cols-2 gap-8">
+            {actualFeatures.map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Card 
                   key={index} 
-                  className={`group border-2 transition-all duration-300 hover:shadow-lg hover:scale-105 ${getCardBorder(feature.color)} bg-white dark:bg-slate-800 hover:bg-gradient-to-br hover:from-white hover:to-wellness/5 dark:hover:from-slate-800 dark:hover:to-wellness/10 animate-fade-in`}
-                  style={{animationDelay: `${index * 0.1}s`}}
+                  className={`group border-2 transition-all duration-300 hover:shadow-lg ${getCardBorder(feature.color)} bg-white dark:bg-slate-800`}
                 >
                   <CardHeader>
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br from-wellness to-wellness/80 shadow-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                      <Icon className="h-7 w-7 text-white" />
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color === 'emergency' ? 'from-emergency to-emergency/80' : feature.color === 'guardian' ? 'from-guardian to-guardian/80' : feature.color === 'wellness' ? 'from-wellness to-wellness/80' : 'from-primary to-primary/80'} shadow-lg flex items-center justify-center mb-4`}>
+                      <Icon className="h-6 w-6 text-white" />
                     </div>
-                    <CardTitle className="text-xl font-semibold text-foreground group-hover:text-wellness transition-colors duration-300">{feature.title}</CardTitle>
+                    <CardTitle className="text-xl font-semibold text-foreground">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <CardDescription className="text-base leading-relaxed text-muted-foreground">
@@ -227,96 +231,46 @@ const FamilyCarerAccessPage = () => {
         </div>
       </section>
 
-      {/* Access Levels Section */}
-      <section className="py-20 bg-gradient-to-b from-background to-wellness/5">
+      {/* How It Works */}
+      <section className="py-20 bg-gradient-to-b from-muted/30 to-background">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-flex items-center bg-guardian/10 rounded-full px-4 py-2 mb-4 border border-guardian/20">
-              <Shield className="h-4 w-4 text-guardian mr-2" />
-              <span className="text-sm font-medium text-guardian">{t('familyCarerAccess.page.accessLevelsTag')}</span>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
+              <Play className="h-4 w-4 text-wellness mr-2" />
+              <span className="text-sm font-medium text-wellness">Simple Setup Process</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {t('familyCarerAccess.page.accessLevelsTitle')}
+              How Family Access Works
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              {t('familyCarerAccess.page.accessLevelsSubtitle')}
+              Set up emergency family coordination in 4 simple steps. Privacy-first design with access only during emergencies.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            {accessLevels.map((level, index) => (
-              <Card 
-                key={index} 
-                className={`group border-2 hover:shadow-xl transition-all duration-500 animate-fade-in bg-white dark:bg-slate-800 hover:bg-gradient-to-br hover:from-white hover:to-guardian/5 dark:hover:from-slate-800 dark:hover:to-guardian/10 ${index === 1 ? 'border-wellness/40 ring-2 ring-wellness/20' : 'border-guardian/20 hover:border-guardian/40'}`}
-                style={{animationDelay: `${index * 0.2}s`}}
-              >
-                <CardHeader>
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className={`w-12 h-12 rounded-xl ${index === 1 ? 'bg-gradient-to-br from-wellness to-wellness/80' : 'bg-gradient-to-br from-guardian to-guardian/80'} shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      <Lock className="h-6 w-6 text-white" />
-                    </div>
-                    <CardTitle className={`text-xl font-bold ${index === 1 ? 'text-wellness' : 'text-guardian'} group-hover:scale-105 transition-transform duration-300`}>
-                      {level.level}
-                    </CardTitle>
-                  </div>
-                  <CardDescription className="text-base text-muted-foreground">{level.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {level.permissions.map((permission, permIndex) => (
-                      <div key={permIndex} className="flex items-center gap-3 group-hover:translate-x-1 transition-transform duration-300" style={{transitionDelay: `${permIndex * 50}ms`}}>
-                        <CheckCircle className={`h-5 w-5 ${index === 1 ? 'text-wellness' : 'text-guardian'}`} />
-                        <span className="text-sm font-medium text-foreground">{permission}</span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Use Cases Section */}
-      <section className="py-20 bg-gradient-to-b from-wellness/5 via-wellness/10 to-primary/5">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-flex items-center bg-primary/10 rounded-full px-4 py-2 mb-4 border border-primary/20">
-              <Activity className="h-4 w-4 text-primary mr-2" />
-              <span className="text-sm font-medium text-primary">{t('familyCarerAccess.page.useCasesTag')}</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              {t('familyCarerAccess.page.useCasesTitle')}
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              {t('familyCarerAccess.page.useCasesSubtitle')}
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {useCases.map((useCase, index) => {
-              const Icon = useCase.icon;
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {howItWorks.map((step, index) => {
+              const Icon = step.icon;
               return (
-                <Card 
-                  key={index} 
-                  className="group border-2 hover:shadow-2xl transition-all duration-500 animate-fade-in bg-white dark:bg-slate-800 hover:bg-gradient-to-br hover:from-white hover:to-primary/5 dark:hover:from-slate-800 dark:hover:to-primary/10 border-primary/20 hover:border-primary/40"
-                  style={{animationDelay: `${index * 0.15}s`}}
-                >
+                <Card key={index} className="relative border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg bg-white dark:bg-slate-800">
                   <CardHeader>
-                    <div className="flex items-center gap-4 mb-3">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-lg flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                        <Icon className="h-7 w-7 text-white" />
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                        {step.step}
                       </div>
-                      <CardTitle className="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-300">
-                        {useCase.title}
-                      </CardTitle>
+                      <Icon className="h-6 w-6 text-primary" />
                     </div>
+                    <CardTitle className="text-lg font-bold text-foreground">{step.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-base leading-relaxed text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                      {useCase.description}
+                    <CardDescription className="text-sm leading-relaxed text-muted-foreground">
+                      {step.description}
                     </CardDescription>
                   </CardContent>
+                  {index < howItWorks.length - 1 && (
+                    <div className="hidden lg:block absolute -right-3 top-1/2 transform -translate-y-1/2 z-10">
+                      <ArrowRight className="h-6 w-6 text-primary/60" />
+                    </div>
+                  )}
                 </Card>
               );
             })}
@@ -324,42 +278,114 @@ const FamilyCarerAccessPage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-wellness/10 via-wellness/5 to-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-wellness/5 to-transparent opacity-50"></div>
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <div className="animate-fade-in">
-            <div className="inline-flex items-center bg-wellness/10 rounded-full px-6 py-3 mb-6 border border-wellness/20 shadow-lg">
-              <Heart className="h-5 w-5 text-wellness mr-2 animate-pulse" />
-              <span className="text-base font-semibold text-wellness">{t('familyCarerAccess.page.ctaTag')}</span>
+      {/* Pricing Section */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-warning/10 rounded-full px-4 py-2 mb-4 border border-warning/20">
+              <Euro className="h-4 w-4 text-warning mr-2" />
+              <span className="text-sm font-medium text-warning">Simple Pricing</span>
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
-              {t('familyCarerAccess.page.ctaTitle')} <span className="text-wellness">{t('familyCarerAccess.page.ctaTitleHighlight')}</span> {t('familyCarerAccess.page.ctaTitleSuffix')}
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Family Access Pricing
             </h2>
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-              {t('familyCarerAccess.page.ctaSubtitle')}
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Transparent pricing with no hidden fees. Add family members to your emergency system for just {formattedSeatPrice} per month each.
             </p>
-            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Member Plan */}
+            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 bg-white dark:bg-slate-800">
+              <CardHeader>
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center mb-4">
+                  <Shield className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-2xl font-bold text-foreground">Member Plan</CardTitle>
+                <div className="text-3xl font-bold text-primary">{formattedMemberPrice}<span className="text-base font-normal text-muted-foreground">/month</span></div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 mb-6">
+                  {["5 emergency call-only contacts", "SOS emergency system", "Location sharing during SOS", "Emergency services integration", "Basic family coordination"].map((feature, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <Check className="h-5 w-5 text-primary" />
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <Button asChild className="w-full bg-primary hover:bg-primary/90">
+                  <Link to="/ai-register">Get Member Plan</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Family Seats */}
+            <Card className="border-2 border-warning/20 hover:border-warning/40 transition-all duration-300 bg-white dark:bg-slate-800">
+              <CardHeader>
+                <div className="w-12 h-12 bg-gradient-to-br from-warning to-warning/80 rounded-xl flex items-center justify-center mb-4">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+                <CardTitle className="text-2xl font-bold text-foreground">Family Access Seats</CardTitle>
+                <div className="text-3xl font-bold text-warning">{formattedSeatPrice}<span className="text-base font-normal text-muted-foreground">/month per seat</span></div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 mb-6">
+                  {["Instant SOS alert notifications", "Live emergency location access", "'Received & On It' responses", "Emergency coordination tools", "Max 5 family members", "Owner or invitee pays option"].map((feature, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <Check className="h-5 w-5 text-warning" />
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                <Button asChild variant="outline" className="w-full border-warning text-warning hover:bg-warning hover:text-white">
+                  <Link to="/family-access-setup">Setup Family Access</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Summary */}
+      <section className="py-20 bg-gradient-to-br from-emergency/5 via-primary/5 to-wellness/5">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center bg-emergency/10 rounded-full px-4 py-2 mb-6 border border-emergency/20">
+              <Heart className="h-4 w-4 text-emergency mr-2" />
+              <span className="text-sm font-medium text-emergency">Peace of Mind for Everyone</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
+              What Your Family Gets
+            </h2>
+            <div className="grid md:grid-cols-2 gap-4 mb-12">
+              {realBenefits.map((benefit, index) => (
+                <div key={index} className="flex items-center gap-3 text-left">
+                  <Check className="h-5 w-5 text-emergency flex-shrink-0" />
+                  <span className="text-muted-foreground">{benefit}</span>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 asChild
-                size="xl" 
-                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-2xl transform hover:scale-105 transition-all duration-300 font-bold text-lg px-10 py-5 rounded-2xl border-2 border-wellness-glow/20"
+                size="lg" 
+                className="bg-emergency text-white hover:bg-emergency/90 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
               >
-                  <Link to="/ai-register">
-                    <UserPlus className="mr-3 h-6 w-6" />
-                    {t('familyCarerAccess.page.startFamilyNetwork')}
-                  </Link>
-                </Button>
-                <Button 
-                  asChild
-                  size="xl" 
-                  variant="outline" 
-                  className="border-2 border-wellness text-wellness hover:bg-wellness hover:text-black shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-bold text-lg px-10 py-5 rounded-2xl"
-                >
-                  <Link to="/#pricing">
-                    <Shield className="mr-3 h-6 w-6" />
-                    {t('familyCarerAccess.page.viewPricingPlans')}
-                  </Link>
+                <Link to="/family-access-setup">
+                  <UserPlus className="mr-2 h-5 w-5" />
+                  Start Family Setup
+                </Link>
+              </Button>
+              <Button 
+                asChild
+                size="lg" 
+                variant="outline" 
+                className="border-emergency text-emergency hover:bg-emergency hover:text-white"
+              >
+                <Link to="/dashboard/family">
+                  <Users className="mr-2 h-5 w-5" />
+                  Manage Family Access
+                </Link>
               </Button>
             </div>
           </div>
