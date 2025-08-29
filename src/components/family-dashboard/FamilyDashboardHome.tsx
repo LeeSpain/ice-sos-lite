@@ -24,27 +24,65 @@ const FamilyDashboardHome = () => {
   const { toast } = useToast();
   
   const [activeSOSEvents, setActiveSOSEvents] = useState<any[]>([]);
-  const [familyMembers, setFamilyMembers] = useState<any[]>([]);
+  const [ownerProfile, setOwnerProfile] = useState<any>(null);
+  const [familyGroup, setFamilyGroup] = useState<any>(null);
   const [recentAlerts, setRecentAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // TEMPORARY: Load dashboard data without family role check to prevent infinite loading
-    loadDashboardData();
-  }, []);
+    if (familyRole?.familyGroupId) {
+      loadDashboardData();
+    } else {
+      setIsLoading(false);
+    }
+  }, [familyRole]);
 
   const loadDashboardData = async () => {
+    if (!familyRole?.familyGroupId) return;
+
     try {
-      // TEMPORARY: Load demo data to fix spinning issue
-      // In production, this would load actual family data
-      setActiveSOSEvents([]);
-      setFamilyMembers([
-        { id: '1', user_id: user?.id, profiles: { first_name: 'Demo', last_name: 'User' } }
-      ]);
-      setRecentAlerts([]);
+      // Load family group and owner details
+      const { data: groupData } = await supabase
+        .from('family_groups')
+        .select(`
+          *,
+          owner_profile:profiles!family_groups_owner_user_id_fkey(*)
+        `)
+        .eq('id', familyRole.familyGroupId)
+        .single();
+
+      if (groupData) {
+        setFamilyGroup(groupData);
+        setOwnerProfile(groupData.owner_profile);
+      }
+
+      // Load active SOS events for the family group
+      const { data: sosEvents } = await supabase
+        .from('sos_events')
+        .select('*')
+        .eq('group_id', familyRole.familyGroupId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      setActiveSOSEvents(sosEvents || []);
+
+      // Load recent family alerts
+      const { data: alerts } = await supabase
+        .from('family_alerts')
+        .select('*')
+        .eq('family_user_id', user?.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      setRecentAlerts(alerts || []);
 
     } catch (error) {
       console.error('Error loading dashboard data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load family emergency information",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -92,13 +130,25 @@ const FamilyDashboardHome = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Family Emergency Dashboard</h1>
-          <p className="text-muted-foreground">Stay connected with your family's safety</p>
+          <h1 className="text-2xl font-bold">
+            {ownerProfile ? `${ownerProfile.first_name}'s Emergency Dashboard` : 'Family Emergency Dashboard'}
+          </h1>
+          <p className="text-muted-foreground">
+            {ownerProfile ? `Connected to ${ownerProfile.first_name} ${ownerProfile.last_name}'s emergency system` : 'Stay connected with your family\'s safety'}
+          </p>
         </div>
-        <Badge variant="outline" className="gap-2">
-          <Heart className="h-3 w-3" />
-          Family Member
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="gap-2">
+            <Heart className="h-3 w-3" />
+            {familyRole?.role === 'owner' ? 'Account Owner' : 'Family Access'}
+          </Badge>
+          {ownerProfile && (
+            <Badge variant="secondary" className="gap-2">
+              <Shield className="h-3 w-3" />
+              Protected by {ownerProfile.first_name}'s Plan
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Active SOS Events - Critical Priority */}
@@ -197,11 +247,22 @@ const FamilyDashboardHome = () => {
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Total Members:</span>
-                <Badge variant="outline">{familyMembers.length + 1}</Badge>
+                <span className="text-sm">Owner:</span>
+                <Badge variant="outline">
+                  {ownerProfile ? `${ownerProfile.first_name} ${ownerProfile.last_name}` : 'Loading...'}
+                </Badge>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Your Access:</span>
+                <Badge variant="outline" className="text-blue-600 border-blue-300">
+                  {familyRole?.role === 'owner' ? 'Full Access' : 'Emergency Monitor'}
+                </Badge>
               </div>
               <div className="text-xs text-muted-foreground">
-                Includes you + {familyMembers.length} family member{familyMembers.length !== 1 ? 's' : ''}
+                {familyRole?.role === 'owner' 
+                  ? 'You own this emergency protection plan'
+                  : `Connected to ${ownerProfile?.first_name || 'owner'}'s emergency account`
+                }
               </div>
               <Button 
                 variant="outline" 
