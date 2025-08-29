@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import TrainingManager from '@/components/admin/TrainingManager';
 
 interface TrainingDataItem {
   id: string;
@@ -350,52 +351,7 @@ const AIAgentPage: React.FC = () => {
 
         {/* Training Data Tab */}
         <TabsContent value="training" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Emma's Training Data & Knowledge Base
-              </CardTitle>
-              <CardDescription>
-                Manage Emma's knowledge base with {trainingData.length} active training entries
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Training Data List */}
-              <div>
-                <h3 className="text-sm font-medium mb-4">Current Training Data</h3>
-                <ScrollArea className="h-64">
-                  <div className="space-y-3">
-                    {trainingData.map((item) => (
-                      <div key={item.id} className="border rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant="secondary">{item.category}</Badge>
-                              <Badge variant="outline">Score: {item.confidence_score}</Badge>
-                              {item.usage_count && item.usage_count > 0 && (
-                                <Badge variant="outline">Used: {item.usage_count}x</Badge>
-                              )}
-                            </div>
-                            <h4 className="font-medium text-sm mb-2">{item.question}</h4>
-                            <p className="text-sm text-muted-foreground">{item.answer.substring(0, 150)}...</p>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button variant="ghost" size="sm">
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-            </CardContent>
-          </Card>
+          <TrainingManager compact />
         </TabsContent>
 
         {/* Performance Tab */}
