@@ -108,7 +108,7 @@ const FamilyCarerAccessPage = () => {
     "Coordinate who's responding to avoid confusion",
     "Complete privacy - no tracking outside emergencies",
     "Simple €2.99/month per family member",
-    "Max 5 family members per account"
+    "Unlimited family members"
   ];
 
   const getIconColor = (color: string) => {
@@ -304,56 +304,64 @@ const FamilyCarerAccessPage = () => {
               Family Access Pricing
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Transparent pricing with no hidden fees. Add family members to your emergency system for just {formattedSeatPrice} per month each.
+              Add unlimited family members to your emergency system for just {formattedSeatPrice} per month each.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {/* Member Plan */}
-            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-all duration-300 bg-white dark:bg-slate-800">
-              <CardHeader>
-                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center mb-4">
-                  <Shield className="h-6 w-6 text-white" />
+          {/* Single Centered Family Access Card */}
+          <div className="max-w-2xl mx-auto">
+            <Card className="relative border-3 border-warning/30 hover:border-warning/50 transition-all duration-500 bg-white dark:bg-slate-800 shadow-xl hover:shadow-2xl overflow-hidden group">
+              {/* Top accent bar */}
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-warning to-warning/60"></div>
+              
+              {/* Popular badge */}
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                <Badge className="bg-warning text-white px-4 py-1 font-semibold shadow-lg">
+                  Most Popular
+                </Badge>
+              </div>
+              
+              <CardHeader className="text-center pt-10 pb-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-warning to-warning/80 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-10 w-10 text-white" />
                 </div>
-                <CardTitle className="text-2xl font-bold text-foreground">Member Plan</CardTitle>
-                <div className="text-3xl font-bold text-primary">{formattedMemberPrice}<span className="text-base font-normal text-muted-foreground">/month</span></div>
+                <CardTitle className="text-3xl md:text-4xl font-bold text-foreground mb-2">Family Access Seats</CardTitle>
+                <div className="text-5xl md:text-6xl font-bold text-warning mb-2">{formattedSeatPrice}</div>
+                <p className="text-lg text-muted-foreground">per family member per month</p>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3 mb-6">
-                  {["5 emergency call-only contacts", "SOS emergency system", "Location sharing during SOS", "Emergency services integration", "Basic family coordination"].map((feature, index) => (
+              
+              <CardContent className="px-8 pb-8">
+                <div className="grid md:grid-cols-2 gap-4 mb-8">
+                  {[
+                    "Instant SOS alert notifications", 
+                    "Live emergency location access", 
+                    "'Received & On It' responses", 
+                    "Emergency coordination tools", 
+                    "Unlimited family members", 
+                    "Owner or invitee pays option"
+                  ].map((feature, index) => (
                     <div key={index} className="flex items-center gap-3">
-                      <Check className="h-5 w-5 text-primary" />
-                      <span className="text-sm">{feature}</span>
+                      <Check className="h-6 w-6 text-warning flex-shrink-0" />
+                      <span className="text-base font-medium text-foreground">{feature}</span>
                     </div>
                   ))}
                 </div>
-                <Button asChild className="w-full bg-primary hover:bg-primary/90">
-                  <Link to="/ai-register">Get Member Plan</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Family Seats */}
-            <Card className="border-2 border-warning/20 hover:border-warning/40 transition-all duration-300 bg-white dark:bg-slate-800">
-              <CardHeader>
-                <div className="w-12 h-12 bg-gradient-to-br from-warning to-warning/80 rounded-xl flex items-center justify-center mb-4">
-                  <Users className="h-6 w-6 text-white" />
+                
+                <div className="text-center space-y-4">
+                  <Button 
+                    asChild 
+                    size="xl" 
+                    className="w-full bg-warning hover:bg-warning/90 text-white font-bold text-lg py-4 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-xl border-2 border-warning/20"
+                  >
+                    <Link to="/ai-register">
+                      <Users className="mr-3 h-6 w-6" />
+                      Start Family Emergency Access
+                    </Link>
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    No setup fees • Cancel anytime • 30-day money-back guarantee
+                  </p>
                 </div>
-                <CardTitle className="text-2xl font-bold text-foreground">Family Access Seats</CardTitle>
-                <div className="text-3xl font-bold text-warning">{formattedSeatPrice}<span className="text-base font-normal text-muted-foreground">/month per seat</span></div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 mb-6">
-                  {["Instant SOS alert notifications", "Live emergency location access", "'Received & On It' responses", "Emergency coordination tools", "Max 5 family members", "Owner or invitee pays option"].map((feature, index) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <Check className="h-5 w-5 text-warning" />
-                      <span className="text-sm">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-                <Button asChild variant="outline" className="w-full border-warning text-warning hover:bg-warning hover:text-white">
-                  <Link to="/ai-register">Join ICE SOS</Link>
-                </Button>
               </CardContent>
             </Card>
           </div>
