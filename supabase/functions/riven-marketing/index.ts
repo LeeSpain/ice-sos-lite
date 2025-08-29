@@ -21,6 +21,34 @@ serve(async (req) => {
   }
 
   try {
+    console.log('📡 Received request:', {
+      method: req.method,
+      url: req.url,
+      hasBody: req.body !== null
+    });
+
+    // Parse request body first to check action
+    const requestBody = await req.json();
+    const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls, prompt, contentId } = requestBody;
+
+    // For provider_status, we don't need authentication - just return the provider status
+    if (action === 'provider_status') {
+      console.log('🔍 Provider status check - no auth required');
+      return new Response(JSON.stringify({
+        success: true,
+        providers: {
+          openai: !!openaiApiKey,
+          xai: !!xaiApiKey,
+        },
+        debug: {
+          openai_configured: !!openaiApiKey,
+          xai_configured: !!xaiApiKey,
+          action: 'provider_status'
+        }
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
+
+    // For all other actions, require authentication
     // Get authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -49,28 +77,6 @@ serve(async (req) => {
     }
 
     console.log('✅ User authenticated:', user.id);
-
-    // Parse request body first to check action
-    const requestBody = await req.json();
-    const { command, action, campaign_id, workflow_id, settings, scheduling_options, publishing_controls, prompt, contentId } = requestBody;
-
-    // For provider_status, we don't need admin check - just return the provider status
-    if (action === 'provider_status') {
-      console.log('🔍 Provider status check - bypassing admin verification');
-      return new Response(JSON.stringify({
-        success: true,
-        providers: {
-          openai: !!openaiApiKey,
-          xai: !!xaiApiKey,
-        },
-        debug: {
-          openai_configured: !!openaiApiKey,
-          xai_configured: !!xaiApiKey,
-          user_id: user.id,
-          action: 'provider_status'
-        }
-      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
 
     // For other actions, check if user is admin
     console.log('🔍 Checking admin status for user:', user.id);
