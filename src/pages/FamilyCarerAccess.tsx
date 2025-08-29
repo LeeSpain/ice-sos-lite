@@ -134,26 +134,26 @@ const FamilyCarerAccessPage = () => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative pt-20 pb-16 bg-gradient-to-br from-emergency/5 via-primary/5 to-wellness/10 overflow-hidden">
-        <div className="container mx-auto px-4">
+      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
+        <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Content */}
-            <div className="text-center lg:text-left animate-fade-in">
-              <div className="inline-flex items-center space-x-2 bg-emergency/10 rounded-full px-4 py-2 mb-6 border border-emergency/20">
-                <Users className="h-4 w-4 text-emergency" />
-                <span className="text-sm font-medium text-emergency">Family Emergency Access</span>
+            <div className="text-center lg:text-left text-white animate-fade-in">
+              <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
+                <Users className="h-4 w-4 text-emergency-glow" />
+                <span className="text-sm font-medium text-white">Family Emergency Access</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-foreground">
-                Connect Your <span className="text-emergency">Family</span> to Your Emergency System
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                Connect Your <span className="text-wellness drop-shadow-md">Family</span> to Your Emergency System
               </h1>
-              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+              <p className="text-xl md:text-2xl text-white/90 max-w-3xl lg:max-w-none mx-auto mb-8 leading-relaxed font-medium drop-shadow-sm">
                 Give your family instant access to your emergency alerts with location sharing during SOS events only. Complete privacy with emergency coordination when it matters most.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
                 <Button 
                   asChild 
-                  size="lg" 
-                  className="bg-emergency text-white hover:bg-emergency/90 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold"
+                  size="xl" 
+                  className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 >
                   <Link to="/family-access-setup">
                     <UserPlus className="mr-2 h-5 w-5" />
@@ -162,9 +162,8 @@ const FamilyCarerAccessPage = () => {
                 </Button>
                 <Button 
                   asChild 
-                  size="lg" 
-                  variant="outline"
-                  className="border-emergency text-emergency hover:bg-emergency hover:text-white"
+                  size="xl" 
+                  className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 >
                   <Link to="/dashboard/family">
                     <Shield className="mr-2 h-5 w-5" />
@@ -176,14 +175,16 @@ const FamilyCarerAccessPage = () => {
             
             {/* Hero Image */}
             <div className="relative animate-scale-in">
-              <OptimizedImage 
-                src="/lovable-uploads/0365334e-7587-4cf4-96a6-5744399b84b2.png" 
-                alt="Family emergency coordination system showing real-time alerts and location sharing"
-                className="w-full max-w-lg mx-auto rounded-2xl shadow-2xl"
-                priority={true}
-                sizes={getImageSizes('hero')}
-                blurDataURL={generateBlurPlaceholder(400, 600)}
-              />
+              <div className="relative z-10">
+                <OptimizedImage 
+                  src="/lovable-uploads/0365334e-7587-4cf4-96a6-5744399b84b2.png" 
+                  alt="Family emergency coordination system showing real-time alerts and location sharing"
+                  className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl hover-scale"
+                  priority={true}
+                  sizes={getImageSizes('hero')}
+                  blurDataURL={generateBlurPlaceholder(400, 600)}
+                />
+              </div>
             </div>
           </div>
         </div>
