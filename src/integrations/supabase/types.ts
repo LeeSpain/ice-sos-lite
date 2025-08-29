@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_notifications: {
+        Row: {
+          action_label: string | null
+          action_url: string | null
+          category: string
+          created_at: string
+          id: string
+          message: string
+          metadata: Json | null
+          priority: string
+          read_at: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_label?: string | null
+          action_url?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          message: string
+          metadata?: Json | null
+          priority?: string
+          read_at?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_label?: string | null
+          action_url?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          message?: string
+          metadata?: Json | null
+          priority?: string
+          read_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_model_settings: {
         Row: {
           created_at: string

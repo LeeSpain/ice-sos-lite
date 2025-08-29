@@ -14,6 +14,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { EnhancedCommandCenter } from '@/components/admin/EnhancedCommandCenter';
+import { RivenCalendar } from '@/components/admin/RivenCalendar';
 import { 
   Send, 
   Settings, 
@@ -117,6 +119,19 @@ interface SchedulingOptions {
   spread_days?: number;
   test_percentage?: number;
   optimal_times?: boolean;
+}
+
+interface CommandConfiguration {
+  command: string;
+  totalPosts: number;
+  postsPerDay: number;
+  campaignDuration: number;
+  platforms: string[];
+  contentTypes: string[];
+  budget: number;
+  schedulingMode: string;
+  targetAudience: string;
+  urgency: string;
 }
 
 interface RivenConfiguration {
@@ -304,8 +319,10 @@ const RivenMarketingAI: React.FC = () => {
     }
   };
 
-  const sendCommandToRiven = async () => {
-    if (!currentCommand.trim()) {
+  const sendCommandToRiven = async (config?: CommandConfiguration) => {
+    const commandToUse = config?.command || currentCommand;
+    
+    if (!commandToUse.trim()) {
       toast({
         title: "Command Required",
         description: "Please enter a command for Riven to process.",
@@ -320,15 +337,25 @@ const RivenMarketingAI: React.FC = () => {
     const workflowId = crypto.randomUUID();
     setCurrentWorkflowId(workflowId);
 
+    // Create notification for new campaign
+    await createNotification(
+      'New Campaign Processing',
+      `Riven is processing your marketing command: "${commandToUse.substring(0, 50)}..."`,
+      'campaign',
+      'medium',
+      `/admin-dashboard/riven-marketing`
+    );
+
     try {
       const { data, error } = await supabase.functions.invoke('riven-marketing', {
         body: {
-          command: currentCommand,
+          command: commandToUse,
           action: 'process_command',
           workflow_id: workflowId,
           scheduling_options: schedulingOptions,
           publishing_controls: publishingControls,
-          settings: rivenConfig
+          settings: rivenConfig,
+          campaign_config: config
         }
       });
 
@@ -339,6 +366,16 @@ const RivenMarketingAI: React.FC = () => {
       if (data.campaign_created) {
         await loadCampaigns();
         setActiveTab('campaigns');
+        
+        // Create notification for campaign completion
+        await createNotification(
+          'Campaign Created Successfully',
+          `New marketing campaign "${data.campaign_title || 'Untitled'}" has been created and is ready for review.`,
+          'campaign',
+          'low',
+          `/admin-dashboard/riven-marketing`,
+          'Review Campaign'
+        );
       }
 
       // Auto-generate content if enabled
@@ -346,6 +383,16 @@ const RivenMarketingAI: React.FC = () => {
         setTimeout(() => {
           generateContent(data.campaign_id);
         }, 1000);
+      } else if (data.campaign_created) {
+        // Create notification for approval needed
+        await createNotification(
+          'Campaign Awaiting Approval',
+          `Your new marketing campaign is ready and needs approval before content generation can begin.`,
+          'approval',
+          'high',
+          `/admin-dashboard/riven-marketing`,
+          'Approve Campaign'
+        );
       }
 
       toast({
@@ -359,6 +406,14 @@ const RivenMarketingAI: React.FC = () => {
         description: "Failed to process command. Please try again.",
         variant: "destructive",
       });
+      
+      // Create error notification
+      await createNotification(
+        'Campaign Processing Failed',
+        `Error processing your marketing command: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'error',
+        'high'
+      );
     } finally {
       setIsProcessing(false);
     }
@@ -377,12 +432,32 @@ const RivenMarketingAI: React.FC = () => {
       if (error) throw error;
 
       await loadContents();
+      
+      // Create notification for content generation completion
+      await createNotification(
+        'Content Generation Complete',
+        `Marketing content has been generated for your campaign and is ready for review and approval.`,
+        'content',
+        'medium',
+        `/admin-dashboard/riven-marketing`,
+        'Review Content'
+      );
+      
       toast({
         title: "Content Generated",
         description: "Marketing content created and ready for review!",
       });
     } catch (error) {
       console.error('Error generating content:', error);
+      
+      // Create error notification
+      await createNotification(
+        'Content Generation Failed',
+        `Failed to generate content for your campaign: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'error',
+        'high'
+      );
+      
       toast({
         title: "Error",
         description: "Failed to generate content. Please try again.",
@@ -466,12 +541,61 @@ const RivenMarketingAI: React.FC = () => {
       // Simulate publishing to social platform
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // Update content status to published
+      const { error } = await supabase
+        .from('marketing_content')
+        .update({ 
+          status: 'published',
+          published_at: new Date().toISOString()
+        })
+        .eq('id', contentId);
+
+      if (error) throw error;
+      await loadContents();
+      
       toast({
         title: "Content Published",
         description: "Content has been successfully posted to social media!",
       });
     } catch (error) {
       console.error('Error publishing content:', error);
+      
+      // Create error notification for publish failure
+      await createNotification(
+        'Publishing Failed',
+        `Failed to publish content to social media: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'error',
+        'high',
+        `/admin-dashboard/riven-marketing`,
+        'Retry Publishing'
+      );
+    }
+  };
+
+  const createNotification = async (
+    title: string,
+    message: string,
+    category: string = 'general',
+    priority: string = 'medium',
+    actionUrl?: string,
+    actionLabel?: string
+  ) => {
+    try {
+      const { error } = await supabase
+        .from('admin_notifications')
+        .insert({
+          user_id: (await supabase.auth.getUser()).data.user?.id,
+          title,
+          message,
+          category,
+          priority,
+          action_url: actionUrl,
+          action_label: actionLabel
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error creating notification:', error);
     }
   };
 
@@ -742,8 +866,9 @@ const RivenMarketingAI: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="command-center">Command Center</TabsTrigger>
+          <TabsTrigger value="calendar">Calendar</TabsTrigger>
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="content">Content Library</TabsTrigger>
           <TabsTrigger value="social-accounts">Social Accounts</TabsTrigger>
@@ -751,10 +876,27 @@ const RivenMarketingAI: React.FC = () => {
         </TabsList>
 
         {/* Command Center Tab */}
-        <TabsContent value="command-center" className="space-y-4">
+        <TabsContent value="command-center" className="space-y-6">
+          <EnhancedCommandCenter
+            currentCommand={currentCommand}
+            setCurrentCommand={setCurrentCommand}
+            isProcessing={isProcessing}
+            onSendCommand={(config) => sendCommandToRiven(config)}
+            commandTemplates={commandTemplates}
+            useTemplate={useTemplate}
+            rivenResponse={rivenResponse}
+          />
+        </TabsContent>
+
+        {/* Calendar Tab */}
+        <TabsContent value="calendar" className="space-y-6">
+          <RivenCalendar />
+        </TabsContent>
+
+        {/* Legacy Card for continuity */}
+        <TabsContent value="legacy-command" className="space-y-4">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2 space-y-4">
-              {/* Command Input */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -799,7 +941,7 @@ const RivenMarketingAI: React.FC = () => {
 
                   <div className="flex gap-2">
                     <Button 
-                      onClick={sendCommandToRiven} 
+                      onClick={() => sendCommandToRiven()} 
                       disabled={isProcessing || !currentCommand.trim()}
                       className="flex-1"
                       size="lg"

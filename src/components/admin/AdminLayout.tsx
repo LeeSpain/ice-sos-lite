@@ -38,6 +38,7 @@ import {
   Video
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
+import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
 
 const adminMenuItems = [
   {
@@ -208,7 +209,10 @@ export default function AdminLayout() {
                 <p className="text-xs text-muted-foreground">ICE SOS Lite Management Portal</p>
               </div>
             </div>
-            <div className="ml-auto"><LanguageCurrencySelector compact /></div>
+            <div className="ml-auto flex items-center gap-4">
+              <AdminNotificationCenter />
+              <LanguageCurrencySelector compact />
+            </div>
           </header>
           <main className="flex-1 p-6 bg-gradient-to-br from-background via-background to-muted/5">
             <Outlet />
