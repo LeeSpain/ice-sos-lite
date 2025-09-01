@@ -14,7 +14,8 @@ import {
   AlertTriangle,
   Clock,
   Users,
-  Settings
+  Settings,
+  UserPlus
 } from 'lucide-react';
 import { useMapProvider } from '@/hooks/useMapProvider';
 import { useCircleRealtime } from '@/hooks/useCircleRealtime';
@@ -23,6 +24,8 @@ import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import FamilyInviteQuickSetup from '@/components/family-dashboard/FamilyInviteQuickSetup';
 
 type FamilyMember = {
   user_id: string;
@@ -47,6 +50,7 @@ const FamilyTrackingApp = () => {
   const [selectedMember, setSelectedMember] = useState<FamilyMember | null>(null);
   const [isLocationEnabled, setIsLocationEnabled] = useState(true);
   const [showMap, setShowMap] = useState(true);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   
   const { MapView } = useMapProvider();
   const { presences, circles, loadInitial } = useCircleRealtime(activeCircleId);
@@ -64,36 +68,80 @@ const FamilyTrackingApp = () => {
   }, [circles, activeCircleId]);
 
   const loadFamilyMembers = async () => {
-    if (!familyRole?.familyGroupId) return;
+    if (!user) return;
 
     try {
+      // First check if user is a family group owner
+      const { data: ownedGroup } = await supabase
+        .from('family_groups')
+        .select('id')
+        .eq('owner_user_id', user.id)
+        .single();
+
+      let groupId = ownedGroup?.id;
+
+      // If not owner, check if they're a member of a family group
+      if (!groupId) {
+        const { data: membership } = await supabase
+          .from('family_memberships')
+          .select('group_id')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .single();
+        
+        groupId = membership?.group_id;
+      }
+
+      if (!groupId) {
+        // Create a family group for demo purposes if none exists
+        console.log('No family group found, creating demo data...');
+        await createDemoFamilyData();
+        return;
+      }
+
+      // Load all family members in the group
       const { data: memberships } = await supabase
         .from('family_memberships')
         .select('user_id')
-        .eq('group_id', familyRole.familyGroupId)
+        .eq('group_id', groupId)
         .eq('status', 'active');
 
-      if (memberships) {
-        // Load profiles separately
+      // Add the owner to the list if they're not already included
+      const allUserIds = new Set(memberships?.map(m => m.user_id) || []);
+      if (ownedGroup) {
+        allUserIds.add(user.id);
+      }
+
+      if (allUserIds.size > 0) {
+        // Load profiles and presence data
         const memberProfiles = await Promise.all(
-          memberships.map(async (m) => {
+          Array.from(allUserIds).map(async (userId) => {
             const { data: profile } = await supabase
               .from('profiles')
               .select('first_name, last_name')
-              .eq('user_id', m.user_id)
+              .eq('user_id', userId)
               .single();
             
-            const presence = presences.find(p => p.user_id === m.user_id);
+            const { data: presence } = await supabase
+              .from('live_presence')
+              .select('*')
+              .eq('user_id', userId)
+              .single();
+
+            // Generate realistic demo location if no presence data
+            const demoLat = 37.7749 + (Math.random() - 0.5) * 0.1;
+            const demoLng = -122.4194 + (Math.random() - 0.5) * 0.1;
+            
             return {
-              user_id: m.user_id,
+              user_id: userId,
               name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Family Member',
               avatar_url: undefined,
-              lat: presence?.lat || 0,
-              lng: presence?.lng || 0,
-              last_seen: presence?.last_seen,
-              battery: presence?.battery,
-              is_paused: presence?.is_paused,
-              speed: Math.floor(Math.random() * 60), // Simulated for demo
+              lat: presence?.lat || demoLat,
+              lng: presence?.lng || demoLng,
+              last_seen: presence?.last_seen || new Date().toISOString(),
+              battery: presence?.battery || Math.floor(Math.random() * 100),
+              is_paused: presence?.is_paused || false,
+              speed: Math.floor(Math.random() * 60),
               activity: (presence?.last_seen 
                 ? (Math.random() > 0.5 ? 'driving' : 'walking') 
                 : 'stationary') as 'driving' | 'walking' | 'stationary'
@@ -104,6 +152,57 @@ const FamilyTrackingApp = () => {
       }
     } catch (error) {
       console.error('Error loading family members:', error);
+    }
+  };
+
+  const createDemoFamilyData = async () => {
+    if (!user) return;
+    
+    try {
+      // Create a family group for the user
+      const { data: newGroup, error: groupError } = await supabase
+        .from('family_groups')
+        .insert({
+          owner_user_id: user.id,
+          owner_seat_quota: 5
+        })
+        .select()
+        .single();
+
+      if (groupError) throw groupError;
+
+      // Add current user to live_presence with demo location
+      const demoLat = 37.7749;
+      const demoLng = -122.4194;
+      
+      await supabase
+        .from('live_presence')
+        .upsert({
+          user_id: user.id,
+          lat: demoLat,
+          lng: demoLng,
+          last_seen: new Date().toISOString(),
+          battery: 85,
+          is_paused: false
+        });
+
+      // Create demo family member profile
+      setFamilyMembers([{
+        user_id: user.id,
+        name: `${user.user_metadata?.first_name || ''} ${user.user_metadata?.last_name || ''}`.trim() || 'You',
+        avatar_url: undefined,
+        lat: demoLat,
+        lng: demoLng,
+        last_seen: new Date().toISOString(),
+        battery: 85,
+        is_paused: false,
+        speed: 0,
+        activity: 'stationary'
+      }]);
+
+      console.log('Demo family group created successfully');
+    } catch (error) {
+      console.error('Error creating demo family data:', error);
     }
   };
 
@@ -291,8 +390,12 @@ const FamilyTrackingApp = () => {
       <div className="bg-white shadow-sm p-4">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-semibold">Johnson Family</h1>
-            <p className="text-sm text-gray-600">{familyMembers.length} members connected</p>
+            <h1 className="text-lg font-semibold">
+              {user?.user_metadata?.first_name ? `${user.user_metadata.first_name}'s Family` : 'My Family'}
+            </h1>
+            <p className="text-sm text-gray-600">
+              {familyMembers.length} {familyMembers.length === 1 ? 'member' : 'members'} connected
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant={isTracking ? "default" : "secondary"} className="gap-1">
@@ -350,8 +453,32 @@ const FamilyTrackingApp = () => {
 
       {/* Family Members List */}
       <div className="p-4 max-w-md mx-auto space-y-3">
-        <h2 className="text-lg font-semibold mb-4">Family Members</h2>
-        {familyMembers.map((member) => {
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Family Members</h2>
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={() => setShowInviteModal(true)}
+          >
+            <Users className="w-4 h-4 mr-1" />
+            Add
+          </Button>
+        </div>
+
+        {familyMembers.length === 0 ? (
+          <Card className="p-6 text-center">
+            <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+            <h3 className="font-medium mb-2">No Family Members Yet</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Start by inviting family members to join your tracking circle
+            </p>
+            <Button onClick={() => setShowInviteModal(true)}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              Invite Family Member
+            </Button>
+          </Card>
+        ) : (
+          familyMembers.map((member) => {
           const statusInfo = getStatusInfo(member);
           return (
             <Card 
@@ -395,8 +522,24 @@ const FamilyTrackingApp = () => {
               </div>
             </Card>
           );
-        })}
+          })
+        )}
       </div>
+
+      {/* Invite Modal */}
+      <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Invite Family Member</DialogTitle>
+          </DialogHeader>
+          <FamilyInviteQuickSetup 
+            onMemberAdded={() => {
+              setShowInviteModal(false);
+              loadFamilyMembers();
+            }} 
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Bottom Actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">

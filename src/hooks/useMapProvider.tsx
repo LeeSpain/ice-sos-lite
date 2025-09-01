@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { supabase } from "@/integrations/supabase/client";
 
 interface MapMarker {
   id: string;
@@ -21,12 +22,35 @@ export function useMapProvider() {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const markersRef = useRef<mapboxgl.Marker[]>([]);
+    const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+    const [tokenError, setTokenError] = useState<string | null>(null);
+
+    // Fetch Mapbox token
+    useEffect(() => {
+      const fetchMapboxToken = async () => {
+        try {
+          const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+          if (error) throw error;
+          
+          if (data?.token) {
+            setMapboxToken(data.token);
+            mapboxgl.accessToken = data.token;
+          } else {
+            throw new Error('No token received');
+          }
+        } catch (error) {
+          console.error('Failed to fetch Mapbox token:', error);
+          setTokenError('Failed to load map token');
+          // Fallback to demo token for development
+          mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbTJ1NGRvN3UwM3d6MnNxcGhoOWJhd2ZwIn0.XSoLIv1rDp_bRgVS3KJ5-g';
+        }
+      };
+      
+      fetchMapboxToken();
+    }, []);
 
     useEffect(() => {
-      if (!mapContainer.current) return;
-
-      // Initialize Mapbox
-      mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbTJ1NGRvN3UwM3d6MnNxcGhoOWJhd2ZwIn0.XSoLIv1rDp_bRgVS3KJ5-g';
+      if (!mapContainer.current || !mapboxgl.accessToken) return;
       
       // Calculate center from markers or use provided center
       const mapCenter = center || (markers.length > 0 ? {
@@ -103,6 +127,17 @@ export function useMapProvider() {
         map.current.fitBounds(bounds, { padding: 50 });
       }
     }, [markers]);
+
+    if (tokenError) {
+      return (
+        <div className={`${className || "h-full w-full"} flex items-center justify-center bg-muted`} style={{ minHeight: '400px' }}>
+          <div className="text-center p-4">
+            <p className="text-destructive font-medium">Map Error</p>
+            <p className="text-sm text-muted-foreground">{tokenError}</p>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div 
