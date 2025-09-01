@@ -13,6 +13,11 @@ import Index from "./pages/Index";
 import Blog from "./pages/Blog";
 import AuthPage from "./pages/AuthPage";
 
+// Live Map Pages
+import MapScreen from "./pages/MapScreen";
+import MyCirclesPage from "./pages/MyCirclesPage";
+import PlacesManager from "./pages/PlacesManager";
+
 import AIRegister from "./pages/AIRegister";
 import Contact from "./pages/Contact";
 import Videos from "./pages/Videos";
@@ -203,6 +208,29 @@ const App = () => {
               <Route path="/family-invite/:token" element={
                 <OptimizedSuspense skeletonType="card">
                   <FamilyInviteAccept />
+                </OptimizedSuspense>
+              } />
+
+              {/* Live Map Routes */}
+              <Route path="/map" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <MapScreen />
+                  </ProtectedRoute>
+                </OptimizedSuspense>
+              } />
+              <Route path="/circles" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <MyCirclesPage />
+                  </ProtectedRoute>
+                </OptimizedSuspense>
+              } />
+              <Route path="/places" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <PlacesManager />
+                  </ProtectedRoute>
                 </OptimizedSuspense>
               } />
 

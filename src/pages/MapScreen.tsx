@@ -84,14 +84,27 @@ export default function MapScreen() {
     }
   };
 
-  const triggerSOS = () => {
-    // TODO: Integrate with existing SOS system
-    toast({
-      title: "SOS Triggered",
-      description: "Emergency alert sent to your family circle.",
-      variant: "destructive"
-    });
-    console.log("SOS triggered for circle:", activeCircleId);
+  const triggerSOS = async () => {
+    try {
+      // Import and use existing SOS hook
+      const { useEmergencySOS } = await import("@/hooks/useEmergencySOS");
+      const { triggerEmergencySOS } = useEmergencySOS();
+      
+      await triggerEmergencySOS();
+      
+      toast({
+        title: "🚨 Family SOS Triggered",
+        description: "Emergency alert sent to your family circle with current location.",
+        variant: "destructive"
+      });
+    } catch (error) {
+      console.error("SOS error:", error);
+      toast({
+        title: "SOS Failed", 
+        description: "Failed to send emergency alert. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (

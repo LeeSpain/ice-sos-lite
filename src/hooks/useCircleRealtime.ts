@@ -92,8 +92,8 @@ export function useCircleRealtime(activeCircleId: string | null) {
         .select("*")
         .in("user_id", members.map(m => m.user_id));
 
-      if (error) {
-        console.error("Error loading presence:", error);
+      if (presenceError) {
+        console.error("Error loading presence:", presenceError);
         return;
       }
 
