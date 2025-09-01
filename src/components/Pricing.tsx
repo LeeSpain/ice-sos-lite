@@ -235,50 +235,25 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         <h3 className="text-xl md:text-2xl font-bold mb-2">
                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
                         </h3>
-                        <p className="text-base text-muted-foreground mb-4">
-                          {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
-                        </p>
-                        <div className="mb-6">
-                          <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
-                          <span className="text-muted-foreground text-base">/{selectedPlan.billing_interval}</span>
-                        </div>
-                        
-                        {/* Additional Details Section */}
-                        <div className="bg-gradient-to-r from-primary/5 to-guardian/5 rounded-xl p-4 mb-6 border border-primary/10">
-                          <h4 className="font-semibold text-sm mb-3 text-foreground">What's Included:</h4>
-                          <div className="grid grid-cols-2 gap-3 text-xs">
-                            <div className="flex items-center gap-2">
-                              <Brain className="h-3 w-3 text-primary" />
-                              <span>AI Monitoring</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Shield className="h-3 w-3 text-guardian" />
-                              <span>24/7 Protection</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Users className="h-3 w-3 text-wellness" />
-                              <span>Family Network</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-3 w-3 text-emergency" />
-                              <span>GPS Tracking</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="bg-white/80 rounded-lg p-3 mb-6 border">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium">Setup Progress</span>
-                            <span className="text-xs text-primary">Ready in 2 mins</span>
-                          </div>
-                          <div className="flex space-x-1">
-                            <div className="flex-1 bg-primary h-1 rounded"></div>
-                            <div className="flex-1 bg-primary h-1 rounded"></div>
-                            <div className="flex-1 bg-primary h-1 rounded"></div>
-                            <div className="flex-1 bg-gray-200 h-1 rounded"></div>
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-1">Quick setup • No hardware required</p>
-                        </div>
+                         <p className="text-base text-muted-foreground mb-4">
+                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
+                         </p>
+                         
+                         {/* Extended Description */}
+                         <div className="mb-6 space-y-3">
+                           <p className="text-sm text-muted-foreground leading-relaxed">
+                             Advanced AI-powered emergency detection monitors your voice patterns, location changes, and safety status. 
+                             Automatically alerts your emergency contacts and professional responders when needed.
+                           </p>
+                           <p className="text-sm text-muted-foreground leading-relaxed">
+                             Includes real-time family tracking, smart geofencing, and 24/7 monitoring with instant emergency response coordination.
+                           </p>
+                         </div>
+                         
+                         <div className="mb-6">
+                           <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
+                           <span className="text-muted-foreground text-base">/{selectedPlan.billing_interval}</span>
+                         </div>
                       </div>
                       
                       <div className="flex flex-col gap-2">
