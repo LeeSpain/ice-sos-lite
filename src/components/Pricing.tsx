@@ -240,7 +240,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                          </p>
                          
                          {/* Extended Description */}
-                         <div className="mb-6 space-y-3">
+                         <div className="mb-6 space-y-2">
                            <p className="text-sm text-muted-foreground leading-relaxed">
                              Advanced AI-powered emergency detection monitors your voice patterns, location changes, and safety status. 
                              Automatically alerts your emergency contacts and professional responders when needed.
@@ -250,85 +250,50 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                            </p>
                          </div>
                          
-                         <div className="mb-6">
+                         <div className="mb-4">
                            <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
                            <span className="text-muted-foreground text-base">/{selectedPlan.billing_interval}</span>
                          </div>
-                      </div>
-                      
-                      <div className="flex flex-col gap-2">
-                        <Button 
-                          size="default"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                          asChild
-                        >
-                          <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
-                        </Button>
-                        
-                        <IntroVideoModal 
-                          defaultVideoId="overview"
-                          trigger={
-                            <Button 
-                              size="default"
-                              variant="outline"
-                              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                            >
-                              <Play className="h-4 w-4 mr-2" />
-                              Watch Intro Video
-                            </Button>
-                          }
-                        />
-                      </div>
-                    </div>
-                    
-                    {/* Plan Image - Right Side */}
-                    <div className="relative">
-                      <div className="bg-white/80 rounded-2xl p-4 shadow-xl border">
-                        <img
-                          src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
-                          alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
-                          className="w-full h-auto rounded-xl shadow-lg object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                        
-                        {/* Additional Info Panel Next to Image */}
-                        <div className="mt-4 space-y-3">
-                          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-3 border border-primary/20">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Brain className="h-4 w-4 text-primary" />
-                              <span className="font-semibold text-sm">AI-Powered</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">Intelligent emergency detection and response</p>
-                          </div>
-                          
-                          <div className="bg-gradient-to-r from-guardian/10 to-wellness/10 rounded-lg p-3 border border-guardian/20">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Shield className="h-4 w-4 text-guardian" />
-                              <span className="font-semibold text-sm">Global Coverage</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">Works in 180+ countries worldwide</p>
-                          </div>
-                          
-                          <div className="bg-gradient-to-r from-wellness/10 to-emergency/10 rounded-lg p-3 border border-wellness/20">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Users className="h-4 w-4 text-wellness" />
-                              <span className="font-semibold text-sm">Family Protected</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">Connect unlimited family members</p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Floating Feature Icons */}
-                      <div className="absolute -top-2 -left-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-primary/20 flex items-center justify-center">
-                        <Brain className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-guardian/20 flex items-center justify-center">
-                        <Shield className="h-6 w-6 text-guardian" />
-                      </div>
-                    </div>
-                  </div>
+                       </div>
+                       
+                       <div className="flex flex-col gap-2">
+                         <Button 
+                           size="default"
+                           className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                           asChild
+                         >
+                           <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
+                         </Button>
+                         
+                         <IntroVideoModal 
+                           defaultVideoId="overview"
+                           trigger={
+                             <Button 
+                               size="default"
+                               variant="outline"
+                               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                             >
+                               <Play className="h-4 w-4 mr-2" />
+                               Watch Intro Video
+                             </Button>
+                           }
+                         />
+                       </div>
+                     </div>
+                     
+                     {/* Plan Image - Right Side */}
+                     <div className="relative">
+                       <div className="bg-white/80 rounded-2xl p-4 shadow-xl border">
+                         <img
+                           src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
+                           alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
+                           className="w-full h-auto rounded-xl shadow-lg object-cover"
+                           loading="lazy"
+                           decoding="async"
+                         />
+                       </div>
+                     </div>
+                   </div>
                   
                   {/* Features - Bottom section */}
                   <div className="bg-white/80 rounded-2xl p-4 border">
