@@ -138,10 +138,38 @@ const AppPreviewSection: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Response Time */}
-                <div className="mt-8 text-center bg-white/80 rounded-xl p-4 border">
-                  <div className="text-2xl font-bold text-emergency mb-1">&lt; 30 seconds</div>
-                  <div className="text-sm text-muted-foreground">Average response time</div>
+                {/* Enhanced Response Metrics */}
+                <div className="mt-8 bg-gradient-to-br from-white via-emergency/5 to-primary/5 rounded-xl p-6 border shadow-lg">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-emergency mb-1">&lt; 15 sec</div>
+                      <div className="text-xs text-muted-foreground">AI Detection</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-primary mb-1">&lt; 30 sec</div>
+                      <div className="text-xs text-muted-foreground">Response Time</div>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="text-center p-2 bg-white/60 rounded-lg">
+                      <div className="text-lg font-bold text-wellness">99.8%</div>
+                      <div className="text-xs text-muted-foreground">Success Rate</div>
+                    </div>
+                    <div className="text-center p-2 bg-white/60 rounded-lg">
+                      <div className="text-lg font-bold text-guardian">24/7</div>
+                      <div className="text-xs text-muted-foreground">Monitoring</div>
+                    </div>
+                    <div className="text-center p-2 bg-white/60 rounded-lg">
+                      <div className="text-lg font-bold text-emergency">180+</div>
+                      <div className="text-xs text-muted-foreground">Countries</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <Shield className="h-3 w-3 text-primary" />
+                    <span>Professional Emergency Response Network</span>
+                  </div>
                 </div>
               </div>
 
