@@ -530,7 +530,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                             ? 'bg-gradient-to-br from-red-500 to-yellow-500'
                             : 'bg-gradient-to-br from-blue-500 to-purple-500'
                         }`}>
-                          <MapPin className="h-7 w-7 text-white" />
+                          <Phone className="h-7 w-7 text-white" />
                         </div>
                         <div>
                           <h3 className="text-2xl font-bold mb-2">
@@ -559,8 +559,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           }`}
                           asChild
                         >
-                          <Link to="/regional-center-spain">
-                            {t('pricing.selectPlan')}
+                          <Link to="/regional-center/spain">
+                            {t('pricing.selectPlan', { defaultValue: 'Select Plan' })}
                           </Link>
                         </Button>
                         
