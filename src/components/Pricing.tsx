@@ -410,7 +410,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                             className="bg-blue-500 hover:bg-blue-500/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                             asChild
                           >
-                            <Link to="/device-ice-sos-pendant">
+                            <Link to="/devices/ice-sos-pendant">
                               Find Out More
                             </Link>
                           </Button>
