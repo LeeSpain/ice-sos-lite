@@ -510,7 +510,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                   <Badge className={`text-white text-sm px-4 py-2 shadow-lg border-0 ${
                     service.name === 'Call Centre Spain' ? 'bg-red-600' : 'bg-blue-600'
                   }`}>
-                    <MapPin className="h-3 w-3 mr-1" />
+                    
                     {service.region.toUpperCase()} Service
                   </Badge>
                 </div>
