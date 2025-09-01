@@ -231,16 +231,53 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="w-12 h-12 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
                         <Brain className="h-6 w-6 text-white" />
                       </div>
-                      <div className="mb-4">
+                      <div className="mb-6">
                         <h3 className="text-xl md:text-2xl font-bold mb-2">
                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
                         </h3>
                         <p className="text-base text-muted-foreground mb-4">
                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
                         </p>
-                        <div className="mb-4">
+                        <div className="mb-6">
                           <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
                           <span className="text-muted-foreground text-base">/{selectedPlan.billing_interval}</span>
+                        </div>
+                        
+                        {/* Additional Details Section */}
+                        <div className="bg-gradient-to-r from-primary/5 to-guardian/5 rounded-xl p-4 mb-6 border border-primary/10">
+                          <h4 className="font-semibold text-sm mb-3 text-foreground">What's Included:</h4>
+                          <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div className="flex items-center gap-2">
+                              <Brain className="h-3 w-3 text-primary" />
+                              <span>AI Monitoring</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Shield className="h-3 w-3 text-guardian" />
+                              <span>24/7 Protection</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Users className="h-3 w-3 text-wellness" />
+                              <span>Family Network</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-3 w-3 text-emergency" />
+                              <span>GPS Tracking</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white/80 rounded-lg p-3 mb-6 border">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium">Setup Progress</span>
+                            <span className="text-xs text-primary">Ready in 2 mins</span>
+                          </div>
+                          <div className="flex space-x-1">
+                            <div className="flex-1 bg-primary h-1 rounded"></div>
+                            <div className="flex-1 bg-primary h-1 rounded"></div>
+                            <div className="flex-1 bg-primary h-1 rounded"></div>
+                            <div className="flex-1 bg-gray-200 h-1 rounded"></div>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">Quick setup • No hardware required</p>
                         </div>
                       </div>
                       
@@ -279,6 +316,33 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           loading="lazy"
                           decoding="async"
                         />
+                        
+                        {/* Additional Info Panel Next to Image */}
+                        <div className="mt-4 space-y-3">
+                          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-3 border border-primary/20">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Brain className="h-4 w-4 text-primary" />
+                              <span className="font-semibold text-sm">AI-Powered</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">Intelligent emergency detection and response</p>
+                          </div>
+                          
+                          <div className="bg-gradient-to-r from-guardian/10 to-wellness/10 rounded-lg p-3 border border-guardian/20">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Shield className="h-4 w-4 text-guardian" />
+                              <span className="font-semibold text-sm">Global Coverage</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">Works in 180+ countries worldwide</p>
+                          </div>
+                          
+                          <div className="bg-gradient-to-r from-wellness/10 to-emergency/10 rounded-lg p-3 border border-wellness/20">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Users className="h-4 w-4 text-wellness" />
+                              <span className="font-semibold text-sm">Family Protected</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">Connect unlimited family members</p>
+                          </div>
+                        </div>
                       </div>
                       
                       {/* Floating Feature Icons */}
