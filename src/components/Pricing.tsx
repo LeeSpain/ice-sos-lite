@@ -271,7 +271,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               <Play className="h-4 w-4 mr-2" />
-                              Watch Demo
+                              Watch Video
                             </Button>
                           }
                         />
