@@ -46,38 +46,72 @@ const Features = () => {
                   <div className="h-80 relative overflow-hidden bg-gray-100">
                     {/* Realistic map background */}
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 320 320">
-                      {/* Map base */}
-                      <rect width="100%" height="100%" fill="#f1f5f9"/>
+                      {/* Map base - lighter gray for streets */}
+                      <rect width="100%" height="100%" fill="#f8fafc"/>
                       
-                      {/* Water/river */}
-                      <path d="M0,120 Q80,110 160,130 T320,140 L320,180 Q240,170 160,160 Q80,150 0,160 Z" fill="#bfdbfe"/>
+                      {/* Terrain and elevation patterns */}
+                      <defs>
+                        <pattern id="terrain" patternUnits="userSpaceOnUse" width="8" height="8">
+                          <rect width="8" height="8" fill="#f1f5f9"/>
+                          <circle cx="2" cy="2" r="0.5" fill="#e2e8f0"/>
+                          <circle cx="6" cy="6" r="0.5" fill="#e2e8f0"/>
+                        </pattern>
+                      </defs>
+                      <rect width="100%" height="100%" fill="url(#terrain)"/>
                       
-                      {/* Parks and green spaces */}
-                      <rect x="240" y="50" width="60" height="80" fill="#bbf7d0" rx="8"/>
-                      <rect x="20" y="220" width="80" height="60" fill="#bbf7d0" rx="8"/>
-                      <circle cx="60" cy="80" r="25" fill="#bbf7d0"/>
+                      {/* Water bodies - more realistic shapes */}
+                      <path d="M0,100 Q40,95 80,110 Q120,125 160,115 Q200,105 240,120 Q280,135 320,125 L320,180 Q280,170 240,175 Q200,180 160,170 Q120,160 80,165 Q40,170 0,160 Z" fill="#3b82f6" opacity="0.7"/>
+                      <ellipse cx="70" cy="250" rx="25" ry="15" fill="#3b82f6" opacity="0.6"/>
                       
-                      {/* Building blocks */}
-                      <rect x="120" y="40" width="30" height="40" fill="#e2e8f0" rx="2"/>
-                      <rect x="160" y="40" width="25" height="35" fill="#e2e8f0" rx="2"/>
-                      <rect x="120" y="240" width="40" height="50" fill="#e2e8f0" rx="2"/>
-                      <rect x="180" y="250" width="35" height="45" fill="#e2e8f0" rx="2"/>
+                      {/* Parks and green spaces - more organic shapes */}
+                      <path d="M240,50 Q280,55 290,75 Q295,95 280,110 Q260,125 240,120 Q225,105 235,85 Q240,65 240,50 Z" fill="#22c55e" opacity="0.4"/>
+                      <path d="M20,220 Q45,215 65,230 Q85,245 75,265 Q65,280 45,275 Q25,270 15,250 Q10,235 20,220 Z" fill="#22c55e" opacity="0.4"/>
+                      <circle cx="60" cy="80" r="22" fill="#22c55e" opacity="0.3"/>
                       
-                      {/* Major roads */}
-                      <path d="M0,100 L320,100" stroke="#ffffff" strokeWidth="6"/>
-                      <path d="M0,200 L320,200" stroke="#ffffff" strokeWidth="6"/>
-                      <path d="M100,0 L100,320" stroke="#ffffff" strokeWidth="6"/>
-                      <path d="M220,0 L220,320" stroke="#ffffff" strokeWidth="6"/>
+                      {/* Building blocks - varied sizes and colors */}
+                      <rect x="120" y="40" width="28" height="38" fill="#64748b" rx="2"/>
+                      <rect x="155" y="45" width="22" height="32" fill="#71717a" rx="2"/>
+                      <rect x="185" y="42" width="18" height="35" fill="#6b7280" rx="1"/>
+                      <rect x="115" y="240" width="35" height="45" fill="#64748b" rx="2"/>
+                      <rect x="160" y="245" width="25" height="40" fill="#71717a" rx="2"/>
+                      <rect x="195" y="250" width="30" height="35" fill="#6b7280" rx="2"/>
                       
-                      {/* Secondary roads */}
-                      <path d="M0,60 L320,60" stroke="#ffffff" strokeWidth="3"/>
-                      <path d="M0,260 L320,260" stroke="#ffffff" strokeWidth="3"/>
-                      <path d="M160,0 L160,320" stroke="#ffffff" strokeWidth="3"/>
-                      <path d="M40,0 L40,320" stroke="#ffffff" strokeWidth="3"/>
+                      {/* Residential areas */}
+                      <rect x="40" y="140" width="12" height="12" fill="#94a3b8" rx="1"/>
+                      <rect x="58" y="145" width="10" height="10" fill="#94a3b8" rx="1"/>
+                      <rect x="75" y="142" width="11" height="11" fill="#94a3b8" rx="1"/>
+                      <rect x="270" y="180" width="15" height="15" fill="#94a3b8" rx="1"/>
+                      <rect x="290" y="185" width="12" height="12" fill="#94a3b8" rx="1"/>
                       
-                      {/* Road markings */}
-                      <path d="M0,100 L320,100" stroke="#fbbf24" strokeWidth="1" strokeDasharray="5,5"/>
-                      <path d="M100,0 L100,320" stroke="#fbbf24" strokeWidth="1" strokeDasharray="5,5"/>
+                      {/* Major highways - realistic curved paths */}
+                      <path d="M0,100 Q80,95 160,105 Q240,115 320,110" stroke="#ffffff" strokeWidth="8" fill="none"/>
+                      <path d="M0,200 Q70,195 140,205 Q210,215 280,200 L320,198" stroke="#ffffff" strokeWidth="8" fill="none"/>
+                      <path d="M100,0 Q95,80 105,160 Q115,240 110,320" stroke="#ffffff" strokeWidth="8" fill="none"/>
+                      <path d="M220,0 Q225,70 215,140 Q205,210 210,280 L212,320" stroke="#ffffff" strokeWidth="8" fill="none"/>
+                      
+                      {/* Secondary roads - curved and branching */}
+                      <path d="M0,60 Q60,58 120,65 Q180,72 240,68 Q280,65 320,62" stroke="#ffffff" strokeWidth="4" fill="none"/>
+                      <path d="M0,260 Q50,258 100,265 Q150,272 200,268 Q250,264 320,260" stroke="#ffffff" strokeWidth="4" fill="none"/>
+                      <path d="M160,0 Q158,60 165,120 Q172,180 168,240 Q165,280 162,320" stroke="#ffffff" strokeWidth="4" fill="none"/>
+                      <path d="M40,0 Q42,50 38,100 Q34,150 40,200 Q46,250 42,320" stroke="#ffffff" strokeWidth="4" fill="none"/>
+                      
+                      {/* Local streets - grid pattern */}
+                      <path d="M0,140 L320,142" stroke="#ffffff" strokeWidth="2" fill="none"/>
+                      <path d="M0,180 L320,182" stroke="#ffffff" strokeWidth="2" fill="none"/>
+                      <path d="M80,0 L82,320" stroke="#ffffff" strokeWidth="2" fill="none"/>
+                      <path d="M260,0 L262,320" stroke="#ffffff" strokeWidth="2" fill="none"/>
+                      
+                      {/* Road center lines on major highways */}
+                      <path d="M0,100 Q80,95 160,105 Q240,115 320,110" stroke="#fbbf24" strokeWidth="1" strokeDasharray="8,4" fill="none"/>
+                      <path d="M100,0 Q95,80 105,160 Q115,240 110,320" stroke="#fbbf24" strokeWidth="1" strokeDasharray="8,4" fill="none"/>
+                      
+                      {/* Points of interest */}
+                      <circle cx="150" cy="150" r="3" fill="#ef4444"/>
+                      <text x="155" y="155" fontSize="6" fill="#374151">School</text>
+                      <circle cx="200" cy="80" r="3" fill="#3b82f6"/>
+                      <text x="205" y="85" fontSize="6" fill="#374151">Hospital</text>
+                      <circle cx="80" cy="200" r="3" fill="#10b981"/>
+                      <text x="85" y="205" fontSize="6" fill="#374151">Park</text>
                     </svg>
                     
                     {/* Family Member Pins */}
@@ -121,11 +155,6 @@ const Features = () => {
                       <div className="w-10 h-10 bg-white rounded-md border shadow-lg flex items-center justify-center hover:bg-gray-50 cursor-pointer">
                         <span className="text-gray-700 text-lg font-light">−</span>
                       </div>
-                    </div>
-
-                    {/* Map attribution */}
-                    <div className="absolute bottom-2 left-2 text-xs text-gray-500 bg-white/80 px-2 py-1 rounded">
-                      Map data ©2024
                     </div>
                   </div>
 
