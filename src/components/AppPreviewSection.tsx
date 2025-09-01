@@ -41,7 +41,7 @@ const AppPreviewSection: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-lg mb-2">Smart Speaker Voice Commands</h4>
-                    <p className="text-muted-foreground">Say "Alexa, ask ICE SOS for help" or "Hey Google, activate emergency" for instant assistance when your hands aren't free.</p>
+                    <p className="text-muted-foreground">Say "help, help, help" three times on any smart device for instant emergency activation when your hands aren't free.</p>
                   </div>
                 </div>
 
