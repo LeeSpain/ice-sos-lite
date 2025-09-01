@@ -461,7 +461,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       {/* Image container - exactly matching Premium Protection */}
                       <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
                         <img
-                          src="/lovable-uploads/a622d998-f25b-472d-a82f-5ae37bd5c7bd.png"
+                          src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
                           alt="ICE SOS Bluetooth Pendant - Emergency device with Bluetooth connectivity"
                           className="w-full h-auto rounded-xl shadow-md object-cover"
                           loading="lazy"
@@ -626,7 +626,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       
                       <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
                         <img
-                          src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
+                          src="/lovable-uploads/ad6fb102-913b-42c4-a5e9-81162c5616c0.png"
                           alt={`${service.name} - Regional emergency response service for ${service.region}`}
                           className="w-full h-auto rounded-xl shadow-md object-cover"
                           loading="lazy"
