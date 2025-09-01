@@ -8,7 +8,7 @@ import Pricing from "@/components/Pricing";
 
 import FamilyCarerAccess from "@/components/FamilyCarerAccess";
 import AppDownload from "@/components/AppDownload";
-import AppSelectionSection from "@/components/AppSelectionSection";
+
 import Footer from "@/components/Footer";
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import AppPreviewSection from '@/components/AppPreviewSection';
@@ -53,8 +53,6 @@ const Index = () => {
 
       <Hero onEmmaClick={openEmmaChat} />
       
-      {/* App Selection Section */}
-      <AppSelectionSection />
       
       <Features />
       {/* <MetricPreview /> */}
