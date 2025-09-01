@@ -45,12 +45,12 @@ const { t } = useTranslation();
         console.log('Admin user, going to admin dashboard');
         navigate('/admin-dashboard');
       } else {
-        console.log('Non-admin user, redirecting to dashboard');
-        navigate('/dashboard');
+        console.log('Non-admin user, redirecting to member dashboard');
+        navigate('/full-dashboard');
       }
     } else {
-      console.log('Going to dashboard');
-      navigate('/dashboard');
+      console.log('Going to member dashboard');
+      navigate('/full-dashboard');
     }
   };
 
