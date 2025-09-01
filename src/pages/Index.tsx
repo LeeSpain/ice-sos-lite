@@ -8,6 +8,7 @@ import Pricing from "@/components/Pricing";
 
 import FamilyCarerAccess from "@/components/FamilyCarerAccess";
 import AppDownload from "@/components/AppDownload";
+import AppSelectionSection from "@/components/AppSelectionSection";
 import Footer from "@/components/Footer";
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import AppPreviewSection from '@/components/AppPreviewSection';
@@ -40,7 +41,21 @@ const Index = () => {
       <FirstVisitPreferencesModal />
       <Navigation onFreeTrialClick={() => setShowFreeTrialPopup(true)} />
 
+      {/* Quick Access for returning users */}
+      <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
+        <a
+          href="/dashboard"
+          className="bg-primary text-white px-4 py-2 rounded-lg shadow-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+        >
+          Open My App
+        </a>
+      </div>
+
       <Hero onEmmaClick={openEmmaChat} />
+      
+      {/* App Selection Section */}
+      <AppSelectionSection />
+      
       <Features />
       {/* <MetricPreview /> */}
 

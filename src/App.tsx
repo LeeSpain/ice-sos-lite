@@ -46,8 +46,10 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import ProtectedSOSRoute from "@/components/ProtectedSOSRoute";
 import DashboardRedirect from "@/components/DashboardRedirect";
+import SmartAppRedirect from "@/components/SmartAppRedirect";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import FamilyTrackingApp from "./pages/FamilyTrackingApp";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
 import ScrollToTop from "@/components/ScrollToTop";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
@@ -152,11 +154,11 @@ const App = () => {
                 </OptimizedSuspense>
               } />
 
-              {/* Dashboard Routes */}
+              {/* Smart App Routing */}
               <Route path="/dashboard" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedRoute>
-                    <DashboardRedirect />
+                    <SmartAppRedirect />
                   </ProtectedRoute>
                 </OptimizedSuspense>
               } />
@@ -182,12 +184,28 @@ const App = () => {
                 </OptimizedSuspense>
               } />
 
-              {/* Protected SOS Emergency App */}
+              {/* Owner's SOS Emergency App */}
               <Route path="/app" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedSOSRoute>
                     <SOSHome />
                   </ProtectedSOSRoute>
+                </OptimizedSuspense>
+              } />
+              <Route path="/sos-app" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedSOSRoute>
+                    <SOSHome />
+                  </ProtectedSOSRoute>
+                </OptimizedSuspense>
+              } />
+
+              {/* Family Tracking App */}
+              <Route path="/family-app" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <FamilyTrackingApp />
+                  </ProtectedRoute>
                 </OptimizedSuspense>
               } />
 
@@ -266,15 +284,17 @@ const App = () => {
               } />
             </Routes>
             
-            {/* Global Emma Chat - appears on all pages except SOS app, admin dashboard, and members dashboard */}
+            {/* Global Emma Chat - appears on all pages except SOS apps, family app, admin dashboard, and member dashboard */}
             {window.location.pathname !== '/app' && 
+             window.location.pathname !== '/sos-app' && 
+             window.location.pathname !== '/family-app' && 
              !window.location.pathname.startsWith('/admin-dashboard') && 
              !window.location.pathname.startsWith('/dashboard') && 
              !window.location.pathname.startsWith('/full-dashboard') && 
              <GlobalEmmaChat />}
             
-            {/* Show device manager only in protected SOS app */}
-            {window.location.pathname === '/app' && <DeviceManagerButton />}
+            {/* Show device manager only in SOS apps */}
+            {(window.location.pathname === '/app' || window.location.pathname === '/sos-app') && <DeviceManagerButton />}
             
             {/* PWA Install Prompt */}
             <PWAInstallPrompt />
