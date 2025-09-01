@@ -254,7 +254,7 @@ const Features = () => {
                   <Button 
                     asChild 
                     size="lg" 
-                    className="bg-green-600 hover:bg-green-700 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="bg-green-100 hover:bg-green-200 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 border border-green-200"
                   >
                     <Link to="/family-carer-access">
                       <Users className="h-5 w-5 mr-2" />
