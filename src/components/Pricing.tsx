@@ -311,8 +311,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
         {/* Safety Products Section */}
         {products.length > 0 && (
-          <>
-            <div className="text-center mb-8 mt-16">
+          <div className="max-w-6xl mx-auto mb-12">
+            <div className="text-center mb-12">
               <h3 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
                 {t('pricing.safetyProductsTitle')}
               </h3>
@@ -321,137 +321,149 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
               </p>
             </div>
 
-
-            <div className="max-w-4xl mx-auto">
-              {products.map((product) => (
-                <Card key={product.id} className="relative border-2 border-blue-400 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-600/5"></div>
-{product.status === 'coming_soon' && (
-  <div className="absolute top-0 left-0 right-0">
-    <div className="bg-gradient-to-r from-secondary to-primary text-white text-sm md:text-base font-semibold py-2 px-4 flex items-center justify-between shadow-md">
-      <span className="flex items-center gap-2">
-        <span className="inline-flex h-2 w-2 rounded-full bg-white/80 animate-pulse"></span>
-        {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
-      </span>
-      {product.coming_soon_url ? (
-        <a
-          href={product.coming_soon_url}
-          target="_blank"
-          rel="noreferrer"
-          className="underline underline-offset-4 hover:no-underline"
-        >
-          {t('common.learnMore', { defaultValue: 'Learn more' })}
-        </a>
-      ) : null}
-    </div>
-  </div>
-)}
-                  
-                  <div className="relative p-8">
-                    {/* Upper half - Image and Text side by side */}
-                    <div className="grid lg:grid-cols-2 gap-8 items-center mb-8">
-                       {/* Product Info - Left Side */}
-                      <div className="text-center lg:text-left">
-                        <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg`}>
-                          <Package className="h-8 w-8 text-white" />
-                        </div>
-                        <CardTitle className="text-3xl font-bold mb-3">
-                          {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' }) : product.name}
-                        </CardTitle>
-                        <CardDescription className="text-lg text-muted-foreground mb-4">
-                          {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
-                        </CardDescription>
-                         <div className="mb-6">
-  <span className={`text-4xl font-bold text-blue-600`}>{formatPriceDisplay(product.price, product.currency)}</span>
-</div>
-                        <div className="flex flex-col gap-3">
-{product.name === 'ICE SOS Bluetooth Pendant' ? (
-                              <div className="flex flex-col gap-3">
-                                {product.status === 'coming_soon' ? (
-                                  <Badge className="px-8 py-4 text-lg font-semibold bg-secondary text-white">Coming Soon</Badge>
-                                ) : (
-                                  <>
-                                    <Button 
-                                      size="lg"
-                                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                                      asChild
-                                    >
-                                      <Link to="/devices/ice-sos-pendant">Learn More</Link>
-                                    </Button>
-                                    
-                                    <IntroVideoModal 
-                                      defaultVideoId="all-ages"
-                                      trigger={
-                                        <Button 
-                                          size="lg"
-                                          variant="outline"
-                                          className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                                        >
-                                          <Play className="h-4 w-4 mr-2" />
-                                          Watch Video
-                                        </Button>
-                                      }
-                                    />
-                                  </>
-                                 )}
-                              </div>
-                            ) : (
-                              <Button 
-                                size="lg"
-                                className="px-8 py-4 bg-blue-600 text-white hover:bg-blue-700 border-0 font-semibold"
-                                asChild
-                              >
-                                <Link to="/devices/ice-sos-pendant">
-                                  {t('pricing.details')}
-                                </Link>
-                              </Button>
-                            )}
-
-                        </div>
-                       </div>
-                        
-                        {/* Product Image - Right Side */}
-                        <div className="flex justify-center items-center">
-                         {product.name === 'ICE SOS Bluetooth Pendant' && (
-                           <div className="w-full max-w-md p-6 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-2xl">
-                             <img
-                               src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
-                               alt="ICE Smart SOS Button – Emergency pendant device"
-                               className="w-full h-auto rounded-xl shadow-lg object-cover"
-                               loading="lazy"
-                               decoding="async"
-                             />
-                           </div>
-                         )}
-                        </div>
+            {products.map((product) => (
+              <div key={product.id} className="bg-gradient-to-br from-blue-500/5 to-blue-600/5 rounded-3xl p-6 border border-blue-500/20 relative overflow-hidden mb-8">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-600/5"></div>
+                
+                {product.status === 'coming_soon' && (
+                  <div className="absolute top-0 left-0 right-0">
+                    <div className="bg-gradient-to-r from-secondary to-primary text-white text-sm md:text-base font-semibold py-2 px-4 flex items-center justify-between shadow-md rounded-t-3xl">
+                      <span className="flex items-center gap-2">
+                        <span className="inline-flex h-2 w-2 rounded-full bg-white/80 animate-pulse"></span>
+                        {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
+                      </span>
+                      {product.coming_soon_url ? (
+                        <a
+                          href={product.coming_soon_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="underline underline-offset-4 hover:no-underline"
+                        >
+                          {t('common.learnMore', { defaultValue: 'Learn more' })}
+                        </a>
+                      ) : null}
                     </div>
-                        
-                        {/* Features - Bottom half */}
-                        <div className="border-t pt-6">
-                         <h4 className="text-xl font-semibold mb-4">{t('pricing.keyFeaturesTitle', { defaultValue: 'Key Features:' })}</h4>
-                         <div className="grid md:grid-cols-3 gap-4">
-                           {product.features.slice(0, 6).map((feature, index) => (
-                             <div key={index} className="flex items-start space-x-3">
-                               <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                               <span className="text-sm text-muted-foreground">{feature}</span>
-                             </div>
-                           ))}
-                         </div>
-                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
-                           <Check className="h-4 w-4 text-green-500" />
-                           <span>{t('pricing.freeShippingInventory', { count: product.inventory_count, defaultValue: 'Free shipping • {{count}} units available' })}</span>
-                         </div>
-                       </div>
-                   </div>
-                 </Card>
-              ))}
-            </div>
-          </>
+                  </div>
+                )}
+                
+                <Badge className="absolute top-4 right-4 bg-blue-600 text-white text-sm px-3 py-1 shadow-lg">
+                  {t('pricing.oneTime')}
+                </Badge>
+                
+                <div className="relative">
+                  {/* Grid layout matching new sections */}
+                  <div className="grid lg:grid-cols-2 gap-8 items-center mb-6">
+                    {/* Product Info - Left Side */}
+                    <div className="text-center lg:text-left">
+                      <div className="w-12 h-12 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+                        <Package className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="mb-4">
+                        <h3 className="text-xl md:text-2xl font-bold mb-2">
+                          {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' }) : product.name}
+                        </h3>
+                        <p className="text-base text-muted-foreground mb-4">
+                          {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
+                        </p>
+                        <div className="mb-4">
+                          <span className="text-3xl font-bold text-blue-600">{formatPriceDisplay(product.price, product.currency)}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-2">
+                        {product.name === 'ICE SOS Bluetooth Pendant' ? (
+                          <div className="flex flex-col gap-2">
+                            {product.status === 'coming_soon' ? (
+                              <Badge className="px-6 py-3 text-base font-semibold bg-secondary text-white">Coming Soon</Badge>
+                            ) : (
+                              <>
+                                <Button 
+                                  size="default"
+                                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                                  asChild
+                                >
+                                  <Link to="/devices/ice-sos-pendant">Learn More</Link>
+                                </Button>
+                                
+                                <IntroVideoModal 
+                                  defaultVideoId="all-ages"
+                                  trigger={
+                                    <Button 
+                                      size="default"
+                                      variant="outline"
+                                      className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                                    >
+                                      <Play className="h-4 w-4 mr-2" />
+                                      Watch Video
+                                    </Button>
+                                  }
+                                />
+                              </>
+                            )}
+                          </div>
+                        ) : (
+                          <Button 
+                            size="default"
+                            className="px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 border-0 font-semibold"
+                            asChild
+                          >
+                            <Link to="/devices/ice-sos-pendant">
+                              {t('pricing.details')}
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Product Image - Right Side */}
+                    <div className="relative">
+                      {product.name === 'ICE SOS Bluetooth Pendant' && (
+                        <div className="bg-white/80 rounded-2xl p-4 shadow-xl border">
+                          <img
+                            src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
+                            alt="ICE Smart SOS Button – Emergency pendant device"
+                            className="w-full h-auto rounded-xl shadow-lg object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Floating Feature Icons */}
+                      <div className="absolute -top-2 -left-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-blue-500/20 flex items-center justify-center">
+                        <Bluetooth className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-blue-600/20 flex items-center justify-center">
+                        <Battery className="h-6 w-6 text-blue-600" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Features - Bottom section */}
+                  <div className="bg-white/80 rounded-2xl p-4 border">
+                    <h4 className="text-lg font-semibold mb-4 text-center">{t('pricing.keyFeaturesTitle', { defaultValue: 'Key Features:' })}</h4>
+                    <div className="grid md:grid-cols-3 gap-3">
+                      {product.features.slice(0, 6).map((feature, index) => (
+                        <div key={index} className="flex items-start space-x-2">
+                          <Check className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
+                      <Check className="h-4 w-4 text-green-500" />
+                      <span>{t('pricing.freeShippingInventory', { count: product.inventory_count, defaultValue: 'Free shipping • {{count}} units available' })}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
 
         {/* Regional Services */}
-        <>
-          <div className="text-center mb-8 mt-16">
+        <div className="max-w-6xl mx-auto mb-12">
+          <div className="text-center mb-12">
             <h3 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
               {t('pricing.regionalServicesTitle', { defaultValue: 'Regional Services' })}
             </h3>
@@ -460,143 +472,168 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
             </p>
           </div>
 
-            {(() => {
-              console.log('Regional services length:', regionalServices.length, 'Services:', regionalServices);
-              return regionalServices.length > 0;
-            })() ? (
-              <div className="max-w-4xl mx-auto">
-                {regionalServices.map((service) => (
-                  <Card key={service.id} className={`relative border-2 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden ${
-                    service.name === 'Call Centre Spain' 
-                      ? 'border-green-500/40' 
-                      : 'border-secondary/40'
+          {(() => {
+            console.log('Regional services length:', regionalServices.length, 'Services:', regionalServices);
+            return regionalServices.length > 0;
+          })() ? (
+            <>
+              {regionalServices.map((service) => (
+                <div key={service.id} className={`rounded-3xl p-6 border relative overflow-hidden mb-8 ${
+                  service.name === 'Call Centre Spain' 
+                    ? 'bg-gradient-to-br from-green-500/5 to-green-600/5 border-green-500/20' 
+                    : 'bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20'
+                }`}>
+                  <div className={`absolute inset-0 ${
+                    service.name === 'Call Centre Spain'
+                      ? 'bg-gradient-to-br from-green-500/5 via-transparent to-green-500/10'
+                      : 'bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10'
+                  }`}></div>
+                  <Badge className={`absolute top-4 right-4 text-white text-sm px-3 py-1 shadow-lg ${
+                    service.name === 'Call Centre Spain'
+                      ? 'bg-green-600'
+                      : 'bg-secondary'
                   }`}>
-                    <div className={`absolute inset-0 ${
-                      service.name === 'Call Centre Spain'
-                        ? 'bg-gradient-to-br from-green-500/5 via-transparent to-green-500/10'
-                        : 'bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10'
-                    }`}></div>
-                    <Badge className={`absolute top-6 right-6 text-white text-sm px-4 py-2 shadow-lg ${
-                      service.name === 'Call Centre Spain'
-                        ? 'bg-green-600'
-                        : 'bg-secondary'
-                    }`}>
-                      {service.region?.toUpperCase()}
-                    </Badge>
-                    
-                    <div className="relative p-8">
-                      {/* Upper half - Image and Text side by side */}
-                      <div className="grid lg:grid-cols-2 gap-8 items-center mb-8">
-                         {/* Service Info - Left Side */}
-                        <div className="text-center lg:text-left">
-                          <div className={`w-16 h-16 mx-auto lg:mx-0 mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
-                            service.name === 'Call Centre Spain'
-                              ? 'bg-gradient-to-br from-green-500 to-green-600'
-                              : 'bg-gradient-to-br from-secondary to-secondary/80'
-                          }`}>
-                            <MapPin className="h-8 w-8 text-white" />
-                          </div>
-                          <CardTitle className="text-3xl font-bold mb-3">
+                    {service.region?.toUpperCase()}
+                  </Badge>
+                  
+                  <div className="relative">
+                    {/* Grid layout matching new sections */}
+                    <div className="grid lg:grid-cols-2 gap-8 items-center mb-6">
+                      {/* Service Info - Left Side */}
+                      <div className="text-center lg:text-left">
+                        <div className={`w-12 h-12 mx-auto lg:mx-0 mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
+                          service.name === 'Call Centre Spain'
+                            ? 'bg-gradient-to-br from-green-500 to-green-600'
+                            : 'bg-gradient-to-br from-secondary to-secondary/80'
+                        }`}>
+                          <MapPin className="h-6 w-6 text-white" />
+                        </div>
+                        <div className="mb-4">
+                          <h3 className="text-xl md:text-2xl font-bold mb-2">
                             {(service.region === 'Spain' || service.name.toLowerCase().includes('spain'))
                               ? t('regionServices.spain.name', { defaultValue: service.name })
                               : service.name}
-                          </CardTitle>
-                          <CardDescription className="text-lg text-muted-foreground mb-4">
+                          </h3>
+                          <p className="text-base text-muted-foreground mb-4">
                             {(service.region === 'Spain' || service.name.toLowerCase().includes('spain'))
                               ? t('regionServices.spain.description', { defaultValue: service.description })
                               : service.description}
-                          </CardDescription>
-                          <div className="mb-6">
-                            <span className={`text-4xl font-bold ${
+                          </p>
+                          <div className="mb-4">
+                            <span className={`text-3xl font-bold ${
                               service.name === 'Call Centre Spain'
                                 ? 'text-green-600'
                                 : 'text-secondary'
                             }`}>{formatPriceDisplay(service.price, service.currency)}</span>
-                            <span className="text-muted-foreground text-lg">{t('common.perMonth', { defaultValue: '/month' })}</span>
+                            <span className="text-muted-foreground text-base">{t('common.perMonth', { defaultValue: '/month' })}</span>
                           </div>
-                          <div className="flex flex-col gap-3">
-                            <Button 
-                              size="lg"
-                              className={`px-8 py-4 ${
-                                service.name === 'Call Centre Spain'
-                                  ? 'bg-green-600 text-white hover:bg-green-700'
-                                  : 'bg-secondary text-white hover:bg-secondary/90'
-                              } border-0 font-semibold`}
-                              asChild
-                            >
-                              <Link to="/regional-center/spain">
-                                {t('pricing.details')}
-                              </Link>
-                            </Button>
-                            
-                            {service.name === 'Call Centre Spain' && (
-                              <IntroVideoModal 
-                                defaultVideoId="spain"
-                                trigger={
-                                  <Button 
-                                    size="lg"
-                                    variant="outline"
-                                    className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                                  >
-                                    <Play className="h-4 w-4 mr-2" />
-                                    Watch Video
-                                  </Button>
-                                }
-                              />
-                            )}
-                          </div>
-                         </div>
+                        </div>
+                        
+                        <div className="flex flex-col gap-2">
+                          <Button 
+                            size="default"
+                            className={`px-6 py-3 ${
+                              service.name === 'Call Centre Spain'
+                                ? 'bg-green-600 text-white hover:bg-green-700'
+                                : 'bg-secondary text-white hover:bg-secondary/90'
+                            } border-0 font-semibold`}
+                            asChild
+                          >
+                            <Link to="/regional-center/spain">
+                              {t('pricing.details')}
+                            </Link>
+                          </Button>
                           
-                          {/* Call Center Image - Right Side */}
-                          <div className="flex justify-center items-center">
-                            {service.name === 'Call Centre Spain' && (
-                              <div className="w-full max-w-md p-6 bg-gradient-to-br from-green-50 to-green-100/50 rounded-2xl">
-                                <img
-                                  src="/lovable-uploads/f65e7524-8dfe-491a-86d1-8d153266a17f.png"
-                                  alt="Centro de Respuesta 24/7 - Spanish Call Center Emergency Response Team"
-                                  className="w-full h-auto rounded-xl shadow-lg object-cover"
-                                  loading="lazy"
-                                  decoding="async"
-                                />
-                              </div>
-                            )}
-                          </div>
+                          {service.name === 'Call Centre Spain' && (
+                            <IntroVideoModal 
+                              defaultVideoId="spain"
+                              trigger={
+                                <Button 
+                                  size="default"
+                                  variant="outline"
+                                  className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                                >
+                                  <Play className="h-4 w-4 mr-2" />
+                                  Watch Video
+                                </Button>
+                              }
+                            />
+                          )}
+                        </div>
                       </div>
-                          
-                      {/* Features - Bottom half */}
-                      <div className="border-t pt-6">
-                        <h4 className="text-xl font-semibold mb-4">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
-                        <div className="grid md:grid-cols-3 gap-4">
-                           {service.features.map((feature, featureIndex) => (
-                             <div key={featureIndex} className="flex items-start space-x-3">
-                               <Check className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                                 service.name === 'Call Centre Spain'
-                                   ? 'text-green-600'
-                                   : 'text-secondary'
-                               }`} />
-                               <span className="text-sm text-muted-foreground">{feature}</span>
-                             </div>
-                           ))}
-                           {service.name === 'Call Centre Spain' && (
-                             <div className="flex items-start space-x-3">
-                               <Check className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                               <span className="text-sm text-muted-foreground">24/7 Professional Support • Live Translation Available</span>
-                             </div>
-                           )}
-                         </div>
+                      
+                      {/* Service Image - Right Side */}
+                      <div className="relative">
+                        {service.name === 'Call Centre Spain' && (
+                          <div className="bg-white/80 rounded-2xl p-4 shadow-xl border">
+                            <img
+                              src="/lovable-uploads/f65e7524-8dfe-491a-86d1-8d153266a17f.png"
+                              alt="Centro de Respuesta 24/7 - Spanish Call Center Emergency Response Team"
+                              className="w-full h-auto rounded-xl shadow-lg object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                        )}
+                        
+                        {/* Floating Feature Icons */}
+                        <div className={`absolute -top-2 -left-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 flex items-center justify-center ${
+                          service.name === 'Call Centre Spain'
+                            ? 'border-green-500/20'
+                            : 'border-secondary/20'
+                        }`}>
+                          <Phone className={`h-6 w-6 ${
+                            service.name === 'Call Centre Spain'
+                              ? 'text-green-600'
+                              : 'text-secondary'
+                          }`} />
+                        </div>
+                        <div className={`absolute -bottom-2 -right-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 flex items-center justify-center ${
+                          service.name === 'Call Centre Spain'
+                            ? 'border-green-600/20'
+                            : 'border-secondary/20'
+                        }`}>
+                          <MapPin className={`h-6 w-6 ${
+                            service.name === 'Call Centre Spain'
+                              ? 'text-green-600'
+                              : 'text-secondary'
+                          }`} />
+                        </div>
                       </div>
                     </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="max-w-4xl mx-auto">
-                <div className="text-center p-8 bg-muted/20 rounded-lg">
-                  <p className="text-muted-foreground">No regional services available at the moment.</p>
+                    
+                    {/* Features - Bottom section */}
+                    <div className="bg-white/80 rounded-2xl p-4 border">
+                      <h4 className="text-lg font-semibold mb-4 text-center">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
+                      <div className="grid md:grid-cols-3 gap-3">
+                        {service.features.map((feature, featureIndex) => (
+                          <div key={featureIndex} className="flex items-start space-x-2">
+                            <Check className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
+                              service.name === 'Call Centre Spain'
+                                ? 'text-green-600'
+                                : 'text-secondary'
+                            }`} />
+                            <span className="text-sm text-muted-foreground">{feature}</span>
+                          </div>
+                        ))}
+                        {service.name === 'Call Centre Spain' && (
+                          <div className="flex items-start space-x-2">
+                            <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground">24/7 Professional Support • Live Translation Available</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
-        </>
+              ))}
+            </>
+          ) : (
+            <div className="text-center p-8 bg-muted/20 rounded-lg">
+              <p className="text-muted-foreground">No regional services available at the moment.</p>
+            </div>
+          )}
+        </div>
 
       </div>
     </section>
