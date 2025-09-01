@@ -217,101 +217,108 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
           {(() => {
             const selectedPlan = globalPlans.find(p => p.name === 'Premium Protection' || p.is_popular || p.name.toLowerCase().includes('premium')) || globalPlans[0];
             return selectedPlan ? (
-              <div className="relative">
-                {/* Section Header */}
-                <div className="text-center lg:text-left mb-8">
-                  <Badge className="inline-flex items-center gap-2 bg-primary/10 text-primary border-0 text-sm px-3 py-1 mb-4">
-                    <Shield className="h-4 w-4" />
+              <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-guardian/10 rounded-3xl p-8 border border-primary/20 shadow-xl relative overflow-hidden">
+                {/* Background accent */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
+                
+                {/* Core Plan Badge */}
+                <div className="absolute top-6 right-6 z-10">
+                  <Badge className="bg-primary text-white text-sm px-4 py-2 shadow-lg border-0">
+                    <Shield className="h-3 w-3 mr-1" />
                     {t('pricing.corePlan')}
                   </Badge>
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                    {t('pricing.coreProtectionTitle', { defaultValue: 'Your Core Protection Subscription' })}
-                  </h3>
                 </div>
 
-                {/* Two Column Grid */}
-                <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
-                  {/* Left Column - Plan Details */}
-                  <div className="text-center lg:text-left">
-                    <div className="inline-flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
-                        <Brain className="h-6 w-6 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="text-xl font-bold">
-                          {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
-                        </h4>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
-                          <span className="text-muted-foreground text-sm">/{selectedPlan.billing_interval}</span>
+                <div className="relative z-10">
+                  {/* Main Content Grid */}
+                  <div className="grid lg:grid-cols-5 gap-8 items-center">
+                    {/* Left Column - Plan Details (3/5 width) */}
+                    <div className="lg:col-span-3">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-14 h-14 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                          <Brain className="h-7 w-7 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold mb-2">
+                            {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
+                          </h3>
+                          <div className="flex items-baseline gap-2 mb-3">
+                            <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
+                            <span className="text-muted-foreground">/{selectedPlan.billing_interval}</span>
+                          </div>
+                          <p className="text-muted-foreground leading-relaxed">
+                            {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
+                          </p>
                         </div>
                       </div>
-                    </div>
-                    
-                    <p className="text-base text-muted-foreground mb-6 leading-relaxed">
-                      {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
-                    </p>
-                    
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <Button 
-                        size="lg"
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                        asChild
-                      >
-                        <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
-                      </Button>
                       
-                      <IntroVideoModal 
-                        defaultVideoId="overview"
-                        trigger={
-                          <Button 
-                            size="lg"
-                            variant="outline"
-                            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                          >
-                            <Play className="h-4 w-4 mr-2" />
-                            Watch Intro Video
-                          </Button>
-                        }
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Right Column - Plan Image with Floating Elements */}
-                  <div className="relative">
-                    {/* Floating accent icons */}
-                    <div className="absolute -top-4 -right-4 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Shield className="h-4 w-4 text-primary" />
-                    </div>
-                    <div className="absolute top-1/2 -left-4 w-6 h-6 bg-guardian/10 rounded-full flex items-center justify-center">
-                      <Heart className="h-3 w-3 text-guardian" />
-                    </div>
-                    <div className="absolute -bottom-2 right-8 w-7 h-7 bg-wellness/10 rounded-full flex items-center justify-center">
-                      <Phone className="h-3 w-3 text-wellness" />
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-3 mb-6">
+                        <Button 
+                          size="lg"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                          asChild
+                        >
+                          <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
+                        </Button>
+                        
+                        <IntroVideoModal 
+                          defaultVideoId="overview"
+                          trigger={
+                            <Button 
+                              size="lg"
+                              variant="outline"
+                              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                              <Play className="h-4 w-4 mr-2" />
+                              Watch Demo
+                            </Button>
+                          }
+                        />
+                      </div>
+
+                      {/* Compact Features Grid */}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {selectedPlan.features.slice(0, 6).map((feature, featureIndex) => (
+                          <div key={featureIndex} className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Check className="h-2.5 w-2.5 text-primary" />
+                            </div>
+                            <span className="text-sm text-muted-foreground">{feature}</span>
+                          </div>
+                        ))}
+                        {selectedPlan.features.length > 6 && (
+                          <div className="flex items-center gap-2 text-primary font-medium">
+                            <span className="text-sm">+{selectedPlan.features.length - 6} more features</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
-                    <div className="relative">
-                      <img
-                        src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
-                        alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
-                        className="w-full h-auto rounded-xl shadow-xl object-cover"
-                        loading="lazy"
-                        decoding="async"
-                      />
+                    {/* Right Column - Plan Image (2/5 width) */}
+                    <div className="lg:col-span-2 relative">
+                      {/* Floating accents - smaller and more subtle */}
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-primary/15 rounded-full flex items-center justify-center">
+                        <Shield className="h-3 w-3 text-primary" />
+                      </div>
+                      <div className="absolute top-1/3 -left-3 w-5 h-5 bg-guardian/15 rounded-full flex items-center justify-center">
+                        <Heart className="h-2.5 w-2.5 text-guardian" />
+                      </div>
+                      <div className="absolute bottom-4 right-4 w-5 h-5 bg-wellness/15 rounded-full flex items-center justify-center">
+                        <Phone className="h-2.5 w-2.5 text-wellness" />
+                      </div>
+                      
+                      <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
+                        <img
+                          src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
+                          alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
+                          className="w-full h-auto rounded-xl shadow-md object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                
-                {/* Features Grid - Clean Layout */}
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {selectedPlan.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-start gap-3 p-4 rounded-lg hover:bg-primary/5 transition-colors duration-200">
-                      <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
-                        <Check className="h-3 w-3 text-primary" />
-                      </div>
-                      <span className="text-sm text-muted-foreground leading-relaxed">{feature}</span>
-                    </div>
-                  ))}
                 </div>
               </div>
             ) : null;
