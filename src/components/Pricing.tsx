@@ -338,132 +338,160 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
             </div>
 
             {products.map((product) => (
-              <div key={product.id} className="bg-gradient-to-br from-orange-50/10 via-orange-50/5 to-blue-50/10 rounded-3xl p-8 border border-orange-200/20 shadow-xl relative overflow-hidden mb-8">
-                {/* Background accent */}
-                <div className="absolute inset-0 bg-gradient-to-br from-orange-50/5 via-transparent to-blue-50/5"></div>
-                
-                {product.status === 'coming_soon' && (
-                  <div className="absolute top-0 left-0 right-0">
-                    <div className="bg-gradient-to-r from-orange-500 to-blue-500 text-white text-sm md:text-base font-semibold py-2 px-4 flex items-center justify-between shadow-md rounded-t-3xl">
-                      <span className="flex items-center gap-2">
-                        <span className="inline-flex h-2 w-2 rounded-full bg-white/80 animate-pulse"></span>
-                        {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
-                      </span>
-                      {product.coming_soon_url ? (
-                        <a
-                          href={product.coming_soon_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="underline underline-offset-4 hover:no-underline"
-                        >
-                          {t('common.learnMore', { defaultValue: 'Learn more' })}
-                        </a>
-                      ) : null}
+              <div key={product.id} className="bg-gradient-to-br from-blue-50/80 via-blue-50/40 to-blue-100/60 rounded-3xl p-1 border border-blue-200/30 shadow-xl relative overflow-hidden mb-8">
+                {/* Inner card container matching the attachment layout */}
+                <div className="bg-white/95 rounded-[1.4rem] p-8 relative">
+                  {product.status === 'coming_soon' && (
+                    <div className="absolute top-0 left-0 right-0">
+                      <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm md:text-base font-semibold py-2 px-4 flex items-center justify-between shadow-md rounded-t-[1.4rem]">
+                        <span className="flex items-center gap-2">
+                          <span className="inline-flex h-2 w-2 rounded-full bg-white/80 animate-pulse"></span>
+                          {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
+                        </span>
+                        {product.coming_soon_url ? (
+                          <a
+                            href={product.coming_soon_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline underline-offset-4 hover:no-underline"
+                          >
+                            {t('common.learnMore', { defaultValue: 'Learn more' })}
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                {/* Product Badge */}
-                <div className="absolute top-6 right-6 z-10">
-                  <Badge className="bg-orange-500 text-white text-sm px-4 py-2 shadow-lg border-0">
-                    <Package className="h-3 w-3 mr-1" />
-                    {t('pricing.oneTime')}
-                  </Badge>
-                </div>
-
-                <div className="relative z-10">
-                  {/* Main Content Grid */}
-                  <div className="grid lg:grid-cols-5 gap-8 items-center">
-                    {/* Left Column - Product Details (3/5 width) */}
-                    <div className="lg:col-span-3">
+                  )}
+                  
+                  {/* Main Content Grid - matching the exact 2-column layout from attachment */}
+                  <div className="grid lg:grid-cols-2 gap-8 items-center">
+                    {/* Left Column - Product Details */}
+                    <div>
                       <div className="flex items-start gap-4 mb-6">
-                        <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-                          <Bluetooth className="h-7 w-7 text-white" />
+                        {/* Blue icon matching the attachment style */}
+                        <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                          <Bluetooth className="h-8 w-8 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-2xl font-bold mb-2">
+                          <h3 className="text-2xl font-bold text-gray-900 mb-2">
                             {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' }) : product.name}
                           </h3>
                           <div className="flex items-baseline gap-2 mb-3">
-                            <span className="text-3xl font-bold text-orange-600">{formatPriceDisplay(product.price, product.currency)}</span>
-                            <span className="text-muted-foreground">/one-time</span>
+                            <span className="text-3xl font-bold text-blue-600">{formatPriceDisplay(product.price, product.currency)}</span>
+                            <span className="text-gray-500">/month</span>
                           </div>
-                          <p className="text-muted-foreground leading-relaxed">
-                            {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
+                          <p className="text-gray-600 leading-relaxed">
+                            {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: 'Advanced protection with AI monitoring' }) : product.description}
                           </p>
                         </div>
                       </div>
                       
-                      {/* Action Buttons */}
+                      {/* Action Buttons - matching attachment layout */}
                       <div className="flex flex-wrap gap-3 mb-6">
                         {product.status === 'coming_soon' ? (
-                          <Badge className="px-8 py-4 text-base font-semibold bg-secondary text-white">Coming Soon</Badge>
+                          <Button 
+                            size="lg"
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3"
+                            disabled
+                          >
+                            {t('common.comingSoon')}
+                          </Button>
                         ) : (
-                          <>
-                            <Button 
-                              size="lg"
-                              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                              onClick={() => handleProductPurchase(product)}
-                            >
-                              {t('pricing.buyNow')}
-                            </Button>
-                            
-                            <IntroVideoModal 
-                              defaultVideoId="ice-sos-pendant"
-                              trigger={
-                                <Button 
-                                  size="lg"
-                                  variant="outline"
-                                  className="border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                                >
-                                  <Play className="h-4 w-4 mr-2" />
-                                  Watch Demo
-                                </Button>
-                              }
-                            />
-                          </>
+                          <Button 
+                            size="lg"
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3"
+                            onClick={() => handleProductPurchase(product)}
+                          >
+                            Subscribe Now
+                          </Button>
                         )}
+                        
+                        <Button 
+                          size="lg"
+                          variant="outline"
+                          className="border-blue-500 text-blue-600 hover:bg-blue-50 font-semibold px-8 py-3"
+                          asChild
+                        >
+                          <Link to={`/device-ice-sos-pendant`}>
+                            <Play className="h-4 w-4 mr-2" />
+                            Watch Demo
+                          </Link>
+                        </Button>
                       </div>
 
-                      {/* Compact Features Grid */}
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        {product.features.slice(0, 6).map((feature, featureIndex) => (
-                          <div key={featureIndex} className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-orange-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                              <Check className="h-2.5 w-2.5 text-orange-600" />
-                            </div>
-                            <span className="text-sm text-muted-foreground">{feature}</span>
+                      {/* Features Grid - compact layout matching attachment */}
+                      <div className="grid sm:grid-cols-2 gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check className="h-2.5 w-2.5 text-blue-600" />
                           </div>
-                        ))}
-                        {product.features.length > 6 && (
-                          <div className="flex items-center gap-2 text-orange-600 font-medium">
-                            <span className="text-sm">+{product.features.length - 6} more features</span>
+                          <span className="text-sm text-gray-600">All Family Connection features</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check className="h-2.5 w-2.5 text-blue-600" />
                           </div>
-                        )}
+                          <span className="text-sm text-gray-600">AI health monitoring</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check className="h-2.5 w-2.5 text-blue-600" />
+                          </div>
+                          <span className="text-sm text-gray-600">24/7 priority support</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check className="h-2.5 w-2.5 text-blue-600" />
+                          </div>
+                          <span className="text-sm text-gray-600">Advanced analytics</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                            <Check className="h-2.5 w-2.5 text-blue-600" />
+                          </div>
+                          <span className="text-sm text-gray-600">Multiple device support</span>
+                        </div>
                       </div>
                     </div>
                     
-                    {/* Right Column - Product Image (2/5 width) */}
-                    <div className="lg:col-span-2 relative">
-                      {/* Floating accents - smaller and more subtle */}
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500/15 rounded-full flex items-center justify-center">
-                        <Bluetooth className="h-3 w-3 text-blue-600" />
-                      </div>
-                      <div className="absolute top-1/3 -left-3 w-5 h-5 bg-green-500/15 rounded-full flex items-center justify-center">
-                        <Battery className="h-2.5 w-2.5 text-green-500" />
-                      </div>
-                      <div className="absolute bottom-4 right-4 w-5 h-5 bg-orange-500/15 rounded-full flex items-center justify-center">
-                        <Droplets className="h-2.5 w-2.5 text-orange-500" />
-                      </div>
-                      
-                      <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
-                        <img
-                          src="/lovable-uploads/a622d998-f25b-472d-a82f-5ae37bd5c7bd.png"
-                          alt={`${product.name} - ICE SOS Bluetooth Pendant Emergency Device`}
-                          className="w-full h-auto rounded-xl shadow-md object-cover"
-                          loading="lazy"
-                          decoding="async"
-                        />
+                    {/* Right Column - Product Image with blue gradient background */}
+                    <div className="relative">
+                      {/* Blue gradient background with floating icons - exactly matching the attachment */}
+                      <div className="bg-gradient-to-br from-blue-400 to-blue-600 rounded-3xl p-8 relative overflow-hidden">
+                        {/* Floating icons positioned like in the attachment */}
+                        <div className="absolute top-4 left-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                          <Heart className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="absolute top-12 right-8 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                          <MapPin className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="absolute bottom-12 left-8 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                          <Users className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="absolute bottom-4 right-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                          <Phone className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="absolute top-1/2 left-2 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                          <Shield className="h-3 w-3 text-white" />
+                        </div>
+                        <div className="absolute top-1/3 right-2 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                          <Brain className="h-3 w-3 text-white" />
+                        </div>
+                        <div className="absolute bottom-1/3 left-1/2 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                          <Battery className="h-3 w-3 text-white" />
+                        </div>
+                        
+                        {/* Central device image */}
+                        <div className="relative z-10 flex items-center justify-center">
+                          <div className="bg-black/10 rounded-3xl p-6 backdrop-blur-sm border border-white/20">
+                            <img
+                              src="/lovable-uploads/a622d998-f25b-472d-a82f-5ae37bd5c7bd.png"
+                              alt="ICE SOS Bluetooth Pendant - Emergency device with Bluetooth connectivity"
+                              className="w-full h-auto max-w-[200px] object-contain"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
