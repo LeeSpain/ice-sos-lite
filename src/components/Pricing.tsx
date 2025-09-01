@@ -213,89 +213,105 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
 
         {/* Emergency Protection Plan Section */}
-        <div className="max-w-6xl mx-auto mb-12">
+        <div className="max-w-6xl mx-auto mb-16">
           {(() => {
             const selectedPlan = globalPlans.find(p => p.name === 'Premium Protection' || p.is_popular || p.name.toLowerCase().includes('premium')) || globalPlans[0];
             return selectedPlan ? (
-              <div className="bg-gradient-to-br from-primary/5 to-guardian/5 rounded-3xl p-6 border border-primary/20 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-                <Badge className="absolute top-4 right-4 bg-primary text-white text-sm px-3 py-1 shadow-lg">
-                  {t('pricing.corePlan')}
-                </Badge>
-                
-                <div className="relative">
-                  {/* Grid layout matching new sections */}
-                  <div className="grid lg:grid-cols-2 gap-8 items-center mb-6">
-                    {/* Plan Info - Left Side */}
-                    <div className="text-center lg:text-left">
-                      <div className="w-12 h-12 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="relative">
+                {/* Section Header */}
+                <div className="text-center lg:text-left mb-8">
+                  <Badge className="inline-flex items-center gap-2 bg-primary/10 text-primary border-0 text-sm px-3 py-1 mb-4">
+                    <Shield className="h-4 w-4" />
+                    {t('pricing.corePlan')}
+                  </Badge>
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                    {t('pricing.coreProtectionTitle', { defaultValue: 'Your Core Protection Subscription' })}
+                  </h3>
+                </div>
+
+                {/* Two Column Grid */}
+                <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
+                  {/* Left Column - Plan Details */}
+                  <div className="text-center lg:text-left">
+                    <div className="inline-flex items-center gap-3 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
                         <Brain className="h-6 w-6 text-white" />
                       </div>
-                      <div className="mb-6">
-                        <h3 className="text-xl md:text-2xl font-bold mb-2">
+                      <div>
+                        <h4 className="text-xl font-bold">
                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
-                        </h3>
-                         <p className="text-base text-muted-foreground mb-4">
-                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
-                         </p>
-                         
-                         <div className="mb-4">
-                           <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
-                           <span className="text-muted-foreground text-base">/{selectedPlan.billing_interval}</span>
-                         </div>
-                       </div>
-                       
-                       <div className="flex flex-col gap-2">
-                         <Button 
-                           size="default"
-                           className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                           asChild
-                         >
-                           <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
-                         </Button>
-                         
-                         <IntroVideoModal 
-                           defaultVideoId="overview"
-                           trigger={
-                             <Button 
-                               size="default"
-                               variant="outline"
-                               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                             >
-                               <Play className="h-4 w-4 mr-2" />
-                               Watch Intro Video
-                             </Button>
-                           }
-                         />
-                       </div>
-                     </div>
-                     
-                     {/* Plan Image - Right Side */}
-                     <div className="relative">
-                       <div className="bg-white/80 rounded-2xl p-4 shadow-xl border">
-                         <img
-                           src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
-                           alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
-                           className="w-full h-auto rounded-xl shadow-lg object-cover"
-                           loading="lazy"
-                           decoding="async"
-                         />
-                       </div>
-                     </div>
-                   </div>
-                  
-                  {/* Features - Bottom section */}
-                  <div className="bg-white/80 rounded-2xl p-4 border">
-                    <h4 className="text-lg font-semibold mb-4 text-center">{t('pricing.everythingIncluded')}</h4>
-                    <div className="grid md:grid-cols-2 gap-3">
-                      {selectedPlan.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-start space-x-2">
-                          <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground">{feature}</span>
+                        </h4>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-2xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
+                          <span className="text-muted-foreground text-sm">/{selectedPlan.billing_interval}</span>
                         </div>
-                      ))}
+                      </div>
+                    </div>
+                    
+                    <p className="text-base text-muted-foreground mb-6 leading-relaxed">
+                      {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
+                    </p>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button 
+                        size="lg"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                        asChild
+                      >
+                        <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
+                      </Button>
+                      
+                      <IntroVideoModal 
+                        defaultVideoId="overview"
+                        trigger={
+                          <Button 
+                            size="lg"
+                            variant="outline"
+                            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                          >
+                            <Play className="h-4 w-4 mr-2" />
+                            Watch Intro Video
+                          </Button>
+                        }
+                      />
                     </div>
                   </div>
+                  
+                  {/* Right Column - Plan Image with Floating Elements */}
+                  <div className="relative">
+                    {/* Floating accent icons */}
+                    <div className="absolute -top-4 -right-4 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Shield className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="absolute top-1/2 -left-4 w-6 h-6 bg-guardian/10 rounded-full flex items-center justify-center">
+                      <Heart className="h-3 w-3 text-guardian" />
+                    </div>
+                    <div className="absolute -bottom-2 right-8 w-7 h-7 bg-wellness/10 rounded-full flex items-center justify-center">
+                      <Phone className="h-3 w-3 text-wellness" />
+                    </div>
+                    
+                    <div className="relative">
+                      <img
+                        src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
+                        alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
+                        className="w-full h-auto rounded-xl shadow-xl object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Features Grid - Clean Layout */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {selectedPlan.features.map((feature, featureIndex) => (
+                    <div key={featureIndex} className="flex items-start gap-3 p-4 rounded-lg hover:bg-primary/5 transition-colors duration-200">
+                      <div className="w-5 h-5 bg-primary/10 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0">
+                        <Check className="h-3 w-3 text-primary" />
+                      </div>
+                      <span className="text-sm text-muted-foreground leading-relaxed">{feature}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             ) : null;
