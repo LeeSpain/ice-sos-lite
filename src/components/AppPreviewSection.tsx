@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Mic, Phone, Bluetooth, Users, Shield, Speaker } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { Link } from "react-router-dom";
+import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 const AppPreviewSection: React.FC = () => {
   const { t } = useTranslation();
@@ -78,16 +79,18 @@ const AppPreviewSection: React.FC = () => {
                       View Smart Devices
                     </Link>
                   </Button>
-                  <Button 
-                    asChild 
-                    size="lg" 
-                    className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <Link to="/videos">
-                      <Speaker className="h-5 w-5 mr-2" />
-                      Watch Video
-                    </Link>
-                  </Button>
+                  <IntroVideoModal 
+                    defaultVideoId="all-ages"
+                    trigger={
+                      <Button 
+                        size="lg" 
+                        className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                      >
+                        <Speaker className="h-5 w-5 mr-2" />
+                        Watch Video
+                      </Button>
+                    }
+                  />
                 </div>
                 <p className="text-sm text-muted-foreground">
                   Compatible with Alexa, Google Assistant & Apple HomeKit
