@@ -50,6 +50,7 @@ import SimpleDashboard from "./pages/SimpleDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
 import ScrollToTop from "@/components/ScrollToTop";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
 
 const App = () => {
@@ -274,6 +275,9 @@ const App = () => {
             
             {/* Show device manager only in protected SOS app */}
             {window.location.pathname === '/app' && <DeviceManagerButton />}
+            
+            {/* PWA Install Prompt */}
+            <PWAInstallPrompt />
           </BrowserRouter>
           </EmmaChatProvider>
         </AuthProvider>
