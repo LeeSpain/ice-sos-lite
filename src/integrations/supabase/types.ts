@@ -1329,6 +1329,7 @@ export type Database = {
       }
       family_memberships: {
         Row: {
+          billing_status: string | null
           billing_type: string
           created_at: string | null
           group_id: string
@@ -1339,6 +1340,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          billing_status?: string | null
           billing_type: string
           created_at?: string | null
           group_id: string
@@ -1349,6 +1351,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          billing_status?: string | null
           billing_type?: string
           created_at?: string | null
           group_id?: string
@@ -1509,6 +1512,72 @@ export type Database = {
           status?: string | null
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      live_presence: {
+        Row: {
+          battery: number | null
+          is_paused: boolean | null
+          last_seen: string | null
+          lat: number | null
+          lng: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          battery?: number | null
+          is_paused?: boolean | null
+          last_seen?: string | null
+          lat?: number | null
+          lng?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          battery?: number | null
+          is_paused?: boolean | null
+          last_seen?: string | null
+          lat?: number | null
+          lng?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      location_pings: {
+        Row: {
+          accuracy: number | null
+          battery: number | null
+          captured_at: string
+          id: string
+          lat: number
+          lng: number
+          source: string | null
+          speed: number | null
+          user_id: string
+        }
+        Insert: {
+          accuracy?: number | null
+          battery?: number | null
+          captured_at?: string
+          id?: string
+          lat: number
+          lng: number
+          source?: string | null
+          speed?: number | null
+          user_id: string
+        }
+        Update: {
+          accuracy?: number | null
+          battery?: number | null
+          captured_at?: string
+          id?: string
+          lat?: number
+          lng?: number
+          source?: string | null
+          speed?: number | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -1756,6 +1825,79 @@ export type Database = {
           verified_at?: string | null
         }
         Relationships: []
+      }
+      place_events: {
+        Row: {
+          event: string
+          id: string
+          occurred_at: string
+          place_id: string
+          user_id: string
+        }
+        Insert: {
+          event: string
+          id?: string
+          occurred_at?: string
+          place_id: string
+          user_id: string
+        }
+        Update: {
+          event?: string
+          id?: string
+          occurred_at?: string
+          place_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "place_events_place_id_fkey"
+            columns: ["place_id"]
+            isOneToOne: false
+            referencedRelation: "places"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      places: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          family_group_id: string
+          id: string
+          lat: number
+          lng: number
+          name: string
+          radius_m: number
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          family_group_id: string
+          id?: string
+          lat: number
+          lng: number
+          name: string
+          radius_m?: number
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          family_group_id?: string
+          id?: string
+          lat?: number
+          lng?: number
+          name?: string
+          radius_m?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "places_family_group_id_fkey"
+            columns: ["family_group_id"]
+            isOneToOne: false
+            referencedRelation: "family_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       posting_queue: {
         Row: {
@@ -3393,6 +3535,46 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      cube: {
+        Args: { "": number[] } | { "": number }
+        Returns: unknown
+      }
+      cube_dim: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      cube_in: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      cube_is_point: {
+        Args: { "": unknown }
+        Returns: boolean
+      }
+      cube_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      cube_recv: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      cube_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      cube_size: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      earth: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      gc_to_sec: {
+        Args: { "": number }
+        Returns: number
+      }
       get_communication_metrics_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -3445,9 +3627,21 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      latitude: {
+        Args: { "": unknown }
+        Returns: number
+      }
       log_security_event: {
         Args: { p_event_type: string; p_metadata?: Json; p_user_id: string }
         Returns: undefined
+      }
+      longitude: {
+        Args: { "": unknown }
+        Returns: number
+      }
+      sec_to_gc: {
+        Args: { "": number }
+        Returns: number
       }
     }
     Enums: {
