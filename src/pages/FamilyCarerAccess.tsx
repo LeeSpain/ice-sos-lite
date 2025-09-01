@@ -333,360 +333,356 @@ const FamilyCarerAccessPage = () => {
         </div>
       </section>
 
-      {/* Owner Invitation Process */}
+      {/* What Your Family Gets - Flow Layout */}
       <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
+              <Users className="h-4 w-4 text-wellness mr-2" />
+              <span className="text-sm font-medium text-wellness">What Your Family Gets</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Complete Emergency Coordination System
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              When you invite family members, they get instant access to your emergency alerts with precise location sharing during SOS events only.
+            </p>
+          </div>
+          
+          {/* Feature Flow */}
+          <div className="max-w-6xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+              <div>
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emergency to-emergency/80 rounded-xl flex items-center justify-center mr-4">
+                    <Bell className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">Instant SOS Alerts</h3>
+                </div>
+                <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                  Family members receive immediate push notifications when you trigger an emergency. They see your exact location, 
+                  emergency type, and can respond with "Received & On It" to coordinate help effectively.
+                </p>
+                <div className="bg-emergency/5 border-l-4 border-emergency p-4 rounded-r-lg">
+                  <p className="text-sm text-emergency font-medium">Real-time location sharing during emergencies only - no constant tracking</p>
+                </div>
+              </div>
+              <div className="relative">
+                <OptimizedImage 
+                  src="/lovable-uploads/0365334e-7587-4cf4-96a6-5744399b84b2.png" 
+                  alt="Family emergency alert notification showing location and response options"
+                  className="w-full rounded-2xl shadow-lg"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-16 items-center mb-20">
+              <div className="order-2 lg:order-1 relative">
+                <OptimizedImage 
+                  src="/lovable-uploads/6adce9d3-1bbc-4e72-87d5-d397b11fcab8.png" 
+                  alt="Family member dashboard showing emergency coordination tools"
+                  className="w-full rounded-2xl shadow-lg"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </div>
+              <div className="order-1 lg:order-2">
+                <div className="flex items-center mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center mr-4">
+                    <MessageSquare className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-foreground">Emergency Coordination Dashboard</h3>
+                </div>
+                <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                  Family members get a clean, mobile-friendly dashboard to coordinate emergency response. See who's responding, 
+                  contact emergency services, and communicate with other family members in real-time.
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-foreground">One-click emergency response</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-foreground">Family coordination tools</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-foreground">Emergency timeline tracking</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How Family Access Works - Timeline */}
+      <section className="py-20 bg-gradient-to-br from-muted/20 via-background to-primary/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-primary/10 rounded-full px-4 py-2 mb-4 border border-primary/20">
               <UserCog className="h-4 w-4 text-primary mr-2" />
-              <span className="text-sm font-medium text-primary">For Family Owners</span>
+              <span className="text-sm font-medium text-primary">Simple Setup</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              How You Invite Family Members
+              How You Add Family Members
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              As the family owner, you control who joins your emergency network with secure invitation links and flexible billing options.
+              As the family owner, you control who joins your emergency network with secure invitations and flexible billing.
             </p>
           </div>
           
-          <div className="relative">
-            {/* Process Flow Line */}
-            <div className="hidden lg:block absolute top-32 left-1/2 transform -translate-x-1/2 w-3/4 h-0.5 bg-gradient-to-r from-primary via-wellness to-emergency opacity-30"></div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6 mt-4">
-              {invitationProcess.map((step, index) => {
-                const Icon = step.icon;
-                const colorClass = getGradientBg(step.color);
-                const textColor = getIconColor(step.color);
-                
-                return (
-                  <div key={index} className="relative group mt-8">
-                    <Card className="relative border-2 border-muted/20 hover:border-wellness/30 transition-all duration-500 hover:shadow-xl bg-white dark:bg-slate-800 group-hover:scale-105 overflow-visible">
-                      {/* Step Number Circle */}
-                      <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-20">
-                        <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg border-4 border-background group-hover:scale-110 transition-transform duration-300`}>
-                          {step.step}
+          {/* Timeline Layout */}
+          <div className="max-w-4xl mx-auto">
+            <div className="relative">
+              {/* Vertical Line */}
+              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-wellness to-emergency opacity-30 hidden md:block"></div>
+              
+              <div className="space-y-12">
+                {invitationProcess.map((step, index) => {
+                  const Icon = step.icon;
+                  const isEven = index % 2 === 0;
+                  
+                  return (
+                    <div key={index} className={`relative flex items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+                      {/* Step Circle */}
+                      <div className="absolute left-8 transform -translate-x-1/2 z-10 hidden md:block">
+                        <div className={`w-16 h-16 bg-gradient-to-br ${getGradientBg(step.color)} rounded-full flex items-center justify-center shadow-lg border-4 border-background`}>
+                          <Icon className="h-8 w-8 text-white" />
                         </div>
                       </div>
                       
-                      <CardHeader className="pt-12 pb-4">
-                        <div className="flex justify-center mb-4">
-                          <div className={`w-16 h-16 bg-gradient-to-br ${colorClass} rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                            <Icon className="h-8 w-8 text-white" />
+                      {/* Content */}
+                      <div className={`flex-1 ${isEven ? 'md:pl-24' : 'md:pr-24'}`}>
+                        <div className={`bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-muted/20 ${isEven ? 'md:ml-8' : 'md:mr-8'}`}>
+                          <div className="flex items-center mb-4 md:hidden">
+                            <div className={`w-12 h-12 bg-gradient-to-br ${getGradientBg(step.color)} rounded-xl flex items-center justify-center mr-4`}>
+                              <Icon className="h-6 w-6 text-white" />
+                            </div>
+                            <span className="text-2xl font-bold text-muted-foreground">0{step.step}</span>
                           </div>
+                          <div className="hidden md:block text-right mb-2">
+                            <span className="text-sm font-semibold text-muted-foreground">STEP {step.step}</span>
+                          </div>
+                          <h3 className={`text-xl font-bold mb-3 ${getIconColor(step.color)}`}>{step.title}</h3>
+                          <p className="text-muted-foreground leading-relaxed">{step.description}</p>
                         </div>
-                        <CardTitle className={`text-xl font-bold text-center ${textColor} group-hover:scale-105 transition-transform duration-300`}>
-                          {step.title}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="text-center pb-8">
-                        <CardDescription className="text-base leading-relaxed text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                          {step.description}
-                        </CardDescription>
-                      </CardContent>
-                    </Card>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Complete Family Features */}
-      <section className="py-20 bg-gradient-to-br from-muted/20 via-background to-primary/5">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
-              <Zap className="h-4 w-4 text-wellness mr-2" />
-              <span className="text-sm font-medium text-wellness">Complete Feature Set</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Everything Your Family Gets
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Comprehensive emergency coordination tools designed for real-world family safety scenarios.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {familyFeatures.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card 
-                  key={index} 
-                  className={`group border-2 transition-all duration-300 hover:shadow-lg ${getCardBorder(feature.color)} bg-white dark:bg-slate-800`}
-                >
-                  <CardHeader>
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${getGradientBg(feature.color)} shadow-lg flex items-center justify-center mb-4`}>
-                      <Icon className="h-6 w-6 text-white" />
+                      </div>
                     </div>
-                    <CardTitle className="text-xl font-semibold text-foreground">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <CardDescription className="text-base leading-relaxed text-muted-foreground">
-                      {feature.description}
-                    </CardDescription>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Family Member Experience */}
+      {/* Pricing Section - Clean Layout */}
       <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-guardian/10 rounded-full px-4 py-2 mb-4 border border-guardian/20">
-              <Users className="h-4 w-4 text-guardian mr-2" />
-              <span className="text-sm font-medium text-guardian">Family Member Experience</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              What Family Members See & Do
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Simple, intuitive interface designed for emergency response. No complex features - just effective family coordination.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            {memberExperience.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <Card key={index} className="group border-2 border-guardian/20 hover:border-guardian/40 transition-all duration-300 hover:shadow-lg bg-white dark:bg-slate-800">
-                  <CardHeader>
-                    <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-guardian to-guardian/80 shadow-lg flex items-center justify-center flex-shrink-0">
-                        <Icon className="h-6 w-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-xl font-semibold text-foreground mb-2">{item.title}</CardTitle>
-                        <CardDescription className="text-base leading-relaxed text-muted-foreground mb-3">
-                          {item.description}
-                        </CardDescription>
-                        <div className="inline-flex items-center bg-guardian/10 rounded-full px-3 py-1 border border-guardian/20">
-                          <CheckCircle className="h-3 w-3 text-guardian mr-2" />
-                          <span className="text-xs font-medium text-guardian">{item.benefit}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Pricing & Billing */}
-      <section className="py-20 bg-gradient-to-br from-warning/5 via-background to-warning/10">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <div className="inline-flex items-center bg-warning/10 rounded-full px-4 py-2 mb-4 border border-warning/20">
               <Euro className="h-4 w-4 text-warning mr-2" />
-              <span className="text-sm font-medium text-warning">Flexible Billing Options</span>
+              <span className="text-sm font-medium text-warning">Simple Pricing</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Family Access Pricing
+              Family Access Costs
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Choose between owner-paid family seats or let family members manage their own subscriptions with full emergency features.
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
+              Two flexible options: you pay for family seats, or they manage their own subscriptions.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {pricingOptions.map((option, index) => (
-              <Card key={index} className={`relative border-2 ${option.popular ? 'border-primary/30 ring-2 ring-primary/20' : 'border-muted/20'} hover:border-primary/40 transition-all duration-300 bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl overflow-hidden`}>
-                {option.popular && (
-                  <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-primary to-primary/80 text-white text-center py-2 text-sm font-semibold">
-                    Most Popular Choice
-                  </div>
-                )}
-                
-                <CardHeader className={`text-center ${option.popular ? 'pt-12' : 'pt-6'} pb-4`}>
-                  <div className={`w-12 h-12 bg-gradient-to-br ${getGradientBg(option.color)} rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg`}>
-                    <CreditCard className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle className="text-2xl font-bold text-foreground mb-3">{option.type}</CardTitle>
-                  <div className="flex items-baseline justify-center gap-1 mb-2">
-                    <span className={`text-3xl font-bold ${getIconColor(option.color)}`}>{option.price}</span>
-                    <span className="text-sm text-muted-foreground">{option.period}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{option.description}</p>
-                </CardHeader>
-                
-                <CardContent className="px-6 pb-6">
-                  <div className="space-y-3 mb-6">
-                    {option.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center gap-3">
-                        <Check className={`h-4 w-4 ${getIconColor(option.color)} flex-shrink-0`} />
-                        <span className="text-sm text-foreground">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                  
-                  <Button 
-                    asChild 
-                    size="lg" 
-                    className={`w-full ${option.popular ? 'bg-primary hover:bg-primary/90' : 'bg-wellness hover:bg-wellness/90'} text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300`}
-                  >
-                    <Link to="/ai-register">
-                      <Users className="mr-2 h-4 w-4" />
-                      Get Started
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          
-          {/* Cost Examples */}
-          <div className="mt-16 bg-muted/30 rounded-2xl p-8 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-center text-foreground mb-6">Family Size Cost Examples</h3>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">{formatDisplayCurrency(convertCurrency(5.98, 'EUR', currency), currency, languageToLocale(language))}</div>
-                <div className="text-sm text-muted-foreground">2 family members</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">{formatDisplayCurrency(convertCurrency(11.96, 'EUR', currency), currency, languageToLocale(language))}</div>
-                <div className="text-sm text-muted-foreground">4 family members</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">{formatDisplayCurrency(convertCurrency(17.94, 'EUR', currency), currency, languageToLocale(language))}</div>
-                <div className="text-sm text-muted-foreground">6 family members</div>
-              </div>
-            </div>
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              All prices per month • No setup fees • Cancel anytime
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Privacy & Security Section */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-guardian/10 rounded-full px-4 py-2 mb-4 border border-guardian/20">
-              <Shield className="h-4 w-4 text-guardian mr-2" />
-              <span className="text-sm font-medium text-guardian">Privacy & Security</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Enterprise-Grade Security
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Your family's emergency data is protected with military-grade encryption and privacy-first architecture.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {securityFeatures.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="border-2 border-guardian/20 hover:border-guardian/40 transition-all duration-300 hover:shadow-lg bg-white dark:bg-slate-800">
-                  <CardHeader>
-                    <div className="flex items-start space-x-4">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-guardian to-guardian/80 shadow-md flex items-center justify-center flex-shrink-0">
-                        <Icon className="h-5 w-5 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <CardTitle className="text-lg font-semibold text-foreground mb-2">{feature.title}</CardTitle>
-                        <CardDescription className="text-sm leading-relaxed text-muted-foreground">
-                          {feature.description}
-                        </CardDescription>
-                      </div>
+          {/* Pricing Comparison */}
+          <div className="max-w-5xl mx-auto">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-muted/20">
+              <div className="grid md:grid-cols-2">
+                {/* Option 1 */}
+                <div className="p-8 border-r border-muted/20">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <Users className="h-8 w-8 text-white" />
                     </div>
-                  </CardHeader>
-                </Card>
-              );
-            })}
-          </div>
-          
-          <div className="mt-12 bg-guardian/5 rounded-2xl p-8 max-w-4xl mx-auto border border-guardian/20">
-            <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-guardian to-guardian/80 shadow-lg flex items-center justify-center flex-shrink-0">
-                <EyeOff className="h-6 w-6 text-white" />
+                    <h3 className="text-2xl font-bold text-foreground mb-2">You Pay for Family</h3>
+                    <div className="text-4xl font-bold text-primary mb-1">{formattedSeatPrice}</div>
+                    <div className="text-sm text-muted-foreground">per family member/month</div>
+                  </div>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center">
+                      <Check className="h-4 w-4 text-primary mr-3" />
+                      <span className="text-sm">You control all billing</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-4 w-4 text-primary mr-3" />
+                      <span className="text-sm">Family gets full access</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-4 w-4 text-primary mr-3" />
+                      <span className="text-sm">Unlimited family members</span>
+                    </div>
+                  </div>
+                  <div className="bg-primary/5 rounded-lg p-3">
+                    <div className="text-xs text-primary font-medium">Most Popular Choice</div>
+                  </div>
+                </div>
+                
+                {/* Option 2 */}
+                <div className="p-8">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <CreditCard className="h-8 w-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">They Pay Themselves</h3>
+                    <div className="text-4xl font-bold text-wellness mb-1">{formattedMemberPrice}</div>
+                    <div className="text-sm text-muted-foreground">per member/month</div>
+                  </div>
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center">
+                      <Check className="h-4 w-4 text-wellness mr-3" />
+                      <span className="text-sm">Independent subscription</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-4 w-4 text-wellness mr-3" />
+                      <span className="text-sm">5 personal emergency contacts</span>
+                    </div>
+                    <div className="flex items-center">
+                      <Check className="h-4 w-4 text-wellness mr-3" />
+                      <span className="text-sm">Full ICE SOS features</span>
+                    </div>
+                  </div>
+                  <div className="bg-wellness/5 rounded-lg p-3">
+                    <div className="text-xs text-wellness font-medium">Includes Own Emergency System</div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-foreground mb-3">Emergency-Only Location Sharing</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Family members can only see your location during active SOS emergencies. No constant tracking, no location history, no monitoring. 
-                  Your privacy is maintained until you specifically trigger an emergency alert.
-                </p>
+            </div>
+            
+            {/* Cost Examples */}
+            <div className="mt-12 text-center">
+              <h3 className="text-xl font-semibold text-foreground mb-6">Example Family Costs (Owner-Paid)</h3>
+              <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+                <div>
+                  <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(5.98, 'EUR', currency), currency, languageToLocale(language))}</div>
+                  <div className="text-sm text-muted-foreground">2 members</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(11.96, 'EUR', currency), currency, languageToLocale(language))}</div>
+                  <div className="text-sm text-muted-foreground">4 members</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(17.94, 'EUR', currency), currency, languageToLocale(language))}</div>
+                  <div className="text-sm text-muted-foreground">6 members</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-20 bg-gradient-to-br from-wellness/5 via-background to-wellness/10">
+      {/* Privacy & Benefits - Split Layout */}
+      <section className="py-20 bg-gradient-to-br from-guardian/5 via-background to-guardian/10">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
-              <Heart className="h-4 w-4 text-wellness mr-2" />
-              <span className="text-sm font-medium text-wellness">Customer Stories</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Real Family Experiences
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              See how families use ICE SOS to stay connected and coordinate emergency responses.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-2 border-wellness/20 hover:border-wellness/40 transition-all duration-300 hover:shadow-lg bg-white dark:bg-slate-800">
-                <CardHeader>
-                  <div className="flex items-center space-x-1 mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-wellness text-wellness" />
-                    ))}
-                  </div>
-                  <Quote className="h-8 w-8 text-wellness/40 mb-2" />
-                </CardHeader>
-                <CardContent>
-                  <blockquote className="text-foreground italic leading-relaxed mb-4">
-                    "{testimonial.content}"
-                  </blockquote>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-wellness to-wellness/80 flex items-center justify-center">
-                      <span className="text-white font-semibold text-sm">
-                        {testimonial.name.split(' ').map(n => n[0]).join('')}
-                      </span>
+          <div className="max-w-6xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Privacy */}
+              <div>
+                <div className="inline-flex items-center bg-guardian/10 rounded-full px-4 py-2 mb-6 border border-guardian/20">
+                  <Shield className="h-4 w-4 text-guardian mr-2" />
+                  <span className="text-sm font-medium text-guardian">Privacy First</span>
+                </div>
+                <h2 className="text-3xl font-bold text-foreground mb-6">
+                  Emergency-Only Location Sharing
+                </h2>
+                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                  Your family can only see your location during active SOS emergencies. No constant tracking, 
+                  no location history, no monitoring outside actual emergencies.
+                </p>
+                
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <div className="w-6 h-6 bg-guardian/20 rounded-full flex items-center justify-center mr-4 mt-1">
+                      <Lock className="h-3 w-3 text-guardian" />
                     </div>
                     <div>
-                      <div className="font-semibold text-foreground">{testimonial.name}</div>
-                      <div className="text-sm text-muted-foreground">{testimonial.role}</div>
+                      <div className="font-semibold text-foreground">End-to-End Encryption</div>
+                      <div className="text-sm text-muted-foreground">All emergency data protected with AES-256 encryption</div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                  <div className="flex items-start">
+                    <div className="w-6 h-6 bg-guardian/20 rounded-full flex items-center justify-center mr-4 mt-1">
+                      <EyeOff className="h-3 w-3 text-guardian" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-foreground">No Constant Monitoring</div>
+                      <div className="text-sm text-muted-foreground">Location shared only during SOS events</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-6 h-6 bg-guardian/20 rounded-full flex items-center justify-center mr-4 mt-1">
+                      <Key className="h-3 w-3 text-guardian" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-foreground">Secure Invitations</div>
+                      <div className="text-sm text-muted-foreground">Cryptographically secure tokens with 72-hour expiry</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Benefits */}
+              <div>
+                <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-6 border border-wellness/20">
+                  <Heart className="h-4 w-4 text-wellness mr-2" />
+                  <span className="text-sm font-medium text-wellness">Peace of Mind</span>
+                </div>
+                <h2 className="text-3xl font-bold text-foreground mb-6">
+                  What This Means for Your Family
+                </h2>
+                
+                <div className="space-y-6">
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-muted/20">
+                    <div className="flex items-center mb-3">
+                      <Bell className="h-5 w-5 text-emergency mr-3" />
+                      <span className="font-semibold text-foreground">Instant Emergency Response</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Family knows immediately when you're in trouble with your exact location</p>
+                  </div>
+                  
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-muted/20">
+                    <div className="flex items-center mb-3">
+                      <UserCheck className="h-5 w-5 text-primary mr-3" />
+                      <span className="font-semibold text-foreground">Coordinated Help</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">Avoid confusion with "Received & On It" responses showing who's helping</p>
+                  </div>
+                  
+                  <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-muted/20">
+                    <div className="flex items-center mb-3">
+                      <Shield className="h-5 w-5 text-guardian mr-3" />
+                      <span className="font-semibold text-foreground">Complete Privacy</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">No tracking outside emergencies - privacy maintained until you need help</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Final CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-emergency/5 via-primary/5 to-wellness/5">
+      {/* Final CTA */}
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center bg-emergency/10 rounded-full px-4 py-2 mb-6 border border-emergency/20">
-              <Users className="h-4 w-4 text-emergency mr-2" />
-              <span className="text-sm font-medium text-emergency">Start Today</span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-8">
-              Connect Your Family to Your Emergency System
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              Ready to Connect Your Family?
             </h2>
             <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto">
-              Join thousands of families who trust ICE SOS for emergency coordination. Set up your family access in minutes with our guided onboarding process.
+              Join thousands of families using ICE SOS for emergency coordination. Set up family access in minutes.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <Button 
                 asChild 
                 size="xl" 
@@ -694,50 +690,36 @@ const FamilyCarerAccessPage = () => {
               >
                 <Link to="/ai-register">
                   <UserPlus className="mr-2 h-5 w-5" />
-                  Start Family Access Setup
+                  Start Family Access
                 </Link>
               </Button>
               
-              <div className="flex items-center space-x-4">
-                <IntroVideoModal 
-                  defaultVideoId="family"
-                  trigger={
-                    <Button 
-                      variant="outline"
-                      size="lg"
-                      className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      Watch Demo
-                    </Button>
-                  }
-                />
-                
-                <Button 
-                  asChild 
-                  variant="ghost" 
-                  size="lg"
-                  className="text-primary hover:bg-primary/10 font-medium"
-                >
-                  <Link to="/dashboard">
-                    <Settings className="mr-2 h-4 w-4" />
-                    Existing User Dashboard
-                  </Link>
-                </Button>
-              </div>
+              <IntroVideoModal 
+                defaultVideoId="family"
+                trigger={
+                  <Button 
+                    variant="outline"
+                    size="xl"
+                    className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                  >
+                    <Play className="h-4 w-4 mr-2" />
+                    Watch Demo
+                  </Button>
+                }
+              />
             </div>
             
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary mb-2">30-Day</div>
+            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto text-center">
+              <div>
+                <div className="text-lg font-bold text-primary mb-1">30-Day</div>
                 <div className="text-sm text-muted-foreground">Money-back guarantee</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary mb-2">No Setup</div>
+              <div>
+                <div className="text-lg font-bold text-primary mb-1">No Setup</div>
                 <div className="text-sm text-muted-foreground">Fees or contracts</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary mb-2">24/7</div>
+              <div>
+                <div className="text-lg font-bold text-primary mb-1">24/7</div>
                 <div className="text-sm text-muted-foreground">Emergency support</div>
               </div>
             </div>
