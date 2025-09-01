@@ -296,7 +296,7 @@ const FamilyCarerAccessPage = () => {
                 >
                   <Link to="/ai-register">
                     <UserPlus className="mr-2 h-5 w-5" />
-                    Start Family Access
+                    Join Now
                   </Link>
                 </Button>
                 
@@ -306,10 +306,10 @@ const FamilyCarerAccessPage = () => {
                     <Button 
                       variant="outline"
                       size="xl"
-                      className="border-2 border-white text-white hover:bg-white hover:text-background font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl backdrop-blur-sm"
+                      className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                     >
                       <Play className="h-5 w-5 mr-2" />
-                      Watch Family Demo
+                      Watch Video
                     </Button>
                   }
                 />
