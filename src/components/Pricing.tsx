@@ -239,17 +239,6 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                            {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
                          </p>
                          
-                         {/* Extended Description */}
-                         <div className="mb-6 space-y-2">
-                           <p className="text-sm text-muted-foreground leading-relaxed">
-                             Advanced AI-powered emergency detection monitors your voice patterns, location changes, and safety status. 
-                             Automatically alerts your emergency contacts and professional responders when needed.
-                           </p>
-                           <p className="text-sm text-muted-foreground leading-relaxed">
-                             Includes real-time family tracking, smart geofencing, and 24/7 monitoring with instant emergency response coordination.
-                           </p>
-                         </div>
-                         
                          <div className="mb-4">
                            <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
                            <span className="text-muted-foreground text-base">/{selectedPlan.billing_interval}</span>
