@@ -443,36 +443,6 @@ const FamilyProfile = () => {
                 </div>
               </div>
 
-              {/* Medical Information */}
-              <div className="space-y-4">
-                <h4 className="font-semibold">Medical Information</h4>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="medical_conditions">Medical Conditions</Label>
-                    <Input
-                      id="medical_conditions"
-                      value={profileData.medical_conditions.join(', ')}
-                      onChange={(e) => setProfileData(prev => ({ 
-                        ...prev, 
-                        medical_conditions: e.target.value ? e.target.value.split(', ').map(item => item.trim()) : []
-                      }))}
-                      placeholder="List any medical conditions (separated by commas)"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="allergies">Allergies</Label>
-                    <Input
-                      id="allergies"
-                      value={profileData.allergies.join(', ')}
-                      onChange={(e) => setProfileData(prev => ({ 
-                        ...prev, 
-                        allergies: e.target.value ? e.target.value.split(', ').map(item => item.trim()) : []
-                      }))}
-                      placeholder="List any allergies (separated by commas)"
-                    />
-                  </div>
-                </div>
-              </div>
 
               {/* Save Button */}
               <Button 
@@ -559,54 +529,8 @@ const FamilyProfile = () => {
           </Card>
         )}
 
-        {/* Family Connection Status */}
+        {/* Privacy & Security */}
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Family Connection Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Connected to:</span>
-                  <Badge variant="default">
-                    {ownerProfile ? `${ownerProfile.first_name} ${ownerProfile.last_name}` : 'Loading...'}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Your Role:</span>
-                  <Badge variant="outline">
-                    {familyMembership?.relationship || 'Family Member'}
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Emergency Alerts:</span>
-                  <Badge variant="outline" className="text-green-600 border-green-300">
-                    Enabled
-                  </Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Access Level:</span>
-                  <Badge variant="outline" className="text-blue-600 border-blue-300">
-                    {familyRole?.role === 'owner' ? 'Full Control' : 'Emergency Monitor'}
-                  </Badge>
-                </div>
-                {familyMembership && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Connected Since:</span>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(familyMembership.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Privacy & Security */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -644,44 +568,6 @@ const FamilyProfile = () => {
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Quick Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start"
-                onClick={() => window.location.href = '/app'}
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                Emergency SOS App
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start"
-                onClick={() => window.location.href = '/family-dashboard/emergency-map'}
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Emergency Map
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start"
-                onClick={() => window.location.href = '/family-dashboard/notifications'}
-              >
-                <Bell className="h-4 w-4 mr-2" />
-                View Notifications
-              </Button>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

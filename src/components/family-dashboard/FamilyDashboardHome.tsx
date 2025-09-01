@@ -17,6 +17,7 @@ const FamilyDashboardHome = () => {
   const [activeSOSEvents, setActiveSOSEvents] = useState<any[]>([]);
   const [ownerProfile, setOwnerProfile] = useState<any>(null);
   const [familyGroup, setFamilyGroup] = useState<any>(null);
+  const [familyMembership, setFamilyMembership] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -75,6 +76,18 @@ const FamilyDashboardHome = () => {
         .order('created_at', { ascending: false });
 
       setActiveSOSEvents(sosEvents || []);
+
+      // Load family membership details
+      if (user) {
+        const { data: membership } = await supabase
+          .from('family_memberships')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('group_id', familyRole.familyGroupId)
+          .single();
+
+        setFamilyMembership(membership);
+      }
 
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -244,6 +257,52 @@ const FamilyDashboardHome = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Family Connection Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            Family Connection Status
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Connected to:</span>
+              <Badge variant="default">
+                {ownerProfile ? `${ownerProfile.first_name} ${ownerProfile.last_name}` : 'Loading...'}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Your Role:</span>
+              <Badge variant="outline">
+                {familyMembership?.relationship || familyRole?.role === 'owner' ? 'Owner' : 'Family Member'}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Emergency Alerts:</span>
+              <Badge variant="outline" className="text-primary">
+                Enabled
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Access Level:</span>
+              <Badge variant="outline" className="text-primary">
+                {familyRole?.role === 'owner' ? 'Full Control' : 'Emergency Monitor'}
+              </Badge>
+            </div>
+            {familyMembership && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Connected Since:</span>
+                <span className="text-xs text-muted-foreground">
+                  {new Date(familyMembership.created_at).toLocaleDateString()}
+                </span>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Quick Access */}
       <Card>
