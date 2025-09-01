@@ -543,7 +543,7 @@ const FamilyProfile = () => {
                 <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                 <div>
                   <p className="font-medium">Location Privacy</p>
-                  <p className="text-muted-foreground">Location is only shared during active SOS emergencies.</p>
+                  <p className="text-muted-foreground">Live location is shared continuously with family members. Emergency contacts only receive location when SOS is activated.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">

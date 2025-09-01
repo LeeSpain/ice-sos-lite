@@ -347,8 +347,8 @@ const FamilyEmergencyMap = () => {
           <div className="flex items-start gap-3">
             <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
             <div>
-              <p className="font-medium text-foreground">Location Sharing</p>
-              <p>Family members' locations are only shared during active SOS emergencies for privacy.</p>
+              <p className="font-medium text-foreground">Live Location Sharing</p>
+              <p>Family members share live locations continuously for safety monitoring. Emergency contacts receive exact location only when SOS is activated.</p>
             </div>
           </div>
           <div className="flex items-start gap-3">

@@ -51,8 +51,8 @@ const FamilyCarerAccessPage = () => {
     },
     {
       icon: MapPin,
-      title: "Emergency Location Sharing",
-      description: "Your exact location is shared with family ONLY during active SOS emergencies - complete privacy otherwise.",
+      title: "Live Location Sharing",
+      description: "Family members share live locations continuously for safety monitoring. Emergency contacts receive exact location when SOS is activated.",
       color: "primary"
     },
     {
@@ -64,7 +64,7 @@ const FamilyCarerAccessPage = () => {
     {
       icon: Shield,
       title: "Privacy-First Design",
-      description: "No location tracking, device monitoring, or activity sharing. Family access is limited to SOS emergencies only.",
+      description: "Live location shared with family for safety. No device monitoring or activity tracking. Emergency contacts notified only during SOS.",
       color: "guardian"
     }
   ];

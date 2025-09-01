@@ -169,10 +169,10 @@ export const PrivacyDialog: React.FC<PrivacyDialogProps> = ({
 
                   <h4 className="font-semibold mb-3">When We Collect Location Data:</h4>
                   <ul className="list-disc pl-6 mb-4 space-y-1">
-                    <li>During active SOS emergency requests</li>
+                    <li>Continuously for family safety monitoring and live tracking</li>
+                    <li>During active SOS emergency requests for emergency contacts</li>
                     <li>When you manually share location for safety</li>
                     <li>For location-based emergency service routing</li>
-                    <li>When enabled for family/carer location sharing</li>
                   </ul>
 
                   <h4 className="font-semibold mb-3">Location Data Types:</h4>
