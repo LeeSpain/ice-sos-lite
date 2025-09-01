@@ -41,37 +41,46 @@ const Features = () => {
                     </div>
                   </div>
 
-                  {/* Realistic Map View - like Google Maps */}
+                  {/* Real Map View */}
                   <div className="h-80 relative overflow-hidden bg-gray-100">
-                    {/* Map Background with geometric pattern like real maps */}
+                    {/* Realistic map background */}
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 320 320">
-                      {/* Geometric map pattern */}
-                      <defs>
-                        <pattern id="mapPattern" patternUnits="userSpaceOnUse" width="20" height="20">
-                          <rect width="20" height="20" fill="#f8f9fa"/>
-                          <polygon points="0,0 20,0 10,10" fill="#e9ecef"/>
-                          <polygon points="0,20 20,20 10,10" fill="#e9ecef"/>
-                          <polygon points="0,0 0,20 10,10" fill="#dee2e6"/>
-                          <polygon points="20,0 20,20 10,10" fill="#dee2e6"/>
-                        </pattern>
-                      </defs>
-                      <rect width="100%" height="100%" fill="url(#mapPattern)"/>
+                      {/* Map base */}
+                      <rect width="100%" height="100%" fill="#f1f5f9"/>
                       
-                      {/* Green areas (parks) */}
-                      <rect x="240" y="180" width="70" height="80" fill="#c3f0ca" rx="8"/>
-                      <rect x="20" y="40" width="50" height="60" fill="#c3f0ca" rx="6"/>
+                      {/* Water/river */}
+                      <path d="M0,120 Q80,110 160,130 T320,140 L320,180 Q240,170 160,160 Q80,150 0,160 Z" fill="#bfdbfe"/>
                       
-                      {/* Roads overlay */}
-                      <path d="M0,160 L320,160" stroke="#ffffff" strokeWidth="4"/>
-                      <path d="M160,0 L160,320" stroke="#ffffff" strokeWidth="4"/>
-                      <path d="M0,80 L320,80" stroke="#ffffff" strokeWidth="2"/>
-                      <path d="M0,240 L320,240" stroke="#ffffff" strokeWidth="2"/>
-                      <path d="M80,0 L80,320" stroke="#ffffff" strokeWidth="2"/>
-                      <path d="M240,0 L240,320" stroke="#ffffff" strokeWidth="2"/>
+                      {/* Parks and green spaces */}
+                      <rect x="240" y="50" width="60" height="80" fill="#bbf7d0" rx="8"/>
+                      <rect x="20" y="220" width="80" height="60" fill="#bbf7d0" rx="8"/>
+                      <circle cx="60" cy="80" r="25" fill="#bbf7d0"/>
+                      
+                      {/* Building blocks */}
+                      <rect x="120" y="40" width="30" height="40" fill="#e2e8f0" rx="2"/>
+                      <rect x="160" y="40" width="25" height="35" fill="#e2e8f0" rx="2"/>
+                      <rect x="120" y="240" width="40" height="50" fill="#e2e8f0" rx="2"/>
+                      <rect x="180" y="250" width="35" height="45" fill="#e2e8f0" rx="2"/>
+                      
+                      {/* Major roads */}
+                      <path d="M0,100 L320,100" stroke="#ffffff" strokeWidth="6"/>
+                      <path d="M0,200 L320,200" stroke="#ffffff" strokeWidth="6"/>
+                      <path d="M100,0 L100,320" stroke="#ffffff" strokeWidth="6"/>
+                      <path d="M220,0 L220,320" stroke="#ffffff" strokeWidth="6"/>
+                      
+                      {/* Secondary roads */}
+                      <path d="M0,60 L320,60" stroke="#ffffff" strokeWidth="3"/>
+                      <path d="M0,260 L320,260" stroke="#ffffff" strokeWidth="3"/>
+                      <path d="M160,0 L160,320" stroke="#ffffff" strokeWidth="3"/>
+                      <path d="M40,0 L40,320" stroke="#ffffff" strokeWidth="3"/>
+                      
+                      {/* Road markings */}
+                      <path d="M0,100 L320,100" stroke="#fbbf24" strokeWidth="1" strokeDasharray="5,5"/>
+                      <path d="M100,0 L100,320" stroke="#fbbf24" strokeWidth="1" strokeDasharray="5,5"/>
                     </svg>
                     
-                    {/* Family Member Pins with proper map pin styling */}
-                    <div className="absolute top-12 left-16">
+                    {/* Family Member Pins */}
+                    <div className="absolute top-16 left-12">
                       <div className="relative">
                         <div className="w-10 h-10 bg-green-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center">
                           <span className="text-white font-bold text-sm">👵</span>
@@ -119,8 +128,8 @@ const Features = () => {
                     </div>
                   </div>
 
-                  {/* Family Status Cards */}
-                  <div className="p-4 space-y-2">
+                  {/* Family Status Cards - Only Grandma */}
+                  <div className="p-4">
                     <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
                       <div className="flex items-center">
                         <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
@@ -129,18 +138,6 @@ const Features = () => {
                         <div>
                           <p className="font-semibold text-xs text-green-800">Grandma is safe</p>
                           <p className="text-xs text-green-600">At home • 2 min ago</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
-                      <div className="flex items-center">
-                        <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center mr-3 animate-pulse">
-                          <span className="text-white text-xs">👧</span>
-                        </div>
-                        <div>
-                          <p className="font-semibold text-xs text-red-800">Emma needs help!</p>
-                          <p className="text-xs text-red-600">SOS activated • 30s ago</p>
                         </div>
                       </div>
                     </div>
