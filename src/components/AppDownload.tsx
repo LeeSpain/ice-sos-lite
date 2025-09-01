@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Download, Smartphone, Brain, MessageCircle, Zap, Star } from "lucide-react";
+import { Check, Download, Smartphone, Brain, MessageCircle, Zap, Star, Phone, Mic, Users, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 import { useEmmaChat } from "@/contexts/EmmaChatContext";
@@ -29,59 +29,124 @@ const AppDownload = () => {
             {/* Left Side - Emma AI Visual */}
             <div className="relative">
               {/* AI Chat Interface Mockup */}
-              <div className="relative mx-auto w-80 h-[500px] bg-gradient-to-b from-slate-900 to-slate-800 rounded-[3rem] p-3 shadow-2xl">
+              <div className="relative mx-auto w-80 h-[600px] bg-gradient-to-b from-slate-900 to-slate-800 rounded-[3rem] p-2 shadow-2xl">
                 <div className="w-full h-full bg-gradient-to-b from-white to-gray-50 rounded-[2.5rem] overflow-hidden relative">
                   {/* Status Bar */}
-                  <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary to-secondary text-white">
-                    <span className="font-bold">Emma AI</span>
+                  <div className="flex justify-between items-center px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white text-sm font-medium">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs">Online</span>
+                      <Brain className="h-4 w-4" />
+                      <span className="font-bold">Emma AI</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <div className="flex gap-0.5">
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                      </div>
+                      <span className="ml-2 text-xs">100%</span>
+                      <div className="w-6 h-3 border border-white rounded-sm bg-white/20 ml-1"></div>
                     </div>
                   </div>
 
-                  {/* Chat Interface */}
-                  <div className="p-4 space-y-4 h-full overflow-hidden">
-                    {/* Emma's Messages */}
-                    <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                        <Brain className="h-4 w-4 text-white" />
+                  {/* Chat Header */}
+                  <div className="bg-gradient-to-r from-primary/10 to-secondary/10 px-6 py-3 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                          <Brain className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">Emma</p>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span className="text-xs text-green-600">Active now</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="bg-primary/10 rounded-lg p-3 max-w-xs">
-                        <p className="text-xs font-medium text-primary mb-1">Emma</p>
-                        <p className="text-sm">Hi! I'm Emma, your AI assistant. How can I help you today?</p>
+                      <div className="flex gap-2">
+                        <div className="w-6 h-6 bg-white rounded-full shadow-sm flex items-center justify-center">
+                          <Phone className="h-3 w-3 text-gray-600" />
+                        </div>
+                        <div className="w-6 h-6 bg-white rounded-full shadow-sm flex items-center justify-center">
+                          <MessageCircle className="h-3 w-3 text-gray-600" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Chat Messages */}
+                  <div className="flex-1 p-4 space-y-4 overflow-hidden">
+                    {/* Welcome Message */}
+                    <div className="flex items-start space-x-3">
+                      <div className="w-7 h-7 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                        <Brain className="h-3 w-3 text-white" />
+                      </div>
+                      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl rounded-tl-sm p-3 max-w-[200px] shadow-sm border border-primary/20">
+                        <p className="text-xs font-medium text-primary mb-1">Emma AI</p>
+                        <p className="text-sm text-gray-800">👋 Hi! I'm Emma, your intelligent AI assistant. I'm here to help with emergency setup, family connections, and answer any questions!</p>
+                        <p className="text-xs text-gray-500 mt-2">Just now</p>
                       </div>
                     </div>
 
+                    {/* Feature Showcase Message */}
                     <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                        <Brain className="h-4 w-4 text-white" />
+                      <div className="w-7 h-7 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                        <Zap className="h-3 w-3 text-white" />
                       </div>
-                      <div className="bg-primary/10 rounded-lg p-3 max-w-xs">
-                        <p className="text-xs font-medium text-primary mb-1">Emma</p>
-                        <p className="text-sm">I can help with emergency setup, family connections, and answer questions about your protection plan.</p>
+                      <div className="bg-gradient-to-r from-secondary/10 to-wellness/10 rounded-2xl rounded-tl-sm p-3 max-w-[200px] shadow-sm border border-secondary/20">
+                        <p className="text-xs font-medium text-secondary mb-1">Smart Features</p>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-xs">
+                            <Shield className="h-3 w-3 text-primary" />
+                            <span>Emergency Setup</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs">
+                            <Users className="h-3 w-3 text-secondary" />
+                            <span>Family Management</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs">
+                            <MessageCircle className="h-3 w-3 text-wellness" />
+                            <span>24/7 Support</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Just now</p>
                       </div>
                     </div>
 
                     {/* User Message */}
                     <div className="flex justify-end">
-                      <div className="bg-gradient-to-r from-primary to-secondary text-white rounded-lg p-3 max-w-xs">
-                        <p className="text-sm">How do I add family members?</p>
+                      <div className="bg-gradient-to-r from-primary to-secondary text-white rounded-2xl rounded-tr-sm p-3 max-w-[180px] shadow-sm">
+                        <p className="text-sm">How do I set up family members?</p>
+                        <p className="text-xs text-white/80 mt-1">Now</p>
                       </div>
                     </div>
 
-                    {/* Emma's Response */}
+                    {/* Emma's Response with Typing */}
                     <div className="flex items-start space-x-3">
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
-                        <Brain className="h-4 w-4 text-white" />
+                      <div className="w-7 h-7 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                        <Brain className="h-3 w-3 text-white" />
                       </div>
-                      <div className="bg-primary/10 rounded-lg p-3 max-w-xs">
-                        <p className="text-xs font-medium text-primary mb-1">Emma</p>
-                        <p className="text-sm">I'll guide you through adding family members step by step...</p>
-                        <div className="mt-2 flex space-x-1">
-                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce"></div>
-                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl rounded-tl-sm p-3 max-w-[200px] shadow-sm border border-primary/20">
+                        <p className="text-xs font-medium text-primary mb-1">Emma AI</p>
+                        <p className="text-sm text-gray-800">I'll guide you through adding family members step by step. It's really simple! 🚀</p>
+                        <div className="mt-3 flex space-x-1">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Chat Input */}
+                  <div className="p-4 border-t border-gray-200 bg-white">
+                    <div className="flex items-center space-x-3 bg-gray-50 rounded-full px-4 py-2 border border-gray-200">
+                      <MessageCircle className="h-4 w-4 text-gray-400" />
+                      <div className="flex-1 text-sm text-gray-500">Type your message...</div>
+                      <div className="flex items-center space-x-2">
+                        <Mic className="h-4 w-4 text-primary cursor-pointer" />
+                        <div className="w-6 h-6 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center cursor-pointer">
+                          <span className="text-white text-xs">→</span>
                         </div>
                       </div>
                     </div>
