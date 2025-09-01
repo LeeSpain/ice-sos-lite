@@ -11,7 +11,7 @@ const AppDownload = () => {
   const { t } = useTranslation();
   const { openEmmaChat } = useEmmaChat();
   return (
-    <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-wellness/5">
+    <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-wellness/5 mb-8">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
