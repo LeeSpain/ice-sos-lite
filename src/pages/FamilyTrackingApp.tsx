@@ -26,10 +26,13 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import FamilyInviteQuickSetup from '@/components/family-dashboard/FamilyInviteQuickSetup';
+import { MemberPin } from '@/components/map/MemberPin';
 
 type FamilyMember = {
   user_id: string;
   name: string;
+  first_name?: string;
+  last_name?: string;
   avatar_url?: string;
   lat: number;
   lng: number;
@@ -135,6 +138,8 @@ const FamilyTrackingApp = () => {
             return {
               user_id: userId,
               name: `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Family Member',
+              first_name: profile?.first_name,
+              last_name: profile?.last_name,
               avatar_url: undefined,
               lat: presence?.lat || demoLat,
               lng: presence?.lng || demoLng,
@@ -416,24 +421,20 @@ const FamilyTrackingApp = () => {
             lat: member.lat,
             lng: member.lng,
             render: () => (
-              <div className="relative">
-                <div 
-                  className="w-12 h-12 rounded-full border-4 border-white shadow-lg overflow-hidden cursor-pointer transform hover:scale-110 transition-transform"
-                  onClick={() => handleMemberSelect(member)}
-                >
-                  <Avatar className="w-full h-full">
-                    <AvatarImage src={member.avatar_url} />
-                    <AvatarFallback className="text-xs">
-                      {member.name.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${getStatusInfo(member).color} rounded-full border-2 border-white`}>
-                  {getStatusInfo(member).status === 'live' && (
-                    <div className="w-1 h-1 bg-white rounded-full animate-pulse absolute inset-1" />
-                  )}
-                </div>
-              </div>
+              <MemberPin 
+                presence={{
+                  user_id: member.user_id,
+                  lat: member.lat,
+                  lng: member.lng,
+                  last_seen: member.last_seen,
+                  battery: member.battery,
+                  is_paused: member.is_paused,
+                  first_name: member.first_name,
+                  last_name: member.last_name,
+                  avatar_url: member.avatar_url
+                }}
+                onClick={() => handleMemberSelect(member)}
+              />
             )
           }))}
         />
