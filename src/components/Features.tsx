@@ -41,72 +41,81 @@ const Features = () => {
                     </div>
                   </div>
 
-                  {/* Realistic Map View */}
-                  <div className="h-80 bg-gradient-to-br from-blue-50 to-green-50 relative overflow-hidden">
-                    {/* Map Roads/Streets Pattern */}
+                  {/* Realistic Map View - like Google Maps */}
+                  <div className="h-80 relative overflow-hidden bg-gray-100">
+                    {/* Map Background with geometric pattern like real maps */}
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 320 320">
-                      {/* Grid pattern for roads */}
+                      {/* Geometric map pattern */}
                       <defs>
-                        <pattern id="roadGrid" patternUnits="userSpaceOnUse" width="40" height="40">
-                          <rect width="40" height="40" fill="#f8fafc"/>
-                          <path d="M 40 0 L 0 0 0 40" stroke="#e2e8f0" strokeWidth="1"/>
+                        <pattern id="mapPattern" patternUnits="userSpaceOnUse" width="20" height="20">
+                          <rect width="20" height="20" fill="#f8f9fa"/>
+                          <polygon points="0,0 20,0 10,10" fill="#e9ecef"/>
+                          <polygon points="0,20 20,20 10,10" fill="#e9ecef"/>
+                          <polygon points="0,0 0,20 10,10" fill="#dee2e6"/>
+                          <polygon points="20,0 20,20 10,10" fill="#dee2e6"/>
                         </pattern>
                       </defs>
-                      <rect width="100%" height="100%" fill="url(#roadGrid)"/>
+                      <rect width="100%" height="100%" fill="url(#mapPattern)"/>
                       
-                      {/* Main roads */}
-                      <path d="M0,80 L320,80" stroke="#cbd5e1" strokeWidth="3"/>
-                      <path d="M0,160 L320,160" stroke="#cbd5e1" strokeWidth="3"/>
-                      <path d="M0,240 L320,240" stroke="#cbd5e1" strokeWidth="3"/>
-                      <path d="M80,0 L80,320" stroke="#cbd5e1" strokeWidth="3"/>
-                      <path d="M160,0 L160,320" stroke="#cbd5e1" strokeWidth="3"/>
-                      <path d="M240,0 L240,320" stroke="#cbd5e1" strokeWidth="3"/>
+                      {/* Green areas (parks) */}
+                      <rect x="240" y="180" width="70" height="80" fill="#c3f0ca" rx="8"/>
+                      <rect x="20" y="40" width="50" height="60" fill="#c3f0ca" rx="6"/>
                       
-                      {/* Park areas */}
-                      <rect x="20" y="20" width="60" height="50" fill="#dcfce7" rx="4"/>
-                      <rect x="200" y="180" width="80" height="60" fill="#dcfce7" rx="4"/>
+                      {/* Roads overlay */}
+                      <path d="M0,160 L320,160" stroke="#ffffff" strokeWidth="4"/>
+                      <path d="M160,0 L160,320" stroke="#ffffff" strokeWidth="4"/>
+                      <path d="M0,80 L320,80" stroke="#ffffff" strokeWidth="2"/>
+                      <path d="M0,240 L320,240" stroke="#ffffff" strokeWidth="2"/>
+                      <path d="M80,0 L80,320" stroke="#ffffff" strokeWidth="2"/>
+                      <path d="M240,0 L240,320" stroke="#ffffff" strokeWidth="2"/>
                     </svg>
                     
-                    {/* Family Member Pins with realistic styling */}
-                    <div className="absolute top-16 left-12">
+                    {/* Family Member Pins with proper map pin styling */}
+                    <div className="absolute top-12 left-16">
                       <div className="relative">
-                        <div className="w-8 h-8 bg-wellness rounded-full border-2 border-white shadow-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-xs">👵</span>
+                        <div className="w-10 h-10 bg-green-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">👵</span>
                         </div>
-                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-6 border-transparent border-t-wellness"></div>
+                        <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-green-500"></div>
                       </div>
-                      <div className="text-xs font-medium text-center mt-2 bg-white px-2 py-1 rounded shadow-sm border">Grandma</div>
+                      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Grandma</div>
                     </div>
                     
-                    <div className="absolute top-24 right-16">
+                    <div className="absolute top-20 right-12">
                       <div className="relative">
-                        <div className="w-8 h-8 bg-primary rounded-full border-2 border-white shadow-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-xs">👨</span>
+                        <div className="w-10 h-10 bg-red-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">👨</span>
                         </div>
-                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-6 border-transparent border-t-primary"></div>
+                        <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
                       </div>
-                      <div className="text-xs font-medium text-center mt-2 bg-white px-2 py-1 rounded shadow-sm border">Dad</div>
+                      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Dad</div>
                     </div>
                     
-                    <div className="absolute bottom-16 left-20">
+                    <div className="absolute bottom-12 left-12">
                       <div className="relative">
-                        <div className="w-8 h-8 bg-emergency rounded-full border-2 border-white shadow-lg flex items-center justify-center relative">
-                          <span className="text-white font-bold text-xs">👧</span>
-                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse border border-white"></div>
+                        <div className="w-10 h-10 bg-red-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center relative animate-pulse">
+                          <span className="text-white font-bold text-sm">👧</span>
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white animate-ping"></div>
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white"></div>
                         </div>
-                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-6 border-transparent border-t-emergency"></div>
+                        <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
                       </div>
-                      <div className="text-xs font-medium text-center mt-2 bg-red-50 px-2 py-1 rounded shadow-sm border border-red-200 text-red-800">Emma - Alert!</div>
+                      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-red-50 px-2 py-1 rounded shadow-md border border-red-200 text-red-800 whitespace-nowrap">Emma - Alert!</div>
                     </div>
 
                     {/* Map Controls */}
-                    <div className="absolute top-4 right-4 flex flex-col gap-2">
-                      <div className="w-8 h-8 bg-white rounded border shadow flex items-center justify-center">
-                        <span className="text-gray-600 text-xs font-bold">+</span>
+                    <div className="absolute top-4 right-4 flex flex-col gap-1">
+                      <div className="w-10 h-10 bg-white rounded-md border shadow-lg flex items-center justify-center hover:bg-gray-50 cursor-pointer">
+                        <span className="text-gray-700 text-lg font-light">+</span>
                       </div>
-                      <div className="w-8 h-8 bg-white rounded border shadow flex items-center justify-center">
-                        <span className="text-gray-600 text-xs font-bold">-</span>
+                      <div className="w-10 h-10 bg-white rounded-md border shadow-lg flex items-center justify-center hover:bg-gray-50 cursor-pointer">
+                        <span className="text-gray-700 text-lg font-light">−</span>
                       </div>
+                    </div>
+
+                    {/* Map attribution */}
+                    <div className="absolute bottom-2 left-2 text-xs text-gray-500 bg-white/80 px-2 py-1 rounded">
+                      Map data ©2024
                     </div>
                   </div>
 
