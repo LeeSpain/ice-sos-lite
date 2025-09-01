@@ -62,7 +62,7 @@ const DeviceIceSosPendant = () => {
   const features = [
     { icon: Bluetooth, text: "Bluetooth 5.0 Low Energy – fast, reliable pairing" },
     { icon: Droplets, text: "IP67 waterproof for everyday wear" },
-    { icon: Battery, text: "Up to 7 days battery life per charge" },
+    { icon: Battery, text: "More than 7 days battery life per charge" },
     { icon: MapPin, text: "100m range from your phone for flexible movement" }
   ];
 
@@ -212,22 +212,22 @@ const DeviceIceSosPendant = () => {
 
           {/* Key Features Grid */}
           <div className="grid md:grid-cols-4 gap-6">
-            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors">
+            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-all duration-300 hover-scale">
               <Zap className="h-12 w-12 text-emergency mx-auto mb-4" />
               <h3 className="font-semibold mb-2">Instant Activation</h3>
               <p className="text-sm text-muted-foreground">One-button emergency alert</p>
             </Card>
-            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors">
+            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-all duration-300 hover-scale">
               <Clock className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">7-Day Battery</h3>
-              <p className="text-sm text-muted-foreground">Long-lasting reliability</p>
+              <h3 className="font-semibold mb-2">Extended Battery</h3>
+              <p className="text-sm text-muted-foreground">More than 7 days reliability</p>
             </Card>
-            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors">
+            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-all duration-300 hover-scale">
               <Droplets className="h-12 w-12 text-guardian mx-auto mb-4" />
               <h3 className="font-semibold mb-2">Waterproof</h3>
               <p className="text-sm text-muted-foreground">IP67 rated protection</p>
             </Card>
-            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-colors">
+            <Card className="text-center p-6 border-2 border-primary/20 hover:border-primary/50 transition-all duration-300 hover-scale">
               <Heart className="h-12 w-12 text-emergency mx-auto mb-4" />
               <h3 className="font-semibold mb-2">Peace of Mind</h3>
               <p className="text-sm text-muted-foreground">Always connected to help</p>
@@ -477,57 +477,6 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
-      {/* Tech Specs */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block text-center w-full">
-            Technical Specifications
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="shadow-lg border-2 border-primary/10 hover:border-primary/30 transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <Bluetooth className="h-8 w-8 text-primary mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Connectivity</h3>
-                    <p className="text-muted-foreground">Bluetooth 5.0 LE</p>
-                    <p className="text-muted-foreground">Quick pairing</p>
-                    <p className="text-muted-foreground">100m range</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="shadow-lg border-2 border-primary/10 hover:border-primary/30 transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <Battery className="h-8 w-8 text-guardian mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Power</h3>
-                    <p className="text-muted-foreground">Rechargeable battery</p>
-                    <p className="text-muted-foreground">7 days typical use</p>
-                    <p className="text-muted-foreground">USB-C charging</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="shadow-lg border-2 border-primary/10 hover:border-primary/30 transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <Shield className="h-8 w-8 text-emergency mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">Durability</h3>
-                    <p className="text-muted-foreground">IP67 waterproof</p>
-                    <p className="text-muted-foreground">Shock resistant</p>
-                    <p className="text-muted-foreground">Premium materials</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* Customer Testimonials Section */}
       <section className="py-20 bg-gradient-to-br from-muted/30 via-background to-muted/30">
@@ -557,7 +506,7 @@ const DeviceIceSosPendant = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-6 shadow-xl border-2 border-primary/10 hover:border-primary/30 transition-colors">
+            <Card className="p-6 shadow-xl border-2 border-primary/10 hover:border-primary/30 transition-all duration-300 hover-scale animate-fade-in">
               <div className="mb-4">
                 <div className="flex text-yellow-400 mb-3">
                   {"★★★★★".split('').map((star, i) => (
@@ -571,7 +520,7 @@ const DeviceIceSosPendant = () => {
               </div>
             </Card>
 
-            <Card className="p-6 shadow-xl border-2 border-primary/10 hover:border-primary/30 transition-colors">
+            <Card className="p-6 shadow-xl border-2 border-primary/10 hover:border-primary/30 transition-all duration-300 hover-scale animate-fade-in" style={{ animationDelay: '0.1s' }}>
               <div className="mb-4">
                 <div className="flex text-yellow-400 mb-3">
                   {"★★★★★".split('').map((star, i) => (
@@ -585,7 +534,7 @@ const DeviceIceSosPendant = () => {
               </div>
             </Card>
 
-            <Card className="p-6 shadow-xl border-2 border-primary/10 hover:border-primary/30 transition-colors">
+            <Card className="p-6 shadow-xl border-2 border-primary/10 hover:border-primary/30 transition-all duration-300 hover-scale animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <div className="mb-4">
                 <div className="flex text-yellow-400 mb-3">
                   {"★★★★★".split('').map((star, i) => (
@@ -593,7 +542,7 @@ const DeviceIceSosPendant = () => {
                   ))}
                 </div>
                 <p className="text-muted-foreground italic mb-4">
-                  "My elderly mother accidentally pressed her pendant while gardening. We all got the alert immediately, but when we called her back she was fine. It's reassuring to know the system works."
+                  "My elderly mother accidentally pressed her pendant while gardening. We all got the alert immediately, but when we called her back she was fine. It's reassuring to know the system works perfectly."
                 </p>
                 <div className="text-sm font-semibold">- Anna P., Madrid</div>
               </div>
@@ -602,40 +551,72 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
-      {/* Technical & Service Details Section */}
+      {/* Technical Specifications & Service Details */}
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-              Complete Technical Specifications
+              Technical Specifications & Service Details
             </h2>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Medical Information Storage */}
-            <Card className="p-8 shadow-xl border-2 border-primary/10">
-              <h3 className="text-2xl font-bold mb-6 text-primary">Medical Information Storage</h3>
+          <div className="grid lg:grid-cols-3 gap-8 mb-12">
+            {/* Technical Specifications */}
+            <Card className="p-8 shadow-xl border-2 border-primary/10 hover:border-primary/30 transition-all duration-300 hover-scale">
+              <h3 className="text-2xl font-bold mb-6 text-primary">Device Specifications</h3>
               <div className="space-y-4">
-                <div>
-                  <h4 className="font-semibold mb-2">What data is stored?</h4>
-                  <ul className="text-muted-foreground space-y-1 text-sm">
-                    <li>• Emergency medical conditions</li>
-                    <li>• Current medications</li>
-                    <li>• Allergies and medical alerts</li>
-                    <li>• Emergency contact information</li>
-                    <li>• Preferred hospital/doctor</li>
-                    <li>• Blood type and medical ID number</li>
-                  </ul>
+                <div className="flex items-start gap-4">
+                  <Bluetooth className="h-6 w-6 text-primary mt-1" />
+                  <div>
+                    <h4 className="font-semibold mb-1">Connectivity</h4>
+                    <p className="text-muted-foreground text-sm">Bluetooth 5.0 LE • 100m range • Quick pairing</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-semibold mb-2">How is it accessed?</h4>
-                  <p className="text-muted-foreground text-sm">Only by certified emergency operators during active SOS alerts. Data is encrypted and GDPR compliant.</p>
+                <div className="flex items-start gap-4">
+                  <Battery className="h-6 w-6 text-guardian mt-1" />
+                  <div>
+                    <h4 className="font-semibold mb-1">Power</h4>
+                    <p className="text-muted-foreground text-sm">More than 7 days battery • USB-C charging • Rechargeable</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Shield className="h-6 w-6 text-emergency mt-1" />
+                  <div>
+                    <h4 className="font-semibold mb-1">Durability</h4>
+                    <p className="text-muted-foreground text-sm">IP67 waterproof • Shock resistant • 25g weight</p>
+                  </div>
+                </div>
+                <div className="pt-2">
+                  <h4 className="font-semibold mb-2">Dimensions</h4>
+                  <p className="text-muted-foreground text-sm">45mm × 35mm × 12mm</p>
                 </div>
               </div>
             </Card>
 
-            {/* Language Support & Coverage */}
-            <Card className="p-8 shadow-xl border-2 border-primary/10">
+            {/* Medical Information Storage */}
+            <Card className="p-8 shadow-xl border-2 border-guardian/10 hover:border-guardian/30 transition-all duration-300 hover-scale">
+              <h3 className="text-2xl font-bold mb-6 text-guardian">Medical Information</h3>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-semibold mb-2">Stored Securely:</h4>
+                  <ul className="text-muted-foreground space-y-1 text-sm">
+                    <li>• Emergency medical conditions</li>
+                    <li>• Current medications</li>
+                    <li>• Allergies and medical alerts</li>
+                    <li>• Blood type and medical ID</li>
+                    <li>• Preferred hospital/doctor</li>
+                    <li>• Emergency contact information</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-2">Privacy & Access:</h4>
+                  <p className="text-muted-foreground text-sm">End-to-end encrypted. Only accessible by certified emergency operators during active SOS alerts. GDPR compliant.</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Global Coverage */}
+            <Card className="p-8 shadow-xl border-2 border-emergency/10 hover:border-emergency/30 transition-all duration-300 hover-scale">
               <h3 className="text-2xl font-bold mb-6 text-emergency">Global Coverage</h3>
               <div className="space-y-4">
                 <div>
@@ -643,18 +624,12 @@ const DeviceIceSosPendant = () => {
                   <p className="text-muted-foreground text-sm">Spanish, English, French, German, Italian, Portuguese, Dutch, Polish, Swedish, Norwegian, Danish, Finnish</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Covered Countries:</h4>
+                  <h4 className="font-semibold mb-2">Coverage Areas:</h4>
                   <p className="text-muted-foreground text-sm">All EU countries, UK, USA, Canada, Australia, New Zealand. Expanding to 50+ countries by 2025.</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Device Specifications:</h4>
-                  <ul className="text-muted-foreground space-y-1 text-sm">
-                    <li>• Range: Up to 100 meters from phone</li>
-                    <li>• Battery: Up to 3 years battery life</li>
-                    <li>• Waterproof: IP67 rated</li>
-                    <li>• Weight: 25 grams</li>
-                    <li>• Dimensions: 45mm x 35mm x 12mm</li>
-                  </ul>
+                  <h4 className="font-semibold mb-2">Smart Home Integration:</h4>
+                  <p className="text-muted-foreground text-sm">Compatible with any Alexa or Google Home device. Works with iOS and Android smartphones.</p>
                 </div>
               </div>
             </Card>
