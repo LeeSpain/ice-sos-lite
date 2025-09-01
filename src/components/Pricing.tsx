@@ -240,7 +240,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         </div>
                         <div>
                           <h3 className="text-2xl font-bold mb-2">
-                            {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
+                            {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Watch Video' }) : selectedPlan.name}
                           </h3>
                           <div className="flex items-baseline gap-2 mb-3">
                             <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
