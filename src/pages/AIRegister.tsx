@@ -655,6 +655,23 @@ const AIRegister = () => {
                         <h3 className="text-lg font-bold text-foreground">Optional Add-ons</h3>
                       </div>
 
+                      {/* Family Membership Payment Info */}
+                      <div className="bg-gradient-to-r from-wellness/10 to-wellness/5 border border-wellness/20 rounded-lg p-4 mb-6">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2 bg-wellness/20 rounded-full">
+                            <Shield className="h-4 w-4 text-wellness" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-foreground mb-2">Family Membership Payment</h4>
+                            <p className="text-sm text-muted-foreground">
+                              Once your account is set up, you can invite family members to join your emergency network. 
+                              Each family member connection costs <span className="font-medium text-foreground">€2.99 per month</span> and 
+                              will be billed separately after they accept your invitation and set up their account.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
 
                       {/* Safety Products Section */}
                       {products.length > 0 && (
