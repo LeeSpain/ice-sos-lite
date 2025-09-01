@@ -125,7 +125,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero">
-        <div className="container mx-auto px-4 py-24">
+        <div className="container mx-auto px-4 py-page-top">
           <div className="text-center text-white">Loading dashboard...</div>
         </div>
       </div>
@@ -151,7 +151,7 @@ const Dashboard = () => {
             <Routes>
               {/* Main Dashboard Overview - Metrics Only */}
               <Route path="/" element={
-                <div className="container mx-auto px-4 py-6">
+                <div className="container mx-auto px-4 py-section">
                   <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                       {/* Main Content - Metrics Dashboard */}
@@ -172,22 +172,22 @@ const Dashboard = () => {
               } />
 
               {/* Products Page */}
-              <Route path="/products" element={
-                <div className="p-6">
+               <Route path="/products" element={
+                 <div className="py-section px-6">
                   <MyProductsWidget profile={profile} />
                 </div>
               } />
 
               {/* Flic Control Page */}
-              <Route path="/flic" element={
-                <div className="p-6">
+               <Route path="/flic" element={
+                 <div className="py-section px-6">
                   <FlicControlPage />
                 </div>
               } />
 
               {/* Profile Page */}
-              <Route path="/profile" element={
-                <div className="p-6">
+               <Route path="/profile" element={
+                 <div className="py-section px-6">
                   <PersonalDetailsCard 
                     profile={profile} 
                     onProfileUpdate={loadProfile}
@@ -196,8 +196,8 @@ const Dashboard = () => {
               } />
 
               {/* Emergency Page */}
-              <Route path="/emergency" element={
-                <div className="p-6 space-y-6">
+               <Route path="/emergency" element={
+                 <div className="py-section px-6 space-y-6">
                   <EmergencyContactsCard 
                     profile={profile} 
                     onProfileUpdate={loadProfile}
@@ -207,73 +207,73 @@ const Dashboard = () => {
               } />
 
               {/* Family SOS Live View */}
-              <Route path="/family-sos" element={
-                <div className="p-6">
-                  <LiveSOSFamily />
-                </div>
-              } />
+               <Route path="/family-sos" element={
+                 <div className="py-section px-6">
+                   <LiveSOSFamily />
+                 </div>
+               } />
 
-              {/* Health Page */}
-              <Route path="/health" element={
-                <div className="p-6">
-                  <MedicalInfoCard 
-                    profile={profile} 
-                    onProfileUpdate={loadProfile}
-                  />
-                </div>
-              } />
+               {/* Health Page */}
+               <Route path="/health" element={
+                 <div className="py-section px-6">
+                   <MedicalInfoCard 
+                     profile={profile} 
+                     onProfileUpdate={loadProfile}
+                   />
+                 </div>
+               } />
 
-              {/* Activity Page */}
-              <Route path="/activity" element={
-                <div className="p-6">
-                  <ActivityCard />
-                </div>
-              } />
+               {/* Activity Page */}
+               <Route path="/activity" element={
+                 <div className="py-section px-6">
+                   <ActivityCard />
+                 </div>
+               } />
 
-              {/* Subscription Page */}
-              <Route path="/subscription" element={
-                <div className="p-6">
-                  <SubscriptionCard subscription={subscription} />
-                </div>
-              } />
+               {/* Subscription Page */}
+               <Route path="/subscription" element={
+                 <div className="py-section px-6">
+                   <SubscriptionCard subscription={subscription} />
+                 </div>
+               } />
 
-              {/* Mobile App Page */}
-              <Route path="/mobile-app" element={
-                <div className="p-6">
-                  <MobileAppCard />
-                </div>
-              } />
+               {/* Mobile App Page */}
+               <Route path="/mobile-app" element={
+                 <div className="py-section px-6">
+                   <MobileAppCard />
+                 </div>
+               } />
 
               {/* Dashboard pages with proper container spacing */}
               <Route path="/family" element={<FamilyPage />} />
-              <Route path="/family-setup" element={
-                <div className="p-6">
-                  <div className="max-w-4xl mx-auto">
-                    <FamilyAccessSetup />
-                  </div>
-                </div>
-              } />
-              <Route path="/location" element={<LocationPage />} />
-              <Route path="/notifications" element={
-                <div className="p-6">
-                  <NotificationsPage />
-                </div>
-              } />
-              <Route path="/security" element={
-                <div className="p-6">
-                  <SecurityPage />
-                </div>
-              } />
-              <Route path="/settings" element={
-                <div className="p-6">
-                  <SettingsPage />
-                </div>
-              } />
-              <Route path="/support" element={
-                <div className="p-6">
-                  <SupportPage />
-                </div>
-              } />
+               <Route path="/family-setup" element={
+                 <div className="py-section px-6">
+                   <div className="max-w-4xl mx-auto">
+                     <FamilyAccessSetup />
+                   </div>
+                 </div>
+               } />
+               <Route path="/location" element={<LocationPage />} />
+               <Route path="/notifications" element={
+                 <div className="py-section px-6">
+                   <NotificationsPage />
+                 </div>
+               } />
+               <Route path="/security" element={
+                 <div className="py-section px-6">
+                   <SecurityPage />
+                 </div>
+               } />
+               <Route path="/settings" element={
+                 <div className="py-section px-6">
+                   <SettingsPage />
+                 </div>
+               } />
+               <Route path="/support" element={
+                 <div className="py-section px-6">
+                   <SupportPage />
+                 </div>
+               } />
               
               {/* Live Map Routes */}
               <Route path="/live-map" element={
@@ -281,21 +281,21 @@ const Dashboard = () => {
                   <MapScreen />
                 </div>
               } />
-              <Route path="/circles" element={
-                <div className="p-6">
-                  <MyCirclesPage />
-                </div>
-              } />
-              <Route path="/places" element={
-                <div className="p-6">
-                  <PlacesManager />
-                </div>
-              } />
-              <Route path="/location-history" element={
-                <div className="p-6">
-                  <LocationHistoryPage />
-                </div>
-              } />
+               <Route path="/circles" element={
+                 <div className="py-section px-6">
+                   <MyCirclesPage />
+                 </div>
+               } />
+               <Route path="/places" element={
+                 <div className="py-section px-6">
+                   <PlacesManager />
+                 </div>
+               } />
+               <Route path="/location-history" element={
+                 <div className="py-section px-6">
+                   <LocationHistoryPage />
+                 </div>
+               } />
             </Routes>
           </div>
         </div>

@@ -65,7 +65,7 @@ const FamilyCarerAccess = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-warning/5 to-warning/10 dark:from-warning/10 dark:to-warning/5">
+    <section className="py-section bg-gradient-to-b from-warning/5 to-warning/10 dark:from-warning/10 dark:to-warning/5">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-8">

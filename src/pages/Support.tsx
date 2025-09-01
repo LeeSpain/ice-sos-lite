@@ -9,7 +9,7 @@ const Support: React.FC = () => {
   return (
     <>
       <PageSEO pageType="support" />
-      <main className="container mx-auto px-4 py-10">
+      <main className="container mx-auto px-4 py-section">
         <header className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">{t('support.title')}</h1>
           <p className="text-muted-foreground mt-2">

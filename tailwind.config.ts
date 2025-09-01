@@ -18,6 +18,10 @@ export default {
 			}
 		},
 		extend: {
+			spacing: {
+				'section': '7rem', // 112px - standard section spacing
+				'page-top': '7rem', // 112px - page top spacing
+			},
 			fontFamily: {
 				'inter': ['Inter', 'sans-serif'],
 				'poppins': ['Poppins', 'sans-serif'],

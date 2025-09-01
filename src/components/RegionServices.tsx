@@ -55,7 +55,7 @@ const RegionServices = () => {
 
   if (loading) {
     return (
-      <section className="py-20 bg-gradient-to-br from-muted/30 to-background">
+      <section className="py-section bg-gradient-to-br from-muted/30 to-background">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">{t('regionServices.loading', { defaultValue: 'Loading Regional Services...' })}</h2>
@@ -70,7 +70,7 @@ const RegionServices = () => {
   }
 
   return (
-    <section className="py-20 bg-gradient-to-br from-muted/30 to-background">
+    <section className="py-section bg-gradient-to-br from-muted/30 to-background">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4 px-4 py-2">

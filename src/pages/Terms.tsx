@@ -35,7 +35,7 @@ const Terms: React.FC = () => {
       />
       
       {/* Fallback content for SEO and accessibility */}
-      <main className="container mx-auto px-4 py-10" style={{ display: dialogOpen ? 'none' : 'block' }}>
+      <main className="container mx-auto px-4 py-section" style={{ display: dialogOpen ? 'none' : 'block' }}>
         <header className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">{t('terms.title')}</h1>
           <p className="text-muted-foreground mt-2">

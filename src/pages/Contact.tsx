@@ -125,7 +125,7 @@ const Contact: React.FC = () => {
 
       <Navigation />
 
-      <main className="container mx-auto px-4 py-12 pt-24">
+      <main className="container mx-auto px-4 py-section pt-page-top">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold tracking-tight mb-4">{t('contact.title')}</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

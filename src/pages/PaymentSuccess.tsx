@@ -100,7 +100,7 @@ const PaymentSuccess = () => {
       <SEO title="Payment Success – ICE SOS Lite" description="Your account is active. Access your dashboard and download the mobile app." />
       <Navigation />
       
-      <div className="container mx-auto px-4 pt-24 pb-12">
+      <div className="container mx-auto px-4 pt-page-top pb-section">
         <div className="max-w-4xl mx-auto">
           {/* Welcome Header */}
           <div className="text-center mb-8">

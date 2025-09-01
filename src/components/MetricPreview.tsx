@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 const MetricPreview = () => {
   const { t } = useTranslation();
   return (
-    <section className="py-20 bg-gradient-to-br from-secondary/20 to-primary/5">
+    <section className="py-section bg-gradient-to-br from-secondary/20 to-primary/5">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">

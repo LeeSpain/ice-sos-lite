@@ -155,7 +155,7 @@ const Blog = () => {
       <Navigation />
       
       {/* Hero Section with Background */}
-      <section className="relative bg-gradient-to-br from-primary/10 via-secondary/5 to-background pt-24 pb-16">
+      <section className="relative bg-gradient-to-br from-primary/10 via-secondary/5 to-background pt-page-top pb-section">
         <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
         <div className="container mx-auto px-4 relative">
           <div className="text-center max-w-4xl mx-auto">
@@ -189,7 +189,7 @@ const Blog = () => {
         </div>
       </section>
 
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 py-section">
         {/* Featured Post */}
         {featuredPost && (
           <section className="mb-20">

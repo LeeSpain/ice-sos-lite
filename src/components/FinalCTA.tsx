@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 const FinalCTA: React.FC = () => {
   return (
-    <section className="py-20 mb-8">
+    <section className="py-section mb-8">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <div className="max-w-4xl mx-auto">
