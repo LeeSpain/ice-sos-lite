@@ -11,7 +11,8 @@ import {
   Shield, 
   Phone,
   Heart,
-  LogOut 
+  LogOut,
+  Activity
 } from 'lucide-react';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
@@ -35,6 +36,13 @@ const FamilyDashboardSidebar = () => {
       icon: MapPin,
       current: location.pathname === '/family-dashboard/emergency-map',
       badge: 'Live'
+    },
+    {
+      name: 'Live Tracking',
+      href: '/family-dashboard/live-map',
+      icon: Activity,
+      current: location.pathname === '/family-dashboard/live-map',
+      badge: 'New'
     },
     {
       name: 'Notifications',

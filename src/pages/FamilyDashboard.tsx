@@ -9,6 +9,7 @@ import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { Navigate } from 'react-router-dom';
 import FamilyDashboardHome from '@/components/family-dashboard/FamilyDashboardHome';
 import FamilyEmergencyMap from '@/components/family-dashboard/FamilyEmergencyMap';
+import FamilyLiveMap from '@/components/family-dashboard/FamilyLiveMap';
 import FamilyNotifications from '@/components/family-dashboard/FamilyNotifications';
 import FamilyProfile from '@/components/family-dashboard/FamilyProfile';
 import FamilyDashboardSidebar from '@/components/family-dashboard/FamilyDashboardSidebar';
@@ -77,6 +78,7 @@ const FamilyDashboard = () => {
         <Routes>
           <Route path="/" element={<FamilyDashboardHome />} />
           <Route path="/emergency-map" element={<FamilyEmergencyMap />} />
+          <Route path="/live-map" element={<FamilyLiveMap />} />
           <Route path="/notifications" element={<FamilyNotifications />} />
           <Route path="/profile" element={<FamilyProfile />} />
         </Routes>

@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { useToast } from '@/hooks/use-toast';
+import LiveTrackingWidget from '@/components/family-dashboard/LiveTrackingWidget';
 
 const FamilyDashboardHome = () => {
   const { user } = useOptimizedAuth();
@@ -251,6 +252,9 @@ const FamilyDashboardHome = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Live Tracking Widget */}
+      <LiveTrackingWidget />
 
       {/* Status Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
