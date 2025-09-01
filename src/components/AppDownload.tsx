@@ -4,10 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Download, Smartphone, Brain, MessageCircle, Zap, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
+import { useEmmaChat } from "@/contexts/EmmaChatContext";
 import { useTranslation } from 'react-i18next';
 
 const AppDownload = () => {
   const { t } = useTranslation();
+  const { openEmmaChat } = useEmmaChat();
   return (
     <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-wellness/5">
       <div className="container mx-auto px-4">
@@ -149,17 +151,17 @@ const AppDownload = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Button 
-                  size="xl" 
-                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold px-8 py-4 shadow-glow hover:shadow-xl transition-all duration-300 rounded-xl"
-                  onClick={() => {
-                    // Emma chat functionality would be triggered here
-                    console.log("Talk to Emma clicked");
-                  }}
-                >
-                  <MessageCircle className="h-5 w-5 mr-2" />
-                  {t('appDownload.cta')}
-                </Button>
+                <div className="relative">
+                  <div className="absolute inset-0 bg-white rounded-xl shadow-lg -z-10"></div>
+                  <Button 
+                    size="xl" 
+                    className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold px-8 py-4 shadow-glow hover:shadow-xl transition-all duration-300 rounded-xl relative z-10"
+                    onClick={openEmmaChat}
+                  >
+                    <MessageCircle className="h-5 w-5 mr-2" />
+                    {t('appDownload.cta')}
+                  </Button>
+                </div>
                 <IntroVideoModal 
                   defaultVideoId="meet-emma"
                   trigger={
@@ -169,7 +171,7 @@ const AppDownload = () => {
                       className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
                     >
                       <Download className="h-5 w-5 mr-2" />
-                      Watch Demo
+                      Watch Video
                     </Button>
                   }
                 />
