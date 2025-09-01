@@ -18,6 +18,7 @@ import MapScreen from "./pages/MapScreen";
 import MyCirclesPage from "./pages/MyCirclesPage";
 import PlacesManager from "./pages/PlacesManager";
 import LocationHistoryPage from "./pages/LocationHistoryPage";
+import MapDemo from "./pages/MapDemo";
 
 import AIRegister from "./pages/AIRegister";
 import Contact from "./pages/Contact";
@@ -240,6 +241,12 @@ const App = () => {
                   <ProtectedRoute>
                     <LocationHistoryPage />
                   </ProtectedRoute>
+                </OptimizedSuspense>
+              } />
+
+              <Route path="/map-demo" element={
+                <OptimizedSuspense skeletonType="card">
+                  <MapDemo />
                 </OptimizedSuspense>
               } />
 
