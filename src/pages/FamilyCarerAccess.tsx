@@ -706,7 +706,7 @@ const FamilyCarerAccessPage = () => {
               Join thousands of families using ICE SOS for emergency coordination. Set up family access in minutes.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+            <div className="flex justify-center mb-12">
               <Button 
                 asChild 
                 size="xl" 
@@ -714,35 +714,21 @@ const FamilyCarerAccessPage = () => {
               >
                 <Link to="/ai-register">
                   <UserPlus className="mr-2 h-5 w-5" />
-                  Start Family Access
+                  Join Now
                 </Link>
               </Button>
-              
-              <IntroVideoModal 
-                defaultVideoId="family"
-                trigger={
-                  <Button 
-                    variant="outline"
-                    size="xl"
-                    className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
-                  >
-                    <Play className="h-4 w-4 mr-2" />
-                    Watch Demo
-                  </Button>
-                }
-              />
             </div>
             
-            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto text-center">
-              <div>
+            <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto">
+              <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-muted/20 shadow-sm">
                 <div className="text-lg font-bold text-primary mb-1">30-Day</div>
                 <div className="text-sm text-muted-foreground">Money-back guarantee</div>
               </div>
-              <div>
+              <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-muted/20 shadow-sm">
                 <div className="text-lg font-bold text-primary mb-1">No Setup</div>
                 <div className="text-sm text-muted-foreground">Fees or contracts</div>
               </div>
-              <div>
+              <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-muted/20 shadow-sm">
                 <div className="text-lg font-bold text-primary mb-1">24/7</div>
                 <div className="text-sm text-muted-foreground">Emergency support</div>
               </div>
