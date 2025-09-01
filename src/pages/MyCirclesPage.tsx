@@ -4,9 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, UserPlus, Settings, MapPin } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Users, UserPlus, Settings, MapPin, Clock, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useFamilyMembers } from "@/hooks/useFamilyMembers";
+import { FamilyMemberCard } from "@/components/family/FamilyMemberCard";
+import FamilyInviteModal from "@/components/dashboard/family/FamilyInviteModal";
 
 interface Circle {
   id: string;
@@ -19,9 +23,14 @@ interface Circle {
 export default function MyCirclesPage() {
   const [circles, setCircles] = useState<Circle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCircleId, setSelectedCircleId] = useState<string | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Get members and invites for selected circle
+  const { data: familyData, isLoading: membersLoading, refetch: refetchMembers } = useFamilyMembers(selectedCircleId);
 
   const loadCircles = async () => {
     if (!user) return;
@@ -93,6 +102,16 @@ export default function MyCirclesPage() {
     loadCircles();
   }, [user]);
 
+  useEffect(() => {
+    // Auto-select first owned circle
+    if (circles.length > 0 && !selectedCircleId) {
+      const ownedCircle = circles.find(c => c.is_owner);
+      if (ownedCircle) {
+        setSelectedCircleId(ownedCircle.id);
+      }
+    }
+  }, [circles, selectedCircleId]);
+
   const getBillingStatusColor = (status?: string) => {
     switch (status) {
       case "active": return "default";
@@ -140,80 +159,150 @@ export default function MyCirclesPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4">
-        {circles.map(circle => (
-          <Card key={circle.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-primary" />
-                  {circle.name}
-                  {circle.is_owner && (
-                    <Badge variant="outline" className="text-xs">Owner</Badge>
-                  )}
-                </CardTitle>
-                <Badge variant={getBillingStatusColor(circle.billing_status)}>
-                  {getBillingStatusText(circle.billing_status)}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    {circle.members_count} member{circle.members_count !== 1 ? 's' : ''}
-                  </span>
-                  <span className="text-xs">
-                    ID: {circle.id.slice(0, 8)}...
-                  </span>
+      <div className="grid gap-6">
+        {circles.map(circle => {
+          const isSelected = selectedCircleId === circle.id;
+          const currentMembers = isSelected ? familyData?.members || [] : [];
+          const currentInvites = isSelected ? familyData?.pendingInvites || [] : [];
+          
+          return (
+            <Card key={circle.id} className={`transition-all ${isSelected ? 'ring-2 ring-primary ring-offset-2' : 'hover:shadow-md'}`}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-primary" />
+                    {circle.name}
+                    {circle.is_owner && (
+                      <Badge variant="outline" className="text-xs">Owner</Badge>
+                    )}
+                  </CardTitle>
+                  <div className="flex gap-2">
+                    <Badge variant={getBillingStatusColor(circle.billing_status)}>
+                      {getBillingStatusText(circle.billing_status)}
+                    </Badge>
+                  </div>
                 </div>
-                
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate(`/map?circle=${circle.id}`)}
-                    className="flex items-center gap-1"
-                  >
-                    <MapPin className="w-3 h-3" />
-                    View Map
-                  </Button>
-                  {circle.is_owner && (
-                    <>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-4">
+                {/* Circle Info and Actions */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      {circle.members_count} member{circle.members_count !== 1 ? 's' : ''}
+                    </span>
+                    {isSelected && currentInvites.length > 0 && (
+                      <span className="flex items-center gap-1 text-secondary-foreground">
+                        <Clock className="w-4 h-4" />
+                        {currentInvites.length} pending
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate(`/map?circle=${circle.id}`)}
+                      className="flex items-center gap-1"
+                    >
+                      <MapPin className="w-3 h-3" />
+                      Map
+                    </Button>
+                    {circle.is_owner && (
                       <Button 
-                        variant="outline" 
+                        variant="default" 
                         size="sm"
-                        onClick={() => navigate(`/family-access-setup?invite=true&group=${circle.id}`)}
+                        onClick={() => {
+                          setSelectedCircleId(circle.id);
+                          setShowInviteModal(true);
+                        }}
                         className="flex items-center gap-1"
                       >
                         <UserPlus className="w-3 h-3" />
-                        Invite
+                        Add Member
                       </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => navigate(`/family-dashboard/settings?group=${circle.id}`)}
-                        className="flex items-center gap-1"
-                      >
-                        <Settings className="w-3 h-3" />
-                        Manage
-                      </Button>
-                    </>
-                  )}
+                    )}
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setSelectedCircleId(isSelected ? null : circle.id)}
+                      className="flex items-center gap-1"
+                    >
+                      <Settings className="w-3 h-3" />
+                      {isSelected ? 'Hide' : 'Manage'}
+                    </Button>
+                  </div>
                 </div>
-              </div>
 
-              {circle.billing_status === "past_due" && (
-                <div className="mt-3 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
-                  <p className="text-sm text-destructive">
-                    Billing is past due. Location sharing has been paused for privacy protection.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+                {/* Billing Warning */}
+                {circle.billing_status === "past_due" && (
+                  <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg border border-destructive/20">
+                    <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
+                    <p className="text-sm text-destructive">
+                      Billing is past due. Location sharing has been paused for privacy protection.
+                    </p>
+                  </div>
+                )}
+
+                {/* Expanded Member Management */}
+                {isSelected && circle.is_owner && (
+                  <>
+                    <Separator />
+                    <div className="space-y-4">
+                      {/* Active Members */}
+                      {currentMembers.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+                            <Users className="w-4 h-4" />
+                            Active Members ({currentMembers.length})
+                          </h4>
+                          <div className="space-y-2">
+                            {currentMembers.map(member => (
+                              <FamilyMemberCard 
+                                key={member.id} 
+                                member={member} 
+                                isOwner={circle.is_owner}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Pending Invitations */}
+                      {currentInvites.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="text-sm font-medium text-foreground flex items-center gap-2">
+                            <Clock className="w-4 h-4" />
+                            Pending Invitations ({currentInvites.length})
+                          </h4>
+                          <div className="space-y-2">
+                            {currentInvites.map(invite => (
+                              <FamilyMemberCard 
+                                key={invite.id} 
+                                invite={invite} 
+                                isOwner={circle.is_owner}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Empty State for Selected Circle */}
+                      {currentMembers.length === 0 && currentInvites.length === 0 && (
+                        <div className="text-center py-8 text-muted-foreground">
+                          <Users className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-sm">No family members yet</p>
+                          <p className="text-xs">Click "Add Member" to invite your first family member</p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
 
         {circles.length === 0 && (
           <Card className="p-8 text-center">
@@ -236,6 +325,16 @@ export default function MyCirclesPage() {
           </Card>
         )}
       </div>
+
+      {/* Family Invite Modal */}
+      <FamilyInviteModal
+        isOpen={showInviteModal}
+        onOpenChange={setShowInviteModal}
+        onInviteCreated={() => {
+          refetchMembers();
+          loadCircles(); // Refresh circle counts
+        }}
+      />
     </div>
   );
 }
