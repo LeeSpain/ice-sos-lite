@@ -79,12 +79,80 @@ const Features = () => {
 
                   {/* Real Mapbox Map */}
                   <div className="h-80 relative overflow-hidden bg-gray-100 rounded-lg">
-                    <MapView 
-                      className="w-full h-full"
-                      markers={familyMembers}
-                      center={{ lat: 51.5074, lng: -0.1278 }}
-                      zoom={12}
-                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-green-100">
+                      {/* Fallback map background with family markers */}
+                      <div className="absolute inset-0 bg-gradient-to-b from-sky-200 to-emerald-200 opacity-80"></div>
+                      
+                      {/* Simulated map features */}
+                      <div className="absolute inset-0">
+                        {/* Roads */}
+                        <div className="absolute top-1/3 left-0 right-0 h-1 bg-white opacity-60"></div>
+                        <div className="absolute top-2/3 left-0 right-0 h-0.5 bg-white opacity-40"></div>
+                        <div className="absolute top-0 bottom-0 left-1/3 w-1 bg-white opacity-60"></div>
+                        <div className="absolute top-0 bottom-0 left-2/3 w-0.5 bg-white opacity-40"></div>
+                        
+                        {/* Green spaces */}
+                        <div className="absolute top-4 right-4 w-16 h-12 bg-green-300 rounded-lg opacity-50"></div>
+                        <div className="absolute bottom-8 left-8 w-12 h-12 bg-green-300 rounded-full opacity-50"></div>
+                        
+                        {/* Buildings */}
+                        <div className="absolute top-12 left-12 w-6 h-8 bg-gray-400 opacity-60"></div>
+                        <div className="absolute top-16 right-16 w-8 h-6 bg-gray-400 opacity-60"></div>
+                      </div>
+
+                      {/* Family Member Markers with Real Photos */}
+                      <div className="absolute top-16 left-16">
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-green-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                            <img src={grandmaAvatar} alt="Grandma" className="w-full h-full object-cover rounded-full" />
+                          </div>
+                          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-green-500"></div>
+                        </div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Grandma</div>
+                      </div>
+                      
+                      <div className="absolute top-20 right-12">
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-blue-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                            <img src={dadAvatar} alt="Dad" className="w-full h-full object-cover rounded-full" />
+                          </div>
+                          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-blue-500"></div>
+                        </div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Dad</div>
+                      </div>
+                      
+                      <div className="absolute bottom-12 left-12">
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-red-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden relative animate-pulse">
+                            <img src={emmaAvatar} alt="Emma" className="w-full h-full object-cover rounded-full" />
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white animate-ping"></div>
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white"></div>
+                          </div>
+                          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
+                        </div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-red-50 px-2 py-1 rounded shadow-md border border-red-200 text-red-800 whitespace-nowrap">Emma - Alert!</div>
+                      </div>
+
+                      <div className="absolute bottom-16 right-16">
+                        <div className="relative">
+                          <div className="w-10 h-10 bg-pink-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden">
+                            <img src={momAvatar} alt="Mom" className="w-full h-full object-cover rounded-full" />
+                          </div>
+                          <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-pink-500"></div>
+                        </div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Mom</div>
+                      </div>
+
+                      {/* Map Controls */}
+                      <div className="absolute top-4 right-4 flex flex-col gap-1">
+                        <div className="w-10 h-10 bg-white rounded-md border shadow-lg flex items-center justify-center hover:bg-gray-50 cursor-pointer">
+                          <span className="text-gray-700 text-lg font-light">+</span>
+                        </div>
+                        <div className="w-10 h-10 bg-white rounded-md border shadow-lg flex items-center justify-center hover:bg-gray-50 cursor-pointer">
+                          <span className="text-gray-700 text-lg font-light">−</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Family Status Cards - Only Grandma */}
