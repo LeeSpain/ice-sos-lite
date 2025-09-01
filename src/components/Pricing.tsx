@@ -338,13 +338,13 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
             </div>
 
             {products.map((product) => (
-              <div key={product.id} className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-blue-600/10 rounded-3xl p-8 border border-blue-500/20 shadow-xl relative overflow-hidden mb-8">
+              <div key={product.id} className="bg-gradient-to-br from-orange-50 to-blue-50 rounded-3xl p-8 border border-orange-200 shadow-xl relative overflow-hidden mb-8">
                 {/* Background accent */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-600/5"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-orange-50/50 via-transparent to-blue-50/50"></div>
                 
                 {product.status === 'coming_soon' && (
                   <div className="absolute top-0 left-0 right-0">
-                    <div className="bg-gradient-to-r from-secondary to-primary text-white text-sm md:text-base font-semibold py-2 px-4 flex items-center justify-between shadow-md rounded-t-3xl">
+                    <div className="bg-gradient-to-r from-orange-500 to-blue-500 text-white text-sm md:text-base font-semibold py-2 px-4 flex items-center justify-between shadow-md rounded-t-3xl">
                       <span className="flex items-center gap-2">
                         <span className="inline-flex h-2 w-2 rounded-full bg-white/80 animate-pulse"></span>
                         {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
@@ -365,7 +365,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                 
                 {/* Product Badge */}
                 <div className="absolute top-6 right-6 z-10">
-                  <Badge className="bg-blue-600 text-white text-sm px-4 py-2 shadow-lg border-0">
+                  <Badge className="bg-orange-500 text-white text-sm px-4 py-2 shadow-lg border-0">
                     <Package className="h-3 w-3 mr-1" />
                     {t('pricing.oneTime')}
                   </Badge>
@@ -377,15 +377,15 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     {/* Left Column - Product Details (3/5 width) */}
                     <div className="lg:col-span-3">
                       <div className="flex items-start gap-4 mb-6">
-                        <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-                          <Package className="h-7 w-7 text-white" />
+                        <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                          <Bluetooth className="h-7 w-7 text-white" />
                         </div>
                         <div>
                           <h3 className="text-2xl font-bold mb-2">
                             {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' }) : product.name}
                           </h3>
                           <div className="flex items-baseline gap-2 mb-3">
-                            <span className="text-3xl font-bold text-blue-600">{formatPriceDisplay(product.price, product.currency)}</span>
+                            <span className="text-3xl font-bold text-orange-600">{formatPriceDisplay(product.price, product.currency)}</span>
                             <span className="text-muted-foreground">/one-time</span>
                           </div>
                           <p className="text-muted-foreground leading-relaxed">
@@ -402,22 +402,25 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           <>
                             <Button 
                               size="lg"
-                              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                              className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                               onClick={() => handleProductPurchase(product)}
                             >
                               {t('pricing.buyNow')}
                             </Button>
                             
-                            <Button 
-                              size="lg"
-                              variant="outline"
-                              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                              asChild
-                            >
-                              <Link to="/device-ice-sos-pendant">
-                                {t('pricing.learnMore')}
-                              </Link>
-                            </Button>
+                            <IntroVideoModal 
+                              defaultVideoId="ice-sos-pendant"
+                              trigger={
+                                <Button 
+                                  size="lg"
+                                  variant="outline"
+                                  className="border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                                >
+                                  <Play className="h-4 w-4 mr-2" />
+                                  Watch Demo
+                                </Button>
+                              }
+                            />
                           </>
                         )}
                       </div>
@@ -426,14 +429,14 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="grid sm:grid-cols-2 gap-3">
                         {product.features.slice(0, 6).map((feature, featureIndex) => (
                           <div key={featureIndex} className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-blue-600/20 rounded-full flex items-center justify-center flex-shrink-0">
-                              <Check className="h-2.5 w-2.5 text-blue-600" />
+                            <div className="w-4 h-4 bg-orange-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Check className="h-2.5 w-2.5 text-orange-600" />
                             </div>
                             <span className="text-sm text-muted-foreground">{feature}</span>
                           </div>
                         ))}
                         {product.features.length > 6 && (
-                          <div className="flex items-center gap-2 text-blue-600 font-medium">
+                          <div className="flex items-center gap-2 text-orange-600 font-medium">
                             <span className="text-sm">+{product.features.length - 6} more features</span>
                           </div>
                         )}
@@ -443,7 +446,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     {/* Right Column - Product Image (2/5 width) */}
                     <div className="lg:col-span-2 relative">
                       {/* Floating accents - smaller and more subtle */}
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600/15 rounded-full flex items-center justify-center">
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500/15 rounded-full flex items-center justify-center">
                         <Bluetooth className="h-3 w-3 text-blue-600" />
                       </div>
                       <div className="absolute top-1/3 -left-3 w-5 h-5 bg-green-500/15 rounded-full flex items-center justify-center">
@@ -456,7 +459,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
                         <img
                           src="/lovable-uploads/a622d998-f25b-472d-a82f-5ae37bd5c7bd.png"
-                          alt={`${product.name} - Emergency protection device`}
+                          alt={`${product.name} - ICE SOS Bluetooth Pendant Emergency Device`}
                           className="w-full h-auto rounded-xl shadow-md object-cover"
                           loading="lazy"
                           decoding="async"
@@ -478,27 +481,27 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                 {t('pricing.regionalServicesTitle', { defaultValue: 'Regional Services' })}
               </h3>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                {t('pricing.regionalServicesDesc', { defaultValue: 'Specialized coverage in your local area with dedicated emergency response teams' })}
+                {t('pricing.regionalServicesDesc', { defaultValue: 'Specialized coverage for European regions with local emergency response teams and multilingual support.' })}
               </p>
             </div>
 
             {regionalServices.map((service) => (
               <div key={service.id} className={`rounded-3xl p-8 border shadow-xl relative overflow-hidden mb-8 ${
                 service.name === 'Call Centre Spain' 
-                  ? 'bg-gradient-to-br from-green-500/10 via-green-500/5 to-green-600/10 border-green-500/20' 
-                  : 'bg-gradient-to-br from-secondary/10 via-secondary/5 to-secondary/15 border-secondary/20'
+                  ? 'bg-gradient-to-br from-red-50 via-yellow-50 to-red-100 border-red-200' 
+                  : 'bg-gradient-to-br from-blue-50 via-purple-50 to-blue-100 border-blue-200'
               }`}>
                 {/* Background accent */}
                 <div className={`absolute inset-0 ${
                   service.name === 'Call Centre Spain' 
-                    ? 'bg-gradient-to-br from-green-500/5 via-transparent to-green-600/5'
-                    : 'bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10'
+                    ? 'bg-gradient-to-br from-red-50/50 via-transparent to-yellow-50/50'
+                    : 'bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50'
                 }`}></div>
                 
                 {/* Regional Service Badge */}
                 <div className="absolute top-6 right-6 z-10">
                   <Badge className={`text-white text-sm px-4 py-2 shadow-lg border-0 ${
-                    service.name === 'Call Centre Spain' ? 'bg-green-600' : 'bg-secondary'
+                    service.name === 'Call Centre Spain' ? 'bg-red-600' : 'bg-blue-600'
                   }`}>
                     <MapPin className="h-3 w-3 mr-1" />
                     {service.region.toUpperCase()} Service
@@ -507,8 +510,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
                 {service.is_popular && (
                   <div className="absolute top-6 left-6 z-10">
-                    <Badge className="bg-wellness text-white text-sm px-4 py-2 shadow-lg border-0">
-                      Most Popular
+                    <Badge className="bg-yellow-500 text-white text-sm px-4 py-2 shadow-lg border-0">
+                      Popular
                     </Badge>
                   </div>
                 )}
@@ -521,8 +524,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="flex items-start gap-4 mb-6">
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ${
                           service.name === 'Call Centre Spain'
-                            ? 'bg-gradient-to-br from-green-500 to-green-600'
-                            : 'bg-gradient-to-br from-secondary to-secondary/80'
+                            ? 'bg-gradient-to-br from-red-500 to-yellow-500'
+                            : 'bg-gradient-to-br from-blue-500 to-purple-500'
                         }`}>
                           <MapPin className="h-7 w-7 text-white" />
                         </div>
@@ -532,7 +535,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           </h3>
                           <div className="flex items-baseline gap-2 mb-3">
                             <span className={`text-3xl font-bold ${
-                              service.name === 'Call Centre Spain' ? 'text-green-600' : 'text-secondary'
+                              service.name === 'Call Centre Spain' ? 'text-red-600' : 'text-blue-600'
                             }`}>{formatPriceDisplay(service.price, service.currency)}</span>
                             <span className="text-muted-foreground">/month</span>
                           </div>
@@ -548,8 +551,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           size="lg"
                           className={`text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
                             service.name === 'Call Centre Spain'
-                              ? 'bg-green-600 hover:bg-green-700'
-                              : 'bg-secondary hover:bg-secondary/90'
+                              ? 'bg-red-600 hover:bg-red-700'
+                              : 'bg-blue-600 hover:bg-blue-700'
                           }`}
                           asChild
                         >
@@ -558,20 +561,23 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           </Link>
                         </Button>
                         
-                        <Button 
-                          size="lg"
-                          variant="outline"
-                          className={`font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
-                            service.name === 'Call Centre Spain'
-                              ? 'border-green-600 text-green-600 hover:bg-green-600 hover:text-white'
-                              : 'border-secondary text-secondary hover:bg-secondary hover:text-white'
-                          }`}
-                          asChild
-                        >
-                          <Link to="/regional-center-spain">
-                            Learn More
-                          </Link>
-                        </Button>
+                        <IntroVideoModal 
+                          defaultVideoId="regional-services"
+                          trigger={
+                            <Button 
+                              size="lg"
+                              variant="outline"
+                              className={`font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                                service.name === 'Call Centre Spain'
+                                  ? 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white'
+                                  : 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
+                              }`}
+                            >
+                              <Play className="h-4 w-4 mr-2" />
+                              Watch Video
+                            </Button>
+                          }
+                        />
                       </div>
 
                       {/* Compact Features Grid */}
@@ -579,10 +585,10 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         {service.features.slice(0, 6).map((feature, featureIndex) => (
                           <div key={featureIndex} className="flex items-center gap-2">
                             <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${
-                              service.name === 'Call Centre Spain' ? 'bg-green-600/20' : 'bg-secondary/20'
+                              service.name === 'Call Centre Spain' ? 'bg-red-600/20' : 'bg-blue-600/20'
                             }`}>
                               <Check className={`h-2.5 w-2.5 ${
-                                service.name === 'Call Centre Spain' ? 'text-green-600' : 'text-secondary'
+                                service.name === 'Call Centre Spain' ? 'text-red-600' : 'text-blue-600'
                               }`} />
                             </div>
                             <span className="text-sm text-muted-foreground">{feature}</span>
@@ -590,7 +596,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         ))}
                         {service.features.length > 6 && (
                           <div className={`flex items-center gap-2 font-medium ${
-                            service.name === 'Call Centre Spain' ? 'text-green-600' : 'text-secondary'
+                            service.name === 'Call Centre Spain' ? 'text-red-600' : 'text-blue-600'
                           }`}>
                             <span className="text-sm">+{service.features.length - 6} more features</span>
                           </div>
@@ -602,17 +608,17 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     <div className="lg:col-span-2 relative">
                       {/* Floating accents - smaller and more subtle */}
                       <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center ${
-                        service.name === 'Call Centre Spain' ? 'bg-green-600/15' : 'bg-secondary/15'
+                        service.name === 'Call Centre Spain' ? 'bg-red-600/15' : 'bg-blue-600/15'
                       }`}>
                         <MapPin className={`h-3 w-3 ${
-                          service.name === 'Call Centre Spain' ? 'text-green-600' : 'text-secondary'
+                          service.name === 'Call Centre Spain' ? 'text-red-600' : 'text-blue-600'
                         }`} />
                       </div>
-                      <div className="absolute top-1/3 -left-3 w-5 h-5 bg-wellness/15 rounded-full flex items-center justify-center">
-                        <UserCheck className="h-2.5 w-2.5 text-wellness" />
+                      <div className="absolute top-1/3 -left-3 w-5 h-5 bg-green-500/15 rounded-full flex items-center justify-center">
+                        <UserCheck className="h-2.5 w-2.5 text-green-500" />
                       </div>
-                      <div className="absolute bottom-4 right-4 w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
-                        <Phone className="h-2.5 w-2.5 text-primary" />
+                      <div className="absolute bottom-4 right-4 w-5 h-5 bg-purple-500/15 rounded-full flex items-center justify-center">
+                        <Phone className="h-2.5 w-2.5 text-purple-500" />
                       </div>
                       
                       <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
@@ -629,6 +635,12 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                 </div>
               </div>
             ))}
+            
+            <div className="text-center mt-12">
+              <p className="text-sm text-muted-foreground bg-white/60 rounded-lg p-4 border border-gray-200 max-w-2xl mx-auto">
+                <span className="font-medium">24/7 Emergency Response:</span> All regional services include immediate access to local emergency coordinators who speak your language and understand local emergency protocols.
+              </p>
+            </div>
           </div>
         )}
 
