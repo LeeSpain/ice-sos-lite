@@ -475,7 +475,7 @@ const FamilyCarerAccessPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section - Clean Layout */}
+      {/* Simplified Pricing Section */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -487,91 +487,95 @@ const FamilyCarerAccessPage = () => {
               Family Access Costs
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
-              Two flexible options: you pay for family seats, or they manage their own subscriptions.
+              Just {formattedSeatPrice} per family connection. You choose who pays - you or them.
             </p>
           </div>
           
-          {/* Pricing Comparison */}
-          <div className="max-w-5xl mx-auto">
+          {/* Single Price Card */}
+          <div className="max-w-2xl mx-auto">
             <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-muted/20">
-              <div className="grid md:grid-cols-2">
-                {/* Option 1 */}
-                <div className="p-8 border-r border-muted/20">
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <Users className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2">You Pay for Family</h3>
-                    <div className="text-4xl font-bold text-primary mb-1">{formattedSeatPrice}</div>
-                    <div className="text-sm text-muted-foreground">per family member/month</div>
+              <div className="p-8 text-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <Users className="h-10 w-10 text-white" />
+                </div>
+                <h3 className="text-3xl font-bold text-foreground mb-2">Family Connection</h3>
+                <div className="text-5xl font-bold text-primary mb-2">{formattedSeatPrice}</div>
+                <div className="text-lg text-muted-foreground mb-8">per family member/month</div>
+                
+                {/* What's Included */}
+                <div className="grid md:grid-cols-2 gap-4 mb-8">
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-sm">Instant SOS alerts</span>
                   </div>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center">
-                      <Check className="h-4 w-4 text-primary mr-3" />
-                      <span className="text-sm">You control all billing</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Check className="h-4 w-4 text-primary mr-3" />
-                      <span className="text-sm">Family gets full access</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Check className="h-4 w-4 text-primary mr-3" />
-                      <span className="text-sm">Unlimited family members</span>
-                    </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-sm">Live emergency location</span>
                   </div>
-                  <div className="bg-primary/5 rounded-lg p-3">
-                    <div className="text-xs text-primary font-medium">Most Popular Choice</div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-sm">Emergency coordination</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-sm">Unlimited connections</span>
                   </div>
                 </div>
                 
-                {/* Option 2 */}
-                <div className="p-8">
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <CreditCard className="h-8 w-8 text-white" />
+                {/* Payment Options */}
+                <div className="bg-muted/30 rounded-2xl p-6 mb-8">
+                  <h4 className="text-lg font-semibold text-foreground mb-4">Who Pays?</h4>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-primary/20">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <CreditCard className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="font-semibold text-foreground mb-2">You Pay</div>
+                      <div className="text-sm text-muted-foreground">You cover the cost for your family members</div>
                     </div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2">They Pay Themselves</h3>
-                    <div className="text-4xl font-bold text-wellness mb-1">{formattedMemberPrice}</div>
-                    <div className="text-sm text-muted-foreground">per member/month</div>
-                  </div>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center">
-                      <Check className="h-4 w-4 text-wellness mr-3" />
-                      <span className="text-sm">Independent subscription</span>
+                    <div className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-wellness/20">
+                      <div className="w-8 h-8 bg-gradient-to-br from-wellness to-wellness/80 rounded-lg flex items-center justify-center mx-auto mb-3">
+                        <UserCheck className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="font-semibold text-foreground mb-2">They Pay</div>
+                      <div className="text-sm text-muted-foreground">Family member pays when they accept invite</div>
                     </div>
-                    <div className="flex items-center">
-                      <Check className="h-4 w-4 text-wellness mr-3" />
-                      <span className="text-sm">5 personal emergency contacts</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Check className="h-4 w-4 text-wellness mr-3" />
-                      <span className="text-sm">Full ICE SOS features</span>
-                    </div>
-                  </div>
-                  <div className="bg-wellness/5 rounded-lg p-3">
-                    <div className="text-xs text-wellness font-medium">Includes Own Emergency System</div>
                   </div>
                 </div>
+                
+                <Button 
+                  asChild 
+                  size="xl" 
+                  className="w-full bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 text-lg rounded-xl"
+                >
+                  <Link to="/ai-register">
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    Start Adding Family
+                  </Link>
+                </Button>
               </div>
             </div>
             
             {/* Cost Examples */}
             <div className="mt-12 text-center">
-              <h3 className="text-xl font-semibold text-foreground mb-6">Example Family Costs (Owner-Paid)</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-6">Example Family Costs</h3>
               <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
                 <div>
                   <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(5.98, 'EUR', currency), currency, languageToLocale(language))}</div>
-                  <div className="text-sm text-muted-foreground">2 members</div>
+                  <div className="text-sm text-muted-foreground">2 connections</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(11.96, 'EUR', currency), currency, languageToLocale(language))}</div>
-                  <div className="text-sm text-muted-foreground">4 members</div>
+                  <div className="text-sm text-muted-foreground">4 connections</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(17.94, 'EUR', currency), currency, languageToLocale(language))}</div>
-                  <div className="text-sm text-muted-foreground">6 members</div>
+                  <div className="text-sm text-muted-foreground">6 connections</div>
                 </div>
               </div>
+              <p className="text-sm text-muted-foreground mt-4">
+                No setup fees • Cancel anytime • 30-day guarantee
+              </p>
             </div>
           </div>
         </div>
