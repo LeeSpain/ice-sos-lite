@@ -3,9 +3,44 @@ import { Users, Heart, MapPin, Phone, Shield, Clock, Play } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { Link } from "react-router-dom";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
+import { useMapProvider } from "@/hooks/useMapProvider";
+import FamilyMarker from "@/components/map/FamilyMarker";
+import emmaAvatar from "/emma-avatar.png";
+import grandmaAvatar from "/grandma-avatar.png";
+import dadAvatar from "/dad-avatar.png";
+import momAvatar from "/mom-avatar.png";
 
 const Features = () => {
   const { t } = useTranslation();
+  const { MapView } = useMapProvider();
+
+  // Family member data for the map
+  const familyMembers = [
+    {
+      id: 'emma',
+      lat: 51.5074,
+      lng: -0.1278,
+      render: () => <FamilyMarker id="emma" name="Emma" avatar={emmaAvatar} status="alert" />
+    },
+    {
+      id: 'grandma',
+      lat: 51.5154,
+      lng: -0.1423,
+      render: () => <FamilyMarker id="grandma" name="Grandma" avatar={grandmaAvatar} status="live" />
+    },
+    {
+      id: 'dad',
+      lat: 51.5094,
+      lng: -0.1180,
+      render: () => <FamilyMarker id="dad" name="Dad" avatar={dadAvatar} status="live" />
+    },
+    {
+      id: 'mom',
+      lat: 51.5030,
+      lng: -0.1340,
+      render: () => <FamilyMarker id="mom" name="Mom" avatar={momAvatar} status="live" />
+    }
+  ];
 
   return (
     <section id="features" className="py-section mb-8">
@@ -42,128 +77,22 @@ const Features = () => {
                     </div>
                   </div>
 
-                  {/* Real Map View */}
-                  <div className="h-80 relative overflow-hidden bg-gray-100">
-                    {/* Realistic map background */}
-                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 320 320">
-                      {/* Map base - lighter gray for streets */}
-                      <rect width="100%" height="100%" fill="#f8fafc"/>
-                      
-                      {/* Terrain and elevation patterns */}
-                      <defs>
-                        <pattern id="terrain" patternUnits="userSpaceOnUse" width="8" height="8">
-                          <rect width="8" height="8" fill="#f1f5f9"/>
-                          <circle cx="2" cy="2" r="0.5" fill="#e2e8f0"/>
-                          <circle cx="6" cy="6" r="0.5" fill="#e2e8f0"/>
-                        </pattern>
-                      </defs>
-                      <rect width="100%" height="100%" fill="url(#terrain)"/>
-                      
-                      {/* Water bodies - more realistic shapes */}
-                      <path d="M0,100 Q40,95 80,110 Q120,125 160,115 Q200,105 240,120 Q280,135 320,125 L320,180 Q280,170 240,175 Q200,180 160,170 Q120,160 80,165 Q40,170 0,160 Z" fill="#3b82f6" opacity="0.7"/>
-                      <ellipse cx="70" cy="250" rx="25" ry="15" fill="#3b82f6" opacity="0.6"/>
-                      
-                      {/* Parks and green spaces - more organic shapes */}
-                      <path d="M240,50 Q280,55 290,75 Q295,95 280,110 Q260,125 240,120 Q225,105 235,85 Q240,65 240,50 Z" fill="#22c55e" opacity="0.4"/>
-                      <path d="M20,220 Q45,215 65,230 Q85,245 75,265 Q65,280 45,275 Q25,270 15,250 Q10,235 20,220 Z" fill="#22c55e" opacity="0.4"/>
-                      <circle cx="60" cy="80" r="22" fill="#22c55e" opacity="0.3"/>
-                      
-                      {/* Building blocks - varied sizes and colors */}
-                      <rect x="120" y="40" width="28" height="38" fill="#64748b" rx="2"/>
-                      <rect x="155" y="45" width="22" height="32" fill="#71717a" rx="2"/>
-                      <rect x="185" y="42" width="18" height="35" fill="#6b7280" rx="1"/>
-                      <rect x="115" y="240" width="35" height="45" fill="#64748b" rx="2"/>
-                      <rect x="160" y="245" width="25" height="40" fill="#71717a" rx="2"/>
-                      <rect x="195" y="250" width="30" height="35" fill="#6b7280" rx="2"/>
-                      
-                      {/* Residential areas */}
-                      <rect x="40" y="140" width="12" height="12" fill="#94a3b8" rx="1"/>
-                      <rect x="58" y="145" width="10" height="10" fill="#94a3b8" rx="1"/>
-                      <rect x="75" y="142" width="11" height="11" fill="#94a3b8" rx="1"/>
-                      <rect x="270" y="180" width="15" height="15" fill="#94a3b8" rx="1"/>
-                      <rect x="290" y="185" width="12" height="12" fill="#94a3b8" rx="1"/>
-                      
-                      {/* Major highways - realistic curved paths */}
-                      <path d="M0,100 Q80,95 160,105 Q240,115 320,110" stroke="#ffffff" strokeWidth="8" fill="none"/>
-                      <path d="M0,200 Q70,195 140,205 Q210,215 280,200 L320,198" stroke="#ffffff" strokeWidth="8" fill="none"/>
-                      <path d="M100,0 Q95,80 105,160 Q115,240 110,320" stroke="#ffffff" strokeWidth="8" fill="none"/>
-                      <path d="M220,0 Q225,70 215,140 Q205,210 210,280 L212,320" stroke="#ffffff" strokeWidth="8" fill="none"/>
-                      
-                      {/* Secondary roads - curved and branching */}
-                      <path d="M0,60 Q60,58 120,65 Q180,72 240,68 Q280,65 320,62" stroke="#ffffff" strokeWidth="4" fill="none"/>
-                      <path d="M0,260 Q50,258 100,265 Q150,272 200,268 Q250,264 320,260" stroke="#ffffff" strokeWidth="4" fill="none"/>
-                      <path d="M160,0 Q158,60 165,120 Q172,180 168,240 Q165,280 162,320" stroke="#ffffff" strokeWidth="4" fill="none"/>
-                      <path d="M40,0 Q42,50 38,100 Q34,150 40,200 Q46,250 42,320" stroke="#ffffff" strokeWidth="4" fill="none"/>
-                      
-                      {/* Local streets - grid pattern */}
-                      <path d="M0,140 L320,142" stroke="#ffffff" strokeWidth="2" fill="none"/>
-                      <path d="M0,180 L320,182" stroke="#ffffff" strokeWidth="2" fill="none"/>
-                      <path d="M80,0 L82,320" stroke="#ffffff" strokeWidth="2" fill="none"/>
-                      <path d="M260,0 L262,320" stroke="#ffffff" strokeWidth="2" fill="none"/>
-                      
-                      {/* Road center lines on major highways */}
-                      <path d="M0,100 Q80,95 160,105 Q240,115 320,110" stroke="#fbbf24" strokeWidth="1" strokeDasharray="8,4" fill="none"/>
-                      <path d="M100,0 Q95,80 105,160 Q115,240 110,320" stroke="#fbbf24" strokeWidth="1" strokeDasharray="8,4" fill="none"/>
-                      
-                      {/* Points of interest */}
-                      <circle cx="150" cy="150" r="3" fill="#ef4444"/>
-                      <text x="155" y="155" fontSize="6" fill="#374151">School</text>
-                      <circle cx="200" cy="80" r="3" fill="#3b82f6"/>
-                      <text x="205" y="85" fontSize="6" fill="#374151">Hospital</text>
-                      <circle cx="80" cy="200" r="3" fill="#10b981"/>
-                      <text x="85" y="205" fontSize="6" fill="#374151">Park</text>
-                    </svg>
-                    
-                    {/* Family Member Pins */}
-                    <div className="absolute top-16 left-12">
-                      <div className="relative">
-                        <div className="w-10 h-10 bg-green-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">👵</span>
-                        </div>
-                        <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-green-500"></div>
-                      </div>
-                      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Grandma</div>
-                    </div>
-                    
-                    <div className="absolute top-20 right-12">
-                      <div className="relative">
-                        <div className="w-10 h-10 bg-red-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">👨</span>
-                        </div>
-                        <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
-                      </div>
-                      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Dad</div>
-                    </div>
-                    
-                    <div className="absolute bottom-12 left-12">
-                      <div className="relative">
-                        <div className="w-10 h-10 bg-red-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center relative animate-pulse">
-                          <span className="text-white font-bold text-sm">👧</span>
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white animate-ping"></div>
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white"></div>
-                        </div>
-                        <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
-                      </div>
-                      <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-red-50 px-2 py-1 rounded shadow-md border border-red-200 text-red-800 whitespace-nowrap">Emma - Alert!</div>
-                    </div>
-
-                    {/* Map Controls */}
-                    <div className="absolute top-4 right-4 flex flex-col gap-1">
-                      <div className="w-10 h-10 bg-white rounded-md border shadow-lg flex items-center justify-center hover:bg-gray-50 cursor-pointer">
-                        <span className="text-gray-700 text-lg font-light">+</span>
-                      </div>
-                      <div className="w-10 h-10 bg-white rounded-md border shadow-lg flex items-center justify-center hover:bg-gray-50 cursor-pointer">
-                        <span className="text-gray-700 text-lg font-light">−</span>
-                      </div>
-                    </div>
+                  {/* Real Mapbox Map */}
+                  <div className="h-80 relative overflow-hidden bg-gray-100 rounded-lg">
+                    <MapView 
+                      className="w-full h-full"
+                      markers={familyMembers}
+                      center={{ lat: 51.5074, lng: -0.1278 }}
+                      zoom={12}
+                    />
                   </div>
 
                   {/* Family Status Cards - Only Grandma */}
                   <div className="p-4">
                     <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
                       <div className="flex items-center">
-                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
-                          <span className="text-white text-xs">👵</span>
+                        <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 overflow-hidden">
+                          <img src={grandmaAvatar} alt="Grandma" className="w-full h-full object-cover rounded-full" />
                         </div>
                         <div>
                           <p className="font-semibold text-xs text-green-800">Grandma is safe</p>
