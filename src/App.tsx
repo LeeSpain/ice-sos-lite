@@ -296,8 +296,8 @@ const App = () => {
             {/* Show device manager only in SOS apps */}
             {(window.location.pathname === '/app' || window.location.pathname === '/sos-app') && <DeviceManagerButton />}
             
-            {/* PWA Install Prompt */}
-            <PWAInstallPrompt />
+            {/* PWA Install Prompt - Disabled */}
+            {/* <PWAInstallPrompt /> */}
           </BrowserRouter>
           </EmmaChatProvider>
         </AuthProvider>
