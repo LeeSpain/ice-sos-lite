@@ -624,9 +624,6 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="absolute top-1/3 -left-3 w-5 h-5 bg-green-500/15 rounded-full flex items-center justify-center">
                         <UserCheck className="h-2.5 w-2.5 text-green-500" />
                       </div>
-                      <div className="absolute bottom-4 right-4 w-5 h-5 bg-purple-500/15 rounded-full flex items-center justify-center">
-                        <Phone className="h-2.5 w-2.5 text-purple-500" />
-                      </div>
                       
                       <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
                         <img
