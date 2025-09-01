@@ -363,7 +363,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                   </div>
                 )}
                 
-                {/* One-Time Badge */}
+                {/* Product Badge */}
                 <div className="absolute top-6 right-6 z-10">
                   <Badge className="bg-blue-600 text-white text-sm px-4 py-2 shadow-lg border-0">
                     <Package className="h-3 w-3 mr-1" />
@@ -475,21 +475,31 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
           <div className="max-w-6xl mx-auto mb-16">
             <div className="text-center mb-12">
               <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                {t('pricing.regionalServicesTitle')}
+                {t('pricing.regionalServicesTitle', { defaultValue: 'Regional Services' })}
               </h3>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                {t('pricing.regionalServicesDesc')}
+                {t('pricing.regionalServicesDesc', { defaultValue: 'Specialized coverage in your local area with dedicated emergency response teams' })}
               </p>
             </div>
 
             {regionalServices.map((service) => (
-              <div key={service.id} className="bg-gradient-to-br from-guardian/10 via-guardian/5 to-wellness/10 rounded-3xl p-8 border border-guardian/20 shadow-xl relative overflow-hidden mb-8">
+              <div key={service.id} className={`rounded-3xl p-8 border shadow-xl relative overflow-hidden mb-8 ${
+                service.name === 'Call Centre Spain' 
+                  ? 'bg-gradient-to-br from-green-500/10 via-green-500/5 to-green-600/10 border-green-500/20' 
+                  : 'bg-gradient-to-br from-secondary/10 via-secondary/5 to-secondary/15 border-secondary/20'
+              }`}>
                 {/* Background accent */}
-                <div className="absolute inset-0 bg-gradient-to-br from-guardian/5 via-transparent to-wellness/5"></div>
+                <div className={`absolute inset-0 ${
+                  service.name === 'Call Centre Spain' 
+                    ? 'bg-gradient-to-br from-green-500/5 via-transparent to-green-600/5'
+                    : 'bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10'
+                }`}></div>
                 
                 {/* Regional Service Badge */}
                 <div className="absolute top-6 right-6 z-10">
-                  <Badge className="bg-guardian text-white text-sm px-4 py-2 shadow-lg border-0">
+                  <Badge className={`text-white text-sm px-4 py-2 shadow-lg border-0 ${
+                    service.name === 'Call Centre Spain' ? 'bg-green-600' : 'bg-secondary'
+                  }`}>
                     <MapPin className="h-3 w-3 mr-1" />
                     {service.region.toUpperCase()} Service
                   </Badge>
@@ -509,7 +519,11 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     {/* Left Column - Service Details (3/5 width) */}
                     <div className="lg:col-span-3">
                       <div className="flex items-start gap-4 mb-6">
-                        <div className="w-14 h-14 bg-gradient-to-br from-guardian to-wellness rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0 ${
+                          service.name === 'Call Centre Spain'
+                            ? 'bg-gradient-to-br from-green-500 to-green-600'
+                            : 'bg-gradient-to-br from-secondary to-secondary/80'
+                        }`}>
                           <MapPin className="h-7 w-7 text-white" />
                         </div>
                         <div>
@@ -517,7 +531,9 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                             {service.name}
                           </h3>
                           <div className="flex items-baseline gap-2 mb-3">
-                            <span className="text-3xl font-bold text-guardian">{formatPriceDisplay(service.price, service.currency)}</span>
+                            <span className={`text-3xl font-bold ${
+                              service.name === 'Call Centre Spain' ? 'text-green-600' : 'text-secondary'
+                            }`}>{formatPriceDisplay(service.price, service.currency)}</span>
                             <span className="text-muted-foreground">/month</span>
                           </div>
                           <p className="text-muted-foreground leading-relaxed">
@@ -530,7 +546,11 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="flex flex-wrap gap-3 mb-6">
                         <Button 
                           size="lg"
-                          className="bg-guardian hover:bg-guardian/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                          className={`text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                            service.name === 'Call Centre Spain'
+                              ? 'bg-green-600 hover:bg-green-700'
+                              : 'bg-secondary hover:bg-secondary/90'
+                          }`}
                           asChild
                         >
                           <Link to="/regional-center-spain">
@@ -541,7 +561,11 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         <Button 
                           size="lg"
                           variant="outline"
-                          className="border-guardian text-guardian hover:bg-guardian hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                          className={`font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 ${
+                            service.name === 'Call Centre Spain'
+                              ? 'border-green-600 text-green-600 hover:bg-green-600 hover:text-white'
+                              : 'border-secondary text-secondary hover:bg-secondary hover:text-white'
+                          }`}
                           asChild
                         >
                           <Link to="/regional-center-spain">
@@ -554,14 +578,20 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       <div className="grid sm:grid-cols-2 gap-3">
                         {service.features.slice(0, 6).map((feature, featureIndex) => (
                           <div key={featureIndex} className="flex items-center gap-2">
-                            <div className="w-4 h-4 bg-guardian/20 rounded-full flex items-center justify-center flex-shrink-0">
-                              <Check className="h-2.5 w-2.5 text-guardian" />
+                            <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${
+                              service.name === 'Call Centre Spain' ? 'bg-green-600/20' : 'bg-secondary/20'
+                            }`}>
+                              <Check className={`h-2.5 w-2.5 ${
+                                service.name === 'Call Centre Spain' ? 'text-green-600' : 'text-secondary'
+                              }`} />
                             </div>
                             <span className="text-sm text-muted-foreground">{feature}</span>
                           </div>
                         ))}
                         {service.features.length > 6 && (
-                          <div className="flex items-center gap-2 text-guardian font-medium">
+                          <div className={`flex items-center gap-2 font-medium ${
+                            service.name === 'Call Centre Spain' ? 'text-green-600' : 'text-secondary'
+                          }`}>
                             <span className="text-sm">+{service.features.length - 6} more features</span>
                           </div>
                         )}
@@ -571,8 +601,12 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     {/* Right Column - Service Image (2/5 width) */}
                     <div className="lg:col-span-2 relative">
                       {/* Floating accents - smaller and more subtle */}
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-guardian/15 rounded-full flex items-center justify-center">
-                        <MapPin className="h-3 w-3 text-guardian" />
+                      <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center ${
+                        service.name === 'Call Centre Spain' ? 'bg-green-600/15' : 'bg-secondary/15'
+                      }`}>
+                        <MapPin className={`h-3 w-3 ${
+                          service.name === 'Call Centre Spain' ? 'text-green-600' : 'text-secondary'
+                        }`} />
                       </div>
                       <div className="absolute top-1/3 -left-3 w-5 h-5 bg-wellness/15 rounded-full flex items-center justify-center">
                         <UserCheck className="h-2.5 w-2.5 text-wellness" />
