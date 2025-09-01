@@ -564,7 +564,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           asChild
                         >
                           <Link to="/regional-center/spain">
-                            {t('pricing.selectPlan', { defaultValue: 'Select Plan' })}
+                            {service.name === 'Call Centre Spain' ? 'Find Out More' : t('pricing.selectPlan', { defaultValue: 'Select Plan' })}
                           </Link>
                         </Button>
                         
