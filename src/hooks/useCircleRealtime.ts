@@ -62,6 +62,7 @@ export function useCircleRealtime(activeCircleId: string | null) {
       const circleData = memberships?.map(m => ({
         id: m.group_id,
         name: `Family Circle ${m.group_id.slice(0, 8)}`, // TODO: Add proper name to family_groups table
+        member_count: 0 // Will be loaded separately if needed
       })) || [];
 
       setCircles(circleData);
