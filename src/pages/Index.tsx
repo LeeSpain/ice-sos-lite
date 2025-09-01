@@ -8,7 +8,7 @@ import Pricing from "@/components/Pricing";
 
 
 import AppDownload from "@/components/AppDownload";
-
+import FinalCTA from "@/components/FinalCTA";
 import Footer from "@/components/Footer";
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import AppPreviewSection from '@/components/AppPreviewSection';
@@ -64,6 +64,7 @@ const Index = () => {
       
       
       <AppDownload />
+      <FinalCTA />
       <Footer />
       
       {/* Free Trial Popups - Both rendered at root level */}
