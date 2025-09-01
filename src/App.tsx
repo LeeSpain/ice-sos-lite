@@ -17,6 +17,7 @@ import AuthPage from "./pages/AuthPage";
 import MapScreen from "./pages/MapScreen";
 import MyCirclesPage from "./pages/MyCirclesPage";
 import PlacesManager from "./pages/PlacesManager";
+import LocationHistoryPage from "./pages/LocationHistoryPage";
 
 import AIRegister from "./pages/AIRegister";
 import Contact from "./pages/Contact";
@@ -230,6 +231,14 @@ const App = () => {
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedRoute>
                     <PlacesManager />
+                  </ProtectedRoute>
+                </OptimizedSuspense>
+              } />
+
+              <Route path="/history" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <LocationHistoryPage />
                   </ProtectedRoute>
                 </OptimizedSuspense>
               } />
