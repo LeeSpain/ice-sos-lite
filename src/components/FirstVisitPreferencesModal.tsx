@@ -70,8 +70,8 @@ export const FirstVisitPreferencesModal: React.FC = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
-      <DialogContent className="sm:max-w-md mx-4 bg-card border-border shadow-glow">
-        <DialogHeader className="text-center space-y-3">
+      <DialogContent className="sm:max-w-md mx-4 bg-card border-border shadow-glow max-h-[90vh] overflow-y-auto">
+        <DialogHeader className="text-center space-y-3 sticky top-0 bg-card/95 backdrop-blur-sm pb-4 z-10">
           <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center shadow-primary">
             <Globe className="w-8 h-8 text-primary-foreground" />
           </div>
@@ -83,7 +83,7 @@ export const FirstVisitPreferencesModal: React.FC = () => {
           </p>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 px-1 overflow-y-auto flex-1">
           {/* Language Selection */}
           <Card className="border-border/50">
             <CardContent className="p-4 space-y-3">
@@ -154,7 +154,7 @@ export const FirstVisitPreferencesModal: React.FC = () => {
           </Button>
         </div>
 
-        <div className="text-center">
+        <div className="text-center pt-4 sticky bottom-0 bg-card/95 backdrop-blur-sm">
           <p className="text-xs text-muted-foreground">
             You can change these preferences anytime in the navigation menu
           </p>
