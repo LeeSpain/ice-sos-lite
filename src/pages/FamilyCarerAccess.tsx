@@ -481,9 +481,9 @@ const FamilyCarerAccessPage = () => {
           <div className="max-w-lg mx-auto">
             <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-muted/10 overflow-hidden">
               {/* Header */}
-              <div className="bg-gradient-to-r from-wellness to-wellness/90 px-8 py-6 text-center">
+              <div className="bg-gradient-to-r from-wellness to-wellness/90 px-8 py-4 text-center">
                 <h2 className="text-2xl font-bold text-black">Family Connection</h2>
-                <p className="text-black/80 text-sm mt-1">Emergency access for family members</p>
+                <p className="text-black/80 text-sm">Emergency access for family members</p>
               </div>
               
               {/* Price */}
