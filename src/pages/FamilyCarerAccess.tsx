@@ -475,104 +475,64 @@ const FamilyCarerAccessPage = () => {
         </div>
       </section>
 
-      {/* Simplified Pricing Section */}
-      <section className="py-20 bg-background">
+      {/* Compact Pricing Section */}
+      <section className="py-20 bg-gradient-to-br from-warning/5 via-background to-warning/10">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center bg-warning/10 rounded-full px-4 py-2 mb-4 border border-warning/20">
-              <Euro className="h-4 w-4 text-warning mr-2" />
-              <span className="text-sm font-medium text-warning">Simple Pricing</span>
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center bg-warning/10 rounded-full px-4 py-2 mb-4 border border-warning/20">
+                <Euro className="h-4 w-4 text-warning mr-2" />
+                <span className="text-sm font-medium text-warning">Simple Pricing</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                {formattedSeatPrice} <span className="text-xl text-muted-foreground font-normal">per family connection</span>
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                You choose who pays - you or them when they accept the invite.
+              </p>
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Family Access Costs
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-12">
-              Just {formattedSeatPrice} per family connection. You choose who pays - you or them.
-            </p>
-          </div>
-          
-          {/* Single Price Card */}
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-muted/20">
-              <div className="p-8 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                  <Users className="h-10 w-10 text-white" />
+            
+            <div className="grid md:grid-cols-3 gap-8 items-center">
+              {/* Payment Choice */}
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <CreditCard className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-foreground mb-2">Family Connection</h3>
-                <div className="text-5xl font-bold text-primary mb-2">{formattedSeatPrice}</div>
-                <div className="text-lg text-muted-foreground mb-8">per family member/month</div>
-                
-                {/* What's Included */}
-                <div className="grid md:grid-cols-2 gap-4 mb-8">
-                  <div className="flex items-center">
-                    <Check className="h-5 w-5 text-wellness mr-3" />
-                    <span className="text-sm">Instant SOS alerts</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Check className="h-5 w-5 text-wellness mr-3" />
-                    <span className="text-sm">Live emergency location</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Check className="h-5 w-5 text-wellness mr-3" />
-                    <span className="text-sm">Emergency coordination</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Check className="h-5 w-5 text-wellness mr-3" />
-                    <span className="text-sm">Unlimited connections</span>
-                  </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Flexible Payment</h3>
+                <p className="text-sm text-muted-foreground">Owner pays or family member pays on invite acceptance</p>
+              </div>
+              
+              {/* What's Included */}
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Bell className="h-8 w-8 text-white" />
                 </div>
-                
-                {/* Payment Options */}
-                <div className="bg-muted/30 rounded-2xl p-6 mb-8">
-                  <h4 className="text-lg font-semibold text-foreground mb-4">Who Pays?</h4>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-primary/20">
-                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        <CreditCard className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="font-semibold text-foreground mb-2">You Pay</div>
-                      <div className="text-sm text-muted-foreground">You cover the cost for your family members</div>
-                    </div>
-                    <div className="bg-white dark:bg-slate-700 rounded-xl p-4 border border-wellness/20">
-                      <div className="w-8 h-8 bg-gradient-to-br from-wellness to-wellness/80 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        <UserCheck className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="font-semibold text-foreground mb-2">They Pay</div>
-                      <div className="text-sm text-muted-foreground">Family member pays when they accept invite</div>
-                    </div>
-                  </div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Full Emergency Access</h3>
+                <p className="text-sm text-muted-foreground">Instant SOS alerts, live location, and emergency coordination</p>
+              </div>
+              
+              {/* No Limits */}
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-guardian to-guardian/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Users className="h-8 w-8 text-white" />
                 </div>
-                
-                <Button 
-                  asChild 
-                  size="xl" 
-                  className="w-full bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 text-lg rounded-xl"
-                >
-                  <Link to="/ai-register">
-                    <UserPlus className="mr-2 h-5 w-5" />
-                    Start Adding Family
-                  </Link>
-                </Button>
+                <h3 className="text-lg font-semibold text-foreground mb-2">Unlimited Connections</h3>
+                <p className="text-sm text-muted-foreground">Add as many family members as you need</p>
               </div>
             </div>
             
-            {/* Cost Examples */}
-            <div className="mt-12 text-center">
-              <h3 className="text-xl font-semibold text-foreground mb-6">Example Family Costs</h3>
-              <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-                <div>
-                  <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(5.98, 'EUR', currency), currency, languageToLocale(language))}</div>
-                  <div className="text-sm text-muted-foreground">2 connections</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(11.96, 'EUR', currency), currency, languageToLocale(language))}</div>
-                  <div className="text-sm text-muted-foreground">4 connections</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-primary">{formatDisplayCurrency(convertCurrency(17.94, 'EUR', currency), currency, languageToLocale(language))}</div>
-                  <div className="text-sm text-muted-foreground">6 connections</div>
-                </div>
-              </div>
+            {/* CTA */}
+            <div className="text-center mt-12">
+              <Button 
+                asChild 
+                size="xl" 
+                className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-12 py-4 shadow-lg hover:shadow-xl transition-all duration-300 text-lg rounded-xl"
+              >
+                <Link to="/ai-register">
+                  <UserPlus className="mr-2 h-5 w-5" />
+                  Start Adding Family
+                </Link>
+              </Button>
               <p className="text-sm text-muted-foreground mt-4">
                 No setup fees • Cancel anytime • 30-day guarantee
               </p>
