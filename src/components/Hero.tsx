@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Shield, Heart, MapPin, Smartphone, Play, Users } from "lucide-react";
+import { Shield, Heart, MapPin, Smartphone, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import OptimizedImage from "@/components/ui/optimized-image";
@@ -37,41 +37,26 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
             </p>
             
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
               <Button 
                 size="xl" 
-                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-6 py-4 rounded-xl border-2 border-wellness/20"
+                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 onClick={onEmmaClick}
               >
                 {t('hero.ctaTalk')}
               </Button>
-              
-              <div className="flex gap-3">
-                <Button 
-                  asChild
-                  size="xl" 
-                  className="bg-warning hover:bg-warning/90 text-white shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-base px-4 py-4 rounded-xl border-2 border-warning/30"
-                >
-                  <Link to="/family-carer-access">
-                    <Users className="mr-2 h-4 w-4" />
-                    Get Family Access
-                  </Link>
-                </Button>
-                
-                <IntroVideoModal 
-                  defaultVideoId="family"
-                  trigger={
-                    <Button 
-                      size="xl" 
-                      variant="outline"
-                      className="border-warning text-warning hover:bg-warning hover:text-white shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-base px-4 py-4 rounded-xl border-2 border-warning"
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      Family Video
-                    </Button>
-                  }
-                />
-              </div>
+              <IntroVideoModal 
+                defaultVideoId="meet-emma"
+                trigger={
+                  <Button 
+                    size="xl" 
+                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                  >
+                    <Play className="h-5 w-5 mr-2" />
+                    Meet Emma
+                  </Button>
+                }
+              />
             </div>
           </div>
           
