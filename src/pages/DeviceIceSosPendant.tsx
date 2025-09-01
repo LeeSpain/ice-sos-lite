@@ -85,31 +85,31 @@ const DeviceIceSosPendant = () => {
       </Helmet>
 
       {/* Hero Section */}
-      <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden bg-gradient-hero">
-        <div className="max-w-6xl mx-auto px-4 py-section relative z-10">
+      <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl mb-4">
+        <div className="container mx-auto px-4 py-section relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left text-white">
-              <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+              <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
                 <Shield className="h-4 w-4 text-emergency-glow" />
-                <span className="text-sm font-medium">24/7 Professional Response</span>
+                <span className="text-sm font-medium text-white">24/7 Professional Response</span>
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-                ICE SOS Emergency <span className="text-wellness">Bluetooth Pendant</span>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                ICE SOS Emergency <span className="text-wellness drop-shadow-md">Bluetooth Pendant</span>
               </h1>
               
-              <p className="text-lg md:text-xl mb-8 leading-relaxed opacity-90">
+              <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
                 Hands-free emergency protection with smart home integration. One button calls ALL your emergency contacts instantly.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
                 {comingSoon ? (
                   <Badge className="px-6 py-3 text-lg font-semibold bg-secondary text-white">Coming Soon</Badge>
                 ) : (
                   <Button 
                     asChild 
-                    size="lg" 
-                    className="bg-wellness text-white hover:bg-wellness/90 hover-scale font-semibold px-8 py-3"
+                    size="xl" 
+                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
                     <Link to="/ai-register">Order Now - €59.99 + €4.99 shipping</Link>
                   </Button>
@@ -118,12 +118,14 @@ const DeviceIceSosPendant = () => {
             </div>
             
             <div className="relative">
-              <img 
-                src="/lovable-uploads/acfcc77a-7e34-44f5-8487-4069c2acb56b.png" 
-                alt="ICE SOS Bluetooth Pendant with smartphone"
-                className="w-full max-w-md mx-auto rounded-2xl shadow-xl"
-                loading="eager"
-              />
+              <div className="relative z-10">
+                <img 
+                  src="/lovable-uploads/eed57ca0-9285-4130-a053-d65b3e140e53.png" 
+                  alt="ICE SOS Bluetooth Pendant - Complete package ready for emergency protection"
+                  className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
+                  loading="eager"
+                />
+              </div>
             </div>
           </div>
         </div>
