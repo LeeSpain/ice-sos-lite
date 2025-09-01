@@ -16,7 +16,7 @@ interface HeroProps {
 const Hero = ({ onEmmaClick }: HeroProps) => {
   const { t } = useTranslation();
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl mb-8">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl mb-4">
       
       <div className="container mx-auto px-4 py-section relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
