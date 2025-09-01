@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Users, Heart, MapPin, Phone, Shield, Clock } from "lucide-react";
+import { Users, Heart, MapPin, Phone, Shield, Clock, Play } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { Link } from "react-router-dom";
+import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 const Features = () => {
   const { t } = useTranslation();
@@ -220,16 +221,30 @@ const Features = () => {
               </div>
 
               <div className="flex flex-col gap-3">
-                <Button 
-                  asChild 
-                  size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  <Link to="/family-carer-access">
-                    <Users className="h-5 w-5 mr-2" />
-                    {t('familyConnections.cta.button')}
-                  </Link>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button 
+                    asChild 
+                    size="lg" 
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                  >
+                    <Link to="/family-carer-access">
+                      <Users className="h-5 w-5 mr-2" />
+                      {t('familyConnections.cta.button')}
+                    </Link>
+                  </Button>
+                  <IntroVideoModal 
+                    defaultVideoId="family"
+                    trigger={
+                      <Button 
+                        size="lg" 
+                        className="bg-wellness text-black hover:bg-wellness/90 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold px-8 py-4"
+                      >
+                        <Play className="h-5 w-5 mr-2" />
+                        Family Video
+                      </Button>
+                    }
+                  />
+                </div>
                 <p className="text-sm text-muted-foreground">
                   Connect your first family member for free • No setup fees
                 </p>
