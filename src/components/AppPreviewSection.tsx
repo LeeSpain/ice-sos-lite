@@ -70,7 +70,7 @@ const AppPreviewSection: React.FC = () => {
                 <Button 
                   asChild 
                   size="lg" 
-                  className="bg-green-600 hover:bg-green-700 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
                   <Link to="/devices/ice-sos-pendant">
                     <Bluetooth className="h-5 w-5 mr-2" />
