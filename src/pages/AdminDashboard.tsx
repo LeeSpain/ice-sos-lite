@@ -35,6 +35,8 @@ import EmergencyIncidentsPage from '@/components/admin/pages/EmergencyIncidentsP
 import SafetyMonitoringPage from '@/components/admin/pages/SafetyMonitoringPage';
 import WhatsAppIntegrationPage from '@/components/admin/pages/WhatsAppIntegrationPage';
 import AIPerformancePage from '@/components/admin/pages/AIPerformancePage';
+import LiveMapMonitorPage from '@/components/admin/pages/LiveMapMonitorPage';
+import CircleAnalyticsPage from '@/components/admin/pages/CircleAnalyticsPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -64,6 +66,10 @@ const AdminDashboard: React.FC = () => {
         <Route path="social-media" element={<SocialMediaIntegration />} />
         <Route path="content-automation" element={<ContentAutomation />} />
         <Route path="whatsapp" element={<WhatsAppIntegrationPage />} />
+        <Route path="live-map-monitor" element={<LiveMapMonitorPage />} />
+        <Route path="circle-analytics" element={<CircleAnalyticsPage />} />
+        <Route path="geofence-admin" element={<div className="p-6"><h1 className="text-2xl font-bold">Geofence Management</h1><p className="text-muted-foreground">Manage place-based alerts and boundaries</p></div>} />
+        <Route path="location-admin" element={<div className="p-6"><h1 className="text-2xl font-bold">Location Data Management</h1><p className="text-muted-foreground">Manage historical location data and privacy settings</p></div>} />
         <Route path="emergencies" element={<EmergencyIncidentsPage />} />
         <Route path="safety" element={<SafetyMonitoringPage />} />
         <Route path="products" element={<ProductsPage />} />

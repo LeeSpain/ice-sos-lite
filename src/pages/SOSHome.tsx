@@ -1,13 +1,106 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SosButton from '@/components/SosButton';
 import { LocationPermissionPrompt } from '@/components/LocationPermissionPrompt';
 import { useWakeLock } from '@/hooks/useWakeLock';
-import { Shield, BatteryCharging, Phone, MapPin, Clock } from 'lucide-react';
+import { useCircleRealtime } from '@/hooks/useCircleRealtime';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Shield, BatteryCharging, Phone, MapPin, Clock, Map, Users } from 'lucide-react';
 import SEO from '@/components/SEO';
 
 const SOSHome = () => {
-  // Keep screen awake while on SOS screen
+  const { user } = useAuth();
   const { isActive } = useWakeLock(true);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [nearbyMembers, setNearbyMembers] = useState(0);
+  const [familyGroupId, setFamilyGroupId] = useState<string | null>(null);
+  
+  const { circles, presences } = useCircleRealtime(familyGroupId);
+
+  useEffect(() => {
+    loadUserFamilyGroup();
+    getCurrentLocation();
+  }, [user]);
+
+  const loadUserFamilyGroup = async () => {
+    if (!user) return;
+    
+    try {
+      // Try to get user's own family group first
+      const { data: ownGroup } = await supabase
+        .from('family_groups')
+        .select('id')
+        .eq('owner_user_id', user.id)
+        .single();
+
+      if (ownGroup) {
+        setFamilyGroupId(ownGroup.id);
+        return;
+      }
+
+      // If no own group, try to get a group where user is a member
+      const { data: memberGroup } = await supabase
+        .from('family_memberships')
+        .select('group_id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (memberGroup) {
+        setFamilyGroupId(memberGroup.group_id);
+      }
+    } catch (error) {
+      console.error('Error loading family group:', error);
+    }
+  };
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => console.error('Error getting location:', error),
+        { enableHighAccuracy: true }
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (userLocation && presences.length > 0) {
+      // Calculate nearby members (within 5km)
+      const nearby = presences.filter(presence => {
+        if (!presence.lat || !presence.lng) return false;
+        const distance = getDistance(
+          userLocation.lat, userLocation.lng,
+          presence.lat, presence.lng
+        );
+        return distance <= 5000; // 5km in meters
+      });
+      setNearbyMembers(nearby.length);
+    }
+  }, [userLocation, presences]);
+
+  // Calculate distance between two coordinates using Haversine formula
+  const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371e3; // Earth's radius in meters
+    const φ1 = lat1 * Math.PI/180;
+    const φ2 = lat2 * Math.PI/180;
+    const Δφ = (lat2-lat1) * Math.PI/180;
+    const Δλ = (lng2-lng1) * Math.PI/180;
+
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    return R * c;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-hero flex flex-col p-6 relative overflow-hidden">
@@ -99,6 +192,47 @@ const SOSHome = () => {
               <span>{isActive ? 'Active & Protected' : 'Standby Mode'}</span>
             </div>
           </div>
+
+          {/* Divider */}
+          <div className="border-t border-gray-200"></div>
+
+          {/* Live Map Mini Widget */}
+          {familyGroupId && (
+            <Card className="border-2 border-primary/20">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Map className="h-4 w-4 text-primary" />
+                    <span className="font-semibold text-sm">Family Status</span>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => window.open('/map-screen', '_blank')}>
+                    <Map className="h-3 w-3 mr-1" />
+                    Full Map
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <p className="text-lg font-bold text-blue-600">{presences.length}</p>
+                    <p className="text-xs text-muted-foreground">Family Online</p>
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-green-600">{nearbyMembers}</p>
+                    <p className="text-xs text-muted-foreground">Nearby (5km)</p>
+                  </div>
+                </div>
+
+                {userLocation && (
+                  <div className="text-center space-y-1">
+                    <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      <span>Your Location: {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}</span>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Divider */}
           <div className="border-t border-gray-200"></div>

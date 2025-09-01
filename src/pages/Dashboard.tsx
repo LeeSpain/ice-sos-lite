@@ -24,6 +24,10 @@ import { SettingsPage } from "@/components/dashboard/pages/SettingsPage";
 import { SupportPage } from "@/components/dashboard/pages/SupportPage";
 import { FlicControlPage } from "@/components/dashboard/pages/FlicControlPage";
 import FamilyAccessSetup from "@/pages/FamilyAccessSetup";
+import MapScreen from "@/pages/MapScreen";
+import MyCirclesPage from "@/pages/MyCirclesPage";
+import PlacesManager from "@/pages/PlacesManager";
+import LocationHistoryPage from "@/pages/LocationHistoryPage";
 import { useTranslation } from 'react-i18next';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 
@@ -268,6 +272,28 @@ const Dashboard = () => {
               <Route path="/support" element={
                 <div className="p-6">
                   <SupportPage />
+                </div>
+              } />
+              
+              {/* Live Map Routes */}
+              <Route path="/live-map" element={
+                <div className="h-full">
+                  <MapScreen />
+                </div>
+              } />
+              <Route path="/circles" element={
+                <div className="p-6">
+                  <MyCirclesPage />
+                </div>
+              } />
+              <Route path="/places" element={
+                <div className="p-6">
+                  <PlacesManager />
+                </div>
+              } />
+              <Route path="/location-history" element={
+                <div className="p-6">
+                  <LocationHistoryPage />
                 </div>
               } />
             </Routes>

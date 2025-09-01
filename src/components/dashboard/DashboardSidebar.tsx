@@ -26,7 +26,10 @@ import {
   HelpCircle,
   Bluetooth,
   Package,
-  Smartphone
+  Smartphone,
+  Map,
+  Navigation,
+  History
 } from "lucide-react";
 
 const dashboardItems = [
@@ -56,14 +59,32 @@ const dashboardItems = [
     icon: Activity
   },
   {
-    title: "Location",
-    url: "/full-dashboard/location",
-    icon: MapPin
-  },
-  {
     title: "Mobile App",
     url: "/full-dashboard/mobile-app",
     icon: Smartphone
+  }
+];
+
+const liveMapItems = [
+  {
+    title: "Live Family Map",
+    url: "/full-dashboard/live-map",
+    icon: Map
+  },
+  {
+    title: "My Circles",
+    url: "/full-dashboard/circles",
+    icon: Users
+  },
+  {
+    title: "Places & Geofences",
+    url: "/full-dashboard/places",
+    icon: Navigation
+  },
+  {
+    title: "Location History",
+    url: "/full-dashboard/location-history",
+    icon: History
   }
 ];
 
@@ -153,6 +174,50 @@ export function DashboardSidebar() {
                     <NavLink 
                        to={item.url} 
                        end={item.url === '/full-dashboard'}
+                      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
+                    >
+                      <div className={`p-1.5 rounded-lg transition-colors ${
+                        isActive(item.url) 
+                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' 
+                          : 'bg-sidebar-muted text-sidebar-muted-foreground group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground'
+                      }`}>
+                        <item.icon className="h-4 w-4" />
+                      </div>
+                       {!collapsed && (
+                        <div className="flex-1 min-w-0">
+                          <span className={`text-sm font-medium block ${
+                            isActive(item.url) ? 'text-sidebar-primary' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground'
+                          }`}>
+                            {item.title}
+                          </span>
+                        </div>
+                       )}
+                      {!collapsed && isActive(item.url) && (
+                        <div className="w-1 h-8 bg-sidebar-primary rounded-full"></div>
+                      )}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Separator */}
+        <div className="mx-4 h-px bg-sidebar-border/50"></div>
+
+        {/* Live Map Navigation */}
+        <SidebarGroup className="px-3 py-4">
+          <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
+            Live Map
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="space-y-1">
+              {liveMapItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink 
+                      to={item.url}
                       className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
                     >
                       <div className={`p-1.5 rounded-lg transition-colors ${

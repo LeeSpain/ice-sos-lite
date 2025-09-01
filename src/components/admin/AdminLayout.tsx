@@ -35,7 +35,10 @@ import {
   Mail,
   Smartphone,
   Bluetooth,
-  Video
+  Video,
+  Map,
+  Navigation,
+  History
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
@@ -82,6 +85,15 @@ const adminMenuItems = [
       { title: "Communication Center", url: "/admin-dashboard/communication", icon: MessageSquare },
       { title: "Social Media Integration", url: "/admin-dashboard/social-media", icon: MessageSquare },
       { title: "Content Automation", url: "/admin-dashboard/content-automation", icon: Bot },
+    ]
+  },
+  {
+    title: "🗺️ Live Map Management",
+    items: [
+      { title: "Live Map Monitor", url: "/admin-dashboard/live-map-monitor", icon: Map },
+      { title: "Circle Analytics", url: "/admin-dashboard/circle-analytics", icon: Users },
+      { title: "Geofence Management", url: "/admin-dashboard/geofence-admin", icon: Navigation },
+      { title: "Location Data", url: "/admin-dashboard/location-admin", icon: History },
     ]
   },
   {
