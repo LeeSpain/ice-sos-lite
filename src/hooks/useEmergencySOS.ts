@@ -139,7 +139,7 @@ export const useEmergencySOS = () => {
         timestamp: new Date().toISOString()
       };
 
-      // Call enhanced emergency SOS function with error handling
+      // Call emergency SOS function with error handling
       const result = await withNetworkErrorHandling(async () => {
         const { data, error } = await supabase.functions.invoke('emergency-sos-enhanced', {
           body: emergencyData
