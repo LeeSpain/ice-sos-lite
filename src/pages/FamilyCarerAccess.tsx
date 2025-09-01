@@ -102,33 +102,33 @@ const FamilyCarerAccessPage = () => {
     }
   ];
 
-  // Owner Invitation Process
+  // Simple invitation process flow
   const invitationProcess = [
     {
       step: "1",
-      title: "Owner Sends Secure Invite",
-      description: "Family owner uses the dashboard to send secure invitation links with 72-hour expiry tokens.",
+      title: "Owner Sends Invite",
+      description: "From your dashboard, enter family member's email and send a secure invitation link.",
       icon: Send,
       color: "primary"
     },
     {
       step: "2", 
-      title: "Family Member Receives Email",
-      description: "Invitation arrives via email with secure registration link and clear explanation of family emergency access.",
+      title: "Member Receives Email",
+      description: "Family member gets invitation email with secure registration link and clear setup instructions.",
       icon: Mail,
       color: "wellness"
     },
     {
       step: "3",
-      title: "Choose Billing Option", 
-      description: "Family member can join with owner-paid access or choose their own €9.99/month subscription with 5 emergency contacts.",
-      icon: CreditCard,
+      title: "Login & Download App", 
+      description: "They log into their dashboard and download the family mobile app for emergency coordination.",
+      icon: Smartphone,
       color: "guardian"
     },
     {
       step: "4",
-      title: "Instant Family Connection",
-      description: "Once accepted, immediate access to family emergency dashboard and real-time SOS coordination system.",
+      title: "Live Family Access",
+      description: "Instant connection established - they now receive your SOS alerts and can coordinate emergency response.",
       icon: CircleCheck,
       color: "emergency"
     }
@@ -433,46 +433,43 @@ const FamilyCarerAccessPage = () => {
             </p>
           </div>
           
-          {/* Timeline Layout */}
-          <div className="max-w-4xl mx-auto">
-            <div className="relative">
-              {/* Vertical Line */}
-              <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-wellness to-emergency opacity-30 hidden md:block"></div>
-              
-              <div className="space-y-12">
-                {invitationProcess.map((step, index) => {
-                  const Icon = step.icon;
-                  const isEven = index % 2 === 0;
-                  
-                  return (
-                    <div key={index} className={`relative flex items-center ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
-                      {/* Step Circle */}
-                      <div className="absolute left-8 transform -translate-x-1/2 z-10 hidden md:block">
-                        <div className={`w-16 h-16 bg-gradient-to-br ${getGradientBg(step.color)} rounded-full flex items-center justify-center shadow-lg border-4 border-background`}>
-                          <Icon className="h-8 w-8 text-white" />
-                        </div>
+          {/* Simplified Timeline Layout */}
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-4 gap-8">
+              {invitationProcess.map((step, index) => {
+                const Icon = step.icon;
+                const colorClass = getGradientBg(step.color);
+                const textColor = getIconColor(step.color);
+                
+                return (
+                  <div key={index} className="relative text-center">
+                    {/* Step Number and Icon */}
+                    <div className="flex flex-col items-center mb-6">
+                      <div className={`w-16 h-16 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center shadow-lg mb-4 relative z-10`}>
+                        <Icon className="h-8 w-8 text-white" />
                       </div>
-                      
-                      {/* Content */}
-                      <div className={`flex-1 ${isEven ? 'md:pl-24' : 'md:pr-24'}`}>
-                        <div className={`bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-lg border border-muted/20 ${isEven ? 'md:ml-8' : 'md:mr-8'}`}>
-                          <div className="flex items-center mb-4 md:hidden">
-                            <div className={`w-12 h-12 bg-gradient-to-br ${getGradientBg(step.color)} rounded-xl flex items-center justify-center mr-4`}>
-                              <Icon className="h-6 w-6 text-white" />
-                            </div>
-                            <span className="text-2xl font-bold text-muted-foreground">0{step.step}</span>
-                          </div>
-                          <div className="hidden md:block text-right mb-2">
-                            <span className="text-sm font-semibold text-muted-foreground">STEP {step.step}</span>
-                          </div>
-                          <h3 className={`text-xl font-bold mb-3 ${getIconColor(step.color)}`}>{step.title}</h3>
-                          <p className="text-muted-foreground leading-relaxed">{step.description}</p>
-                        </div>
-                      </div>
+                      <div className="text-2xl font-bold text-muted-foreground/60">0{step.step}</div>
                     </div>
-                  );
-                })}
-              </div>
+                    
+                    {/* Content */}
+                    <div className="space-y-3">
+                      <h3 className={`text-xl font-bold ${textColor}`}>
+                        {step.title}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed text-sm">
+                        {step.description}
+                      </p>
+                    </div>
+                    
+                    {/* Arrow */}
+                    {index < invitationProcess.length - 1 && (
+                      <div className="hidden md:block absolute top-8 left-full transform -translate-y-1/2 z-0">
+                        <ArrowRight className="h-6 w-6 text-muted-foreground/30" />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
