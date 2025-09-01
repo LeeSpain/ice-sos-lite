@@ -116,16 +116,16 @@
     }
   },
   "appDownload": {
-    "title": "Professional Mobile App",
-    "subtitle": "Download ICE SOS Lite - Your complete emergency protection platform",
-    "platformBadge": "PROFESSIONAL PLATFORM",
-    "appName": "ICE SOS Lite",
-    "heroDescription": "Professional emergency protection platform for individuals and families. Download free, then activate your premium protection features.",
-    "cta": "Join Now",
+    "title": "Meet Emma - Your AI Assistant",
+    "subtitle": "Experience the future of emergency support with intelligent AI assistance",
+    "platformBadge": "AI POWERED",
+    "appName": "Emma AI Assistant",
+    "heroDescription": "Advanced AI technology that understands your needs, learns from interactions, and provides instant, intelligent emergency support 24/7.",
+    "cta": "Talk to Emma",
     "features": {
-      "emergencySOS": { "title": "Emergency SOS", "description": "One-tap emergency button with GPS location sharing and instant alerts" },
-      "globalCoverage": { "title": "Global Coverage", "description": "Works worldwide with full multilingual support and 24/7 monitoring" },
-      "instantSetup": { "title": "Instant Setup", "description": "Ready to use in minutes with simple configuration and onboarding" }
+      "intelligentSupport": { "title": "Intelligent Support", "description": "Natural language processing for instant help and emergency assistance" },
+      "learningAI": { "title": "Learning AI", "description": "Gets smarter over time, adapting to your specific needs and preferences" },
+      "instantResponse": { "title": "Instant Response", "description": "Immediate AI-powered assistance available 24/7 in multiple languages" }
     },
     "infoTitle": "Important Information",
     "planFeaturesTitle": "Plan Features:",

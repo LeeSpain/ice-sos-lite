@@ -1,95 +1,189 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Download, Smartphone } from "lucide-react";
+import { Check, Download, Smartphone, Brain, MessageCircle, Zap, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { IntroVideoModal } from "@/components/IntroVideoModal";
 import { useTranslation } from 'react-i18next';
 
 const AppDownload = () => {
   const { t } = useTranslation();
   return (
-    <section className="py-20 bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <section className="py-20 bg-gradient-to-br from-primary/5 via-secondary/5 to-wellness/5">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center bg-primary/10 rounded-full px-4 py-2 mb-4 border border-primary/20">
-            <div className="w-2 h-2 bg-primary rounded-full mr-2 animate-pulse"></div>
-            <span className="text-sm font-medium text-primary">{t('appDownload.platformBadge')}</span>
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center bg-gradient-to-r from-primary/10 to-secondary/10 rounded-full px-6 py-3 mb-6 border border-primary/20 shadow-lg">
+            <Brain className="w-5 h-5 text-primary mr-3 animate-pulse" />
+            <span className="text-sm font-bold text-primary tracking-wide">{t('appDownload.platformBadge')}</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
             {t('appDownload.title')}
           </h2>
-          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             {t('appDownload.subtitle')}
           </p>
         </div>
 
-        {/* Main Content Card */}
-        <Card className="relative border-2 border-primary/20 bg-white dark:bg-slate-800 shadow-xl overflow-hidden max-w-4xl mx-auto">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
-          
-          <CardContent className="p-6 md:p-8">
-            {/* Compact Layout */}
-            <div className="grid md:grid-cols-2 gap-6 items-center">
-              {/* Left Side - App Info */}
-              <div className="text-center md:text-left">
-                <div className="w-14 h-14 bg-gradient-to-br from-primary to-secondary shadow-lg rounded-2xl flex items-center justify-center mx-auto md:mx-0 mb-4">
-                  <Smartphone className="h-7 w-7 text-white" />
+        {/* Main Content Grid */}
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Emma AI Visual */}
+            <div className="relative">
+              {/* AI Chat Interface Mockup */}
+              <div className="relative mx-auto w-80 h-[500px] bg-gradient-to-b from-slate-900 to-slate-800 rounded-[3rem] p-3 shadow-2xl">
+                <div className="w-full h-full bg-gradient-to-b from-white to-gray-50 rounded-[2.5rem] overflow-hidden relative">
+                  {/* Status Bar */}
+                  <div className="flex justify-between items-center px-6 py-4 bg-gradient-to-r from-primary to-secondary text-white">
+                    <span className="font-bold">Emma AI</span>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-xs">Online</span>
+                    </div>
+                  </div>
+
+                  {/* Chat Interface */}
+                  <div className="p-4 space-y-4 h-full overflow-hidden">
+                    {/* Emma's Messages */}
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                        <Brain className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="bg-primary/10 rounded-lg p-3 max-w-xs">
+                        <p className="text-xs font-medium text-primary mb-1">Emma</p>
+                        <p className="text-sm">Hi! I'm Emma, your AI assistant. How can I help you today?</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                        <Brain className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="bg-primary/10 rounded-lg p-3 max-w-xs">
+                        <p className="text-xs font-medium text-primary mb-1">Emma</p>
+                        <p className="text-sm">I can help with emergency setup, family connections, and answer questions about your protection plan.</p>
+                      </div>
+                    </div>
+
+                    {/* User Message */}
+                    <div className="flex justify-end">
+                      <div className="bg-gradient-to-r from-primary to-secondary text-white rounded-lg p-3 max-w-xs">
+                        <p className="text-sm">How do I add family members?</p>
+                      </div>
+                    </div>
+
+                    {/* Emma's Response */}
+                    <div className="flex items-start space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
+                        <Brain className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="bg-primary/10 rounded-lg p-3 max-w-xs">
+                        <p className="text-xs font-medium text-primary mb-1">Emma</p>
+                        <p className="text-sm">I'll guide you through adding family members step by step...</p>
+                        <div className="mt-2 flex space-x-1">
+                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce"></div>
+                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-1 h-1 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-3 text-foreground">
+              </div>
+
+              {/* Floating AI Features */}
+              <div className="absolute -left-8 top-20 bg-white rounded-xl p-4 shadow-xl border border-primary/20 max-w-48">
+                <div className="flex items-center mb-2">
+                  <MessageCircle className="h-4 w-4 text-primary mr-2" />
+                  <span className="font-semibold text-sm">Natural Language</span>
+                </div>
+                <p className="text-xs text-gray-600">Speaks your language naturally</p>
+              </div>
+
+              <div className="absolute -right-8 bottom-32 bg-white rounded-xl p-4 shadow-xl border border-secondary/20 max-w-48">
+                <div className="flex items-center mb-2">
+                  <Zap className="h-4 w-4 text-secondary mr-2" />
+                  <span className="font-semibold text-sm">Instant Response</span>
+                </div>
+                <p className="text-xs text-gray-600">24/7 immediate assistance</p>
+              </div>
+            </div>
+
+            {/* Right Side - AI Features & CTA */}
+            <div className="text-center lg:text-left">
+              <div className="mb-8">
+                <h3 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
                   {t('appDownload.appName')}
                 </h3>
-                <p className="text-muted-foreground text-sm mb-4">
+                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
                   {t('appDownload.heroDescription')}
-                </p>
-                
-                {/* CTA Button */}
-                <Button asChild size="lg" className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl">
-                  <Link to="/ai-register" className="flex items-center justify-center">
-                    <Download className="mr-2 h-4 w-4" />
-                    {t('appDownload.cta')}
-                  </Link>
-                </Button>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Free to download • No credit card required
                 </p>
               </div>
 
-              {/* Right Side - Features Grid */}
-              <div className="grid grid-cols-1 gap-4">
-                <div className="flex items-center space-x-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Check className="h-5 w-5 text-white" />
+              <div className="grid gap-6 mb-8">
+                <div className="flex items-start space-x-4 text-left">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Brain className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm text-foreground">{t('appDownload.features.emergencySOS.title')}</h4>
-                    <p className="text-xs text-muted-foreground">{t('appDownload.features.emergencySOS.description')}</p>
+                    <h4 className="font-bold text-lg mb-2">{t('appDownload.features.intelligentSupport.title')}</h4>
+                    <p className="text-muted-foreground">{t('appDownload.features.intelligentSupport.description')}</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center space-x-3 p-3 rounded-lg bg-secondary/5 border border-secondary/10">
-                  <div className="w-10 h-10 bg-gradient-to-br from-secondary to-secondary/80 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Check className="h-5 w-5 text-white" />
+
+                <div className="flex items-start space-x-4 text-left">
+                  <div className="w-12 h-12 bg-gradient-to-br from-secondary/10 to-secondary/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Star className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm text-foreground">{t('appDownload.features.globalCoverage.title')}</h4>
-                    <p className="text-xs text-muted-foreground">{t('appDownload.features.globalCoverage.description')}</p>
+                    <h4 className="font-bold text-lg mb-2">{t('appDownload.features.learningAI.title')}</h4>
+                    <p className="text-muted-foreground">{t('appDownload.features.learningAI.description')}</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center space-x-3 p-3 rounded-lg bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Check className="h-5 w-5 text-white" />
+
+                <div className="flex items-start space-x-4 text-left">
+                  <div className="w-12 h-12 bg-gradient-to-br from-wellness/10 to-wellness/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Zap className="h-6 w-6 text-wellness" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm text-foreground">{t('appDownload.features.instantSetup.title')}</h4>
-                    <p className="text-xs text-muted-foreground">{t('appDownload.features.instantSetup.description')}</p>
+                    <h4 className="font-bold text-lg mb-2">{t('appDownload.features.instantResponse.title')}</h4>
+                    <p className="text-muted-foreground">{t('appDownload.features.instantResponse.description')}</p>
                   </div>
                 </div>
               </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Button 
+                  size="xl" 
+                  className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold px-8 py-4 shadow-glow hover:shadow-xl transition-all duration-300 rounded-xl"
+                  onClick={() => {
+                    // Emma chat functionality would be triggered here
+                    console.log("Talk to Emma clicked");
+                  }}
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  {t('appDownload.cta')}
+                </Button>
+                <IntroVideoModal 
+                  defaultVideoId="meet-emma"
+                  trigger={
+                    <Button 
+                      size="xl" 
+                      variant="outline"
+                      className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                    >
+                      <Download className="h-5 w-5 mr-2" />
+                      Watch Demo
+                    </Button>
+                  }
+                />
+              </div>
+              <p className="text-sm text-muted-foreground mt-4">
+                Advanced AI • Multilingual • Available 24/7
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </section>
   );
