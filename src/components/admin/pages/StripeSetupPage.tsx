@@ -54,7 +54,7 @@ export default function StripeSetupPage() {
             <ul className="mt-2 space-y-1">
               <li>• 2 Subscription Plans (Family Connection €4.99/mo, Premium Protection €4.99/mo)</li>
               <li>• 1 Regional Service (Call Centre Spain €24.99/mo)</li>
-              <li>• 1 Physical Product (ICE SOS Bluetooth Pendant €59.99)</li>
+              <li>• 1 Physical Product (ICE SOS Bluetooth Pendant €4.99)</li>
             </ul>
           </CardDescription>
         </CardHeader>

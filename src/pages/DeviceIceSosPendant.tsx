@@ -34,7 +34,7 @@ const DeviceIceSosPendant = () => {
     offers: {
       "@type": "Offer",
       priceCurrency: "EUR",
-      price: "59.99",
+      price: "4.99",
       availability: "https://schema.org/InStock",
       url: canonical
     }
@@ -124,7 +124,7 @@ const DeviceIceSosPendant = () => {
                     size="xl" 
                     className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
-                    <Link to="/ai-register">Order Now - €59.99</Link>
+                    <Link to="/ai-register">Order Now - €4.99</Link>
                   </Button>
                 )}
               </div>
@@ -284,7 +284,7 @@ const DeviceIceSosPendant = () => {
                   {comingSoon ? (
                     <span>Coming Soon</span>
                   ) : (
-                    <Link to="/ai-register">Get Your ICE Pendant - €59.99</Link>
+                    <Link to="/ai-register">Get Your ICE Pendant - €4.99</Link>
                   )}
                 </Button>
               </div>
@@ -541,7 +541,7 @@ const DeviceIceSosPendant = () => {
 
             <Card className="p-6 shadow-lg">
               <h3 className="font-bold text-lg mb-3">How much does it cost?</h3>
-              <p className="text-muted-foreground">Premium Protection is €4.99/month with no setup fees. The Bluetooth pendant is €59.99 one-time. Cancel anytime with 30 days notice.</p>
+              <p className="text-muted-foreground">Premium Protection is €4.99/month with no setup fees. The Bluetooth pendant is €4.99 one-time. Cancel anytime with 30 days notice.</p>
             </Card>
           </div>
         </div>
@@ -563,7 +563,7 @@ const DeviceIceSosPendant = () => {
               ) : (
                 <>
                   <Button size="lg" className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-emergency to-primary hover:from-emergency/90 hover:to-primary/90 shadow-xl" asChild>
-                    <Link to="/ai-register">Order Now - €59.99</Link>
+                    <Link to="/ai-register">Order Now - €4.99</Link>
                   </Button>
                   <div className="text-sm text-muted-foreground">
                     <Check className="h-4 w-4 inline mr-2 text-green-600" />
