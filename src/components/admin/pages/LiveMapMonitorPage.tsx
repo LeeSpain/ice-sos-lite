@@ -25,6 +25,8 @@ interface FamilyGroup {
 export default function LiveMapMonitorPage() {
   const [presences, setPresences] = useState<LivePresence[]>([]);
   const [familyGroups, setFamilyGroups] = useState<FamilyGroup[]>([]);
+  const [locationPings, setLocationPings] = useState<any[]>([]);
+  const [placeEvents, setPlaceEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { MapView } = useMapProvider();
   const { toast } = useToast();
@@ -35,6 +37,69 @@ export default function LiveMapMonitorPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const createSampleData = async () => {
+    try {
+      setLoading(true);
+      toast({
+        title: "Creating Sample Data",
+        description: "Generating test family groups and location data..."
+      });
+
+      // Create sample live presence data for demo
+      const samplePresences = [
+        {
+          user_id: '11111111-1111-1111-1111-111111111111',
+          lat: 37.3881024, // Albox, Spain (from geo logs)
+          lng: -2.1417503,
+          last_seen: new Date().toISOString(),
+          battery: 85,
+          is_paused: false,
+          updated_at: new Date().toISOString()
+        },
+        {
+          user_id: '22222222-2222-2222-2222-222222222222',
+          lat: 37.3901024,
+          lng: -2.1437503,
+          last_seen: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5 minutes ago
+          battery: 72,
+          is_paused: false,
+          updated_at: new Date().toISOString()
+        },
+        {
+          user_id: '33333333-3333-3333-3333-333333333333',
+          lat: 37.3861024,
+          lng: -2.1397503,
+          last_seen: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
+          battery: 45,
+          is_paused: true,
+          updated_at: new Date().toISOString()
+        }
+      ];
+
+      // Insert sample presence data
+      for (const presence of samplePresences) {
+        await supabase
+          .from('live_presence')
+          .upsert(presence, { onConflict: 'user_id' });
+      }
+
+      toast({
+        title: "Success",
+        description: "Sample data created successfully!"
+      });
+
+      // Reload data to show the new sample data
+      await loadData();
+    } catch (error) {
+      console.error('Error creating sample data:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create sample data",
+        variant: "destructive"
+      });
+    }
+  };
+
   const loadData = async () => {
     try {
       setLoading(true);
@@ -44,18 +109,40 @@ export default function LiveMapMonitorPage() {
         .from('live_presence')
         .select('*');
 
-      if (presenceError) throw presenceError;
+      if (presenceError) {
+        console.error('Presence error:', presenceError);
+      }
 
       // Load family groups with member counts
       const { data: groupsData, error: groupsError } = await supabase
         .from('family_groups')
-        .select(`
-          id,
-          owner_user_id,
-          created_at
-        `);
+        .select('*');
 
-      if (groupsError) throw groupsError;
+      if (groupsError) {
+        console.error('Groups error:', groupsError);
+      }
+
+      // Load location pings for additional analytics
+      const { data: locationData, error: locationError } = await supabase
+        .from('location_pings')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (locationError) {
+        console.error('Location error:', locationError);
+      }
+
+      // Load place events
+      const { data: eventsData, error: eventsError } = await supabase
+        .from('place_events')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (eventsError) {
+        console.error('Events error:', eventsError);
+      }
 
       // Transform groups data to include member count
       const enrichedGroups = await Promise.all(
@@ -74,11 +161,14 @@ export default function LiveMapMonitorPage() {
 
       setPresences(presenceData || []);
       setFamilyGroups(enrichedGroups);
+      setLocationPings(locationData || []);
+      setPlaceEvents(eventsData || []);
+
     } catch (error) {
       console.error('Error loading Live Map data:', error);
       toast({
         title: "Error",
-        description: "Failed to load Live Map data",
+        description: "Failed to load Live Map data. Check console for details.",
         variant: "destructive"
       });
     } finally {
@@ -105,11 +195,36 @@ export default function LiveMapMonitorPage() {
           <h1 className="text-3xl font-bold text-foreground">Live Map Monitor</h1>
           <p className="text-muted-foreground">Real-time family location tracking overview</p>
         </div>
-        <Button onClick={loadData} disabled={loading} variant="outline">
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          {presences.length === 0 && (
+            <Button onClick={createSampleData} disabled={loading} variant="default">
+              Create Sample Data
+            </Button>
+          )}
+          <Button onClick={loadData} disabled={loading} variant="outline">
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
+
+      {/* Data Status Alert */}
+      {presences.length === 0 && !loading && (
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <MapPin className="h-5 w-5 text-yellow-600" />
+              <div>
+                <h3 className="font-semibold text-yellow-800">No Location Data Available</h3>
+                <p className="text-sm text-yellow-700">
+                  The Live Map system is ready but has no active users sharing location data. 
+                  You can create sample data to test the system or wait for real users to start sharing their location.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -148,12 +263,23 @@ export default function LiveMapMonitorPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <CardTitle className="text-sm font-medium">Location Pings</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-purple-600">{locationPings.length}</div>
+            <p className="text-xs text-muted-foreground">Recent location updates</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Place Events</CardTitle>
             <Map className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">{presences.length}</div>
-            <p className="text-xs text-muted-foreground">In Live Map system</p>
+            <div className="text-2xl font-bold text-orange-600">{placeEvents.length}</div>
+            <p className="text-xs text-muted-foreground">Geofence enter/exit events</p>
           </CardContent>
         </Card>
       </div>
