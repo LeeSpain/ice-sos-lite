@@ -410,7 +410,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                             className="bg-blue-500 hover:bg-blue-500/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                             onClick={() => handleProductPurchase(product)}
                           >
-                            {t('pricing.orderNow')}
+                            {t('pricing.orderNow', { defaultValue: 'Order Now' })}
                           </Button>
                         )}
                         
@@ -422,7 +422,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         >
                           <Link to={`/device-ice-sos-pendant`}>
                             <Play className="h-4 w-4 mr-2" />
-                            Watch Demo
+                            Watch Video
                           </Link>
                         </Button>
                       </div>
