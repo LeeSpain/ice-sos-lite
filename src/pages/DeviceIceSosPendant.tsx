@@ -6,9 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall, CheckCircle2, Smartphone, Zap, Clock, Heart, Star, Users, Globe, Phone } from "lucide-react";
+import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall, CheckCircle2, Smartphone, Zap, Clock, Heart, Star, Users, Globe, Phone, Play } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { supabase } from "@/integrations/supabase/client";
+import OptimizedImage from "@/components/ui/optimized-image";
+import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
+import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 const DeviceIceSosPendant = () => {
   console.log('[DeviceIceSosPendant] Component rendering started');
@@ -114,16 +117,30 @@ const DeviceIceSosPendant = () => {
                     <Link to="/ai-register">Order Now - €59.99 + €4.99 shipping</Link>
                   </Button>
                 )}
+                <IntroVideoModal 
+                  defaultVideoId="ice-pendant-demo"
+                  trigger={
+                    <Button 
+                      size="xl" 
+                      className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                    >
+                      <Play className="h-5 w-5 mr-2" />
+                      Watch Demo
+                    </Button>
+                  }
+                />
               </div>
             </div>
             
             <div className="relative">
               <div className="relative z-10">
-                <img 
+                <OptimizedImage 
                   src="/lovable-uploads/eed57ca0-9285-4130-a053-d65b3e140e53.png" 
                   alt="ICE SOS Bluetooth Pendant - Complete package ready for emergency protection"
                   className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
-                  loading="eager"
+                  priority={true}
+                  sizes={getImageSizes('hero')}
+                  blurDataURL={generateBlurPlaceholder(400, 600)}
                 />
               </div>
             </div>
