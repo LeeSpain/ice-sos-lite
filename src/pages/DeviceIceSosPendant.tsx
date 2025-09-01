@@ -34,9 +34,10 @@ const DeviceIceSosPendant = () => {
     offers: {
       "@type": "Offer",
       priceCurrency: "EUR",
-      price: "4.99",
+      price: "64.98",
       availability: "https://schema.org/InStock",
-      url: canonical
+      url: canonical,
+      description: "ICE SOS Bluetooth Pendant €59.99 + €4.99 shipping"
     }
   };
 
@@ -108,11 +109,11 @@ const DeviceIceSosPendant = () => {
               </div>
               
               <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
-                Get Emergency Help in 30 Seconds - <span className="text-wellness">Even When You Can't Speak or Dial</span>
+                Complete Emergency Ecosystem - <span className="text-wellness">Pendant + Smart Home + Emergency Contacts</span>
               </h1>
               
               <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
-                Professional emergency operators respond to your GPS location with your medical information - in any language, anywhere in the world
+                One button instantly calls ALL your emergency contacts and works with your existing Alexa/Google Home - professional response anywhere in the world
               </p>
               
               <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
@@ -124,7 +125,7 @@ const DeviceIceSosPendant = () => {
                     size="xl" 
                     className="bg-wellness text-white hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
-                    <Link to="/ai-register">Order Now - €4.99</Link>
+                    <Link to="/ai-register">Order Complete Ecosystem - €59.99 + €4.99 shipping</Link>
                   </Button>
                 )}
               </div>
@@ -235,13 +236,170 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
+      {/* Smart Home Integration Section */}
+      <section className="py-20 bg-gradient-to-br from-guardian/10 via-background to-primary/10">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">Works With Your Smart Home</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              No additional hubs required. Your pendant integrates seamlessly with existing Alexa, Google Home, and any smartphone.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
+            {/* Alexa Integration */}
+            <Card className="p-8 text-center shadow-xl border-2 border-primary/10 hover:border-primary/30 transition-colors">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center">
+                <span className="text-2xl font-bold text-primary">A</span>
+              </div>
+              <h3 className="text-xl font-bold mb-4">Amazon Alexa</h3>
+              <p className="text-muted-foreground mb-4">
+                "Alexa, help help help" instantly triggers emergency alerts to ALL contacts
+              </p>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>✓ Works with any Alexa device</p>
+                <p>✓ Voice activation from anywhere</p>
+                <p>✓ Announces emergency to household</p>
+              </div>
+            </Card>
+
+            {/* Google Home Integration */}
+            <Card className="p-8 text-center shadow-xl border-2 border-guardian/10 hover:border-guardian/30 transition-colors">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-guardian/20 to-guardian/10 rounded-full flex items-center justify-center">
+                <span className="text-2xl font-bold text-guardian">G</span>
+              </div>
+              <h3 className="text-xl font-bold mb-4">Google Home</h3>
+              <p className="text-muted-foreground mb-4">
+                "Hey Google, emergency" calls ALL contacts and shares location
+              </p>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>✓ Works with Google Nest devices</p>
+                <p>✓ Multi-room emergency broadcast</p>
+                <p>✓ Instant family coordination</p>
+              </div>
+            </Card>
+
+            {/* Smartphone Integration */}
+            <Card className="p-8 text-center shadow-xl border-2 border-emergency/10 hover:border-emergency/30 transition-colors">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-emergency/20 to-emergency/10 rounded-full flex items-center justify-center">
+                <Smartphone className="h-8 w-8 text-emergency" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Any Smartphone</h3>
+              <p className="text-muted-foreground mb-4">
+                iOS/Android compatible - no brand restrictions
+              </p>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>✓ iPhone and Android support</p>
+                <p>✓ Background app protection</p>
+                <p>✓ Always connected via Bluetooth</p>
+              </div>
+            </Card>
+          </div>
+
+          {/* Setup Process */}
+          <div className="bg-white/50 backdrop-blur-sm rounded-3xl p-8 shadow-xl">
+            <h3 className="text-2xl font-bold text-center mb-8">5-Minute Smart Home Setup</h3>
+            <div className="grid md:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">1</div>
+                <p className="text-sm font-semibold">Download ICE SOS Lite app</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-guardian rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">2</div>
+                <p className="text-sm font-semibold">Pair pendant via Bluetooth</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-emergency rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">3</div>
+                <p className="text-sm font-semibold">Connect to Alexa/Google</p>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-wellness rounded-full flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">4</div>
+                <p className="text-sm font-semibold">Test emergency system</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Emergency Contact Calling Section */}
+      <section className="py-20 bg-emergency/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">ALL Emergency Contacts Called Simultaneously</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Unlike other systems that only send alerts, we CALL all your emergency contacts at the same time for guaranteed response.
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <Card className="p-6 border-l-4 border-emergency shadow-lg">
+                <h3 className="text-xl font-bold mb-3 text-emergency">Instant Phone Calls</h3>
+                <p className="text-muted-foreground">
+                  The system automatically dials ALL your emergency contacts (up to 5) simultaneously. No waiting for text responses - direct voice contact for immediate action.
+                </p>
+              </Card>
+
+              <Card className="p-6 border-l-4 border-guardian shadow-lg">
+                <h3 className="text-xl font-bold mb-3 text-guardian">GPS Location Shared</h3>
+                <p className="text-muted-foreground">
+                  Every contact receives your exact GPS coordinates via SMS and voice message. They know exactly where to find you or where to send help.
+                </p>
+              </Card>
+
+              <Card className="p-6 border-l-4 border-primary shadow-lg">
+                <h3 className="text-xl font-bold mb-3 text-primary">Medical Information Included</h3>
+                <p className="text-muted-foreground">
+                  Critical medical conditions, medications, and allergies are automatically shared with your emergency contacts so they can inform first responders.
+                </p>
+              </Card>
+
+              <Card className="p-6 border-l-4 border-wellness shadow-lg">
+                <h3 className="text-xl font-bold mb-3 text-wellness">Smart Speaker Announcement</h3>
+                <p className="text-muted-foreground">
+                  If you have Alexa or Google Home, they announce the emergency throughout your home so anyone present knows to help or call 911.
+                </p>
+              </Card>
+            </div>
+
+            <div className="relative">
+              <div className="bg-gradient-to-br from-emergency/10 to-primary/10 rounded-3xl p-8 shadow-2xl">
+                <h3 className="text-2xl font-bold mb-6 text-center">Emergency Response Timeline</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-emergency rounded-full flex items-center justify-center text-white text-sm font-bold">0s</div>
+                    <p className="text-sm">Button pressed or voice command</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-guardian rounded-full flex items-center justify-center text-white text-sm font-bold">3s</div>
+                    <p className="text-sm">ALL contacts called simultaneously</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">5s</div>
+                    <p className="text-sm">GPS location sent via SMS</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-wellness rounded-full flex items-center justify-center text-white text-sm font-bold">7s</div>
+                    <p className="text-sm">Smart speakers announce emergency</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-emergency rounded-full flex items-center justify-center text-white text-sm font-bold">30s</div>
+                    <p className="text-sm">First contact typically responds</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How it Works Section */}
       <section id="how-it-works" className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">How it Works</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Simple setup, powerful protection. Get emergency help with just one button press.
+            <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">Complete Emergency Ecosystem</h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Your pendant works with existing smart speakers and automatically calls ALL emergency contacts. No additional hubs needed - uses your current setup.
             </p>
           </div>
 
@@ -250,32 +408,32 @@ const DeviceIceSosPendant = () => {
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-emergency flex items-center justify-center text-white font-bold text-lg">1</div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Pair & Setup</h3>
-                  <p className="text-muted-foreground">Connect the pendant to your phone via Bluetooth in the ICE SOS Lite app. Quick 2-minute setup.</p>
+                  <h3 className="text-xl font-semibold mb-2">Connect Everything</h3>
+                  <p className="text-muted-foreground">Pair pendant to phone + connect to existing Alexa/Google Home. Works with ANY smartphone (iOS/Android). 5-minute setup.</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-emergency flex items-center justify-center text-white font-bold text-lg">2</div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Wear Anywhere</h3>
-                  <p className="text-muted-foreground">Attach to clothing, wear as a pendant, or keep on your keyring. Comfortable for daily use.</p>
+                  <h3 className="text-xl font-semibold mb-2">Voice Commands Ready</h3>
+                  <p className="text-muted-foreground">Say "Alexa, help help help" or "Hey Google, emergency" - your smart speakers become emergency triggers too.</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-emergency flex items-center justify-center text-white font-bold text-lg">3</div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">One-Button Alert</h3>
-                  <p className="text-muted-foreground">Press once to trigger SOS. Your emergency contacts receive instant alerts with your location.</p>
+                  <h3 className="text-xl font-semibold mb-2">Instant Emergency Response</h3>
+                  <p className="text-muted-foreground">One button press or voice command → ALL emergency contacts called simultaneously + GPS location sent + smart speakers announce emergency.</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-emergency flex items-center justify-center text-white font-bold text-lg">4</div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Help Arrives</h3>
-                  <p className="text-muted-foreground">Emergency responders receive your GPS location and critical medical information instantly.</p>
+                  <h3 className="text-xl font-semibold mb-2">Professional Help Dispatched</h3>
+                  <p className="text-muted-foreground">Emergency operators receive GPS location + medical information + contact all family members. Complete coordination in any language, anywhere in the world.</p>
                 </div>
               </div>
 
@@ -284,7 +442,7 @@ const DeviceIceSosPendant = () => {
                   {comingSoon ? (
                     <span>Coming Soon</span>
                   ) : (
-                    <Link to="/ai-register">Get Your ICE Pendant - €4.99</Link>
+                    <Link to="/ai-register">Get Complete Emergency System - €59.99 + €4.99 shipping</Link>
                   )}
                 </Button>
               </div>
@@ -541,7 +699,7 @@ const DeviceIceSosPendant = () => {
 
             <Card className="p-6 shadow-lg">
               <h3 className="font-bold text-lg mb-3">How much does it cost?</h3>
-              <p className="text-muted-foreground">Premium Protection is €4.99/month with no setup fees. The Bluetooth pendant is €4.99 one-time. Cancel anytime with 30 days notice.</p>
+              <p className="text-muted-foreground">Premium Protection is €4.99/month with no setup fees. The Bluetooth pendant is €59.99 one-time + €4.99 shipping. Cancel anytime with 30 days notice.</p>
             </Card>
           </div>
         </div>
@@ -563,7 +721,7 @@ const DeviceIceSosPendant = () => {
               ) : (
                 <>
                   <Button size="lg" className="px-8 py-4 text-lg font-semibold bg-gradient-to-r from-emergency to-primary hover:from-emergency/90 hover:to-primary/90 shadow-xl" asChild>
-                    <Link to="/ai-register">Order Now - €4.99</Link>
+                    <Link to="/ai-register">Order Complete System - €59.99 + €4.99 shipping</Link>
                   </Button>
                   <div className="text-sm text-muted-foreground">
                     <Check className="h-4 w-4 inline mr-2 text-green-600" />
