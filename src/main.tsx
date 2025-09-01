@@ -6,6 +6,8 @@ import { HelmetProvider } from 'react-helmet-async'
 import { PreferencesProvider } from '@/contexts/PreferencesContext'
 import { initAnalytics } from '@/lib/analytics'
 import { performanceMonitor } from '@/utils/performance'
+import ErrorBoundary from './components/ErrorBoundary'
+import './utils/errorReporting' // Initialize global error handlers
 
 // Initialize performance monitoring
 performanceMonitor.mark('app-start');
@@ -31,11 +33,13 @@ const preloadCriticalResources = () => {
 preloadCriticalResources();
 
 createRoot(document.getElementById("root")!).render(
-  <HelmetProvider>
-    <PreferencesProvider>
-      <App />
-    </PreferencesProvider>
-  </HelmetProvider>
+  <ErrorBoundary>
+    <HelmetProvider>
+      <PreferencesProvider>
+        <App />
+      </PreferencesProvider>
+    </HelmetProvider>
+  </ErrorBoundary>
 );
 
 // Log performance metrics after app loads
