@@ -408,23 +408,27 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           <Button 
                             size="lg"
                             className="bg-blue-500 hover:bg-blue-500/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                            onClick={() => handleProductPurchase(product)}
+                            asChild
                           >
-                            {t('pricing.orderNow', { defaultValue: 'Order Now' })}
+                            <Link to="/device-ice-sos-pendant">
+                              Find Out More
+                            </Link>
                           </Button>
                         )}
                         
-                        <Button 
-                          size="lg"
-                          variant="outline"
-                          className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                          asChild
-                        >
-                          <Link to={`/device-ice-sos-pendant`}>
-                            <Play className="h-4 w-4 mr-2" />
-                            Watch Video
-                          </Link>
-                        </Button>
+                        <IntroVideoModal 
+                          defaultVideoId="ice-sos-pendant"
+                          trigger={
+                            <Button 
+                              size="lg"
+                              variant="outline"
+                              className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                              <Play className="h-4 w-4 mr-2" />
+                              Watch Video
+                            </Button>
+                          }
+                        />
                       </div>
 
                       {/* Compact Features Grid - exactly matching Premium Protection */}
