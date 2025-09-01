@@ -213,41 +213,41 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
 
         {/* Emergency Protection Plan Section */}
-        <div className="max-w-6xl mx-auto mb-16">
+        <div className="max-w-6xl mx-auto mb-12">
           {(() => {
             const selectedPlan = globalPlans.find(p => p.name === 'Premium Protection' || p.is_popular || p.name.toLowerCase().includes('premium')) || globalPlans[0];
             return selectedPlan ? (
-              <div className="bg-gradient-to-br from-primary/5 to-guardian/5 rounded-3xl p-8 border border-primary/20 relative overflow-hidden">
+              <div className="bg-gradient-to-br from-primary/5 to-guardian/5 rounded-3xl p-6 border border-primary/20 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-                <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
+                <Badge className="absolute top-4 right-4 bg-primary text-white text-sm px-3 py-1 shadow-lg">
                   {t('pricing.corePlan')}
                 </Badge>
                 
                 <div className="relative">
                   {/* Grid layout matching new sections */}
-                  <div className="grid lg:grid-cols-2 gap-12 items-center mb-8">
+                  <div className="grid lg:grid-cols-2 gap-8 items-center mb-6">
                     {/* Plan Info - Left Side */}
                     <div className="text-center lg:text-left">
-                      <div className="w-16 h-16 mx-auto lg:mx-0 mb-6 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
-                        <Brain className="h-8 w-8 text-white" />
+                      <div className="w-12 h-12 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
+                        <Brain className="h-6 w-6 text-white" />
                       </div>
-                      <div className="mb-6">
-                        <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                      <div className="mb-4">
+                        <h3 className="text-xl md:text-2xl font-bold mb-2">
                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
                         </h3>
-                        <p className="text-lg text-muted-foreground mb-6">
+                        <p className="text-base text-muted-foreground mb-4">
                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
                         </p>
-                        <div className="mb-6">
-                          <span className="text-4xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
-                          <span className="text-muted-foreground text-lg">/{selectedPlan.billing_interval}</span>
+                        <div className="mb-4">
+                          <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
+                          <span className="text-muted-foreground text-base">/{selectedPlan.billing_interval}</span>
                         </div>
                       </div>
                       
-                      <div className="flex flex-col gap-3">
+                      <div className="flex flex-col gap-2">
                         <Button 
-                          size="lg"
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                          size="default"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                           asChild
                         >
                           <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
@@ -257,9 +257,9 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           defaultVideoId="overview"
                           trigger={
                             <Button 
-                              size="lg"
+                              size="default"
                               variant="outline"
-                              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               <Play className="h-4 w-4 mr-2" />
                               Watch Intro Video
@@ -271,7 +271,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     
                     {/* Plan Image - Right Side */}
                     <div className="relative">
-                      <div className="bg-white/80 rounded-2xl p-6 shadow-xl border">
+                      <div className="bg-white/80 rounded-2xl p-4 shadow-xl border">
                         <img
                           src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
                           alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
@@ -282,22 +282,22 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                       </div>
                       
                       {/* Floating Feature Icons */}
-                      <div className="absolute -top-4 -left-4 w-16 h-16 bg-white rounded-full shadow-xl border-4 border-primary/20 flex items-center justify-center">
-                        <Brain className="h-8 w-8 text-primary" />
+                      <div className="absolute -top-2 -left-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-primary/20 flex items-center justify-center">
+                        <Brain className="h-6 w-6 text-primary" />
                       </div>
-                      <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-white rounded-full shadow-xl border-4 border-guardian/20 flex items-center justify-center">
-                        <Shield className="h-8 w-8 text-guardian" />
+                      <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-guardian/20 flex items-center justify-center">
+                        <Shield className="h-6 w-6 text-guardian" />
                       </div>
                     </div>
                   </div>
                   
                   {/* Features - Bottom section */}
-                  <div className="bg-white/80 rounded-2xl p-6 border">
-                    <h4 className="text-xl font-semibold mb-6 text-center">{t('pricing.everythingIncluded')}</h4>
-                    <div className="grid md:grid-cols-2 gap-4">
+                  <div className="bg-white/80 rounded-2xl p-4 border">
+                    <h4 className="text-lg font-semibold mb-4 text-center">{t('pricing.everythingIncluded')}</h4>
+                    <div className="grid md:grid-cols-2 gap-3">
                       {selectedPlan.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-start space-x-3">
-                          <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <div key={featureIndex} className="flex items-start space-x-2">
+                          <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                           <span className="text-sm text-muted-foreground">{feature}</span>
                         </div>
                       ))}
