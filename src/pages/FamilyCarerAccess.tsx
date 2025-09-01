@@ -475,67 +475,72 @@ const FamilyCarerAccessPage = () => {
         </div>
       </section>
 
-      {/* Compact Pricing Section */}
-      <section className="py-20 bg-gradient-to-br from-warning/5 via-background to-warning/10">
+      {/* Clean Ecommerce Pricing Card */}
+      <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center bg-warning/10 rounded-full px-4 py-2 mb-4 border border-warning/20">
-                <Euro className="h-4 w-4 text-warning mr-2" />
-                <span className="text-sm font-medium text-warning">Simple Pricing</span>
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                {formattedSeatPrice} <span className="text-xl text-muted-foreground font-normal">per family connection</span>
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                You choose who pays - you or them when they accept the invite.
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-8 items-center">
-              {/* Payment Choice */}
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <CreditCard className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Flexible Payment</h3>
-                <p className="text-sm text-muted-foreground">Owner pays or family member pays on invite acceptance</p>
+          <div className="max-w-lg mx-auto">
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-muted/10 overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-wellness to-wellness/90 px-8 py-6 text-center">
+                <h2 className="text-2xl font-bold text-black">Family Connection</h2>
+                <p className="text-black/80 text-sm mt-1">Emergency access for family members</p>
               </div>
               
-              {/* What's Included */}
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-wellness to-wellness/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Bell className="h-8 w-8 text-white" />
+              {/* Price */}
+              <div className="px-8 py-8 text-center">
+                <div className="mb-6">
+                  <div className="text-5xl font-bold text-foreground mb-2">{formattedSeatPrice}</div>
+                  <div className="text-lg text-muted-foreground">per family member / month</div>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Full Emergency Access</h3>
-                <p className="text-sm text-muted-foreground">Instant SOS alerts, live location, and emergency coordination</p>
-              </div>
-              
-              {/* No Limits */}
-              <div className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-guardian to-guardian/80 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-8 w-8 text-white" />
+                
+                {/* Features List */}
+                <div className="space-y-3 mb-8 text-left">
+                  <div className="flex justify-between items-center py-2 border-b border-muted/20">
+                    <span className="text-foreground">Instant SOS alerts</span>
+                    <span className="text-wellness font-semibold">✓</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-muted/20">
+                    <span className="text-foreground">Live emergency location</span>
+                    <span className="text-wellness font-semibold">✓</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-muted/20">
+                    <span className="text-foreground">Emergency coordination</span>
+                    <span className="text-wellness font-semibold">✓</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-muted/20">
+                    <span className="text-foreground">Unlimited family members</span>
+                    <span className="text-wellness font-semibold">✓</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-foreground">Emergency-only privacy</span>
+                    <span className="text-wellness font-semibold">✓</span>
+                  </div>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">Unlimited Connections</h3>
-                <p className="text-sm text-muted-foreground">Add as many family members as you need</p>
+                
+                {/* Payment Options */}
+                <div className="bg-muted/20 rounded-2xl p-4 mb-8">
+                  <div className="text-sm font-semibold text-foreground mb-3">Payment Options</div>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <div>• You pay for family members</div>
+                    <div>• Family member pays when accepting invite</div>
+                  </div>
+                </div>
+                
+                {/* CTA Button */}
+                <Button 
+                  asChild 
+                  size="xl" 
+                  className="w-full bg-wellness hover:bg-wellness/90 text-black font-bold px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <Link to="/ai-register">
+                    Join Now
+                  </Link>
+                </Button>
+                
+                <div className="mt-4 text-xs text-muted-foreground">
+                  No setup fees • Cancel anytime • 30-day guarantee
+                </div>
               </div>
-            </div>
-            
-            {/* CTA */}
-            <div className="text-center mt-12">
-              <Button 
-                asChild 
-                size="xl" 
-                className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-12 py-4 shadow-lg hover:shadow-xl transition-all duration-300 text-lg rounded-xl"
-              >
-                <Link to="/ai-register">
-                  <UserPlus className="mr-2 h-5 w-5" />
-                  Start Adding Family
-                </Link>
-              </Button>
-              <p className="text-sm text-muted-foreground mt-4">
-                No setup fees • Cancel anytime • 30-day guarantee
-              </p>
             </div>
           </div>
         </div>
