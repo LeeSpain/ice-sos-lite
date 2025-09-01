@@ -213,95 +213,100 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
 
         {/* Emergency Protection Plan Section */}
-        <div className="mb-8">
-          
-          {/* Premium Protection Plan - 3/4 width */}
-          <div className="max-w-4xl mx-auto">
-            {(() => {
-              const selectedPlan = globalPlans.find(p => p.name === 'Premium Protection' || p.is_popular || p.name.toLowerCase().includes('premium')) || globalPlans[0];
-              return selectedPlan ? (
-                <Card key={selectedPlan.id} className="relative border-2 border-primary/40 shadow-xl hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-card to-card/80 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
-<Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
-  {t('pricing.corePlan')}
-</Badge>
-                  
-                  <div className="relative p-8">
-                    {/* Upper half - Image and Text side by side */}
-                    <div className="grid lg:grid-cols-2 gap-8 items-center mb-8">
-                       {/* Plan Info - Left Side */}
-                      <div className="text-center lg:text-left">
-                        <div className="w-16 h-16 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
-                          <Brain className="h-8 w-8 text-white" />
-                        </div>
-                        <CardTitle className="text-3xl font-bold mb-3">
+        <div className="max-w-6xl mx-auto mb-16">
+          {(() => {
+            const selectedPlan = globalPlans.find(p => p.name === 'Premium Protection' || p.is_popular || p.name.toLowerCase().includes('premium')) || globalPlans[0];
+            return selectedPlan ? (
+              <div className="bg-gradient-to-br from-primary/5 to-guardian/5 rounded-3xl p-8 border border-primary/20 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-guardian/5"></div>
+                <Badge className="absolute top-6 right-6 bg-primary text-white text-sm px-4 py-2 shadow-lg">
+                  {t('pricing.corePlan')}
+                </Badge>
+                
+                <div className="relative">
+                  {/* Grid layout matching new sections */}
+                  <div className="grid lg:grid-cols-2 gap-12 items-center mb-8">
+                    {/* Plan Info - Left Side */}
+                    <div className="text-center lg:text-left">
+                      <div className="w-16 h-16 mx-auto lg:mx-0 mb-6 bg-gradient-to-br from-primary to-guardian rounded-2xl flex items-center justify-center shadow-lg">
+                        <Brain className="h-8 w-8 text-white" />
+                      </div>
+                      <div className="mb-6">
+                        <h3 className="text-2xl md:text-3xl font-bold mb-4">
                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Premium Protection' }) : selectedPlan.name}
-                        </CardTitle>
-                        <CardDescription className="text-lg text-muted-foreground mb-4">
+                        </h3>
+                        <p className="text-lg text-muted-foreground mb-6">
                           {selectedPlan.name === 'Premium Protection' ? t('plans.premium.description', { defaultValue: selectedPlan.description }) : selectedPlan.description}
-                        </CardDescription>
-<div className="mb-6">
-  <span className="text-4xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
-  <span className="text-muted-foreground text-lg">/{selectedPlan.billing_interval}</span>
-</div>
-                        <div className="flex flex-col gap-3">
-                          <Button 
-                            size="lg"
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                            asChild
-                          >
-                            <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
-                          </Button>
-                          
-                          <IntroVideoModal 
-                            defaultVideoId="overview"
-                            trigger={
-                              <Button 
-                                size="lg"
-                                variant="outline"
-                                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                              >
-                                <Play className="h-4 w-4 mr-2" />
-                                Watch Intro Video
-                              </Button>
-                            }
-                          />
+                        </p>
+                        <div className="mb-6">
+                          <span className="text-4xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
+                          <span className="text-muted-foreground text-lg">/{selectedPlan.billing_interval}</span>
                         </div>
-                       </div>
+                      </div>
+                      
+                      <div className="flex flex-col gap-3">
+                        <Button 
+                          size="lg"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                          asChild
+                        >
+                          <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
+                        </Button>
                         
-                        {/* Plan Image - Right Side */}
-                        <div className="flex justify-center items-center">
-                          <div className="w-full max-w-md p-6 bg-gradient-to-br from-primary/10 to-guardian/10 rounded-2xl">
-                            <img
-                              src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
-                              alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
-                              className="w-full h-auto rounded-xl shadow-lg object-cover"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          </div>
-                        </div>
+                        <IntroVideoModal 
+                          defaultVideoId="overview"
+                          trigger={
+                            <Button 
+                              size="lg"
+                              variant="outline"
+                              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                            >
+                              <Play className="h-4 w-4 mr-2" />
+                              Watch Intro Video
+                            </Button>
+                          }
+                        />
+                      </div>
                     </div>
-                        
-                    {/* Features - Bottom half */}
-                    <div className="border-t pt-6">
-                      <h4 className="text-xl font-semibold mb-4">{t('pricing.everythingIncluded')}</h4>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        {selectedPlan.features.map((feature, featureIndex) => (
-                          <div key={featureIndex} className="flex items-start space-x-3">
-                            <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground">{feature}</span>
-                          </div>
-                        ))}
+                    
+                    {/* Plan Image - Right Side */}
+                    <div className="relative">
+                      <div className="bg-white/80 rounded-2xl p-6 shadow-xl border">
+                        <img
+                          src="/lovable-uploads/ed708afa-4c90-4168-9516-83a6d034debd.png"
+                          alt="ICE SOS Premium Protection - 3D phone with emergency services icons"
+                          className="w-full h-auto rounded-xl shadow-lg object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      
+                      {/* Floating Feature Icons */}
+                      <div className="absolute -top-4 -left-4 w-16 h-16 bg-white rounded-full shadow-xl border-4 border-primary/20 flex items-center justify-center">
+                        <Brain className="h-8 w-8 text-primary" />
+                      </div>
+                      <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-white rounded-full shadow-xl border-4 border-guardian/20 flex items-center justify-center">
+                        <Shield className="h-8 w-8 text-guardian" />
                       </div>
                     </div>
                   </div>
-                </Card>
-              ) : null;
-            })()}
-          </div>
-
-
+                  
+                  {/* Features - Bottom section */}
+                  <div className="bg-white/80 rounded-2xl p-6 border">
+                    <h4 className="text-xl font-semibold mb-6 text-center">{t('pricing.everythingIncluded')}</h4>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {selectedPlan.features.map((feature, featureIndex) => (
+                        <div key={featureIndex} className="flex items-start space-x-3">
+                          <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null;
+          })()}
         </div>
 
         {/* Safety Products Section */}
