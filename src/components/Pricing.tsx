@@ -327,9 +327,9 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
         {/* Safety Products Section */}
         {products.length > 0 && (
-          <div className="max-w-6xl mx-auto mb-12">
+          <div className="max-w-6xl mx-auto mb-16">
             <div className="text-center mb-12">
-              <h3 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
                 {t('pricing.safetyProductsTitle')}
               </h3>
               <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -338,7 +338,8 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
             </div>
 
             {products.map((product) => (
-              <div key={product.id} className="bg-gradient-to-br from-blue-500/5 to-blue-600/5 rounded-3xl p-6 border border-blue-500/20 relative overflow-hidden mb-8">
+              <div key={product.id} className="bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-blue-600/10 rounded-3xl p-8 border border-blue-500/20 shadow-xl relative overflow-hidden mb-8">
+                {/* Background accent */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-blue-600/5"></div>
                 
                 {product.status === 'coming_soon' && (
@@ -362,113 +363,105 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                   </div>
                 )}
                 
-                <Badge className="absolute top-4 right-4 bg-blue-600 text-white text-sm px-3 py-1 shadow-lg">
-                  {t('pricing.oneTime')}
-                </Badge>
-                
-                <div className="relative">
-                  {/* Grid layout matching new sections */}
-                  <div className="grid lg:grid-cols-2 gap-8 items-center mb-6">
-                    {/* Product Info - Left Side */}
-                    <div className="text-center lg:text-left">
-                      <div className="w-12 h-12 mx-auto lg:mx-0 mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-                        <Package className="h-6 w-6 text-white" />
-                      </div>
-                      <div className="mb-4">
-                        <h3 className="text-xl md:text-2xl font-bold mb-2">
-                          {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' }) : product.name}
-                        </h3>
-                        <p className="text-base text-muted-foreground mb-4">
-                          {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
-                        </p>
-                        <div className="mb-4">
-                          <span className="text-3xl font-bold text-blue-600">{formatPriceDisplay(product.price, product.currency)}</span>
+                {/* One-Time Badge */}
+                <div className="absolute top-6 right-6 z-10">
+                  <Badge className="bg-blue-600 text-white text-sm px-4 py-2 shadow-lg border-0">
+                    <Package className="h-3 w-3 mr-1" />
+                    {t('pricing.oneTime')}
+                  </Badge>
+                </div>
+
+                <div className="relative z-10">
+                  {/* Main Content Grid */}
+                  <div className="grid lg:grid-cols-5 gap-8 items-center">
+                    {/* Left Column - Product Details (3/5 width) */}
+                    <div className="lg:col-span-3">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                          <Package className="h-7 w-7 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold mb-2">
+                            {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.name', { defaultValue: 'ICE SOS Bluetooth Pendant' }) : product.name}
+                          </h3>
+                          <div className="flex items-baseline gap-2 mb-3">
+                            <span className="text-3xl font-bold text-blue-600">{formatPriceDisplay(product.price, product.currency)}</span>
+                            <span className="text-muted-foreground">/one-time</span>
+                          </div>
+                          <p className="text-muted-foreground leading-relaxed">
+                            {product.name === 'ICE SOS Bluetooth Pendant' ? t('products.icePendant.description', { defaultValue: product.description }) : product.description}
+                          </p>
                         </div>
                       </div>
                       
-                      <div className="flex flex-col gap-2">
-                        {product.name === 'ICE SOS Bluetooth Pendant' ? (
-                          <div className="flex flex-col gap-2">
-                            {product.status === 'coming_soon' ? (
-                              <Badge className="px-6 py-3 text-base font-semibold bg-secondary text-white">Coming Soon</Badge>
-                            ) : (
-                              <>
-                                <Button 
-                                  size="default"
-                                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                                  asChild
-                                >
-                                  <Link to="/devices/ice-sos-pendant">Learn More</Link>
-                                </Button>
-                                
-                                <IntroVideoModal 
-                                  defaultVideoId="all-ages"
-                                  trigger={
-                                    <Button 
-                                      size="default"
-                                      variant="outline"
-                                      className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                                    >
-                                      <Play className="h-4 w-4 mr-2" />
-                                      Watch Video
-                                    </Button>
-                                  }
-                                />
-                              </>
-                            )}
-                          </div>
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-3 mb-6">
+                        {product.status === 'coming_soon' ? (
+                          <Badge className="px-8 py-4 text-base font-semibold bg-secondary text-white">Coming Soon</Badge>
                         ) : (
-                          <Button 
-                            size="default"
-                            className="px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 border-0 font-semibold"
-                            asChild
-                          >
-                            <Link to="/devices/ice-sos-pendant">
-                              {t('pricing.details')}
-                            </Link>
-                          </Button>
+                          <>
+                            <Button 
+                              size="lg"
+                              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                              onClick={() => handleProductPurchase(product)}
+                            >
+                              {t('pricing.buyNow')}
+                            </Button>
+                            
+                            <Button 
+                              size="lg"
+                              variant="outline"
+                              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                              asChild
+                            >
+                              <Link to="/device-ice-sos-pendant">
+                                {t('pricing.learnMore')}
+                              </Link>
+                            </Button>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Compact Features Grid */}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {product.features.slice(0, 6).map((feature, featureIndex) => (
+                          <div key={featureIndex} className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-blue-600/20 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Check className="h-2.5 w-2.5 text-blue-600" />
+                            </div>
+                            <span className="text-sm text-muted-foreground">{feature}</span>
+                          </div>
+                        ))}
+                        {product.features.length > 6 && (
+                          <div className="flex items-center gap-2 text-blue-600 font-medium">
+                            <span className="text-sm">+{product.features.length - 6} more features</span>
+                          </div>
                         )}
                       </div>
                     </div>
                     
-                    {/* Product Image - Right Side */}
-                    <div className="relative">
-                      {product.name === 'ICE SOS Bluetooth Pendant' && (
-                        <div className="bg-white/80 rounded-2xl p-4 shadow-xl border">
-                          <img
-                            src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
-                            alt="ICE Smart SOS Button – Emergency pendant device"
-                            className="w-full h-auto rounded-xl shadow-lg object-cover"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        </div>
-                      )}
+                    {/* Right Column - Product Image (2/5 width) */}
+                    <div className="lg:col-span-2 relative">
+                      {/* Floating accents - smaller and more subtle */}
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600/15 rounded-full flex items-center justify-center">
+                        <Bluetooth className="h-3 w-3 text-blue-600" />
+                      </div>
+                      <div className="absolute top-1/3 -left-3 w-5 h-5 bg-green-500/15 rounded-full flex items-center justify-center">
+                        <Battery className="h-2.5 w-2.5 text-green-500" />
+                      </div>
+                      <div className="absolute bottom-4 right-4 w-5 h-5 bg-orange-500/15 rounded-full flex items-center justify-center">
+                        <Droplets className="h-2.5 w-2.5 text-orange-500" />
+                      </div>
                       
-                      {/* Floating Feature Icons */}
-                      <div className="absolute -top-2 -left-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-blue-500/20 flex items-center justify-center">
-                        <Bluetooth className="h-6 w-6 text-blue-600" />
+                      <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
+                        <img
+                          src="/lovable-uploads/a622d998-f25b-472d-a82f-5ae37bd5c7bd.png"
+                          alt={`${product.name} - Emergency protection device`}
+                          className="w-full h-auto rounded-xl shadow-md object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
                       </div>
-                      <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 border-blue-600/20 flex items-center justify-center">
-                        <Battery className="h-6 w-6 text-blue-600" />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Features - Bottom section */}
-                  <div className="bg-white/80 rounded-2xl p-4 border">
-                    <h4 className="text-lg font-semibold mb-4 text-center">{t('pricing.keyFeaturesTitle', { defaultValue: 'Key Features:' })}</h4>
-                    <div className="grid md:grid-cols-3 gap-3">
-                      {product.features.slice(0, 6).map((feature, index) => (
-                        <div key={index} className="flex items-start space-x-2">
-                          <Check className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
-                      <Check className="h-4 w-4 text-green-500" />
-                      <span>{t('pricing.freeShippingInventory', { count: product.inventory_count, defaultValue: 'Free shipping • {{count}} units available' })}</span>
                     </div>
                   </div>
                 </div>
@@ -477,179 +470,133 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
           </div>
         )}
 
-        {/* Regional Services */}
-        <div className="max-w-6xl mx-auto mb-12">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-              {t('pricing.regionalServicesTitle', { defaultValue: 'Regional Services' })}
-            </h3>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              {t('pricing.regionalServicesDesc', { defaultValue: 'Specialized coverage in your local area with dedicated emergency response teams' })}
-            </p>
-          </div>
+        {/* Regional Services Section */}
+        {regionalServices.length > 0 && (
+          <div className="max-w-6xl mx-auto mb-16">
+            <div className="text-center mb-12">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                {t('pricing.regionalServicesTitle')}
+              </h3>
+              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                {t('pricing.regionalServicesDesc')}
+              </p>
+            </div>
 
-          {(() => {
-            console.log('Regional services length:', regionalServices.length, 'Services:', regionalServices);
-            return regionalServices.length > 0;
-          })() ? (
-            <>
-              {regionalServices.map((service) => (
-                <div key={service.id} className={`rounded-3xl p-6 border relative overflow-hidden mb-8 ${
-                  service.name === 'Call Centre Spain' 
-                    ? 'bg-gradient-to-br from-green-500/5 to-green-600/5 border-green-500/20' 
-                    : 'bg-gradient-to-br from-secondary/5 to-secondary/10 border-secondary/20'
-                }`}>
-                  <div className={`absolute inset-0 ${
-                    service.name === 'Call Centre Spain'
-                      ? 'bg-gradient-to-br from-green-500/5 via-transparent to-green-500/10'
-                      : 'bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10'
-                  }`}></div>
-                  <Badge className={`absolute top-4 right-4 text-white text-sm px-3 py-1 shadow-lg ${
-                    service.name === 'Call Centre Spain'
-                      ? 'bg-green-600'
-                      : 'bg-secondary'
-                  }`}>
-                    {service.region?.toUpperCase()}
+            {regionalServices.map((service) => (
+              <div key={service.id} className="bg-gradient-to-br from-guardian/10 via-guardian/5 to-wellness/10 rounded-3xl p-8 border border-guardian/20 shadow-xl relative overflow-hidden mb-8">
+                {/* Background accent */}
+                <div className="absolute inset-0 bg-gradient-to-br from-guardian/5 via-transparent to-wellness/5"></div>
+                
+                {/* Regional Service Badge */}
+                <div className="absolute top-6 right-6 z-10">
+                  <Badge className="bg-guardian text-white text-sm px-4 py-2 shadow-lg border-0">
+                    <MapPin className="h-3 w-3 mr-1" />
+                    {service.region.toUpperCase()} Service
                   </Badge>
-                  
-                  <div className="relative">
-                    {/* Grid layout matching new sections */}
-                    <div className="grid lg:grid-cols-2 gap-8 items-center mb-6">
-                      {/* Service Info - Left Side */}
-                      <div className="text-center lg:text-left">
-                        <div className={`w-12 h-12 mx-auto lg:mx-0 mb-4 rounded-2xl flex items-center justify-center shadow-lg ${
-                          service.name === 'Call Centre Spain'
-                            ? 'bg-gradient-to-br from-green-500 to-green-600'
-                            : 'bg-gradient-to-br from-secondary to-secondary/80'
-                        }`}>
-                          <MapPin className="h-6 w-6 text-white" />
+                </div>
+
+                {service.is_popular && (
+                  <div className="absolute top-6 left-6 z-10">
+                    <Badge className="bg-wellness text-white text-sm px-4 py-2 shadow-lg border-0">
+                      Most Popular
+                    </Badge>
+                  </div>
+                )}
+
+                <div className="relative z-10">
+                  {/* Main Content Grid */}
+                  <div className="grid lg:grid-cols-5 gap-8 items-center">
+                    {/* Left Column - Service Details (3/5 width) */}
+                    <div className="lg:col-span-3">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-14 h-14 bg-gradient-to-br from-guardian to-wellness rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                          <MapPin className="h-7 w-7 text-white" />
                         </div>
-                        <div className="mb-4">
-                          <h3 className="text-xl md:text-2xl font-bold mb-2">
-                            {(service.region === 'Spain' || service.name.toLowerCase().includes('spain'))
-                              ? t('regionServices.spain.name', { defaultValue: service.name })
-                              : service.name}
+                        <div>
+                          <h3 className="text-2xl font-bold mb-2">
+                            {service.name}
                           </h3>
-                          <p className="text-base text-muted-foreground mb-4">
-                            {(service.region === 'Spain' || service.name.toLowerCase().includes('spain'))
-                              ? t('regionServices.spain.description', { defaultValue: service.description })
-                              : service.description}
-                          </p>
-                          <div className="mb-4">
-                            <span className={`text-3xl font-bold ${
-                              service.name === 'Call Centre Spain'
-                                ? 'text-green-600'
-                                : 'text-secondary'
-                            }`}>{formatPriceDisplay(service.price, service.currency)}</span>
-                            <span className="text-muted-foreground text-base">{t('common.perMonth', { defaultValue: '/month' })}</span>
+                          <div className="flex items-baseline gap-2 mb-3">
+                            <span className="text-3xl font-bold text-guardian">{formatPriceDisplay(service.price, service.currency)}</span>
+                            <span className="text-muted-foreground">/month</span>
                           </div>
-                        </div>
-                        
-                        <div className="flex flex-col gap-2">
-                          <Button 
-                            size="default"
-                            className={`px-6 py-3 ${
-                              service.name === 'Call Centre Spain'
-                                ? 'bg-green-600 text-white hover:bg-green-700'
-                                : 'bg-secondary text-white hover:bg-secondary/90'
-                            } border-0 font-semibold`}
-                            asChild
-                          >
-                            <Link to="/regional-center/spain">
-                              {t('pricing.details')}
-                            </Link>
-                          </Button>
-                          
-                          {service.name === 'Call Centre Spain' && (
-                            <IntroVideoModal 
-                              defaultVideoId="spain"
-                              trigger={
-                                <Button 
-                                  size="default"
-                                  variant="outline"
-                                  className="border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
-                                >
-                                  <Play className="h-4 w-4 mr-2" />
-                                  Watch Video
-                                </Button>
-                              }
-                            />
-                          )}
+                          <p className="text-muted-foreground leading-relaxed">
+                            {service.description}
+                          </p>
                         </div>
                       </div>
                       
-                      {/* Service Image - Right Side */}
-                      <div className="relative">
-                        {service.name === 'Call Centre Spain' && (
-                          <div className="bg-white/80 rounded-2xl p-4 shadow-xl border">
-                            <img
-                              src="/lovable-uploads/f65e7524-8dfe-491a-86d1-8d153266a17f.png"
-                              alt="Centro de Respuesta 24/7 - Spanish Call Center Emergency Response Team"
-                              className="w-full h-auto rounded-xl shadow-lg object-cover"
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          </div>
-                        )}
+                      {/* Action Buttons */}
+                      <div className="flex flex-wrap gap-3 mb-6">
+                        <Button 
+                          size="lg"
+                          className="bg-guardian hover:bg-guardian/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                          asChild
+                        >
+                          <Link to="/regional-center-spain">
+                            {t('pricing.selectPlan')}
+                          </Link>
+                        </Button>
                         
-                        {/* Floating Feature Icons */}
-                        <div className={`absolute -top-2 -left-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 flex items-center justify-center ${
-                          service.name === 'Call Centre Spain'
-                            ? 'border-green-500/20'
-                            : 'border-secondary/20'
-                        }`}>
-                          <Phone className={`h-6 w-6 ${
-                            service.name === 'Call Centre Spain'
-                              ? 'text-green-600'
-                              : 'text-secondary'
-                          }`} />
-                        </div>
-                        <div className={`absolute -bottom-2 -right-2 w-12 h-12 bg-white rounded-full shadow-xl border-4 flex items-center justify-center ${
-                          service.name === 'Call Centre Spain'
-                            ? 'border-green-600/20'
-                            : 'border-secondary/20'
-                        }`}>
-                          <MapPin className={`h-6 w-6 ${
-                            service.name === 'Call Centre Spain'
-                              ? 'text-green-600'
-                              : 'text-secondary'
-                          }`} />
-                        </div>
+                        <Button 
+                          size="lg"
+                          variant="outline"
+                          className="border-guardian text-guardian hover:bg-guardian hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                          asChild
+                        >
+                          <Link to="/regional-center-spain">
+                            Learn More
+                          </Link>
+                        </Button>
                       </div>
-                    </div>
-                    
-                    {/* Features - Bottom section */}
-                    <div className="bg-white/80 rounded-2xl p-4 border">
-                      <h4 className="text-lg font-semibold mb-4 text-center">{t('pricing.regionalFeaturesTitle', { defaultValue: 'Regional Features:' })}</h4>
-                      <div className="grid md:grid-cols-3 gap-3">
-                        {service.features.map((feature, featureIndex) => (
-                          <div key={featureIndex} className="flex items-start space-x-2">
-                            <Check className={`h-4 w-4 mt-0.5 flex-shrink-0 ${
-                              service.name === 'Call Centre Spain'
-                                ? 'text-green-600'
-                                : 'text-secondary'
-                            }`} />
+
+                      {/* Compact Features Grid */}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        {service.features.slice(0, 6).map((feature, featureIndex) => (
+                          <div key={featureIndex} className="flex items-center gap-2">
+                            <div className="w-4 h-4 bg-guardian/20 rounded-full flex items-center justify-center flex-shrink-0">
+                              <Check className="h-2.5 w-2.5 text-guardian" />
+                            </div>
                             <span className="text-sm text-muted-foreground">{feature}</span>
                           </div>
                         ))}
-                        {service.name === 'Call Centre Spain' && (
-                          <div className="flex items-start space-x-2">
-                            <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground">24/7 Professional Support • Live Translation Available</span>
+                        {service.features.length > 6 && (
+                          <div className="flex items-center gap-2 text-guardian font-medium">
+                            <span className="text-sm">+{service.features.length - 6} more features</span>
                           </div>
                         )}
+                      </div>
+                    </div>
+                    
+                    {/* Right Column - Service Image (2/5 width) */}
+                    <div className="lg:col-span-2 relative">
+                      {/* Floating accents - smaller and more subtle */}
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-guardian/15 rounded-full flex items-center justify-center">
+                        <MapPin className="h-3 w-3 text-guardian" />
+                      </div>
+                      <div className="absolute top-1/3 -left-3 w-5 h-5 bg-wellness/15 rounded-full flex items-center justify-center">
+                        <UserCheck className="h-2.5 w-2.5 text-wellness" />
+                      </div>
+                      <div className="absolute bottom-4 right-4 w-5 h-5 bg-primary/15 rounded-full flex items-center justify-center">
+                        <Phone className="h-2.5 w-2.5 text-primary" />
+                      </div>
+                      
+                      <div className="bg-white/90 rounded-2xl p-4 shadow-lg border border-white/50 backdrop-blur-sm">
+                        <img
+                          src="/lovable-uploads/579998cf-4192-42e5-bef8-7016f892c30a.png"
+                          alt={`${service.name} - Regional emergency response service for ${service.region}`}
+                          className="w-full h-auto rounded-xl shadow-md object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
-            </>
-          ) : (
-            <div className="text-center p-8 bg-muted/20 rounded-lg">
-              <p className="text-muted-foreground">No regional services available at the moment.</p>
-            </div>
-          )}
-        </div>
+              </div>
+            ))}
+          </div>
+        )}
 
       </div>
     </section>
