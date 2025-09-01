@@ -78,6 +78,42 @@
       { "title": "Bluetooth-apparaatondersteuning", "description": "Compatibel met ICE SOS Bluetooth-hanger voor handsfree activatie tot 100 m." }
     ]
   },
+  "familyConnections": {
+    "badge": "Familie Zorgnetwerk",
+    "title": "Familie & Verzorger Verbindingen",
+    "description": "Bouw een veilig netwerk van vertrouwde familieleden en verzorgers die ondersteuning kunnen bieden, welzijn kunnen monitoren en zorg kunnen coördineren tijdens zowel dagelijkse situaties als noodsituaties.",
+    "features": [
+      {
+        "title": "Vertrouwd Familienetwerk",
+        "description": "Verbind familieleden en verzorgers met veilige toegangsniveaus, rolgebaseerde rechten en versleutelde communicatiekanalen."
+      },
+      {
+        "title": "Real-time Noodwaarschuwingen",
+        "description": "Directe meldingen naar alle verbonden familieleden met locatiegegevens, noodtype en respons coördinatie tools."
+      },
+      {
+        "title": "Locatie Delen Controle",
+        "description": "Privacy-gecontroleerde locatie delen met aanpasbare rechten, geofencing waarschuwingen en activiteiten tracking voor gemoedsrust."
+      },
+      {
+        "title": "Zorgcoördinatie Hub",
+        "description": "Naadloze coördinatie tussen familieleden en verzorgers met gedeelde agenda's, notities, medicatie herinneringen en zorgplannen."
+      },
+      {
+        "title": "Privacy & Toegangscontroles",
+        "description": "Gedetailleerde instellingen voor informatie delen, toegangsniveaus en communicatie voorkeuren met volledige transparantie en controle."
+      },
+      {
+        "title": "24/7 Familie Ondersteuning",
+        "description": "Professionele ondersteuning beschikbaar voor alle verbonden familieleden met expert begeleiding en noodrespons coördinatie."
+      }
+    ],
+    "cta": {
+      "title": "Begin met Bouwen van je Familie Zorgnetwerk",
+      "description": "Verbind met je dierbaren en creëer een veilig ondersteuningssysteem dat werkt voor iedereen in je familie.",
+      "button": "Krijg Familie Toegang"
+    }
+  },
   "appDownload": {
     "title": "Professionele mobiele app",
     "subtitle": "Download ICE SOS Lite - jouw complete beschermingsplatform",

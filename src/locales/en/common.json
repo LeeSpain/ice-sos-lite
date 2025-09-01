@@ -79,6 +79,42 @@
       { "title": "Bluetooth Device Support", "description": "Compatible with ICE SOS Bluetooth Pendant for hands-free emergency activation up to 100m range." }
     ]
   },
+  "familyConnections": {
+    "badge": "Family Care Network",
+    "title": "Family & Carers Connections",
+    "description": "Build a secure network of trusted family members and carers who can provide support, monitor wellbeing, and coordinate care during both everyday situations and emergencies.",
+    "features": [
+      {
+        "title": "Trusted Family Network",
+        "description": "Connect family members and carers with secure access levels, role-based permissions, and encrypted communication channels."
+      },
+      {
+        "title": "Real-time Emergency Alerts",
+        "description": "Instant notifications to all connected family members with location data, emergency type, and response coordination tools."
+      },
+      {
+        "title": "Location Sharing Control",
+        "description": "Privacy-controlled location sharing with customizable permissions, geofencing alerts, and activity tracking for peace of mind."
+      },
+      {
+        "title": "Care Coordination Hub",
+        "description": "Seamless coordination between family members and carers with shared calendars, notes, medication reminders, and care plans."
+      },
+      {
+        "title": "Privacy & Access Controls",
+        "description": "Granular settings for information sharing, access levels, and communication preferences with full transparency and control."
+      },
+      {
+        "title": "24/7 Family Support",
+        "description": "Professional support available to all connected family members with expert guidance and emergency response coordination."
+      }
+    ],
+    "cta": {
+      "title": "Start Building Your Family Care Network",
+      "description": "Connect with your loved ones and create a secure support system that works for everyone in your family.",
+      "button": "Get Family Access"
+    }
+  },
   "appDownload": {
     "title": "Professional Mobile App",
     "subtitle": "Download ICE SOS Lite - Your complete emergency protection platform",

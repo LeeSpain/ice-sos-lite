@@ -78,6 +78,42 @@
       { "title": "Compatibilidad con dispositivos Bluetooth", "description": "Compatible con el colgante Bluetooth ICE SOS para activación manos libres hasta 100 m." }
     ]
   },
+  "familyConnections": {
+    "badge": "Red de Cuidado Familiar",
+    "title": "Conexiones Familiares y de Cuidadores",
+    "description": "Construye una red segura de familiares y cuidadores de confianza que puedan brindar apoyo, monitorear el bienestar y coordinar la atención durante situaciones cotidianas y emergencias.",
+    "features": [
+      {
+        "title": "Red Familiar de Confianza",
+        "description": "Conecta familiares y cuidadores con niveles de acceso seguros, permisos basados en roles y canales de comunicación encriptados."
+      },
+      {
+        "title": "Alertas de Emergencia en Tiempo Real",
+        "description": "Notificaciones instantáneas a todos los familiares conectados con datos de ubicación, tipo de emergencia y herramientas de coordinación de respuesta."
+      },
+      {
+        "title": "Control de Compartir Ubicación",
+        "description": "Compartir ubicación controlado por privacidad con permisos personalizables, alertas de geocercas y seguimiento de actividades para tranquilidad."
+      },
+      {
+        "title": "Centro de Coordinación de Cuidados",
+        "description": "Coordinación perfecta entre familiares y cuidadores con calendarios compartidos, notas, recordatorios de medicación y planes de cuidado."
+      },
+      {
+        "title": "Controles de Privacidad y Acceso",
+        "description": "Configuraciones granulares para compartir información, niveles de acceso y preferencias de comunicación con total transparencia y control."
+      },
+      {
+        "title": "Apoyo Familiar 24/7",
+        "description": "Apoyo profesional disponible para todos los familiares conectados con orientación experta y coordinación de respuesta de emergencia."
+      }
+    ],
+    "cta": {
+      "title": "Comienza a Construir Tu Red de Cuidado Familiar",
+      "description": "Conéctate con tus seres queridos y crea un sistema de apoyo seguro que funcione para todos en tu familia.",
+      "button": "Obtener Acceso Familiar"
+    }
+  },
   "appDownload": {
     "title": "Aplicación móvil profesional",
     "subtitle": "Descarga ICE SOS Lite - Tu plataforma completa de protección",
