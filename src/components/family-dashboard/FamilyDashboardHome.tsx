@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Shield, 
-  MapPin, 
-  Phone, 
-  Bell, 
-  Clock,
-  AlertTriangle,
-  CheckCircle,
-  Users,
-  Heart
-} from 'lucide-react';
+import { Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { useToast } from '@/hooks/use-toast';
-import LiveTrackingWidget from '@/components/family-dashboard/LiveTrackingWidget';
+import ConnectionHeader from '@/components/family-dashboard/ConnectionHeader';
+import WhoWeProtectCard from '@/components/family-dashboard/WhoWeProtectCard';
+import FamilyNetworkMap from '@/components/family-dashboard/FamilyNetworkMap';
+import MyRoleCard from '@/components/family-dashboard/MyRoleCard';
+import EmergencyStatusCenter from '@/components/family-dashboard/EmergencyStatusCenter';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const FamilyDashboardHome = () => {
   const { user } = useOptimizedAuth();
@@ -28,7 +21,9 @@ const FamilyDashboardHome = () => {
   const [ownerProfile, setOwnerProfile] = useState<any>(null);
   const [familyGroup, setFamilyGroup] = useState<any>(null);
   const [recentAlerts, setRecentAlerts] = useState<any[]>([]);
+  const [emergencyContacts, setEmergencyContacts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastSync, setLastSync] = useState<Date>(new Date());
 
   useEffect(() => {
     if (familyRole?.familyGroupId) {
@@ -96,6 +91,15 @@ const FamilyDashboardHome = () => {
         .limit(5);
 
       setRecentAlerts(alerts || []);
+
+      // Load emergency contacts
+      const { data: contacts } = await supabase
+        .from('emergency_contacts')
+        .select('*')
+        .eq('user_id', groupData.owner_user_id);
+
+      setEmergencyContacts(contacts || []);
+      setLastSync(new Date());
 
     } catch (error) {
       console.error('Error loading dashboard data:', error);
@@ -171,267 +175,64 @@ const FamilyDashboardHome = () => {
     );
   }
 
+  // Define user access permissions based on role
+  const userAccess = {
+    canViewLocation: true, // Most family members can view location
+    canViewMedical: familyRole?.role === 'owner' || emergencyContacts.some(c => c.email === user?.email),
+    canReceiveAlerts: true, // All family members receive alerts
+    canContactEmergency: true // All family members can contact emergency
+  };
+
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">
-            {ownerProfile ? `${ownerProfile.first_name}'s Emergency Dashboard` : 'Family Emergency Dashboard'}
-          </h1>
-          <p className="text-muted-foreground">
-            {familyRole?.role === 'owner' 
-              ? 'Manage your family emergency protection system'
-              : ownerProfile 
-                ? `Connected to ${ownerProfile.first_name} ${ownerProfile.last_name}'s emergency system` 
-                : 'Stay connected with your family\'s safety'
-            }
-          </p>
+      {/* Connection Header */}
+      <ConnectionHeader 
+        ownerProfile={ownerProfile}
+        familyRole={familyRole}
+        isConnected={true}
+        lastSync={lastSync}
+      />
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column */}
+        <div className="space-y-6">
+          {/* Who We're Protecting */}
+          <WhoWeProtectCard 
+            ownerProfile={ownerProfile}
+            familyRole={familyRole}
+            emergencyContacts={emergencyContacts}
+            userAccess={userAccess}
+          />
+          
+          {/* My Role & Responsibilities */}
+          <MyRoleCard 
+            familyRole={familyRole}
+            userAccess={userAccess}
+            ownerName={ownerProfile?.first_name || 'the family owner'}
+          />
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="gap-2">
-            <Heart className="h-3 w-3" />
-            {familyRole?.role === 'owner' ? 'Account Owner' : 'Family Access'}
-          </Badge>
-          {ownerProfile && (
-            <Badge variant="secondary" className="gap-2">
-              <Shield className="h-3 w-3" />
-              Protected by {ownerProfile.first_name}'s Plan
-            </Badge>
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          {/* Emergency Status Center */}
+          <EmergencyStatusCenter 
+            activeSOSEvents={activeSOSEvents}
+            recentAlerts={recentAlerts}
+            ownerName={ownerProfile?.first_name || 'the family owner'}
+            onSOSAcknowledge={handleSOSAcknowledge}
+          />
+          
+          {/* Family Network Map */}
+          {familyRole?.familyGroupId && (
+            <FamilyNetworkMap 
+              familyGroupId={familyRole.familyGroupId}
+              ownerProfile={ownerProfile}
+              currentUserRole={familyRole}
+            />
           )}
         </div>
       </div>
-
-      {/* Active SOS Events - Critical Priority */}
-      {activeSOSEvents.length > 0 && (
-        <Card className="border-red-200 bg-red-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-700">
-              <AlertTriangle className="h-5 w-5" />
-              Active Emergency Alert
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {activeSOSEvents.map((event) => (
-              <div key={event.id} className="bg-white p-4 rounded-lg border border-red-200">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold text-red-900">Emergency SOS Active</h3>
-                    <p className="text-sm text-red-700">
-                      Started: {new Date(event.created_at).toLocaleString()}
-                    </p>
-                    {event.address && (
-                      <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
-                        <MapPin className="h-3 w-3" />
-                        {event.address}
-                      </p>
-                    )}
-                  </div>
-                  <Badge variant="destructive">ACTIVE</Badge>
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    onClick={() => handleSOSAcknowledge(event.id)}
-                    className="bg-red-600 hover:bg-red-700"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Received & On My Way
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => window.open(`/family-dashboard/emergency-map?event=${event.id}`, '_blank')}
-                  >
-                    <MapPin className="h-4 w-4 mr-2" />
-                    View Live Map
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Live Tracking Widget */}
-      <LiveTrackingWidget />
-
-      {/* Status Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Emergency Status */}
-        <Card className="bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-emerald-700">
-              <Shield className="h-5 w-5" />
-              Emergency Status
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Family Network:</span>
-                <Badge variant="outline" className="text-emerald-700 border-emerald-300">
-                  {activeSOSEvents.length === 0 ? 'All Safe' : 'Emergency Active'}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Your Status:</span>
-                <Badge variant="outline" className="text-emerald-700 border-emerald-300">
-                  Connected
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Notifications:</span>
-                <Badge variant="outline" className="text-emerald-700 border-emerald-300">
-                  Enabled
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Family Members */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Family Network
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Owner:</span>
-                <Badge variant="outline">
-                  {ownerProfile ? `${ownerProfile.first_name} ${ownerProfile.last_name}` : 'Loading...'}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm">Your Access:</span>
-                <Badge variant="outline" className="text-blue-600 border-blue-300">
-                  {familyRole?.role === 'owner' ? 'Full Access' : 'Emergency Monitor'}
-                </Badge>
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {familyRole?.role === 'owner' 
-                  ? 'You own this emergency protection plan'
-                  : `Connected to ${ownerProfile?.first_name || 'owner'}'s emergency account`
-                }
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full mt-3"
-                onClick={() => window.location.href = '/family-dashboard/emergency-map'}
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                View Network Map
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Phone className="h-5 w-5" />
-              Quick Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start"
-                onClick={() => window.location.href = '/family-dashboard/notifications'}
-              >
-                <Bell className="h-4 w-4 mr-2" />
-                View All Alerts
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start"
-                onClick={() => window.location.href = '/family-dashboard/profile'}
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                Update My Info
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-start"
-                onClick={() => window.location.href = '/app'}
-              >
-                <AlertTriangle className="h-4 w-4 mr-2" />
-                Emergency SOS App
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Alerts */}
-      {recentAlerts.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Recent Alerts
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentAlerts.map((alert) => (
-                <div key={alert.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium text-sm">{alert.alert_type.replace('_', ' ').toUpperCase()}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(alert.created_at).toLocaleString()}
-                    </p>
-                  </div>
-                  <Badge 
-                    variant={alert.status === 'delivered' ? 'default' : 'secondary'}
-                  >
-                    {alert.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* No Emergencies - Safe State */}
-      {activeSOSEvents.length === 0 && (
-        <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-          <CardContent className="text-center py-8">
-            <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-              <Shield className="h-8 w-8 text-blue-600" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">All Family Members Safe</h3>
-            <p className="text-muted-foreground mb-4">
-              No active emergency alerts. Your family network is connected and protected.
-            </p>
-            <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                Network Active
-              </div>
-              <div className="flex items-center gap-1">
-                <Bell className="h-4 w-4 text-blue-500" />
-                Alerts Enabled
-              </div>
-              <div className="flex items-center gap-1">
-                <Heart className="h-4 w-4 text-red-500" />
-                Family Protected
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
