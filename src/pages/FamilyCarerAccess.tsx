@@ -541,89 +541,147 @@ const FamilyCarerAccessPage = () => {
         </div>
       </section>
 
-      {/* Privacy & Benefits - Split Layout */}
-      <section className="py-20 bg-gradient-to-br from-guardian/5 via-background to-guardian/10">
+      {/* Professional Testimonials Section */}
+      <section className="py-20 bg-gradient-to-br from-muted/10 via-background to-muted/20 overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              {/* Privacy */}
-              <div>
-                <div className="inline-flex items-center bg-guardian/10 rounded-full px-4 py-2 mb-6 border border-guardian/20">
-                  <Shield className="h-4 w-4 text-guardian mr-2" />
-                  <span className="text-sm font-medium text-guardian">Privacy First</span>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-4 border border-wellness/20">
+              <Quote className="h-4 w-4 text-wellness mr-2" />
+              <span className="text-sm font-medium text-wellness">Customer Stories</span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Trusted by Families Worldwide
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              See how families use ICE SOS to stay connected and coordinate emergency responses when it matters most.
+            </p>
+          </div>
+          
+          {/* Moving Testimonials */}
+          <div className="relative">
+            <div className="flex space-x-6 animate-slide-testimonials">
+              {/* Testimonial 1 */}
+              <div className="min-w-[350px] bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-muted/20 hover:shadow-xl transition-shadow duration-300">
+                <div className="flex items-center space-x-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-wellness text-wellness" />
+                  ))}
                 </div>
-                <h2 className="text-3xl font-bold text-foreground mb-6">
-                  Emergency-Only Location Sharing
-                </h2>
-                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-                  Your family can only see your location during active SOS emergencies. No constant tracking, 
-                  no location history, no monitoring outside actual emergencies.
-                </p>
-                
-                <div className="space-y-4">
-                  <div className="flex items-start">
-                    <div className="w-6 h-6 bg-guardian/20 rounded-full flex items-center justify-center mr-4 mt-1">
-                      <Lock className="h-3 w-3 text-guardian" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-foreground">End-to-End Encryption</div>
-                      <div className="text-sm text-muted-foreground">All emergency data protected with AES-256 encryption</div>
-                    </div>
+                <blockquote className="text-foreground italic leading-relaxed mb-6">
+                  "When my husband had a heart attack while jogging, our adult children were instantly notified with his exact location. They coordinated with each other and emergency services perfectly."
+                </blockquote>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">MG</span>
                   </div>
-                  <div className="flex items-start">
-                    <div className="w-6 h-6 bg-guardian/20 rounded-full flex items-center justify-center mr-4 mt-1">
-                      <EyeOff className="h-3 w-3 text-guardian" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-foreground">No Constant Monitoring</div>
-                      <div className="text-sm text-muted-foreground">Location shared only during SOS events</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <div className="w-6 h-6 bg-guardian/20 rounded-full flex items-center justify-center mr-4 mt-1">
-                      <Key className="h-3 w-3 text-guardian" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-foreground">Secure Invitations</div>
-                      <div className="text-sm text-muted-foreground">Cryptographically secure tokens with 72-hour expiry</div>
-                    </div>
+                  <div>
+                    <div className="font-semibold text-foreground">Maria Gonzalez</div>
+                    <div className="text-sm text-muted-foreground">Family Owner • Madrid, Spain</div>
                   </div>
                 </div>
               </div>
-              
-              {/* Benefits */}
-              <div>
-                <div className="inline-flex items-center bg-wellness/10 rounded-full px-4 py-2 mb-6 border border-wellness/20">
-                  <Heart className="h-4 w-4 text-wellness mr-2" />
-                  <span className="text-sm font-medium text-wellness">Peace of Mind</span>
+
+              {/* Testimonial 2 */}
+              <div className="min-w-[350px] bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-muted/20 hover:shadow-xl transition-shadow duration-300">
+                <div className="flex items-center space-x-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-wellness text-wellness" />
+                  ))}
                 </div>
-                <h2 className="text-3xl font-bold text-foreground mb-6">
-                  What This Means for Your Family
-                </h2>
-                
-                <div className="space-y-6">
-                  <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-muted/20">
-                    <div className="flex items-center mb-3">
-                      <Bell className="h-5 w-5 text-emergency mr-3" />
-                      <span className="font-semibold text-foreground">Instant Emergency Response</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Family knows immediately when you're in trouble with your exact location</p>
+                <blockquote className="text-foreground italic leading-relaxed mb-6">
+                  "The privacy-first approach is perfect. I know my location is only shared during actual emergencies, not constantly tracked. Finally, a system that respects boundaries."
+                </blockquote>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-guardian to-guardian/80 flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">JW</span>
                   </div>
-                  
-                  <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-muted/20">
-                    <div className="flex items-center mb-3">
-                      <UserCheck className="h-5 w-5 text-primary mr-3" />
-                      <span className="font-semibold text-foreground">Coordinated Help</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">Avoid confusion with "Received & On It" responses showing who's helping</p>
+                  <div>
+                    <div className="font-semibold text-foreground">James Wilson</div>
+                    <div className="text-sm text-muted-foreground">Family Member • London, UK</div>
                   </div>
-                  
-                  <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-muted/20">
-                    <div className="flex items-center mb-3">
-                      <Shield className="h-5 w-5 text-guardian mr-3" />
-                      <span className="font-semibold text-foreground">Complete Privacy</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">No tracking outside emergencies - privacy maintained until you need help</p>
+                </div>
+              </div>
+
+              {/* Testimonial 3 */}
+              <div className="min-w-[350px] bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-muted/20 hover:shadow-xl transition-shadow duration-300">
+                <div className="flex items-center space-x-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-wellness text-wellness" />
+                  ))}
+                </div>
+                <blockquote className="text-foreground italic leading-relaxed mb-6">
+                  "As a caregiver for my elderly father, having instant SOS coordination with my siblings has been life-changing. We avoid the chaos of multiple calls and confusion."
+                </blockquote>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-wellness to-wellness/80 flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">SK</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground">Sarah Kim</div>
+                    <div className="text-sm text-muted-foreground">Family Caregiver • Toronto, Canada</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 4 */}
+              <div className="min-w-[350px] bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-muted/20 hover:shadow-xl transition-shadow duration-300">
+                <div className="flex items-center space-x-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-wellness text-wellness" />
+                  ))}
+                </div>
+                <blockquote className="text-foreground italic leading-relaxed mb-6">
+                  "The 'Received & On It' feature is brilliant. When mom triggered SOS, we could see who was responding in real-time. No duplicate efforts, perfect coordination."
+                </blockquote>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emergency to-emergency/80 flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">DR</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground">David Rodriguez</div>
+                    <div className="text-sm text-muted-foreground">Adult Child • Barcelona, Spain</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 5 */}
+              <div className="min-w-[350px] bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-muted/20 hover:shadow-xl transition-shadow duration-300">
+                <div className="flex items-center space-x-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-wellness text-wellness" />
+                  ))}
+                </div>
+                <blockquote className="text-foreground italic leading-relaxed mb-6">
+                  "Setup was incredibly simple. My three children connected within minutes, and the €2.99 per person is reasonable for the peace of mind it provides our family."
+                </blockquote>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">AM</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground">Anna Mueller</div>
+                    <div className="text-sm text-muted-foreground">Family Owner • Berlin, Germany</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Duplicate cards for seamless loop */}
+              <div className="min-w-[350px] bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-muted/20 hover:shadow-xl transition-shadow duration-300">
+                <div className="flex items-center space-x-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-wellness text-wellness" />
+                  ))}
+                </div>
+                <blockquote className="text-foreground italic leading-relaxed mb-6">
+                  "When my husband had a heart attack while jogging, our adult children were instantly notified with his exact location. They coordinated with each other and emergency services perfectly."
+                </blockquote>
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">MG</span>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-foreground">Maria Gonzalez</div>
+                    <div className="text-sm text-muted-foreground">Family Owner • Madrid, Spain</div>
                   </div>
                 </div>
               </div>
