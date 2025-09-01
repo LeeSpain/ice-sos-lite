@@ -6,7 +6,7 @@ import Features from "@/components/Features";
 // import MetricPreview from "@/components/MetricPreview";
 import Pricing from "@/components/Pricing";
 
-import FamilyCarerAccess from "@/components/FamilyCarerAccess";
+
 import AppDownload from "@/components/AppDownload";
 
 import Footer from "@/components/Footer";
@@ -62,8 +62,6 @@ const Index = () => {
 
       <Pricing />
       
-      {/* Family & Carer Access moved below Pricing, above AppDownload */}
-      <FamilyCarerAccess />
       
       <AppDownload />
       <Footer />
