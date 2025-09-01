@@ -13,14 +13,10 @@ const AppDownload = () => {
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center bg-gradient-to-r from-primary/10 to-secondary/10 rounded-full px-6 py-3 mb-6 border border-primary/20 shadow-lg">
-            <Brain className="w-5 h-5 text-primary mr-3 animate-pulse" />
-            <span className="text-sm font-bold text-primary tracking-wide">{t('appDownload.platformBadge')}</span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
             {t('appDownload.title')}
           </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             {t('appDownload.subtitle')}
           </p>
         </div>
@@ -112,10 +108,10 @@ const AppDownload = () => {
             {/* Right Side - AI Features & CTA */}
             <div className="text-center lg:text-left">
               <div className="mb-8">
-                <h3 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
+                <h3 className="text-2xl md:text-3xl font-bold mb-4 text-foreground">
                   {t('appDownload.appName')}
                 </h3>
-                <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+                <p className="text-lg text-muted-foreground mb-6">
                   {t('appDownload.heroDescription')}
                 </p>
               </div>
@@ -126,7 +122,7 @@ const AppDownload = () => {
                     <Brain className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg mb-2">{t('appDownload.features.intelligentSupport.title')}</h4>
+                    <h4 className="font-semibold text-lg mb-2">{t('appDownload.features.intelligentSupport.title')}</h4>
                     <p className="text-muted-foreground">{t('appDownload.features.intelligentSupport.description')}</p>
                   </div>
                 </div>
@@ -136,7 +132,7 @@ const AppDownload = () => {
                     <Star className="h-6 w-6 text-secondary" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg mb-2">{t('appDownload.features.learningAI.title')}</h4>
+                    <h4 className="font-semibold text-lg mb-2">{t('appDownload.features.learningAI.title')}</h4>
                     <p className="text-muted-foreground">{t('appDownload.features.learningAI.description')}</p>
                   </div>
                 </div>
@@ -146,7 +142,7 @@ const AppDownload = () => {
                     <Zap className="h-6 w-6 text-wellness" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg mb-2">{t('appDownload.features.instantResponse.title')}</h4>
+                    <h4 className="font-semibold text-lg mb-2">{t('appDownload.features.instantResponse.title')}</h4>
                     <p className="text-muted-foreground">{t('appDownload.features.instantResponse.description')}</p>
                   </div>
                 </div>
