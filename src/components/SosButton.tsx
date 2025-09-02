@@ -4,19 +4,44 @@ import { Phone, Mic, MicOff, MapPin, AlertTriangle } from "lucide-react";
 import { useVoiceActivation } from "@/hooks/useVoiceActivation";
 import { useEmergencySOS } from "@/hooks/useEmergencySOS";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
+import { useEmergencyDisclaimer } from "@/hooks/useEmergencyDisclaimer";
+import { EmergencyDisclaimerModal } from "@/components/emergency/EmergencyDisclaimerModal";
+import { EmergencyStatusBanner } from "@/components/emergency/EmergencyStatusBanner";
 
 
 const SosButton = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const { triggerEmergencySOS, isTriggering, locationPermissionGranted, locationPermissionDenied } = useEmergencySOS();
   const { toast } = useToast();
+  
+  // Subscription and disclaimer hooks
+  const { tier: subscriptionTier, loading: subscriptionLoading } = useSubscriptionTier();
+  const { 
+    showDisclaimer, 
+    hasAcceptedDisclaimer, 
+    requestDisclaimerAcceptance, 
+    acceptDisclaimer, 
+    cancelDisclaimer 
+  } = useEmergencyDisclaimer();
 
   const handleEmergencyTrigger = async () => {
+    // Check if disclaimer needs to be accepted first
+    if (!requestDisclaimerAcceptance()) {
+      return; // Block SOS if disclaimer not accepted
+    }
+
     try {
       await triggerEmergencySOS();
     } catch (error) {
       console.error('Emergency SOS failed:', error);
     }
+  };
+
+  const handleDisclaimerAccept = () => {
+    acceptDisclaimer();
+    // Automatically trigger SOS after accepting disclaimer
+    handleEmergencyTrigger();
   };
 
   const { isListening, hasPermission } = useVoiceActivation({
@@ -48,7 +73,23 @@ const SosButton = () => {
   }, [voiceEnabled, isListening, toast]);
 
   return (
-    <div className="flex flex-col items-center space-y-4 w-full max-w-md mx-auto">
+    <>
+      {/* Emergency Disclaimer Modal */}
+      <EmergencyDisclaimerModal
+        isOpen={showDisclaimer}
+        onAccept={handleDisclaimerAccept}
+        onCancel={cancelDisclaimer}
+        subscriptionTier={subscriptionTier}
+      />
+
+      <div className="flex flex-col items-center space-y-4 w-full max-w-md mx-auto">
+        {/* Emergency Status Banner */}
+        {!subscriptionLoading && subscriptionTier && (
+          <EmergencyStatusBanner 
+            subscriptionTier={subscriptionTier}
+            className="w-full mb-4"
+          />
+        )}
       {/* Voice Activation Toggle */}
       <div className="flex items-center gap-2 mb-2">
         <Button
@@ -107,7 +148,8 @@ const SosButton = () => {
           {voiceEnabled && <span className="block">or say "Help Help Help"</span>}
         </p>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
