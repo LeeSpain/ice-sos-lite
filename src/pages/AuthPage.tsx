@@ -58,9 +58,12 @@ const AuthPage = () => {
     );
   }
 
-  // If user is logged in and not trying to access signup, redirect to dashboard
+  // Only redirect logged-in users if they're not explicitly on the auth page
   const isSignupIntent = searchParams.get('tab') === 'signup';
-  if (user && !isSignupIntent) {
+  const isExplicitAuthVisit = window.location.pathname === '/auth';
+  
+  // Don't redirect if user explicitly navigated to /auth (let them see they're logged in)
+  if (user && !isSignupIntent && !isExplicitAuthVisit) {
     return <Navigate to="/dashboard" replace />;
   }
 
