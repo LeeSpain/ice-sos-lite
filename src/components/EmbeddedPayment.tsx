@@ -629,31 +629,6 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         </CardContent>
       </Card>
       
-      {/* Skip Payment Option */}
-      <Button 
-        onClick={() => {
-          // Store welcome data for testing, same as payment success
-          const welcomeData = {
-            firstName,
-            lastName,
-            email: userEmail,
-            subscriptionPlans: planData,
-            products: productData,
-            regionalServices: serviceData,
-            totalAmount: grandTotal
-          };
-          
-          sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
-          
-          // Navigate directly to welcome page
-          window.location.href = '/welcome';
-        }} 
-        variant="secondary" 
-        className="w-full"
-        size="lg"
-      >
-        Skip Payment & Continue
-      </Button>
       
       <Button variant="outline" onClick={onBack} className="w-full">
         Back to Plans
