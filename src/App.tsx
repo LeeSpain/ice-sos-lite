@@ -187,7 +187,7 @@ const App = () => {
                 </OptimizedSuspense>
               } />
 
-              {/* Owner's SOS Emergency App */}
+               {/* Owner's SOS Emergency App */}
               <Route path="/app" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedSOSRoute>
@@ -202,6 +202,18 @@ const App = () => {
                   </ProtectedSOSRoute>
                 </OptimizedSuspense>
               } />
+              <Route path="/sos" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedSOSRoute>
+                    <SOSHome />
+                  </ProtectedSOSRoute>
+                </OptimizedSuspense>
+              } />
+              <Route path="/mobile-app" element={
+                <OptimizedSuspense skeletonType="card">
+                  <SmartAppRedirect />
+                </OptimizedSuspense>
+              } />
 
               {/* Family Tracking App */}
               <Route path="/family-app" element={
@@ -212,11 +224,18 @@ const App = () => {
                 </OptimizedSuspense>
               } />
 
-              {/* Family Dashboard Routes */}
+               {/* Family Dashboard Routes */}
               <Route path="/family-dashboard/*" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedRoute>
                     <FamilyDashboard />
+                  </ProtectedRoute>
+                </OptimizedSuspense>
+              } />
+              <Route path="/family-sos" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <FamilyTrackingApp />
                   </ProtectedRoute>
                 </OptimizedSuspense>
               } />
