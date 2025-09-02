@@ -148,6 +148,202 @@ const DeviceIceSosPendant = () => {
         </div>
       </section>
 
+      {/* Smart Home Integration Section */}
+      <section className="py-section bg-gradient-to-br from-primary/5 via-background to-guardian/5">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center space-x-2 bg-primary/10 backdrop-blur-sm rounded-full px-6 py-3 mb-6 shadow-lg border border-primary/20">
+              <Zap className="h-5 w-5 text-primary" />
+              <span className="text-sm font-semibold text-primary">Enterprise-Grade Integration</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-guardian to-primary bg-clip-text text-transparent">
+              Smart Home Integration
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Seamlessly integrates with your existing smart home ecosystem. Professional-grade compatibility with zero additional hubs or complex setup required.
+            </p>
+          </div>
+
+          {/* Integration Cards */}
+          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+            <Card className="p-8 text-center hover-scale border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-xl bg-gradient-to-br from-card to-card/80">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">A</span>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Amazon Alexa</h3>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Voice-activated emergency system with household-wide alerts and instant response coordination.
+              </p>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Compatible with all Alexa devices</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Multi-room emergency broadcasting</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Voice command: "Alexa, help help help"</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Professional monitoring integration</span>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-8 text-center hover-scale border-guardian/20 hover:border-guardian/40 transition-all duration-300 hover:shadow-xl bg-gradient-to-br from-card to-card/80">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-guardian/20 to-guardian/10 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-guardian rounded-xl flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">G</span>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Google Home</h3>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Advanced AI-powered emergency response with intelligent location sharing and contact prioritization.
+              </p>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Google Nest ecosystem support</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Intelligent emergency routing</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Voice command: "Hey Google, emergency"</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Real-time location broadcast</span>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-8 text-center hover-scale border-emergency/20 hover:border-emergency/40 transition-all duration-300 hover:shadow-xl bg-gradient-to-br from-card to-card/80">
+              <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-emergency/20 to-emergency/10 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-12 h-12 bg-emergency rounded-xl flex items-center justify-center">
+                  <Smartphone className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Universal Mobile</h3>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Cross-platform compatibility with enterprise-grade security and 24/7 background protection monitoring.
+              </p>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>iOS & Android certified</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Bluetooth 5.0 Low Energy</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>Background service protection</span>
+                </div>
+                <div className="flex items-center justify-center space-x-2">
+                  <CheckCircle2 className="h-4 w-4 text-wellness" />
+                  <span>100m professional range</span>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Professional Setup Process */}
+          <div className="bg-gradient-to-br from-card via-card/95 to-card/90 rounded-3xl p-10 shadow-2xl border border-primary/10">
+            <div className="text-center mb-10">
+              <h3 className="text-3xl font-bold mb-4">Professional Installation Process</h3>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Enterprise-grade setup with professional support and comprehensive testing protocols
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-4 gap-8">
+              <div className="text-center group">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary-glow rounded-2xl flex items-center justify-center text-white font-bold mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <span className="text-xl">1</span>
+                  </div>
+                  <div className="absolute -inset-2 bg-primary/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                </div>
+                <h4 className="font-bold text-lg mb-2">Download & Setup</h4>
+                <p className="text-sm text-muted-foreground">Professional app installation with guided configuration</p>
+              </div>
+              
+              <div className="text-center group">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-guardian to-guardian-glow rounded-2xl flex items-center justify-center text-white font-bold mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <span className="text-xl">2</span>
+                  </div>
+                  <div className="absolute -inset-2 bg-guardian/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                </div>
+                <h4 className="font-bold text-lg mb-2">Device Pairing</h4>
+                <p className="text-sm text-muted-foreground">Secure Bluetooth 5.0 connection with encryption</p>
+              </div>
+              
+              <div className="text-center group">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-emergency to-emergency-glow rounded-2xl flex items-center justify-center text-white font-bold mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <span className="text-xl">3</span>
+                  </div>
+                  <div className="absolute -inset-2 bg-emergency/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                </div>
+                <h4 className="font-bold text-lg mb-2">Smart Home Sync</h4>
+                <p className="text-sm text-muted-foreground">Automated discovery and integration setup</p>
+              </div>
+              
+              <div className="text-center group">
+                <div className="relative mb-6">
+                  <div className="w-16 h-16 bg-gradient-to-br from-wellness to-wellness-glow rounded-2xl flex items-center justify-center text-white font-bold mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
+                    <span className="text-xl">4</span>
+                  </div>
+                  <div className="absolute -inset-2 bg-wellness/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
+                </div>
+                <h4 className="font-bold text-lg mb-2">System Testing</h4>
+                <p className="text-sm text-muted-foreground">Comprehensive testing with professional verification</p>
+              </div>
+            </div>
+
+            {/* Technical Specifications */}
+            <div className="mt-12 grid md:grid-cols-2 gap-8">
+              <div className="bg-background/50 rounded-2xl p-6 border border-primary/10">
+                <h4 className="font-bold text-lg mb-4 flex items-center">
+                  <Shield className="h-5 w-5 text-primary mr-2" />
+                  Security & Compliance
+                </h4>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>✓ End-to-end encryption</p>
+                  <p>✓ GDPR compliant data handling</p>
+                  <p>✓ ISO 27001 security standards</p>
+                  <p>✓ Professional monitoring protocols</p>
+                </div>
+              </div>
+              
+              <div className="bg-background/50 rounded-2xl p-6 border border-guardian/10">
+                <h4 className="font-bold text-lg mb-4 flex items-center">
+                  <Zap className="h-5 w-5 text-guardian mr-2" />
+                  Technical Specifications
+                </h4>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>✓ Bluetooth 5.0 Low Energy</p>
+                  <p>✓ 100-meter professional range</p>
+                  <p>✓ 7+ day battery life</p>
+                  <p>✓ IP67 waterproof rating</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Key Features Section */}
       <section className="py-section bg-gradient-to-br from-background via-muted/20 to-background">
         <div className="max-w-6xl mx-auto px-4">
@@ -207,87 +403,6 @@ const DeviceIceSosPendant = () => {
                   <h3 className="font-semibold mb-2">Comfortable Wear</h3>
                   <p className="text-sm opacity-90">Daily protection</p>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Smart Home Integration Section */}
-      <section className="py-section bg-gradient-to-br from-guardian/5 to-primary/5">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Smart Home Integration</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Works with your existing devices - no additional hubs required
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <Card className="p-6 text-center hover-scale">
-              <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                <span className="text-xl font-bold text-primary">A</span>
-              </div>
-              <h3 className="text-lg font-bold mb-3">Amazon Alexa</h3>
-              <p className="text-muted-foreground mb-4">
-                "Alexa, help help help" triggers emergency alerts
-              </p>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>✓ Any Alexa device</p>
-                <p>✓ Voice activation</p>
-                <p>✓ Household alerts</p>
-              </div>
-            </Card>
-
-            <Card className="p-6 text-center hover-scale">
-              <div className="w-16 h-16 mx-auto mb-4 bg-guardian/10 rounded-full flex items-center justify-center">
-                <span className="text-xl font-bold text-guardian">G</span>
-              </div>
-              <h3 className="text-lg font-bold mb-3">Google Home</h3>
-              <p className="text-muted-foreground mb-4">
-                "Hey Google, emergency" calls all contacts
-              </p>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>✓ Google Nest devices</p>
-                <p>✓ Multi-room broadcast</p>
-                <p>✓ Location sharing</p>
-              </div>
-            </Card>
-
-            <Card className="p-6 text-center hover-scale">
-              <div className="w-16 h-16 mx-auto mb-4 bg-emergency/10 rounded-full flex items-center justify-center">
-                <Smartphone className="h-6 w-6 text-emergency" />
-              </div>
-              <h3 className="text-lg font-bold mb-3">Any Smartphone</h3>
-              <p className="text-muted-foreground mb-4">
-                iOS/Android compatible
-              </p>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>✓ iPhone & Android</p>
-                <p>✓ Background protection</p>
-                <p>✓ Bluetooth connectivity</p>
-              </div>
-            </Card>
-          </div>
-
-          <div className="bg-card rounded-2xl p-8 shadow-lg">
-            <h3 className="text-xl font-bold text-center mb-6">Simple Setup Process</h3>
-            <div className="grid md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold mx-auto mb-3">1</div>
-                <p className="text-sm">Download app</p>
-              </div>
-              <div className="text-center">
-                <div className="w-10 h-10 bg-guardian rounded-full flex items-center justify-center text-white font-bold mx-auto mb-3">2</div>
-                <p className="text-sm">Pair Bluetooth</p>
-              </div>
-              <div className="text-center">
-                <div className="w-10 h-10 bg-emergency rounded-full flex items-center justify-center text-white font-bold mx-auto mb-3">3</div>
-                <p className="text-sm">Connect smart home</p>
-              </div>
-              <div className="text-center">
-                <div className="w-10 h-10 bg-wellness rounded-full flex items-center justify-center text-white font-bold mx-auto mb-3">4</div>
-                <p className="text-sm">Test system</p>
               </div>
             </div>
           </div>
