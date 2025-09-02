@@ -135,8 +135,8 @@ const DeviceIceSosPendant = () => {
             <div className="relative">
               <div className="relative z-10">
                 <OptimizedImage 
-                  src="/lovable-uploads/eed57ca0-9285-4130-a053-d65b3e140e53.png" 
-                  alt="ICE SOS Bluetooth Pendant - Complete package ready for emergency protection"
+                  src="/lovable-uploads/a5d9b9a3-71f8-4e05-b21b-2f2bc801fbc8.png" 
+                  alt="ICE Smart SOS Button - Bluetooth pendant with keychain and card"
                   className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                   priority={true}
                   sizes={getImageSizes('hero')}
