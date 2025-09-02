@@ -155,18 +155,20 @@ const App = () => {
                 </OptimizedSuspense>
               } />
 
-              {/* Smart App Routing */}
-              <Route path="/dashboard/*" element={
+              {/* Smart Dashboard Routing */}
+              <Route path="/dashboard" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedRoute>
-                    <Dashboard />
+                    <DashboardRedirect />
                   </ProtectedRoute>
                 </OptimizedSuspense>
               } />
+
+              {/* Member Dashboard */}
               <Route path="/full-dashboard/*" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedRoute>
-                    <SimpleDashboard />
+                    <Dashboard />
                   </ProtectedRoute>
                 </OptimizedSuspense>
               } />
