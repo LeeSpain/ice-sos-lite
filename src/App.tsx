@@ -48,6 +48,7 @@ import ProtectedSOSRoute from "@/components/ProtectedSOSRoute";
 import DashboardRedirect from "@/components/DashboardRedirect";
 import SmartAppRedirect from "@/components/SmartAppRedirect";
 import SimpleDashboard from "./pages/SimpleDashboard";
+import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import FamilyTrackingApp from "./pages/FamilyTrackingApp";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
@@ -155,10 +156,10 @@ const App = () => {
               } />
 
               {/* Smart App Routing */}
-              <Route path="/dashboard" element={
+              <Route path="/dashboard/*" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedRoute>
-                    <SmartAppRedirect />
+                    <Dashboard />
                   </ProtectedRoute>
                 </OptimizedSuspense>
               } />
