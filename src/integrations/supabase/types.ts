@@ -1995,7 +1995,7 @@ export type Database = {
           method: string
           phone_number: string
           status: string
-          user_id: string | null
+          user_id: string
           verification_code: string
           verified_at: string | null
         }
@@ -2008,7 +2008,7 @@ export type Database = {
           method?: string
           phone_number: string
           status?: string
-          user_id?: string | null
+          user_id: string
           verification_code: string
           verified_at?: string | null
         }
@@ -2021,7 +2021,7 @@ export type Database = {
           method?: string
           phone_number?: string
           status?: string
-          user_id?: string | null
+          user_id?: string
           verification_code?: string
           verified_at?: string | null
         }
