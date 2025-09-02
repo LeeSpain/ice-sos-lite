@@ -8,6 +8,7 @@ import { useSubscriptionTier } from "@/hooks/useSubscriptionTier";
 import { useEmergencyDisclaimer } from "@/hooks/useEmergencyDisclaimer";
 import { EmergencyDisclaimerModal } from "@/components/emergency/EmergencyDisclaimerModal";
 import { EmergencyStatusBanner } from "@/components/emergency/EmergencyStatusBanner";
+import { EnhancedSOSButton } from "@/components/sos/EnhancedSOSButton";
 
 
 const SosButton = () => {
@@ -82,21 +83,11 @@ const SosButton = () => {
         subscriptionTier={subscriptionTier}
       />
 
-      {/* Main Emergency Button */}
-      <Button
-        variant="emergency"
-        size="emergency"
-        onClick={handleEmergencyTrigger}
-        disabled={isTriggering}
-        className="relative transition-all duration-300"
-        aria-label="Emergency SOS Button"
-      >
-        <Phone className="h-10 w-10" />
-        <span className="sr-only">Emergency SOS</span>
-        {isTriggering && (
-          <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse" />
-        )}
-      </Button>
+      {/* Enhanced SOS Button */}
+      <EnhancedSOSButton 
+        onTrigger={handleEmergencyTrigger}
+        isTriggering={isTriggering}
+      />
     </>
   );
 };

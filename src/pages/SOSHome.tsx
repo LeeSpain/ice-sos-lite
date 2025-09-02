@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Shield, Settings, Bluetooth, HeartPulse, PlugZap, MapPin, Phone } from 'lucide-react';
 import SEO from '@/components/SEO';
 import DeviceManagerButton from '@/components/devices/DeviceManagerButton';
+import { FamilyContactsList } from '@/components/sos/FamilyContactsList';
 
 const SOSHome = () => {
   const { user } = useAuth();
@@ -63,58 +64,90 @@ const SOSHome = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-red-500 to-red-600 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-red-500 via-red-600 to-orange-600 flex items-center justify-center p-4 relative overflow-hidden">
       <SEO title="Emergency SOS – ICE SOS Lite" description="Trigger emergency alerts and share live location with one tap." />
       
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-white/5 rounded-full animate-pulse"></div>
+        <div className="absolute top-3/4 right-1/4 w-24 h-24 bg-white/5 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-1/4 left-1/3 w-16 h-16 bg-white/5 rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+      
       {/* Main Card */}
-      <Card className="w-full max-w-sm bg-white border-0 shadow-2xl relative z-10 rounded-3xl">
-        <CardContent className="p-8 text-center space-y-6 relative">
+      <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm border-0 shadow-2xl relative z-10 rounded-3xl overflow-hidden">
+        <CardContent className="p-8 text-center space-y-8 relative">
           
           {/* Settings Button - Top Right of Card */}
           <Button 
             variant="ghost" 
             size="icon"
             onClick={() => window.dispatchEvent(new CustomEvent('open-device-settings'))}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full h-8 w-8"
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full h-8 w-8 transition-all duration-200"
           >
             <Settings className="h-4 w-4" />
           </Button>
 
-          {/* Header */}
+          {/* Header with enhanced styling */}
           <div className="space-y-4 pt-4">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500 shadow-lg">
-              <Shield className="h-8 w-8 text-white" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-full blur-lg opacity-30"></div>
+              <div className="relative inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-xl">
+                <Shield className="h-10 w-10 text-white drop-shadow-lg" />
+              </div>
             </div>
-            <div className="space-y-1">
-              <h1 className="text-3xl font-bold text-red-900 tracking-tight">ICE SOS</h1>
-              <p className="text-gray-600 font-medium">Emergency Response System</p>
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-red-800 to-red-600 bg-clip-text text-transparent tracking-tight">
+                ICE SOS
+              </h1>
+              <p className="text-gray-600 font-medium text-lg">Emergency Response System</p>
+              <div className="w-16 h-0.5 bg-gradient-to-r from-red-500 to-orange-500 mx-auto rounded-full"></div>
             </div>
           </div>
 
-          {/* Device Status */}
+          {/* Device Status with enhanced styling */}
           {deviceConnected && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <div className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                <Bluetooth className="h-4 w-4" />
+            <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-4 border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <Bluetooth className="h-4 w-4 text-blue-600" />
                 <span>Device Connected</span>
               </div>
-              <div className="flex items-center justify-center gap-6">
+              <div className="flex items-center justify-center gap-8">
                 <div className="flex items-center gap-2">
-                  <HeartPulse className="h-4 w-4 text-red-500" />
-                  <span className="font-bold text-gray-800">{heartRate}</span>
-                  <span className="text-xs text-gray-600">BPM</span>
+                  <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
+                    <HeartPulse className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="text-center">
+                    <span className="block font-bold text-gray-800 text-lg">{heartRate}</span>
+                    <span className="text-xs text-gray-600">BPM</span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${batteryLevel! > 20 ? 'bg-green-500' : 'bg-orange-500'}`}></div>
-                  <span className="font-bold text-gray-800">{batteryLevel}%</span>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                    batteryLevel! > 20 
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
+                      : 'bg-gradient-to-r from-orange-500 to-red-500'
+                  }`}>
+                    <PlugZap className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="text-center">
+                    <span className="block font-bold text-gray-800 text-lg">{batteryLevel}%</span>
+                    <span className="text-xs text-gray-600">Battery</span>
+                  </div>
                 </div>
               </div>
             </div>
           )}
           
-          {/* SOS Button */}
-          <div className="space-y-3">
+          {/* SOS Button with enhanced spacing */}
+          <div className="py-4">
             <SosButton />
+          </div>
+
+          {/* Family Contacts List */}
+          <div className="pt-4 border-t border-gray-100">
+            <FamilyContactsList />
           </div>
 
         </CardContent>
