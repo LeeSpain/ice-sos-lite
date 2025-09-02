@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Check, Bluetooth, Battery, Droplets, MapPin, Shield, PhoneCall, CheckCircle2, Smartphone, Zap, Clock, Heart, Star, Users, Globe, Phone, Play } from "lucide-react";
@@ -411,57 +412,6 @@ const DeviceIceSosPendant = () => {
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-12">
               Real emergencies, real outcomes. Trusted by thousands of families worldwide for critical protection.
             </p>
-            
-            {/* Enhanced Statistics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-12">
-              <div className="text-center group">
-                <div className="relative mb-4">
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
-                    <Shield className="h-8 w-8 text-primary" />
-                  </div>
-                  <div className="absolute -inset-2 bg-primary/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
-                </div>
-                <div className="text-3xl font-bold text-primary mb-2">2,847</div>
-                <div className="text-sm text-muted-foreground font-medium">Emergencies Handled</div>
-                <div className="text-xs text-muted-foreground mt-1">Professional Response</div>
-              </div>
-              
-              <div className="text-center group">
-                <div className="relative mb-4">
-                  <div className="w-20 h-20 bg-gradient-to-br from-emergency/20 to-emergency/10 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
-                    <Heart className="h-8 w-8 text-emergency" />
-                  </div>
-                  <div className="absolute -inset-2 bg-emergency/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
-                </div>
-                <div className="text-3xl font-bold text-emergency mb-2">98.5%</div>
-                <div className="text-sm text-muted-foreground font-medium">Satisfaction Rate</div>
-                <div className="text-xs text-muted-foreground mt-1">Verified Reviews</div>
-              </div>
-              
-              <div className="text-center group">
-                <div className="relative mb-4">
-                  <div className="w-20 h-20 bg-gradient-to-br from-guardian/20 to-guardian/10 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
-                    <Clock className="h-8 w-8 text-guardian" />
-                  </div>
-                  <div className="absolute -inset-2 bg-guardian/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
-                </div>
-                <div className="text-3xl font-bold text-guardian mb-2">45 sec</div>
-                <div className="text-sm text-muted-foreground font-medium">Average Response</div>
-                <div className="text-xs text-muted-foreground mt-1">Emergency Alert Time</div>
-              </div>
-              
-              <div className="text-center group">
-                <div className="relative mb-4">
-                  <div className="w-20 h-20 bg-gradient-to-br from-wellness/20 to-wellness/10 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-xl transition-all duration-300">
-                    <CheckCircle2 className="h-8 w-8 text-wellness" />
-                  </div>
-                  <div className="absolute -inset-2 bg-wellness/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></div>
-                </div>
-                <div className="text-3xl font-bold text-wellness mb-2">100%</div>
-                <div className="text-sm text-muted-foreground font-medium">Reliability Rate</div>
-                <div className="text-xs text-muted-foreground mt-1">Zero Missed Alerts</div>
-              </div>
-            </div>
           </div>
 
           {/* Enhanced Customer Stories Grid */}
@@ -577,85 +527,105 @@ const DeviceIceSosPendant = () => {
 
       {/* FAQ Section */}
       <section className="py-section bg-gradient-to-br from-guardian/5 via-background to-wellness/5">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Professional FAQ</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-black">Frequently Asked Questions</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Comprehensive answers to technical, operational, and business questions about your ICE SOS Bluetooth Pendant
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-6">
-            <Card className="p-6 hover-scale border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-primary">How does the emergency system work?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+          <Accordion type="single" collapsible className="space-y-4">
+            <AccordionItem value="item-1" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                How does the emergency system work?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 One button press instantly alerts ALL emergency contacts with your exact GPS location. The system uses Bluetooth 5.0 for secure smartphone connection and professional-grade emergency protocols with 24/7 monitoring capabilities.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-guardian/20 hover:border-guardian/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-guardian">What's the battery life and charging process?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-2" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                What's the battery life and charging process?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 7+ days typical use with intelligent power management. Magnetic USB charging takes 2 hours for full charge. Low battery alerts ensure you're never caught unprepared. Enterprise-grade lithium battery with 2-year warranty.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-emergency/20 hover:border-emergency/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-emergency">Is the device waterproof for all activities?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-3" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                Is the device waterproof for all activities?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 IP67 certified waterproof rating for swimming, showering, and extreme weather. Professional testing ensures reliability in all conditions. Saltwater resistant for beach activities with full functionality maintained underwater up to 1 meter.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-wellness/20 hover:border-wellness/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-wellness">What wearing options are included?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-4" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                What wearing options are included?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 Complete package includes: adjustable lanyard for daily wear, secure carabiner clip for bags/belts, and comfortable sport wristbands (white & black). All attachments are professionally tested for security and comfort.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-primary">Which smartphones and smart homes are compatible?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-5" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                Which smartphones and smart homes are compatible?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 Universal compatibility: iOS 12+ and Android 8+. Seamless integration with Amazon Alexa, Google Home, and all major smart home platforms. Professional setup ensures optimal performance across all systems.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-guardian/20 hover:border-guardian/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-guardian">What's the range and connection reliability?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-6" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                What's the range and connection reliability?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 100-meter professional range in open areas, 30-50m through walls. Advanced signal processing ensures reliable connection. Automatic reconnection when back in range with missed alert notifications for complete peace of mind.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-emergency/20 hover:border-emergency/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-emergency">How much does the service cost?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-7" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                How much does the service cost?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 Device: €59.99 + €4.99 shipping. No monthly fees for basic emergency contacts. Optional professional monitoring services available. All major payment methods accepted with secure checkout and immediate activation.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-wellness/20 hover:border-wellness/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-wellness">What privacy and security measures are in place?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-8" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                What privacy and security measures are in place?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 End-to-end encryption for all data. GDPR compliant with zero data sharing. Your location and medical information are stored securely with military-grade encryption. Full control over who receives alerts and when.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-primary/20 hover:border-primary/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-primary">Is international travel supported?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-9" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                Is international travel supported?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 Global coverage with local emergency service integration in 50+ countries. Automatic regional compliance and language support. Professional partnerships ensure consistent service quality worldwide with local emergency protocols.
-              </p>
-            </Card>
+              </AccordionContent>
+            </AccordionItem>
 
-            <Card className="p-6 hover-scale border-guardian/20 hover:border-guardian/40 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-card to-card/95">
-              <h3 className="font-semibold text-lg mb-3 text-guardian">What warranty and support is provided?</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
+            <AccordionItem value="item-10" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
+              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+                What warranty and support is provided?
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
                 2-year full warranty covering device, battery, and accessories. 24/7 technical support in 25+ languages. Free replacement for any manufacturing defects. Professional setup assistance and ongoing technical consultation included.
-              </p>
-            </Card>
-          </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
       </section>
 
