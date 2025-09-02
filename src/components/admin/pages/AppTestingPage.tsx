@@ -9,14 +9,17 @@ import { Plus, Trash2, Save, RotateCcw } from "lucide-react";
 import AppPreviewPhone from "@/components/app-preview/AppPreviewPhone";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { AppPreviewConfig, AppPreviewCard, getDefaultAppPreview } from "@/types/appPreview";
+import { getTranslatedAppPreview } from "@/utils/appPreviewTranslations";
 import { useToast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
+import { useTranslation } from 'react-i18next';
 import ColorPicker from "@/components/admin/ColorPicker";
 
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const AppTestingPage: React.FC = () => {
-  const defaults = useMemo(() => getDefaultAppPreview(), []);
+  const { t } = useTranslation();
+  const defaults = useMemo(() => getTranslatedAppPreview(t), [t]);
   const { toast } = useToast();
 
   const { value, isLoading, save, isSaving } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
@@ -72,7 +75,7 @@ const AppTestingPage: React.FC = () => {
   };
 
   const onReset = () => {
-    const df = getDefaultAppPreview();
+    const df = getTranslatedAppPreview(t);
     setDraft(df);
     toast({ title: "Reset", description: "Defaults restored. Click Save to persist." });
   };

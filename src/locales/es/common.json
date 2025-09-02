@@ -535,5 +535,37 @@
     "description": "Únete a miles de familias que confían en ICE SOS Lite para protección integral de emergencia. Comienza hoy y experimenta tranquilidad con monitoreo profesional, conectividad familiar y asistencia con IA.",
     "startProtection": "Iniciar Protección",
     "connectFamily": "Conectar Familia"
+  },
+  "mockupNames": {
+    "dad": "Papá",
+    "mom": "Mamá",
+    "grandma": "Abuela",
+    "emma": "Emma"
+  },
+  "deviceStatus": {
+    "deviceBattery": "Batería del dispositivo",
+    "healthStatus": "Estado de salud",
+    "guardianAI": "Guardian IA",
+    "reminders": "Recordatorios",
+    "bluetoothStatus": "Estado del dispositivo Bluetooth",
+    "liveHeartRate": "Ritmo cardíaco en vivo vía dispositivo",
+    "active": "Activo",
+    "idle": "Inactivo",
+    "standingBy": "En espera",
+    "nextIn": "Próximo en 30 min",
+    "allDone": "Todo listo",
+    "connected": "Conectado",
+    "disconnected": "Desconectado",
+    "ready": "Listo",
+    "pendant": "Colgante",
+    "manage": "Gestionar",
+    "bpm": "BPM"
+  },
+  "appPreview": {
+    "appName": "ICE SOS Lite",
+    "tagline": "Toca una vez para ayuda inmediata",
+    "voiceOff": "Voz APAGADA",
+    "emergencySOS": "SOS de Emergencia",
+    "tapForHelp": "Toca para ayuda inmediata"
   }
 }

@@ -1,5 +1,6 @@
 
 import React from "react";
+import { useTranslation } from 'react-i18next';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -12,6 +13,7 @@ type Props = {
 };
 
 const AppPreviewPhone: React.FC<Props> = ({ config, className, simulateRealtime }) => {
+  const { t } = useTranslation();
   const mainColor = config.sosColor ? config.sosColor : "hsl(var(--primary))";
   const brandColor = config.primaryColor ? config.primaryColor : "hsl(var(--primary))";
 
@@ -40,13 +42,13 @@ const AppPreviewPhone: React.FC<Props> = ({ config, className, simulateRealtime 
         const includeRem = config.enableRemindersCard ?? false;
         const list: { icon: string; title: string; status: string; description: string }[] = [];
         if (includeBattery)
-          list.push({ icon: "battery", title: "Device Battery", status: `${Math.round(battery)}%`, description: "Bluetooth device status" });
+          list.push({ icon: "battery", title: t('deviceStatus.deviceBattery'), status: `${Math.round(battery)}%`, description: t('deviceStatus.bluetoothStatus') });
         if (includeHR)
-          list.push({ icon: "heart", title: "Health Status", status: `${Math.round(heart)} bpm`, description: "Live heart rate via device" });
+          list.push({ icon: "heart", title: t('deviceStatus.healthStatus'), status: `${Math.round(heart)} bpm`, description: t('deviceStatus.liveHeartRate') });
         if (includeAI)
-          list.push({ icon: "activity", title: "Guardian AI", status: aiActive ? "Active" : "Idle", description: aiActive ? '"How are you feeling today?"' : "Standing by" });
+          list.push({ icon: "activity", title: t('deviceStatus.guardianAI'), status: aiActive ? t('deviceStatus.active') : t('deviceStatus.idle'), description: aiActive ? '"How are you feeling today?"' : t('deviceStatus.standingBy') });
         if (includeRem)
-          list.push({ icon: "bell", title: "Reminders", status: `${reminders} Today`, description: reminders > 0 ? "Next in 30 min" : "All done" });
+          list.push({ icon: "bell", title: t('deviceStatus.reminders'), status: `${reminders} Today`, description: reminders > 0 ? t('deviceStatus.nextIn') : t('deviceStatus.allDone') });
         return list;
       })()
     : (config.cards ?? []);

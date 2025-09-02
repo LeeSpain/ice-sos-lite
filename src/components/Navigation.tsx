@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Shield, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
+import { AppPreviewConfig } from "@/types/appPreview";
+import { getTranslatedAppPreview } from "@/utils/appPreviewTranslations";
 import { useTranslation } from 'react-i18next';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { usePreferences } from '@/contexts/PreferencesContext';
@@ -16,9 +17,9 @@ interface NavigationProps {
 
 const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const defaults = React.useMemo(() => getDefaultAppPreview(), []);
-  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
   const { t } = useTranslation();
+  const defaults = React.useMemo(() => getTranslatedAppPreview(t), [t]);
+  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
   const { language } = usePreferences();
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">

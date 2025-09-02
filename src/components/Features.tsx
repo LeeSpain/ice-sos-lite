@@ -20,25 +20,25 @@ const Features = () => {
       id: 'emma',
       lat: 51.5074,
       lng: -0.1278,
-      render: () => <FamilyMarker id="emma" name="Emma" avatar={emmaAvatar} status="alert" />
+      render: () => <FamilyMarker id="emma" name={t('mockupNames.emma')} avatar={emmaAvatar} status="alert" />
     },
     {
       id: 'grandma',
       lat: 51.5154,
       lng: -0.1423,
-      render: () => <FamilyMarker id="grandma" name="Grandma" avatar={grandmaAvatar} status="live" />
+      render: () => <FamilyMarker id="grandma" name={t('mockupNames.grandma')} avatar={grandmaAvatar} status="live" />
     },
     {
       id: 'dad',
       lat: 51.5094,
       lng: -0.1180,
-      render: () => <FamilyMarker id="dad" name="Dad" avatar={dadAvatar} status="live" />
+      render: () => <FamilyMarker id="dad" name={t('mockupNames.dad')} avatar={dadAvatar} status="live" />
     },
     {
       id: 'mom',
       lat: 51.5030,
       lng: -0.1340,
-      render: () => <FamilyMarker id="mom" name="Mom" avatar={momAvatar} status="live" />
+      render: () => <FamilyMarker id="mom" name={t('mockupNames.mom')} avatar={momAvatar} status="live" />
     }
   ];
 
@@ -104,43 +104,43 @@ const Features = () => {
                       <div className="absolute top-16 left-16">
                         <div className="relative">
                           <div className="w-10 h-10 bg-green-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden">
-                            <img src={grandmaAvatar} alt="Grandma" className="w-full h-full object-cover rounded-full" />
+                            <img src={grandmaAvatar} alt={t('mockupNames.grandma')} className="w-full h-full object-cover rounded-full" />
                           </div>
                           <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-green-500"></div>
                         </div>
-                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Grandma</div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">{t('mockupNames.grandma')}</div>
                       </div>
                       
                       <div className="absolute top-20 right-12">
                         <div className="relative">
                           <div className="w-10 h-10 bg-blue-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden">
-                            <img src={dadAvatar} alt="Dad" className="w-full h-full object-cover rounded-full" />
+                            <img src={dadAvatar} alt={t('mockupNames.dad')} className="w-full h-full object-cover rounded-full" />
                           </div>
                           <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-blue-500"></div>
                         </div>
-                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Dad</div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">{t('mockupNames.dad')}</div>
                       </div>
                       
                       <div className="absolute bottom-12 left-12">
                         <div className="relative">
                           <div className="w-10 h-10 bg-red-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden relative animate-pulse">
-                            <img src={emmaAvatar} alt="Emma" className="w-full h-full object-cover rounded-full" />
+                            <img src={emmaAvatar} alt={t('mockupNames.emma')} className="w-full h-full object-cover rounded-full" />
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white animate-ping"></div>
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white"></div>
                           </div>
                           <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
                         </div>
-                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-red-50 px-2 py-1 rounded shadow-md border border-red-200 text-red-800 whitespace-nowrap">Emma - Alert!</div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-red-50 px-2 py-1 rounded shadow-md border border-red-200 text-red-800 whitespace-nowrap">{t('mockupNames.emma')} - Alert!</div>
                       </div>
 
                       <div className="absolute bottom-16 right-16">
                         <div className="relative">
                           <div className="w-10 h-10 bg-pink-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden">
-                            <img src={momAvatar} alt="Mom" className="w-full h-full object-cover rounded-full" />
+                            <img src={momAvatar} alt={t('mockupNames.mom')} className="w-full h-full object-cover rounded-full" />
                           </div>
                           <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-pink-500"></div>
                         </div>
-                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">Mom</div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-white px-2 py-1 rounded shadow-md border whitespace-nowrap">{t('mockupNames.mom')}</div>
                       </div>
 
                       {/* Map Controls */}
@@ -160,7 +160,7 @@ const Features = () => {
                     <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
                       <div className="flex items-center">
                         <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 overflow-hidden">
-                          <img src={grandmaAvatar} alt="Grandma" className="w-full h-full object-cover rounded-full" />
+                          <img src={grandmaAvatar} alt={t('mockupNames.grandma')} className="w-full h-full object-cover rounded-full" />
                         </div>
                         <div>
                           <p className="font-semibold text-xs text-green-800">{t('features.grandmaSafe')}</p>

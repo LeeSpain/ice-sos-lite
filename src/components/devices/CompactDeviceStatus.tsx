@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Bluetooth, PlugZap, HeartPulse, Battery } from 'lucide-react';
@@ -16,6 +17,7 @@ export const CompactDeviceStatus: React.FC<CompactDeviceStatusProps> = ({
   batteryLevel,
   onManageClick
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-3">
       {/* Device Status Row */}
@@ -23,15 +25,15 @@ export const CompactDeviceStatus: React.FC<CompactDeviceStatusProps> = ({
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <Bluetooth className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Pendant</span>
+            <span className="text-sm font-medium">{t('deviceStatus.pendant')}</span>
           </div>
           {connected ? (
             <Badge variant="secondary" className="gap-1 text-xs">
               <PlugZap className="h-3 w-3" />
-              Connected
+              {t('deviceStatus.connected')}
             </Badge>
           ) : (
-            <Badge variant="outline" className="text-xs">Ready</Badge>
+            <Badge variant="outline" className="text-xs">{t('deviceStatus.ready')}</Badge>
           )}
         </div>
         <Button 
@@ -40,7 +42,7 @@ export const CompactDeviceStatus: React.FC<CompactDeviceStatusProps> = ({
           onClick={onManageClick}
           className="h-8 px-3 text-xs"
         >
-          Manage
+          {t('deviceStatus.manage')}
         </Button>
       </div>
 
@@ -49,7 +51,7 @@ export const CompactDeviceStatus: React.FC<CompactDeviceStatusProps> = ({
         <div className="flex items-center justify-center gap-6 py-2 bg-muted/30 rounded-lg">
           <div className="flex items-center gap-2 text-sm">
             <HeartPulse className="h-4 w-4 text-red-500" />
-            <span className="font-medium">{heartRate} BPM</span>
+            <span className="font-medium">{heartRate} {t('deviceStatus.bpm')}</span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Battery className={`h-4 w-4 ${batteryLevel > 20 ? 'text-green-500' : 'text-yellow-500'}`} />

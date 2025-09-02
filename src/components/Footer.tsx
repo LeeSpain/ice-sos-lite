@@ -3,16 +3,17 @@ import { Shield, Mail } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSiteContent } from "@/hooks/useSiteContent";
-import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
+import { AppPreviewConfig } from "@/types/appPreview";
+import { getTranslatedAppPreview } from "@/utils/appPreviewTranslations";
 import { useTranslation } from 'react-i18next';
 
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const Footer = () => {
   const { user } = useAuth();
-  const defaults = React.useMemo(() => getDefaultAppPreview(), []);
-  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
   const { t } = useTranslation();
+  const defaults = React.useMemo(() => getTranslatedAppPreview(t), [t]);
+  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
 
   return (
     <footer className="bg-background border-t border-border">

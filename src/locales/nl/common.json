@@ -504,5 +504,37 @@
     "description": "Sluit je aan bij duizenden families die ICE SOS Lite vertrouwen voor uitgebreide noodbescherming. Begin vandaag en ervaar gemoedsrust met professionele monitoring, familieconnectiviteit en AI-assistentie.",
     "startProtection": "Start Bescherming",
     "connectFamily": "Verbind Familie"
+  },
+  "mockupNames": {
+    "dad": "Papa",
+    "mom": "Mama",
+    "grandma": "Oma",
+    "emma": "Emma"
+  },
+  "deviceStatus": {
+    "deviceBattery": "Apparaatbatterij",
+    "healthStatus": "Gezondheidsstatus",
+    "guardianAI": "Guardian AI",
+    "reminders": "Herinneringen",
+    "bluetoothStatus": "Bluetooth apparaatstatus",
+    "liveHeartRate": "Live hartslag via apparaat",
+    "active": "Actief",
+    "idle": "Inactief",
+    "standingBy": "Stand-by",
+    "nextIn": "Volgende over 30 min",
+    "allDone": "Alles klaar",
+    "connected": "Verbonden",
+    "disconnected": "Niet verbonden",
+    "ready": "Gereed",
+    "pendant": "Hanger",
+    "manage": "Beheren",
+    "bpm": "BPM"
+  },
+  "appPreview": {
+    "appName": "ICE SOS Lite",
+    "tagline": "Tik eenmaal voor onmiddellijke hulp",
+    "voiceOff": "Stem UIT",
+    "emergencySOS": "Nood SOS",
+    "tapForHelp": "Tik voor onmiddellijke hulp"
   }
 }

@@ -536,5 +536,37 @@
     "description": "Join thousands of families who trust ICE SOS Lite for comprehensive emergency protection. Start today and experience peace of mind with professional monitoring, family connectivity, and AI-powered assistance.",
     "startProtection": "Start Protection",
     "connectFamily": "Connect Family"
+  },
+  "mockupNames": {
+    "dad": "Dad",
+    "mom": "Mom",
+    "grandma": "Grandma",
+    "emma": "Emma"
+  },
+  "deviceStatus": {
+    "deviceBattery": "Device Battery",
+    "healthStatus": "Health Status",
+    "guardianAI": "Guardian AI",
+    "reminders": "Reminders",
+    "bluetoothStatus": "Bluetooth device status",
+    "liveHeartRate": "Live heart rate via device",
+    "active": "Active",
+    "idle": "Idle",
+    "standingBy": "Standing by",
+    "nextIn": "Next in 30 min",
+    "allDone": "All done",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "ready": "Ready",
+    "pendant": "Pendant",
+    "manage": "Manage",
+    "bpm": "BPM"
+  },
+  "appPreview": {
+    "appName": "ICE SOS Lite",
+    "tagline": "Tap once for immediate help",
+    "voiceOff": "Voice OFF",
+    "emergencySOS": "Emergency SOS",
+    "tapForHelp": "Tap for immediate help"
   }
 }
