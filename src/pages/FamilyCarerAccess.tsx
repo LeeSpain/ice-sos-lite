@@ -380,8 +380,8 @@ const FamilyCarerAccessPage = () => {
               </div>
               <div className="relative">
                 <OptimizedImage 
-                  src="/lovable-uploads/0365334e-7587-4cf4-96a6-5744399b84b2.png" 
-                  alt="Family emergency alert notification showing location and response options"
+                  src="/lovable-uploads/d5f130de-342d-4b7a-b485-0f595024d2d8.png" 
+                  alt="Father with emergency pendant and daughter receiving Dad SOS notification on her phone"
                   className="w-full rounded-2xl shadow-lg"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
