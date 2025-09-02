@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import IntroVideoModal from '@/components/IntroVideoModal';
+import { useInteractionTracking } from '@/hooks/useInteractionTracking';
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 interface NavigationProps {
@@ -21,12 +22,37 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
   const defaults = React.useMemo(() => getTranslatedAppPreview(t), [t]);
   const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
   const { language } = usePreferences();
+  const { trackButtonClick, trackLinkClick, trackVideoInteraction } = useInteractionTracking();
+
+  const handleContactClick = () => {
+    trackButtonClick('navigation', 'Contact Us', { location: 'header' });
+  };
+
+  const handleVideoClick = () => {
+    trackVideoInteraction('video_modal_open', 'intro-video', 'Navigation Intro Video');
+  };
+
+  const handleSignInClick = () => {
+    trackButtonClick('navigation', 'Sign In', { location: 'header' });
+  };
+
+  const handleJoinNowClick = () => {
+    trackButtonClick('navigation', 'Join Now', { location: 'header' });
+  };
+
+  const handleLogoClick = () => {
+    trackLinkClick('navigation', '/', 'Logo');
+  };
+
+  const handleRegionalCenterClick = () => {
+    trackLinkClick('navigation', '/regional-center/spain', 'Regional Center Spain');
+  };
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+          <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity" onClick={handleLogoClick}>
             <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
               <Shield className="h-5 w-5 text-white" />
             </div>
@@ -35,14 +61,14 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            <Button asChild size="sm" className="bg-wellness hover:bg-wellness/90 text-black font-medium shadow-sm">
+            <Button asChild size="sm" className="bg-wellness hover:bg-wellness/90 text-black font-medium shadow-sm" onClick={handleContactClick}>
               <Link to="/contact">
                 {t('nav.contact', 'Contact Us')}
               </Link>
             </Button>
             <IntroVideoModal 
               trigger={
-                <Button size="sm" className="bg-wellness hover:bg-wellness/90 text-black font-medium shadow-sm">
+                <Button size="sm" className="bg-wellness hover:bg-wellness/90 text-black font-medium shadow-sm" onClick={handleVideoClick}>
                   {t('nav.introVideo', 'Intro Video')}
                 </Button>
               }
@@ -51,6 +77,7 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
               <Link 
                 to="/regional-center/spain" 
                 className="text-sm font-medium text-foreground hover:text-primary transition-all duration-200 hover:scale-105 px-3 py-2 rounded-lg hover:bg-primary/5"
+                onClick={handleRegionalCenterClick}
               >
                 {t('nav.regionalCenter')}
               </Link>
@@ -59,12 +86,13 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
               <LanguageCurrencySelector compact />
             </div>
             <div className="flex items-center space-x-3">
-              <Button asChild variant="outline" size="sm" className="font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
+              <Button asChild variant="outline" size="sm" className="font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200" onClick={handleSignInClick}>
                 <Link to="/auth">{t('nav.signIn')}</Link>
               </Button>
               <Button asChild
                 size="sm" 
                 className="bg-wellness text-black hover:bg-wellness/90 font-medium transition-all duration-200 hover:scale-105 shadow-lg"
+                onClick={handleJoinNowClick}
               >
                 <Link to="/ai-register">{t('nav.joinNow', 'Join Now')}</Link>
               </Button>

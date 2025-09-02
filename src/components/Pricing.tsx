@@ -10,6 +10,7 @@ import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
 import { useTranslation } from 'react-i18next';
 import { IntroVideoModal } from "@/components/IntroVideoModal";
+import { useInteractionTracking } from "@/hooks/useInteractionTracking";
 interface Product {
   id: string;
   name: string;
@@ -59,6 +60,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
   const { language, currency: selectedCurrency } = usePreferences();
   const { t } = useTranslation();
+  const { trackButtonClick, trackVideoInteraction } = useInteractionTracking();
   const locale = languageToLocale(language as any);
   const toCurrency = (c: string) => (['EUR','GBP','USD','AUD'].includes((c || '').toUpperCase()) ? (c || 'EUR').toUpperCase() : 'EUR') as any;
   const formatPriceDisplay = (amount: number, fromCurrency: string) => {
@@ -157,6 +159,12 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
 
   const handleSubscriptionPurchase = async (plan: SubscriptionPlan) => {
+    trackButtonClick('subscription_purchase', plan.name, { 
+      plan_id: plan.id, 
+      price: plan.price, 
+      currency: plan.currency 
+    });
+
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
@@ -177,6 +185,12 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
   };
 
   const handleProductPurchase = async (product: Product) => {
+    trackButtonClick('product_purchase', product.name, { 
+      product_id: product.id, 
+      price: product.price, 
+      currency: product.currency 
+    });
+
     try {
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
@@ -258,6 +272,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           size="lg"
                           className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                           asChild
+                          onClick={() => trackButtonClick('cta', 'Subscribe Now', { plan_type: 'premium', location: 'pricing_hero' })}
                         >
                           <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
                         </Button>
@@ -269,6 +284,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                               size="lg"
                               variant="outline"
                               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                              onClick={() => trackVideoInteraction('video_modal_open', 'overview', 'Pricing Overview Video')}
                             >
                               <Play className="h-4 w-4 mr-2" />
                               {t('common.watchVideo')}

@@ -7,6 +7,7 @@ import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import { queryClient } from "@/lib/queryClient";
 import OptimizedSuspense from '@/components/OptimizedSuspense';
 import EnhancedErrorBoundary from '@/components/EnhancedErrorBoundary';
+import { usePageTracking } from '@/hooks/usePageTracking';
 
 // Import all pages
 import Index from "./pages/Index";
@@ -57,6 +58,9 @@ import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
 
 const App = () => {
+  // Enable global page tracking for all routes
+  usePageTracking();
+
   return (
     <EnhancedErrorBoundary>
       <QueryClientProvider client={queryClient}>

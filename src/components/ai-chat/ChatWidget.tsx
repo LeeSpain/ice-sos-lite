@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 import { usePreferences } from '@/contexts/PreferencesContext';
+import { useInteractionTracking } from '@/hooks/useInteractionTracking';
 
 interface Message {
   id: string;
@@ -26,6 +27,7 @@ interface ChatWidgetProps {
 const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "User", context = "registration" }) => {
   const { t } = useTranslation();
   const { language, currency } = usePreferences();
+  const { trackChatInteraction } = useInteractionTracking();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -52,6 +54,9 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    // Track chat interaction
+    trackChatInteraction('message_sent', context, inputMessage.length);
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -87,8 +92,10 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
       };
 
       setMessages(prev => [...prev, aiMessage]);
+      trackChatInteraction('message_received', context, data.response?.length || 0);
     } catch (error) {
       console.error('Error sending message:', error);
+      trackChatInteraction('error', context, 0);
       toast({
         title: t('chatWidget.connectionErrorTitle', { defaultValue: 'Connection Error' }),
         description: t('chatWidget.connectionErrorDesc', { defaultValue: 'Unable to connect to Emma. Please try again.' }),
@@ -130,7 +137,10 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
             </div>
           </div>
           <Button
-            onClick={onClose}
+            onClick={() => {
+              trackChatInteraction('chat_closed', context);
+              onClose();
+            }}
             variant="ghost"
             size="sm"
             className="text-white hover:bg-white/20 h-8 w-8 p-0 flex-shrink-0"

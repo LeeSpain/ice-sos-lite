@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import OptimizedImage from "@/components/ui/optimized-image";
 import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
+import { useInteractionTracking } from "@/hooks/useInteractionTracking";
 
 const heroImage = '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png?v=1';
 
@@ -15,6 +16,20 @@ interface HeroProps {
 
 const Hero = ({ onEmmaClick }: HeroProps) => {
   const { t } = useTranslation();
+  const { trackButtonClick, trackVideoInteraction } = useInteractionTracking();
+
+  const handleEmmaClick = () => {
+    trackButtonClick('cta', 'Talk to Emma', { category: 'hero', interaction_type: 'chat_open' });
+    onEmmaClick?.();
+  };
+
+  const handleJoinNowClick = () => {
+    trackButtonClick('cta', 'Join Now', { category: 'hero', interaction_type: 'registration' });
+  };
+
+  const handleVideoClick = () => {
+    trackVideoInteraction('video_modal_open', 'meet-emma', 'Meet Emma');
+  };
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl mb-4">
       
@@ -43,6 +58,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                 asChild
                 size="xl" 
                 className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                onClick={handleJoinNowClick}
               >
                 <Link to="/ai-register">
                   <Shield className="h-5 w-5 mr-2" />
@@ -54,7 +70,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
               <Button 
                 size="xl" 
                 className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
-                onClick={onEmmaClick}
+                onClick={handleEmmaClick}
               >
                 <Heart className="h-5 w-5 mr-2" />
                 {t('hero.ctaTalk')}
@@ -68,6 +84,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                     size="xl" 
                     variant="outline"
                     className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                    onClick={handleVideoClick}
                   >
                     <Play className="h-5 w-5 mr-2" />
                     {t('hero.meetEmma')}

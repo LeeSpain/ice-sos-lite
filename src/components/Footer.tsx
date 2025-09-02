@@ -6,6 +6,7 @@ import { useSiteContent } from "@/hooks/useSiteContent";
 import { AppPreviewConfig } from "@/types/appPreview";
 import { getTranslatedAppPreview } from "@/utils/appPreviewTranslations";
 import { useTranslation } from 'react-i18next';
+import { useInteractionTracking } from "@/hooks/useInteractionTracking";
 
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
@@ -14,6 +15,11 @@ const Footer = () => {
   const { t } = useTranslation();
   const defaults = React.useMemo(() => getTranslatedAppPreview(t), [t]);
   const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
+  const { trackLinkClick } = useInteractionTracking();
+
+  const handleFooterLinkClick = (linkType: string, destination: string, text: string) => {
+    trackLinkClick('footer', destination, text);
+  };
 
   return (
     <footer className="bg-background border-t border-border">
@@ -36,16 +42,16 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.quickLinks')}</h3>
             <div className="space-y-2">
-              <Link to="/blog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/blog" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('blog', '/blog', 'Blog')}>
                 {t('footer.blog')}
               </Link>
-              <Link to="/devices/ice-sos-pendant" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/devices/ice-sos-pendant" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('products', '/devices/ice-sos-pendant', 'Safety Products')}>
                 {t('footer.safetyProducts')}
               </Link>
-              <Link to="/regional-center/spain" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/regional-center/spain" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('regional', '/regional-center/spain', 'Regional Services')}>
                 {t('footer.regionalServices')}
               </Link>
-              <Link to="/family-carer-access" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/family-carer-access" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('family', '/family-carer-access', 'Family Carer Access')}>
                 {t('footer.familyCarerAccess')}
               </Link>
             </div>
@@ -57,15 +63,15 @@ const Footer = () => {
             <div className="space-y-2">
               {!user ? (
                 <>
-                  <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('auth', '/auth', 'Sign In')}>
                     {t('footer.signIn')}
                   </Link>
-                  <Link to="/ai-register" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                  <Link to="/ai-register" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('auth', '/ai-register', 'Subscribe')}>
                     {t('footer.subscribe')}
                   </Link>
                 </>
               ) : (
-                <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/auth" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('auth', '/auth', 'Sign Out')}>
                   {t('footer.signOut')}
                 </Link>
               )}
@@ -76,7 +82,7 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.connect')}</h3>
             <div className="space-y-2">
-              <Link to="/contact" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/contact" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('contact', '/contact', 'Contact Us')}>
                 <Mail className="h-4 w-4" />
                 {t('footer.contactUs')}
               </Link>
@@ -91,13 +97,13 @@ const Footer = () => {
               © 2024 {(value ?? defaults).appName}. {t('footer.rights')}
             </p>
             <div className="flex space-x-6">
-              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('legal', '/privacy', 'Privacy')}>
                 {t('footer.privacy')}
               </Link>
-              <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('legal', '/terms', 'Terms')}>
                 {t('footer.terms')}
               </Link>
-              <Link to="/support" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Link to="/support" className="text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('support', '/support', 'Support')}>
                 {t('footer.supportLink')}
               </Link>
             </div>
