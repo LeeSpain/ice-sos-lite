@@ -529,12 +529,9 @@
           "description": "Coordinate daily care activities, medication reminders, and health monitoring."
   },
   "finalCta": {
-    "title": "Ready to Connect Your Emergency Network?",
-    "description": "Join thousands who trust voice-activated emergency protection to keep them and their loved ones safe.",
-    "startProtection": "Start Protection Plan",
+    "title": "Ready to Protect Your Family?",
+    "description": "Join thousands of families who trust ICE SOS Lite for comprehensive emergency protection. Start today and experience peace of mind with professional monitoring, family connectivity, and AI-powered assistance.",
+    "startProtection": "Start Protection",
     "connectFamily": "Connect Family"
-  }
-}
-    }
   }
 }

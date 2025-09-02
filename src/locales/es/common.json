@@ -528,12 +528,9 @@
           "description": "Coordina actividades de atención diaria, recordatorios de medicación y monitoreo de salud."
   },
   "finalCta": {
-    "title": "¿Listo para Conectar tu Red de Emergencia?",
-    "description": "Únete a miles que confían en la protección de emergencia activada por voz para mantener seguros a ellos y sus seres queridos.",
-    "startProtection": "Iniciar Plan de Protección",
+    "title": "¿Listo para Proteger a Tu Familia?",
+    "description": "Únete a miles de familias que confían en ICE SOS Lite para protección integral de emergencia. Comienza hoy y experimenta tranquilidad con monitoreo profesional, conectividad familiar y asistencia con IA.",
+    "startProtection": "Iniciar Protección",
     "connectFamily": "Conectar Familia"
-  }
-}
-    }
   }
 }

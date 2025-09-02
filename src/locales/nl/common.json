@@ -497,13 +497,10 @@
           "description": "Coördineer dagelijkse zorgactiviteiten, medicatie herinneringen en gezondheidsmonitoring."
   },
   "finalCta": {
-    "title": "Klaar om je Noodnetwerk te Verbinden?",
-    "description": "Sluit je aan bij duizenden die vertrouwen op spraakgeactiveerde noodbescherming om henzelf en hun dierbaren veilig te houden.",
-    "startProtection": "Start Beschermingsplan",
+    "title": "Klaar om Je Familie te Beschermen?",
+    "description": "Sluit je aan bij duizenden families die ICE SOS Lite vertrouwen voor uitgebreide noodbescherming. Begin vandaag en ervaar gemoedsrust met professionele monitoring, familieconnectiviteit en AI-assistentie.",
+    "startProtection": "Start Bescherming",
     "connectFamily": "Verbind Familie"
-  }
-}
-    }
   }
 }
 
