@@ -103,6 +103,11 @@ const AuthPage = () => {
             source: 'auth_page'
           });
         }, 0);
+        
+        // Redirect to dashboard after successful sign in
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 1000);
       }
     } catch (error: any) {
       console.error('Sign in error:', error);
