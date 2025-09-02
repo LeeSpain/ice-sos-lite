@@ -18,17 +18,12 @@ import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
 import { preloadCriticalImages } from "@/utils/imageOptimization";
 import { useEmmaChat } from "@/contexts/EmmaChatContext";
 import { FirstVisitPreferencesModal } from "@/components/FirstVisitPreferencesModal";
-import { FreeTrialPopup } from "@/components/FreeTrialPopup";
-import { useFreeTrialPopup } from "@/hooks/useFreeTrialPopup";
-import { useState } from "react";
 
 const Index = () => {
   useScrollToTop();
   usePerformanceMonitoring();
   const { t } = useTranslation();
   const { openEmmaChat } = useEmmaChat();
-  const { showPopup, closePopup } = useFreeTrialPopup();
-  const [showFreeTrialPopup, setShowFreeTrialPopup] = useState(false);
 
   // Preload critical images
   useEffect(() => {
@@ -57,10 +52,6 @@ const Index = () => {
       <AppDownload />
       <FinalCTA />
       <Footer />
-      
-      {/* Free Trial Popups - Both rendered at root level */}
-      {showPopup && <FreeTrialPopup onClose={closePopup} />}
-      {showFreeTrialPopup && <FreeTrialPopup onClose={() => setShowFreeTrialPopup(false)} />}
     </div>
   );
 };
