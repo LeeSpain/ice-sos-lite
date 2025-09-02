@@ -363,8 +363,19 @@ const FamilyCarerAccessPage = () => {
                   Family members receive immediate push notifications when you trigger an emergency. They see your exact location, 
                   emergency type, and can respond with "Received & On It" to coordinate help effectively.
                 </p>
-                <div className="bg-emergency/5 border-l-4 border-emergency p-4 rounded-r-lg">
-                  <p className="text-sm text-emergency font-medium">Real-time location sharing during emergencies only - no constant tracking</p>
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-foreground">Emergency-only location sharing</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-foreground">Complete privacy outside emergencies</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Check className="h-5 w-5 text-wellness mr-3" />
+                    <span className="text-foreground">Real-time coordination tools</span>
+                  </div>
                 </div>
               </div>
               <div className="relative">
