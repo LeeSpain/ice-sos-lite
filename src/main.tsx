@@ -4,6 +4,7 @@ import './index.css'
 import './i18n'
 import { HelmetProvider } from 'react-helmet-async'
 import { PreferencesProvider } from '@/contexts/PreferencesContext'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { initAnalytics } from '@/lib/analytics'
 import { performanceMonitor } from '@/utils/performance'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -35,9 +36,11 @@ preloadCriticalResources();
 createRoot(document.getElementById("root")!).render(
   <ErrorBoundary>
     <HelmetProvider>
-      <PreferencesProvider>
-        <App />
-      </PreferencesProvider>
+      <AuthProvider>
+        <PreferencesProvider>
+          <App />
+        </PreferencesProvider>
+      </AuthProvider>
     </HelmetProvider>
   </ErrorBoundary>
 );
