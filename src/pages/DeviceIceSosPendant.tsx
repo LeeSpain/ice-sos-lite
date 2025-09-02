@@ -360,42 +360,42 @@ const DeviceIceSosPendant = () => {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="relative rounded-2xl overflow-hidden shadow-lg hover-scale">
               <img
-                src="/lovable-uploads/eed57ca0-9285-4130-a053-d65b3e140e53.png"
-                alt="ICE SOS Pendant packaging"
-                className="w-full h-64 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
-                <div className="p-6 text-white">
-                  <h3 className="font-semibold mb-2">Complete Package</h3>
-                  <p className="text-sm opacity-90">Ready to use out of the box</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative rounded-2xl overflow-hidden shadow-lg hover-scale">
-              <img
-                src="/lovable-uploads/fc8e5cbc-2145-4857-81a9-17c7795350c1.png"
-                alt="ICE SOS Pendant with card"
-                className="w-full h-64 object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
-                <div className="p-6 text-white">
-                  <h3 className="font-semibold mb-2">Premium Design</h3>
-                  <p className="text-sm opacity-90">Elegant and discreet</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative rounded-2xl overflow-hidden shadow-lg hover-scale">
-              <img
                 src="/lovable-uploads/5c1a45e0-5a70-4691-bc64-550668fe6e0f.png"
-                alt="ICE SOS Pendant on lanyard"
+                alt="ICE SOS Pendant on lanyard for comfortable daily wear"
                 className="w-full h-64 object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
                 <div className="p-6 text-white">
-                  <h3 className="font-semibold mb-2">Comfortable Wear</h3>
-                  <p className="text-sm opacity-90">Daily protection</p>
+                  <h3 className="font-semibold mb-2">Comfortable Lanyard</h3>
+                  <p className="text-sm opacity-90">Daily protection with adjustable lanyard</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative rounded-2xl overflow-hidden shadow-lg hover-scale">
+              <img
+                src="/lovable-uploads/51174548-f504-43a6-b947-a681fdfb6552.png"
+                alt="ICE SOS Pendant with secure carabiner clip attachment"
+                className="w-full h-64 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="font-semibold mb-2">Secure Clip</h3>
+                  <p className="text-sm opacity-90">Carabiner attachment for bags & belts</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative rounded-2xl overflow-hidden shadow-lg hover-scale">
+              <img
+                src="/lovable-uploads/a9a98b5b-436a-488c-b4f0-4a9c3ba75614.png"
+                alt="ICE SOS Pendant with comfortable wristbands in white and black"
+                className="w-full h-64 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                <div className="p-6 text-white">
+                  <h3 className="font-semibold mb-2">Sport Wristbands</h3>
+                  <p className="text-sm opacity-90">Active wear with white & black options</p>
                 </div>
               </div>
             </div>
