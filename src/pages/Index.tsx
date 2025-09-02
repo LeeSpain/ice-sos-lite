@@ -21,7 +21,6 @@ import { FirstVisitPreferencesModal } from "@/components/FirstVisitPreferencesMo
 import { FreeTrialPopup } from "@/components/FreeTrialPopup";
 import { useFreeTrialPopup } from "@/hooks/useFreeTrialPopup";
 import { useState } from "react";
-import { BetaLaunchBanner } from "@/components/BetaLaunchBanner";
 
 const Index = () => {
   useScrollToTop();
@@ -41,11 +40,6 @@ const Index = () => {
       <PageSEO pageType="home" />
       <FirstVisitPreferencesModal />
       <Navigation onFreeTrialClick={() => setShowFreeTrialPopup(true)} />
-
-      {/* Beta Launch Banner */}
-      <div className="container mx-auto px-4 pt-20">
-        <BetaLaunchBanner />
-      </div>
 
       {/* Quick Access for returning users */}
       <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
