@@ -46,7 +46,7 @@ const AuthPage = () => {
     href: window.location.href
   });
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated, unless they're specifically trying to signup
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
@@ -58,7 +58,9 @@ const AuthPage = () => {
     );
   }
 
-  if (user) {
+  // If user is logged in and not trying to access signup, redirect to dashboard
+  const isSignupIntent = searchParams.get('tab') === 'signup';
+  if (user && !isSignupIntent) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -252,6 +254,20 @@ const AuthPage = () => {
               </TabsContent>
               
               <TabsContent value="signup">
+                {user && (
+                  <Alert className="mb-4">
+                    <AlertDescription>
+                      You're already logged in as {user.email}. 
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto ml-2 text-primary"
+                        onClick={() => window.location.href = '/dashboard'}
+                      >
+                        Go to Dashboard
+                      </Button>
+                    </AlertDescription>
+                  </Alert>
+                )}
                 <form onSubmit={handleSignUp} className="space-y-4">
                   <div className="space-y-2">
                     <Input
