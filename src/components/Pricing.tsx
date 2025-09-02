@@ -240,7 +240,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         </div>
                         <div>
                           <h3 className="text-2xl font-bold mb-2">
-                            {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: 'Watch Video' }) : selectedPlan.name}
+                            {selectedPlan.name === 'Premium Protection' ? t('plans.premium.name', { defaultValue: selectedPlan.name }) : selectedPlan.name}
                           </h3>
                           <div className="flex items-baseline gap-2 mb-3">
                             <span className="text-3xl font-bold text-primary">{formatPriceDisplay(selectedPlan.price, selectedPlan.currency)}</span>
@@ -271,7 +271,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                               className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               <Play className="h-4 w-4 mr-2" />
-                              Watch Video
+                              {t('common.watchVideo')}
                             </Button>
                           }
                         />
@@ -347,7 +347,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                     <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm md:text-base font-semibold py-2 px-4 flex items-center justify-between shadow-md rounded-t-3xl">
                       <span className="flex items-center gap-2">
                         <span className="inline-flex h-2 w-2 rounded-full bg-white/80 animate-pulse"></span>
-                        {t('common.comingSoon', { defaultValue: 'Coming Soon' })}
+                        {t('common.comingSoon')}
                       </span>
                       {product.coming_soon_url ? (
                         <a
@@ -356,7 +356,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           rel="noreferrer"
                           className="underline underline-offset-4 hover:no-underline"
                         >
-                          {t('common.learnMore', { defaultValue: 'Learn more' })}
+                          {t('common.learnMore')}
                         </a>
                       ) : null}
                     </div>
@@ -367,7 +367,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                 <div className="absolute top-6 right-6 z-10">
                   <Badge className="bg-blue-500 text-white text-sm px-4 py-2 shadow-lg border-0">
                     <Package className="h-3 w-3 mr-1" />
-                    {t('pricing.oneTime')}
+                    {t('common.oneTime')}
                   </Badge>
                 </div>
 
@@ -411,7 +411,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                             asChild
                           >
                             <Link to="/devices/ice-sos-pendant">
-                              Find Out More
+                              {t('common.learnMore')}
                             </Link>
                           </Button>
                         )}
@@ -425,7 +425,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                               className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                             >
                               <Play className="h-4 w-4 mr-2" />
-                              Watch Video
+                              {t('common.watchVideo')}
                             </Button>
                           }
                         />
@@ -557,7 +557,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                           asChild
                         >
                           <Link to="/regional-center/spain">
-                            {service.name === 'Call Centre Spain' ? 'Find Out More' : t('pricing.selectPlan', { defaultValue: 'Select Plan' })}
+                            {service.name === 'Call Centre Spain' ? t('common.learnMore') : t('pricing.selectPlan', { defaultValue: 'Select Plan' })}
                           </Link>
                         </Button>
                         
@@ -572,10 +572,10 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                                   ? 'border-red-600 text-red-600 hover:bg-red-600 hover:text-white'
                                   : 'border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
                               }`}
-                            >
-                              <Play className="h-4 w-4 mr-2" />
-                              Watch Video
-                            </Button>
+                              >
+                                <Play className="h-4 w-4 mr-2" />
+                                {t('common.watchVideo')}
+                              </Button>
                           }
                         />
                       </div>

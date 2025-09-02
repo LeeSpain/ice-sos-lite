@@ -59,7 +59,7 @@ const AppDownload = () => {
                           <p className="text-sm font-semibold text-gray-900">Emma</p>
                           <div className="flex items-center gap-1">
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                            <span className="text-xs text-green-600">Active now</span>
+                            <span className="text-xs text-green-600">{t('common.activeNow')}</span>
                           </div>
                         </div>
                       </div>
@@ -84,7 +84,7 @@ const AppDownload = () => {
                       <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl rounded-tl-sm p-3 max-w-[200px] shadow-sm border border-primary/20">
                         <p className="text-xs font-medium text-primary mb-1">Emma AI</p>
                         <p className="text-sm text-gray-800">👋 Hi! I'm Emma, your intelligent AI assistant. I'm here to help with emergency setup, family connections, and answer any questions!</p>
-                        <p className="text-xs text-gray-500 mt-2">Just now</p>
+                        <p className="text-xs text-gray-500 mt-2">{t('common.justNow')}</p>
                       </div>
                     </div>
 
@@ -109,7 +109,7 @@ const AppDownload = () => {
                             <span>24/7 Support</span>
                           </div>
                         </div>
-                        <p className="text-xs text-gray-500 mt-2">Just now</p>
+                        <p className="text-xs text-gray-500 mt-2">{t('common.justNow')}</p>
                       </div>
                     </div>
 
@@ -117,7 +117,7 @@ const AppDownload = () => {
                     <div className="flex justify-end">
                       <div className="bg-gradient-to-r from-primary to-secondary text-white rounded-2xl rounded-tr-sm p-3 max-w-[180px] shadow-sm">
                         <p className="text-sm">How do I set up family members?</p>
-                        <p className="text-xs text-white/80 mt-1">Now</p>
+                        <p className="text-xs text-white/80 mt-1">{t('common.justNow')}</p>
                       </div>
                     </div>
 
@@ -142,7 +142,7 @@ const AppDownload = () => {
                   <div className="p-4 border-t border-gray-200 bg-white">
                     <div className="flex items-center space-x-3 bg-gray-50 rounded-full px-4 py-2 border border-gray-200">
                       <MessageCircle className="h-4 w-4 text-gray-400" />
-                      <div className="flex-1 text-sm text-gray-500">Type your message...</div>
+                      <div className="flex-1 text-sm text-gray-500">{t('common.typeMessage')}</div>
                       <div className="flex items-center space-x-2">
                         <Mic className="h-4 w-4 text-primary cursor-pointer" />
                         <div className="w-6 h-6 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center cursor-pointer">
@@ -234,15 +234,15 @@ const AppDownload = () => {
                       size="xl" 
                       variant="outline"
                       className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
-                    >
-                      <Download className="h-5 w-5 mr-2" />
-                      Watch Video
-                    </Button>
+                      >
+                        <Download className="h-5 w-5 mr-2" />
+                        {t('common.watchVideo')}
+                      </Button>
                   }
                 />
               </div>
               <p className="text-sm text-muted-foreground mt-4">
-                Advanced AI • Multilingual • Available 24/7
+                {t('common.aiFeatures')}
               </p>
             </div>
           </div>

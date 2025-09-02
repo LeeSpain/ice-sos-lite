@@ -14,10 +14,10 @@ const AppPreviewSection: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-            Voice-Activated Emergency Protection
+            {t('common.voiceActivatedProtection')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Connect your smart devices and emergency contacts for instant, hands-free protection when you need it most
+            {t('common.responseDescription')}
           </p>
         </div>
 
@@ -28,10 +28,10 @@ const AppPreviewSection: React.FC = () => {
             <div className="text-center lg:text-left">
               <div className="mb-8">
                 <h3 className="text-2xl md:text-3xl font-bold mb-4 text-foreground">
-                  Smart Device Integration
+                  {t('common.smartDeviceIntegration')}
                 </h3>
                 <p className="text-lg text-muted-foreground mb-6">
-                  Connect your smart speakers, Bluetooth pendant, and mobile devices for comprehensive emergency protection that activates with your voice or a simple button press.
+                  {t('common.deviceIntegrationDescription')}
                 </p>
               </div>
 
@@ -41,8 +41,8 @@ const AppPreviewSection: React.FC = () => {
                     <Speaker className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg mb-2">Smart Speaker Voice Commands</h4>
-                    <p className="text-muted-foreground">Say "help, help, help" three times on any smart device for instant emergency activation when your hands aren't free.</p>
+                    <h4 className="font-semibold text-lg mb-2">{t('common.smartSpeaker')}</h4>
+                    <p className="text-muted-foreground">{t('common.smartSpeakerDesc')}</p>
                   </div>
                 </div>
 
@@ -51,8 +51,8 @@ const AppPreviewSection: React.FC = () => {
                     <Bluetooth className="h-6 w-6 text-emergency" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg mb-2">Bluetooth Emergency Pendant</h4>
-                    <p className="text-muted-foreground">Wearable device with one-button emergency activation. Works up to 100 meters from your phone with instant SOS alerts.</p>
+                    <h4 className="font-semibold text-lg mb-2">{t('common.bluetoothPendant')}</h4>
+                    <p className="text-muted-foreground">{t('common.bluetoothPendantDesc')}</p>
                   </div>
                 </div>
 
@@ -61,8 +61,8 @@ const AppPreviewSection: React.FC = () => {
                     <Mic className="h-6 w-6 text-wellness" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg mb-2">Voice Recognition Technology</h4>
-                    <p className="text-muted-foreground">Advanced AI recognizes distress calls, unusual sounds, or specific trigger words to automatically activate emergency protocols.</p>
+                    <h4 className="font-semibold text-lg mb-2">{t('common.voiceRecognition')}</h4>
+                    <p className="text-muted-foreground">{t('common.voiceRecognitionDesc')}</p>
                   </div>
                 </div>
               </div>
@@ -76,7 +76,7 @@ const AppPreviewSection: React.FC = () => {
                   >
                     <Link to="/devices/ice-sos-pendant">
                       <Bluetooth className="h-5 w-5 mr-2" />
-                      View Smart Devices
+                      {t('common.viewDevices')}
                     </Link>
                   </Button>
                   <IntroVideoModal 
@@ -87,13 +87,13 @@ const AppPreviewSection: React.FC = () => {
                         className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                       >
                         <Speaker className="h-5 w-5 mr-2" />
-                        Watch Video
+                        {t('common.watchVideo')}
                       </Button>
                     }
                   />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Compatible with Alexa, Google Assistant & Apple HomeKit
+                  {t('common.compatible')}
                 </p>
               </div>
             </div>
@@ -103,7 +103,7 @@ const AppPreviewSection: React.FC = () => {
               {/* Emergency Response Visualization */}
               <div className="bg-gradient-to-br from-emergency/5 to-primary/5 rounded-3xl p-8 border border-emergency/20">
                 <h4 className="text-xl font-bold text-center mb-8 text-foreground">
-                  Instant Emergency Response
+                  {t('common.instantResponse')}
                 </h4>
                 
                 {/* Response Steps */}
@@ -113,8 +113,8 @@ const AppPreviewSection: React.FC = () => {
                       1
                     </div>
                     <div className="flex-1">
-                      <h5 className="font-semibold text-sm">Voice/Button Activation</h5>
-                      <p className="text-xs text-muted-foreground">"Help me" or pendant button press</p>
+                      <h5 className="font-semibold text-sm">{t('common.voiceButtonActivation')}</h5>
+                      <p className="text-xs text-muted-foreground">{t('common.helpCommand')}</p>
                     </div>
                     <Mic className="h-6 w-6 text-emergency" />
                   </div>
@@ -124,8 +124,8 @@ const AppPreviewSection: React.FC = () => {
                       2
                     </div>
                     <div className="flex-1">
-                      <h5 className="font-semibold text-sm">Location & Alert Sent</h5>
-                      <p className="text-xs text-muted-foreground">GPS coordinates shared instantly</p>
+                      <h5 className="font-semibold text-sm">{t('common.locationAlert')}</h5>
+                      <p className="text-xs text-muted-foreground">{t('common.gpsShared')}</p>
                     </div>
                     <Shield className="h-6 w-6 text-primary" />
                   </div>
@@ -135,8 +135,8 @@ const AppPreviewSection: React.FC = () => {
                       3
                     </div>
                     <div className="flex-1">
-                      <h5 className="font-semibold text-sm">Emergency Contacts Called</h5>
-                      <p className="text-xs text-muted-foreground">Family, carers & services notified</p>
+                      <h5 className="font-semibold text-sm">{t('common.emergencyContacts')}</h5>
+                      <p className="text-xs text-muted-foreground">{t('common.familyNotified')}</p>
                     </div>
                     <Phone className="h-6 w-6 text-wellness" />
                   </div>
@@ -146,8 +146,8 @@ const AppPreviewSection: React.FC = () => {
                       4
                     </div>
                     <div className="flex-1">
-                      <h5 className="font-semibold text-sm">Professional Response</h5>
-                      <p className="text-xs text-muted-foreground">24/7 monitoring center activated</p>
+                      <h5 className="font-semibold text-sm">{t('common.professionalResponse')}</h5>
+                      <p className="text-xs text-muted-foreground">{t('common.monitoringCenter')}</p>
                     </div>
                     <Users className="h-6 w-6 text-guardian" />
                   </div>
@@ -158,32 +158,32 @@ const AppPreviewSection: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-emergency mb-1">&lt; 15 sec</div>
-                      <div className="text-xs text-muted-foreground">AI Detection</div>
+                      <div className="text-xs text-muted-foreground">{t('common.aiDetection')}</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-primary mb-1">&lt; 30 sec</div>
-                      <div className="text-xs text-muted-foreground">Response Time</div>
+                      <div className="text-xs text-muted-foreground">{t('common.responseTime')}</div>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-3 gap-3 mb-4">
                     <div className="text-center p-2 bg-white/60 rounded-lg">
                       <div className="text-lg font-bold text-wellness">99.8%</div>
-                      <div className="text-xs text-muted-foreground">Success Rate</div>
+                      <div className="text-xs text-muted-foreground">{t('common.successRate')}</div>
                     </div>
                     <div className="text-center p-2 bg-white/60 rounded-lg">
                       <div className="text-lg font-bold text-guardian">24/7</div>
-                      <div className="text-xs text-muted-foreground">Monitoring</div>
+                      <div className="text-xs text-muted-foreground">{t('common.monitoring')}</div>
                     </div>
                     <div className="text-center p-2 bg-white/60 rounded-lg">
                       <div className="text-lg font-bold text-emergency">180+</div>
-                      <div className="text-xs text-muted-foreground">Countries</div>
+                      <div className="text-xs text-muted-foreground">{t('common.countries')}</div>
                     </div>
                   </div>
                   
                   <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                     <Shield className="h-3 w-3 text-primary" />
-                    <span>Professional Emergency Response Network</span>
+                    <span>{t('common.professionalNetwork')}</span>
                   </div>
                 </div>
               </div>

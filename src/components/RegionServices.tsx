@@ -164,7 +164,7 @@ const RegionServices = () => {
                         className="w-full border-primary text-primary hover:bg-primary hover:text-white font-medium"
                       >
                         <Play className="h-4 w-4 mr-2" />
-                        Watch Video
+                        {t('common.watchVideo')}
                       </Button>
                     }
                   />
