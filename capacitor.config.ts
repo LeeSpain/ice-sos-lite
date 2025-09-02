@@ -1,32 +1,31 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.a856a70f639b4212b411d2cdb524d754',
-  appName: 'ice-sos-lite',
+  appId: 'com.icesosinternational.app',
+  appName: 'ICE SOS - Emergency Protection',
   webDir: 'dist',
+  bundledWebRuntime: false,
   server: {
+    // Production: Remove or comment this section for production builds
     url: 'https://a856a70f-639b-4212-b411-d2cdb524d754.lovableproject.com?forceHideBadge=true',
     cleartext: true
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 3000,
+      launchShowDuration: 2500,
       launchAutoHide: true,
       backgroundColor: "#ef4444",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
-      showSpinner: true,
-      androidSpinnerStyle: "large",
-      iosSpinnerStyle: "small",
-      spinnerColor: "#FFFFFF",
+      showSpinner: false,
       splashFullScreen: true,
       splashImmersive: true,
-      layoutName: "launch_screen",
-      useDialog: true
+      useDialog: false
     },
     Geolocation: {
       enableHighAccuracy: true,
-      timeout: 10000,
+      timeout: 15000,
+      maximumAge: 30000,
       permissions: {
         android: [
           "android.permission.ACCESS_COARSE_LOCATION",
@@ -35,7 +34,8 @@ const config: CapacitorConfig = {
         ],
         ios: [
           "NSLocationWhenInUseUsageDescription",
-          "NSLocationAlwaysAndWhenInUseUsageDescription"
+          "NSLocationAlwaysAndWhenInUseUsageDescription",
+          "NSLocationAlwaysUsageDescription"
         ]
       }
     },
@@ -49,9 +49,17 @@ const config: CapacitorConfig = {
           "android.permission.ACCESS_NETWORK_STATE",
           "android.permission.WAKE_LOCK",
           "android.permission.VIBRATE",
-          "android.permission.CALL_PHONE"
+          "android.permission.CALL_PHONE",
+          "android.permission.CAMERA",
+          "android.permission.RECORD_AUDIO",
+          "android.permission.WRITE_EXTERNAL_STORAGE",
+          "android.permission.READ_EXTERNAL_STORAGE"
         ]
       }
+    },
+    StatusBar: {
+      style: "dark",
+      backgroundColor: "#ef4444"
     }
   }
 };
