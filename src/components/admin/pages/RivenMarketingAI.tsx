@@ -64,6 +64,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useAuth } from '@/contexts/AuthContext';
+import { handleNetworkError, withNetworkErrorHandling } from '@/utils/networkErrorHandler';
 
 // Unified interfaces for all Riven functionality
 interface Campaign {
@@ -168,6 +169,8 @@ const RivenMarketingAI: React.FC = () => {
   const [rivenResponse, setRivenResponse] = useState('');
   const [activeTab, setActiveTab] = useState('command-center');
   const [currentWorkflowId, setCurrentWorkflowId] = useState<string | null>(null);
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [diagnosticsRunning, setDiagnosticsRunning] = useState(false);
   
   // Configuration state using site_content
   const { value: rivenConfig, save: saveRivenConfig, isLoading: configLoading } = useSiteContent('riven_ai_configuration', {
@@ -708,6 +711,61 @@ const RivenMarketingAI: React.FC = () => {
     }
   };
 
+  // Diagnostics: Test AI provider connectivity (no auth required)
+  const testProviders = async () => {
+    setTestingConnection(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('riven-marketing', {
+        body: { action: 'provider_status' }
+      });
+      if (error) throw error as any;
+
+      const openaiOk = data?.providers?.openai;
+      const xaiOk = data?.providers?.xai;
+
+      toast({
+        title: 'Provider Status',
+        description: `OpenAI: ${openaiOk ? 'configured' : 'missing'} • xAI: ${xaiOk ? 'configured' : 'missing'}`,
+      });
+    } catch (e) {
+      handleNetworkError(e, 'Riven provider status');
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
+  // Diagnostics: minimal end-to-end DB + auth test (requires admin)
+  const runDiagnostics = async () => {
+    setDiagnosticsRunning(true);
+    try {
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
+      const { data, error } = await supabase.functions.invoke('riven-marketing', {
+        body: {
+          action: 'test_campaign',
+          command: 'Diagnostics health-check'
+        },
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
+
+      if (error) throw error as any;
+      if (!data?.success) throw new Error(data?.error || 'Diagnostics failed');
+
+      await loadCampaigns();
+      setActiveTab('campaigns');
+
+      toast({
+        title: 'Diagnostics Passed',
+        description: 'Created a test campaign successfully.'
+      });
+    } catch (e) {
+      handleNetworkError(e, 'Riven diagnostics');
+    } finally {
+      setDiagnosticsRunning(false);
+    }
+  };
   if (configLoading) {
     return (
       <div className="space-y-6">
@@ -736,6 +794,22 @@ const RivenMarketingAI: React.FC = () => {
         </div>
         
         <div className="flex gap-2">
+          <Button variant="outline" onClick={testProviders} disabled={testingConnection}>
+            {testingConnection ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <RefreshCw className="h-4 w-4 mr-2" />
+            )}
+            Test Connection
+          </Button>
+          <Button variant="outline" onClick={runDiagnostics} disabled={diagnosticsRunning}>
+            {diagnosticsRunning ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Activity className="h-4 w-4 mr-2" />
+            )}
+            Run Diagnostics
+          </Button>
           <Dialog open={showSettings} onOpenChange={setShowSettings}>
             <DialogTrigger asChild>
               <Button variant="outline">
