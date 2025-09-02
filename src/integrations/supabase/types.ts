@@ -89,6 +89,42 @@ export type Database = {
         }
         Relationships: []
       }
+      auth_failures: {
+        Row: {
+          attempt_count: number | null
+          blocked_until: string | null
+          created_at: string | null
+          email: string | null
+          failure_reason: string
+          id: string
+          ip_address: unknown | null
+          last_attempt_at: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          attempt_count?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          email?: string | null
+          failure_reason: string
+          id?: string
+          ip_address?: unknown | null
+          last_attempt_at?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          attempt_count?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          email?: string | null
+          failure_reason?: string
+          id?: string
+          ip_address?: unknown | null
+          last_attempt_at?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       auto_reply_queue: {
         Row: {
           category_id: string | null
@@ -2574,6 +2610,10 @@ export type Database = {
           id: string
           ip_address: string | null
           metadata: Json | null
+          risk_score: number | null
+          session_id: string | null
+          severity: string | null
+          source_component: string | null
           user_agent: string | null
           user_id: string | null
         }
@@ -2583,6 +2623,10 @@ export type Database = {
           id?: string
           ip_address?: string | null
           metadata?: Json | null
+          risk_score?: number | null
+          session_id?: string | null
+          severity?: string | null
+          source_component?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
@@ -2592,6 +2636,10 @@ export type Database = {
           id?: string
           ip_address?: string | null
           metadata?: Json | null
+          risk_score?: number | null
+          session_id?: string | null
+          severity?: string | null
+          source_component?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
