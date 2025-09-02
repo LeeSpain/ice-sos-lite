@@ -30,6 +30,7 @@ import PlacesManager from "@/pages/PlacesManager";
 import LocationHistoryPage from "@/pages/LocationHistoryPage";
 import { useTranslation } from 'react-i18next';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 
 const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
@@ -144,6 +145,7 @@ const Dashboard = () => {
             <div className="flex-1">
               <h1 className="text-xl font-semibold">{t('dashboard.title', { defaultValue: 'Dashboard' })}</h1>
             </div>
+            <LanguageCurrencySelector compact />
           </header>
 
           {/* Dashboard Content */}

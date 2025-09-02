@@ -31,96 +31,105 @@ import {
   Navigation,
   History
 } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
-const dashboardItems = [
-  {
-    title: "Overview",
-    url: "/full-dashboard",
-    icon: LayoutDashboard
-  },
-  {
-    title: "Profile",
-    url: "/full-dashboard/profile",
-    icon: User
-  },
-  {
-    title: "My Products",
-    url: "/full-dashboard/products",
-    icon: Package
-  },
-  {
-    title: "Flic Control",
-    url: "/full-dashboard/flic",
-    icon: Bluetooth
-  },
-  {
-    title: "Activity",
-    url: "/full-dashboard/activity",
-    icon: Activity
-  },
-  {
-    title: "Mobile App",
-    url: "/full-dashboard/mobile-app",
-    icon: Smartphone
-  }
-];
+const useDashboardItems = () => {
+  const { t } = useTranslation();
+  
+  const dashboardItems = [
+    {
+      title: t('dashboard.overview'),
+      url: "/full-dashboard",
+      icon: LayoutDashboard
+    },
+    {
+      title: t('dashboard.profile'),
+      url: "/full-dashboard/profile",
+      icon: User
+    },
+    {
+      title: t('dashboard.myProducts'),
+      url: "/full-dashboard/products",
+      icon: Package
+    },
+    {
+      title: t('dashboard.flickControl'),
+      url: "/full-dashboard/flic",
+      icon: Bluetooth
+    },
+    {
+      title: t('dashboard.activity'),
+      url: "/full-dashboard/activity",
+      icon: Activity
+    },
+    {
+      title: t('dashboard.mobileApp'),
+      url: "/full-dashboard/mobile-app",
+      icon: Smartphone
+    }
+  ];
 
-const liveMapItems = [
-  {
-    title: "Live Family Map",
-    url: "/full-dashboard/live-map",
-    icon: Map
-  },
-  {
-    title: "My Circles",
-    url: "/full-dashboard/circles",
-    icon: Users
-  },
-  {
-    title: "Places & Geofences",
-    url: "/full-dashboard/places",
-    icon: Navigation
-  },
-  {
-    title: "Location History",
-    url: "/full-dashboard/location-history",
-    icon: History
-  }
-];
+  const liveMapItems = [
+    {
+      title: t('dashboard.liveFamilyMap'),
+      url: "/full-dashboard/live-map",
+      icon: Map
+    },
+    {
+      title: t('dashboard.myCircles'),
+      url: "/full-dashboard/circles",
+      icon: Users
+    },
+    {
+      title: t('dashboard.placesGeofences'),
+      url: "/full-dashboard/places",
+      icon: Navigation
+    },
+    {
+      title: t('dashboard.locationHistory'),
+      url: "/full-dashboard/location-history",
+      icon: History
+    }
+  ];
 
-const settingsItems = [
-  {
-    title: "Subscription",
-    url: "/full-dashboard/subscription",
-    icon: CreditCard
-  },
-  {
-    title: "Notifications",
-    url: "/full-dashboard/notifications",
-    icon: Bell
-  },
-  {
-    title: "Security",
-    url: "/full-dashboard/security",
-    icon: Shield
-  },
-  {
-    title: "Settings",
-    url: "/full-dashboard/settings",
-    icon: Settings
-  },
-  {
-    title: "Support",
-    url: "/full-dashboard/support",
-    icon: HelpCircle
-  }
-];
+  const settingsItems = [
+    {
+      title: t('dashboard.subscription'),
+      url: "/full-dashboard/subscription",
+      icon: CreditCard
+    },
+    {
+      title: t('dashboard.notifications'),
+      url: "/full-dashboard/notifications",
+      icon: Bell
+    },
+    {
+      title: t('dashboard.security'),
+      url: "/full-dashboard/security",
+      icon: Shield
+    },
+    {
+      title: t('dashboard.settings'),
+      url: "/full-dashboard/settings",
+      icon: Settings
+    },
+    {
+      title: t('dashboard.support'),
+      url: "/full-dashboard/support",
+      icon: HelpCircle
+    }
+  ];
+  
+  return { dashboardItems, liveMapItems, settingsItems };
+};
 
 export function DashboardSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
+  const { t } = useTranslation();
+  const { dashboardItems, liveMapItems, settingsItems } = useDashboardItems();
 
   const isActive = (path: string) => {
     if (path === '/full-dashboard') {
@@ -151,7 +160,7 @@ export function DashboardSidebar() {
               </div>
               <div>
                 <h2 className="font-bold text-lg text-sidebar-foreground">ICE SOS</h2>
-                <p className="text-sm text-sidebar-muted-foreground font-medium">Member Portal</p>
+                <p className="text-sm text-sidebar-muted-foreground font-medium">{t('dashboard.memberPortal')}</p>
               </div>
             </div>
           ) : (
@@ -164,7 +173,7 @@ export function DashboardSidebar() {
         {/* Main Dashboard Navigation */}
         <SidebarGroup className="px-3 py-4">
           <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
-            Dashboard
+            {t('dashboard.overview')}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
@@ -209,7 +218,7 @@ export function DashboardSidebar() {
         {/* Live Map Navigation */}
         <SidebarGroup className="px-3 py-4">
           <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
-            Live Map
+            {t('dashboard.liveMap')}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
@@ -253,7 +262,7 @@ export function DashboardSidebar() {
         {/* Settings Navigation */}
         <SidebarGroup className="px-3 py-4">
           <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
-            Settings
+            {t('dashboard.settings')}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">

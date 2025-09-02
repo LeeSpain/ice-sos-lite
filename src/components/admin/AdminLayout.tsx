@@ -42,91 +42,98 @@ import {
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
+import { useTranslation } from 'react-i18next';
 
-const adminMenuItems = [
-  {
-    title: "📊 Overview & Analytics",
-    items: [
-      { title: "Dashboard", url: "/admin-dashboard", icon: BarChart3 },
-      { title: "Analytics", url: "/admin-dashboard/analytics", icon: BarChart3 },
-      { title: "Video Analytics", url: "/admin-dashboard/video-analytics", icon: Video },
-      { title: "Revenue Analytics", url: "/admin-dashboard/revenue", icon: DollarSign },
-      { title: "User Growth", url: "/admin-dashboard/growth", icon: TrendingUp },
-    ]
-  },
-  {
-    title: "🤖 AI & Marketing Intelligence", 
-    items: [
-      { title: "Emma AI Agent", url: "/admin-dashboard/ai-agent", icon: Bot },
-      { title: "Riven Marketing AI", url: "/admin-dashboard/riven-marketing", icon: Brain },
-    ]
-  },
-  {
-    title: "👥 Customer Management", 
-    items: [
-      { title: "All Customers", url: "/admin-dashboard/customers", icon: Users },
-      { title: "Subscriptions", url: "/admin-dashboard/subscriptions", icon: Database },
-      { title: "Family Accounts", url: "/admin-dashboard/families", icon: Heart },
-    ]
-  },
-  {
-    title: "💬 AI Chat & Leads",
-    items: [
-      { title: "Lead Management", url: "/admin-dashboard/leads", icon: MessageSquare },
-      { title: "Conversations", url: "/admin-dashboard/conversations", icon: MessageSquare },
-      { title: "AI Performance", url: "/admin-dashboard/ai-metrics", icon: BarChart3 },
-    ]
-  },
-  {
-    title: "📧 Communication & Marketing",
-    items: [
-      { title: "Contact Submissions", url: "/admin-dashboard/contact-submissions", icon: Mail },
-      { title: "Email Campaigns", url: "/admin-dashboard/email-campaigns", icon: Mail },
-      { title: "Communication Center", url: "/admin-dashboard/communication", icon: MessageSquare },
-      { title: "Social Media Integration", url: "/admin-dashboard/social-media", icon: MessageSquare },
-      { title: "Content Automation", url: "/admin-dashboard/content-automation", icon: Bot },
-    ]
-  },
-  {
-    title: "🗺️ Live Map Management",
-    items: [
-      { title: "Live Map Monitor", url: "/admin-dashboard/live-map-monitor", icon: Map },
-      { title: "Circle Analytics", url: "/admin-dashboard/circle-analytics", icon: Users },
-      { title: "Geofence Management", url: "/admin-dashboard/geofence-admin", icon: Navigation },
-      { title: "Location Data", url: "/admin-dashboard/location-admin", icon: History },
-    ]
-  },
-  {
-    title: "🚨 Emergency & Safety",
-    items: [
-      { title: "Emergency Incidents", url: "/admin-dashboard/emergencies", icon: AlertTriangle },
-      { title: "Safety Monitoring", url: "/admin-dashboard/safety", icon: Shield },
-    ]
-  },
-  {
-    title: "🛍️ Product & Services",
-    items: [
-      { title: "Products", url: "/admin-dashboard/products", icon: Package },
-      { title: "Regional Services", url: "/admin-dashboard/regional-services", icon: MapPin },
-      { title: "Subscription Plans", url: "/admin-dashboard/protection-plans", icon: Shield },
-      { title: "Flic Control", url: "/admin-dashboard/flic-control", icon: Bluetooth },
-    ]
-  },
-  {
-    title: "⚙️ System",
-    items: [
-      { title: "User Activity", url: "/admin-dashboard/activity", icon: Activity },
-      { title: "System Settings", url: "/admin-dashboard/settings", icon: Settings },
-      { title: "Reports", url: "/admin-dashboard/reports", icon: FileText },
-      { title: "App Testing", url: "/admin-dashboard/app-testing", icon: Smartphone },
-    ]
-  }
-];
+const useAdminMenuItems = () => {
+  const { t } = useTranslation();
+  
+  return [
+    {
+      title: t('admin.overview'),
+      items: [
+        { title: t('admin.dashboard'), url: "/admin-dashboard", icon: BarChart3 },
+        { title: t('admin.analytics'), url: "/admin-dashboard/analytics", icon: BarChart3 },
+        { title: t('admin.videoAnalytics'), url: "/admin-dashboard/video-analytics", icon: Video },
+        { title: t('admin.revenueAnalytics'), url: "/admin-dashboard/revenue", icon: DollarSign },
+        { title: t('admin.userGrowth'), url: "/admin-dashboard/growth", icon: TrendingUp },
+      ]
+    },
+    {
+      title: t('admin.aiMarketing'), 
+      items: [
+        { title: t('admin.emmaAiAgent'), url: "/admin-dashboard/ai-agent", icon: Bot },
+        { title: t('admin.rivenMarketingAi'), url: "/admin-dashboard/riven-marketing", icon: Brain },
+      ]
+    },
+    {
+      title: t('admin.customerManagement'), 
+      items: [
+        { title: t('admin.allCustomers'), url: "/admin-dashboard/customers", icon: Users },
+        { title: t('admin.subscriptions'), url: "/admin-dashboard/subscriptions", icon: Database },
+        { title: t('admin.familyAccounts'), url: "/admin-dashboard/families", icon: Heart },
+      ]
+    },
+    {
+      title: t('admin.aiChatLeads'),
+      items: [
+        { title: t('admin.leadManagement'), url: "/admin-dashboard/leads", icon: MessageSquare },
+        { title: t('admin.conversations'), url: "/admin-dashboard/conversations", icon: MessageSquare },
+        { title: t('admin.aiPerformance'), url: "/admin-dashboard/ai-metrics", icon: BarChart3 },
+      ]
+    },
+    {
+      title: t('admin.communicationMarketing'),
+      items: [
+        { title: t('admin.contactSubmissions'), url: "/admin-dashboard/contact-submissions", icon: Mail },
+        { title: t('admin.emailCampaigns'), url: "/admin-dashboard/email-campaigns", icon: Mail },
+        { title: t('admin.communicationCenter'), url: "/admin-dashboard/communication", icon: MessageSquare },
+        { title: t('admin.socialMediaIntegration'), url: "/admin-dashboard/social-media", icon: MessageSquare },
+        { title: t('admin.contentAutomation'), url: "/admin-dashboard/content-automation", icon: Bot },
+      ]
+    },
+    {
+      title: t('admin.liveMapManagement'),
+      items: [
+        { title: t('admin.liveMapMonitor'), url: "/admin-dashboard/live-map-monitor", icon: Map },
+        { title: t('admin.circleAnalytics'), url: "/admin-dashboard/circle-analytics", icon: Users },
+        { title: t('admin.geofenceManagement'), url: "/admin-dashboard/geofence-admin", icon: Navigation },
+        { title: t('admin.locationData'), url: "/admin-dashboard/location-admin", icon: History },
+      ]
+    },
+    {
+      title: t('admin.emergencySafety'),
+      items: [
+        { title: t('admin.emergencyIncidents'), url: "/admin-dashboard/emergencies", icon: AlertTriangle },
+        { title: t('admin.safetyMonitoring'), url: "/admin-dashboard/safety", icon: Shield },
+      ]
+    },
+    {
+      title: t('admin.productServices'),
+      items: [
+        { title: t('admin.products'), url: "/admin-dashboard/products", icon: Package },
+        { title: t('admin.regionalServices'), url: "/admin-dashboard/regional-services", icon: MapPin },
+        { title: t('admin.subscriptionPlans'), url: "/admin-dashboard/protection-plans", icon: Shield },
+        { title: t('admin.flickControl'), url: "/admin-dashboard/flic-control", icon: Bluetooth },
+      ]
+    },
+    {
+      title: t('admin.system'),
+      items: [
+        { title: t('admin.userActivity'), url: "/admin-dashboard/activity", icon: Activity },
+        { title: t('admin.systemSettings'), url: "/admin-dashboard/settings", icon: Settings },
+        { title: t('admin.reports'), url: "/admin-dashboard/reports", icon: FileText },
+        { title: t('admin.appTesting'), url: "/admin-dashboard/app-testing", icon: Smartphone },
+      ]
+    }
+  ];
+};
 
 function AdminSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  const { t } = useTranslation();
+  const adminMenuItems = useAdminMenuItems();
 
   const isActive = (path: string) => currentPath === path;
   const isGroupActive = (items: typeof adminMenuItems[0]['items']) => 
@@ -143,9 +150,9 @@ function AdminSidebar() {
             {state !== "collapsed" && (
               <div>
                 <h2 className="font-bold text-lg text-sidebar-foreground">
-                  ICE SOS Admin
+                  {t('dashboard.iceAdmin')}
                 </h2>
-                <p className="text-xs text-sidebar-foreground/60">Management Dashboard</p>
+                <p className="text-xs text-sidebar-foreground/60">{t('dashboard.managementDashboard')}</p>
               </div>
             )}
           </div>
@@ -204,6 +211,7 @@ function AdminSidebar() {
 
 export default function AdminLayout() {
   console.log('🏗️ AdminLayout is rendering');
+  const { t } = useTranslation();
   
   return (
     <SidebarProvider>
@@ -216,9 +224,9 @@ export default function AdminLayout() {
               <div className="h-6 w-px bg-border/60" />
               <div>
                 <h1 className="text-xl font-semibold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                  Admin Dashboard
+                  {t('admin.title')}
                 </h1>
-                <p className="text-xs text-muted-foreground">ICE SOS Lite Management Portal</p>
+                <p className="text-xs text-muted-foreground">{t('admin.subtitle')}</p>
               </div>
             </div>
             <div className="ml-auto flex items-center gap-4">
