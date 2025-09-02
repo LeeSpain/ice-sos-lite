@@ -273,9 +273,12 @@ Deno.serve(async (req: Request) => {
       console.warn('Subscriber lookup failed, defaulting to contacts route');
     }
 
-    // Allow explicit override via request body (optional)
+    // Allow explicit override via request body (optional), but gate by secret
     const bodyAny: any = body as any;
-    if (bodyAny?.route === 'call_center') route = 'call_center';
+    const callCenterEnabled = (Deno.env.get("CALL_CENTER_ENABLED") || "").toLowerCase() === "true";
+    if (callCenterEnabled && bodyAny?.route === 'call_center') route = 'call_center';
+    // Final safety: if secret not enabled, force contacts
+    if (!callCenterEnabled) route = 'contacts';
 
     if (route === 'call_center') {
       // Regional Call Centre path: call the call centre only (no phone calls to contacts), but still emailed above
