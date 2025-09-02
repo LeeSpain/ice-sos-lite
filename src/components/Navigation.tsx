@@ -65,7 +65,7 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
                 size="sm" 
                 className="bg-wellness text-black hover:bg-wellness/90 font-medium transition-all duration-200 hover:scale-105 shadow-lg"
               >
-                <Link to="/auth?tab=signup">{t('nav.joinNow', 'Join Now')}</Link>
+                <Link to="/ai-register">{t('nav.joinNow', 'Join Now')}</Link>
               </Button>
             </div>
           </div>
@@ -122,7 +122,7 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
                   size="sm" 
                   className="bg-wellness text-white hover:bg-wellness/90 font-medium transition-all duration-200 shadow-lg"
                 >
-                  <Link to="/auth?tab=signup" onClick={() => setIsMenuOpen(false)}>
+                  <Link to="/ai-register" onClick={() => setIsMenuOpen(false)}>
                     {t('nav.joinNow', 'Join Now')}
                   </Link>
                 </Button>
