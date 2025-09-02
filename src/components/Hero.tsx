@@ -38,19 +38,36 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
             
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+              {/* Join Now Button - Primary CTA */}
               <Button 
+                asChild
                 size="xl" 
                 className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+              >
+                <Link to="/auth?tab=signup">
+                  <Shield className="h-5 w-5 mr-2" />
+                  {t('nav.joinNow')}
+                </Link>
+              </Button>
+              
+              {/* Emma Chat Button */}
+              <Button 
+                size="xl" 
+                className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-white/20"
                 onClick={onEmmaClick}
               >
+                <Heart className="h-5 w-5 mr-2" />
                 {t('hero.ctaTalk')}
               </Button>
+              
+              {/* Meet Emma Video */}
               <IntroVideoModal 
                 defaultVideoId="meet-emma"
                 trigger={
                   <Button 
                     size="xl" 
-                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                    variant="outline"
+                    className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border-white/30 hover:border-white/50 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
                   >
                     <Play className="h-5 w-5 mr-2" />
                     Meet Emma
