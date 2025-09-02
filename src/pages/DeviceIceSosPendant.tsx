@@ -152,14 +152,8 @@ const DeviceIceSosPendant = () => {
       <section className="py-section bg-gradient-to-br from-primary/5 via-background to-guardian/5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center space-x-2 bg-primary/10 backdrop-blur-sm rounded-full px-6 py-3 mb-6 shadow-lg border border-primary/20">
-              <Zap className="h-5 w-5 text-primary" />
-              <span className="text-sm font-semibold text-primary">Enterprise-Grade Integration</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary via-guardian to-primary bg-clip-text text-transparent">
-              Smart Home Integration
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Smart Home Integration</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Seamlessly integrates with your existing smart home ecosystem. Professional-grade compatibility with zero additional hubs or complex setup required.
             </p>
           </div>
