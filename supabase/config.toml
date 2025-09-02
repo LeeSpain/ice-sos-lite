@@ -1,1 +1,4 @@
 project_id = "mqroziggaalltuzoyyao"
+
+[functions.riven-marketing]
+verify_jwt = false

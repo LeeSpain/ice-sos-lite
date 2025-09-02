@@ -171,6 +171,8 @@ const RivenMarketingAI: React.FC = () => {
   const [currentWorkflowId, setCurrentWorkflowId] = useState<string | null>(null);
   const [testingConnection, setTestingConnection] = useState(false);
   const [diagnosticsRunning, setDiagnosticsRunning] = useState(false);
+  const [providerStatus, setProviderStatus] = useState('');
+  const [diagnosticsStatus, setDiagnosticsStatus] = useState('');
   
   // Configuration state using site_content
   const { value: rivenConfig, save: saveRivenConfig, isLoading: configLoading } = useSiteContent('riven_ai_configuration', {
@@ -716,24 +718,24 @@ const RivenMarketingAI: React.FC = () => {
     setTestingConnection(true);
     try {
       const { data, error } = await supabase.functions.invoke('riven-marketing', {
-        body: { action: 'provider_status' }
+        body: { action: 'provider_status' },
+        headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : undefined
       });
       if (error) throw error as any;
 
       const openaiOk = data?.providers?.openai;
       const xaiOk = data?.providers?.xai;
+      const statusText = `OpenAI: ${openaiOk ? 'configured' : 'missing'} • xAI: ${xaiOk ? 'configured' : 'missing'}`;
+      setProviderStatus(statusText);
 
-      toast({
-        title: 'Provider Status',
-        description: `OpenAI: ${openaiOk ? 'configured' : 'missing'} • xAI: ${xaiOk ? 'configured' : 'missing'}`,
-      });
+      toast({ title: 'Provider Status', description: statusText });
     } catch (e) {
+      setProviderStatus('Failed to fetch provider status');
       handleNetworkError(e, 'Riven provider status');
     } finally {
       setTestingConnection(false);
     }
   };
-
   // Diagnostics: minimal end-to-end DB + auth test (requires admin)
   const runDiagnostics = async () => {
     setDiagnosticsRunning(true);
@@ -756,11 +758,13 @@ const RivenMarketingAI: React.FC = () => {
       await loadCampaigns();
       setActiveTab('campaigns');
 
+      setDiagnosticsStatus('Passed: test campaign created');
       toast({
         title: 'Diagnostics Passed',
         description: 'Created a test campaign successfully.'
       });
-    } catch (e) {
+    } catch (e: any) {
+      setDiagnosticsStatus(`Failed: ${e?.message || 'Unknown error'}`);
       handleNetworkError(e, 'Riven diagnostics');
     } finally {
       setDiagnosticsRunning(false);
@@ -988,6 +992,13 @@ const RivenMarketingAI: React.FC = () => {
           </Button>
         </div>
       </div>
+
+{(providerStatus || diagnosticsStatus) && (
+  <div className="text-sm text-muted-foreground -mt-2">
+    {providerStatus && <div>Providers: {providerStatus}</div>}
+    {diagnosticsStatus && <div>Diagnostics: {diagnosticsStatus}</div>}
+  </div>
+)}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid w-full grid-cols-6">
