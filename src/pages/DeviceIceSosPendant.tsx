@@ -401,6 +401,60 @@ const DeviceIceSosPendant = () => {
               </div>
             </div>
           </div>
+
+          {/* Pricing and Description Section */}
+          <div className="mt-16 bg-gradient-to-br from-card via-card/95 to-card/90 rounded-3xl p-10 shadow-2xl border border-primary/10">
+            <div className="text-center max-w-4xl mx-auto">
+              <h3 className="text-3xl font-bold mb-6">Complete Protection Package</h3>
+              
+              <div className="grid md:grid-cols-2 gap-8 items-center mb-8">
+                <div className="text-left">
+                  <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+                    The ICE SOS Bluetooth Pendant is a professional-grade emergency response device that provides instant protection with one-button activation. Featuring IP67 waterproof design, 7+ day battery life, and 100-meter Bluetooth range, this pendant ensures you're always connected to help when you need it most.
+                  </p>
+                  
+                  <p className="text-lg text-muted-foreground leading-relaxed">
+                    Complete with three wearing options - comfortable lanyard, secure carabiner clip, and sport wristbands - this comprehensive safety solution integrates seamlessly with your smartphone and smart home devices for 24/7 peace of mind.
+                  </p>
+                </div>
+                
+                <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-2xl p-8 text-center">
+                  <div className="mb-6">
+                    <div className="text-4xl font-bold text-primary mb-2">€59.99</div>
+                    <div className="text-lg text-muted-foreground">+ €4.99 shipping</div>
+                    <div className="text-sm text-muted-foreground mt-2">One-time purchase • No monthly fees</div>
+                  </div>
+                  
+                  <div className="space-y-3 mb-6">
+                    <div className="flex items-center justify-center space-x-2">
+                      <CheckCircle2 className="h-4 w-4 text-wellness" />
+                      <span className="text-sm">Complete package with all accessories</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-2">
+                      <CheckCircle2 className="h-4 w-4 text-wellness" />
+                      <span className="text-sm">2-year warranty included</span>
+                    </div>
+                    <div className="flex items-center justify-center space-x-2">
+                      <CheckCircle2 className="h-4 w-4 text-wellness" />
+                      <span className="text-sm">Free professional setup support</span>
+                    </div>
+                  </div>
+                  
+                  {comingSoon ? (
+                    <Badge className="px-6 py-3 text-lg font-semibold bg-secondary text-white">Coming Soon</Badge>
+                  ) : (
+                    <Button 
+                      asChild 
+                      size="lg" 
+                      className="w-full bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
+                    >
+                      <Link to="/ai-register">Join Now - Get Protected Today</Link>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
