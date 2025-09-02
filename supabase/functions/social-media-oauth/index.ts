@@ -7,40 +7,33 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false },
-      global: { headers: { Authorization: req.headers.get('Authorization') ?? '' } }
-    });
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    );
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      throw new Error('Authentication required');
-    }
+    const { platform, action, redirectUri, code, state } = await req.json();
 
-    const { action, platform } = await req.json();
+    console.log(`Social OAuth request: ${action} for ${platform}`);
 
     switch (action) {
       case 'initiate':
-        return await initiateOAuth(platform, user.id);
-      case 'status':
-        return await getAccountStatus(user.id, supabase);
+        return await initiateOAuth(platform, redirectUri, supabaseClient);
+      case 'callback':
+        return await handleOAuthCallback(platform, code, state, supabaseClient);
       case 'disconnect':
-        return await disconnectAccount(platform, user.id, supabase);
+        return await disconnectAccount(platform, supabaseClient);
       default:
-        throw new Error('Invalid action specified');
+        throw new Error('Invalid action');
     }
-
   } catch (error) {
-    console.error('Error in social-media-oauth function:', error);
+    console.error('Social OAuth error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -48,74 +41,107 @@ serve(async (req) => {
   }
 });
 
-async function initiateOAuth(platform: string, userId: string) {
-  // For now, simulate OAuth connection
-  // In production, this would redirect to actual OAuth providers
-  
-  const authUrls = {
-    facebook: 'https://www.facebook.com/v18.0/dialog/oauth',
-    instagram: 'https://api.instagram.com/oauth/authorize', 
-    linkedin: 'https://www.linkedin.com/oauth/v2/authorization',
-    twitter: 'https://twitter.com/i/oauth2/authorize'
+async function initiateOAuth(platform: string, redirectUri: string, supabase: any) {
+  const platformConfigs = {
+    facebook: {
+      authUrl: 'https://www.facebook.com/v18.0/dialog/oauth',
+      clientId: Deno.env.get('FACEBOOK_CLIENT_ID'),
+      scopes: 'pages_manage_posts,pages_read_engagement'
+    },
+    twitter: {
+      authUrl: 'https://twitter.com/i/oauth2/authorize',
+      clientId: Deno.env.get('TWITTER_CLIENT_ID'),
+      scopes: 'tweet.read tweet.write users.read'
+    },
+    linkedin: {
+      authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
+      clientId: Deno.env.get('LINKEDIN_CLIENT_ID'),
+      scopes: 'w_member_social r_liteprofile'
+    },
+    instagram: {
+      authUrl: 'https://api.instagram.com/oauth/authorize',
+      clientId: Deno.env.get('INSTAGRAM_CLIENT_ID'),
+      scopes: 'user_profile,user_media'
+    },
+    youtube: {
+      authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+      clientId: Deno.env.get('YOUTUBE_CLIENT_ID'),
+      scopes: 'https://www.googleapis.com/auth/youtube.upload'
+    }
   };
 
-  const authUrl = authUrls[platform as keyof typeof authUrls];
-  
-  if (!authUrl) {
+  const config = platformConfigs[platform];
+  if (!config) {
     throw new Error(`Unsupported platform: ${platform}`);
   }
 
-  // For demo purposes, we'll return a mock OAuth URL
-  // In production, this would include proper client_id, redirect_uri, etc.
-  const mockAuthUrl = `${authUrl}?client_id=demo&redirect_uri=demo&scope=demo&state=${userId}`;
+  const state = crypto.randomUUID();
+  const params = new URLSearchParams({
+    client_id: config.clientId || '',
+    redirect_uri: redirectUri,
+    scope: config.scopes,
+    response_type: 'code',
+    state: state
+  });
 
-  return new Response(JSON.stringify({ 
-    authUrl: mockAuthUrl,
-    success: true 
-  }), {
+  const authUrl = `${config.authUrl}?${params.toString()}`;
+
+  return new Response(JSON.stringify({ authUrl, state }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   });
 }
 
-async function getAccountStatus(userId: string, supabase: any) {
+async function handleOAuthCallback(platform: string, code: string, state: string, supabase: any) {
+  // Mock implementation - would exchange code for access token
+  console.log(`OAuth callback for ${platform} with code: ${code.substring(0, 10)}...`);
+  
+  // Insert or update social media account
+  const accountData = {
+    platform: platform,
+    account_name: `${platform}_user_${Date.now()}`,
+    account_status: 'connected',
+    is_active: true,
+    access_token: `mock_token_${platform}_${Date.now()}`,
+    last_connected: new Date().toISOString(),
+    follower_count: Math.floor(Math.random() * 10000) + 1000,
+    posting_permissions: { post: true, story: true },
+    rate_limits: { daily: 100, hourly: 10 }
+  };
+
   const { data, error } = await supabase
     .from('social_media_accounts')
-    .select('platform, account_name, account_status, is_active, follower_count, last_sync_at')
-    .eq('user_id', userId)
-    .eq('is_active', true);
+    .upsert(accountData, { 
+      onConflict: 'platform',
+      ignoreDuplicates: false 
+    })
+    .select()
+    .single();
 
   if (error) {
-    throw new Error(`Failed to get account status: ${error.message}`);
+    console.error('Error saving social account:', error);
+    throw error;
   }
 
-  return new Response(JSON.stringify({ 
-    accounts: data || [],
-    success: true 
-  }), {
+  return new Response(JSON.stringify({ success: true, account: data }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   });
 }
 
-async function disconnectAccount(platform: string, userId: string, supabase: any) {
+async function disconnectAccount(platform: string, supabase: any) {
   const { error } = await supabase
     .from('social_media_accounts')
     .update({ 
-      is_active: false, 
-      account_status: 'disconnected',
-      access_token: null,
-      refresh_token: null
+      is_active: false,
+      account_status: 'disconnected'
     })
-    .eq('user_id', userId)
     .eq('platform', platform);
 
   if (error) {
-    throw new Error(`Failed to disconnect account: ${error.message}`);
+    console.error('Error disconnecting account:', error);
+    throw error;
   }
 
-  return new Response(JSON.stringify({ 
-    success: true, 
-    message: `${platform} account disconnected` 
-  }), {
+  return new Response(JSON.stringify({ success: true }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   });
 }

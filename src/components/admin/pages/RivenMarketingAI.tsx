@@ -250,6 +250,51 @@ const RivenMarketingAI: React.FC = () => {
 
   useEffect(() => {
     loadAllData();
+    
+    // Set up real-time subscriptions
+    const campaignsChannel = supabase
+      .channel('campaigns-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'marketing_campaigns'
+      }, (payload) => {
+        console.log('Campaign update:', payload);
+        loadCampaigns();
+      })
+      .subscribe();
+
+    const contentChannel = supabase
+      .channel('content-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'marketing_content'
+      }, (payload) => {
+        console.log('Content update:', payload);
+        loadContents();
+      })
+      .subscribe();
+
+    const workflowChannel = supabase
+      .channel('workflow-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'workflow_steps'
+      }, (payload) => {
+        console.log('Workflow update:', payload);
+        if (currentWorkflowId) {
+          loadWorkflowSteps(currentWorkflowId);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(campaignsChannel);
+      supabase.removeChannel(contentChannel);
+      supabase.removeChannel(workflowChannel);
+    };
   }, []);
 
   useEffect(() => {
@@ -593,37 +638,49 @@ const RivenMarketingAI: React.FC = () => {
 
   const publishContent = async (contentId: string) => {
     try {
-      // Simulate publishing to social platform
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Update content status to published
-      const { error } = await supabase
-        .from('marketing_content')
-        .update({ 
-          status: 'published',
-          published_at: new Date().toISOString()
-        })
-        .eq('id', contentId);
+      const response = await supabase.functions.invoke('content-publisher', {
+        body: { action: 'publish', contentId }
+      });
 
-      if (error) throw error;
-      await loadContents();
-      
+      if (response.error) throw response.error;
+
       toast({
         title: "Content Published",
-        description: "Content has been successfully posted to social media!",
+        description: "Content has been published successfully"
       });
+
+      // Real-time will handle the update automatically
     } catch (error) {
       console.error('Error publishing content:', error);
-      
-      // Create error notification for publish failure
-      await createNotification(
-        'Publishing Failed',
-        `Failed to publish content to social media: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'error',
-        'high',
-        `/admin-dashboard/riven-marketing`,
-        'Retry Publishing'
-      );
+      toast({
+        title: "Error",
+        description: "Failed to publish content",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const scheduleContent = async (contentId: string, scheduledTime: string) => {
+    try {
+      const response = await supabase.functions.invoke('content-publisher', {
+        body: { action: 'schedule', contentId, scheduledTime }
+      });
+
+      if (response.error) throw response.error;
+
+      toast({
+        title: "Content Scheduled",
+        description: "Content has been scheduled for posting"
+      });
+
+      // Real-time will handle the update automatically
+    } catch (error) {
+      console.error('Error scheduling content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to schedule content",
+        variant: "destructive"
+      });
     }
   };
 
@@ -1433,10 +1490,25 @@ const RivenMarketingAI: React.FC = () => {
                     </Badge>
                     
                     {content.status === 'draft' && (
-                      <Button size="sm" onClick={() => publishContent(content.id)}>
-                        <Share2 className="h-4 w-4 mr-1" />
-                        Publish
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={() => publishContent(content.id)}>
+                          <Share2 className="h-4 w-4 mr-1" />
+                          Publish
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            const scheduledTime = prompt("Enter scheduled time (YYYY-MM-DD HH:MM):");
+                            if (scheduledTime) {
+                              scheduleContent(content.id, new Date(scheduledTime).toISOString());
+                            }
+                          }}
+                        >
+                          <Timer className="h-4 w-4 mr-1" />
+                          Schedule
+                        </Button>
+                      </div>
                     )}
                   </div>
                 </CardContent>

@@ -38,14 +38,33 @@ serve(async (req) => {
 });
 
 async function publishContent(contentId: string, supabase: any) {
-  // Mock implementation - would integrate with actual social media APIs
+  // Add to posting queue for immediate processing
   await supabase
-    .from('marketing_content')
-    .update({ 
-      status: 'published',
-      published_at: new Date().toISOString()
-    })
-    .eq('id', contentId);
+    .from('posting_queue')
+    .insert({
+      content_id: contentId,
+      scheduled_time: new Date().toISOString(),
+      status: 'scheduled',
+      platform: 'auto' // Will be determined from content
+    });
+
+  // Trigger posting processor
+  try {
+    const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/posting-processor`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ action: 'post_now', contentId })
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to trigger posting processor');
+    }
+  } catch (error) {
+    console.error('Error triggering posting processor:', error);
+  }
 
   return new Response(JSON.stringify({ success: true }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -53,13 +72,30 @@ async function publishContent(contentId: string, supabase: any) {
 }
 
 async function scheduleContent(contentId: string, scheduledTime: string, supabase: any) {
+  // Get content platform
+  const { data: content } = await supabase
+    .from('marketing_content')
+    .select('platform')
+    .eq('id', contentId)
+    .single();
+
   await supabase
     .from('posting_queue')
     .insert({
       content_id: contentId,
       scheduled_time: scheduledTime,
+      platform: content?.platform || 'auto',
       status: 'scheduled'
     });
+
+  // Update content status
+  await supabase
+    .from('marketing_content')
+    .update({
+      status: 'scheduled',
+      scheduled_time: scheduledTime
+    })
+    .eq('id', contentId);
 
   return new Response(JSON.stringify({ success: true }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
