@@ -60,16 +60,27 @@ export const MobileAppInstructions = () => {
                 <div>npm install</div>
                 <div>npx cap add ios  # for iOS</div>
                 <div>npx cap add android  # for Android</div>
+                <div>npx cap update ios  # update iOS dependencies</div>
+                <div>npx cap update android  # update Android dependencies</div>
               </div>
             </div>
 
             <div className="border-l-4 border-blue-500 pl-4">
-              <h4 className="font-semibold">Step 3: Build and Sync</h4>
+              <h4 className="font-semibold">Step 3: Build and Deploy</h4>
               <div className="bg-gray-100 p-3 rounded-md font-mono text-sm mt-2">
                 <div>npm run build</div>
                 <div>npx cap sync</div>
-                <div>npx cap run ios  # or android</div>
+                <div>npx cap run ios  # for iOS device/simulator</div>
+                <div>npx cap run android  # for Android device/emulator</div>
               </div>
+            </div>
+
+            <div className="border-l-4 border-green-500 pl-4">
+              <h4 className="font-semibold">🔥 Hot Reload Enabled</h4>
+              <p className="text-sm text-muted-foreground">
+                Your mobile app will automatically reload changes from the Lovable sandbox! 
+                After initial setup, you only need to run <code className="bg-gray-200 px-1 rounded">npx cap sync</code> when pulling new code.
+              </p>
             </div>
           </div>
         </CardContent>
