@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Layers } from "lucide-react";
 
 interface MapMarker {
   id: string;
@@ -17,6 +20,20 @@ interface MapViewProps {
   zoom?: number;
 }
 
+type MapStyle = {
+  id: string;
+  name: string;
+  style: string;
+}
+
+const MAP_STYLES: MapStyle[] = [
+  { id: 'satellite', name: 'Satellite', style: 'mapbox://styles/mapbox/satellite-streets-v12' },
+  { id: 'terrain', name: 'Terrain', style: 'mapbox://styles/mapbox/outdoors-v12' },
+  { id: 'streets', name: 'Streets', style: 'mapbox://styles/mapbox/streets-v12' },
+  { id: 'light', name: 'Light', style: 'mapbox://styles/mapbox/light-v11' },
+  { id: 'dark', name: 'Dark', style: 'mapbox://styles/mapbox/dark-v11' }
+];
+
 export function useMapProvider() {
   const MapView: React.FC<MapViewProps> = ({ className, markers, center, zoom = 13 }) => {
     const mapContainer = useRef<HTMLDivElement>(null);
@@ -24,6 +41,7 @@ export function useMapProvider() {
     const markersRef = useRef<mapboxgl.Marker[]>([]);
     const [mapboxToken, setMapboxToken] = useState<string | null>(null);
     const [tokenError, setTokenError] = useState<string | null>(null);
+    const [currentStyle, setCurrentStyle] = useState<MapStyle>(MAP_STYLES[0]);
 
     // Fetch Mapbox token
     useEffect(() => {
@@ -60,31 +78,27 @@ export function useMapProvider() {
 
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/satellite-streets-v12', // Colorful satellite style
+        style: currentStyle.style,
         center: [mapCenter.lng, mapCenter.lat],
         zoom: zoom,
         attributionControl: false
       });
 
-      // Add navigation controls
+      // Add navigation controls only
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-      // Add geolocate control
-      map.current.addControl(
-        new mapboxgl.GeolocateControl({
-          positionOptions: {
-            enableHighAccuracy: true
-          },
-          trackUserLocation: true,
-          showUserHeading: true
-        }),
-        'top-right'
-      );
 
       return () => {
         map.current?.remove();
       };
-    }, []);
+    }, [currentStyle]);
+
+    // Handle style changes
+    const handleStyleChange = (style: MapStyle) => {
+      setCurrentStyle(style);
+      if (map.current) {
+        map.current.setStyle(style.style);
+      }
+    };
 
     // Update markers when they change
     useEffect(() => {
@@ -140,11 +154,35 @@ export function useMapProvider() {
     }
 
     return (
-      <div 
-        ref={mapContainer} 
-        className={className || "h-full w-full"}
-        style={{ minHeight: '400px' }}
-      />
+      <div className={`relative ${className || "h-full w-full"}`} style={{ minHeight: '400px' }}>
+        <div 
+          ref={mapContainer} 
+          className="absolute inset-0"
+        />
+        
+        {/* Map Style Selector */}
+        <div className="absolute top-4 left-4 z-10">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="bg-background/90 backdrop-blur-sm">
+                <Layers className="h-4 w-4 mr-2" />
+                {currentStyle.name}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {MAP_STYLES.map((style) => (
+                <DropdownMenuItem
+                  key={style.id}
+                  onClick={() => handleStyleChange(style)}
+                  className={currentStyle.id === style.id ? "bg-accent" : ""}
+                >
+                  {style.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
     );
   };
   
