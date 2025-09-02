@@ -59,6 +59,37 @@
     "productSpecs": "Volledige productspecificaties en installatie-informatie"
   },
   "hero": {
+    "badge": "Apparaatvrije Noodbescherming",
+    "titlePart1": "Transformeer Je Telefoon Tot een",
+    "titleEmphasis": "Levensreddende",
+    "titlePart2": "Assistent",
+    "description": "ICE SOS Lite biedt meertalige noodbescherming met AI Guardian, professionele callcenter toegang en familieconnectiviteit — wereldwijd beschikbaar.",
+    "ctaJoin": "Doe vandaag mee",
+    "ctaTalk": "Praat met Emma",
+    "meetEmma": "Ontmoet Emma"
+  },
+  "features": {
+    "familyTracker": "Familie Tracker",
+    "grandmaSafe": "Oma is veilig",
+    "atHome": "Thuis • 2 min geleden",
+    "emergencyActive": "Noodgeval Actief",
+    "responding": "Aan het reageren",
+    "liveLocation": "Live Locatie",
+    "realtimeTracking": "Real-time familie tracking",
+    "instantAlerts": "Directe Waarschuwingen",
+    "emergencyNotifications": "Noodmeldingen",
+    "keepFamilyConnected": "Houd Je Familie Verbonden & Beschermd",
+    "familyDescription": "Zie precies waar je dierbaren zijn, krijg directe waarschuwingen wanneer ze hulp nodig hebben, en coördineer zorg naadloos binnen je hele familienetwerk.",
+    "familyNetwork": "Familie Netwerk",
+    "familyNetworkDesc": "Verbind alle familieleden met veilige, rolgebaseerde toegang tot locatie en noodinformatie.",
+    "emergencyAlerts": "Noodwaarschuwingen",
+    "emergencyAlertsDesc": "Directe meldingen wanneer iemand SOS activeert, met locatiegegevens en responscoördinatie.",
+    "monitoring247": "24/7 Monitoring",
+    "monitoring247Desc": "Professionele monitoring en familiewaarschuwingen zorgen ervoor dat er altijd iemand over je dierbaren waakt.",
+    "familyVideo": "Familie Video",
+    "connectFirstFree": "Verbind je eerste familielid gratis • Geen installatiekosten"
+  },
+  "hero": {
     "badge": "Noodbescherming zonder apparaat",
     "titlePart1": "Verander je telefoon in een",
     "titleEmphasis": "levensredende",
@@ -464,8 +495,14 @@
         "routineCare": {
           "title": "Routine Zorgbeheer",
           "description": "Coördineer dagelijkse zorgactiviteiten, medicatie herinneringen en gezondheidsmonitoring."
-        }
-      }
+  },
+  "finalCta": {
+    "title": "Klaar om je Noodnetwerk te Verbinden?",
+    "description": "Sluit je aan bij duizenden die vertrouwen op spraakgeactiveerde noodbescherming om henzelf en hun dierbaren veilig te houden.",
+    "startProtection": "Start Beschermingsplan",
+    "connectFamily": "Verbind Familie"
+  }
+}
     }
   }
 }

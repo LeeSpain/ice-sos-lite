@@ -65,7 +65,7 @@ const Features = () => {
                 <div className="w-full h-full bg-gradient-to-b from-gray-50 to-white rounded-[2.5rem] overflow-hidden relative">
                   {/* Status Bar */}
                   <div className="flex justify-between items-center px-6 py-3 bg-primary text-white text-sm font-medium">
-                    <span>Family Tracker</span>
+                    <span>{t('features.familyTracker')}</span>
                     <div className="flex items-center gap-1">
                       <div className="flex gap-0.5">
                         <div className="w-1 h-1 bg-white rounded-full"></div>
@@ -163,8 +163,8 @@ const Features = () => {
                           <img src={grandmaAvatar} alt="Grandma" className="w-full h-full object-cover rounded-full" />
                         </div>
                         <div>
-                          <p className="font-semibold text-xs text-green-800">Grandma is safe</p>
-                          <p className="text-xs text-green-600">At home • 2 min ago</p>
+                          <p className="font-semibold text-xs text-green-800">{t('features.grandmaSafe')}</p>
+                          <p className="text-xs text-green-600">{t('features.atHome')}</p>
                         </div>
                       </div>
                     </div>
@@ -176,9 +176,9 @@ const Features = () => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
                           <Phone className="h-4 w-4 mr-2" />
-                          <span className="font-medium text-sm">Emergency Active</span>
+                          <span className="font-medium text-sm">{t('features.emergencyActive')}</span>
                         </div>
-                        <div className="text-xs bg-white/20 px-2 py-1 rounded-full">Responding</div>
+                        <div className="text-xs bg-white/20 px-2 py-1 rounded-full">{t('features.responding')}</div>
                       </div>
                     </div>
                   </div>
@@ -189,17 +189,17 @@ const Features = () => {
               <div className="absolute -left-8 top-20 bg-white rounded-xl p-3 shadow-xl border border-wellness/20 max-w-44">
                 <div className="flex items-center mb-1">
                   <MapPin className="h-4 w-4 text-wellness mr-2" />
-                  <span className="font-semibold text-xs">Live Location</span>
+                  <span className="font-semibold text-xs">{t('features.liveLocation')}</span>
                 </div>
-                <p className="text-xs text-gray-600">Real-time family tracking</p>
+                <p className="text-xs text-gray-600">{t('features.realtimeTracking')}</p>
               </div>
 
               <div className="absolute -right-8 bottom-32 bg-white rounded-xl p-3 shadow-xl border border-primary/20 max-w-44">
                 <div className="flex items-center mb-1">
                   <Shield className="h-4 w-4 text-primary mr-2" />
-                  <span className="font-semibold text-xs">Instant Alerts</span>
+                  <span className="font-semibold text-xs">{t('features.instantAlerts')}</span>
                 </div>
-                <p className="text-xs text-gray-600">Emergency notifications</p>
+                <p className="text-xs text-gray-600">{t('features.emergencyNotifications')}</p>
               </div>
             </div>
 
@@ -207,10 +207,10 @@ const Features = () => {
             <div className="order-1 lg:order-2 text-center lg:text-left">
               <div className="mb-8">
                 <h3 className="text-2xl md:text-3xl font-bold mb-4 text-foreground">
-                  Keep Your Family Connected & Protected
+                  {t('features.keepFamilyConnected')}
                 </h3>
                 <p className="text-lg text-muted-foreground mb-6">
-                  See exactly where your loved ones are, get instant alerts when they need help, and coordinate care seamlessly across your entire family network.
+                  {t('features.familyDescription')}
                 </p>
               </div>
 
@@ -220,8 +220,8 @@ const Features = () => {
                     <Users className="h-6 w-6 text-wellness" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg mb-2">Family Network</h4>
-                    <p className="text-muted-foreground">Connect all family members with secure, role-based access to location and emergency information.</p>
+                    <h4 className="font-semibold text-lg mb-2">{t('features.familyNetwork')}</h4>
+                    <p className="text-muted-foreground">{t('features.familyNetworkDesc')}</p>
                   </div>
                 </div>
 
@@ -230,8 +230,8 @@ const Features = () => {
                     <Heart className="h-6 w-6 text-emergency" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg mb-2">Emergency Alerts</h4>
-                    <p className="text-muted-foreground">Instant notifications when someone activates SOS, with location data and response coordination.</p>
+                    <h4 className="font-semibold text-lg mb-2">{t('features.emergencyAlerts')}</h4>
+                    <p className="text-muted-foreground">{t('features.emergencyAlertsDesc')}</p>
                   </div>
                 </div>
 
@@ -240,8 +240,8 @@ const Features = () => {
                     <Clock className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-lg mb-2">24/7 Monitoring</h4>
-                    <p className="text-muted-foreground">Professional monitoring and family alerts ensure someone is always watching over your loved ones.</p>
+                    <h4 className="font-semibold text-lg mb-2">{t('features.monitoring247')}</h4>
+                    <p className="text-muted-foreground">{t('features.monitoring247Desc')}</p>
                   </div>
                 </div>
               </div>
@@ -266,13 +266,13 @@ const Features = () => {
                         className="bg-wellness text-black hover:bg-wellness/90 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold px-8 py-4"
                       >
                         <Play className="h-5 w-5 mr-2" />
-                        Family Video
+                        {t('features.familyVideo')}
                       </Button>
                     }
                   />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Connect your first family member for free • No setup fees
+                  {t('features.connectFirstFree')}
                 </p>
               </div>
             </div>

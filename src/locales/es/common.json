@@ -59,6 +59,37 @@
     "productSpecs": "Especificaciones completas del producto e información de configuración"
   },
   "hero": {
+    "badge": "Protección de Emergencia Sin Dispositivos",
+    "titlePart1": "Transforma Tu Teléfono en un",
+    "titleEmphasis": "Asistente Salvavidas",
+    "titlePart2": "",
+    "description": "ICE SOS Lite proporciona protección de emergencia multilingüe con AI Guardian, acceso al centro de llamadas profesional y conectividad familiar — disponible globalmente.",
+    "ctaJoin": "Únete hoy",
+    "ctaTalk": "Hablar con Emma",
+    "meetEmma": "Conoce a Emma"
+  },
+  "features": {
+    "familyTracker": "Rastreador Familiar",
+    "grandmaSafe": "La abuela está segura",
+    "atHome": "En casa • hace 2 min",
+    "emergencyActive": "Emergencia Activa",
+    "responding": "Respondiendo",
+    "liveLocation": "Ubicación en Vivo",
+    "realtimeTracking": "Seguimiento familiar en tiempo real",
+    "instantAlerts": "Alertas Instantáneas",
+    "emergencyNotifications": "Notificaciones de emergencia",
+    "keepFamilyConnected": "Mantén a Tu Familia Conectada y Protegida",
+    "familyDescription": "Ve exactamente dónde están tus seres queridos, recibe alertas instantáneas cuando necesiten ayuda, y coordina el cuidado sin problemas en toda tu red familiar.",
+    "familyNetwork": "Red Familiar",
+    "familyNetworkDesc": "Conecta a todos los miembros de la familia con acceso seguro basado en roles a la ubicación e información de emergencia.",
+    "emergencyAlerts": "Alertas de Emergencia",
+    "emergencyAlertsDesc": "Notificaciones instantáneas cuando alguien activa SOS, con datos de ubicación y coordinación de respuesta.",
+    "monitoring247": "Monitoreo 24/7",
+    "monitoring247Desc": "El monitoreo profesional y las alertas familiares aseguran que siempre alguien esté cuidando a tus seres queridos.",
+    "familyVideo": "Video Familiar",
+    "connectFirstFree": "Conecta a tu primer miembro familiar gratis • Sin costos de instalación"
+  },
+  "hero": {
     "badge": "Protección de emergencia sin dispositivo",
     "titlePart1": "Convierte tu teléfono en un",
     "titleEmphasis": "salvavidas",
@@ -495,8 +526,14 @@
         "routineCare": {
           "title": "Gestión de Atención Rutinaria",
           "description": "Coordina actividades de atención diaria, recordatorios de medicación y monitoreo de salud."
-        }
-      }
+  },
+  "finalCta": {
+    "title": "¿Listo para Conectar tu Red de Emergencia?",
+    "description": "Únete a miles que confían en la protección de emergencia activada por voz para mantener seguros a ellos y sus seres queridos.",
+    "startProtection": "Iniciar Plan de Protección",
+    "connectFamily": "Conectar Familia"
+  }
+}
     }
   }
 }

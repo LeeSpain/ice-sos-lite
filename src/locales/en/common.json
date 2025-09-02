@@ -11,7 +11,13 @@
     "introVideo": "Intro Video"
   },
   "footer": {
+    "companyDescription": "Emergency response and family safety platform providing peace of mind through advanced protection services.",
     "quickLinks": "Quick Links",
+    "blog": "Blog",
+    "safetyProducts": "Safety Products", 
+    "regionalServices": "Regional Services",
+    "familyCarerAccess": "Family & Carer Access",
+    "familyDashboard": "Family Dashboard",
     "pricing": "Pricing",
     "devices": "Devices",
     "support": "Support",
@@ -22,6 +28,7 @@
     "membersDashboard": "Members Dashboard",
     "adminDashboard": "Admin Dashboard",
     "connect": "Connect",
+    "contactUs": "Contact Us",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "supportLink": "Support",
@@ -66,9 +73,29 @@
     "titlePart2": "Assistant",
     "description": "ICE SOS Lite provides multilingual emergency protection with AI Guardian, professional call center access, and family connectivity — globally available.",
     "ctaJoin": "Join Today",
-    "ctaTalk": "Talk To Emma"
+    "ctaTalk": "Talk To Emma",
+    "meetEmma": "Meet Emma"
   },
   "features": {
+    "familyTracker": "Family Tracker",
+    "grandmaSafe": "Grandma is safe",
+    "atHome": "At home • 2 min ago",
+    "emergencyActive": "Emergency Active",
+    "responding": "Responding",
+    "liveLocation": "Live Location",
+    "realtimeTracking": "Real-time family tracking",
+    "instantAlerts": "Instant Alerts",
+    "emergencyNotifications": "Emergency notifications",
+    "keepFamilyConnected": "Keep Your Family Connected & Protected",
+    "familyDescription": "See exactly where your loved ones are, get instant alerts when they need help, and coordinate care seamlessly across your entire family network.",
+    "familyNetwork": "Family Network",
+    "familyNetworkDesc": "Connect all family members with secure, role-based access to location and emergency information.",
+    "emergencyAlerts": "Emergency Alerts", 
+    "emergencyAlertsDesc": "Instant notifications when someone activates SOS, with location data and response coordination.",
+    "monitoring247": "24/7 Monitoring",
+    "monitoring247Desc": "Professional monitoring and family alerts ensure someone is always watching over your loved ones.",
+    "familyVideo": "Family Video",
+    "connectFirstFree": "Connect your first family member for free • No setup fees",
     "title": "Complete Emergency Protection Suite",
     "description": "Professional emergency protection with global call center access, Bluetooth device support, and AI monitoring — starting from €4.99/month with worldwide coverage.",
     "items": [
@@ -500,8 +527,14 @@
         "routineCare": {
           "title": "Routine Care Management",
           "description": "Coordinate daily care activities, medication reminders, and health monitoring."
-        }
-      }
+  },
+  "finalCta": {
+    "title": "Ready to Connect Your Emergency Network?",
+    "description": "Join thousands who trust voice-activated emergency protection to keep them and their loved ones safe.",
+    "startProtection": "Start Protection Plan",
+    "connectFamily": "Connect Family"
+  }
+}
     }
   }
 }

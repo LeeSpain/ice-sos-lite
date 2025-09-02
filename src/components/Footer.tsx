@@ -67,7 +67,7 @@ const { t } = useTranslation();
               <span className="text-lg font-bold font-poppins text-foreground">{(value ?? defaults).appName}</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Emergency response and family safety platform providing peace of mind through advanced protection services.
+              {t('footer.companyDescription')}
             </p>
           </div>
 
@@ -76,19 +76,19 @@ const { t } = useTranslation();
             <h3 className="font-semibold text-foreground">{t('footer.quickLinks')}</h3>
             <div className="space-y-2">
               <Link to="/blog" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Blog
+                {t('footer.blog')}
               </Link>
               <Link to="/devices/ice-sos-pendant" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Safety Products
+                {t('footer.safetyProducts')}
               </Link>
               <Link to="/regional-center/spain" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Regional Services
+                {t('footer.regionalServices')}
               </Link>
               <Link to="/family-carer-access" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Family & Carer Access
+                {t('footer.familyCarerAccess')}
               </Link>
               <Link to="/family-dashboard" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Family Dashboard
+                {t('footer.familyDashboard')}
               </Link>
             </div>
           </div>
@@ -134,7 +134,7 @@ const { t } = useTranslation();
             <div className="space-y-2">
               <Link to="/contact" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
                 <Mail className="h-4 w-4" />
-                Contact Us
+                {t('footer.contactUs')}
               </Link>
             </div>
           </div>
