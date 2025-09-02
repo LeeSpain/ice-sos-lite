@@ -18,17 +18,18 @@ import {
   Smartphone,
   Tablet
 } from 'lucide-react';
-import { useVideoAnalytics, useVideoEvents } from '@/hooks/useVideoAnalytics';
+import { useVideoAnalytics, useVideoEvents, useVideoKpis24h } from '@/hooks/useVideoAnalytics';
 import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
 const VideoAnalyticsPage = () => {
   const { data: videoAnalytics, isLoading: isLoadingAnalytics, refetch: refetchAnalytics } = useVideoAnalytics();
-  const { data: recentEvents, isLoading: isLoadingEvents } = useVideoEvents(100);
+  const { data: recentEvents, isLoading: isLoadingEvents, refetch: refetchEvents } = useVideoEvents(100);
+  const { data: kpis24h, refetch: refetchKpis } = useVideoKpis24h();
 
   const isLoading = isLoadingAnalytics || isLoadingEvents;
 
   const refreshAllData = async () => {
-    await refetchAnalytics();
+    await Promise.all([refetchAnalytics(), refetchEvents(), refetchKpis()]);
   };
 
   // Calculate totals
@@ -37,6 +38,8 @@ const VideoAnalyticsPage = () => {
   const avgCompletionRate = videoAnalytics?.length ? 
     videoAnalytics.reduce((sum, video) => sum + video.completion_rate, 0) / videoAnalytics.length : 0;
   const totalUniqueViewers = videoAnalytics?.reduce((sum, video) => sum + video.unique_viewers, 0) || 0;
+
+  const lastEventAt = recentEvents && recentEvents.length > 0 ? new Date(recentEvents[0].created_at).toLocaleTimeString() : '—';
 
   // Get device breakdown from recent events
   const deviceBreakdown = recentEvents?.reduce((acc, event) => {
@@ -116,6 +119,8 @@ const VideoAnalyticsPage = () => {
             </p>
           </div>
           <div className="flex items-center space-x-2">
+            <Badge variant="default" className="text-xs">Live</Badge>
+            <Badge variant="outline" className="text-xs">Last event: {lastEventAt}</Badge>
             <Badge variant="outline" className="text-xs">
               {videoAnalytics?.length || 0} videos tracked
             </Badge>
