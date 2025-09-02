@@ -1184,6 +1184,183 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_escalation_log: {
+        Row: {
+          action_taken: string
+          created_at: string
+          event_id: string
+          id: string
+          metadata: Json | null
+          provider_id: string
+          response_time_ms: number | null
+          service_request_id: string | null
+          success: boolean
+        }
+        Insert: {
+          action_taken: string
+          created_at?: string
+          event_id: string
+          id?: string
+          metadata?: Json | null
+          provider_id: string
+          response_time_ms?: number | null
+          service_request_id?: string | null
+          success?: boolean
+        }
+        Update: {
+          action_taken?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          metadata?: Json | null
+          provider_id?: string
+          response_time_ms?: number | null
+          service_request_id?: string | null
+          success?: boolean
+        }
+        Relationships: []
+      }
+      emergency_service_requests: {
+        Row: {
+          additional_info: string | null
+          created_at: string
+          emergency_type: string
+          event_id: string
+          id: string
+          location_data: Json | null
+          provider_id: string
+          provider_name: string
+          request_timestamp: string
+          response_data: Json | null
+          severity: string
+          status: string
+          updated_at: string
+          user_profile: Json | null
+        }
+        Insert: {
+          additional_info?: string | null
+          created_at?: string
+          emergency_type: string
+          event_id: string
+          id?: string
+          location_data?: Json | null
+          provider_id: string
+          provider_name: string
+          request_timestamp?: string
+          response_data?: Json | null
+          severity: string
+          status?: string
+          updated_at?: string
+          user_profile?: Json | null
+        }
+        Update: {
+          additional_info?: string | null
+          created_at?: string
+          emergency_type?: string
+          event_id?: string
+          id?: string
+          location_data?: Json | null
+          provider_id?: string
+          provider_name?: string
+          request_timestamp?: string
+          response_data?: Json | null
+          severity?: string
+          status?: string
+          updated_at?: string
+          user_profile?: Json | null
+        }
+        Relationships: []
+      }
+      emergency_test_results: {
+        Row: {
+          created_at: string
+          detailed_results: Json | null
+          duration_ms: number
+          failure_reason: string | null
+          id: string
+          performance_metrics: Json | null
+          steps_completed: number
+          success: boolean
+          test_id: string
+          test_scenario: string
+          test_timestamp: string
+          test_type: string
+          total_steps: number
+        }
+        Insert: {
+          created_at?: string
+          detailed_results?: Json | null
+          duration_ms: number
+          failure_reason?: string | null
+          id?: string
+          performance_metrics?: Json | null
+          steps_completed?: number
+          success?: boolean
+          test_id: string
+          test_scenario: string
+          test_timestamp?: string
+          test_type: string
+          total_steps?: number
+        }
+        Update: {
+          created_at?: string
+          detailed_results?: Json | null
+          duration_ms?: number
+          failure_reason?: string | null
+          id?: string
+          performance_metrics?: Json | null
+          steps_completed?: number
+          success?: boolean
+          test_id?: string
+          test_scenario?: string
+          test_timestamp?: string
+          test_type?: string
+          total_steps?: number
+        }
+        Relationships: []
+      }
+      error_tracking: {
+        Row: {
+          created_at: string
+          error_message: string
+          error_timestamp: string
+          error_type: string
+          id: string
+          metadata: Json | null
+          severity: string | null
+          stack_trace: string | null
+          url: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message: string
+          error_timestamp?: string
+          error_type: string
+          id?: string
+          metadata?: Json | null
+          severity?: string | null
+          stack_trace?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string
+          error_timestamp?: string
+          error_type?: string
+          id?: string
+          metadata?: Json | null
+          severity?: string | null
+          stack_trace?: string | null
+          url?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       family_alerts: {
         Row: {
           alert_data: Json | null
@@ -1783,6 +1960,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      performance_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          metric_type: string
+          test_timestamp: string
+          values: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metric_type: string
+          test_timestamp?: string
+          values?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metric_type?: string
+          test_timestamp?: string
+          values?: Json
+        }
+        Relationships: []
       }
       phone_verifications: {
         Row: {
@@ -2948,6 +3149,45 @@ export type Database = {
         }
         Relationships: []
       }
+      system_health_checks: {
+        Row: {
+          auth_status: string
+          check_timestamp: string
+          created_at: string
+          database_status: string
+          emergency_status: string
+          id: string
+          overall_status: string
+          payment_status: string
+          performance_data: Json | null
+          storage_status: string
+        }
+        Insert: {
+          auth_status: string
+          check_timestamp?: string
+          created_at?: string
+          database_status: string
+          emergency_status: string
+          id?: string
+          overall_status: string
+          payment_status: string
+          performance_data?: Json | null
+          storage_status: string
+        }
+        Update: {
+          auth_status?: string
+          check_timestamp?: string
+          created_at?: string
+          database_status?: string
+          emergency_status?: string
+          id?: string
+          overall_status?: string
+          payment_status?: string
+          performance_data?: Json | null
+          storage_status?: string
+        }
+        Relationships: []
+      }
       training_data: {
         Row: {
           answer: string
@@ -3114,6 +3354,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      usage_metrics: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          metrics: Json
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          metrics?: Json
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          metrics?: Json
+        }
+        Relationships: []
       }
       user_activity: {
         Row: {
