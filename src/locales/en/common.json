@@ -527,6 +527,9 @@
         "routineCare": {
           "title": "Routine Care Management",
           "description": "Coordinate daily care activities, medication reminders, and health monitoring."
+        }
+      }
+    }
   },
   "finalCta": {
     "title": "Ready to Protect Your Family?",

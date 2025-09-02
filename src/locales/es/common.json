@@ -526,6 +526,9 @@
         "routineCare": {
           "title": "Gestión de Atención Rutinaria",
           "description": "Coordina actividades de atención diaria, recordatorios de medicación y monitoreo de salud."
+        }
+      }
+    }
   },
   "finalCta": {
     "title": "¿Listo para Proteger a Tu Familia?",

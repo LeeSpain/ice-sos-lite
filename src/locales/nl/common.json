@@ -495,6 +495,9 @@
         "routineCare": {
           "title": "Routine Zorgbeheer",
           "description": "Coördineer dagelijkse zorgactiviteiten, medicatie herinneringen en gezondheidsmonitoring."
+        }
+      }
+    }
   },
   "finalCta": {
     "title": "Klaar om Je Familie te Beschermen?",
@@ -503,4 +506,3 @@
     "connectFamily": "Verbind Familie"
   }
 }
-
