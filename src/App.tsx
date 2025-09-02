@@ -306,13 +306,14 @@ const App = () => {
               } />
             </Routes>
             
-            {/* Global Emma Chat - appears on all pages except SOS apps, family app, admin dashboard, and member dashboard */}
-            {window.location.pathname !== '/app' && 
-             window.location.pathname !== '/sos-app' && 
-             window.location.pathname !== '/family-app' && 
-             !window.location.pathname.startsWith('/admin-dashboard') && 
-             !window.location.pathname.startsWith('/dashboard') && 
-             !window.location.pathname.startsWith('/full-dashboard') && 
+            {/* Global Emma Chat - appears only on frontend/marketing pages */}
+            {(window.location.pathname === '/' || 
+              window.location.pathname === '/contact' || 
+              window.location.pathname === '/support' || 
+              window.location.pathname === '/blog' || 
+              window.location.pathname === '/videos' || 
+              window.location.pathname === '/privacy' || 
+              window.location.pathname === '/terms') && 
              <GlobalEmmaChat />}
             
             {/* Show device manager only in SOS apps */}
