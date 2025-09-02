@@ -82,47 +82,6 @@ const SosButton = () => {
         subscriptionTier={subscriptionTier}
       />
 
-      <div className="flex flex-col items-center space-y-4 w-full max-w-md mx-auto">
-        {/* Emergency Status Banner */}
-        {!subscriptionLoading && subscriptionTier && (
-          <EmergencyStatusBanner 
-            subscriptionTier={subscriptionTier}
-            className="w-full mb-4"
-          />
-        )}
-      {/* Voice Activation Toggle */}
-      <div className="flex items-center gap-2 mb-2">
-        <Button
-          variant={voiceEnabled ? "wellness" : "outline"}
-          size="sm"
-          onClick={toggleVoiceActivation}
-          className="text-xs"
-        >
-          {isListening ? <Mic className="h-3 w-3" /> : <MicOff className="h-3 w-3" />}
-          Voice {voiceEnabled ? 'ON' : 'OFF'}
-        </Button>
-        {voiceEnabled && (
-          <span className="text-xs text-muted-foreground">
-            Say: "Help Help Help"
-          </span>
-        )}
-      </div>
-
-      {/* Location status indicator */}
-      {locationPermissionDenied && (
-        <div className="flex items-center justify-center gap-2 text-sm text-warning bg-warning/10 rounded-lg p-3 border border-warning/20">
-          <AlertTriangle className="h-4 w-4" />
-          <span className="text-xs text-center">Location access required for precise emergency alerts</span>
-        </div>
-      )}
-
-      {locationPermissionGranted && (
-        <div className="flex items-center justify-center gap-2 text-sm text-wellness bg-wellness/10 rounded-lg p-3 border border-wellness/20">
-          <MapPin className="h-4 w-4" />
-          <span className="text-xs text-center">GPS location sharing enabled</span>
-        </div>
-      )}
-
       {/* Main Emergency Button */}
       <Button
         variant="emergency"
@@ -138,17 +97,6 @@ const SosButton = () => {
           <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse" />
         )}
       </Button>
-      
-      <div className="text-center">
-        <p className="text-sm font-medium text-emergency">
-          {isTriggering ? "Activating Emergency..." : "Emergency SOS"}
-        </p>
-        <p className="text-xs text-muted-foreground">
-          Tap to alert emergency contacts with GPS location
-          {voiceEnabled && <span className="block">or say "Help Help Help"</span>}
-        </p>
-      </div>
-      </div>
     </>
   );
 };
