@@ -3848,46 +3848,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
-      cube: {
-        Args: { "": number[] } | { "": number }
-        Returns: unknown
-      }
-      cube_dim: {
-        Args: { "": unknown }
-        Returns: number
-      }
-      cube_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      cube_is_point: {
-        Args: { "": unknown }
-        Returns: boolean
-      }
-      cube_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      cube_recv: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      cube_send: {
-        Args: { "": unknown }
-        Returns: string
-      }
-      cube_size: {
-        Args: { "": unknown }
-        Returns: number
-      }
-      earth: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      gc_to_sec: {
-        Args: { "": number }
-        Returns: number
-      }
       get_communication_metrics_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -3940,10 +3900,6 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
-      latitude: {
-        Args: { "": unknown }
-        Returns: number
-      }
       log_enhanced_security_event: {
         Args: {
           p_event_type: string
@@ -3958,14 +3914,6 @@ export type Database = {
       log_security_event: {
         Args: { p_event_type: string; p_metadata?: Json; p_user_id: string }
         Returns: undefined
-      }
-      longitude: {
-        Args: { "": unknown }
-        Returns: number
-      }
-      sec_to_gc: {
-        Args: { "": number }
-        Returns: number
       }
       track_auth_failure: {
         Args: {
