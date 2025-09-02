@@ -41,15 +41,6 @@ const Index = () => {
       <FirstVisitPreferencesModal />
       <Navigation />
 
-      {/* Quick Access for returning users */}
-      <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
-        <a
-          href="/dashboard"
-          className="bg-primary text-white px-4 py-2 rounded-lg shadow-lg hover:bg-primary/90 transition-colors text-sm font-medium"
-        >
-          Open My App
-        </a>
-      </div>
 
       <Hero onEmmaClick={openEmmaChat} />
       
