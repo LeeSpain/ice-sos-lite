@@ -69,8 +69,9 @@ serve(async (req) => {
       auth: { persistSession: false }
     });
 
-    // Check user authentication
-    const { data: { user }, error: userError } = await userSupabase.auth.getUser();
+    // Check user authentication using explicit token (more reliable in functions)
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+    const { data: { user }, error: userError } = await userSupabase.auth.getUser(token);
     if (userError || !user) {
       console.error('❌ User auth error:', userError);
       throw new Error('Authentication failed');
