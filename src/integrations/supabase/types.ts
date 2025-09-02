@@ -3844,6 +3844,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      cleanup_old_security_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       cube: {
         Args: { "": number[] } | { "": number }
         Returns: unknown
@@ -3940,6 +3944,17 @@ export type Database = {
         Args: { "": unknown }
         Returns: number
       }
+      log_enhanced_security_event: {
+        Args: {
+          p_event_type: string
+          p_metadata?: Json
+          p_risk_score?: number
+          p_severity?: string
+          p_source_component?: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       log_security_event: {
         Args: { p_event_type: string; p_metadata?: Json; p_user_id: string }
         Returns: undefined
@@ -3951,6 +3966,15 @@ export type Database = {
       sec_to_gc: {
         Args: { "": number }
         Returns: number
+      }
+      track_auth_failure: {
+        Args: {
+          p_email: string
+          p_failure_reason: string
+          p_ip_address: unknown
+          p_user_agent?: string
+        }
+        Returns: boolean
       }
     }
     Enums: {

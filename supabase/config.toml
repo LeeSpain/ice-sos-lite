@@ -1,5 +1,8 @@
 project_id = "rqahqicfafnxlmdjcozu"
 
+[functions.auth-security-monitor]
+verify_jwt = false
+
 [functions.gmail-token-security]
 verify_jwt = true
 

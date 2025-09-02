@@ -13,7 +13,7 @@ import { TermsDialog } from '@/components/legal/TermsDialog';
 import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import useRateLimit from '@/hooks/useRateLimit';
 import { PageSEO } from '@/components/PageSEO';
-import { validatePasswordStrength } from '@/utils/security';
+import { validatePasswordStrength, logSecurityEvent } from '@/utils/security';
 
 const AuthPage = () => {
   const { user, loading } = useAuth();
@@ -84,12 +84,32 @@ const AuthPage = () => {
 
       if (error) {
         recordAttempt();
+        // Log failed sign in attempt
+        setTimeout(() => {
+          logSecurityEvent('signin_failure', {
+            email: email.trim(),
+            error: error.message,
+            timestamp: new Date().toISOString(),
+            ip_address: 'client_side',
+            source: 'auth_page'
+          });
+        }, 0);
         throw error;
       }
 
       if (data.user) {
         setSuccess('Sign in successful! Redirecting...');
         resetRateLimit();
+        // Log successful sign in
+        setTimeout(() => {
+          logSecurityEvent('signin_success', {
+            user_id: data.user.id,
+            email: data.user.email,
+            timestamp: new Date().toISOString(),
+            ip_address: 'client_side',
+            source: 'auth_page'
+          });
+        }, 0);
       }
     } catch (error: any) {
       console.error('Sign in error:', error);
@@ -142,13 +162,35 @@ const AuthPage = () => {
 
       if (error) {
         recordAttempt();
+        // Log failed signup attempt
+        setTimeout(() => {
+          logSecurityEvent('signup_failure', {
+            email: email.trim(),
+            error: error.message,
+            timestamp: new Date().toISOString(),
+            ip_address: 'client_side',
+            source: 'auth_page'
+          });
+        }, 0);
         throw error;
       }
 
       if (data.user) {
+        resetRateLimit();
+        // Log successful signup
+        setTimeout(() => {
+          logSecurityEvent('signup_success', {
+            user_id: data.user.id,
+            email: data.user.email,
+            email_confirmed: !!data.user.email_confirmed_at,
+            timestamp: new Date().toISOString(),
+            ip_address: 'client_side',
+            source: 'auth_page'
+          });
+        }, 0);
+        
         if (data.user.email_confirmed_at) {
           setSuccess('Account created successfully! Redirecting...');
-          resetRateLimit();
         } else {
           setSuccess('Please check your email to confirm your account before signing in.');
         }

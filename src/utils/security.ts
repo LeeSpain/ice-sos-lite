@@ -134,12 +134,73 @@ export const logSecurityEvent = async (
   metadata?: Record<string, any>
 ) => {
   try {
-    // This would typically send to your security logging endpoint
+    // Enhanced security logging with server-side tracking
     console.warn(`Security Event: ${eventType}`, metadata);
     
-    // In a real implementation, you might send this to an analytics service
-    // or security monitoring tool
+    // For authentication failures, also call our auth security monitor
+    if (eventType.includes('failure') && metadata?.email) {
+      try {
+        const response = await fetch('/supabase/functions/v1/auth-security-monitor', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: metadata.email,
+            failure_reason: metadata.error || eventType,
+            ip_address: metadata.ip_address,
+            user_agent: metadata.user_agent || navigator.userAgent
+          })
+        });
+        
+        if (!response.ok) {
+          console.warn('Failed to track auth failure on server:', response.statusText);
+        }
+      } catch (serverError) {
+        console.warn('Failed to connect to auth security monitor:', serverError);
+      }
+    }
+    
+    // Store locally for immediate UI feedback
+    const securityEvents = JSON.parse(localStorage.getItem('security_events') || '[]');
+    securityEvents.unshift({
+      id: crypto.randomUUID(),
+      event_type: eventType,
+      metadata: metadata || {},
+      timestamp: new Date().toISOString(),
+      severity: determineSeverity(eventType, metadata)
+    });
+    
+    // Keep only last 100 events in local storage
+    securityEvents.splice(100);
+    localStorage.setItem('security_events', JSON.stringify(securityEvents));
+    
   } catch (error) {
     console.error('Failed to log security event:', error);
   }
+};
+
+// Determine event severity based on type and metadata
+const determineSeverity = (eventType: string, metadata?: Record<string, any>): string => {
+  if (eventType.includes('failure') || eventType.includes('denied') || eventType.includes('attack')) {
+    return 'high';
+  }
+  if (eventType.includes('suspicious') || eventType.includes('blocked')) {
+    return 'medium';
+  }
+  return 'low';
+};
+
+// Get recent security events from local storage
+export const getRecentSecurityEvents = (): any[] => {
+  try {
+    return JSON.parse(localStorage.getItem('security_events') || '[]');
+  } catch {
+    return [];
+  }
+};
+
+// Clear local security event cache
+export const clearSecurityEventCache = (): void => {
+  localStorage.removeItem('security_events');
 };

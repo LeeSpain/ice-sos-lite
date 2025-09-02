@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { logSecurityEvent } from '@/utils/security';
 
 interface AuthContextType {
   user: User | null;
@@ -70,9 +71,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setSession(session);
           setUser(session?.user ?? null);
           
+          // Log authentication events for security monitoring
+          setTimeout(() => {
+            if (event === 'SIGNED_IN' && session?.user) {
+              logSecurityEvent('user_signin', {
+                user_id: session.user.id,
+                email: session.user.email,
+                timestamp: new Date().toISOString(),
+                ip_address: 'client_side',
+                source: 'auth_context'
+              });
+            } else if (event === 'SIGNED_OUT') {
+              logSecurityEvent('user_signout', {
+                timestamp: new Date().toISOString(),
+                source: 'auth_context'
+              });
+            } else if (event === 'TOKEN_REFRESHED') {
+              logSecurityEvent('token_refresh', {
+                user_id: session?.user?.id,
+                timestamp: new Date().toISOString(),
+                source: 'auth_context'
+              });
+            }
+          }, 0);
+          
           // Handle email confirmation status
           if (session?.user && !session.user.email_confirmed_at) {
             console.log('⚠️ User email not confirmed:', session.user.email);
+            setTimeout(() => {
+              logSecurityEvent('unconfirmed_email_access', {
+                user_id: session.user.id,
+                email: session.user.email,
+                timestamp: new Date().toISOString()
+              });
+            }, 0);
           }
         }
       }
@@ -88,10 +120,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
+      const currentUserId = user?.id;
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      
+      // Log successful signout
+      if (currentUserId) {
+        setTimeout(() => {
+          logSecurityEvent('user_signout_initiated', {
+            user_id: currentUserId,
+            timestamp: new Date().toISOString(),
+            source: 'manual_signout'
+          });
+        }, 0);
+      }
     } catch (error) {
       console.error('Error signing out:', error);
+      // Log failed signout attempt
+      setTimeout(() => {
+        logSecurityEvent('signout_failure', {
+          user_id: user?.id,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          timestamp: new Date().toISOString()
+        });
+      }, 0);
     }
   };
 
