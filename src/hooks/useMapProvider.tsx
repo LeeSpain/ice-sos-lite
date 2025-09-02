@@ -92,15 +92,44 @@ export function useMapProvider() {
       };
     }, [currentStyle]);
 
-    // Handle style changes
+    // Handle style changes - wait for map to be ready before re-adding markers
     const handleStyleChange = (style: MapStyle) => {
       setCurrentStyle(style);
       if (map.current) {
         map.current.setStyle(style.style);
+        
+        // Re-add markers after style loads
+        map.current.once('styledata', () => {
+          // Trigger marker re-render by updating the markers dependency
+          if (markers.length > 0) {
+            // Remove and re-add markers
+            markersRef.current.forEach(marker => marker.remove());
+            markersRef.current = [];
+            
+            markers.forEach(markerData => {
+              const el = document.createElement('div');
+              el.style.width = '40px';
+              el.style.height = '40px';
+              el.style.borderRadius = '50%';
+              el.style.cursor = 'pointer';
+              
+              const markerComponent = markerData.render();
+              if (markerComponent) {
+                el.innerHTML = '<div style="width: 40px; height: 40px; background: #3b82f6; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>';
+              }
+
+              const marker = new mapboxgl.Marker(el)
+                .setLngLat([markerData.lng, markerData.lat])
+                .addTo(map.current!);
+
+              markersRef.current.push(marker);
+            });
+          }
+        });
       }
     };
 
-    // Update markers when they change
+    // Update markers when they change or when map style changes
     useEffect(() => {
       if (!map.current) return;
 
@@ -140,7 +169,7 @@ export function useMapProvider() {
         });
         map.current.fitBounds(bounds, { padding: 50 });
       }
-    }, [markers]);
+    }, [markers, currentStyle]); // Added currentStyle to dependencies
 
     if (tokenError) {
       return (
