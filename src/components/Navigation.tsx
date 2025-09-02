@@ -11,10 +11,10 @@ import IntroVideoModal from '@/components/IntroVideoModal';
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 interface NavigationProps {
-  onFreeTrialClick?: () => void;
+  onJoinNowClick?: () => void;
 }
 
-const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
+const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const defaults = React.useMemo(() => getDefaultAppPreview(), []);
   const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
@@ -61,12 +61,11 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
               <Button asChild variant="outline" size="sm" className="font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
                 <Link to="/auth">{t('nav.signIn')}</Link>
               </Button>
-              <Button 
+              <Button asChild
                 size="sm" 
                 className="bg-wellness text-black hover:bg-wellness/90 font-medium transition-all duration-200 hover:scale-105 shadow-lg"
-                onClick={onFreeTrialClick || (() => {})}
               >
-                {t('nav.freeTrial', 'Free Trial')}
+                <Link to="/auth?tab=signup">{t('nav.joinNow', 'Join Now')}</Link>
               </Button>
             </div>
           </div>
@@ -119,15 +118,13 @@ const Navigation = ({ onFreeTrialClick }: NavigationProps = {}) => {
                 <Button asChild variant="outline" size="sm" className="font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200">
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>{t('nav.signIn')}</Link>
                 </Button>
-                <Button 
+                <Button asChild
                   size="sm" 
                   className="bg-wellness text-white hover:bg-wellness/90 font-medium transition-all duration-200 shadow-lg"
-                  onClick={() => {
-                    onFreeTrialClick?.();
-                    setIsMenuOpen(false);
-                  }}
                 >
-                  {t('nav.freeTrial', 'Free Trial')}
+                  <Link to="/auth?tab=signup" onClick={() => setIsMenuOpen(false)}>
+                    {t('nav.joinNow', 'Join Now')}
+                  </Link>
                 </Button>
               </div>
             </div>

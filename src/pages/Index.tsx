@@ -39,7 +39,7 @@ const Index = () => {
     <div className="min-h-screen">
       <PageSEO pageType="home" />
       <FirstVisitPreferencesModal />
-      <Navigation onFreeTrialClick={() => setShowFreeTrialPopup(true)} />
+      <Navigation />
 
       {/* Quick Access for returning users */}
       <div className="fixed top-20 right-4 z-50 flex flex-col gap-2">
