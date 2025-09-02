@@ -591,91 +591,91 @@ const DeviceIceSosPendant = () => {
 
           <Accordion type="single" collapsible className="space-y-4">
             <AccordionItem value="item-1" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 How does the emergency system work?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 One button press instantly alerts ALL emergency contacts with your exact GPS location. The system uses Bluetooth 5.0 for secure smartphone connection and professional-grade emergency protocols with 24/7 monitoring capabilities.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-2" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 What's the battery life and charging process?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 7+ days typical use with intelligent power management. Magnetic USB charging takes 2 hours for full charge. Low battery alerts ensure you're never caught unprepared. Enterprise-grade lithium battery with 2-year warranty.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-3" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 Is the device waterproof for all activities?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 IP67 certified waterproof rating for swimming, showering, and extreme weather. Professional testing ensures reliability in all conditions. Saltwater resistant for beach activities with full functionality maintained underwater up to 1 meter.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-4" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 What wearing options are included?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 Complete package includes: adjustable lanyard for daily wear, secure carabiner clip for bags/belts, and comfortable sport wristbands (white & black). All attachments are professionally tested for security and comfort.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-5" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 Which smartphones and smart homes are compatible?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 Universal compatibility: iOS 12+ and Android 8+. Seamless integration with Amazon Alexa, Google Home, and all major smart home platforms. Professional setup ensures optimal performance across all systems.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-6" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 What's the range and connection reliability?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 100-meter professional range in open areas, 30-50m through walls. Advanced signal processing ensures reliable connection. Automatic reconnection when back in range with missed alert notifications for complete peace of mind.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-7" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 How much does the service cost?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 Device: €59.99 + €4.99 shipping. No monthly fees for basic emergency contacts. Optional professional monitoring services available. All major payment methods accepted with secure checkout and immediate activation.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-8" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 What privacy and security measures are in place?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 End-to-end encryption for all data. GDPR compliant with zero data sharing. Your location and medical information are stored securely with military-grade encryption. Full control over who receives alerts and when.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-9" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 Is international travel supported?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 Global coverage with local emergency service integration in 50+ countries. Automatic regional compliance and language support. Professional partnerships ensure consistent service quality worldwide with local emergency protocols.
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="item-10" className="border border-border rounded-lg bg-card/50 backdrop-blur-sm">
-              <AccordionTrigger className="px-6 py-4 text-left font-semibold text-black hover:no-underline hover:bg-muted/50 transition-colors">
+              <AccordionTrigger className="px-6 py-4 text-left font-medium text-sm text-black hover:no-underline hover:bg-muted/50 transition-colors">
                 What warranty and support is provided?
               </AccordionTrigger>
-              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed">
+              <AccordionContent className="px-6 pb-4 text-muted-foreground leading-relaxed text-sm">
                 2-year full warranty covering device, battery, and accessories. 24/7 technical support in 25+ languages. Free replacement for any manufacturing defects. Professional setup assistance and ongoing technical consultation included.
               </AccordionContent>
             </AccordionItem>
