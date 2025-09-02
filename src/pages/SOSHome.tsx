@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Settings, Bluetooth, HeartPulse, PlugZap, MapPin } from 'lucide-react';
+import { Shield, Settings, Bluetooth, HeartPulse, PlugZap, MapPin, Phone } from 'lucide-react';
 import SEO from '@/components/SEO';
 
 const SOSHome = () => {
@@ -67,7 +67,7 @@ const SOSHome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-red-500 to-red-600 flex items-center justify-center p-4 relative overflow-hidden">
       <SEO title="Emergency SOS – ICE SOS Lite" description="Trigger emergency alerts and share live location with one tap." />
       
       {/* Settings Button - Top Right */}
@@ -80,68 +80,89 @@ const SOSHome = () => {
         <Settings className="h-6 w-6" />
       </Button>
 
-      {/* Background accent elements */}
-      <div className="absolute inset-0 opacity-8">
-        <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-white/15 blur-2xl"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full bg-white/10 blur-2xl"></div>
-      </div>
-
       {/* Main Card */}
-      <Card className="w-full max-w-sm bg-white border-0 shadow-2xl relative z-10">
-        <CardContent className="p-10 text-center space-y-8">
+      <Card className="w-full max-w-sm bg-white border-0 shadow-2xl relative z-10 rounded-3xl">
+        <CardContent className="p-8 text-center space-y-6">
           
           {/* Header */}
-          <div className="space-y-5">
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-emergency shadow-lg">
-              <Shield className="h-12 w-12 text-white" />
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-4xl font-bold text-guardian tracking-tight">ICE SOS</h1>
-              <p className="text-muted-foreground font-medium">Emergency Response System</p>
-            </div>
-          </div>
-          
-          {/* SOS Button */}
           <div className="space-y-4">
-            <SosButton />
-            <p className="text-sm text-muted-foreground font-medium">
-              Emergency Alert Ready
-            </p>
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500 shadow-lg">
+              <Shield className="h-8 w-8 text-white" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-3xl font-bold text-red-900 tracking-tight">ICE SOS</h1>
+              <p className="text-gray-600 font-medium">Emergency Response System</p>
+            </div>
           </div>
 
-          {/* Status Metrics */}
-          <div className="space-y-5">
+          {/* Emergency Plan Section */}
+          <div className="bg-gray-50 rounded-2xl p-4 space-y-3 text-left">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full border-2 border-gray-400 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+              </div>
+              <span className="text-sm font-medium text-gray-700">Emergency Plan:</span>
+              <Badge variant="outline" className="text-xs bg-white border-gray-300">Basic Contacts</Badge>
+            </div>
             
+            <div className="flex items-start gap-2 text-sm text-gray-600">
+              <Phone className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-medium">Emergency contacts will be called sequentially</p>
+                <p className="text-xs text-gray-500">Contacts called one-by-one until someone answers (15-second intervals)</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 rounded-lg p-2">
+              <span className="text-lg">⚠️</span>
+              <span className="font-medium">Always call 112/911 first for life-threatening emergencies</span>
+            </div>
+          </div>
+
+          {/* Status Indicators */}
+          <div className="space-y-3">
+            {/* Voice Status */}
+            <div className="flex items-center justify-center gap-2 bg-gray-100 rounded-lg py-2 px-4">
+              <span className="text-sm font-medium text-gray-700">🎤 Voice OFF</span>
+            </div>
+
+            {/* Location Status */}
+            <div className="flex items-center justify-center gap-2 bg-green-100 rounded-lg py-2 px-4">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <MapPin className="h-4 w-4 text-green-600" />
+              <span className="text-sm font-medium text-green-700">GPS location sharing enabled</span>
+            </div>
+
             {/* Device Status */}
             {deviceConnected && (
-              <div className="bg-muted/20 rounded-2xl p-5 space-y-4">
-                <div className="flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground">
+              <div className="bg-gray-100 rounded-lg p-3 space-y-2">
+                <div className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700">
                   <Bluetooth className="h-4 w-4" />
                   <span>Device Connected</span>
                 </div>
-                <div className="flex items-center justify-center gap-8">
+                <div className="flex items-center justify-center gap-6">
                   <div className="flex items-center gap-2">
-                    <HeartPulse className="h-5 w-5 text-red-500" />
-                    <span className="text-xl font-bold text-foreground">{heartRate}</span>
-                    <span className="text-sm text-muted-foreground font-medium">BPM</span>
+                    <HeartPulse className="h-4 w-4 text-red-500" />
+                    <span className="font-bold text-gray-800">{heartRate}</span>
+                    <span className="text-xs text-gray-600">BPM</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className={`w-4 h-4 rounded-full ${batteryLevel! > 20 ? 'bg-green-500' : 'bg-orange-500'}`}></div>
-                    <span className="text-xl font-bold text-foreground">{batteryLevel}%</span>
+                    <div className={`w-3 h-3 rounded-full ${batteryLevel! > 20 ? 'bg-green-500' : 'bg-orange-500'}`}></div>
+                    <span className="font-bold text-gray-800">{batteryLevel}%</span>
                   </div>
                 </div>
               </div>
             )}
-
-            {/* Location Status */}
-            <div className="flex items-center justify-center gap-3 py-2">
-              <div className={`w-3 h-3 rounded-full ${locationGranted ? 'bg-green-500' : 'bg-orange-500'} shadow-sm`}></div>
-              <MapPin className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-muted-foreground">
-                {locationGranted ? 'Location Services Active' : 'Location Access Required'}
-              </span>
+          </div>
+          
+          {/* SOS Button */}
+          <div className="space-y-3">
+            <SosButton />
+            <div className="space-y-1">
+              <p className="text-lg font-semibold text-red-600">Emergency SOS</p>
+              <p className="text-sm text-gray-600">Tap to alert emergency contacts with GPS location</p>
+              <p className="text-sm font-medium text-gray-800">Emergency Alert Ready</p>
             </div>
-
           </div>
 
         </CardContent>
