@@ -1,58 +1,18 @@
 import React from "react";
 import { Shield, Mail } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useUserRole } from "@/hooks/useUserRole";
 import { useSiteContent } from "@/hooks/useSiteContent";
 import { AppPreviewConfig, getDefaultAppPreview } from "@/types/appPreview";
 import { useTranslation } from 'react-i18next';
-import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
+
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
 const Footer = () => {
-  const { user, loading } = useAuth();
-  const { isAdmin, loading: roleLoading } = useUserRole();
-  const navigate = useNavigate();
-const defaults = React.useMemo(() => getDefaultAppPreview(), []);
-const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
-const { t } = useTranslation();
-  const handleDashboardClick = (e: React.MouseEvent, dashboardType: 'member' | 'admin') => {
-    e.preventDefault();
-    
-    console.log('Dashboard click:', { user: !!user, isAdmin, loading, roleLoading, dashboardType });
-    
-    // If still loading auth state, wait
-    if (loading) {
-      console.log('Auth still loading, waiting...');
-      return;
-    }
-
-    // If no user, redirect to auth
-    if (!user) {
-      console.log('No user, redirecting to auth');
-      navigate('/auth');
-      return;
-    }
-
-    // User is authenticated, navigate to appropriate dashboard
-    // If role is still loading, default to member dashboard for member clicks
-    // and allow admin dashboard access for admin clicks (will be protected by route)
-    if (dashboardType === 'admin') {
-      if (roleLoading) {
-        console.log('Role loading, going to admin dashboard (route will handle protection)');
-        navigate('/admin-dashboard');
-      } else if (isAdmin) {
-        console.log('Admin user, going to admin dashboard');
-        navigate('/admin-dashboard');
-      } else {
-        console.log('Non-admin user, redirecting to member dashboard');
-        navigate('/full-dashboard');
-      }
-    } else {
-      console.log('Going to member dashboard');
-      navigate('/full-dashboard');
-    }
-  };
+  const { user } = useAuth();
+  const defaults = React.useMemo(() => getDefaultAppPreview(), []);
+  const { value } = useSiteContent<AppPreviewConfig>(SITE_CONTENT_KEY, defaults);
+  const { t } = useTranslation();
 
   return (
     <footer className="bg-background border-t border-border">
@@ -87,14 +47,11 @@ const { t } = useTranslation();
               <Link to="/family-carer-access" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
                 {t('footer.familyCarerAccess')}
               </Link>
-              <Link to="/family-dashboard" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                {t('footer.familyDashboard')}
-              </Link>
             </div>
           </div>
 
           {/* Account & Legal */}
-<div className="space-y-4">
+          <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.account')}</h3>
             <div className="space-y-2">
               {!user ? (
@@ -111,20 +68,6 @@ const { t } = useTranslation();
                   {t('footer.signOut')}
                 </Link>
               )}
-              <a 
-                href="#" 
-                onClick={(e) => handleDashboardClick(e, 'member')}
-                className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-              >
-                {loading ? 'Loading...' : t('footer.membersDashboard')}
-              </a>
-              <a 
-                href="#" 
-                onClick={(e) => handleDashboardClick(e, 'admin')}
-                className="block text-sm text-muted-foreground hover:text-primary transition-colors cursor-pointer"
-              >
-                {loading ? 'Loading...' : t('footer.adminDashboard')}
-              </a>
             </div>
           </div>
 
