@@ -12,7 +12,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 3000,
       launchAutoHide: true,
-      backgroundColor: "#FF0000",
+      backgroundColor: "#ef4444",
       androidSplashResourceName: "splash",
       androidScaleType: "CENTER_CROP",
       showSpinner: true,
@@ -25,17 +25,31 @@ const config: CapacitorConfig = {
       useDialog: true
     },
     Geolocation: {
-      // Enable GPS settings for enhanced accuracy
       enableHighAccuracy: true,
       timeout: 10000,
       permissions: {
         android: [
           "android.permission.ACCESS_COARSE_LOCATION",
-          "android.permission.ACCESS_FINE_LOCATION"
+          "android.permission.ACCESS_FINE_LOCATION",
+          "android.permission.ACCESS_BACKGROUND_LOCATION"
         ],
         ios: [
           "NSLocationWhenInUseUsageDescription",
           "NSLocationAlwaysAndWhenInUseUsageDescription"
+        ]
+      }
+    },
+    PushNotifications: {
+      presentationOptions: ["badge", "sound", "alert"]
+    },
+    App: {
+      permissions: {
+        android: [
+          "android.permission.INTERNET",
+          "android.permission.ACCESS_NETWORK_STATE",
+          "android.permission.WAKE_LOCK",
+          "android.permission.VIBRATE",
+          "android.permission.CALL_PHONE"
         ]
       }
     }
