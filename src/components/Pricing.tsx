@@ -515,13 +515,6 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                   </Badge>
                 </div>
 
-                {service.is_popular && (
-                  <div className="absolute top-6 left-6 z-10">
-                    <Badge className="bg-yellow-500 text-white text-sm px-4 py-2 shadow-lg border-0">
-                      Popular
-                    </Badge>
-                  </div>
-                )}
 
                 <div className="relative z-10">
                   {/* Main Content Grid */}
