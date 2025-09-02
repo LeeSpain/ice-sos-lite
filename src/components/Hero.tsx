@@ -53,7 +53,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
               {/* Emma Chat Button */}
               <Button 
                 size="xl" 
-                className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-white/20"
+                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                 onClick={onEmmaClick}
               >
                 <Heart className="h-5 w-5 mr-2" />
@@ -67,7 +67,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                   <Button 
                     size="xl" 
                     variant="outline"
-                    className="bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border-white/30 hover:border-white/50 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
+                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
                     <Play className="h-5 w-5 mr-2" />
                     {t('hero.meetEmma')}
