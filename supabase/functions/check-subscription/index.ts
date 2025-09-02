@@ -7,6 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper logging function for enhanced debugging
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
@@ -17,18 +18,19 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
-  );
-
   try {
     logStep("Function started");
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
+
+    // Use service role key to perform writes (upsert) in Supabase
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
@@ -57,7 +59,7 @@ serve(async (req) => {
         subscription_end: null,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'email' });
-      return new Response(JSON.stringify({ subscribed: false, subscription_tiers: [] }), {
+      return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
@@ -69,35 +71,29 @@ serve(async (req) => {
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
-      limit: 10,
+      limit: 1,
     });
     const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionTiers: string[] = [];
+    let subscriptionTier = null;
     let subscriptionEnd = null;
 
     if (hasActiveSub) {
-      // Get the earliest subscription end date
-      subscriptionEnd = new Date(Math.min(...subscriptions.data.map(sub => sub.current_period_end * 1000))).toISOString();
-      logStep("Active subscriptions found", { count: subscriptions.data.length, endDate: subscriptionEnd });
+      const subscription = subscriptions.data[0];
+      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
       
-      // Collect all subscription tiers
-      for (const subscription of subscriptions.data) {
-        for (const item of subscription.items.data) {
-          const price = await stripe.prices.retrieve(item.price.id);
-          const amount = price.unit_amount || 0;
-          
-          if (amount === 99) {
-            subscriptionTiers.push("Family Sharing");
-          } else if (amount === 199) {
-            subscriptionTiers.push("Personal Account");
-          } else if (amount === 499) {
-            subscriptionTiers.push("Guardian Wellness"); 
-          } else if (amount === 2499) {
-            subscriptionTiers.push("Call Centre");
-          }
-        }
+      // Determine subscription tier from price
+      const priceId = subscription.items.data[0].price.id;
+      const price = await stripe.prices.retrieve(priceId);
+      const amount = price.unit_amount || 0;
+      if (amount <= 999) {
+        subscriptionTier = "Basic";
+      } else if (amount <= 1999) {
+        subscriptionTier = "Premium";
+      } else {
+        subscriptionTier = "Enterprise";
       }
-      logStep("Determined subscription tiers", { tiers: subscriptionTiers });
+      logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
     } else {
       logStep("No active subscription found");
     }
@@ -107,16 +103,15 @@ serve(async (req) => {
       user_id: user.id,
       stripe_customer_id: customerId,
       subscribed: hasActiveSub,
-      subscription_tier: subscriptionTiers.join(", "),
+      subscription_tier: subscriptionTier,
       subscription_end: subscriptionEnd,
       updated_at: new Date().toISOString(),
     }, { onConflict: 'email' });
 
-    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTiers });
+    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
-      subscription_tier: subscriptionTiers.join(", "),
-      subscription_tiers: subscriptionTiers,
+      subscription_tier: subscriptionTier,
       subscription_end: subscriptionEnd
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
