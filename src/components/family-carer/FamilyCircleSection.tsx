@@ -826,9 +826,6 @@ export const FamilyCircleSection: React.FC = () => {
                       <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                         Perfect if you want to provide peace of mind as a gift to your family. You handle all subscription costs, and your family members just enjoy the protection.
                       </p>
-                      <div className="text-xs text-muted-foreground bg-wellness/10 rounded-lg p-3">
-                        <strong>Example:</strong> Connect 3 family members = €8.97/month total on your card
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -844,9 +841,6 @@ export const FamilyCircleSection: React.FC = () => {
                       <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                         Each family member manages their own €2.99/month subscription. Great for adult children who want to contribute to the family's safety network.
                       </p>
-                      <div className="text-xs text-muted-foreground bg-secondary/10 rounded-lg p-3">
-                        <strong>Example:</strong> You pay €0, each of 3 family members pays €2.99/month
-                      </div>
                     </div>
                   </div>
                 </div>
