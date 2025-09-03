@@ -8,7 +8,7 @@ interface RegionalProtectedRouteProps {
 }
 
 const RegionalProtectedRoute = ({ children }: RegionalProtectedRouteProps) => {
-  const { user, loading } = useOptimizedAuth();
+  const { user, loading, isAdmin } = useOptimizedAuth();
   const { data: roleData, isLoading: roleLoading } = useRegionalRole();
 
   console.log('🔐 RegionalProtectedRoute:', {
@@ -16,6 +16,7 @@ const RegionalProtectedRoute = ({ children }: RegionalProtectedRouteProps) => {
     role: roleData?.role || 'none',
     loading,
     roleLoading,
+    isAdmin,
     currentPath: window.location.pathname,
     isRegionalOperator: roleData?.isRegionalOperator,
     isRegionalSupervisor: roleData?.isRegionalSupervisor,
@@ -41,10 +42,11 @@ const RegionalProtectedRoute = ({ children }: RegionalProtectedRouteProps) => {
     return <Navigate to="/auth" replace />;
   }
 
-  // Check if user has regional access
-  const hasRegionalAccess = roleData?.isRegionalOperator || 
-                           roleData?.isRegionalSupervisor || 
-                           roleData?.isPlatformAdmin;
+  // Check if user has regional access (including platform admins)
+  const hasRegionalAccess = isAdmin || 
+                            roleData?.isRegionalOperator || 
+                            roleData?.isRegionalSupervisor || 
+                            roleData?.isPlatformAdmin;
 
   if (!hasRegionalAccess) {
     console.log('🔐 RegionalProtectedRoute: User lacks regional access, redirecting to dashboard');
