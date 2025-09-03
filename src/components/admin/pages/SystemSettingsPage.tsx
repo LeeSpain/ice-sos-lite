@@ -90,40 +90,44 @@ export default function SystemSettingsPage() {
   const loadSystemHealth = async () => {
     try {
       setHealthLoading(true);
-      
-      // Create mock health data since system-health function has issues
-      const mockHealthChecks: HealthCheck[] = [
-        {
-          component: 'database_connection',
-          status: 'healthy',
-          response_time: 45,
-          details: 'Supabase connection active'
-        },
-        {
-          component: 'authentication_service',
-          status: 'healthy', 
-          response_time: 32,
-          details: 'Auth endpoints responding'
-        },
-        {
-          component: 'edge_functions',
-          status: 'healthy',
-          response_time: 120,
-          details: 'All functions operational'
-        },
-        {
-          component: 'real_time_updates',
-          status: 'healthy',
-          response_time: 28,
-          details: 'WebSocket connections stable'
+
+      // Call the edge function directly via GET (it returns overall_status and checks[])
+      const functionUrl = 'https://mqroziggaalltuzoyyao.supabase.co/functions/v1/system-health';
+      const res = await fetch(functionUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {})
         }
-      ];
-      
-      setHealthChecks(mockHealthChecks);
-      
+      });
+
+      if (!res.ok) throw new Error(`Health check failed: ${res.status}`);
+
+      const data = await res.json() as {
+        overall_status?: string;
+        checks?: Array<{ component: string; status: 'healthy' | 'warning' | 'error'; response_time: number; details: string; }>;
+      };
+
+      if (Array.isArray(data.checks)) {
+        setHealthChecks(
+          data.checks.map((c) => ({
+            component: c.component,
+            status: c.status,
+            response_time: c.response_time,
+            details: c.details,
+          }))
+        );
+      } else {
+        throw new Error('Invalid health response');
+      }
     } catch (error) {
       console.error('Error loading system health:', error);
-      toast.error('Failed to load system health');
+      toast.error('Failed to load system health (showing last known status)');
+      if (healthChecks.length === 0) {
+        setHealthChecks([
+          { component: 'edge_functions', status: 'warning', response_time: 0, details: 'No health data available' }
+        ]);
+      }
     } finally {
       setHealthLoading(false);
     }
