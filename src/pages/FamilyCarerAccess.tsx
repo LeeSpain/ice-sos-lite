@@ -71,7 +71,7 @@ const FamilyCarerAccessPage = () => {
                   <OptimizedImage 
                     src="/lovable-uploads/7b271d34-59d8-4874-9441-77c857b01fac.png" 
                     alt="Family carer emergency coordination - woman and elderly man using emergency alert system with family access dashboard"
-                    className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
+                    className="w-full h-full object-cover rounded-3xl shadow-2xl"
                     priority={true}
                     sizes={getImageSizes('hero')}
                     blurDataURL={generateBlurPlaceholder(400, 600)}
