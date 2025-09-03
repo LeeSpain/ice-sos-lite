@@ -1,10 +1,14 @@
 import React from 'react';
 import { Users, Heart, Shield, Wifi, AlertTriangle, User, Clock, Baby, UserCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { BackgroundMap } from "./BackgroundMap";
 
 export const FamilyCircleSection: React.FC = () => {
   return (
     <section className="py-section bg-gradient-to-br from-background to-muted/50 relative overflow-hidden">
+      {/* Background Map */}
+      <BackgroundMap />
+      
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-10 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
