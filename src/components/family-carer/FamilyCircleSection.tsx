@@ -705,7 +705,174 @@ export const FamilyCircleSection: React.FC = () => {
                 </div>
               </div>
             </div>
+        </div>
+
+        {/* Family Testimonials */}
+        <div className="py-20 bg-gradient-to-b from-background to-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-6">Real Families, Real Peace of Mind</h3>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                Hear from families who've experienced the difference our emergency response system makes when it matters most.
+              </p>
+            </div>
+
+            <div className="max-w-7xl mx-auto">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                {/* Testimonial 1 */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
+                      <img src="/mom-avatar.png" alt="Sarah" className="w-10 h-10 rounded-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">Sarah M.</h4>
+                      <p className="text-sm text-muted-foreground">Daughter</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed italic">
+                    "This system saved my mother's life. When she had a fall, the entire family was alerted immediately and help arrived within minutes. I can't imagine not having this protection now."
+                  </p>
+                  <div className="mt-4 flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Heart key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimonial 2 */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-wellness/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-wellness to-wellness/80 rounded-full flex items-center justify-center">
+                      <img src="/dad-avatar.png" alt="James" className="w-10 h-10 rounded-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">James R.</h4>
+                      <p className="text-sm text-muted-foreground">Son</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed italic">
+                    "Dad was hesitant at first, but after his first emergency alert, he calls it his 'guardian angel'. The whole family feels so much more secure knowing we're all connected and can respond instantly."
+                  </p>
+                  <div className="mt-4 flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Heart key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimonial 3 */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-secondary/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-secondary to-secondary/80 rounded-full flex items-center justify-center">
+                      <img src="/emma-avatar.png" alt="Emma" className="w-10 h-10 rounded-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">Emma K.</h4>
+                      <p className="text-sm text-muted-foreground">Granddaughter</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed italic">
+                    "Grandma loves that she can see where all of us are and know we're safe. It's become more than an emergency system - it's brought our family closer together."
+                  </p>
+                  <div className="mt-4 flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Heart key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimonial 4 */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
+                      <img src="/grandma-avatar.png" alt="Margaret" className="w-10 h-10 rounded-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">Margaret D.</h4>
+                      <p className="text-sm text-muted-foreground">Grandmother</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed italic">
+                    "At 78, I was worried about being a burden. This system gives me independence while keeping my children's minds at ease. When I press the button, I know help is coming."
+                  </p>
+                  <div className="mt-4 flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Heart key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimonial 5 */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-wellness/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                      <img src="/lovable-uploads/carer-avatar.png" alt="Dr. Lisa" className="w-10 h-10 rounded-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">Dr. Lisa H.</h4>
+                      <p className="text-sm text-muted-foreground">Professional Carer</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed italic">
+                    "As a professional carer, I've seen how crucial those first few minutes are in an emergency. This system ensures no one waits alone for help to arrive."
+                  </p>
+                  <div className="mt-4 flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Heart key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Testimonial 6 */}
+                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-secondary/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <img src="/lovable-uploads/neighbor-avatar.png" alt="Robert" className="w-10 h-10 rounded-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">Robert T.</h4>
+                      <p className="text-sm text-muted-foreground">Trusted Neighbor</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed italic">
+                    "Being included as a trusted contact makes me feel like part of the family. I'm honored to be someone they can count on, and the system makes it so easy to help when needed."
+                  </p>
+                  <div className="mt-4 flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Heart key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="mt-16 text-center">
+                <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <Shield className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">10,000+ Families Protected</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Heart className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">98% Family Satisfaction</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                      <Clock className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="text-sm font-medium text-muted-foreground">24/7 Support Available</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
         </div>
       </div>
     </section>
