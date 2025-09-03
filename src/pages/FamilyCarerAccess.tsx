@@ -17,98 +17,166 @@ const FamilyCarerAccessPage = () => {
       <Navigation />
       
       <main>
-        {/* Hero Section */}
-        <section className="py-section">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h1 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
-                Family Emergency Coordination
-              </h1>
-              <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                Connect your loved ones with instant SOS alerts, real-time location sharing during emergencies only, and 24/7 professional monitoring. Simple setup, complete privacy protection.
-              </p>
-            </div>
-
-            <div className="max-w-6xl mx-auto">
-              <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
-                {/* Benefits */}
-                <div className="text-center lg:text-left">
-                  <h2 className="text-2xl md:text-3xl font-bold mb-6 text-foreground">
-                    Professional Emergency Coordination for Modern Families
-                  </h2>
-                  
-                  <div className="grid gap-6 mb-8">
-                    <div className="flex items-start space-x-4 text-left">
-                      <div className="w-12 h-12 bg-emergency/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Shield className="h-6 w-6 text-emergency" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">Instant SOS Alerts</h3>
-                        <p className="text-muted-foreground">One-button emergency alerts reach all family members in under 30 seconds with precise location</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-4 text-left">
-                      <div className="w-12 h-12 bg-wellness/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Users className="h-6 w-6 text-wellness" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">Family Network</h3>
-                        <p className="text-muted-foreground">Connect parents, children, grandparents and trusted contacts in one secure network</p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-4 text-left">
-                      <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Heart className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">Privacy Protected</h3>
-                        <p className="text-muted-foreground">Location shared only during emergencies. GDPR compliant with complete privacy control</p>
-                      </div>
-                    </div>
-                  </div>
-
+        {/* Hero Section - matching homepage layout */}
+        <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
+          <div className="container mx-auto px-4 py-16 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Content */}
+              <div className="text-center lg:text-left text-white">
+                <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-emergency/30">
+                  <Users className="h-4 w-4 text-emergency-glow" />
+                  <span className="text-sm font-medium text-white">Family Emergency Network</span>
+                </div>
+                
+                <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
+                  Connect Your Family's 
+                  <span className="text-wellness drop-shadow-md block">Emergency Response</span>
+                </h1>
+                
+                <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
+                  Instant SOS alerts, real-time coordination, and 24/7 professional monitoring. 
+                  When emergencies happen, every family member knows immediately.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mb-8">
+                  {/* Primary CTA */}
                   <Button 
-                    asChild 
-                    size="lg" 
-                    className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                    asChild
+                    size="xl" 
+                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
                     <Link to="/ai-register">
                       <Shield className="h-5 w-5 mr-2" />
-                      Start Protecting Your Family
-                      <ArrowRight className="h-5 w-5 ml-2" />
+                      Protect Your Family Now
                     </Link>
                   </Button>
-                </div>
-
-                {/* Simple Demo */}
-                <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-guardian/10 rounded-3xl p-8 border border-primary/20 shadow-xl">
-                  <h3 className="text-xl font-bold mb-6 text-center">How It Works</h3>
                   
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm">
-                      <div className="w-8 h-8 bg-emergency rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
-                      <div>
-                        <p className="font-semibold">Emergency Happens</p>
-                        <p className="text-sm text-muted-foreground">Family member presses SOS button</p>
+                  {/* Secondary CTA */}
+                  <Button 
+                    size="xl" 
+                    variant="outline"
+                    className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
+                  >
+                    <Phone className="h-5 w-5 mr-2" />
+                    Talk to Expert
+                  </Button>
+                </div>
+                
+                {/* Trust Indicators */}
+                <div className="flex flex-wrap gap-6 justify-center lg:justify-start">
+                  <div className="flex items-center gap-2 text-white/80">
+                    <Shield className="h-4 w-4" />
+                    <span className="text-sm">GDPR Compliant</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <Clock className="h-4 w-4" />
+                    <span className="text-sm">30-Second Response</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-white/80">
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="text-sm">24/7 Monitoring</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Hero Demo - Family Emergency Coordination */}
+              <div className="relative">
+                <div className="relative z-10">
+                  {/* Phone Mockup with Family Emergency Interface */}
+                  <div className="relative mx-auto w-80 h-[600px] bg-gradient-to-b from-slate-900 to-slate-800 rounded-[3rem] p-2 shadow-2xl">
+                    <div className="w-full h-full bg-gradient-to-b from-gray-50 to-white rounded-[2.5rem] overflow-hidden relative">
+                      {/* Status Bar */}
+                      <div className="flex justify-between items-center px-6 py-3 bg-primary text-white text-sm font-medium">
+                        <span>Family Emergency</span>
+                        <div className="flex items-center gap-1">
+                          <div className="flex gap-0.5">
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                          </div>
+                          <span className="ml-2 text-xs">100%</span>
+                        </div>
+                      </div>
+
+                      {/* Emergency Alert */}
+                      <div className="p-4">
+                        <div className="bg-emergency/10 border border-emergency/20 p-4 rounded-xl mb-4">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-4 h-4 bg-emergency rounded-full animate-pulse"></div>
+                            <span className="font-semibold text-emergency text-sm">SOS Alert - Grandma</span>
+                          </div>
+                          <p className="text-xs text-gray-700">Emergency button pressed</p>
+                          <p className="text-xs text-gray-600 mt-1">📍 High Street, London</p>
+                        </div>
+
+                        {/* Family Response Status */}
+                        <div className="space-y-3 mb-4">
+                          <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                👩
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-green-800 text-xs">Sarah - Responding</p>
+                                <p className="text-xs text-green-600">2 minutes away</p>
+                              </div>
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            </div>
+                          </div>
+                          
+                          <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                👨
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-blue-800 text-xs">Dad - En Route</p>
+                                <p className="text-xs text-blue-600">5 minutes away</p>
+                              </div>
+                              <Clock className="h-4 w-4 text-blue-500" />
+                            </div>
+                          </div>
+                          
+                          <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                🚑
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-yellow-800 text-xs">Emergency Services</p>
+                                <p className="text-xs text-yellow-600">Dispatched</p>
+                              </div>
+                              <Shield className="h-4 w-4 text-yellow-500" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Bar */}
+                        <div className="bg-primary text-white rounded-xl p-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-xs">Professional Monitoring</p>
+                              <p className="text-xs opacity-90">Coordinating response...</p>
+                            </div>
+                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm">
-                      <div className="w-8 h-8 bg-wellness rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
-                      <div>
-                        <p className="font-semibold">Family Alerted</p>
-                        <p className="text-sm text-muted-foreground">Everyone notified with location instantly</p>
-                      </div>
+                  </div>
+                  
+                  {/* Floating Stats */}
+                  <div className="absolute -left-8 top-16 bg-white rounded-xl p-3 shadow-xl border border-wellness/20 max-w-40">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-wellness">30s</div>
+                      <div className="text-xs text-gray-600">Average Alert Time</div>
                     </div>
-                    
-                    <div className="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm">
-                      <div className="w-8 h-8 bg-guardian rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
-                      <div>
-                        <p className="font-semibold">Help Arrives</p>
-                        <p className="text-sm text-muted-foreground">Coordinated response ensures quick help</p>
-                      </div>
+                  </div>
+                  
+                  <div className="absolute -right-8 bottom-32 bg-white rounded-xl p-3 shadow-xl border border-primary/20 max-w-40">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-primary">24/7</div>
+                      <div className="text-xs text-gray-600">Professional Monitoring</div>
                     </div>
                   </div>
                 </div>
