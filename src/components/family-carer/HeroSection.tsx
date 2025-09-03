@@ -55,96 +55,117 @@ export const HeroSection = () => {
               </div>
 
               <div className="flex flex-col gap-3">
-                <Button 
-                  asChild 
-                  size="lg" 
-                  className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  <Link to="/ai-register">
-                    <Shield className="h-5 w-5 mr-2" />
-                    Start Protecting Your Family
-                </Link>
-              </Button>
-              
-              <IntroVideoModal 
-                defaultVideoId="family"
-                trigger={
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
-                    variant="outline"
-                    size="xl"
-                    className="bg-white/10 text-white border-white/30 hover:bg-white/20 font-bold text-xl px-12 py-6 rounded-2xl backdrop-blur-sm"
+                    asChild 
+                    size="lg" 
+                    className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                   >
-                    <Play className="h-6 w-6 mr-3 fill-current" />
-                    See How It Works
+                    <Link to="/ai-register">
+                      <Shield className="h-5 w-5 mr-2" />
+                      Start Protecting Your Family
+                    </Link>
                   </Button>
-                }
-              />
+                  <IntroVideoModal 
+                    defaultVideoId="family-coordination"
+                    trigger={
+                      <Button 
+                        size="lg" 
+                        className="bg-wellness text-black hover:bg-wellness/90 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold px-8 py-4"
+                      >
+                        <Play className="h-5 w-5 mr-2" />
+                        Watch Demo
+                      </Button>
+                    }
+                  />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  First family member free • No contracts • GDPR compliant
+                </p>
+              </div>
             </div>
 
-            {/* Trust Indicators */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="flex items-center justify-center space-x-3 text-white/80">
-                <Shield className="h-8 w-8 text-wellness" />
-                <div className="text-left">
-                  <div className="font-bold text-white">Privacy First</div>
-                  <div className="text-sm">No tracking outside emergencies</div>
+            {/* Left Side - Demo Preview */}
+            <div className="relative order-2 lg:order-1">
+              {/* Phone Mockup with emergency coordination flow */}
+              <div className="relative mx-auto w-80 h-[600px] bg-gradient-to-b from-slate-900 to-slate-800 rounded-[3rem] p-2 shadow-2xl">
+                <div className="w-full h-full bg-gradient-to-b from-gray-50 to-white rounded-[2.5rem] overflow-hidden relative">
+                  {/* Status Bar */}
+                  <div className="flex justify-between items-center px-6 py-3 bg-primary text-white text-sm font-medium">
+                    <span>Emergency Coordination</span>
+                    <div className="flex items-center gap-1">
+                      <div className="flex gap-0.5">
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                        <div className="w-1 h-1 bg-white rounded-full"></div>
+                      </div>
+                      <span className="ml-2 text-xs">100%</span>
+                    </div>
+                  </div>
+
+                  {/* Emergency Alert Interface */}
+                  <div className="p-4 h-full flex flex-col">
+                    <div className="bg-emergency/10 border border-emergency/20 p-4 rounded-xl mb-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-4 h-4 bg-emergency rounded-full animate-pulse"></div>
+                        <span className="font-semibold text-emergency">SOS Alert Active</span>
+                      </div>
+                      <p className="text-sm text-gray-700">Emma needs help - Location shared</p>
+                    </div>
+
+                    <div className="space-y-3 mb-6">
+                      <div className="bg-green-50 border border-green-200 p-3 rounded-lg flex items-center gap-3">
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          M
+                        </div>
+                        <div>
+                          <p className="font-medium text-green-800 text-sm">Mom - Responding</p>
+                          <p className="text-xs text-green-600">2 min away</p>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                          D
+                        </div>
+                        <div>
+                          <p className="font-medium text-blue-800 text-sm">Dad - En Route</p>
+                          <p className="text-xs text-blue-600">5 min away</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-primary text-white rounded-xl p-4 mt-auto">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-sm">Emergency Services</p>
+                          <p className="text-xs opacity-90">Professional monitoring active</p>
+                        </div>
+                        <Phone className="h-5 w-5" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="flex items-center justify-center space-x-3 text-white/80">
-                <Clock className="h-8 w-8 text-wellness" />
-                <div className="text-left">
-                  <div className="font-bold text-white">Instant Setup</div>
-                  <div className="text-sm">Connected in under 5 minutes</div>
+
+              {/* Floating Feature Highlights - matching Features section */}
+              <div className="absolute -left-8 top-20 bg-white rounded-xl p-3 shadow-xl border border-wellness/20 max-w-44">
+                <div className="flex items-center mb-1">
+                  <Shield className="h-4 w-4 text-wellness mr-2" />
+                  <span className="font-semibold text-xs">Privacy Protected</span>
                 </div>
+                <p className="text-xs text-gray-600">Location shared only during emergencies</p>
               </div>
-              <div className="flex items-center justify-center space-x-3 text-white/80">
-                <CheckCircle className="h-8 w-8 text-wellness" />
-                <div className="text-left">
-                  <div className="font-bold text-white">Proven System</div>
-                  <div className="text-sm">Trusted by thousands of families</div>
+
+              <div className="absolute -right-8 bottom-32 bg-white rounded-xl p-3 shadow-xl border border-primary/20 max-w-44">
+                <div className="flex items-center mb-1">
+                  <Clock className="h-4 w-4 text-primary mr-2" />
+                  <span className="font-semibold text-xs">Instant Response</span>
                 </div>
+                <p className="text-xs text-gray-600">Family alerted in under 30 seconds</p>
               </div>
             </div>
           </div>
-
-          {/* Live Demo Preview */}
-          <div className="relative animate-scale-in">
-            <div className="absolute inset-0 bg-gradient-to-t from-guardian/20 via-transparent to-transparent rounded-3xl"></div>
-            <div className="relative bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl">
-              <div className="text-center mb-6">
-                <h3 className="text-2xl font-bold text-white mb-2">Live Emergency Coordination</h3>
-                <p className="text-white/80">Real-time family emergency response in action</p>
-              </div>
-              
-              {/* Simulated Emergency Flow */}
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="bg-emergency/20 backdrop-blur-sm rounded-2xl p-6 border border-emergency/30">
-                  <div className="w-12 h-12 bg-emergency rounded-xl flex items-center justify-center mb-4">
-                    <div className="text-white font-bold">1</div>
-                  </div>
-                  <h4 className="text-white font-bold mb-2">SOS Triggered</h4>
-                  <p className="text-white/80 text-sm">Dad presses emergency button</p>
-                </div>
-                
-                <div className="bg-primary/20 backdrop-blur-sm rounded-2xl p-6 border border-primary/30">
-                  <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4">
-                    <div className="text-white font-bold">2</div>
-                  </div>
-                  <h4 className="text-white font-bold mb-2">Family Alerted</h4>
-                  <p className="text-white/80 text-sm">Instant notifications with location</p>
-                </div>
-                
-                <div className="bg-wellness/20 backdrop-blur-sm rounded-2xl p-6 border border-wellness/30">
-                  <div className="w-12 h-12 bg-wellness rounded-xl flex items-center justify-center mb-4">
-                    <div className="text-white font-bold">3</div>
-                  </div>
-                  <h4 className="text-white font-bold mb-2">Response Coordinated</h4>
-                  <p className="text-white/80 text-sm">Sarah responds "On my way!"</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
         </div>
       </div>
     </section>
