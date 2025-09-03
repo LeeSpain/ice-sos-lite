@@ -41,7 +41,7 @@ import FamilyInviteAccept from "./pages/FamilyInviteAccept";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import SOSHome from "./pages/SOSHome";
 import FamilyDashboard from "./pages/FamilyDashboard";
-import RegionalDashboard from "./pages/RegionalDashboardTest";
+import RegionalDashboard from "./pages/RegionalDashboard";
 
 // Import protected routes and components
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -175,6 +175,13 @@ const App = () => {
               } />
 
               {/* Member Dashboard */}
+              <Route path="/member-dashboard/*" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <SimpleDashboard />
+                  </ProtectedRoute>
+                </OptimizedSuspense>
+              } />
               <Route path="/full-dashboard/*" element={
                 <OptimizedSuspense skeletonType="card">
                   <ProtectedRoute>
