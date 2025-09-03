@@ -240,11 +240,29 @@ const Dashboard = () => {
                } />
 
                {/* Mobile App Page */}
-               <Route path="/mobile-app" element={
-                 <div className="py-section px-6">
-                   <MobileAppCard />
-                 </div>
-               } />
+                <Route path="/mobile-app" element={
+                  <div className="py-section px-6">
+                    <MobileAppCard />
+                  </div>
+                } />
+
+               {/* Mobile Dashboard Page */}
+                <Route path="/mobile-dashboard" element={
+                  <div className="py-section px-6">
+                    <div className="max-w-7xl mx-auto">
+                      <div className="mb-6">
+                        <h1 className="text-2xl font-bold">Mobile Development Dashboard</h1>
+                        <p className="text-muted-foreground">Monitor mobile app readiness and native capabilities</p>
+                      </div>
+                      <div className="space-y-6">
+                        {React.createElement(() => {
+                          const { MobileDashboard } = require('@/components/mobile/MobileDashboard');
+                          return React.createElement(MobileDashboard);
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                } />
 
               {/* Dashboard pages with proper container spacing */}
               <Route path="/family" element={<FamilyPage />} />
