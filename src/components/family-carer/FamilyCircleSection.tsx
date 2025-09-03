@@ -155,9 +155,9 @@ export const FamilyCircleSection: React.FC = () => {
             {/* Professional Carer */}
             <div className="absolute bottom-12 left-12">
               <div className="relative group hover:scale-110 transition-transform duration-300">
-                <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
-                  <User className="h-10 w-10 text-secondary-foreground relative z-10" />
+                  <img src="/public/lovable-uploads/carer-avatar.png" alt="Professional Carer" className="w-16 h-16 object-cover rounded-full relative z-10" />
                   
                   {/* Available status indicator */}
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
@@ -174,9 +174,9 @@ export const FamilyCircleSection: React.FC = () => {
             {/* Neighbor */}
             <div className="absolute bottom-12 right-12">
               <div className="relative group hover:scale-110 transition-transform duration-300">
-                <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
-                  <Heart className="h-10 w-10 text-secondary-foreground relative z-10" />
+                  <img src="/public/lovable-uploads/neighbor-avatar.png" alt="Trusted Neighbor" className="w-16 h-16 object-cover rounded-full relative z-10" />
                   
                   {/* Available status indicator */}
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
@@ -259,8 +259,9 @@ export const FamilyCircleSection: React.FC = () => {
             <div className="grid grid-cols-2 gap-6">
               <div className="text-center">
                 <div className="relative group">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2">
-                    <User className="h-8 w-8 text-secondary-foreground" />
+                  <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
+                    <img src="/public/lovable-uploads/carer-avatar.png" alt="Professional Carer" className="w-16 h-16 object-cover rounded-full relative z-10" />
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
                   </div>
                   <h5 className="font-medium text-sm">Professional Carer</h5>
@@ -270,8 +271,9 @@ export const FamilyCircleSection: React.FC = () => {
               
               <div className="text-center">
                 <div className="relative group">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2">
-                    <Heart className="h-8 w-8 text-secondary-foreground" />
+                  <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
+                    <img src="/public/lovable-uploads/neighbor-avatar.png" alt="Trusted Neighbor" className="w-16 h-16 object-cover rounded-full relative z-10" />
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
                   </div>
                   <h5 className="font-medium">Neighbor</h5>
