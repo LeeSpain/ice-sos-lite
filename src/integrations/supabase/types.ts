@@ -334,6 +334,39 @@ export type Database = {
           },
         ]
       }
+      circle_permissions: {
+        Row: {
+          can_view_devices: boolean | null
+          can_view_history: boolean | null
+          can_view_location: boolean | null
+          created_at: string | null
+          family_user_id: string
+          id: string
+          owner_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          can_view_devices?: boolean | null
+          can_view_history?: boolean | null
+          can_view_location?: boolean | null
+          created_at?: string | null
+          family_user_id: string
+          id?: string
+          owner_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          can_view_devices?: boolean | null
+          can_view_history?: boolean | null
+          can_view_location?: boolean | null
+          created_at?: string | null
+          family_user_id?: string
+          id?: string
+          owner_id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       communication_analytics: {
         Row: {
           category_breakdown: Json | null
@@ -445,6 +478,60 @@ export type Database = {
           posting_frequency?: number | null
           top_content_types?: string[] | null
           trending_hashtags?: string[] | null
+        }
+        Relationships: []
+      }
+      connections: {
+        Row: {
+          accepted_at: string | null
+          contact_user_id: string | null
+          created_at: string | null
+          escalation_priority: number | null
+          id: string
+          invite_email: string | null
+          invite_token: string | null
+          invited_at: string | null
+          notify_channels: Json | null
+          owner_id: string
+          preferred_language: string | null
+          relationship: string | null
+          status: string | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          contact_user_id?: string | null
+          created_at?: string | null
+          escalation_priority?: number | null
+          id?: string
+          invite_email?: string | null
+          invite_token?: string | null
+          invited_at?: string | null
+          notify_channels?: Json | null
+          owner_id: string
+          preferred_language?: string | null
+          relationship?: string | null
+          status?: string | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          contact_user_id?: string | null
+          created_at?: string | null
+          escalation_priority?: number | null
+          id?: string
+          invite_email?: string | null
+          invite_token?: string | null
+          invited_at?: string | null
+          notify_channels?: Json | null
+          owner_id?: string
+          preferred_language?: string | null
+          relationship?: string | null
+          status?: string | null
+          type?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -2404,6 +2491,7 @@ export type Database = {
           blood_type: string | null
           call_center_number: string | null
           country: string | null
+          country_code: string | null
           created_at: string
           date_of_birth: string | null
           emergency_contacts: Json | null
@@ -2431,6 +2519,7 @@ export type Database = {
           blood_type?: string | null
           call_center_number?: string | null
           country?: string | null
+          country_code?: string | null
           created_at?: string
           date_of_birth?: string | null
           emergency_contacts?: Json | null
@@ -2458,6 +2547,7 @@ export type Database = {
           blood_type?: string | null
           call_center_number?: string | null
           country?: string | null
+          country_code?: string | null
           created_at?: string
           date_of_birth?: string | null
           emergency_contacts?: Json | null
@@ -3313,6 +3403,41 @@ export type Database = {
           },
         ]
       }
+      sos_event_access: {
+        Row: {
+          access_scope: string | null
+          event_id: string | null
+          expires_at: string | null
+          granted_at: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          access_scope?: string | null
+          event_id?: string | null
+          expires_at?: string | null
+          granted_at?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          access_scope?: string | null
+          event_id?: string | null
+          expires_at?: string | null
+          granted_at?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_event_access_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "sos_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sos_events: {
         Row: {
           address: string | null
@@ -4164,6 +4289,13 @@ export type Database = {
         }
         Relationships: []
       }
+      v_owner_active_connection_counts: {
+        Row: {
+          active_count: number | null
+          owner_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       assign_admin_role: {
@@ -4172,6 +4304,10 @@ export type Database = {
       }
       check_admin_setup_allowed: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      check_spain_rule: {
+        Args: { p_user_id: string }
         Returns: boolean
       }
       cleanup_old_security_data: {
