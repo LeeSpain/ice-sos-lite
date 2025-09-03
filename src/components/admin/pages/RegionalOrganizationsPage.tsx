@@ -25,7 +25,7 @@ const RegionalOrganizationsPage = () => {
   const [newOrg, setNewOrg] = useState({
     name: '',
     region: '',
-    locale_default: 'es-ES'
+    locale_default: 'es'
   });
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -64,7 +64,7 @@ const RegionalOrganizationsPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       setIsCreateOpen(false);
-      setNewOrg({ name: '', region: '', locale_default: 'es-ES' });
+      setNewOrg({ name: '', region: '', locale_default: 'es' });
       toast({
         title: "Organization Created",
         description: "The regional organization has been created successfully.",
@@ -145,13 +145,12 @@ const RegionalOrganizationsPage = () => {
                   onValueChange={(value) => setNewOrg({ ...newOrg, locale_default: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select language" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="es-ES">Spanish (Spain)</SelectItem>
-                    <SelectItem value="en-US">English (US)</SelectItem>
-                    <SelectItem value="ca-ES">Catalan</SelectItem>
-                    <SelectItem value="eu-ES">Basque</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="nl">Nederlands</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
