@@ -413,9 +413,9 @@ export const FamilyCircleSection: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <h4 className="text-lg font-bold text-foreground">SOS Activated</h4>
+                  <h4 className="text-lg font-bold text-foreground">SOS Button Pressed</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed px-2">
-                    Emergency button pressed or automatic fall detection triggers the alert system instantly
+                    Emergency SOS button is pressed, immediately triggering the emergency response system
                   </p>
                 </div>
                 
@@ -446,9 +446,9 @@ export const FamilyCircleSection: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <h4 className="text-lg font-bold text-foreground">Instant Network Alert</h4>
+                  <h4 className="text-lg font-bold text-foreground">Emergency Calls Made</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed px-2">
-                    Family circle receives immediate notifications via app, SMS, and push alerts simultaneously
+                    System automatically calls emergency contacts in priority order until someone answers
                   </p>
                 </div>
                 
@@ -478,9 +478,9 @@ export const FamilyCircleSection: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <h4 className="text-lg font-bold text-foreground">Live Coordination</h4>
+                  <h4 className="text-lg font-bold text-foreground">Family Coordination</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed px-2">
-                    Family members see real-time location, communicate instantly, and coordinate the fastest response
+                    Family members receive alerts and coordinate who's responding while calls are being made
                   </p>
                 </div>
                 
@@ -510,9 +510,9 @@ export const FamilyCircleSection: React.FC = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <h4 className="text-lg font-bold text-foreground">Help Arrives Fast</h4>
+                  <h4 className="text-lg font-bold text-foreground">Help Responds</h4>
                   <p className="text-sm text-muted-foreground leading-relaxed px-2">
-                    Closest family member or trusted contact arrives with complete situational awareness
+                    Emergency contact answers the call and family member arrives with full situation awareness
                   </p>
                 </div>
               </div>
