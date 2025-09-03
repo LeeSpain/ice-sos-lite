@@ -13,25 +13,72 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-    );
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
-    const { action } = await req.json();
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const token = authHeader.replace(/^Bearer\s+/i, '');
+
+    // Validate user via anon client and token
+    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: { persistSession: false },
+      global: { headers: { Authorization: `Bearer ${token}` } },
+    });
+
+    const { data: { user }, error: userError } = await userSupabase.auth.getUser(token);
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: 'Invalid token' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Service client for DB operations
+    const serviceSupabase = createClient(supabaseUrl, supabaseServiceRoleKey, { auth: { persistSession: false } });
+
+    // Ensure user is admin
+    const { data: profile, error: profileError } = await serviceSupabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', user.id)
+      .single();
+
+    if (profileError || profile?.role !== 'admin') {
+      return new Response(JSON.stringify({ error: 'Forbidden: admin only' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Parse request payload once
+    const payload = await req.json().catch(() => ({}));
+    const { action, contentId } = payload as { action?: string; contentId?: string };
 
     switch (action) {
       case 'process_queue':
-        return await processPostingQueue(supabaseClient);
+        return await processPostingQueue(serviceSupabase);
       case 'post_now':
-        const { contentId } = await req.json();
-        return await postContentNow(contentId, supabaseClient);
+        if (!contentId) {
+          return new Response(JSON.stringify({ error: 'contentId is required' }), {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        return await postContentNow(contentId, serviceSupabase);
       default:
         throw new Error('Invalid action');
     }
   } catch (error) {
     console.error('Posting processor error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: (error as Error).message || 'Unknown error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

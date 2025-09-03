@@ -1,7 +1,7 @@
 project_id = "mqroziggaalltuzoyyao"
 
 [functions.riven-marketing]
-verify_jwt = false
+verify_jwt = true
 
 [functions.content-publisher]
 verify_jwt = true
@@ -10,4 +10,4 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.posting-processor]
-verify_jwt = false
+verify_jwt = true
