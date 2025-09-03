@@ -523,9 +523,181 @@ export const FamilyCircleSection: React.FC = () => {
               <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary/10 to-wellness/10 px-6 py-3 rounded-full border border-primary/20">
                 <Clock className="h-5 w-5 text-primary" />
                 <span className="text-sm font-semibold text-foreground">Average response time: Under 2 minutes</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Family Connection Setup & Pricing */}
+        <div className="mb-20">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-6">Building Your Family Safety Network</h3>
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+              Create meaningful connections with the people who matter most. Set up your family circle with transparent pricing and flexible payment options that work for everyone.
+            </p>
+          </div>
+
+          {/* Connection Setup Process */}
+          <div className="max-w-6xl mx-auto mb-16">
+            <div className="grid md:grid-cols-3 gap-8">
+              
+              {/* Step 1: Send Invitations */}
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500">
+                    <Users className="h-10 w-10 text-white" />
+                  </div>
+                  {/* Step number */}
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-white text-primary rounded-full flex items-center justify-center text-sm font-bold shadow-lg border-2 border-primary/20">
+                    1
+                  </div>
+                </div>
+                <h4 className="text-xl font-bold text-foreground mb-4">Send Personal Invitations</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  As the account owner, you'll send warm, personal invitations to your family members via email or phone. Each invitation explains how the service works and why their participation keeps you safe.
+                </p>
+              </div>
+
+              {/* Step 2: Choose Payment Method */}
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 bg-gradient-to-br from-wellness to-wellness/80 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500">
+                    <Heart className="h-10 w-10 text-white" />
+                  </div>
+                  {/* Step number */}
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-white text-wellness rounded-full flex items-center justify-center text-sm font-bold shadow-lg border-2 border-wellness/20">
+                    2
+                  </div>
+                </div>
+                <h4 className="text-xl font-bold text-foreground mb-4">Flexible Payment Options</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  You decide who pays for each connection. Cover all costs yourself as a gift to your family, or let each family member handle their own €2.99/month subscription. Change this anytime.
+                </p>
+              </div>
+
+              {/* Step 3: Activate Protection */}
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-500 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500">
+                    <Shield className="h-10 w-10 text-white" />
+                  </div>
+                  {/* Step number */}
+                  <div className="absolute -top-3 -right-3 w-8 h-8 bg-white text-green-600 rounded-full flex items-center justify-center text-sm font-bold shadow-lg border-2 border-green-600/20">
+                    3
+                  </div>
+                </div>
+                <h4 className="text-xl font-bold text-foreground mb-4">Instant Protection Active</h4>
+                <p className="text-muted-foreground leading-relaxed">
+                  Once your family accepts and sets up their accounts, your safety network is immediately active. Everyone can see when you're safe and respond instantly in emergencies.
+                </p>
               </div>
             </div>
           </div>
+
+          {/* Pricing & Payment Details */}
+          <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            
+            {/* Pricing Information */}
+            <div className="bg-gradient-to-br from-primary/5 to-wellness/10 rounded-3xl p-8 border border-primary/20 backdrop-blur-sm">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/20 rounded-full mb-4">
+                  <Clock className="h-8 w-8 text-primary" />
+                </div>
+                <h4 className="text-2xl font-bold text-foreground mb-2">Simple, Transparent Pricing</h4>
+                <p className="text-muted-foreground">No hidden fees, no long-term contracts</p>
+              </div>
+
+              <div className="space-y-6">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-primary mb-2">€2.99</div>
+                  <div className="text-lg text-muted-foreground mb-4">per month, per family connection</div>
+                  <div className="bg-white/60 rounded-lg p-4 border border-primary/10">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Each family member you connect costs just €2.99/month. Start with one connection and add more family members as needed. Cancel anytime with no penalties.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3 p-3 bg-white/60 rounded-lg border border-primary/10">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Clock className="h-3 w-3 text-white" />
+                    </div>
+                    <span className="text-sm font-medium">24/7 emergency monitoring</span>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-white/60 rounded-lg border border-primary/10">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Wifi className="h-3 w-3 text-white" />
+                    </div>
+                    <span className="text-sm font-medium">Real-time location sharing</span>
+                  </div>
+                  <div className="flex items-center space-x-3 p-3 bg-white/60 rounded-lg border border-primary/10">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Users className="h-3 w-3 text-white" />
+                    </div>
+                    <span className="text-sm font-medium">Instant emergency alerts</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Options */}
+            <div className="bg-gradient-to-br from-wellness/5 to-secondary/10 rounded-3xl p-8 border border-wellness/20 backdrop-blur-sm">
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-wellness/20 rounded-full mb-4">
+                  <Heart className="h-8 w-8 text-wellness" />
+                </div>
+                <h4 className="text-2xl font-bold text-foreground mb-2">Payment Flexibility</h4>
+                <p className="text-muted-foreground">Choose what works best for your family</p>
+              </div>
+
+              <div className="space-y-6">
+                
+                {/* Owner Pays Option */}
+                <div className="bg-white/60 rounded-lg p-6 border border-wellness/10">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-wellness/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <UserCircle className="h-4 w-4 text-wellness" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="font-semibold text-foreground mb-2">I'll Cover Everyone (Owner Pays)</h5>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                        Perfect if you want to provide peace of mind as a gift to your family. You handle all subscription costs, and your family members just enjoy the protection.
+                      </p>
+                      <div className="text-xs text-muted-foreground bg-wellness/10 rounded-lg p-3">
+                        <strong>Example:</strong> Connect 3 family members = €8.97/month total on your card
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Family Pays Option */}
+                <div className="bg-white/60 rounded-lg p-6 border border-wellness/10">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                      <Users className="h-4 w-4 text-secondary" />
+                    </div>
+                    <div className="flex-1">
+                      <h5 className="font-semibold text-foreground mb-2">Each Family Member Pays</h5>
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-3">
+                        Each family member manages their own €2.99/month subscription. Great for adult children who want to contribute to the family's safety network.
+                      </p>
+                      <div className="text-xs text-muted-foreground bg-secondary/10 rounded-lg p-3">
+                        <strong>Example:</strong> You pay €0, each of 3 family members pays €2.99/month
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mixed Option */}
+                <div className="bg-gradient-to-r from-primary/10 to-wellness/10 rounded-lg p-4 border border-primary/20">
+                  <p className="text-sm text-center text-muted-foreground">
+                    <strong className="text-foreground">Mix & Match:</strong> You can change payment responsibility for any family member at any time through your account settings.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
     </section>
