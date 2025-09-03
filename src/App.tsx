@@ -41,7 +41,7 @@ import FamilyInviteAccept from "./pages/FamilyInviteAccept";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import SOSHome from "./pages/SOSHome";
 import FamilyDashboard from "./pages/FamilyDashboard";
-import RegionalDashboard from "./pages/RegionalDashboard";
+// Regional Dashboard will be added later
 
 // Import protected routes and components
 import ProtectedRoute from "@/components/ProtectedRoute";
