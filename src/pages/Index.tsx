@@ -45,10 +45,9 @@ const Index = () => {
       {/* Live App Preview Section (reflects admin "App Testing" settings) */}
       <AppPreviewSection />
       
-      <FamilyCarerAccess />
-
       <Pricing />
       
+      <FamilyCarerAccess />
       
       <AppDownload />
       <FinalCTA />
