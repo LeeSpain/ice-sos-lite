@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useRegionalRole } from '@/hooks/useRegionalRole';
@@ -7,9 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Users, Phone, Settings } from 'lucide-react';
-import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
+import LanguageSelector from '@/components/LanguageSelector';
 
 const RegionalDashboard = () => {
+  const { t } = useTranslation();
   const { data: regionalRole } = useRegionalRole();
   const { isAdmin } = useOptimizedAuth();
 
@@ -27,12 +29,12 @@ const RegionalDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Access Restricted
+              {t('regionalDashboard.accessRestricted')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600">
-              You don't have permission to access the regional call center.
+              {t('regionalDashboard.noPermission')}
             </p>
           </CardContent>
         </Card>
@@ -49,15 +51,15 @@ const RegionalDashboard = () => {
             <Phone className="h-8 w-8 text-blue-600" />
             <div>
               <h1 className="text-2xl font-bold text-gray-900">
-                Regional Call Center
+                {t('regionalDashboard.title')}
               </h1>
               <p className="text-sm text-gray-600">
-                Emergency control center dashboard - {regionalRole?.organizationName || 'Platform Admin'}
+                {t('regionalDashboard.subtitle')} - {regionalRole?.organizationName || t('regionalDashboard.platformAdmin')}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <LanguageCurrencySelector compact />
+            <LanguageSelector compact />
           </div>
         </div>
       </div>
@@ -71,12 +73,12 @@ const RegionalDashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5 text-blue-600" />
-                    Active Customers
+                    {t('regionalDashboard.activeCustomers')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">0</div>
-                  <p className="text-sm text-gray-600">Connected customers</p>
+                  <p className="text-sm text-gray-600">{t('regionalDashboard.connectedCustomers')}</p>
                 </CardContent>
               </Card>
 
@@ -84,12 +86,12 @@ const RegionalDashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5 text-amber-600" />
-                    Open Alerts
+                    {t('regionalDashboard.openAlerts')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">0</div>
-                  <p className="text-sm text-gray-600">Pending events</p>
+                  <p className="text-sm text-gray-600">{t('regionalDashboard.pendingEvents')}</p>
                 </CardContent>
               </Card>
 
@@ -97,14 +99,14 @@ const RegionalDashboard = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Phone className="h-5 w-5 text-green-600" />
-                    System Status
+                    {t('regionalDashboard.systemStatus')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Badge variant="outline" className="text-green-600 border-green-600">
-                    OPERATIONAL
+                    {t('regionalDashboard.operational')}
                   </Badge>
-                  <p className="text-sm text-gray-600 mt-1">All systems functioning</p>
+                  <p className="text-sm text-gray-600 mt-1">{t('regionalDashboard.allSystemsFunctioning')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -112,14 +114,14 @@ const RegionalDashboard = () => {
             {/* Main Content Area */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle>Active SOS Events</CardTitle>
+                <CardTitle>{t('regionalDashboard.activeSosEvents')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
                   <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No active SOS events at this time</p>
+                  <p className="text-gray-500">{t('regionalDashboard.noActiveSos')}</p>
                   <p className="text-sm text-gray-400 mt-2">
-                    SOS events will appear here when activated
+                    {t('regionalDashboard.sosEventsWillAppear')}
                   </p>
                 </div>
               </CardContent>
@@ -128,13 +130,13 @@ const RegionalDashboard = () => {
             {/* Side Panel */}
             <Card>
               <CardHeader>
-                <CardTitle>Notification Center</CardTitle>
+                <CardTitle>{t('regionalDashboard.notificationCenter')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
-                  <p className="text-gray-500">No pending notifications</p>
+                  <p className="text-gray-500">{t('regionalDashboard.noPendingNotifications')}</p>
                   <p className="text-sm text-gray-400 mt-2">
-                    Family notifications will appear here
+                    {t('regionalDashboard.familyNotificationsWillAppear')}
                   </p>
                 </div>
               </CardContent>
@@ -144,22 +146,22 @@ const RegionalDashboard = () => {
           {/* Quick Info */}
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>System Information</CardTitle>
+              <CardTitle>{t('regionalDashboard.systemInformation')}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold text-sm">Organization</h4>
-                  <p className="text-gray-600">{regionalRole?.organizationName || 'Not assigned'}</p>
+                  <h4 className="font-semibold text-sm">{t('regionalDashboard.organization')}</h4>
+                  <p className="text-gray-600">{regionalRole?.organizationName || t('regionalDashboard.notAssigned')}</p>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-sm">Role</h4>
+                  <h4 className="font-semibold text-sm">{t('regionalDashboard.role')}</h4>
                   <Badge variant="outline">
-                    {isAdmin ? 'Platform Admin' :
-                     regionalRole?.isRegionalSupervisor ? 'Regional Supervisor' : 
-                     regionalRole?.isRegionalOperator ? 'Regional Operator' : 
-                     regionalRole?.isPlatformAdmin ? 'Platform Admin' :
-                     'User'}
+                    {isAdmin ? t('regionalDashboard.platformAdmin') :
+                     regionalRole?.isRegionalSupervisor ? t('regionalDashboard.regionalSupervisor') : 
+                     regionalRole?.isRegionalOperator ? t('regionalDashboard.regionalOperator') : 
+                     regionalRole?.isPlatformAdmin ? t('regionalDashboard.platformAdmin') :
+                     t('regionalDashboard.user')}
                   </Badge>
                 </div>
               </div>

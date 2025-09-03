@@ -315,6 +315,33 @@
       "description": "Bericht verzenden mislukt. Probeer het opnieuw."
     }
   },
+  "regionalDashboard": {
+    "title": "Regionaal Callcenter",
+    "subtitle": "Noodcontrolecentrum dashboard",
+    "accessRestricted": "Toegang Beperkt",
+    "noPermission": "Je hebt geen toestemming om het regionale callcenter te bezoeken.",
+    "activeCustomers": "Actieve Klanten",
+    "connectedCustomers": "Verbonden klanten",
+    "openAlerts": "Open Meldingen",
+    "pendingEvents": "Wachtende gebeurtenissen",
+    "systemStatus": "Systeemstatus",
+    "operational": "OPERATIONEEL",
+    "allSystemsFunctioning": "Alle systemen functioneren",
+    "activeSosEvents": "Actieve SOS Gebeurtenissen",
+    "noActiveSos": "Geen actieve SOS gebeurtenissen op dit moment",
+    "sosEventsWillAppear": "SOS gebeurtenissen verschijnen hier wanneer geactiveerd",
+    "notificationCenter": "Notificatiecentrum",
+    "noPendingNotifications": "Geen wachtende notificaties",
+    "familyNotificationsWillAppear": "Familie notificaties verschijnen hier",
+    "systemInformation": "Systeeminformatie",
+    "organization": "Organisatie",
+    "notAssigned": "Niet toegewezen",
+    "role": "Rol",
+    "platformAdmin": "Platform Beheerder",
+    "regionalSupervisor": "Regionale Supervisor",
+    "regionalOperator": "Regionale Operator",
+    "user": "Gebruiker"
+  },
   "admin": {
     "title": "Admin Dashboard",
     "subtitle": "ICE SOS Lite Beheerportaal",

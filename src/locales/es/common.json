@@ -306,6 +306,33 @@
       "description": "Respuesta de emergencia especializada para España con soporte en el idioma local y disponibilidad 24/7."
     }
   },
+  "regionalDashboard": {
+    "title": "Centro de Llamadas Regional",
+    "subtitle": "Panel de control del centro de emergencias",
+    "accessRestricted": "Acceso Restringido",
+    "noPermission": "No tienes permiso para acceder al centro de llamadas regional.",
+    "activeCustomers": "Clientes Activos",
+    "connectedCustomers": "Clientes conectados",
+    "openAlerts": "Alertas Abiertas",
+    "pendingEvents": "Eventos pendientes",
+    "systemStatus": "Estado del Sistema",
+    "operational": "OPERATIVO",
+    "allSystemsFunctioning": "Todos los sistemas funcionando",
+    "activeSosEvents": "Eventos SOS Activos",
+    "noActiveSos": "No hay eventos SOS activos en este momento",
+    "sosEventsWillAppear": "Los eventos SOS aparecerán aquí cuando se activen",
+    "notificationCenter": "Centro de Notificaciones",
+    "noPendingNotifications": "No hay notificaciones pendientes",
+    "familyNotificationsWillAppear": "Las notificaciones familiares aparecerán aquí",
+    "systemInformation": "Información del Sistema",
+    "organization": "Organización",
+    "notAssigned": "No asignado",
+    "role": "Rol",
+    "platformAdmin": "Administrador de Plataforma",
+    "regionalSupervisor": "Supervisor Regional",
+    "regionalOperator": "Operador Regional",
+    "user": "Usuario"
+  },
   "regionalCenterES": {
     "h1": "Centro de Llamadas Regional de España",
     "intro": "Soporte de emergencia bilingüe 24/7 para residentes y visitantes en España.",
