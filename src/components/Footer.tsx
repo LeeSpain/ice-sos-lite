@@ -78,6 +78,25 @@ const Footer = () => {
             </div>
           </div>
 
+          {/* Legal Compliance */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground">Legal & Compliance</h3>
+            <div className="space-y-2">
+              <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Privacy Policy
+              </a>
+              <a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Terms of Service
+              </a>
+              <a href="/emergency-liability.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Emergency Liability
+              </a>
+              <a href="/medical-data-compliance.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
+                Medical Compliance
+              </a>
+            </div>
+          </div>
+
           {/* Connect */}
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.connect')}</h3>
