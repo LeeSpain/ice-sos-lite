@@ -3,7 +3,7 @@ import { ConnectionsWidget } from './ConnectionsWidget';
 
 export const ConnectionsPage: React.FC = () => {
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="w-full">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Emergency Connections</h1>
         <p className="text-muted-foreground">

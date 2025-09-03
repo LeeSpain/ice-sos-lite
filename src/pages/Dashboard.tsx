@@ -157,8 +157,8 @@ const Dashboard = () => {
             <Routes>
               {/* Main Dashboard Overview - Family Circle Focused */}
               <Route path="/" element={
-                <div className="container mx-auto px-4 py-section">
-                  <div className="max-w-7xl mx-auto">
+                <div className="p-6">
+                  <div className="max-w-none">
                     {/* Welcome Header */}
                     <div className="mb-6">
                       <h1 className="text-3xl font-bold">
@@ -194,21 +194,21 @@ const Dashboard = () => {
 
               {/* Products Page */}
                <Route path="/products" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                   <MyProductsWidget profile={profile} />
                 </div>
               } />
 
               {/* Flic Control Page */}
                <Route path="/flic" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                   <FlicControlPage />
                 </div>
               } />
 
               {/* Profile Page */}
                <Route path="/profile" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                   <PersonalDetailsCard 
                     profile={profile} 
                     onProfileUpdate={loadProfile}
@@ -218,7 +218,7 @@ const Dashboard = () => {
 
               {/* Emergency Page */}
                <Route path="/emergency" element={
-                 <div className="py-section px-6 space-y-6">
+                 <div className="p-6 space-y-6">
                   <EmergencyContactsCard 
                     profile={profile} 
                     onProfileUpdate={loadProfile}
@@ -229,14 +229,14 @@ const Dashboard = () => {
 
               {/* Family SOS Live View */}
                <Route path="/family-sos" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <LiveSOSFamily />
                  </div>
                } />
 
                {/* Health Page */}
                <Route path="/health" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <MedicalInfoCard 
                      profile={profile} 
                      onProfileUpdate={loadProfile}
@@ -246,47 +246,45 @@ const Dashboard = () => {
 
                {/* Activity Page */}
                <Route path="/activity" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <ActivityCard />
                  </div>
                } />
 
                {/* Subscription Page */}
                <Route path="/subscription" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <SubscriptionCard subscription={subscription} />
                  </div>
                } />
 
                {/* Mobile App Page */}
                 <Route path="/mobile-app" element={
-                  <div className="py-section px-6">
+                  <div className="p-6">
                     <MobileAppCard />
                   </div>
                 } />
 
                {/* Mobile Dashboard Page */}
                 <Route path="/mobile-dashboard" element={
-                  <div className="py-section px-6">
-                    <div className="max-w-7xl mx-auto">
-                      <div className="mb-6">
-                        <h1 className="text-2xl font-bold">Mobile Development Dashboard</h1>
-                        <p className="text-muted-foreground">Monitor mobile app readiness and native capabilities</p>
-                      </div>
-                      <div className="space-y-6">
-                        {React.createElement(() => {
-                          const { MobileDashboard } = require('@/components/mobile/MobileDashboard');
-                          return React.createElement(MobileDashboard);
-                        })}
-                      </div>
+                  <div className="p-6">
+                    <div className="mb-6">
+                      <h1 className="text-2xl font-bold">Mobile Development Dashboard</h1>
+                      <p className="text-muted-foreground">Monitor mobile app readiness and native capabilities</p>
+                    </div>
+                    <div className="space-y-6">
+                      {React.createElement(() => {
+                        const { MobileDashboard } = require('@/components/mobile/MobileDashboard');
+                        return React.createElement(MobileDashboard);
+                      })}
                     </div>
                   </div>
                 } />
 
-              {/* Dashboard pages with proper container spacing */}
+              {/* Dashboard pages with full width */}
               <Route path="/family" element={<FamilyPage />} />
                <Route path="/family-setup" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <div className="max-w-4xl mx-auto">
                      <FamilyAccessSetup />
                    </div>
@@ -294,22 +292,22 @@ const Dashboard = () => {
                } />
                <Route path="/location" element={<LocationPage />} />
                <Route path="/notifications" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <NotificationsPage />
                  </div>
                } />
                <Route path="/security" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <SecurityPage />
                  </div>
                } />
                <Route path="/settings" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <SettingsPage />
                  </div>
                } />
                <Route path="/support" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <SupportPage />
                  </div>
                } />
@@ -321,24 +319,24 @@ const Dashboard = () => {
                 </div>
               } />
                <Route path="/circles" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <MyCirclesPage />
                  </div>
                } />
                <Route path="/places" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <PlacesManager />
                  </div>
                } />
                <Route path="/location-history" element={
-                 <div className="py-section px-6">
+                 <div className="p-6">
                    <LocationHistoryPage />
                  </div>
                 } />
                 
                 {/* Connections Page */}
                 <Route path="/connections" element={
-                  <div className="py-section px-6">
+                  <div className="p-6">
                     <ConnectionsPage />
                   </div>
                 } />
