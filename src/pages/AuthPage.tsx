@@ -65,13 +65,24 @@ const AuthPage = () => {
       return;
     }
 
+    const emailTrimmed = email.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailTrimmed)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
     setSuccess('');
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: emailTrimmed,
         password,
       });
 
@@ -80,7 +91,7 @@ const AuthPage = () => {
         // Log failed sign in attempt
         setTimeout(() => {
           logSecurityEvent('signin_failure', {
-            email: email.trim(),
+            email: emailTrimmed,
             error: error.message,
             timestamp: new Date().toISOString(),
             ip_address: 'client_side',

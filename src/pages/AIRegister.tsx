@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { usePreferences } from '@/contexts/PreferencesContext';
 
 import SEO from '@/components/SEO';
+import { isValidEmail, isValidPhone, validatePasswordStrength } from '@/utils/security';
 
 
 interface Plan {
