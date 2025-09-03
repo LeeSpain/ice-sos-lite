@@ -53,14 +53,14 @@ export const FamilyCircleOverview = () => {
 
   return (
     <Card className={`${getHealthBg(circleHealth)} border-0`}>
-      <CardHeader>
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-6 w-6 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Users className="h-5 w-5 text-primary" />
               Family Circle Status
             </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Your emergency network and protection readiness
             </p>
           </div>
@@ -72,114 +72,109 @@ export const FamilyCircleOverview = () => {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Circle Health Score */}
-        <div className="flex items-center justify-between">
+      <CardContent className="space-y-4">{/* Circle Health Score & Connection Summary - Combined */}
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-3xl font-bold">{circleHealth}%</p>
-            <p className="text-sm font-medium text-muted-foreground">Circle Health</p>
-          </div>
-          <div className="text-right">
-            <div className={`flex items-center gap-2 ${getHealthColor(circleHealth)}`}>
-              {circleHealth >= 80 ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-              <span className="text-sm font-medium">
+            <p className="text-2xl font-bold">{circleHealth}%</p>
+            <p className="text-xs font-medium text-muted-foreground">Circle Health</p>
+            <div className={`flex items-center gap-1 mt-1 ${getHealthColor(circleHealth)}`}>
+              {circleHealth >= 80 ? <CheckCircle className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
+              <span className="text-xs font-medium">
                 {circleHealth >= 80 ? 'Ready' : circleHealth >= 60 ? 'Almost Ready' : 'Setup Needed'}
               </span>
             </div>
           </div>
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div>
+              <div className="text-lg font-bold text-primary">{totalActive}</div>
+              <div className="text-xs text-muted-foreground">Active</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-orange-500">{totalPending}</div>
+              <div className="text-xs text-muted-foreground">Pending</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-green-600">{activeFamily.length}</div>
+              <div className="text-xs text-muted-foreground">Family</div>
+            </div>
+          </div>
         </div>
         
-        <Progress value={circleHealth} className="h-3" />
+        <Progress value={circleHealth} className="h-2" />
 
-        {/* Connection Summary */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-primary">{totalActive}</div>
-            <div className="text-xs text-muted-foreground">Active Connections</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-500">{totalPending}</div>
-            <div className="text-xs text-muted-foreground">Pending Invites</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{activeFamily.length}</div>
-            <div className="text-xs text-muted-foreground">Family Members</div>
-          </div>
-        </div>
-
-        {/* Connection Types */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-lg border bg-background/50">
-            <Crown className="h-6 w-6 text-primary" />
-            <div className="flex-1">
-              <div className="font-semibold text-sm">Family Circle</div>
-              <div className="text-xs text-muted-foreground">
-                {activeFamily.length} members with full access
-              </div>
-            </div>
-            <Badge variant="default" className="text-xs">{activeFamily.length}</Badge>
-          </div>
-
-          <div className="flex items-center gap-3 p-3 rounded-lg border bg-background/50">
-            <Shield className="h-6 w-6 text-secondary" />
-            <div className="flex-1">
-              <div className="font-semibold text-sm">Trusted Contacts</div>
-              <div className="text-xs text-muted-foreground">
-                {activeTrusted.length} emergency-only contacts
-              </div>
-            </div>
-            <Badge variant="secondary" className="text-xs">{activeTrusted.length}</Badge>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
+        {/* Connection Types - Compact */}
         <div className="grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2 p-2 rounded-lg border bg-background/50">
+            <Crown className="h-4 w-4 text-primary" />
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-xs">Family Circle</div>
+              <div className="text-xs text-muted-foreground">
+                {activeFamily.length} members
+              </div>
+            </div>
+            <Badge variant="default" className="text-xs px-1 py-0">{activeFamily.length}</Badge>
+          </div>
+
+          <div className="flex items-center gap-2 p-2 rounded-lg border bg-background/50">
+            <Shield className="h-4 w-4 text-secondary" />
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-xs">Trusted Contacts</div>
+              <div className="text-xs text-muted-foreground">
+                {activeTrusted.length} contacts
+              </div>
+            </div>
+            <Badge variant="secondary" className="text-xs px-1 py-0">{activeTrusted.length}</Badge>
+          </div>
+        </div>
+
+        {/* Quick Actions - Compact */}
+        <div className="grid grid-cols-2 gap-2">
           <Button 
             onClick={() => navigate('/full-dashboard/connections')} 
-            className="text-xs"
+            className="text-xs h-8"
             size="sm"
           >
-            <UserPlus className="h-4 w-4 mr-2" />
+            <UserPlus className="h-3 w-3 mr-1" />
             Add Connection
           </Button>
           <Button 
             onClick={() => navigate('/full-dashboard/live-map')} 
             variant="outline" 
-            className="text-xs"
+            className="text-xs h-8"
             size="sm"
           >
-            <Map className="h-4 w-4 mr-2" />
+            <Map className="h-3 w-3 mr-1" />
             Live Map
           </Button>
         </div>
 
-        {/* Setup Recommendations */}
+        {/* Setup Recommendations - Compact */}
         {circleHealth < 80 && (
-          <div className="p-3 rounded-lg bg-accent/50 border border-accent">
+          <div className="p-2 rounded-lg bg-accent/50 border border-accent">
             <div className="flex items-start gap-2">
-              <AlertTriangle className="h-4 w-4 text-orange-500 mt-0.5" />
+              <AlertTriangle className="h-3 w-3 text-orange-500 mt-0.5 flex-shrink-0" />
               <div className="text-xs">
                 <p className="font-medium mb-1">Improve your circle:</p>
-                <ul className="space-y-1 text-muted-foreground">
-                  {activeFamily.length < 2 && <li>• Add at least 2 family members</li>}
-                  {activeTrusted.length < 1 && <li>• Add trusted emergency contacts</li>}
-                  {totalPending > 0 && <li>• Follow up on pending invitations</li>}
+                <ul className="space-y-0.5 text-muted-foreground text-xs leading-tight">
+                  {activeFamily.length < 2 && <li>• Add 2+ family members</li>}
+                  {activeTrusted.length < 1 && <li>• Add trusted contacts</li>}
+                  {totalPending > 0 && <li>• Follow up on pending invites</li>}
                 </ul>
               </div>
             </div>
           </div>
         )}
 
-        {/* Empty State */}
+        {/* Empty State - Compact */}
         {totalActive === 0 && (
-          <div className="text-center py-4 border-t">
-            <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <div className="text-center py-3 border-t">
+            <Users className="h-6 w-6 text-muted-foreground mx-auto mb-2" />
             <h4 className="font-semibold text-sm mb-1">Build your emergency network</h4>
             <p className="text-xs text-muted-foreground mb-3">
               Add family members and trusted contacts for emergency alerts
             </p>
-            <Button onClick={() => navigate('/full-dashboard/connections')} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
+            <Button onClick={() => navigate('/full-dashboard/connections')} size="sm" className="h-8 text-xs">
+              <Plus className="h-3 w-3 mr-1" />
               Get Started
             </Button>
           </div>
