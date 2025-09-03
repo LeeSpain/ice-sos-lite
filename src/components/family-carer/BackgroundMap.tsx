@@ -38,6 +38,8 @@ export const BackgroundMap: React.FC<BackgroundMapProps> = ({ className }) => {
           logoPosition: 'bottom-left'
         });
 
+        console.log('Background map initialized');
+
         // Disable all interactions
         map.current.dragPan.disable();
         map.current.scrollZoom.disable();
@@ -46,6 +48,11 @@ export const BackgroundMap: React.FC<BackgroundMapProps> = ({ className }) => {
         map.current.keyboard.disable();
         map.current.doubleClickZoom.disable();
         map.current.touchZoomRotate.disable();
+
+        // Add load event listener
+        map.current.on('load', () => {
+          console.log('Background map loaded successfully');
+        });
 
       } catch (error) {
         console.error('Failed to initialize background map:', error);
@@ -61,15 +68,15 @@ export const BackgroundMap: React.FC<BackgroundMapProps> = ({ className }) => {
 
   return (
     <div 
-      className={`absolute inset-0 opacity-10 pointer-events-none ${className || ''}`}
-      style={{ filter: 'blur(1px)' }}
+      className={`absolute inset-0 opacity-30 pointer-events-none ${className || ''}`}
+      style={{ filter: 'blur(0.5px)' }}
     >
       <div 
         ref={mapContainer} 
         className="w-full h-full"
       />
       {/* Overlay gradient to blend with background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/60 via-transparent to-white/40" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/20" />
     </div>
   );
 };
