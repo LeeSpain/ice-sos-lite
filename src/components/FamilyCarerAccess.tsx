@@ -82,33 +82,49 @@ const FamilyCarerAccess = () => {
         </div>
 
         {/* Main Content Card */}
-        <Card className="relative border-2 border-warning/20 bg-white dark:bg-slate-800 shadow-xl overflow-hidden max-w-4xl mx-auto">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-warning to-warning/60"></div>
-          
-          <CardContent className="p-6 md:p-8">
-            {/* Split Layout */}
-            <div className="grid md:grid-cols-2 gap-6 items-center">
-              {/* Left Side - Main Info */}
-              <div className="text-center md:text-left">
-                <div className="w-14 h-14 bg-gradient-to-br from-warning to-warning/80 shadow-lg rounded-2xl flex items-center justify-center mx-auto md:mx-0 mb-4">
-                  <Users className="h-7 w-7 text-white" />
+        <Card className="relative bg-card border border-border rounded-3xl shadow-lg overflow-hidden max-w-4xl mx-auto">
+          <CardContent className="p-0">
+            <div className="grid md:grid-cols-3 gap-0">
+              {/* Left Side - Main Content (2/3 width) */}
+              <div className="md:col-span-2 p-6 md:p-8 relative">
+                {/* Icon and Title */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-warning rounded-xl flex items-center justify-center">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground">
+                    {t('familyCarerAccess.cardTitle')}
+                  </h3>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-3 text-foreground">
-                  {t('familyCarerAccess.cardTitle')}
-                </h3>
+
+                {/* Price */}
                 <div className="mb-4">
-                  <span className="text-3xl font-bold text-warning">{formattedPrice}</span>
-                  <span className="text-muted-foreground text-sm">{billingInterval} {t('familyCarerAccess.cardSubtitle')}</span>
+                  <span className="text-2xl font-bold text-warning">{formattedPrice}</span>
+                  <span className="text-muted-foreground text-sm ml-1">{billingInterval}</span>
                 </div>
-                <p className="text-muted-foreground text-sm mb-4">
+
+                {/* Description */}
+                <p className="text-muted-foreground text-sm mb-6">
                   {t('familyCarerAccess.cardDescription')}
                 </p>
-                
-                {/* CTA Buttons */}
-                <div className="flex flex-col gap-3">
-                  <Button asChild size="lg" className="bg-warning hover:bg-warning/90 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl border-2 border-warning/30">
+
+                {/* Feature List */}
+                <div className="space-y-3 mb-6">
+                  {features.slice(0, 4).map((feature, index) => {
+                    const Icon = feature.icon;
+                    return (
+                      <div key={index} className="flex items-start gap-3">
+                        <CheckCircle className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-foreground font-medium">{feature.title}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button asChild className="bg-warning hover:bg-warning/90 text-white">
                     <Link to="/family-carer-access">
-                      <Users className="mr-2 h-4 w-4" />
                       {t('familyCarerAccess.learnMore')}
                     </Link>
                   </Button>
@@ -118,8 +134,7 @@ const FamilyCarerAccess = () => {
                     trigger={
                       <Button 
                         variant="outline"
-                        size="lg"
-                        className="border-warning text-warning hover:bg-warning hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                        className="border-warning text-warning hover:bg-warning hover:text-white"
                       >
                         <Play className="h-4 w-4 mr-2" />
                         {t('familyCarerAccess.watchVideo')}
@@ -127,27 +142,15 @@ const FamilyCarerAccess = () => {
                     }
                   />
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {t('familyCarerAccess.secureNote')}
-                </p>
               </div>
 
-              {/* Right Side - Features Grid */}
-              <div className="grid grid-cols-1 gap-4">
-                {features.slice(0, 3).map((feature, index) => {
-                  const Icon = feature.icon;
-                  return (
-                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-warning/5 border border-warning/10">
-                      <div className={`w-10 h-10 bg-gradient-to-br from-warning to-warning/80 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        <Icon className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm text-foreground">{feature.title}</h4>
-                        <p className="text-xs text-muted-foreground">{feature.description}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* Right Side - Image (1/3 width) */}
+              <div className="md:col-span-1 relative bg-gradient-to-br from-warning/10 to-warning/20 flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/a90a1824-7b89-4eec-9e3e-da2f4bc97119.png"
+                  alt="Family & Carer Support"
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </CardContent>
