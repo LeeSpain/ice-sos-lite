@@ -374,52 +374,156 @@ export const FamilyCircleSection: React.FC = () => {
         </div>
 
         {/* Emergency Scenario Flow */}
-        <div className="bg-gradient-to-r from-emergency/10 via-primary/5 to-wellness/10 rounded-3xl p-8 border border-emergency/20 backdrop-blur-sm">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">When Emergency Happens</h3>
-            <p className="text-lg text-muted-foreground">See how alerts flow through your family circle in real-time</p>
+        <div className="mb-20">
+          <div className="text-center mb-16">
+            <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-6">When Emergency Happens</h3>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              See how our seamless emergency response system activates instantly, connecting your entire support network in seconds
+            </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center group">
-              <div className="relative">
-                <div className="w-20 h-20 bg-emergency rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
-                  <Shield className="h-10 w-10 text-white" />
-                  <div className="absolute -inset-2 border-4 border-emergency/30 rounded-full animate-ping"></div>
-                </div>
-              </div>
-              <h4 className="font-bold text-lg mb-3">SOS Activated</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">Grandad presses emergency button or automatic alert triggers</p>
+          {/* Professional Flow Timeline */}
+          <div className="relative max-w-5xl mx-auto">
+            {/* Connection Line - Desktop */}
+            <div className="hidden md:block absolute top-20 left-0 right-0 h-0.5 bg-gradient-to-r from-emergency via-primary to-wellness opacity-30"></div>
+            <div className="hidden md:block absolute top-20 left-0 right-0 h-0.5 bg-gradient-to-r from-emergency via-primary to-wellness">
+              <div className="h-full bg-gradient-to-r from-emergency via-primary to-wellness animate-pulse"></div>
             </div>
             
-            <div className="text-center group">
-              <div className="relative">
-                <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
-                  <Wifi className="h-10 w-10 text-white animate-pulse" />
+            {/* Flow Steps */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-4">
+              
+              {/* Step 1: SOS Activation */}
+              <div className="relative text-center group">
+                {/* Step Number */}
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-emergency text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-lg">
+                  1
+                </div>
+                
+                {/* Icon Circle */}
+                <div className="relative mb-8">
+                  <div className="w-24 h-24 bg-gradient-to-br from-emergency to-emergency/80 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500 relative z-10">
+                    <Shield className="h-12 w-12 text-white" />
+                  </div>
+                  {/* Pulsing Rings */}
+                  <div className="absolute inset-0 w-24 h-24 mx-auto">
+                    <div className="absolute inset-0 border-4 border-emergency/20 rounded-full animate-ping"></div>
+                    <div className="absolute inset-2 border-2 border-emergency/40 rounded-full animate-ping" style={{animationDelay: '0.5s'}}></div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-foreground">SOS Activated</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed px-2">
+                    Emergency button pressed or automatic fall detection triggers the alert system instantly
+                  </p>
+                </div>
+                
+                {/* Mobile Connection Arrow */}
+                <div className="md:hidden flex justify-center mt-6 mb-2">
+                  <div className="w-6 h-6 border-r-2 border-b-2 border-primary transform rotate-45 animate-bounce"></div>
                 </div>
               </div>
-              <h4 className="font-bold text-lg mb-3">Instant Alerts</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">All family members notified simultaneously via app and SMS</p>
+              
+              {/* Step 2: Instant Alerts */}
+              <div className="relative text-center group">
+                {/* Step Number */}
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-lg">
+                  2
+                </div>
+                
+                {/* Icon Circle */}
+                <div className="relative mb-8">
+                  <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500 relative z-10">
+                    <Wifi className="h-12 w-12 text-white animate-pulse" />
+                  </div>
+                  {/* Signal Waves */}
+                  <div className="absolute inset-0 w-24 h-24 mx-auto">
+                    <div className="absolute inset-0 border-2 border-primary/30 rounded-full animate-ping"></div>
+                    <div className="absolute inset-4 border-2 border-primary/50 rounded-full animate-ping" style={{animationDelay: '0.3s'}}></div>
+                    <div className="absolute inset-8 border-2 border-primary/70 rounded-full animate-ping" style={{animationDelay: '0.6s'}}></div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-foreground">Instant Network Alert</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed px-2">
+                    Family circle receives immediate notifications via app, SMS, and push alerts simultaneously
+                  </p>
+                </div>
+                
+                {/* Mobile Connection Arrow */}
+                <div className="md:hidden flex justify-center mt-6 mb-2">
+                  <div className="w-6 h-6 border-r-2 border-b-2 border-primary transform rotate-45 animate-bounce"></div>
+                </div>
+              </div>
+              
+              {/* Step 3: Real-time Coordination */}
+              <div className="relative text-center group">
+                {/* Step Number */}
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-wellness text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-lg">
+                  3
+                </div>
+                
+                {/* Icon Circle */}
+                <div className="relative mb-8">
+                  <div className="w-24 h-24 bg-gradient-to-br from-wellness to-wellness/80 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500 relative z-10">
+                    <Users className="h-12 w-12 text-white" />
+                  </div>
+                  {/* Coordination Rings */}
+                  <div className="absolute inset-0 w-24 h-24 mx-auto">
+                    <div className="absolute inset-0 border-2 border-wellness/40 rounded-full animate-spin" style={{animationDuration: '3s'}}></div>
+                    <div className="absolute inset-6 border-2 border-wellness/60 rounded-full animate-spin" style={{animationDuration: '2s', animationDirection: 'reverse'}}></div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-foreground">Live Coordination</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed px-2">
+                    Family members see real-time location, communicate instantly, and coordinate the fastest response
+                  </p>
+                </div>
+                
+                {/* Mobile Connection Arrow */}
+                <div className="md:hidden flex justify-center mt-6 mb-2">
+                  <div className="w-6 h-6 border-r-2 border-b-2 border-primary transform rotate-45 animate-bounce"></div>
+                </div>
+              </div>
+              
+              {/* Step 4: Help Arrives */}
+              <div className="relative text-center group">
+                {/* Step Number */}
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold z-10 shadow-lg">
+                  4
+                </div>
+                
+                {/* Icon Circle */}
+                <div className="relative mb-8">
+                  <div className="w-24 h-24 bg-gradient-to-br from-green-600 to-green-500 rounded-full flex items-center justify-center mx-auto shadow-2xl group-hover:scale-110 transition-all duration-500 relative z-10">
+                    <Heart className="h-12 w-12 text-white" />
+                  </div>
+                  {/* Success Glow */}
+                  <div className="absolute inset-0 w-24 h-24 mx-auto">
+                    <div className="absolute inset-0 bg-green-500/20 rounded-full animate-pulse"></div>
+                    <div className="absolute inset-2 bg-green-500/30 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <h4 className="text-lg font-bold text-foreground">Help Arrives Fast</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed px-2">
+                    Closest family member or trusted contact arrives with complete situational awareness
+                  </p>
+                </div>
+              </div>
             </div>
             
-            <div className="text-center group">
-              <div className="relative">
-                <div className="w-20 h-20 bg-wellness rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
-                  <Users className="h-10 w-10 text-white" />
-                </div>
+            {/* Bottom Statistics */}
+            <div className="mt-16 text-center">
+              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary/10 to-wellness/10 px-6 py-3 rounded-full border border-primary/20">
+                <Clock className="h-5 w-5 text-primary" />
+                <span className="text-sm font-semibold text-foreground">Average response time: Under 2 minutes</span>
               </div>
-              <h4 className="font-bold text-lg mb-3">Coordination</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">Family coordinates response in real-time with live updates</p>
-            </div>
-            
-            <div className="text-center group">
-              <div className="relative">
-                <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
-                  <Heart className="h-10 w-10 text-white" />
-                </div>
-              </div>
-              <h4 className="font-bold text-lg mb-3">Help Arrives</h4>
-              <p className="text-sm text-muted-foreground leading-relaxed">Fastest responder reaches grandad with full situation context</p>
             </div>
           </div>
         </div>
