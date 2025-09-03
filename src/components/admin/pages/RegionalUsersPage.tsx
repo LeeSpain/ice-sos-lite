@@ -76,9 +76,9 @@ const RegionalUsersPage = () => {
 
   const inviteUserMutation = useMutation({
     mutationFn: async (userData: typeof newUser) => {
-      // First, invite the user to Supabase Auth (this would typically be done through an edge function)
-      const { data, error } = await supabase.auth.admin.inviteUserByEmail(userData.email, {
-        data: {
+      const { data, error } = await supabase.functions.invoke('regional-user-invite', {
+        body: {
+          email: userData.email,
           organization_id: userData.organization_id,
           role: userData.role,
           language: userData.language
@@ -86,19 +86,6 @@ const RegionalUsersPage = () => {
       });
 
       if (error) throw error;
-
-      // Create organization_users record
-      const { error: orgUserError } = await supabase
-        .from('organization_users')
-        .insert([{
-          user_id: data.user.id,
-          organization_id: userData.organization_id,
-          role: userData.role,
-          language: userData.language
-        }]);
-
-      if (orgUserError) throw orgUserError;
-
       return data;
     },
     onSuccess: () => {
