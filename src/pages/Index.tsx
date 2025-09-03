@@ -3,8 +3,6 @@ import React, { useEffect } from 'react';
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
-import MetricPreview from "@/components/MetricPreview";
-import RegionServices from "@/components/RegionServices";
 import FamilyCarerAccess from "@/components/FamilyCarerAccess";
 import Pricing from "@/components/Pricing";
 
@@ -43,12 +41,9 @@ const Index = () => {
       
       
       <Features />
-      <MetricPreview />
 
       {/* Live App Preview Section (reflects admin "App Testing" settings) */}
       <AppPreviewSection />
-
-      <RegionServices />
       <FamilyCarerAccess />
 
       <Pricing />
