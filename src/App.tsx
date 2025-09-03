@@ -256,6 +256,15 @@ const App = () => {
                 </OptimizedSuspense>
               } />
 
+              {/* Regional Dashboard */}
+              <Route path="/regional-dashboard" element={
+                <OptimizedSuspense skeletonType="card">
+                  <RegionalProtectedRoute>
+                    <RegionalDashboard />
+                  </RegionalProtectedRoute>
+                </OptimizedSuspense>
+              } />
+
               {/* Family Invite Accept */}
               <Route path="/family-invite/:token" element={
                 <OptimizedSuspense skeletonType="card">

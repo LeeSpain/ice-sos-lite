@@ -38,7 +38,8 @@ import {
   Video,
   Map,
   Navigation,
-  History
+  History,
+  Phone
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
