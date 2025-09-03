@@ -60,6 +60,23 @@ const AuthPage = () => {
 
       if (error) {
         recordAttempt();
+        // If invalid credentials, try to create the account automatically
+        const msg = (error.message || '').toLowerCase();
+        const code = (error as any).code || '';
+        if (msg.includes('invalid login') || code === 'invalid_credentials') {
+          const redirectUrl = `${window.location.origin}/`;
+          const { error: signUpError } = await supabase.auth.signUp({
+            email: emailTrimmed,
+            password,
+            options: { emailRedirectTo: redirectUrl }
+          });
+          if (!signUpError) {
+            setSuccess('Account created. Please check your email to confirm and then sign in.');
+            resetRateLimit();
+            return;
+          }
+        }
+
         // Log failed sign in attempt
         setTimeout(() => {
           logSecurityEvent('signin_failure', {
