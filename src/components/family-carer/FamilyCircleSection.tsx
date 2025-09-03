@@ -296,22 +296,38 @@ export const FamilyCircleSection: React.FC = () => {
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-4 h-4 bg-primary rounded-full animate-pulse"></div>
               <h3 className="text-xl font-bold text-foreground">Family Circle</h3>
+              <Badge className="bg-primary/10 text-primary border-primary/20">Always Connected</Badge>
             </div>
-            <p className="text-muted-foreground mb-6">
-              Direct family members with full access to emergency status, location data, and coordination capabilities.
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Your closest family members stay connected with you through continuous location sharing and full emergency coordination. They're always just a glance away from knowing you're safe.
             </p>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
-                <Shield className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm font-medium">Instant SOS notifications</span>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-4 p-4 bg-white/60 rounded-lg border border-primary/10">
+                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Clock className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Always-On Location Sharing</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Family members can see your real-time location 24/7, giving everyone peace of mind. Perfect for knowing when you've arrived safely or if you need assistance.</p>
+                </div>
               </div>
-              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
-                <Clock className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm font-medium">Real-time location access</span>
+              <div className="flex items-start space-x-4 p-4 bg-white/60 rounded-lg border border-primary/10">
+                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Shield className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Instant Emergency Response</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">The moment an SOS is triggered, family members receive immediate alerts and can coordinate the response together in real-time.</p>
+                </div>
               </div>
-              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
-                <Users className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm font-medium">Full coordination rights</span>
+              <div className="flex items-start space-x-4 p-4 bg-white/60 rounded-lg border border-primary/10">
+                <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Users className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Full Coordination Access</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Family members can see each other's locations during emergencies, communicate through the app, and ensure the fastest response possible.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -320,22 +336,38 @@ export const FamilyCircleSection: React.FC = () => {
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-4 h-4 border-2 border-secondary border-dashed rounded-full animate-pulse"></div>
               <h3 className="text-xl font-bold text-foreground">Trusted Contacts</h3>
+              <Badge variant="outline" className="bg-secondary/10 text-secondary border-secondary/20">Privacy First</Badge>
             </div>
-            <p className="text-muted-foreground mb-6">
-              Professional carers, neighbors, and friends with limited access for support and backup assistance.
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              Professional carers, close neighbors, and trusted friends who provide support when needed, while respecting your privacy. They're only alerted during genuine emergencies unless you choose otherwise.
             </p>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
-                <Heart className="h-5 w-5 text-secondary flex-shrink-0" />
-                <span className="text-sm font-medium">Emergency notifications</span>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-4 p-4 bg-white/60 rounded-lg border border-secondary/10">
+                <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Heart className="h-4 w-4 text-secondary" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Emergency-Only Alerts</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Trusted contacts are only notified during genuine SOS situations, ensuring your privacy while maintaining a reliable support network when you need it most.</p>
+                </div>
               </div>
-              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
-                <Wifi className="h-5 w-5 text-secondary flex-shrink-0" />
-                <span className="text-sm font-medium">Status updates only</span>
+              <div className="flex items-start space-x-4 p-4 bg-white/60 rounded-lg border border-secondary/10">
+                <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <UserCircle className="h-4 w-4 text-secondary" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Professional Support Access</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Perfect for professional carers who need emergency access but respect your daily privacy. You can grant additional permissions if desired.</p>
+                </div>
               </div>
-              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
-                <UserCircle className="h-5 w-5 text-secondary flex-shrink-0" />
-                <span className="text-sm font-medium">Support role access</span>
+              <div className="flex items-start space-x-4 p-4 bg-white/60 rounded-lg border border-secondary/10">
+                <div className="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Wifi className="h-4 w-4 text-secondary" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm mb-1">Customizable Permissions</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">You control what information trusted contacts can see. Start with emergency-only access and upgrade to location sharing if you choose.</p>
+                </div>
               </div>
             </div>
           </div>
