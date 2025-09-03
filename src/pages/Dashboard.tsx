@@ -7,6 +7,9 @@ import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import MetricsDashboard from "@/components/dashboard/MetricsDashboard";
 import EmergencyActionsWidget from "@/components/dashboard/EmergencyActionsWidget";
+import { FamilyCircleOverview } from "@/components/dashboard/FamilyCircleOverview";
+import { LiveFamilyStatus } from "@/components/dashboard/LiveFamilyStatus";
+import { EmergencyPreparedness } from "@/components/dashboard/EmergencyPreparedness";
 import MyProductsWidget from "@/components/dashboard/MyProductsWidget";
 import PersonalDetailsCard from "@/components/dashboard/PersonalDetailsCard";
 import EmergencyContactsCard from "@/components/dashboard/EmergencyContactsCard";
@@ -152,21 +155,32 @@ const Dashboard = () => {
           {/* Dashboard Content */}
           <div className="flex-1 overflow-auto">
             <Routes>
-              {/* Main Dashboard Overview - Metrics Only */}
+              {/* Main Dashboard Overview - Family Circle Focused */}
               <Route path="/" element={
                 <div className="container mx-auto px-4 py-section">
                   <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-                      {/* Main Content - Metrics Dashboard */}
-                      <div className="xl:col-span-3">
+                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                      {/* Main Content - Metrics & Family Circle */}
+                      <div className="xl:col-span-2 space-y-6">
+                        {/* Family Circle Overview - Prominent */}
+                        <FamilyCircleOverview />
+                        
+                        {/* Emergency Preparedness */}
+                        <EmergencyPreparedness 
+                          profile={profile} 
+                          subscription={subscription}
+                        />
+                        
+                        {/* Traditional Metrics - Condensed */}
                         <MetricsDashboard 
                           profile={profile} 
                           subscription={subscription}
                         />
                       </div>
                       
-                      {/* Sidebar Widgets */}
+                      {/* Sidebar - Live Status & Actions */}
                       <div className="space-y-6">
+                        <LiveFamilyStatus />
                         <EmergencyActionsWidget profile={profile} subscription={subscription} />
                       </div>
                     </div>
