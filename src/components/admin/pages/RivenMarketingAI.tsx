@@ -58,7 +58,8 @@ import {
   Sparkles,
   Globe,
   Link2,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Mail
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -89,6 +90,10 @@ interface MarketingContent {
   hashtags: string[];
   status: string;
   scheduled_time: string;
+  email_template?: string;
+  recipient_list?: string[];
+  open_count?: number;
+  click_count?: number;
 }
 
 interface SocialMediaAccount {
@@ -168,6 +173,26 @@ const RivenMarketingAI: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [rivenResponse, setRivenResponse] = useState('');
   const [activeTab, setActiveTab] = useState('command-center');
+  
+  // Email marketing state
+  const [emailTemplates, setEmailTemplates] = useState([
+    {
+      name: "welcome",
+      subject: "🛡️ Welcome to ICE SOS - Your Safety Network is Active!",
+      content: `<h1>Welcome to ICE SOS!</h1><p>Thank you for joining our personal safety network. Your account is now active and ready to protect you.</p><h3>Next Steps:</h3><ul><li>Complete your profile and emergency contacts</li><li>Set up your medical information</li><li>Download our mobile app</li></ul><a href="{{dashboard_url}}" style="background: #3B82F6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Access Dashboard</a>`
+    },
+    {
+      name: "family_invite",
+      subject: "👨‍👩‍👧‍👦 You're invited to join a family safety circle",
+      content: `<h1>Family Safety Invitation</h1><p>You've been invited to join a family safety circle on ICE SOS.</p><p>This means you'll be able to see location updates and receive emergency alerts from your family members.</p><a href="{{invite_link}}" style="background: #10B981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Accept Invitation</a>`
+    },
+    {
+      name: "emergency_alert",
+      subject: "🚨 EMERGENCY ALERT - Immediate Action Required",
+      content: `<div style="background: #EF4444; color: white; padding: 20px; border-radius: 8px;"><h1>🚨 EMERGENCY ALERT</h1><p><strong>{{contact_name}}</strong> has activated their emergency SOS system.</p><p><strong>Location:</strong> {{location}}</p><p><strong>Time:</strong> {{timestamp}}</p><a href="{{emergency_link}}" style="background: white; color: #EF4444; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">VIEW EMERGENCY DETAILS</a></div>`
+    }
+  ]);
+  const [emailCampaigns, setEmailCampaigns] = useState([]);
   const [currentWorkflowId, setCurrentWorkflowId] = useState<string | null>(null);
   const [testingConnection, setTestingConnection] = useState(false);
   const [diagnosticsRunning, setDiagnosticsRunning] = useState(false);
@@ -1602,6 +1627,95 @@ const RivenMarketingAI: React.FC = () => {
               );
             })}
           </div>
+        </TabsContent>
+
+        {/* Email Marketing Tab */}
+        <TabsContent value="email-marketing" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold">Email Marketing</h3>
+              <p className="text-muted-foreground">Create and manage email campaigns</p>
+            </div>
+            <Button>
+              <Mail className="h-4 w-4 mr-2" />
+              New Email Campaign
+            </Button>
+          </div>
+
+          {/* Email Templates */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Mail className="h-5 w-5" />
+                Email Templates
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {emailTemplates.map((template, index) => (
+                  <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow">
+                    <CardContent className="pt-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium capitalize">{template.name.replace('_', ' ')}</h4>
+                        <Badge variant="outline">{template.name}</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        {template.subject}
+                      </p>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Edit3 className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                        <Button size="sm">
+                          <Send className="h-3 w-3 mr-1" />
+                          Use Template
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Email Campaigns */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Recent Email Campaigns
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {emailCampaigns.length === 0 ? (
+                <div className="text-center py-8">
+                  <Mail className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">No email campaigns yet</p>
+                  <p className="text-sm text-muted-foreground">Create your first email campaign with Riven AI</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {emailCampaigns.map((campaign: any, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <h4 className="font-medium">{campaign.name}</h4>
+                        <p className="text-sm text-muted-foreground">{campaign.subject}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={campaign.status === 'sent' ? 'default' : 'secondary'}>
+                          {campaign.status}
+                        </Badge>
+                        <Button size="sm" variant="outline">
+                          View Details
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Analytics Tab */}

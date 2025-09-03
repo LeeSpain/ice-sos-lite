@@ -15,13 +15,10 @@ import AIAgentPage from '@/components/admin/pages/AIAgentPage';
 import AITrainingPage from '@/components/admin/pages/AITrainingPage';
 import AIModelSettingsPage from '@/components/admin/pages/AIModelSettingsPage';
 import RivenMarketingAI from '@/components/admin/pages/RivenMarketingAI';
-import { SocialMediaIntegration } from '@/components/admin/pages/SocialMediaIntegration';
-import ContentAutomation from '@/components/admin/pages/ContentAutomation';
 import ProductsPage from '@/components/admin/pages/ProductsPage';
 import RegionalServicesPage from '@/components/admin/pages/RegionalServicesPage';
 import GlobalProtectionPlansPage from '@/components/admin/pages/GlobalProtectionPlansPage';
 import CommunicationPage from '@/components/admin/pages/CommunicationPage';
-import EmailCampaignsPage from '@/components/admin/pages/EmailCampaignsPage';
 import FamilyAccountsPage from '@/components/admin/pages/FamilyAccountsPage';
 import SystemSettingsPage from '@/components/admin/pages/SystemSettingsPage';
 import ReportsPage from '@/components/admin/pages/ReportsPage';
@@ -67,10 +64,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="conversations" element={<ConversationsPage />} />
         <Route path="ai-metrics" element={<AIPerformancePage />} />
         <Route path="contact-submissions" element={<ContactSubmissionsPage />} />
-        <Route path="email-campaigns" element={<EmailCampaignsPage />} />
         <Route path="communication" element={<CommunicationPage />} />
-        <Route path="social-media" element={<SocialMediaIntegration />} />
-        <Route path="content-automation" element={<ContentAutomation />} />
         <Route path="whatsapp" element={<WhatsAppIntegrationPage />} />
         <Route path="live-map-monitor" element={<LiveMapMonitorPage />} />
         <Route path="circle-analytics" element={<CircleAnalyticsPage />} />

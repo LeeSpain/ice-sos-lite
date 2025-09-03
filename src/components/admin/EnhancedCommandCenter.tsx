@@ -85,7 +85,8 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
     { id: 'twitter', name: 'Twitter', icon: Twitter, color: '#1DA1F2' },
     { id: 'linkedin', name: 'LinkedIn', icon: Linkedin, color: '#0A66C2' },
     { id: 'youtube', name: 'YouTube', icon: Youtube, color: '#FF0000' },
-    { id: 'blog', name: 'Blog', icon: BookOpen, color: '#10B981' }
+    { id: 'blog', name: 'Blog', icon: BookOpen, color: '#10B981' },
+    { id: 'email', name: 'Email Marketing', icon: Send, color: '#059669' }
   ];
 
   const contentTypes = [
@@ -97,7 +98,10 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
     { id: 'case-study', name: 'Case Study', description: 'Customer success stories' },
     { id: 'industry-insights', name: 'Industry Insights', description: 'Thought leadership articles' },
     { id: 'product-features', name: 'Product Features', description: 'Detailed product explanations' },
-    { id: 'safety-tips', name: 'Safety Tips', description: 'Emergency preparedness content' }
+    { id: 'safety-tips', name: 'Safety Tips', description: 'Emergency preparedness content' },
+    { id: 'email-welcome', name: 'Welcome Email', description: 'New user onboarding emails' },
+    { id: 'email-newsletter', name: 'Newsletter', description: 'Regular email newsletters' },
+    { id: 'email-campaign', name: 'Email Campaign', description: 'Promotional email sequences' }
   ];
 
   const audiences = [

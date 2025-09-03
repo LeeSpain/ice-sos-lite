@@ -87,10 +87,7 @@ const useAdminMenuItems = () => {
       title: t('admin.communicationMarketing'),
       items: [
         { title: t('admin.contactSubmissions'), url: "/admin-dashboard/contact-submissions", icon: Mail },
-        { title: t('admin.emailCampaigns'), url: "/admin-dashboard/email-campaigns", icon: Mail },
         { title: t('admin.communicationCenter'), url: "/admin-dashboard/communication", icon: MessageSquare },
-        { title: t('admin.socialMediaIntegration'), url: "/admin-dashboard/social-media", icon: MessageSquare },
-        { title: t('admin.contentAutomation'), url: "/admin-dashboard/content-automation", icon: Bot },
       ]
     },
     {
