@@ -36,6 +36,7 @@ import TestPage from "./pages/TestPage";
 import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
 import RegionalCenterSpain from "./pages/RegionalCenterSpain";
 import FamilyCarerAccess from "./pages/FamilyCarerAccess";
+import TrustedNetworkManagement from "./pages/TrustedNetworkManagement";
 import FamilyAccessSetup from "./pages/FamilyAccessSetup";
 import FamilyInviteAccept from "./pages/FamilyInviteAccept";
 import AdminSetupPage from "./pages/AdminSetupPage";
