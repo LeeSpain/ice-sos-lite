@@ -32,7 +32,7 @@ const FamilyCarerAccessPage = () => {
                 
                 <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-white drop-shadow-lg">
                   Connect Your Family's 
-                  <span className="text-wellness drop-shadow-md block">Emergency Response</span>
+                  <span className="text-wellness drop-shadow-md">Emergency Response</span>
                 </h1>
                 
                 <p className="text-xl md:text-2xl mb-8 text-white leading-relaxed font-medium drop-shadow-sm">
@@ -40,7 +40,8 @@ const FamilyCarerAccessPage = () => {
                   When emergencies happen, every family member knows immediately.
                 </p>
                 
-                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start mb-8">
+
+                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
                   {/* Primary CTA */}
                   <Button 
                     asChild
@@ -49,35 +50,30 @@ const FamilyCarerAccessPage = () => {
                   >
                     <Link to="/ai-register">
                       <Shield className="h-5 w-5 mr-2" />
-                      Protect Your Family Now
+                      Protect Your Family
                     </Link>
                   </Button>
                   
-                  {/* Secondary CTA */}
+                  {/* Talk to Expert Button */}
+                  <Button 
+                    asChild
+                    size="xl" 
+                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                  >
+                    <Link to="/contact">
+                      <Phone className="h-5 w-5 mr-2" />
+                      Talk to Expert
+                    </Link>
+                  </Button>
+
+                  {/* Watch Demo Button */}
                   <Button 
                     size="xl" 
-                    variant="outline"
-                    className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
+                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
-                    <Phone className="h-5 w-5 mr-2" />
-                    Talk to Expert
+                    <Heart className="h-5 w-5 mr-2" />
+                    Watch Demo
                   </Button>
-                </div>
-                
-                {/* Trust Indicators */}
-                <div className="flex flex-wrap gap-6 justify-center lg:justify-start">
-                  <div className="flex items-center gap-2 text-white/80">
-                    <Shield className="h-4 w-4" />
-                    <span className="text-sm">GDPR Compliant</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/80">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm">30-Second Response</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-white/80">
-                    <CheckCircle className="h-4 w-4" />
-                    <span className="text-sm">24/7 Monitoring</span>
-                  </div>
                 </div>
               </div>
               
