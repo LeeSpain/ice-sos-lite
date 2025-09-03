@@ -64,8 +64,8 @@ const useDashboardItems = () => {
 
   const familyCircleItems = [
     {
-      title: "Trusted Network",
-      url: "/trusted-network",
+      title: "Family Connections",
+      url: "/full-dashboard/connections",
       icon: UserPlus
     },
     {

@@ -36,7 +36,6 @@ import TestPage from "./pages/TestPage";
 import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
 import RegionalCenterSpain from "./pages/RegionalCenterSpain";
 import FamilyCarerAccess from "./pages/FamilyCarerAccess";
-import TrustedNetworkManagement from "./pages/TrustedNetworkManagement";
 import FamilyAccessSetup from "./pages/FamilyAccessSetup";
 import FamilyInviteAccept from "./pages/FamilyInviteAccept";
 import AdminSetupPage from "./pages/AdminSetupPage";
@@ -144,11 +143,6 @@ const App = () => {
               <Route path="/family-carer-access" element={
                 <OptimizedSuspense skeletonType="card">
                   <FamilyCarerAccess />
-                </OptimizedSuspense>
-              } />
-              <Route path="/trusted-network" element={
-                <OptimizedSuspense skeletonType="card">
-                  <TrustedNetworkManagement />
                 </OptimizedSuspense>
               } />
 

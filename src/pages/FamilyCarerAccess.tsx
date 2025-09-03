@@ -1,5 +1,4 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,8 +53,6 @@ import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/util
 import { IntroVideoModal } from '@/components/IntroVideoModal';
 
 const FamilyCarerAccessPage = () => {
-  // Redirect to new Trusted Network Management
-  return <Navigate to="/trusted-network" replace />;
   const { t } = useTranslation();
   const { currency, language } = usePreferences();
   
