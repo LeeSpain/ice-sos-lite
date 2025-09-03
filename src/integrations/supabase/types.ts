@@ -1584,6 +1584,50 @@ export type Database = {
           },
         ]
       }
+      family_notifications: {
+        Row: {
+          client_id: string | null
+          delivered: boolean | null
+          event_id: string | null
+          id: string
+          language: string | null
+          message: string | null
+          message_type: string | null
+          sent_at: string | null
+          sent_by: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          delivered?: boolean | null
+          event_id?: string | null
+          id?: string
+          language?: string | null
+          message?: string | null
+          message_type?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          delivered?: boolean | null
+          event_id?: string | null
+          id?: string
+          language?: string | null
+          message?: string | null
+          message_type?: string | null
+          sent_at?: string | null
+          sent_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_notifications_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "regional_sos_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gmail_token_access_log: {
         Row: {
           action: string
@@ -1997,6 +2041,74 @@ export type Database = {
           },
         ]
       }
+      organization_users: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          language: string | null
+          organization_id: string | null
+          role: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          language?: string | null
+          organization_id?: string | null
+          role: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          language?: string | null
+          organization_id?: string | null
+          role?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_users_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          created_at: string | null
+          id: string
+          locale_default: string | null
+          name: string
+          region: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          locale_default?: string | null
+          name: string
+          region?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          locale_default?: string | null
+          name?: string
+          region?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       performance_metrics: {
         Row: {
           created_at: string
@@ -2304,9 +2416,12 @@ export type Database = {
           location_sharing_enabled: boolean | null
           medical_conditions: string[] | null
           medications: string[] | null
+          organization_id: string | null
           phone: string | null
+          preferred_language: string | null
           profile_completion_percentage: number | null
           role: string
+          subscription_regional: boolean | null
           updated_at: string
           user_id: string
         }
@@ -2328,9 +2443,12 @@ export type Database = {
           location_sharing_enabled?: boolean | null
           medical_conditions?: string[] | null
           medications?: string[] | null
+          organization_id?: string | null
           phone?: string | null
+          preferred_language?: string | null
           profile_completion_percentage?: number | null
           role?: string
+          subscription_regional?: boolean | null
           updated_at?: string
           user_id: string
         }
@@ -2352,13 +2470,24 @@ export type Database = {
           location_sharing_enabled?: boolean | null
           medical_conditions?: string[] | null
           medications?: string[] | null
+          organization_id?: string | null
           phone?: string | null
+          preferred_language?: string | null
           profile_completion_percentage?: number | null
           role?: string
+          subscription_regional?: boolean | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rate_limits: {
         Row: {
@@ -2390,6 +2519,116 @@ export type Database = {
           identifier?: string
           updated_at?: string
           window_start?: string
+        }
+        Relationships: []
+      }
+      regional_audit_log: {
+        Row: {
+          action: string | null
+          changes: Json | null
+          created_at: string | null
+          id: string
+          organization_id: string | null
+          target_id: string | null
+          target_table: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action?: string | null
+          changes?: Json | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          target_id?: string | null
+          target_table?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string | null
+          changes?: Json | null
+          created_at?: string | null
+          id?: string
+          organization_id?: string | null
+          target_id?: string | null
+          target_table?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regional_audit_log_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regional_devices: {
+        Row: {
+          battery_level: number | null
+          client_id: string | null
+          created_at: string | null
+          device_name: string | null
+          device_type: string | null
+          id: string
+          is_active: boolean | null
+          last_ping_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          battery_level?: number | null
+          client_id?: string | null
+          created_at?: string | null
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_ping_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          battery_level?: number | null
+          client_id?: string | null
+          created_at?: string | null
+          device_name?: string | null
+          device_type?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_ping_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      regional_emergency_contacts: {
+        Row: {
+          client_id: string | null
+          created_at: string | null
+          id: string
+          name: string | null
+          phone: string | null
+          priority: number | null
+          relation: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          priority?: number | null
+          relation?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string | null
+          phone?: string | null
+          priority?: number | null
+          relation?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -2437,6 +2676,62 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      regional_sos_events: {
+        Row: {
+          assigned_operator: string | null
+          client_id: string | null
+          created_at: string | null
+          emergency_type: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          organization_id: string | null
+          priority: string | null
+          source: string | null
+          status: string | null
+          triggered_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_operator?: string | null
+          client_id?: string | null
+          created_at?: string | null
+          emergency_type?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          organization_id?: string | null
+          priority?: string | null
+          source?: string | null
+          status?: string | null
+          triggered_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_operator?: string | null
+          client_id?: string | null
+          created_at?: string | null
+          emergency_type?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          organization_id?: string | null
+          priority?: string | null
+          source?: string | null
+          status?: string | null
+          triggered_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regional_sos_events_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       registration_selections: {
         Row: {
@@ -2920,6 +3215,41 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "sos_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sos_actions: {
+        Row: {
+          action_type: string | null
+          actor_user_id: string | null
+          created_at: string | null
+          event_id: string | null
+          id: string
+          payload: Json | null
+        }
+        Insert: {
+          action_type?: string | null
+          actor_user_id?: string | null
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          payload?: Json | null
+        }
+        Update: {
+          action_type?: string | null
+          actor_user_id?: string | null
+          created_at?: string | null
+          event_id?: string | null
+          id?: string
+          payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sos_actions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "regional_sos_events"
             referencedColumns: ["id"]
           },
         ]
