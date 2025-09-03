@@ -7,6 +7,7 @@ import { AppPreviewConfig } from "@/types/appPreview";
 import { getTranslatedAppPreview } from "@/utils/appPreviewTranslations";
 import { useTranslation } from 'react-i18next';
 import { useInteractionTracking } from "@/hooks/useInteractionTracking";
+import LegalComplianceModal from "@/components/LegalComplianceModal";
 
 const SITE_CONTENT_KEY = "homepage_app_preview";
 
@@ -24,7 +25,7 @@ const Footer = () => {
   return (
     <footer className="bg-background border-t border-border">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
@@ -38,9 +39,9 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Protection Services */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">{t('footer.quickLinks')}</h3>
+            <h3 className="font-semibold text-foreground">Protection Services</h3>
             <div className="space-y-2">
               <Link to="/blog" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('blog', '/blog', 'Blog')}>
                 {t('footer.blog')}
@@ -54,10 +55,13 @@ const Footer = () => {
               <Link to="/family-carer-access" className="block text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('family', '/family-carer-access', 'Family Carer Access')}>
                 {t('footer.familyCarerAccess')}
               </Link>
+              <div onClick={() => handleFooterLinkClick('legal', '#legal-modal', 'Legal & Compliance')}>
+                <LegalComplianceModal />
+              </div>
             </div>
           </div>
 
-          {/* Account & Legal */}
+          {/* Account & Connect */}
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground">{t('footer.account')}</h3>
             <div className="space-y-2">
@@ -75,32 +79,6 @@ const Footer = () => {
                   {t('footer.signOut')}
                 </Link>
               )}
-            </div>
-          </div>
-
-          {/* Legal Compliance */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">Legal & Compliance</h3>
-            <div className="space-y-2">
-              <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Privacy Policy
-              </a>
-              <a href="/terms-of-service.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Terms of Service
-              </a>
-              <a href="/emergency-liability.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Emergency Liability
-              </a>
-              <a href="/medical-data-compliance.html" target="_blank" rel="noopener noreferrer" className="block text-sm text-muted-foreground hover:text-primary transition-colors">
-                Medical Compliance
-              </a>
-            </div>
-          </div>
-
-          {/* Connect */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-foreground">{t('footer.connect')}</h3>
-            <div className="space-y-2">
               <Link to="/contact" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => handleFooterLinkClick('contact', '/contact', 'Contact Us')}>
                 <Mail className="h-4 w-4" />
                 {t('footer.contactUs')}
