@@ -28,35 +28,7 @@ const AuthPage = () => {
     reset: resetRateLimit
   } = useRateLimit('auth-attempts', { maxAttempts: 5, windowMs: 15 * 60 * 1000 }); // 5 attempts per 15 minutes
 
-  console.log('🔐 AuthPage render:', { 
-    hasUser: !!user, 
-    userEmail: user?.email,
-    loading, 
-    isSubmitting,
-    path: window.location.pathname,
-    href: window.location.href
-  });
-
-  // Redirect if already authenticated, unless they're specifically trying to signup
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Only redirect logged-in users if they're not explicitly on the auth page
-  const isExplicitAuthVisit = window.location.pathname === '/auth';
-  
-  // Don't redirect if user explicitly navigated to /auth (let them see they're logged in)
-  if (user && !isExplicitAuthVisit) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
+  // Move all useCallback hooks here BEFORE any early returns
   const handleSignIn = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -127,6 +99,35 @@ const AuthPage = () => {
       setIsSubmitting(false);
     }
   }, [email, password, isRateLimited, getRemainingTime, recordAttempt, resetRateLimit]);
+
+  console.log('🔐 AuthPage render:', { 
+    hasUser: !!user, 
+    userEmail: user?.email,
+    loading, 
+    isSubmitting,
+    path: window.location.pathname,
+    href: window.location.href
+  });
+
+  // NOW do conditional returns AFTER all hooks
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Only redirect logged-in users if they're not explicitly on the auth page
+  const isExplicitAuthVisit = window.location.pathname === '/auth';
+  
+  // Don't redirect if user explicitly navigated to /auth (let them see they're logged in)
+  if (user && !isExplicitAuthVisit) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const structuredData = {
     "@context": "https://schema.org",
