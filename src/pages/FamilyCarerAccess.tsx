@@ -50,29 +50,17 @@ const FamilyCarerAccessPage = () => {
                   >
                     <Link to="/ai-register">
                       <Shield className="h-5 w-5 mr-2" />
-                      Protect Your Family
-                    </Link>
-                  </Button>
-                  
-                  {/* Talk to Expert Button */}
-                  <Button 
-                    asChild
-                    size="xl" 
-                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
-                  >
-                    <Link to="/contact">
-                      <Phone className="h-5 w-5 mr-2" />
-                      Talk to Expert
+                      Join Now
                     </Link>
                   </Button>
 
-                  {/* Watch Demo Button */}
+                  {/* Watch Video Button */}
                   <Button 
                     size="xl" 
                     className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
                   >
                     <Heart className="h-5 w-5 mr-2" />
-                    Watch Demo
+                    Watch Video
                   </Button>
                 </div>
               </div>
