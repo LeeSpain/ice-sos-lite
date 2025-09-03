@@ -214,7 +214,7 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
   };
 
   return (
-    <section id="pricing" className="pt-16 pb-2 mb-2">
+    <section id="pricing" className="py-section">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">

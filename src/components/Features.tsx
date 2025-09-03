@@ -43,7 +43,7 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="pt-14 pb-section mb-8">
+    <section id="features" className="py-section">
       <div className="container mx-auto px-4">
         {/* Header - matching other sections */}
         <div className="text-center mb-16">

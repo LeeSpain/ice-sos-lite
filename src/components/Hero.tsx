@@ -31,7 +31,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
     trackVideoInteraction('video_modal_open', 'meet-emma', 'Meet Emma');
   };
   return (
-    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl mb-4">
+    <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
       
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">

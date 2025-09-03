@@ -9,7 +9,7 @@ const AppPreviewSection: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <section className="pt-16 pb-section mb-8">
+    <section className="py-section">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-16">
