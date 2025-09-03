@@ -41,12 +41,13 @@ import FamilyInviteAccept from "./pages/FamilyInviteAccept";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import SOSHome from "./pages/SOSHome";
 import FamilyDashboard from "./pages/FamilyDashboard";
-// Regional Dashboard will be added later
+import RegionalDashboard from "./pages/RegionalDashboard";
 
 // Import protected routes and components
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import ProtectedSOSRoute from "@/components/ProtectedSOSRoute";
+import RegionalProtectedRoute from "@/components/RegionalProtectedRoute";
 import DashboardRedirect from "@/components/DashboardRedirect";
 import SmartAppRedirect from "@/components/SmartAppRedirect";
 import SimpleDashboard from "./pages/SimpleDashboard";
