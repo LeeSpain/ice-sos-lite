@@ -5,8 +5,6 @@ import SEO from '@/components/SEO';
 import { Button } from "@/components/ui/button";
 import { Users, Shield, Heart, Clock, Phone, CheckCircle, Star, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import OptimizedImage from "@/components/ui/optimized-image";
-import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
 
 const FamilyCarerAccessPage = () => {
   return (
@@ -81,17 +79,106 @@ const FamilyCarerAccessPage = () => {
                 </div>
               </div>
               
-              {/* Hero Image - matching homepage layout */}
+              {/* Hero Demo - Family Emergency Coordination */}
               <div className="relative">
                 <div className="relative z-10">
-                  <OptimizedImage 
-                    src="/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png?v=1" 
-                    alt="Family emergency coordination system - mobile app and pendant for family safety"
-                    className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
-                    priority={true}
-                    sizes={getImageSizes('hero')}
-                    blurDataURL={generateBlurPlaceholder(400, 600)}
-                  />
+                  {/* Phone Mockup with Family Emergency Interface */}
+                  <div className="relative mx-auto w-80 h-[600px] bg-gradient-to-b from-slate-900 to-slate-800 rounded-[3rem] p-2 shadow-2xl">
+                    <div className="w-full h-full bg-gradient-to-b from-gray-50 to-white rounded-[2.5rem] overflow-hidden relative">
+                      {/* Status Bar */}
+                      <div className="flex justify-between items-center px-6 py-3 bg-primary text-white text-sm font-medium">
+                        <span>Family Emergency</span>
+                        <div className="flex items-center gap-1">
+                          <div className="flex gap-0.5">
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                          </div>
+                          <span className="ml-2 text-xs">100%</span>
+                        </div>
+                      </div>
+
+                      {/* Emergency Alert */}
+                      <div className="p-4">
+                        <div className="bg-emergency/10 border border-emergency/20 p-4 rounded-xl mb-4">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-4 h-4 bg-emergency rounded-full animate-pulse"></div>
+                            <span className="font-semibold text-emergency text-sm">SOS Alert - Grandma</span>
+                          </div>
+                          <p className="text-xs text-gray-700">Emergency button pressed</p>
+                          <p className="text-xs text-gray-600 mt-1">📍 High Street, London</p>
+                        </div>
+
+                        {/* Family Response Status */}
+                        <div className="space-y-3 mb-4">
+                          <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                👩
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-green-800 text-xs">Sarah - Responding</p>
+                                <p className="text-xs text-green-600">2 minutes away</p>
+                              </div>
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            </div>
+                          </div>
+                          
+                          <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                👨
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-blue-800 text-xs">Dad - En Route</p>
+                                <p className="text-xs text-blue-600">5 minutes away</p>
+                              </div>
+                              <Clock className="h-4 w-4 text-blue-500" />
+                            </div>
+                          </div>
+                          
+                          <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                🚑
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-medium text-yellow-800 text-xs">Emergency Services</p>
+                                <p className="text-xs text-yellow-600">Dispatched</p>
+                              </div>
+                              <Shield className="h-4 w-4 text-yellow-500" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Action Bar */}
+                        <div className="bg-primary text-white rounded-xl p-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium text-xs">Professional Monitoring</p>
+                              <p className="text-xs opacity-90">Coordinating response...</p>
+                            </div>
+                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Floating Stats */}
+                  <div className="absolute -left-8 top-16 bg-white rounded-xl p-3 shadow-xl border border-wellness/20 max-w-40">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-wellness">30s</div>
+                      <div className="text-xs text-gray-600">Average Alert Time</div>
+                    </div>
+                  </div>
+                  
+                  <div className="absolute -right-8 bottom-32 bg-white rounded-xl p-3 shadow-xl border border-primary/20 max-w-40">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-primary">24/7</div>
+                      <div className="text-xs text-gray-600">Professional Monitoring</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
