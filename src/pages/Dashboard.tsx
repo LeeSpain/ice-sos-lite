@@ -28,6 +28,7 @@ import MapScreen from "@/pages/MapScreen";
 import MyCirclesPage from "@/pages/MyCirclesPage";
 import PlacesManager from "@/pages/PlacesManager";
 import LocationHistoryPage from "@/pages/LocationHistoryPage";
+import { ConnectionsPage } from "@/components/dashboard/ConnectionsPage";
 import { useTranslation } from 'react-i18next';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeUpdates';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
@@ -315,7 +316,14 @@ const Dashboard = () => {
                  <div className="py-section px-6">
                    <LocationHistoryPage />
                  </div>
-               } />
+                } />
+                
+                {/* Connections Page */}
+                <Route path="/connections" element={
+                  <div className="py-section px-6">
+                    <ConnectionsPage />
+                  </div>
+                } />
             </Routes>
           </div>
         </div>

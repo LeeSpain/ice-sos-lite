@@ -343,14 +343,6 @@ const App = () => {
                  </OptimizedSuspense>
                } />
 
-               {/* Connections Page in Full Dashboard */}
-               <Route path="/full-dashboard/connections" element={
-                 <OptimizedSuspense skeletonType="card">
-                   <ProtectedRoute>
-                     <ConnectionsPage />
-                   </ProtectedRoute>
-                 </OptimizedSuspense>
-               } />
 
                {/* Test Page */}
                <Route path="/test" element={
