@@ -30,9 +30,9 @@ const FamilyCarerAccess = () => {
 
 
   return (
-    <section className="py-20 bg-gradient-to-br from-background via-muted/20 to-background">
+    <section className="py-8 bg-gradient-to-br from-background via-muted/20 to-background">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-6">
           <div className="inline-flex items-center space-x-2 bg-warning/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-warning/30">
             <Users className="h-4 w-4 text-warning" />
             <span className="text-sm font-medium text-warning">{t('familyCarerAccess.sectionBadge')}</span>
@@ -46,40 +46,40 @@ const FamilyCarerAccess = () => {
         </div>
 
         <Card className="shadow-xl border-2 border-warning/20 hover:border-warning/40 transition-colors">
-          <CardContent className="p-8">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <CardContent className="p-6">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
               {/* Content */}
               <div className="text-center lg:text-left">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-warning to-warning/80 flex items-center justify-center">
-                    <Users className="h-6 w-6 text-white" />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-warning to-warning/80 flex items-center justify-center">
+                    <Users className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold">{t('familyCarerAccess.cardTitle')}</h3>
+                  <h3 className="text-xl font-bold">{t('familyCarerAccess.cardTitle')}</h3>
                 </div>
                 
-                <div className="mb-6">
-                  <span className="text-3xl font-bold text-warning">{formattedPrice}</span>
+                <div className="mb-4">
+                  <span className="text-2xl font-bold text-warning">{formattedPrice}</span>
                   <span className="text-muted-foreground text-sm ml-2">{billingInterval} {t('familyCarerAccess.cardSubtitle')}</span>
                 </div>
                 
-                <p className="text-muted-foreground mb-6">
+                <p className="text-muted-foreground mb-4 text-sm">
                   {t('familyCarerAccess.cardDescription')}
                 </p>
                 
-                <div className="space-y-3 mb-8">
+                <div className="grid grid-cols-1 gap-2 mb-6">
                   {features.map((feature, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-warning mt-0.5 flex-shrink-0" />
-                      <span className="text-foreground">{feature}</span>
+                    <div key={i} className="flex items-start gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
+                      <span className="text-foreground text-sm">{feature}</span>
                     </div>
                   ))}
                 </div>
                 
-                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                   <Button 
                     asChild 
-                    size="lg" 
-                    className="bg-warning text-white hover:bg-warning/90 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold px-8 py-4 rounded-xl border-2 border-warning/20"
+                    size="default" 
+                    className="bg-warning text-white hover:bg-warning/90 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold px-6 py-2 rounded-xl border-2 border-warning/20"
                   >
                     <Link to="/family-carer-access">
                       <Users className="mr-2 h-4 w-4" />
@@ -92,8 +92,8 @@ const FamilyCarerAccess = () => {
                     trigger={
                       <Button 
                         variant="outline"
-                        size="lg"
-                        className="border-warning text-warning hover:bg-warning hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                        size="default"
+                        className="border-warning text-warning hover:bg-warning hover:text-white font-semibold px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
                       >
                         <Play className="h-4 w-4 mr-2" />
                         {t('familyCarerAccess.watchVideo')}
@@ -102,7 +102,7 @@ const FamilyCarerAccess = () => {
                   />
                 </div>
                 
-                <p className="text-xs text-muted-foreground mt-4">
+                <p className="text-xs text-muted-foreground mt-3">
                   {t('familyCarerAccess.secureNote')}
                 </p>
               </div>
