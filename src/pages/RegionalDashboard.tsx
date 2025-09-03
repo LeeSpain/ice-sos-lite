@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useRegionalRole } from '@/hooks/useRegionalRole';
+import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,9 +10,16 @@ import { AlertTriangle, Users, Phone } from 'lucide-react';
 
 const RegionalDashboard = () => {
   const { data: regionalRole } = useRegionalRole();
+  const { isAdmin } = useOptimizedAuth();
+
+  // Check if user has regional access (including platform admins)
+  const hasRegionalAccess = isAdmin || 
+                           regionalRole?.isRegionalOperator || 
+                           regionalRole?.isRegionalSupervisor || 
+                           regionalRole?.isPlatformAdmin;
 
   // Show loading or access denied if not authorized
-  if (!regionalRole?.isRegionalOperator && !regionalRole?.isRegionalSupervisor && !regionalRole?.isPlatformAdmin) {
+  if (!hasRegionalAccess) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <Card className="max-w-md">
@@ -135,9 +143,11 @@ const RegionalDashboard = () => {
               <div>
                 <h4 className="font-semibold text-sm">Rol</h4>
                 <Badge variant="outline">
-                  {regionalRole?.isRegionalSupervisor ? 'Supervisor Regional' : 
+                  {isAdmin ? 'Admin de Plataforma' :
+                   regionalRole?.isRegionalSupervisor ? 'Supervisor Regional' : 
                    regionalRole?.isRegionalOperator ? 'Operador Regional' : 
-                   'Admin de Plataforma'}
+                   regionalRole?.isPlatformAdmin ? 'Admin de Plataforma' :
+                   'Usuario'}
                 </Badge>
               </div>
             </div>
