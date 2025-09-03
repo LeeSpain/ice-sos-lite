@@ -404,7 +404,13 @@
     "userActivity": "User Activity",
     "systemSettings": "System Settings",
     "reports": "Reports",
-    "appTesting": "App Testing"
+    "appTesting": "App Testing",
+    "regionalManagement": "🌍 Regional Management",
+    "regionalManagementDescription": "Centralized control over all regional emergency response operations",
+    "regionalHub": "Regional Hub",
+    "regionalOrganizations": "Organizations",
+    "regionalUsers": "Regional Staff",
+    "regionalAudit": "Audit Log"
   },
   "dashboard": {
     "greeting": {

@@ -416,7 +416,13 @@
     "userActivity": "Actividad de Usuario",
     "systemSettings": "Configuración del Sistema",
     "reports": "Reportes",
-    "appTesting": "Pruebas de App"
+    "appTesting": "Pruebas de App",
+    "regionalManagement": "🌍 Gestión Regional",
+    "regionalManagementDescription": "Control centralizado de todas las operaciones regionales de respuesta de emergencia",
+    "regionalHub": "Centro Regional",
+    "regionalOrganizations": "Organizaciones",
+    "regionalUsers": "Personal Regional",
+    "regionalAudit": "Registro de Auditoría"
   },
   "dashboard": {
     "greeting": {

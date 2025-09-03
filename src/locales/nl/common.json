@@ -385,7 +385,13 @@
     "userActivity": "Gebruikersactiviteit",
     "systemSettings": "Systeeminstellingen",
     "reports": "Rapporten",
-    "appTesting": "App Testen"
+    "appTesting": "App Testen",
+    "regionalManagement": "🌍 Regionaal Beheer",
+    "regionalManagementDescription": "Gecentraliseerde controle over alle regionale noodresponse operaties",
+    "regionalHub": "Regionaal Hub",
+    "regionalOrganizations": "Organisaties",
+    "regionalUsers": "Regionaal Personeel",
+    "regionalAudit": "Audit Log"
   },
   "dashboard": {
     "greeting": {

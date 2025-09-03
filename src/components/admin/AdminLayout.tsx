@@ -39,7 +39,8 @@ import {
   Map,
   Navigation,
   History,
-  Phone
+  Phone,
+  Building
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
@@ -106,6 +107,15 @@ const useAdminMenuItems = () => {
       items: [
         { title: t('admin.emergencyIncidents'), url: "/admin-dashboard/emergencies", icon: AlertTriangle },
         { title: t('admin.safetyMonitoring'), url: "/admin-dashboard/safety", icon: Shield },
+      ]
+    },
+    {
+      title: t('admin.regionalManagement'),
+      items: [
+        { title: t('admin.regionalHub'), url: "/admin-dashboard/regional-hub", icon: MapPin },
+        { title: t('admin.regionalOrganizations'), url: "/admin-dashboard/regional-organizations", icon: Building },
+        { title: t('admin.regionalUsers'), url: "/admin-dashboard/regional-users", icon: Users },
+        { title: t('admin.regionalAudit'), url: "/admin-dashboard/regional-audit", icon: FileText },
       ]
     },
     {

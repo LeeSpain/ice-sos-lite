@@ -39,6 +39,10 @@ import LiveMapMonitorPage from '@/components/admin/pages/LiveMapMonitorPage';
 import CircleAnalyticsPage from '@/components/admin/pages/CircleAnalyticsPage';
 import GeofenceAdminPage from '@/components/admin/pages/GeofenceAdminPage';
 import LocationDataAdminPage from '@/components/admin/pages/LocationDataAdminPage';
+import RegionalOrganizationsPage from '@/components/admin/pages/RegionalOrganizationsPage';
+import RegionalUsersPage from '@/components/admin/pages/RegionalUsersPage';
+import RegionalAuditPage from '@/components/admin/pages/RegionalAuditPage';
+import RegionalHubPage from '@/components/admin/pages/RegionalHubPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -74,6 +78,10 @@ const AdminDashboard: React.FC = () => {
         <Route path="location-admin" element={<LocationDataAdminPage />} />
         <Route path="emergencies" element={<EmergencyIncidentsPage />} />
         <Route path="safety" element={<SafetyMonitoringPage />} />
+        <Route path="regional-hub" element={<RegionalHubPage />} />
+        <Route path="regional-organizations" element={<RegionalOrganizationsPage />} />
+        <Route path="regional-users" element={<RegionalUsersPage />} />
+        <Route path="regional-audit" element={<RegionalAuditPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="regional-services" element={<RegionalServicesPage />} />
         <Route path="activity" element={<ActivityPage />} />
