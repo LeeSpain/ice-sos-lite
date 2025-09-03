@@ -30,7 +30,7 @@ const FamilyCarerAccess = () => {
   ];
 
   return (
-    <section className="py-section">
+    <section className="py-14">
       <div className="container mx-auto px-4">
         {/* Emergency Protection Plan Section */}
         <div className="max-w-6xl mx-auto mb-16">
