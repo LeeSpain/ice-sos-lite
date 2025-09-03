@@ -29,7 +29,8 @@ import {
   Smartphone,
   Map,
   Navigation,
-  History
+  History,
+  UserPlus
 } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 
@@ -61,6 +62,11 @@ const useDashboardItems = () => {
       title: t('dashboard.activity'),
       url: "/full-dashboard/activity",
       icon: Activity
+    },
+    {
+      title: "Emergency Connections",
+      url: "/full-dashboard/connections",
+      icon: UserPlus
     },
     {
       title: t('dashboard.mobileApp'),

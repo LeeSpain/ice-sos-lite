@@ -54,6 +54,7 @@ import SmartAppRedirect from "@/components/SmartAppRedirect";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import Dashboard from "./pages/Dashboard";
 import { ConnectionsPage } from "./components/dashboard/ConnectionsPage";
+import TrustedContactView from "@/pages/TrustedContactView";
 import AdminDashboard from "./pages/AdminDashboard";
 import FamilyTrackingApp from "./pages/FamilyTrackingApp";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
@@ -335,12 +336,28 @@ const App = () => {
                 </OptimizedSuspense>
               } />
 
-              {/* Test Page */}
-              <Route path="/test" element={
-                <OptimizedSuspense skeletonType="card">
-                  <TestPage />
-                </OptimizedSuspense>
-              } />
+               {/* Trusted Contact View */}
+               <Route path="/trusted-contact/:eventId" element={
+                 <OptimizedSuspense skeletonType="card">
+                   <TrustedContactView />
+                 </OptimizedSuspense>
+               } />
+
+               {/* Connections Page in Full Dashboard */}
+               <Route path="/full-dashboard/connections" element={
+                 <OptimizedSuspense skeletonType="card">
+                   <ProtectedRoute>
+                     <ConnectionsPage />
+                   </ProtectedRoute>
+                 </OptimizedSuspense>
+               } />
+
+               {/* Test Page */}
+               <Route path="/test" element={
+                 <OptimizedSuspense skeletonType="card">
+                   <TestPage />
+                 </OptimizedSuspense>
+               } />
 
               {/* 404 Page */}
               <Route path="*" element={
