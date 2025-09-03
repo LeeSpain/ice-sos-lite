@@ -75,7 +75,7 @@ export const FamilyCircleSection: React.FC = () => {
               <div className="relative">
                 <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full border-4 border-white/50 shadow-2xl flex items-center justify-center overflow-hidden relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-wellness/20 rounded-full"></div>
-                  <img src="/grandma-avatar.png" alt="Grandad" className="w-20 h-20 object-cover rounded-full relative z-10 border-2 border-white/30" />
+                  <img src="/grandma-avatar.png" alt="Grandmother" className="w-20 h-20 object-cover rounded-full relative z-10 border-2 border-white/30" />
                   
                   {/* Pulsing alert ring */}
                   <div className="absolute -inset-2 border-4 border-emergency/60 rounded-full animate-ping"></div>
@@ -83,7 +83,7 @@ export const FamilyCircleSection: React.FC = () => {
                 </div>
                 
                 <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-xl border border-white/50 text-sm font-semibold text-primary">
-                  Grandad
+                  Grandmother
                 </div>
                 
                 {/* Alert indicator with animation */}
@@ -157,7 +157,7 @@ export const FamilyCircleSection: React.FC = () => {
               <div className="relative group hover:scale-110 transition-transform duration-300">
                 <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
-                  <img src="/public/lovable-uploads/carer-avatar.png" alt="Professional Carer" className="w-16 h-16 object-cover rounded-full relative z-10" />
+                    <img src="/lovable-uploads/carer-avatar.png" alt="Professional Carer" className="w-16 h-16 object-cover rounded-full relative z-10" />
                   
                   {/* Available status indicator */}
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
@@ -176,7 +176,7 @@ export const FamilyCircleSection: React.FC = () => {
               <div className="relative group hover:scale-110 transition-transform duration-300">
                 <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
-                  <img src="/public/lovable-uploads/neighbor-avatar.png" alt="Trusted Neighbor" className="w-16 h-16 object-cover rounded-full relative z-10" />
+                    <img src="/lovable-uploads/neighbor-avatar.png" alt="Trusted Neighbor" className="w-16 h-16 object-cover rounded-full relative z-10" />
                   
                   {/* Available status indicator */}
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
@@ -196,7 +196,7 @@ export const FamilyCircleSection: React.FC = () => {
             <div className="text-center">
               <div className="relative inline-block">
                 <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full border-4 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-4 overflow-hidden relative">
-                  <img src="/grandma-avatar.png" alt="Grandad" className="w-20 h-20 object-cover rounded-full" />
+                  <img src="/grandma-avatar.png" alt="Grandmother" className="w-20 h-20 object-cover rounded-full" />
                   
                   {/* Pulsing alert rings */}
                   <div className="absolute -inset-2 border-4 border-emergency/60 rounded-full animate-ping"></div>
@@ -208,7 +208,7 @@ export const FamilyCircleSection: React.FC = () => {
                   <AlertTriangle className="h-4 w-4 text-white" />
                 </div>
               </div>
-              <h4 className="font-semibold text-lg">Grandad</h4>
+              <h4 className="font-semibold text-lg">Grandmother</h4>
               <p className="text-sm text-muted-foreground">Emergency Alert Activated</p>
             </div>
 
@@ -261,7 +261,7 @@ export const FamilyCircleSection: React.FC = () => {
                 <div className="relative group">
                   <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
-                    <img src="/public/lovable-uploads/carer-avatar.png" alt="Professional Carer" className="w-16 h-16 object-cover rounded-full relative z-10" />
+                    <img src="/lovable-uploads/carer-avatar.png" alt="Professional Carer" className="w-16 h-16 object-cover rounded-full relative z-10" />
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
                   </div>
                   <h5 className="font-medium text-sm">Professional Carer</h5>
@@ -273,7 +273,7 @@ export const FamilyCircleSection: React.FC = () => {
                 <div className="relative group">
                   <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2 overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
-                    <img src="/public/lovable-uploads/neighbor-avatar.png" alt="Trusted Neighbor" className="w-16 h-16 object-cover rounded-full relative z-10" />
+                    <img src="/lovable-uploads/neighbor-avatar.png" alt="Trusted Neighbor" className="w-16 h-16 object-cover rounded-full relative z-10" />
                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
                   </div>
                   <h5 className="font-medium">Neighbor</h5>
