@@ -92,7 +92,7 @@ export default function SystemSettingsPage() {
       setHealthLoading(true);
 
       // Call the edge function directly via GET (it returns overall_status and checks[])
-      const functionUrl = 'https://mqroziggaalltuzoyyao.supabase.co/functions/v1/system-health';
+      const functionUrl = 'https://rqahqicfafnxlmdjcozu.supabase.co/functions/v1/system-health';
       const res = await fetch(functionUrl, {
         method: 'GET',
         headers: {
