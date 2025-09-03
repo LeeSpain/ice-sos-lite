@@ -57,17 +57,21 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 
 
-const App = () => {
-  // Enable global page tracking for all routes
+// Component that handles page tracking inside Router context
+const PageTrackingWrapper = ({ children }: { children: React.ReactNode }) => {
   usePageTracking();
+  return <>{children}</>;
+};
 
+const App = () => {
   return (
     <EnhancedErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <EmmaChatProvider>
           <BrowserRouter>
-            <ScrollToTop />
+            <PageTrackingWrapper>
+              <ScrollToTop />
             <Routes>
               {/* Main Homepage */}
               <Route path="/" element={
@@ -325,6 +329,7 @@ const App = () => {
             
             {/* PWA Install Prompt - Disabled */}
             {/* <PWAInstallPrompt /> */}
+            </PageTrackingWrapper>
           </BrowserRouter>
           </EmmaChatProvider>
         </AuthProvider>
