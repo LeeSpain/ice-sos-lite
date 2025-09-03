@@ -7,6 +7,7 @@ import { Users, Shield, Heart, Clock, Phone, CheckCircle, Star, ArrowRight } fro
 import { Link } from "react-router-dom";
 import OptimizedImage from "@/components/ui/optimized-image";
 import { getImageSizes, generateBlurPlaceholder } from "@/utils/imageOptimization";
+import { FamilyCircleSection } from "@/components/family-carer/FamilyCircleSection";
 
 const FamilyCarerAccessPage = () => {
   return (
@@ -81,6 +82,9 @@ const FamilyCarerAccessPage = () => {
             </div>
           </div>
         </section>
+
+        {/* Family Circle Section */}
+        <FamilyCircleSection />
 
         {/* Pricing Section */}
         <section className="py-section bg-gray-50">
