@@ -6,9 +6,6 @@ import { BackgroundMap } from "./BackgroundMap";
 export const FamilyCircleSection: React.FC = () => {
   return (
     <section className="py-section bg-gradient-to-br from-background to-muted/50 relative overflow-hidden">
-      {/* Background Map */}
-      <BackgroundMap />
-      
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="absolute top-10 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
@@ -38,8 +35,11 @@ export const FamilyCircleSection: React.FC = () => {
           
           {/* Desktop Flow */}
           <div className="hidden lg:block relative h-[500px] bg-gradient-to-br from-primary/5 to-wellness/10 rounded-3xl p-8 border border-primary/10 shadow-2xl backdrop-blur-sm">
+            {/* Background Map */}
+            <BackgroundMap className="z-0" />
+            
             {/* Background Pattern */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent rounded-3xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent rounded-3xl z-5"></div>
             
             {/* Animated Connection Lines - SVG */}
             <svg className="absolute inset-0 w-full h-full z-10" viewBox="0 0 800 500">
@@ -196,7 +196,9 @@ export const FamilyCircleSection: React.FC = () => {
           </div>
 
           {/* Mobile Flow - Enhanced vertical layout */}
-          <div className="lg:hidden space-y-8 bg-gradient-to-b from-primary/5 to-wellness/10 rounded-3xl p-6 border border-primary/10 shadow-xl">
+          <div className="lg:hidden space-y-8 bg-gradient-to-b from-primary/5 to-wellness/10 rounded-3xl p-6 border border-primary/10 shadow-xl relative">
+            {/* Background Map */}
+            <BackgroundMap className="z-0" />
             <div className="text-center">
               <div className="relative inline-block">
                 <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full border-4 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-4 overflow-hidden relative">
