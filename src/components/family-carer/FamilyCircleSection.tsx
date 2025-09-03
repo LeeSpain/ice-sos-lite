@@ -1,7 +1,161 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Heart, Shield, Wifi, AlertTriangle, User, Clock, Baby, UserCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { BackgroundMap } from "./BackgroundMap";
+
+// Testimonial Carousel Component
+const TestimonialCarousel: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const testimonials = [
+    {
+      id: 1,
+      name: "Sarah M.",
+      role: "Daughter",
+      avatar: "/mom-avatar.png",
+      gradient: "from-primary to-primary/80",
+      border: "border-primary/10",
+      text: "This system saved my mother's life. When she had a fall, the entire family was alerted immediately and help arrived within minutes. I can't imagine not having this protection now."
+    },
+    {
+      id: 2,
+      name: "James R.",
+      role: "Son",
+      avatar: "/dad-avatar.png",
+      gradient: "from-wellness to-wellness/80",
+      border: "border-wellness/10",
+      text: "Dad was hesitant at first, but after his first emergency alert, he calls it his 'guardian angel'. The whole family feels so much more secure knowing we're all connected and can respond instantly."
+    },
+    {
+      id: 3,
+      name: "Emma K.",
+      role: "Granddaughter",
+      avatar: "/emma-avatar.png",
+      gradient: "from-secondary to-secondary/80",
+      border: "border-secondary/10",
+      text: "Grandma loves that she can see where all of us are and know we're safe. It's become more than an emergency system - it's brought our family closer together."
+    },
+    {
+      id: 4,
+      name: "Margaret D.",
+      role: "Grandmother",
+      avatar: "/grandma-avatar.png",
+      gradient: "from-green-500 to-green-600",
+      border: "border-primary/10",
+      text: "At 78, I was worried about being a burden. This system gives me independence while keeping my children's minds at ease. When I press the button, I know help is coming."
+    },
+    {
+      id: 5,
+      name: "Dr. Lisa H.",
+      role: "Professional Carer",
+      avatar: "/lovable-uploads/carer-avatar.png",
+      gradient: "from-blue-500 to-blue-600",
+      border: "border-wellness/10",
+      text: "As a professional carer, I've seen how crucial those first few minutes are in an emergency. This system ensures no one waits alone for help to arrive."
+    },
+    {
+      id: 6,
+      name: "Robert T.",
+      role: "Trusted Neighbor",
+      avatar: "/lovable-uploads/neighbor-avatar.png",
+      gradient: "from-purple-500 to-purple-600",
+      border: "border-secondary/10",
+      text: "Being included as a trusted contact makes me feel like part of the family. I'm honored to be someone they can count on, and the system makes it so easy to help when needed."
+    }
+  ];
+
+  // Auto-advance carousel every 4 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
+
+    return () => clearInterval(timer);
+  }, [testimonials.length]);
+
+  // Get 3 testimonials to show (current and next 2)
+  const getVisibleTestimonials = () => {
+    const visible = [];
+    for (let i = 0; i < 3; i++) {
+      const index = (currentIndex + i) % testimonials.length;
+      visible.push(testimonials[index]);
+    }
+    return visible;
+  };
+
+  const visibleTestimonials = getVisibleTestimonials();
+
+  return (
+    <div className="relative">
+      {/* Carousel Container */}
+      <div className="overflow-hidden rounded-2xl">
+        <div 
+          className="flex transition-transform duration-1000 ease-in-out"
+          style={{ transform: `translateX(0%)` }}
+        >
+          <div className="min-w-full">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
+              {visibleTestimonials.map((testimonial, index) => (
+                <div 
+                  key={`${testimonial.id}-${currentIndex}-${index}`}
+                  className={`bg-white/70 backdrop-blur-sm rounded-2xl p-6 ${testimonial.border} shadow-lg hover:shadow-xl transition-all duration-500 group transform hover:scale-105`}
+                  style={{
+                    opacity: index === 1 ? 1 : 0.8,
+                    transform: index === 1 ? 'scale(1.02)' : 'scale(1)',
+                    transition: 'all 0.5s ease-in-out'
+                  }}
+                >
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${testimonial.gradient} rounded-full flex items-center justify-center`}>
+                      <img src={testimonial.avatar} alt={testimonial.name} className="w-10 h-10 rounded-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground">{testimonial.name}</h4>
+                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed italic mb-4">
+                    "{testimonial.text}"
+                  </p>
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <Heart key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Dots */}
+      <div className="flex justify-center mt-8 space-x-2">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              index === currentIndex 
+                ? 'bg-primary scale-125 shadow-lg' 
+                : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+            }`}
+          />
+        ))}
+      </div>
+
+      {/* Progress Bar */}
+      <div className="mt-4 w-full bg-muted-foreground/10 rounded-full h-1 overflow-hidden">
+        <div 
+          className="h-full bg-gradient-to-r from-primary to-wellness transition-all duration-1000 ease-linear"
+          style={{
+            width: `${((currentIndex + 1) / testimonials.length) * 100}%`
+          }}
+        />
+      </div>
+    </div>
+  );
+};
 
 export const FamilyCircleSection: React.FC = () => {
   return (
@@ -718,134 +872,8 @@ export const FamilyCircleSection: React.FC = () => {
             </div>
 
             <div className="max-w-7xl mx-auto">
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
-                {/* Testimonial 1 */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
-                      <img src="/mom-avatar.png" alt="Sarah" className="w-10 h-10 rounded-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Sarah M.</h4>
-                      <p className="text-sm text-muted-foreground">Daughter</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    "This system saved my mother's life. When she had a fall, the entire family was alerted immediately and help arrived within minutes. I can't imagine not having this protection now."
-                  </p>
-                  <div className="mt-4 flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Heart key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Testimonial 2 */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-wellness/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-wellness to-wellness/80 rounded-full flex items-center justify-center">
-                      <img src="/dad-avatar.png" alt="James" className="w-10 h-10 rounded-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">James R.</h4>
-                      <p className="text-sm text-muted-foreground">Son</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    "Dad was hesitant at first, but after his first emergency alert, he calls it his 'guardian angel'. The whole family feels so much more secure knowing we're all connected and can respond instantly."
-                  </p>
-                  <div className="mt-4 flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Heart key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Testimonial 3 */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-secondary/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-secondary to-secondary/80 rounded-full flex items-center justify-center">
-                      <img src="/emma-avatar.png" alt="Emma" className="w-10 h-10 rounded-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Emma K.</h4>
-                      <p className="text-sm text-muted-foreground">Granddaughter</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    "Grandma loves that she can see where all of us are and know we're safe. It's become more than an emergency system - it's brought our family closer together."
-                  </p>
-                  <div className="mt-4 flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Heart key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Testimonial 4 */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-primary/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
-                      <img src="/grandma-avatar.png" alt="Margaret" className="w-10 h-10 rounded-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Margaret D.</h4>
-                      <p className="text-sm text-muted-foreground">Grandmother</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    "At 78, I was worried about being a burden. This system gives me independence while keeping my children's minds at ease. When I press the button, I know help is coming."
-                  </p>
-                  <div className="mt-4 flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Heart key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Testimonial 5 */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-wellness/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                      <img src="/lovable-uploads/carer-avatar.png" alt="Dr. Lisa" className="w-10 h-10 rounded-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Dr. Lisa H.</h4>
-                      <p className="text-sm text-muted-foreground">Professional Carer</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    "As a professional carer, I've seen how crucial those first few minutes are in an emergency. This system ensures no one waits alone for help to arrive."
-                  </p>
-                  <div className="mt-4 flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Heart key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Testimonial 6 */}
-                <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-secondary/10 shadow-lg hover:shadow-xl transition-all duration-300 group">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
-                      <img src="/lovable-uploads/neighbor-avatar.png" alt="Robert" className="w-10 h-10 rounded-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-foreground">Robert T.</h4>
-                      <p className="text-sm text-muted-foreground">Trusted Neighbor</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground leading-relaxed italic">
-                    "Being included as a trusted contact makes me feel like part of the family. I'm honored to be someone they can count on, and the system makes it so easy to help when needed."
-                  </p>
-                  <div className="mt-4 flex text-yellow-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Heart key={i} className="h-4 w-4 fill-current" />
-                    ))}
-                  </div>
-                </div>
-              </div>
+              {/* Carousel Container */}
+              <TestimonialCarousel />
 
               {/* Trust Indicators */}
               <div className="mt-16 text-center">
