@@ -146,6 +146,11 @@ const App = () => {
                   <FamilyCarerAccess />
                 </OptimizedSuspense>
               } />
+              <Route path="/trusted-network" element={
+                <OptimizedSuspense skeletonType="card">
+                  <TrustedNetworkManagement />
+                </OptimizedSuspense>
+              } />
 
               {/* Success Pages */}
               <Route path="/payment-success" element={
