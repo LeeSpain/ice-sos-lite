@@ -16,6 +16,7 @@ import EmergencyContactsCard from "@/components/dashboard/EmergencyContactsCard"
 import FamilyAccessPanel from "@/components/dashboard/family/FamilyAccessPanel";
 import LiveSOSFamily from "@/components/dashboard/family/LiveSOSFamily";
 import MedicalInfoCard from "@/components/dashboard/MedicalInfoCard";
+import EnhancedProfilePage from "@/components/dashboard/pages/EnhancedProfilePage";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import MobileAppCard from "@/components/dashboard/MobileAppCard";
 import ActivityCard from "@/components/dashboard/ActivityCard";
@@ -209,10 +210,7 @@ const Dashboard = () => {
               {/* Profile Page */}
                <Route path="/profile" element={
                  <div className="p-6">
-                  <PersonalDetailsCard 
-                    profile={profile} 
-                    onProfileUpdate={loadProfile}
-                  />
+                  <EnhancedProfilePage />
                 </div>
               } />
 
