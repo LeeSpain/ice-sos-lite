@@ -58,7 +58,7 @@ export function useRealTimeAnalytics() {
         const [contactsResult, ordersResult, registrationsResult, profilesResult] = await Promise.allSettled([
           supabase.from('contact_submissions').select('count', { count: 'exact', head: true }),
           supabase.from('orders').select('total_price').eq('status', 'completed').throwOnError(),
-          supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true).throwOnError(),
+          supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true),
           supabase.from('profiles').select('count', { count: 'exact', head: true }).throwOnError()
         ]);
 
