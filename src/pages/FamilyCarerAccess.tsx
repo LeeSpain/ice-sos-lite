@@ -85,8 +85,8 @@ const FamilyCarerAccessPage = () => {
               <div className="relative">
                 <div className="relative z-10">
                   <OptimizedImage 
-                    src="/lovable-uploads/f65e7524-8dfe-491a-86d1-8d153266a17f.png" 
-                    alt="Family carer emergency coordination - connecting families for emergency response and safety monitoring"
+                    src="/lovable-uploads/7b271d34-59d8-4874-9441-77c857b01fac.png" 
+                    alt="Family carer emergency coordination - woman and elderly man using emergency alert system with family access dashboard"
                     className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
                     priority={true}
                     sizes={getImageSizes('hero')}
