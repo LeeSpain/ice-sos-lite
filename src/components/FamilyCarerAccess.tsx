@@ -1,13 +1,13 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Users, Heart, Shield, Clock, UserCheck, CheckCircle, Play } from 'lucide-react';
+import { Users, Heart, Shield, Clock, UserCheck, CheckCircle2, Play } from 'lucide-react';
 import { Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { IntroVideoModal } from '@/components/IntroVideoModal';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/utils/currency';
+import familyCarerImage from '@/assets/family-carer-support.jpg';
 
 const FamilyCarerAccess = () => {
   const { t } = useTranslation();
@@ -20,93 +20,67 @@ const FamilyCarerAccess = () => {
   const billingInterval = t('common.perMonth');
 
   const features = [
-    {
-      icon: UserCheck,
-      title: t('familyCarerAccess.features.trustedContacts.title'),
-      description: t('familyCarerAccess.features.trustedContacts.description'),
-      color: "primary"
-    },
-    {
-      icon: Heart,
-      title: t('familyCarerAccess.features.careCoordination.title'),
-      description: t('familyCarerAccess.features.careCoordination.description'),
-      color: "wellness"
-    },
-    {
-      icon: Shield,
-      title: t('familyCarerAccess.features.privacyControls.title'),
-      description: t('familyCarerAccess.features.privacyControls.description'),
-      color: "guardian"
-    },
-    {
-      icon: Clock,
-      title: t('familyCarerAccess.features.realTimeUpdates.title'),
-      description: t('familyCarerAccess.features.realTimeUpdates.description'),
-      color: "emergency"
-    }
+    'Trusted family contacts & emergency coordination',
+    'Professional care coordination with medical teams',
+    'Privacy controls for family access levels',
+    'Real-time updates during emergency situations',
+    'Multi-generational family support plans',
+    'Secure family communication channels'
   ];
 
-  const getIconColor = (color: string) => {
-    switch (color) {
-      case 'emergency': return 'text-emergency';
-      case 'guardian': return 'text-guardian';
-      case 'wellness': return 'text-wellness';
-      default: return 'text-primary';
-    }
-  };
-
-  const getCardBorder = (color: string) => {
-    switch (color) {
-      case 'emergency': return 'border-emergency/20 hover:border-emergency/40';
-      case 'guardian': return 'border-guardian/20 hover:border-guardian/40';
-      case 'wellness': return 'border-wellness/20 hover:border-wellness/40';
-      default: return 'border-primary/20 hover:border-primary/40';
-    }
-  };
 
   return (
-    <section className="py-12 bg-background">
+    <section className="py-20 bg-gradient-to-br from-background via-muted/20 to-background">
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center bg-warning/10 rounded-full px-4 py-2 mb-4 border border-warning/20">
-            <div className="w-2 h-2 bg-warning rounded-full mr-2 animate-pulse"></div>
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center space-x-2 bg-warning/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6 shadow-lg border border-warning/30">
+            <Users className="h-4 w-4 text-warning" />
             <span className="text-sm font-medium text-warning">{t('familyCarerAccess.sectionBadge')}</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">
+          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
             {t('familyCarerAccess.title')}
           </h2>
-          <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             {t('familyCarerAccess.subtitle')}
           </p>
         </div>
 
-        {/* Main Content Card */}
-        <Card className="relative border-2 border-warning/20 bg-white dark:bg-slate-800 shadow-xl overflow-hidden max-w-4xl mx-auto">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-warning to-warning/60"></div>
-          
-          <CardContent className="p-6 md:p-8">
-            {/* Split Layout */}
-            <div className="grid md:grid-cols-2 gap-6 items-center">
-              {/* Left Side - Main Info */}
-              <div className="text-center md:text-left">
-                <div className="w-14 h-14 bg-gradient-to-br from-warning to-warning/80 shadow-lg rounded-2xl flex items-center justify-center mx-auto md:mx-0 mb-4">
-                  <Users className="h-7 w-7 text-white" />
+        <Card className="shadow-xl border-2 border-warning/20 hover:border-warning/40 transition-colors">
+          <CardContent className="p-8">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Content */}
+              <div className="text-center lg:text-left">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-warning to-warning/80 flex items-center justify-center">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold">{t('familyCarerAccess.cardTitle')}</h3>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-3 text-foreground">
-                  {t('familyCarerAccess.cardTitle')}
-                </h3>
-                <div className="mb-4">
+                
+                <div className="mb-6">
                   <span className="text-3xl font-bold text-warning">{formattedPrice}</span>
-                  <span className="text-muted-foreground text-sm">{billingInterval} {t('familyCarerAccess.cardSubtitle')}</span>
+                  <span className="text-muted-foreground text-sm ml-2">{billingInterval} {t('familyCarerAccess.cardSubtitle')}</span>
                 </div>
-                <p className="text-muted-foreground text-sm mb-4">
+                
+                <p className="text-muted-foreground mb-6">
                   {t('familyCarerAccess.cardDescription')}
                 </p>
                 
-                {/* CTA Buttons */}
-                <div className="flex flex-col gap-3">
-                  <Button asChild size="lg" className="bg-warning hover:bg-warning/90 text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl border-2 border-warning/30">
+                <div className="space-y-3 mb-8">
+                  {features.map((feature, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <CheckCircle2 className="h-5 w-5 text-warning mt-0.5 flex-shrink-0" />
+                      <span className="text-foreground">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+                  <Button 
+                    asChild 
+                    size="lg" 
+                    className="bg-warning text-white hover:bg-warning/90 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold px-8 py-4 rounded-xl border-2 border-warning/20"
+                  >
                     <Link to="/family-carer-access">
                       <Users className="mr-2 h-4 w-4" />
                       {t('familyCarerAccess.learnMore')}
@@ -119,7 +93,7 @@ const FamilyCarerAccess = () => {
                       <Button 
                         variant="outline"
                         size="lg"
-                        className="border-warning text-warning hover:bg-warning hover:text-white font-semibold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
+                        className="border-warning text-warning hover:bg-warning hover:text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl"
                       >
                         <Play className="h-4 w-4 mr-2" />
                         {t('familyCarerAccess.watchVideo')}
@@ -127,41 +101,28 @@ const FamilyCarerAccess = () => {
                     }
                   />
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
+                
+                <p className="text-xs text-muted-foreground mt-4">
                   {t('familyCarerAccess.secureNote')}
                 </p>
               </div>
-
-              {/* Right Side - Features Grid */}
-              <div className="grid grid-cols-1 gap-4">
-                {features.slice(0, 3).map((feature, index) => {
-                  const Icon = feature.icon;
-                  return (
-                    <div key={index} className="flex items-center space-x-3 p-3 rounded-lg bg-warning/5 border border-warning/10">
-                      <div className={`w-10 h-10 bg-gradient-to-br from-warning to-warning/80 rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        <Icon className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-sm text-foreground">{feature.title}</h4>
-                        <p className="text-xs text-muted-foreground">{feature.description}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+              
+              {/* Family Image */}
+              <div className="relative">
+                <div className="relative z-10">
+                  <img 
+                    src={familyCarerImage} 
+                    alt="Professional family care support - Multi-generational family representing comprehensive family protection services"
+                    className="w-full max-w-lg mx-auto rounded-3xl shadow-2xl"
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(min-width: 1024px) 512px, 90vw"
+                  />
+                </div>
               </div>
             </div>
           </CardContent>
         </Card>
-
-        {/* Footer Note */}
-        <div className="text-center mt-8">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
-            <Heart className="h-4 w-4 text-warning" />
-            <span className="text-sm text-muted-foreground">
-              {t('familyCarerAccess.footerText')}
-            </span>
-          </div>
-        </div>
       </div>
     </section>
   );
