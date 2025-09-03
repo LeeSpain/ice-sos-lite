@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
-// import MetricPreview from "@/components/MetricPreview";
+import MetricPreview from "@/components/MetricPreview";
+import RegionServices from "@/components/RegionServices";
+import FamilyCarerAccess from "@/components/FamilyCarerAccess";
 import Pricing from "@/components/Pricing";
-
 
 import AppDownload from "@/components/AppDownload";
 import FinalCTA from "@/components/FinalCTA";
