@@ -68,7 +68,7 @@ export const BackgroundMap: React.FC<BackgroundMapProps> = ({ className }) => {
 
   return (
     <div 
-      className={`absolute inset-0 opacity-40 pointer-events-none ${className || ''}`}
+      className={`absolute inset-0 opacity-80 pointer-events-none ${className || ''}`}
       style={{ filter: 'blur(0.5px)' }}
     >
       <div 
