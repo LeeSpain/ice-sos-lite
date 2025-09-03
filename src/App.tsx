@@ -42,6 +42,7 @@ import AdminSetupPage from "./pages/AdminSetupPage";
 import SOSHome from "./pages/SOSHome";
 import FamilyDashboard from "./pages/FamilyDashboard";
 import RegionalDashboard from "./pages/RegionalDashboard";
+import { ConnectionAcceptPage } from "./pages/ConnectionAcceptPage";
 
 // Import protected routes and components
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -52,6 +53,7 @@ import DashboardRedirect from "@/components/DashboardRedirect";
 import SmartAppRedirect from "@/components/SmartAppRedirect";
 import SimpleDashboard from "./pages/SimpleDashboard";
 import Dashboard from "./pages/Dashboard";
+import { ConnectionsPage } from "./components/dashboard/ConnectionsPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import FamilyTrackingApp from "./pages/FamilyTrackingApp";
 import GlobalEmmaChat from "@/components/GlobalEmmaChat";
@@ -173,6 +175,15 @@ const App = () => {
                   </ProtectedRoute>
                 </OptimizedSuspense>
               } />
+              
+              {/* Connections Management */}
+              <Route path="/dashboard/connections" element={
+                <OptimizedSuspense skeletonType="card">
+                  <ProtectedRoute>
+                    <ConnectionsPage />
+                  </ProtectedRoute>
+                </OptimizedSuspense>
+               } />
 
               {/* Member Dashboard */}
               <Route path="/member-dashboard/*" element={
@@ -273,12 +284,19 @@ const App = () => {
                 </OptimizedSuspense>
               } />
 
-              {/* Family Invite Accept */}
-              <Route path="/family-invite/:token" element={
-                <OptimizedSuspense skeletonType="card">
-                  <FamilyInviteAccept />
-                </OptimizedSuspense>
-              } />
+               {/* Connection Accept */}
+               <Route path="/invite/accept" element={
+                 <OptimizedSuspense skeletonType="card">
+                   <ConnectionAcceptPage />
+                 </OptimizedSuspense>
+               } />
+               
+               {/* Family Invite Accept */}
+               <Route path="/family-invite/:token" element={
+                 <OptimizedSuspense skeletonType="card">
+                   <FamilyInviteAccept />
+                 </OptimizedSuspense>
+               } />
 
               {/* Live Map Routes */}
               <Route path="/map" element={
