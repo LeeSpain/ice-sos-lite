@@ -244,10 +244,9 @@ const RegionalUsersPage = () => {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="es">Spanish</SelectItem>
+                    <SelectItem value="es">Español</SelectItem>
                     <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="ca">Catalan</SelectItem>
-                    <SelectItem value="eu">Basque</SelectItem>
+                    <SelectItem value="nl">Nederlands</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
