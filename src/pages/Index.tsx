@@ -42,10 +42,13 @@ const Index = () => {
       
       
       <Features />
-      {/* <MetricPreview /> */}
+      <MetricPreview />
 
       {/* Live App Preview Section (reflects admin "App Testing" settings) */}
       <AppPreviewSection />
+
+      <RegionServices />
+      <FamilyCarerAccess />
 
       <Pricing />
       
