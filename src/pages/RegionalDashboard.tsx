@@ -6,7 +6,8 @@ import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Users, Phone } from 'lucide-react';
+import { AlertTriangle, Users, Phone, Settings } from 'lucide-react';
+import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 
 const RegionalDashboard = () => {
   const { data: regionalRole } = useRegionalRole();
@@ -26,12 +27,12 @@ const RegionalDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-amber-500" />
-              Acceso Restringido
+              Access Restricted
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600">
-              No tienes permisos para acceder al centro de llamadas regional.
+              You don't have permission to access the regional call center.
             </p>
           </CardContent>
         </Card>
@@ -40,119 +41,131 @@ const RegionalDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header with Language Selector */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <Phone className="h-8 w-8 text-blue-600" />
-            Centro de Llamadas Regional
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Panel de control para operadores del centro de emergencias - {regionalRole?.organizationName}
-          </p>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Regional Call Center
+              </h1>
+              <p className="text-sm text-gray-600">
+                Emergency control center dashboard - {regionalRole?.organizationName || 'Platform Admin'}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <LanguageCurrencySelector compact />
+          </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Overview Cards */}
-          <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <Card>
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Overview Cards */}
+            <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-blue-600" />
+                    Active Customers
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">0</div>
+                  <p className="text-sm text-gray-600">Connected customers</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-amber-600" />
+                    Open Alerts
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">0</div>
+                  <p className="text-sm text-gray-600">Pending events</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Phone className="h-5 w-5 text-green-600" />
+                    System Status
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Badge variant="outline" className="text-green-600 border-green-600">
+                    OPERATIONAL
+                  </Badge>
+                  <p className="text-sm text-gray-600 mt-1">All systems functioning</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Main Content Area */}
+            <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-blue-600" />
-                  Clientes Activos
-                </CardTitle>
+                <CardTitle>Active SOS Events</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-gray-600">Clientes conectados</p>
+                <div className="text-center py-8">
+                  <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500">No active SOS events at this time</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    SOS events will appear here when activated
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
+            {/* Side Panel */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-600" />
-                  Alertas Abiertas
-                </CardTitle>
+                <CardTitle>Notification Center</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-sm text-gray-600">Eventos pendientes</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Phone className="h-5 w-5 text-green-600" />
-                  Estado del Sistema
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Badge variant="outline" className="text-green-600 border-green-600">
-                  OPERATIVO
-                </Badge>
-                <p className="text-sm text-gray-600 mt-1">Todos los sistemas funcionando</p>
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No pending notifications</p>
+                  <p className="text-sm text-gray-400 mt-2">
+                    Family notifications will appear here
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Main Content Area */}
-          <Card className="lg:col-span-2">
+          {/* Quick Info */}
+          <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Eventos SOS Activos</CardTitle>
+              <CardTitle>System Information</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">No hay eventos SOS activos en este momento</p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Los eventos SOS aparecerán aquí cuando se activen
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Side Panel */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Centro de Notificaciones</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <p className="text-gray-500">No hay notificaciones pendientes</p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Las notificaciones de familia aparecerán aquí
-                </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-semibold text-sm">Organization</h4>
+                  <p className="text-gray-600">{regionalRole?.organizationName || 'Not assigned'}</p>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-sm">Role</h4>
+                  <Badge variant="outline">
+                    {isAdmin ? 'Platform Admin' :
+                     regionalRole?.isRegionalSupervisor ? 'Regional Supervisor' : 
+                     regionalRole?.isRegionalOperator ? 'Regional Operator' : 
+                     regionalRole?.isPlatformAdmin ? 'Platform Admin' :
+                     'User'}
+                  </Badge>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Quick Info */}
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Información del Sistema</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <h4 className="font-semibold text-sm">Organización</h4>
-                <p className="text-gray-600">{regionalRole?.organizationName || 'No asignada'}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold text-sm">Rol</h4>
-                <Badge variant="outline">
-                  {isAdmin ? 'Admin de Plataforma' :
-                   regionalRole?.isRegionalSupervisor ? 'Supervisor Regional' : 
-                   regionalRole?.isRegionalOperator ? 'Operador Regional' : 
-                   regionalRole?.isPlatformAdmin ? 'Admin de Plataforma' :
-                   'Usuario'}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
