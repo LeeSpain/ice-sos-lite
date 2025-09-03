@@ -1,53 +1,68 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
+import { Shield, Heart, MapPin, Users, Clock, CheckCircle, Play, Phone, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Users, UserPlus, Play, Shield, Clock, CheckCircle, ArrowRight } from "lucide-react";
-import { IntroVideoModal } from '@/components/IntroVideoModal';
+import { IntroVideoModal } from "@/components/IntroVideoModal";
 
 export const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-hero">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_0%,transparent_50%)] animate-pulse"></div>
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emergency/20 rounded-full blur-3xl animate-[pulse_4s_ease-in-out_infinite]"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-wellness/20 rounded-full blur-3xl animate-[pulse_6s_ease-in-out_infinite]"></div>
-      </div>
+    <section className="py-section bg-gradient-hero shadow-2xl">
+      <div className="container mx-auto px-4">
+        {/* Header - matching other sections */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
+            Family Emergency Coordination
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Connect your loved ones with instant SOS alerts, real-time location sharing during emergencies only, and 24/7 professional monitoring.
+          </p>
+        </div>
 
-      <div className="container mx-auto px-4 py-20 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          
-          {/* Hero Content */}
-          <div className="text-center mb-16 animate-fade-in">
-            <div className="inline-flex items-center space-x-2 bg-emergency/20 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-emergency/30 shadow-glow">
-              <Users className="h-5 w-5 text-emergency-glow" />
-              <span className="text-white font-medium">Professional Emergency Coordination</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight text-white">
-              Your Family's
-              <br />
-              <span className="bg-gradient-to-r from-wellness via-white to-emergency-glow bg-clip-text text-transparent">
-                Emergency Lifeline
-              </span>
-            </h1>
-            
-            <p className="text-2xl md:text-3xl text-white/90 max-w-4xl mx-auto mb-12 leading-relaxed font-light">
-              Instant SOS alerts. Real-time coordination. Complete privacy.
-              <br />
-              <span className="text-wellness font-medium">Professional emergency response for modern families.</span>
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-16">
-              <Button 
-                asChild 
-                size="xl" 
-                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow font-bold text-xl px-12 py-6 rounded-2xl hover-scale"
-              >
-                <Link to="/ai-register">
-                  <UserPlus className="mr-3 h-6 w-6" />
-                  Start Protecting Your Family
-                  <ArrowRight className="ml-3 h-6 w-6" />
+        {/* Main Content - matching Features section layout */}
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Right Side - Benefits */}
+            <div className="text-center lg:text-left">
+              <div className="mb-8">
+                <h3 className="text-2xl md:text-3xl font-bold mb-4 text-foreground">
+                  Protect Your Family With Professional Emergency Coordination
+                </h3>
+                <p className="text-lg text-muted-foreground mb-6">
+                  When emergencies happen, every second counts. Our family coordination system ensures help arrives quickly while respecting privacy.
+                </p>
+              </div>
+
+              <div className="grid gap-6 mb-8">
+                <div className="flex items-start space-x-4 text-left">
+                  <div className="w-12 h-12 bg-emergency/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Shield className="h-6 w-6 text-emergency" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Instant SOS Alerts</h4>
+                    <p className="text-muted-foreground">One-button emergency alerts to all family members with precise location sharing</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4 text-left">
+                  <div className="w-12 h-12 bg-wellness/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Users className="h-6 w-6 text-wellness" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Family Network</h4>
+                    <p className="text-muted-foreground">Connect parents, children, grandparents and trusted contacts in one secure network</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <Button 
+                  asChild 
+                  size="lg" 
+                  className="bg-wellness hover:bg-wellness/90 text-black font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
+                >
+                  <Link to="/ai-register">
+                    <Shield className="h-5 w-5 mr-2" />
+                    Start Protecting Your Family
                 </Link>
               </Button>
               
