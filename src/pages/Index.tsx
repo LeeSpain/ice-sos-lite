@@ -18,7 +18,7 @@ import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
 import { preloadCriticalImages } from "@/utils/imageOptimization";
 import { useEmmaChat } from "@/contexts/EmmaChatContext";
 import { FirstVisitPreferencesModal } from "@/components/FirstVisitPreferencesModal";
-import RealTimeAnalyticsDebugger from "@/components/RealTimeAnalyticsDebugger";
+
 
 const Index = () => {
   useScrollToTop();
@@ -53,7 +53,7 @@ const Index = () => {
       <AppDownload />
       <FinalCTA />
       <Footer />
-      <RealTimeAnalyticsDebugger />
+      
     </div>
   );
 };
