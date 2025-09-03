@@ -1,278 +1,385 @@
 import React from 'react';
-import { Users, Heart, Shield, Wifi, WifiOff, Dot, ArrowRight, UserCircle, Baby, User } from "lucide-react";
+import { Users, Heart, Shield, Wifi, AlertTriangle, User, Clock, Baby, UserCircle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-export const FamilyCircleSection = () => {
+export const FamilyCircleSection: React.FC = () => {
   return (
-    <section className="py-section bg-background">
-      <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-20">
-          <div className="inline-flex items-center space-x-2 bg-primary/10 rounded-full px-4 py-2 mb-6">
-            <Users className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Family Connections</span>
-          </div>
-          
-          <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-            How Your
-            <span className="bg-gradient-to-r from-primary via-emergency to-wellness bg-clip-text text-transparent"> Family Circle</span> Works
+    <section className="py-section bg-gradient-to-br from-background to-muted/50 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+      <div className="absolute top-10 left-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-wellness/5 rounded-full blur-3xl"></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Section Header - Matching Homepage Pattern */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-black bg-white p-4 rounded-lg shadow-sm mb-4 inline-block">
+            How Your Family Circle Works
           </h2>
-          <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            Create secure connections between family members and trusted carers. When emergencies happen, 
-            everyone in your circle knows instantly and can coordinate the response.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Create secure connections with family members and trusted contacts. Everyone in your circle knows exactly what's happening during an emergency.
           </p>
         </div>
 
         {/* Visual Flow Diagram */}
-        <div className="max-w-6xl mx-auto mb-20">
-          <div className="relative min-h-[600px] flex items-center justify-center">
+        <div className="relative max-w-6xl mx-auto mb-20">
+          <div className="text-center mb-16">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+              Your Emergency Network
+            </h3>
+            <p className="text-lg text-muted-foreground">
+              See how information flows instantly through your family circle during an emergency
+            </p>
+          </div>
+          
+          {/* Desktop Flow */}
+          <div className="hidden lg:block relative h-[500px] bg-gradient-to-br from-primary/5 to-wellness/10 rounded-3xl p-8 border border-primary/10 shadow-2xl backdrop-blur-sm">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent rounded-3xl"></div>
             
-            {/* Central Grandfather Figure */}
-            <div className="absolute z-20 flex flex-col items-center">
+            {/* Animated Connection Lines - SVG */}
+            <svg className="absolute inset-0 w-full h-full z-10" viewBox="0 0 800 500">
+              <defs>
+                <linearGradient id="familyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.8"/>
+                  <stop offset="100%" stopColor="hsl(var(--wellness))" stopOpacity="0.6"/>
+                </linearGradient>
+                <linearGradient id="trustedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="hsl(var(--secondary))" stopOpacity="0.6"/>
+                  <stop offset="100%" stopColor="hsl(var(--muted))" stopOpacity="0.4"/>
+                </linearGradient>
+              </defs>
+              
+              {/* Family connections - Solid animated lines */}
+              <path d="M 400 250 Q 200 150 150 120" stroke="url(#familyGradient)" strokeWidth="3" fill="none" strokeDasharray="0" className="animate-pulse">
+                <animate attributeName="stroke-dasharray" values="0,1000;20,980;0,1000" dur="3s" repeatCount="indefinite"/>
+              </path>
+              <path d="M 400 250 Q 600 150 650 120" stroke="url(#familyGradient)" strokeWidth="3" fill="none" strokeDasharray="0" className="animate-pulse">
+                <animate attributeName="stroke-dasharray" values="0,1000;20,980;0,1000" dur="3s" repeatCount="indefinite"/>
+              </path>
+              <path d="M 400 250 Q 400 100 400 80" stroke="url(#familyGradient)" strokeWidth="3" fill="none" strokeDasharray="0" className="animate-pulse">
+                <animate attributeName="stroke-dasharray" values="0,1000;20,980;0,1000" dur="3s" repeatCount="indefinite"/>
+              </path>
+              
+              {/* Trusted contact connections - Dashed lines */}
+              <path d="M 400 250 Q 200 350 150 380" stroke="url(#trustedGradient)" strokeWidth="2" fill="none" strokeDasharray="10,10" className="animate-pulse">
+                <animate attributeName="stroke-dashoffset" values="0;20" dur="2s" repeatCount="indefinite"/>
+              </path>
+              <path d="M 400 250 Q 600 350 650 380" stroke="url(#trustedGradient)" strokeWidth="2" fill="none" strokeDasharray="10,10" className="animate-pulse">
+                <animate attributeName="stroke-dashoffset" values="0;20" dur="2s" repeatCount="indefinite"/>
+              </path>
+            </svg>
+
+            {/* Central Figure - Grandad with glassmorphism effect */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
               <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center shadow-xl border-4 border-white">
-                  <img 
-                    src="/dad-avatar.png" 
-                    alt="Grandfather" 
-                    className="w-20 h-20 rounded-full object-cover"
-                  />
+                <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full border-4 border-white/50 shadow-2xl flex items-center justify-center overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-wellness/20 rounded-full"></div>
+                  <img src="/grandma-avatar.png" alt="Grandad" className="w-20 h-20 object-cover rounded-full relative z-10 border-2 border-white/30" />
+                  
+                  {/* Pulsing alert ring */}
+                  <div className="absolute -inset-2 border-4 border-emergency/60 rounded-full animate-ping"></div>
+                  <div className="absolute -inset-1 border-2 border-emergency rounded-full"></div>
                 </div>
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                  <div className="w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+                
+                <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-xl border border-white/50 text-sm font-semibold text-primary">
+                  Grandad
                 </div>
-              </div>
-              <div className="mt-3 text-center">
-                <p className="font-semibold text-foreground">Grandad</p>
-                <p className="text-sm text-muted-foreground">Protected Person</p>
-              </div>
-            </div>
-
-            {/* Family Connections (Solid Lines) */}
-            
-            {/* Daughter - Left */}
-            <div className="absolute left-12 top-20 z-10">
-              <div className="flex items-center space-x-4">
-                <div className="flex flex-col items-center">
-                  <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-wellness to-wellness/80 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                      <img 
-                        src="/emma-avatar.png" 
-                        alt="Daughter" 
-                        className="w-14 h-14 rounded-full object-cover"
-                      />
-                    </div>
-                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full border border-white"></div>
-                    </div>
-                  </div>
-                  <div className="mt-2 text-center">
-                    <p className="font-medium text-sm">Emma</p>
-                    <p className="text-xs text-muted-foreground">Daughter</p>
-                  </div>
-                </div>
-                {/* Connection Line */}
-                <div className="w-32 h-0.5 bg-gradient-to-r from-wellness to-primary"></div>
-              </div>
-            </div>
-
-            {/* Son - Right */}
-            <div className="absolute right-12 top-20 z-10">
-              <div className="flex items-center space-x-4 flex-row-reverse">
-                <div className="flex flex-col items-center">
-                  <div className="relative">
-                    <div className="w-16 h-16 bg-gradient-to-br from-guardian to-guardian/80 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                      <User className="h-10 w-10 text-white" />
-                    </div>
-                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full border border-white"></div>
-                    </div>
-                  </div>
-                  <div className="mt-2 text-center">
-                    <p className="font-medium text-sm">James</p>
-                    <p className="text-xs text-muted-foreground">Son</p>
-                  </div>
-                </div>
-                {/* Connection Line */}
-                <div className="w-32 h-0.5 bg-gradient-to-l from-guardian to-primary"></div>
-              </div>
-            </div>
-
-            {/* Grandchild - Top */}
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10">
-              <div className="flex flex-col items-center space-y-4">
-                <div className="flex flex-col items-center">
-                  <div className="relative">
-                    <div className="w-14 h-14 bg-gradient-to-br from-emergency to-emergency/80 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                      <Baby className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-                      <div className="w-3 h-3 bg-yellow-500 rounded-full border border-white"></div>
-                    </div>
-                  </div>
-                  <div className="mt-2 text-center">
-                    <p className="font-medium text-sm">Sophie</p>
-                    <p className="text-xs text-muted-foreground">Grandchild</p>
-                  </div>
-                </div>
-                {/* Connection Line */}
-                <div className="w-0.5 h-24 bg-gradient-to-b from-emergency to-primary"></div>
-              </div>
-            </div>
-
-            {/* Trusted Carer Connections (Dashed Lines) */}
-            
-            {/* Professional Carer - Bottom Left */}
-            <div className="absolute bottom-4 left-20 z-10">
-              <div className="flex flex-col items-center space-y-4">
-                {/* Connection Line - Dashed */}
-                <div className="w-0.5 h-24 bg-gradient-to-t from-muted to-primary opacity-60" 
-                     style={{
-                       background: `repeating-linear-gradient(to top, hsl(var(--primary)) 0px, hsl(var(--primary)) 4px, transparent 4px, transparent 8px)`
-                     }}>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="relative">
-                    <div className="w-14 h-14 bg-gradient-to-br from-muted to-muted/80 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                      <UserCircle className="h-8 w-8 text-foreground" />
-                    </div>
-                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-                      <div className="w-3 h-3 bg-gray-400 rounded-full border border-white"></div>
-                    </div>
-                  </div>
-                  <div className="mt-2 text-center">
-                    <p className="font-medium text-sm">Care Pro</p>
-                    <p className="text-xs text-muted-foreground">Professional</p>
-                  </div>
+                
+                {/* Alert indicator with animation */}
+                <div className="absolute -top-3 -right-3 w-8 h-8 bg-emergency rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                  <AlertTriangle className="h-4 w-4 text-white" />
                 </div>
               </div>
             </div>
 
-            {/* Neighbor/Friend - Bottom Right */}
-            <div className="absolute bottom-4 right-20 z-10">
-              <div className="flex flex-col items-center space-y-4">
-                {/* Connection Line - Dashed */}
-                <div className="w-0.5 h-24 bg-gradient-to-t from-muted to-primary opacity-60"
-                     style={{
-                       background: `repeating-linear-gradient(to top, hsl(var(--primary)) 0px, hsl(var(--primary)) 4px, transparent 4px, transparent 8px)`
-                     }}>
+            {/* Family Members with enhanced styling */}
+            {/* Daughter */}
+            <div className="absolute top-12 left-12">
+              <div className="relative group hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-wellness/20 to-primary/10 rounded-full"></div>
+                  <img src="/mom-avatar.png" alt="Daughter" className="w-16 h-16 object-cover rounded-full relative z-10" />
+                  
+                  {/* Online status indicator */}
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
                 </div>
-                <div className="flex flex-col items-center">
-                  <div className="relative">
-                    <div className="w-14 h-14 bg-gradient-to-br from-muted to-muted/80 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                      <Heart className="h-8 w-8 text-foreground" />
-                    </div>
-                    <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2">
-                      <div className="w-3 h-3 bg-green-500 rounded-full border border-white"></div>
-                    </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg text-xs font-medium">
+                  Daughter
+                </div>
+                <Badge className="absolute -top-4 -right-4 text-xs px-3 py-1 bg-primary/90 text-white shadow-lg">
+                  Family
+                </Badge>
+              </div>
+            </div>
+
+            {/* Son */}
+            <div className="absolute top-12 right-12">
+              <div className="relative group hover:scale-110 transition-transform duration-300">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-wellness/20 to-primary/10 rounded-full"></div>
+                  <img src="/dad-avatar.png" alt="Son" className="w-16 h-16 object-cover rounded-full relative z-10" />
+                  
+                  {/* Online status indicator */}
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg text-xs font-medium">
+                  Son
+                </div>
+                <Badge className="absolute -top-4 -right-4 text-xs px-3 py-1 bg-primary/90 text-white shadow-lg">
+                  Family
+                </Badge>
+              </div>
+            </div>
+
+            {/* Grandchild */}
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
+              <div className="relative group hover:scale-110 transition-transform duration-300">
+                <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-wellness/20 to-primary/10 rounded-full"></div>
+                  <img src="/emma-avatar.png" alt="Grandchild" className="w-14 h-14 object-cover rounded-full relative z-10" />
+                  
+                  {/* Online status indicator */}
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg text-xs font-medium">
+                  Emma
+                </div>
+                <Badge className="absolute -top-4 -right-4 text-xs px-3 py-1 bg-primary/90 text-white shadow-lg">
+                  Family
+                </Badge>
+              </div>
+            </div>
+
+            {/* Trusted Contacts with enhanced styling */}
+            {/* Professional Carer */}
+            <div className="absolute bottom-12 left-12">
+              <div className="relative group hover:scale-110 transition-transform duration-300">
+                <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
+                  <User className="h-10 w-10 text-secondary-foreground relative z-10" />
+                  
+                  {/* Available status indicator */}
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg text-xs font-medium">
+                  Carer
+                </div>
+                <Badge variant="outline" className="absolute -top-4 -right-4 text-xs px-3 py-1 bg-white/90 shadow-lg">
+                  Trusted
+                </Badge>
+              </div>
+            </div>
+
+            {/* Neighbor */}
+            <div className="absolute bottom-12 right-12">
+              <div className="relative group hover:scale-110 transition-transform duration-300">
+                <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-muted/10 rounded-full"></div>
+                  <Heart className="h-10 w-10 text-secondary-foreground relative z-10" />
+                  
+                  {/* Available status indicator */}
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
+                </div>
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg text-xs font-medium">
+                  Neighbor
+                </div>
+                <Badge variant="outline" className="absolute -top-4 -right-4 text-xs px-3 py-1 bg-white/90 shadow-lg">
+                  Trusted
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Flow - Enhanced vertical layout */}
+          <div className="lg:hidden space-y-8 bg-gradient-to-b from-primary/5 to-wellness/10 rounded-3xl p-6 border border-primary/10 shadow-xl">
+            <div className="text-center">
+              <div className="relative inline-block">
+                <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full border-4 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-4 overflow-hidden relative">
+                  <img src="/grandma-avatar.png" alt="Grandad" className="w-20 h-20 object-cover rounded-full" />
+                  
+                  {/* Pulsing alert rings */}
+                  <div className="absolute -inset-2 border-4 border-emergency/60 rounded-full animate-ping"></div>
+                  <div className="absolute -inset-1 border-2 border-emergency rounded-full"></div>
+                </div>
+                
+                {/* Alert indicator */}
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-emergency rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                  <AlertTriangle className="h-4 w-4 text-white" />
+                </div>
+              </div>
+              <h4 className="font-semibold text-lg">Grandad</h4>
+              <p className="text-sm text-muted-foreground">Emergency Alert Activated</p>
+            </div>
+
+            {/* Animated connection indicator */}
+            <div className="flex justify-center">
+              <div className="flex flex-col items-center">
+                <div className="w-1 h-8 bg-gradient-to-b from-primary to-primary/50 rounded-full animate-pulse"></div>
+                <div className="w-3 h-3 bg-primary rounded-full animate-bounce"></div>
+                <div className="w-1 h-8 bg-gradient-to-b from-primary/50 to-transparent rounded-full animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Family members */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center">
+                <div className="relative group">
+                  <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2 overflow-hidden">
+                    <img src="/mom-avatar.png" alt="Daughter" className="w-16 h-16 object-cover rounded-full" />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
                   </div>
-                  <div className="mt-2 text-center">
-                    <p className="font-medium text-sm">Neighbor</p>
-                    <p className="text-xs text-muted-foreground">Trusted Friend</p>
+                  <h5 className="font-medium">Daughter</h5>
+                  <Badge className="text-xs bg-primary/90 text-white">Family</Badge>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className="relative group">
+                  <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2 overflow-hidden">
+                    <img src="/dad-avatar.png" alt="Son" className="w-16 h-16 object-cover rounded-full" />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
                   </div>
+                  <h5 className="font-medium">Son</h5>
+                  <Badge className="text-xs bg-primary/90 text-white">Family</Badge>
                 </div>
               </div>
             </div>
 
-            {/* Background Circles for Visual Depth */}
-            <div className="absolute inset-0 z-0">
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border-2 border-primary/20 rounded-full"></div>
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-primary/10 rounded-full"></div>
+            {/* Connection separator */}
+            <div className="flex justify-center">
+              <div className="flex flex-col items-center">
+                <div className="w-1 h-6 bg-gradient-to-b from-secondary to-secondary/50 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-secondary rounded-full animate-bounce" style={{animationDelay: '0.5s'}}></div>
+                <div className="w-1 h-6 bg-gradient-to-b from-secondary/50 to-transparent rounded-full animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Trusted contacts */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="text-center">
+                <div className="relative group">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2">
+                    <User className="h-8 w-8 text-secondary-foreground" />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
+                  </div>
+                  <h5 className="font-medium text-sm">Professional Carer</h5>
+                  <Badge variant="outline" className="text-xs bg-white/90">Trusted</Badge>
+                </div>
+              </div>
+              
+              <div className="text-center">
+                <div className="relative group">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center mx-auto mb-2">
+                    <Heart className="h-8 w-8 text-secondary-foreground" />
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-blue-500 rounded-full border-2 border-white animate-pulse"></div>
+                  </div>
+                  <h5 className="font-medium">Neighbor</h5>
+                  <Badge variant="outline" className="text-xs bg-white/90">Trusted</Badge>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Connection Types Explanation */}
         <div className="grid md:grid-cols-2 gap-8 mb-16">
-          <div className="bg-gradient-to-br from-wellness/10 to-primary/10 rounded-2xl p-8 border border-primary/20">
+          <div className="bg-gradient-to-br from-wellness/10 to-primary/10 rounded-2xl p-8 border border-primary/20 backdrop-blur-sm">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-3 h-3 bg-wellness rounded-full"></div>
+              <div className="w-4 h-4 bg-primary rounded-full animate-pulse"></div>
               <h3 className="text-xl font-bold text-foreground">Family Circle</h3>
             </div>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-6">
               Direct family members with full access to emergency status, location data, and coordination capabilities.
             </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-wellness" />
-                <span>Instant SOS notifications</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-wellness" />
-                <span>Real-time location access</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-wellness" />
-                <span>Full coordination rights</span>
-              </li>
-            </ul>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
+                <Shield className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm font-medium">Instant SOS notifications</span>
+              </div>
+              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
+                <Clock className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm font-medium">Real-time location access</span>
+              </div>
+              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
+                <Users className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="text-sm font-medium">Full coordination rights</span>
+              </div>
+            </div>
           </div>
 
-          <div className="bg-gradient-to-br from-muted/20 to-muted/10 rounded-2xl p-8 border border-muted/30">
+          <div className="bg-gradient-to-br from-muted/20 to-secondary/10 rounded-2xl p-8 border border-muted/30 backdrop-blur-sm">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-3 h-3 bg-muted border-2 border-primary rounded-full" 
-                   style={{
-                     background: `repeating-conic-gradient(hsl(var(--primary)) 0deg, hsl(var(--primary)) 45deg, transparent 45deg, transparent 90deg)`
-                   }}>
-              </div>
+              <div className="w-4 h-4 border-2 border-secondary border-dashed rounded-full animate-pulse"></div>
               <h3 className="text-xl font-bold text-foreground">Trusted Contacts</h3>
             </div>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-6">
               Professional carers, neighbors, and friends with limited access for support and backup assistance.
             </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex items-center space-x-2">
-                <Heart className="h-4 w-4 text-muted-foreground" />
-                <span>Emergency notifications</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Heart className="h-4 w-4 text-muted-foreground" />
-                <span>Status updates only</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Heart className="h-4 w-4 text-muted-foreground" />
-                <span>Support role access</span>
-              </li>
-            </ul>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
+                <Heart className="h-5 w-5 text-secondary flex-shrink-0" />
+                <span className="text-sm font-medium">Emergency notifications</span>
+              </div>
+              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
+                <Wifi className="h-5 w-5 text-secondary flex-shrink-0" />
+                <span className="text-sm font-medium">Status updates only</span>
+              </div>
+              <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-lg">
+                <UserCircle className="h-5 w-5 text-secondary flex-shrink-0" />
+                <span className="text-sm font-medium">Support role access</span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Emergency Scenario Flow */}
-        <div className="bg-gradient-to-r from-emergency/10 via-primary/5 to-wellness/10 rounded-3xl p-8 border border-emergency/20">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-foreground mb-4">When Emergency Happens</h3>
-            <p className="text-muted-foreground">See how alerts flow through your family circle in real-time</p>
+        <div className="bg-gradient-to-r from-emergency/10 via-primary/5 to-wellness/10 rounded-3xl p-8 border border-emergency/20 backdrop-blur-sm">
+          <div className="text-center mb-12">
+            <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">When Emergency Happens</h3>
+            <p className="text-lg text-muted-foreground">See how alerts flow through your family circle in real-time</p>
           </div>
           
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-emergency rounded-full flex items-center justify-center mx-auto mb-4 emergency-pulse">
-                <Shield className="h-8 w-8 text-white" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="text-center group">
+              <div className="relative">
+                <div className="w-20 h-20 bg-emergency rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                  <Shield className="h-10 w-10 text-white" />
+                  <div className="absolute -inset-2 border-4 border-emergency/30 rounded-full animate-ping"></div>
+                </div>
               </div>
-              <h4 className="font-semibold mb-2">SOS Activated</h4>
-              <p className="text-sm text-muted-foreground">Grandad presses emergency button</p>
+              <h4 className="font-bold text-lg mb-3">SOS Activated</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">Grandad presses emergency button or automatic alert triggers</p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                <Wifi className="h-8 w-8 text-white animate-pulse" />
+            <div className="text-center group">
+              <div className="relative">
+                <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                  <Wifi className="h-10 w-10 text-white animate-pulse" />
+                </div>
               </div>
-              <h4 className="font-semibold mb-2">Instant Alerts</h4>
-              <p className="text-sm text-muted-foreground">All family members notified simultaneously</p>
+              <h4 className="font-bold text-lg mb-3">Instant Alerts</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">All family members notified simultaneously via app and SMS</p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-wellness rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-white" />
+            <div className="text-center group">
+              <div className="relative">
+                <div className="w-20 h-20 bg-wellness rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-10 w-10 text-white" />
+                </div>
               </div>
-              <h4 className="font-semibold mb-2">Coordination</h4>
-              <p className="text-sm text-muted-foreground">Family coordinates response in real-time</p>
+              <h4 className="font-bold text-lg mb-3">Coordination</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">Family coordinates response in real-time with live updates</p>
             </div>
             
-            <div className="text-center">
-              <div className="w-16 h-16 bg-guardian rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="h-8 w-8 text-white" />
+            <div className="text-center group">
+              <div className="relative">
+                <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl group-hover:scale-110 transition-transform duration-300">
+                  <Heart className="h-10 w-10 text-white" />
+                </div>
               </div>
-              <h4 className="font-semibold mb-2">Help Arrives</h4>
-              <p className="text-sm text-muted-foreground">Fastest responder reaches grandad</p>
+              <h4 className="font-bold text-lg mb-3">Help Arrives</h4>
+              <p className="text-sm text-muted-foreground leading-relaxed">Fastest responder reaches grandad with full situation context</p>
             </div>
           </div>
         </div>
