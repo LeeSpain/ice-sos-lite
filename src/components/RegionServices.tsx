@@ -70,7 +70,7 @@ const RegionServices = () => {
   }
 
   return (
-    <section className="py-section bg-gradient-to-br from-muted/30 to-background">
+    <section className="py-12 bg-gradient-to-br from-muted/30 to-background">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <Badge variant="secondary" className="mb-4 px-4 py-2">
@@ -174,11 +174,11 @@ const RegionServices = () => {
           </div>
         </div>
 
-        <div className="text-center mt-16">
+        <div className="text-center mt-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-muted/50 rounded-full">
             <Clock className="h-4 w-4 text-primary" />
             <span className="text-sm text-muted-foreground">
-              {t('regionServices.footerNote', { defaultValue: 'All regional services include 24/7 emergency response' })}
+              {t('regionServices.footerNote', { defaultValue: '24/7 Emergency Response: All regional services include immediate access to local emergency coordinators who speak your language and understand local emergency protocols.' })}
             </span>
           </div>
         </div>
