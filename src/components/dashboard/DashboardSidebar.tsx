@@ -14,8 +14,6 @@ import {
 import {
   LayoutDashboard,
   User,
-  Heart,
-  Phone,
   Settings,
   CreditCard,
   Activity,
@@ -24,7 +22,6 @@ import {
   Shield,
   Bell,
   HelpCircle,
-  Bluetooth,
   Package,
   Smartphone,
   Map,
@@ -93,24 +90,6 @@ const useDashboardItems = () => {
     }
   ];
 
-  const emergencyItems = [
-    {
-      title: "Emergency Contacts",
-      url: "/full-dashboard/emergency",
-      icon: Phone
-    },
-    {
-      title: "Medical Information",
-      url: "/full-dashboard/health",
-      icon: Heart
-    },
-    {
-      title: t('dashboard.flickControl'),
-      url: "/full-dashboard/flic",
-      icon: Bluetooth
-    }
-  ];
-
   const settingsItems = [
     {
       title: t('dashboard.subscription'),
@@ -139,7 +118,7 @@ const useDashboardItems = () => {
     }
   ];
   
-  return { dashboardItems, familyCircleItems, emergencyItems, settingsItems };
+  return { dashboardItems, familyCircleItems, settingsItems };
 };
 
 export function DashboardSidebar() {
@@ -148,7 +127,7 @@ export function DashboardSidebar() {
   const currentPath = location.pathname;
   const collapsed = state === "collapsed";
   const { t } = useTranslation();
-  const { dashboardItems, familyCircleItems, emergencyItems, settingsItems } = useDashboardItems();
+  const { dashboardItems, familyCircleItems, settingsItems } = useDashboardItems();
 
   const isActive = (path: string) => {
     if (path === '/full-dashboard') {
@@ -242,50 +221,6 @@ export function DashboardSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {familyCircleItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
-                    >
-                      <div className={`p-1.5 rounded-lg transition-colors ${
-                        isActive(item.url) 
-                          ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' 
-                          : 'bg-sidebar-muted text-sidebar-muted-foreground group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground'
-                      }`}>
-                        <item.icon className="h-4 w-4" />
-                      </div>
-                       {!collapsed && (
-                        <div className="flex-1 min-w-0">
-                          <span className={`text-sm font-medium block ${
-                            isActive(item.url) ? 'text-sidebar-primary' : 'text-sidebar-foreground group-hover:text-sidebar-accent-foreground'
-                          }`}>
-                            {item.title}
-                          </span>
-                        </div>
-                       )}
-                      {!collapsed && isActive(item.url) && (
-                        <div className="w-1 h-8 bg-sidebar-primary rounded-full"></div>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {/* Separator */}
-        <div className="mx-4 h-px bg-sidebar-border/50"></div>
-
-        {/* Emergency & Safety Navigation */}
-        <SidebarGroup className="px-3 py-4">
-          <SidebarGroupLabel className="text-sidebar-muted-foreground font-semibold text-xs uppercase tracking-wider mb-3">
-            Emergency & Safety
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
-              {emergencyItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink 

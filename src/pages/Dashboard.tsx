@@ -17,6 +17,7 @@ import FamilyAccessPanel from "@/components/dashboard/family/FamilyAccessPanel";
 import LiveSOSFamily from "@/components/dashboard/family/LiveSOSFamily";
 import MedicalInfoCard from "@/components/dashboard/MedicalInfoCard";
 import EnhancedProfilePage from "@/components/dashboard/pages/EnhancedProfilePage";
+import EnhancedMyProductsPage from "@/components/dashboard/pages/EnhancedMyProductsPage";
 import SubscriptionCard from "@/components/dashboard/SubscriptionCard";
 import MobileAppCard from "@/components/dashboard/MobileAppCard";
 import ActivityCard from "@/components/dashboard/ActivityCard";
@@ -196,14 +197,7 @@ const Dashboard = () => {
               {/* Products Page */}
                <Route path="/products" element={
                  <div className="p-6">
-                  <MyProductsWidget profile={profile} />
-                </div>
-              } />
-
-              {/* Flic Control Page */}
-               <Route path="/flic" element={
-                 <div className="p-6">
-                  <FlicControlPage />
+                  <EnhancedMyProductsPage />
                 </div>
               } />
 
@@ -214,31 +208,10 @@ const Dashboard = () => {
                 </div>
               } />
 
-              {/* Emergency Page */}
-               <Route path="/emergency" element={
-                 <div className="p-6 space-y-6">
-                  <EmergencyContactsCard 
-                    profile={profile} 
-                    onProfileUpdate={loadProfile}
-                  />
-                  <FamilyAccessPanel />
-                </div>
-              } />
-
               {/* Family SOS Live View */}
                <Route path="/family-sos" element={
                  <div className="p-6">
                    <LiveSOSFamily />
-                 </div>
-               } />
-
-               {/* Health Page */}
-               <Route path="/health" element={
-                 <div className="p-6">
-                   <MedicalInfoCard 
-                     profile={profile} 
-                     onProfileUpdate={loadProfile}
-                   />
                  </div>
                } />
 
