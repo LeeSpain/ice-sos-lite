@@ -159,20 +159,24 @@ const Dashboard = () => {
               <Route path="/" element={
                 <div className="container mx-auto px-4 py-section">
                   <div className="max-w-7xl mx-auto">
+                    {/* Welcome Header */}
+                    <div className="mb-6">
+                      <h1 className="text-3xl font-bold">
+                        Welcome back, {profile?.first_name || 'Member'}!
+                      </h1>
+                      <p className="text-muted-foreground mt-1">
+                        Here's your protection status at a glance
+                      </p>
+                    </div>
+
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                      {/* Main Content - Metrics & Family Circle */}
+                      {/* Main Content - Family Circle Focus */}
                       <div className="xl:col-span-2 space-y-6">
                         {/* Family Circle Overview - Prominent */}
                         <FamilyCircleOverview />
                         
                         {/* Emergency Preparedness */}
                         <EmergencyPreparedness 
-                          profile={profile} 
-                          subscription={subscription}
-                        />
-                        
-                        {/* Traditional Metrics - Condensed */}
-                        <MetricsDashboard 
                           profile={profile} 
                           subscription={subscription}
                         />

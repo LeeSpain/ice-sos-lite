@@ -148,100 +148,48 @@ const MetricsDashboard = ({ profile, subscription }: MetricsDashboardProps) => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
-      <Card className="bg-gradient-to-r from-primary/5 to-emergency/5 border-0">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">
-                {t('dashboardOverview.welcome', { name: profile?.first_name || 'Member' })}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Here's your protection metrics at a glance
-              </p>
-            </div>
-            <div className="hidden sm:block">
-              <Badge 
-                variant={subscription?.subscribed ? "default" : "destructive"}
-                className={subscription?.subscribed ? "bg-emergency text-black" : ""}
-              >
-                {subscription?.subscribed ? 'Protected' : 'Inactive'}
-              </Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-4">
+      {/* Subscription Status Badge */}
+      <div className="flex justify-end">
+        <Badge 
+          variant={subscription?.subscribed ? "default" : "destructive"}
+          className={subscription?.subscribed ? "bg-emergency text-black" : ""}
+        >
+          {subscription?.subscribed ? 'Protected' : 'Inactive'}
+        </Badge>
+      </div>
 
-      {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Key Metrics Grid - Simplified */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* System Health Score */}
         <Card className={`hover:shadow-md transition-shadow ${getHealthScoreBg(metrics.systemHealthScore)}`}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Shield className={`h-6 w-6 ${getHealthScoreColor(metrics.systemHealthScore)}`} />
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <Shield className={`h-5 w-5 ${getHealthScoreColor(metrics.systemHealthScore)}`} />
               <Badge variant="outline" className="text-xs">
                 {metrics.systemHealthScore >= 80 ? 'Excellent' : 
                  metrics.systemHealthScore >= 60 ? 'Good' : 'Needs Attention'}
               </Badge>
             </div>
             <div>
-              <p className="text-3xl font-bold">{metrics.systemHealthScore}%</p>
+              <p className="text-2xl font-bold">{metrics.systemHealthScore}%</p>
               <p className="text-sm font-medium text-muted-foreground">System Health</p>
               <Progress value={metrics.systemHealthScore} className="mt-2 h-2" />
             </div>
           </CardContent>
         </Card>
 
-        {/* Emergency Contacts */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Users className={`h-6 w-6 ${metrics.emergencyContactsCount >= 5 ? 'text-green-600' : 'text-orange-500'}`} />
-              {metrics.emergencyContactsCount >= 5 ? (
-                <CheckCircle className="h-5 w-5 text-green-600" />
-              ) : (
-                <AlertTriangle className="h-5 w-5 text-orange-500" />
-              )}
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{metrics.emergencyContactsCount}<span className="text-lg text-muted-foreground">/5</span></p>
-              <p className="text-sm font-medium text-muted-foreground">Emergency Contacts</p>
-              <Progress value={(metrics.emergencyContactsCount / 5) * 100} className="mt-2 h-2" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Family Connections */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Heart className={`h-6 w-6 ${metrics.familyMembersCount > 0 ? 'text-pink-600' : 'text-muted-foreground'}`} />
-              <Badge variant={metrics.familyMembersCount > 0 ? "default" : "secondary"} className="text-xs">
-                {metrics.familyMembersCount > 0 ? 'Connected' : 'None'}
-              </Badge>
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{metrics.familyMembersCount}</p>
-              <p className="text-sm font-medium text-muted-foreground">Family Members</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {metrics.familyMembersCount > 0 ? 'Ready for alerts' : 'Add family connections'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Protection Days */}
         <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Calendar className={`h-6 w-6 ${subscription?.subscribed ? 'text-blue-600' : 'text-muted-foreground'}`} />
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-3">
+              <Calendar className={`h-5 w-5 ${subscription?.subscribed ? 'text-blue-600' : 'text-muted-foreground'}`} />
               <Badge variant={subscription?.subscribed ? "default" : "secondary"} className="text-xs">
                 {subscription?.subscribed ? 'Active' : 'Inactive'}
               </Badge>
             </div>
             <div>
-              <p className="text-3xl font-bold">{metrics.protectionDays}</p>
+              <p className="text-2xl font-bold">{metrics.protectionDays}</p>
               <p className="text-sm font-medium text-muted-foreground">Days Protected</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {subscription?.subscribed ? 'Continuous protection' : 'Activate protection'}
@@ -251,118 +199,34 @@ const MetricsDashboard = ({ profile, subscription }: MetricsDashboardProps) => {
         </Card>
       </div>
 
-      {/* Activity & Status Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activity Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Activity Summary
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div>
-                  <p className="font-medium">Recent Actions</p>
-                  <p className="text-sm text-muted-foreground">
-                    {metrics.recentActivityCount} activities in last 10 records
-                  </p>
-                </div>
-                <Badge variant="outline">{metrics.recentActivityCount}</Badge>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div>
-                  <p className="font-medium">Last Activity</p>
-                  <p className="text-sm text-muted-foreground">
-                    {formatTimeSince(metrics.lastActivityDate)}
-                  </p>
-                </div>
-                <Clock className="h-5 w-5 text-muted-foreground" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Profile Completion */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Profile Completion
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Overall Progress</span>
-                <span className="text-sm text-muted-foreground">{profile?.profile_completion_percentage || 0}%</span>
-              </div>
-              <Progress value={profile?.profile_completion_percentage || 0} className="h-3" />
-              
-              <div className="grid grid-cols-2 gap-2 mt-4">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className={`h-4 w-4 ${profile?.first_name ? 'text-green-600' : 'text-muted-foreground'}`} />
-                  <span className="text-xs">Personal Details</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className={`h-4 w-4 ${metrics.emergencyContactsCount >= 3 ? 'text-green-600' : 'text-muted-foreground'}`} />
-                  <span className="text-xs">Emergency Contacts</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className={`h-4 w-4 ${profile?.medical_conditions?.length > 0 ? 'text-green-600' : 'text-muted-foreground'}`} />
-                  <span className="text-xs">Medical Info</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle className={`h-4 w-4 ${profile?.location_sharing_enabled ? 'text-green-600' : 'text-muted-foreground'}`} />
-                  <span className="text-xs">Location Sharing</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Quick Health Insights */}
+      {/* Activity Summary - Condensed */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            System Health Insights
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Activity className="h-4 w-4" />
+            Recent Activity
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className={`p-4 rounded-lg ${subscription?.subscribed ? 'bg-green-100 dark:bg-green-950' : 'bg-red-100 dark:bg-red-950'}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className={`h-5 w-5 ${subscription?.subscribed ? 'text-green-600' : 'text-red-600'}`} />
-                <span className="font-medium">Protection</span>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <div>
+                <p className="font-medium text-sm">Actions</p>
+                <p className="text-xs text-muted-foreground">
+                  {metrics.recentActivityCount} recent
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {subscription?.subscribed ? 'Active and monitoring' : 'Not activated'}
-              </p>
+              <Badge variant="outline" className="text-xs">{metrics.recentActivityCount}</Badge>
             </div>
-
-            <div className={`p-4 rounded-lg ${metrics.emergencyContactsCount >= 3 ? 'bg-green-100 dark:bg-green-950' : 'bg-yellow-100 dark:bg-yellow-950'}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <Users className={`h-5 w-5 ${metrics.emergencyContactsCount >= 3 ? 'text-green-600' : 'text-yellow-600'}`} />
-                <span className="font-medium">Contacts</span>
+            
+            <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+              <div>
+                <p className="font-medium text-sm">Last Activity</p>
+                <p className="text-xs text-muted-foreground">
+                  {formatTimeSince(metrics.lastActivityDate)}
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {metrics.emergencyContactsCount >= 3 ? 'Well configured' : 'Need more contacts'}
-              </p>
-            </div>
-
-            <div className={`p-4 rounded-lg ${profile?.location_sharing_enabled ? 'bg-green-100 dark:bg-green-950' : 'bg-orange-100 dark:bg-orange-950'}`}>
-              <div className="flex items-center gap-2 mb-2">
-                <MapPin className={`h-5 w-5 ${profile?.location_sharing_enabled ? 'text-green-600' : 'text-orange-600'}`} />
-                <span className="font-medium">Location</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {profile?.location_sharing_enabled ? 'Sharing enabled' : 'Enable for better protection'}
-              </p>
+              <Clock className="h-4 w-4 text-muted-foreground" />
             </div>
           </div>
         </CardContent>
