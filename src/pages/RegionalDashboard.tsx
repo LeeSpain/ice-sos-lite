@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,11 +9,100 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Users, Phone, Settings } from 'lucide-react';
 import LanguageSelector from '@/components/LanguageSelector';
+import { RegionalClientsPanel } from '@/components/regional/RegionalClientsPanel';
+import { ActiveSOSPanel } from '@/components/regional/ActiveSOSPanel';
+import { QuickNotificationsPanel } from '@/components/regional/QuickNotificationsPanel';
 
 const RegionalDashboard = () => {
   const { t } = useTranslation();
   const { data: regionalRole } = useRegionalRole();
   const { isAdmin } = useOptimizedAuth();
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [activeEvents, setActiveEvents] = useState([]);
+  const [clients, setClients] = useState([]);
+
+  // Fetch regional clients and SOS events with real-time updates
+  const { data: clientsData = [], refetch: refetchClients } = useQuery({
+    queryKey: ['regional-clients', regionalRole?.organizationId],
+    queryFn: async () => {
+      if (!regionalRole?.organizationId) return [];
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('organization_id', regionalRole.organizationId)
+        .eq('subscription_regional', true);
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!regionalRole?.organizationId,
+    staleTime: 30000,
+  });
+
+  const { data: eventsData = [], refetch: refetchEvents } = useQuery({
+    queryKey: ['regional-sos-events', regionalRole?.organizationId],
+    queryFn: async () => {
+      if (!regionalRole?.organizationId) return [];
+      
+      const { data, error } = await supabase
+        .from('regional_sos_events')
+        .select('*')
+        .eq('organization_id', regionalRole.organizationId)
+        .order('triggered_at', { ascending: false });
+      
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!regionalRole?.organizationId,
+    staleTime: 10000,
+  });
+
+  // Set up real-time subscriptions
+  useEffect(() => {
+    if (!regionalRole?.organizationId) return;
+
+    const eventsChannel = supabase
+      .channel('regional-sos-events-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'regional_sos_events',
+          filter: `organization_id=eq.${regionalRole.organizationId}`
+        },
+        () => {
+          refetchEvents();
+        }
+      )
+      .subscribe();
+
+    const notificationsChannel = supabase
+      .channel('family-notifications-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'family_notifications'
+        },
+        () => {
+          refetchEvents();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(eventsChannel);
+      supabase.removeChannel(notificationsChannel);
+    };
+  }, [regionalRole?.organizationId, refetchEvents]);
+
+  useEffect(() => {
+    setClients(clientsData);
+    setActiveEvents(eventsData);
+  }, [clientsData, eventsData]);
 
   // Check if user has regional access (including platform admins)
   const hasRegionalAccess = isAdmin || 
@@ -77,7 +166,7 @@ const RegionalDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">0</div>
+                  <div className="text-2xl font-bold">{clients.length}</div>
                   <p className="text-sm text-gray-600">{t('regionalDashboard.connectedCustomers')}</p>
                 </CardContent>
               </Card>
@@ -90,7 +179,7 @@ const RegionalDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">0</div>
+                  <div className="text-2xl font-bold">{activeEvents.filter(e => e.status === 'open').length}</div>
                   <p className="text-sm text-gray-600">{t('regionalDashboard.pendingEvents')}</p>
                 </CardContent>
               </Card>
@@ -111,34 +200,50 @@ const RegionalDashboard = () => {
               </Card>
             </div>
 
-            {/* Main Content Area */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>{t('regionalDashboard.activeSosEvents')}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">{t('regionalDashboard.noActiveSos')}</p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    {t('regionalDashboard.sosEventsWillAppear')}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Main Dashboard Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Client Selection */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Regional Clients</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <RegionalClientsPanel 
+                    clients={clients}
+                    selectedClient={selectedClient}
+                    onSelectClient={setSelectedClient}
+                    organizationId={regionalRole?.organizationId}
+                  />
+                </CardContent>
+              </Card>
 
-            {/* Side Panel */}
+              {/* Active SOS Panel */}
+              {selectedClient && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Emergency Management</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ActiveSOSPanel 
+                      client={selectedClient}
+                      events={activeEvents}
+                      organizationId={regionalRole?.organizationId}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Side Panel - Quick Notifications */}
             <Card>
               <CardHeader>
-                <CardTitle>{t('regionalDashboard.notificationCenter')}</CardTitle>
+                <CardTitle>Quick Notifications</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8">
-                  <p className="text-gray-500">{t('regionalDashboard.noPendingNotifications')}</p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    {t('regionalDashboard.familyNotificationsWillAppear')}
-                  </p>
-                </div>
+                <QuickNotificationsPanel 
+                  selectedClient={selectedClient}
+                  organizationId={regionalRole?.organizationId}
+                />
               </CardContent>
             </Card>
           </div>
