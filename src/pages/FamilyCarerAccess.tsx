@@ -87,39 +87,6 @@ const FamilyCarerAccessPage = () => {
         <FamilyCircleSection />
 
         {/* Pricing Section */}
-        {/* Social Proof & CTA */}
-        <section className="py-section">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <div className="flex justify-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                ))}
-              </div>
-              <blockquote className="text-lg text-foreground mb-4 italic">
-                "This system saved my mother's life. When she had a fall, the entire family was alerted immediately 
-                and help arrived within minutes. I can't imagine not having this protection now."
-              </blockquote>
-              <cite className="text-muted-foreground">— Sarah M., Mother of 3, London</cite>
-              
-              <div className="mt-8 pt-8 border-t">
-                <p className="text-muted-foreground mb-6">
-                  Have questions? Want to learn more about how family emergency coordination works?
-                </p>
-                <Button 
-                  asChild
-                  variant="outline"
-                  size="lg" 
-                  className="font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  <Link to="/contact">
-                    Talk to a Family Safety Expert
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       
       <Footer />
