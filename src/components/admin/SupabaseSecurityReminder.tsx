@@ -6,7 +6,7 @@ interface Props {
   className?: string;
 }
 
-const PROJECT_ID = 'mqroziggaalltuzoyyao';
+const PROJECT_ID = 'rqahqicfafnxlmdjcozu';
 const SUPABASE_AUTH_SETTINGS_URL = `https://supabase.com/dashboard/project/${PROJECT_ID}/auth/settings`;
 
 export const SupabaseSecurityReminder: React.FC<Props> = ({ className = '' }) => {
