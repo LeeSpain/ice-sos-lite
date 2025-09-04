@@ -100,6 +100,9 @@ const SosButton = () => {
         subscriptionTier={subscriptionTier}
       />
 
+      {/* Plan status + critical notice */}
+      <EmergencyStatusBanner subscriptionTier={subscriptionTier} className="mb-4" />
+
       {/* Enhanced SOS Button */}
       <EnhancedSOSButton 
         onTrigger={handleEmergencyTrigger}

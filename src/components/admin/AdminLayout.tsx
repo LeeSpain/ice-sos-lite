@@ -45,6 +45,7 @@ import {
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
 import { useTranslation } from 'react-i18next';
+import SupabaseSecurityReminder from '@/components/admin/SupabaseSecurityReminder';
 
 const useAdminMenuItems = () => {
   const { t } = useTranslation();
@@ -243,6 +244,10 @@ export default function AdminLayout() {
             </div>
           </header>
           <main className="flex-1 p-6 bg-gradient-to-br from-background via-background to-muted/5">
+            {/* Security reminder for Supabase Auth hardening */}
+            <div className="max-w-5xl mx-auto mb-4">
+              <SupabaseSecurityReminder />
+            </div>
             <Outlet />
           </main>
         </div>
