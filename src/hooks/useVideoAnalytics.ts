@@ -285,12 +285,11 @@ export function useVideoTracker() {
         browser: browser
       };
 
-      const { error } = await supabase
-        .from('video_analytics')
-        .insert(eventData);
+      const { data: resp, error } = await supabase
+        .functions.invoke('video-analytics-ingest', { body: eventData });
 
-      if (error) {
-        console.error('Error tracking video event:', error);
+      if (error || !resp?.success) {
+        console.error('Error tracking video event:', error || resp);
       } else {
         console.log('🎥 Video event tracked:', { videoId, eventType });
       }
