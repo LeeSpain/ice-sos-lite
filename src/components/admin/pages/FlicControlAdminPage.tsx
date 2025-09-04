@@ -23,7 +23,7 @@ interface AdminFlicEvent {
   ts: string;
 }
 
-const projectId = "mqroziggaalltuzoyyao"; // for webhook URL display
+const projectId = "rqahqicfafnxlmdjcozu"; // for webhook URL display
 
 const FlicControlAdminPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
