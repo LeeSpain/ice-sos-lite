@@ -39,6 +39,9 @@ import { useSiteContent } from '@/hooks/useSiteContent';
 import { EnhancedCommandCenter } from '@/components/admin/EnhancedCommandCenter';
 import { EnhancedMarketingCampaigns } from '@/components/admin/EnhancedMarketingCampaigns';
 import { CampaignDetailsModal } from '@/components/admin/CampaignDetailsModal';
+import { ContentApprovalDashboard } from '@/components/admin/ContentApprovalDashboard';
+import { SocialHub } from '@/components/admin/SocialHub';
+import { AnalyticsDashboard } from '@/components/admin/AnalyticsDashboard';
 import SocialMediaOAuth from '@/components/admin/SocialMediaOAuth';
 
 interface UnifiedContentItem {
@@ -519,192 +522,29 @@ const [rivenResponse, setRivenResponse] = useState('');
 
         {/* Content Approval Tab */}
         <TabsContent value="content-approval" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5" />
-                Content Approval Dashboard
-              </CardTitle>
-              <CardDescription>
-                Review and approve all AI-generated content across platforms
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {contents.length === 0 ? (
-                  <div className="text-center py-8">
-                    <BookOpen className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-medium">No content to review</h3>
-                    <p className="text-muted-foreground">Generate content using the Command Center to get started</p>
-                  </div>
-                ) : (
-                  <div className="grid gap-4">
-                    {contents.map((content) => (
-                      <Card key={content.id} className="border-l-4 border-l-blue-500">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2">
-                                {content.platform === 'Blog' ? (
-                                  <BookOpen className="h-4 w-4 text-orange-600" />
-                                ) : content.platform === 'Email' ? (
-                                  <Mail className="h-4 w-4 text-green-600" />
-                                ) : (
-                                  <Share2 className="h-4 w-4 text-blue-600" />
-                                )}
-                                <Badge variant="outline">{content.platform}</Badge>
-                                {getStatusBadge(content.status)}
-                                <Badge variant="secondary">{content.content_type}</Badge>
-                              </div>
-                              <h3 className="font-semibold mb-1">
-                                {content.seo_title || content.title || 'Untitled Content'}
-                              </h3>
-                              <p className="text-sm text-muted-foreground mb-2">
-                                {content.meta_description || content.body_text?.substring(0, 100) + '...'}
-                              </p>
-                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                <span>Created: {formatDate(content.created_at)}</span>
-                                {content.reading_time && (
-                                  <span>{content.reading_time}m read</span>
-                                )}
-                                {content.seo_score && (
-                                  <span>SEO: {content.seo_score}%</span>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 ml-4">
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedContent(content);
-                                  setPreviewModalOpen(true);
-                                }}
-                              >
-                                <Eye className="h-4 w-4 mr-1" />
-                                Preview
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Edit className="h-4 w-4 mr-1" />
-                                Edit
-                              </Button>
-                              {(content.status === 'draft' || content.status === 'pending_review') && (
-                                <>
-                                  <Button 
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleContentApproval(content.id, 'published')}
-                                  >
-                                    <CheckCircle className="h-4 w-4 mr-1" />
-                                    Approve
-                                  </Button>
-                                  <Button 
-                                    size="sm"
-                                    onClick={() => handlePublishContent(content.id)}
-                                    className="bg-green-600 hover:bg-green-700 text-white"
-                                  >
-                                    <CheckCircle className="h-4 w-4 mr-1" />
-                                    Publish Live
-                                  </Button>
-                                </>
-                              )}
-                              {content.status === 'published' && content.platform === 'Blog' && content.slug && (
-                                <Button 
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => window.open(`/blog/${content.slug}`, '_blank')}
-                                >
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  View Live
-                                </Button>
-                              )}
-                              <Button 
-                                variant="destructive" 
-                                size="sm"
-                                onClick={() => handleContentApproval(content.id, 'rejected')}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <ContentApprovalDashboard
+            contents={contents}
+            onContentUpdate={loadContents}
+            onContentApproval={handleContentApproval}
+            onPublishContent={handlePublishContent}
+            onPreviewContent={(content) => {
+              setSelectedContent(content);
+              setPreviewModalOpen(true);
+            }}
+          />
         </TabsContent>
 
         {/* Social Hub Tab */}
         <TabsContent value="social-hub" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Share2 className="h-5 w-5" />
-                Social Media Hub
-              </CardTitle>
-              <CardDescription>
-                Manage social media accounts and cross-platform content
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {socialAccounts.map((account) => (
-                  <Card key={account.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge variant={account.connection_status === 'connected' ? "default" : "secondary"}>
-                          {account.platform}
-                        </Badge>
-                        <Badge variant={account.connection_status === 'connected' ? "default" : "outline"}>
-                          {account.connection_status === 'connected' ? 'Connected' : 'Disconnected'}
-                        </Badge>
-                      </div>
-                      <h3 className="font-medium">{account.platform_name}</h3>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Last updated: {formatDate(account.updated_at)}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
-                {socialAccounts.length === 0 && (
-                  <div className="col-span-full text-center py-8">
-                    <Share2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-medium">No social accounts connected</h3>
-                    <p className="text-muted-foreground">Connect your social media accounts to get started</p>
-                    <Button className="mt-4">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Connect Account
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <SocialHub
+            socialAccounts={socialAccounts}
+            onAccountsUpdate={fetchSocialAccounts}
+          />
         </TabsContent>
 
         {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Marketing Analytics
-              </CardTitle>
-              <CardDescription>
-                Performance metrics for all Riven-generated content
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <BarChart3 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium">Analytics Coming Soon</h3>
-                <p className="text-muted-foreground">Performance tracking and insights will be available here</p>
-              </div>
-            </CardContent>
-          </Card>
+          <AnalyticsDashboard />
         </TabsContent>
 
         {/* Settings Tab */}
