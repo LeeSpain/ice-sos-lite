@@ -38,6 +38,8 @@ export default function OptimizedComponentLoader({ type, props, enhanced = true 
             contents={props.contents || []}
             onContentApproval={props.onContentApproval || (() => {})}
             onPublishContent={props.onPublishContent || (() => {})}
+            onDeleteContent={props.onDeleteContent || (() => {})}
+            onEditContent={props.onEditContent || (() => {})}
             isLoading={props.isLoading || false}
           />
         ) : (

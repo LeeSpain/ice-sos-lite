@@ -34,7 +34,9 @@ import {
   MessageSquare,
   ThumbsUp,
   ThumbsDown,
-  MoreHorizontal
+  MoreHorizontal,
+  Trash2,
+  Save
 } from 'lucide-react';
 
 interface ContentItem {
@@ -58,6 +60,8 @@ interface EnhancedContentApprovalProps {
   contents: ContentItem[];
   onContentApproval: (contentId: string, approved: boolean) => void;
   onPublishContent: (contentId: string) => void;
+  onDeleteContent: (contentId: string) => void;
+  onEditContent: (contentId: string, updates: Partial<ContentItem>) => void;
   isLoading: boolean;
 }
 
@@ -65,6 +69,8 @@ const EnhancedContentApproval: React.FC<EnhancedContentApprovalProps> = ({
   contents,
   onContentApproval,
   onPublishContent,
+  onDeleteContent,
+  onEditContent,
   isLoading
 }) => {
   const { toast } = useToast();
@@ -145,12 +151,23 @@ const EnhancedContentApproval: React.FC<EnhancedContentApprovalProps> = ({
         onContentApproval(id, false);
       } else if (action === 'publish') {
         onPublishContent(id);
+      } else if (action === 'delete') {
+        onDeleteContent(id);
       }
     });
     setSelectedItems([]);
     toast({
       title: "Bulk Action Completed",
       description: `${action} applied to ${selectedItems.length} items`,
+    });
+  };
+
+  const handleEditContent = (content: ContentItem, updates: Partial<ContentItem>) => {
+    onEditContent(content.id, updates);
+    setSelectedContent(null);
+    toast({
+      title: "Content Updated",
+      description: "Content has been successfully updated",
     });
   };
 
@@ -310,9 +327,13 @@ const EnhancedContentApproval: React.FC<EnhancedContentApprovalProps> = ({
                       {/* Preview actions */}
                       <div className="flex items-center justify-between pt-4 border-t">
                         <div className="flex items-center space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Edit3 className="h-4 w-4 mr-2" />
-                            Edit Content
+                          <Button variant="outline" size="sm" onClick={() => handleEditContent(selectedContent!, { title: selectedContent?.title, body_text: selectedContent?.body_text })}>
+                            <Save className="h-4 w-4 mr-2" />
+                            Save Changes
+                          </Button>
+                          <Button variant="outline" size="sm" onClick={() => onDeleteContent(selectedContent!.id)}>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
                           </Button>
                           <Button variant="outline" size="sm">
                             <Download className="h-4 w-4 mr-2" />
@@ -361,6 +382,9 @@ const EnhancedContentApproval: React.FC<EnhancedContentApprovalProps> = ({
                     <Share2 className="h-4 w-4" />
                   </Button>
                 )}
+                <Button variant="outline" size="sm" onClick={() => onDeleteContent(content.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           )}

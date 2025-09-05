@@ -185,6 +185,59 @@ export default function OptimizedRivenMarketingAI() {
     }
   }, [toast, handleContentUpdate]);
 
+  const handleDeleteContent = useCallback(async (contentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketing_content')
+        .delete()
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Content Deleted",
+        description: "Content has been permanently deleted.",
+      });
+
+      handleContentUpdate();
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete content",
+        variant: "destructive"
+      });
+    }
+  }, [toast, handleContentUpdate]);
+
+  const handleEditContent = useCallback(async (contentId: string, updates: any) => {
+    try {
+      const { error } = await supabase
+        .from('marketing_content')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Content Updated",
+        description: "Content has been successfully updated.",
+      });
+
+      handleContentUpdate();
+    } catch (error) {
+      console.error('Error updating content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update content",
+        variant: "destructive"
+      });
+    }
+  }, [toast, handleContentUpdate]);
+
   const handlePublishContent = useCallback(async (contentId: string) => {
     try {
       const { error } = await supabase
@@ -477,6 +530,8 @@ export default function OptimizedRivenMarketingAI() {
               onContentUpdate: handleContentUpdate,
               onContentApproval: handleContentApproval,
               onPublishContent: handlePublishContent,
+              onDeleteContent: handleDeleteContent,
+              onEditContent: handleEditContent,
               isLoading: contentsLoading
             }}
           />
