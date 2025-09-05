@@ -124,7 +124,42 @@ switch (action) {
       const { analysis } = await processMarketingCommand(command, user.id, serviceSupabase, workflow_id, settings, scheduling_options, publishing_controls, effectiveConfig);
       const campaign = await createMarketingCampaign(analysis, command, user.id, serviceSupabase);
       if (workflow_id) await updateWorkflowStep(workflow_id, 'creating_campaign', 'completed', serviceSupabase);
-      response = (analysis?.response || 'Command processed successfully!') + '\n\nCampaign created successfully.';
+      
+      // CRITICAL: Auto-generate content after campaign creation (100% complete process)
+      if (campaign?.id) {
+        console.log('🎯 Starting automatic content generation for campaign:', campaign.id);
+        if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'in_progress', serviceSupabase);
+        
+        try {
+          await generateMarketingContent(campaign.id, serviceSupabase, settings, effectiveConfig);
+          console.log('✅ Content generation completed for campaign:', campaign.id);
+          if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'completed', serviceSupabase);
+          
+          // Update campaign status to completed
+          await serviceSupabase
+            .from('marketing_campaigns')
+            .update({ status: 'completed', completed_at: new Date().toISOString() })
+            .eq('id', campaign.id);
+          
+          // Auto-publish for immediate mode
+          if (scheduling_options?.mode === 'immediate' && !publishing_controls?.approval_required) {
+            if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'in_progress', serviceSupabase);
+            await publishGeneratedContent(campaign.id, serviceSupabase);
+            if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'completed', serviceSupabase);
+          }
+        } catch (contentError) {
+          console.error('❌ Content generation failed:', contentError);
+          if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'failed', serviceSupabase, contentError.message);
+          
+          // Update campaign status to failed
+          await serviceSupabase
+            .from('marketing_campaigns')
+            .update({ status: 'failed', error_message: contentError.message })
+            .eq('id', campaign.id);
+        }
+      }
+      
+      response = (analysis?.response || 'Command processed successfully!') + '\n\nCampaign created successfully with content generated automatically.';
       campaign_created = !!campaign;
     } catch (err) {
       console.error('Error in process_command flow:', err);
@@ -330,20 +365,41 @@ async function callLLM(
   messages: Array<{ role: 'system'|'user'|'assistant'; content: string }>,
   options?: { model?: string; maxTokens?: number }
 ) {
-  const provider = chooseProviderForStage(aiConfig, stage);
-  let model = options?.model || aiConfig?.providers?.[provider]?.model || (provider === 'openai' ? 'gpt-4.1-2025-04-14' : 'grok-beta');
+  const preferredProvider = chooseProviderForStage(aiConfig, stage);
+  let model = options?.model || aiConfig?.providers?.[preferredProvider]?.model || (preferredProvider === 'openai' ? 'gpt-4.1-2025-04-14' : 'grok-beta');
   const maxTokens = options?.maxTokens ?? (stage === 'text' ? 2000 : 1500);
-  console.log(`🤖 AI routing -> stage=${stage} provider=${provider} model=${model}`);
-  // Sanitize/normalize model for OpenAI to avoid unsupported IDs
-  if (provider === 'openai') {
-    const validModels = ['gpt-4.1-2025-04-14', 'gpt-4.1-mini-2025-04-14', 'gpt-4o', 'gpt-4o-mini'];
-    if (!validModels.includes(model)) model = 'gpt-4.1-2025-04-14';
-    return await openAIChat(messages, model, maxTokens);
+  
+  console.log(`🤖 AI routing -> stage=${stage} provider=${preferredProvider} model=${model}`);
+  
+  // Try preferred provider first with intelligent failover
+  const providers = [preferredProvider, preferredProvider === 'openai' ? 'xai' : 'openai'].filter(p => 
+    p === 'openai' ? !!openaiApiKey : !!xaiApiKey
+  );
+  
+  for (const provider of providers) {
+    try {
+      if (provider === 'openai') {
+        const validModels = ['gpt-5-2025-08-07', 'gpt-4.1-2025-04-14', 'gpt-4.1-mini-2025-04-14', 'gpt-4o', 'gpt-4o-mini'];
+        const openaiModel = validModels.includes(model) ? model : 'gpt-4.1-2025-04-14';
+        console.log(`🔄 Trying OpenAI with model: ${openaiModel}`);
+        return await openAIChat(messages, openaiModel, maxTokens);
+      }
+      if (provider === 'xai') {
+        console.log(`🔄 Trying xAI with model: grok-beta`);
+        return await xaiChat(messages, 'grok-beta', maxTokens);
+      }
+    } catch (error) {
+      console.error(`❌ ${provider} failed:`, error.message);
+      if (providers.indexOf(provider) === providers.length - 1) {
+        // Last provider failed, throw error
+        throw new Error(`All AI providers failed. Last error: ${error.message}`);
+      }
+      // Continue to next provider
+      console.log(`🔄 Failing over to next provider...`);
+    }
   }
-  if (provider === 'xai') {
-    return await xaiChat(messages, model, maxTokens);
-  }
-  throw new Error('Unsupported provider');
+  
+  throw new Error('No AI providers available or configured');
 }
 
 async function openAIChat(
