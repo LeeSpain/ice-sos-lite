@@ -155,6 +155,7 @@ export default function RivenConfigurationPage() {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error('User not authenticated');
 
+      // Only save the fields that exist in the riven_settings table
       const settingsToSave = {
         ai_model: settings.ai_model,
         temperature: settings.temperature,
@@ -162,7 +163,7 @@ export default function RivenConfigurationPage() {
         brand_voice: settings.brand_voice,
         content_guidelines: settings.content_guidelines,
         auto_approve_content: settings.auto_approve_content,
-        preferred_posting_times: settings.preferred_posting_times,
+        preferred_posting_times: JSON.stringify(settings.preferred_posting_times),
         default_budget: settings.default_budget,
         user_id: userData.user.id
       };
@@ -170,8 +171,7 @@ export default function RivenConfigurationPage() {
       const { data, error } = await supabase
         .from('riven_settings')
         .upsert(settingsToSave, { 
-          onConflict: 'user_id',
-          ignoreDuplicates: false 
+          onConflict: 'user_id'
         })
         .select()
         .single();

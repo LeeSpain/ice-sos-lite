@@ -14,7 +14,7 @@ import AdvancedAnalyticsDashboard from './enhanced/AdvancedAnalyticsDashboard';
 import ProfessionalSocialHub from './enhanced/ProfessionalSocialHub';
 import AdvancedCampaignMonitor from './enhanced/AdvancedCampaignMonitor';
 
-// AI & Configuration Components
+// AI & Configuration Components - Direct imports
 import AIModelSettingsPage from '../pages/AIModelSettingsPage';
 import AITrainingPage from '../pages/AITrainingPage';
 import RivenConfigurationPage from '../pages/RivenConfigurationPage';
