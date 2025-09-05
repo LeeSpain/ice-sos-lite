@@ -1966,6 +1966,7 @@ export type Database = {
           created_at: string
           created_by: string
           description: string | null
+          error_message: string | null
           id: string
           scheduled_at: string | null
           status: string
@@ -1980,6 +1981,7 @@ export type Database = {
           created_at?: string
           created_by: string
           description?: string | null
+          error_message?: string | null
           id?: string
           scheduled_at?: string | null
           status?: string
@@ -1994,6 +1996,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           description?: string | null
+          error_message?: string | null
           id?: string
           scheduled_at?: string | null
           status?: string
