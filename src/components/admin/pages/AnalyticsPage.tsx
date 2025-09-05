@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -43,6 +45,44 @@ import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
 const AnalyticsPage = () => {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const queryClient = useQueryClient();
+
+  // Realtime updates: invalidate queries when new analytics events arrive
+  useEffect(() => {
+    const channel = supabase
+      .channel('analytics-live')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'homepage_analytics' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['lovable-analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['enhanced-traffic-sources'] });
+          queryClient.invalidateQueries({ queryKey: ['enhanced-device-data'] });
+          queryClient.invalidateQueries({ queryKey: ['top-pages'] });
+          queryClient.invalidateQueries({ queryKey: ['custom-events'] });
+          queryClient.invalidateQueries({ queryKey: ['real-time-active-users'] });
+          queryClient.invalidateQueries({ queryKey: ['session-metrics'] });
+          queryClient.invalidateQueries({ queryKey: ['page-analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['geographic-analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['user-journey-analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['real-time-analytics'] });
+          setLastUpdated(new Date());
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'video_analytics' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['custom-events'] });
+          setLastUpdated(new Date());
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
   
   // Real-time data hooks
   const { data: realTimeMetrics, isLoading: isLoadingMetrics, refetch: refetchMetrics } = useRealTimeAnalytics();
@@ -63,7 +103,20 @@ const AnalyticsPage = () => {
   // Refresh all data
   const refreshAllData = async () => {
     setLastUpdated(new Date());
-    await refetchMetrics();
+    const keys: readonly (readonly string[])[] = [
+      ['real-time-analytics'],
+      ['lovable-analytics'],
+      ['enhanced-traffic-sources'],
+      ['enhanced-device-data'],
+      ['top-pages'],
+      ['custom-events'],
+      ['real-time-active-users'],
+      ['session-metrics'],
+      ['page-analytics'],
+      ['geographic-analytics'],
+      ['user-journey-analytics'],
+    ];
+    keys.forEach((key) => queryClient.invalidateQueries({ queryKey: key as any }));
   };
 
   const MetricCard = ({ 

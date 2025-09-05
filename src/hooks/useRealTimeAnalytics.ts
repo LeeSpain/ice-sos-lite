@@ -119,8 +119,8 @@ export function useRealTimeAnalytics() {
         };
       }
     },
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes (less aggressive)
-    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds
+    staleTime: 30 * 1000, // Data is fresh for 30 seconds
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
@@ -161,8 +161,8 @@ export function useLovableAnalytics() {
         };
       }
     },
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds
+    staleTime: 30 * 1000, // Data is fresh for 30 seconds
     refetchIntervalInBackground: false,
   });
 }
@@ -340,8 +340,8 @@ export function useTopPages() {
         ];
       }
     },
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds
+    staleTime: 30 * 1000, // Data is fresh for 30 seconds
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
@@ -405,8 +405,8 @@ export function useCustomEvents() {
         ];
       }
     },
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds
+    staleTime: 30 * 1000, // Data is fresh for 30 seconds
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
@@ -468,8 +468,8 @@ export function useRealTimeActiveUsers() {
         };
       }
     },
-    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes (less aggressive)
-    staleTime: 60 * 1000, // Data is fresh for 1 minute
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds
+    staleTime: 30 * 1000, // Data is fresh for 30 seconds
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
