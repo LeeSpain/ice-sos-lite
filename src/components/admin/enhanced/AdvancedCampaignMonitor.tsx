@@ -6,6 +6,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -304,12 +307,6 @@ const AdvancedCampaignMonitor: React.FC = () => {
     }
   };
 
-  const getTrendIcon = (value: number, comparison: number) => {
-    if (value > comparison) return <ArrowUp className="h-3 w-3 text-green-600" />;
-    if (value < comparison) return <ArrowDown className="h-3 w-3 text-red-600" />;
-    return <Minus className="h-3 w-3 text-gray-600" />;
-  };
-
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
@@ -507,124 +504,149 @@ const AdvancedCampaignMonitor: React.FC = () => {
       ) : (
         <div className="space-y-4">
           {filteredCampaigns.map((campaign) => (
-            <Card key={campaign.id} className="group border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      {getStatusIcon(campaign.status)}
-                      <h4 className="font-semibold text-lg line-clamp-1">{campaign.title}</h4>
-                      <Badge variant={getStatusBadgeVariant(campaign.status) as any}>
-                        {campaign.status}
+            <Card key={campaign.id} className="hover:shadow-md transition-all duration-200">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {getStatusIcon(campaign.status)}
+                    <CardTitle className="text-lg line-clamp-1">{campaign.title}</CardTitle>
+                    <Badge variant={getStatusBadgeVariant(campaign.status) as any}>
+                      {campaign.status}
+                    </Badge>
+                    {campaign.status === 'running' && (
+                      <Badge variant="outline" className="animate-pulse">
+                        <Activity className="h-3 w-3 mr-1" />
+                        Live
                       </Badge>
-                      {campaign.status === 'running' && (
-                        <Badge variant="outline" className="animate-pulse">
-                          <Activity className="h-3 w-3 mr-1" />
-                          Live
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    <p className="text-muted-foreground mb-4 line-clamp-2">
-                      {campaign.description}
-                    </p>
-
-                    {/* Performance Metrics */}
-                    {campaign.performance_metrics && (
-                      <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-4">
-                        <div className="text-center">
-                          <p className="text-sm font-semibold text-blue-600">
-                            {formatNumber(campaign.performance_metrics.views)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">Views</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-semibold text-green-600">
-                            {campaign.performance_metrics.engagement}
-                          </p>
-                          <p className="text-xs text-muted-foreground">Engagement</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-semibold text-purple-600">
-                            {campaign.performance_metrics.clicks}
-                          </p>
-                          <p className="text-xs text-muted-foreground">Clicks</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-semibold text-orange-600">
-                            {campaign.performance_metrics.ctr.toFixed(1)}%
-                          </p>
-                          <p className="text-xs text-muted-foreground">CTR</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-semibold text-pink-600">
-                            {formatNumber(campaign.performance_metrics.reach)}
-                          </p>
-                          <p className="text-xs text-muted-foreground">Reach</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-semibold text-indigo-600">
-                            {campaign.performance_metrics.engagement_rate.toFixed(1)}%
-                          </p>
-                          <p className="text-xs text-muted-foreground">Eng. Rate</p>
-                        </div>
-                      </div>
                     )}
+                  </div>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-popover border shadow-md z-[100]" sideOffset={5}>
+                      <DropdownMenuItem 
+                        onClick={() => handleEditCampaign(campaign)}
+                        className="cursor-pointer"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Campaign
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDeleteCampaign(campaign.id)}
+                        className="text-destructive cursor-pointer focus:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Campaign
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-muted-foreground mb-4 line-clamp-2">
+                  {campaign.description}
+                </p>
 
-                    {/* Content Progress */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex justify-between text-sm">
-                        <span>Content Progress</span>
-                        <span className="text-muted-foreground">
-                          {campaign.content_published || 0} / {campaign.content_generated || 0} published
-                        </span>
-                      </div>
-                      <Progress 
-                        value={((campaign.content_published || 0) / Math.max(campaign.content_generated || 1, 1)) * 100} 
-                        className="h-2"
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Generated: {campaign.content_generated || 0}</span>
-                        <span>Approved: {campaign.content_approved || 0}</span>
-                        <span>Published: {campaign.content_published || 0}</span>
-                      </div>
+                {/* Performance Metrics Grid */}
+                {campaign.performance_metrics && (
+                  <div className="grid grid-cols-6 gap-4 p-4 bg-gradient-to-r from-gray-50 to-gray-100/50 rounded-lg mb-4">
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-blue-600">
+                        {formatNumber(campaign.performance_metrics.views)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Views</p>
                     </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-green-600">
+                        {campaign.performance_metrics.engagement}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Engagement</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-purple-600">
+                        {campaign.performance_metrics.clicks}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Clicks</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-orange-600">
+                        {campaign.performance_metrics.ctr.toFixed(1)}%
+                      </p>
+                      <p className="text-xs text-muted-foreground">CTR</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-pink-600">
+                        {formatNumber(campaign.performance_metrics.reach)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Reach</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-semibold text-indigo-600">
+                        {campaign.performance_metrics.engagement_rate.toFixed(1)}%
+                      </p>
+                      <p className="text-xs text-muted-foreground">Eng. Rate</p>
+                    </div>
+                  </div>
+                )}
 
-                    {/* Error Message */}
-                    {campaign.error_message && (
-                      <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded-lg mb-4">
-                        <div className="flex items-start gap-2">
-                          <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <strong>Error:</strong> {campaign.error_message}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                {/* Content Progress */}
+                <div className="space-y-2 mb-4">
+                  <div className="flex justify-between text-sm">
+                    <span>Content Progress</span>
+                    <span className="text-muted-foreground">
+                      {campaign.content_published || 0} / {campaign.content_generated || 0} published
+                    </span>
+                  </div>
+                  <Progress 
+                    value={((campaign.content_published || 0) / Math.max(campaign.content_generated || 1, 1)) * 100} 
+                    className="h-2"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Generated: {campaign.content_generated || 0}</span>
+                    <span>Approved: {campaign.content_approved || 0}</span>
+                    <span>Published: {campaign.content_published || 0}</span>
+                  </div>
+                </div>
 
-                    {/* Timeline */}
-                    <div className="flex items-center text-xs text-muted-foreground space-x-4">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-1" />
-                        Created: {new Date(campaign.created_at).toLocaleDateString()}
-                      </div>
-                      {campaign.completed_at && (
-                        <div className="flex items-center">
-                          <CheckCircle2 className="h-4 w-4 mr-1" />
-                          Completed: {new Date(campaign.completed_at).toLocaleDateString()}
-                        </div>
-                      )}
-                      <div className="flex items-center">
-                        <Timer className="h-4 w-4 mr-1" />
-                        Duration: {campaign.completed_at 
-                          ? Math.round((new Date(campaign.completed_at).getTime() - new Date(campaign.created_at).getTime()) / (1000 * 60 * 60)) + 'h'
-                          : Math.round((new Date().getTime() - new Date(campaign.created_at).getTime()) / (1000 * 60 * 60)) + 'h'
-                        }
+                {/* Error Message */}
+                {campaign.error_message && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded-lg mb-4">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <strong>Error:</strong> {campaign.error_message}
                       </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Action Buttons */}
+                {/* Timeline */}
+                <div className="flex items-center text-xs text-muted-foreground space-x-4 mb-4">
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Created: {new Date(campaign.created_at).toLocaleDateString()}
+                  </div>
+                  {campaign.completed_at && (
+                    <div className="flex items-center">
+                      <CheckCircle2 className="h-4 w-4 mr-1" />
+                      Completed: {new Date(campaign.completed_at).toLocaleDateString()}
+                    </div>
+                  )}
+                  <div className="flex items-center">
+                    <Timer className="h-4 w-4 mr-1" />
+                    Duration: {campaign.completed_at 
+                      ? Math.round((new Date(campaign.completed_at).getTime() - new Date(campaign.created_at).getTime()) / (1000 * 60 * 60)) + 'h'
+                      : Math.round((new Date().getTime() - new Date(campaign.created_at).getTime()) / (1000 * 60 * 60)) + 'h'
+                    }
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Dialog>
                       <DialogTrigger asChild>
@@ -757,30 +779,6 @@ const AdvancedCampaignMonitor: React.FC = () => {
                         Resume
                       </Button>
                     )}
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48 bg-background border shadow-lg z-[100]">
-                        <DropdownMenuItem 
-                          onClick={() => handleEditCampaign(campaign)}
-                          className="cursor-pointer"
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Campaign
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDeleteCampaign(campaign.id)}
-                          className="text-destructive cursor-pointer focus:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Campaign
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                   </div>
                 </div>
               </CardContent>
@@ -790,42 +788,53 @@ const AdvancedCampaignMonitor: React.FC = () => {
       )}
 
       {/* Edit Campaign Dialog */}
-      {editingCampaign && (
-        <Dialog open={!!editingCampaign} onOpenChange={() => setEditingCampaign(null)}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Campaign</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Title</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  defaultValue={editingCampaign.title}
-                  onChange={(e) => setEditingCampaign({...editingCampaign, title: e.target.value})}
-                />
+      <Dialog open={!!editingCampaign} onOpenChange={() => setEditingCampaign(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Campaign</DialogTitle>
+          </DialogHeader>
+          {editingCampaign && (
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              handleSaveCampaign({
+                title: formData.get('title'),
+                description: formData.get('description')
+              });
+            }}>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="title">Campaign Title</Label>
+                  <Input
+                    id="title"
+                    name="title"
+                    defaultValue={editingCampaign.title}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    defaultValue={editingCampaign.description}
+                    rows={3}
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button type="button" variant="outline" onClick={() => setEditingCampaign(null)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                    Save Changes
+                  </Button>
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium">Description</label>
-                <textarea
-                  className="w-full p-2 border rounded h-20"
-                  defaultValue={editingCampaign.description}
-                  onChange={(e) => setEditingCampaign({...editingCampaign, description: e.target.value})}
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button variant="outline" onClick={() => setEditingCampaign(null)}>
-                  Cancel
-                </Button>
-                <Button onClick={() => handleSaveCampaign(editingCampaign)}>
-                  Save Changes
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
