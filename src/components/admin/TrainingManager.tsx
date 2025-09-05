@@ -6,7 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { CheckCircle, AlertCircle, X, Plus, Edit3, Trash2, Database } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CheckCircle, AlertCircle, X, Plus, Edit3, Trash2, Database, Filter } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface TrainingData {
@@ -31,10 +32,13 @@ interface TrainingManagerProps {
 }
 
 const categories = ['general', 'product', 'pricing', 'features', 'support', 'technical'];
+const audiences = ['customer', 'internal', 'admin'] as const;
 
 export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma's Training Data & Knowledge Base", compact = false }) => {
   const [trainingData, setTrainingData] = useState<TrainingData[]>([]);
+  const [filteredData, setFilteredData] = useState<TrainingData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [audienceFilter, setAudienceFilter] = useState<string>('all');
 
   const [newQuestion, setNewQuestion] = useState('');
   const [newAnswer, setNewAnswer] = useState('');
@@ -53,6 +57,14 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
   useEffect(() => {
     loadTrainingData();
   }, []);
+
+  useEffect(() => {
+    if (audienceFilter === 'all') {
+      setFilteredData(trainingData);
+    } else {
+      setFilteredData(trainingData.filter(item => item.audience === audienceFilter));
+    }
+  }, [trainingData, audienceFilter]);
 
   const loadTrainingData = async () => {
     try {
@@ -74,9 +86,17 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
   const addTrainingData = async () => {
     if (!newQuestion.trim() || !newAnswer.trim()) return;
     try {
+      const tagsArray = newTags.trim() ? newTags.split(',').map(tag => tag.trim()).filter(Boolean) : [];
       const { data, error } = await supabase
         .from('training_data')
-        .insert({ question: newQuestion, answer: newAnswer, category: newCategory, status: 'pending' })
+        .insert({ 
+          question: newQuestion, 
+          answer: newAnswer, 
+          category: newCategory, 
+          audience: newAudience,
+          tags: tagsArray,
+          status: 'pending' 
+        })
         .select()
         .single();
       if (error) throw error;
@@ -84,6 +104,8 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
       setNewQuestion('');
       setNewAnswer('');
       setNewCategory('general');
+      setNewAudience('customer');
+      setNewTags('');
     } catch (e) {
       console.error('Failed to add training data', e);
     }
@@ -95,6 +117,8 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
     setEditAnswer(item.answer);
     setEditCategory(item.category);
     setEditStatus(item.status);
+    setEditAudience((item.audience as 'customer' | 'internal' | 'admin') || 'customer');
+    setEditTags(item.tags?.join(', ') || '');
   };
 
   const cancelEdit = () => {
@@ -103,11 +127,14 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
     setEditAnswer('');
     setEditCategory('general');
     setEditStatus('pending');
+    setEditAudience('customer');
+    setEditTags('');
   };
 
   const saveEdit = async () => {
     if (!editingId || !editQuestion.trim() || !editAnswer.trim()) return;
     try {
+      const tagsArray = editTags.trim() ? editTags.split(',').map(tag => tag.trim()).filter(Boolean) : [];
       const { data, error } = await supabase
         .from('training_data')
         .update({
@@ -115,6 +142,8 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
           answer: editAnswer,
           category: editCategory,
           status: editStatus,
+          audience: editAudience,
+          tags: tagsArray,
           updated_at: new Date().toISOString()
         })
         .eq('id', editingId)
@@ -166,6 +195,20 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
     }
   };
 
+  const getAudienceBadge = (audience?: string) => {
+    const audienceValue = audience || 'customer';
+    const variants = {
+      customer: 'bg-green-100 text-green-800 hover:bg-green-200',
+      internal: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
+      admin: 'bg-red-100 text-red-800 hover:bg-red-200'
+    };
+    return (
+      <Badge className={variants[audienceValue as keyof typeof variants] || variants.customer}>
+        {audienceValue}
+      </Badge>
+    );
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -175,6 +218,28 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Filters */}
+        <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Audience:</label>
+            <Select value={audienceFilter} onValueChange={setAudienceFilter}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="customer">Customer</SelectItem>
+                <SelectItem value="internal">Internal</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredData.length} of {trainingData.length} entries
+          </div>
+        </div>
+
         {/* Add New */}
         {!compact && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -183,15 +248,38 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
                 <label className="text-sm font-medium">Question</label>
                 <Input value={newQuestion} onChange={(e) => setNewQuestion(e.target.value)} placeholder="What question should Emma answer?" />
               </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-sm font-medium">Category</label>
+                  <select value={newCategory} onChange={(e) => setNewCategory(e.target.value)} className="w-full p-2 border rounded-lg">
+                    {categories.map((c) => (
+                      <option key={c} value={c}>
+                        {c.charAt(0).toUpperCase() + c.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Audience</label>
+                  <Select value={newAudience} onValueChange={(value: 'customer' | 'internal' | 'admin') => setNewAudience(value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="customer">Customer</SelectItem>
+                      <SelectItem value="internal">Internal</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
               <div>
-                <label className="text-sm font-medium">Category</label>
-                <select value={newCategory} onChange={(e) => setNewCategory(e.target.value)} className="w-full p-2 border rounded-lg">
-                  {categories.map((c) => (
-                    <option key={c} value={c}>
-                      {c.charAt(0).toUpperCase() + c.slice(1)}
-                    </option>
-                  ))}
-                </select>
+                <label className="text-sm font-medium">Tags</label>
+                <Input 
+                  value={newTags} 
+                  onChange={(e) => setNewTags(e.target.value)} 
+                  placeholder="pricing, emergency, setup (comma-separated)" 
+                />
               </div>
             </div>
             <div className="space-y-4">
@@ -215,6 +303,8 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
                 <TableHead>Question</TableHead>
                 <TableHead>Answer</TableHead>
                 <TableHead>Category</TableHead>
+                <TableHead>Audience</TableHead>
+                <TableHead>Tags</TableHead>
                 <TableHead>Updated</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -222,18 +312,20 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6}>
+                  <TableCell colSpan={8}>
                     <div className="text-center text-muted-foreground py-6">Loading training data...</div>
                   </TableCell>
                 </TableRow>
-              ) : trainingData.length === 0 ? (
+              ) : filteredData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6}>
-                    <div className="text-center text-muted-foreground py-6">No training data yet. Add your first example above.</div>
+                  <TableCell colSpan={8}>
+                    <div className="text-center text-muted-foreground py-6">
+                      {trainingData.length === 0 ? "No training data yet. Add your first example above." : "No data matches the current filter."}
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
-                trainingData.map((item) =>
+                filteredData.map((item) =>
                   editingId === item.id ? (
                     <TableRow key={item.id}>
                       <TableCell>
@@ -257,6 +349,26 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
                             </option>
                           ))}
                         </select>
+                      </TableCell>
+                      <TableCell>
+                        <Select value={editAudience} onValueChange={(value: 'customer' | 'internal' | 'admin') => setEditAudience(value)}>
+                          <SelectTrigger className="w-24">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="customer">Customer</SelectItem>
+                            <SelectItem value="internal">Internal</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell>
+                        <Input 
+                          value={editTags} 
+                          onChange={(e) => setEditTags(e.target.value)} 
+                          className="min-w-[120px]" 
+                          placeholder="tag1, tag2"
+                        />
                       </TableCell>
                       <TableCell>
                         <div className="text-sm text-muted-foreground">—</div>
@@ -300,6 +412,27 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{item.category}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {getAudienceBadge(item.audience)}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {item.tags && item.tags.length > 0 ? (
+                            item.tags.slice(0, 2).map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))
+                          ) : (
+                            <span className="text-xs text-muted-foreground">—</span>
+                          )}
+                          {item.tags && item.tags.length > 2 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{item.tags.length - 2}
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm text-muted-foreground">
