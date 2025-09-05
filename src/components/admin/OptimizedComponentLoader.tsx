@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import EnhancedCommandCenter from './EnhancedCommandCenter';
-import ContentApprovalDashboard from './ContentApprovalDashboard';
-import SocialHub from './SocialHub';
-import AnalyticsDashboard from './AnalyticsDashboard';
+import { EnhancedCommandCenter } from './EnhancedCommandCenter';
+import { ContentApprovalDashboard } from './ContentApprovalDashboard';
+import { SocialHub } from './SocialHub';
+import { AnalyticsDashboard } from './AnalyticsDashboard';
 import CampaignMonitor from './CampaignMonitor';
 
 interface OptimizedComponentLoaderProps {
