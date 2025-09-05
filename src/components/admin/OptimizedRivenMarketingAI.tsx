@@ -215,7 +215,7 @@ export default function OptimizedRivenMarketingAI() {
   }, [toast, handleContentUpdate]);
 
   // Command Center handlers
-  const handleSendCommand = useCallback(async (command: string, config: any) => {
+  const handleSendCommand = useCallback(async (config: any) => {
     setIsProcessing(true);
     setRivenResponse('');
     
@@ -223,8 +223,22 @@ export default function OptimizedRivenMarketingAI() {
       const response = await supabase.functions.invoke('riven-marketing', {
         body: {
           action: 'process_command',
-          command,
-          configuration: config
+          command: currentCommand,
+          settings: {
+            word_count: config?.wordCount,
+            seo_difficulty: config?.seoDifficulty,
+            content_depth: config?.contentDepth,
+          },
+          scheduling_options: {
+            mode: config?.schedulingMode,
+            spread_days: config?.campaignDuration,
+            posts_per_day: config?.postsPerDay,
+            total_posts: config?.totalPosts,
+          },
+          publishing_controls: {
+            platforms: config?.platforms,
+            approval_required: true,
+          }
         }
       });
 
@@ -232,6 +246,7 @@ export default function OptimizedRivenMarketingAI() {
 
       setRivenResponse(response.data?.message || 'Command processed successfully');
       handleCampaignUpdate(); // Refresh campaigns list
+      handleContentUpdate(); // Refresh content list
       
       toast({
         title: "Command Executed",
@@ -248,7 +263,7 @@ export default function OptimizedRivenMarketingAI() {
     } finally {
       setIsProcessing(false);
     }
-  }, [toast, handleCampaignUpdate]);
+  }, [toast, handleCampaignUpdate, handleContentUpdate, currentCommand]);
 
   const handleUseTemplate = useCallback((template: any) => {
     setCurrentCommand(template.command);

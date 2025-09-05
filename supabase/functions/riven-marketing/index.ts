@@ -131,18 +131,18 @@ switch (action) {
         if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'in_progress', serviceSupabase);
         
         try {
-          await generateMarketingContent(campaign.id, serviceSupabase, settings, effectiveConfig);
-          console.log('✅ Content generation completed for campaign:', campaign.id);
+          const createdCount = await generateMarketingContent(campaign.id, serviceSupabase, settings, effectiveConfig);
+          console.log('✅ Content generation completed for campaign:', campaign.id, 'items:', createdCount);
           if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'completed', serviceSupabase);
           
-          // Update campaign status to completed
+          // Update campaign status based on created content
           await serviceSupabase
             .from('marketing_campaigns')
-            .update({ status: 'completed', completed_at: new Date().toISOString() })
+            .update({ status: createdCount > 0 ? 'completed' : 'failed', completed_at: new Date().toISOString(), error_message: createdCount > 0 ? null : 'No content generated' })
             .eq('id', campaign.id);
           
           // Auto-publish for immediate mode
-          if (scheduling_options?.mode === 'immediate' && !publishing_controls?.approval_required) {
+          if (createdCount > 0 && scheduling_options?.mode === 'immediate' && !publishing_controls?.approval_required) {
             if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'in_progress', serviceSupabase);
             await publishGeneratedContent(campaign.id, serviceSupabase);
             if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'completed', serviceSupabase);
@@ -170,10 +170,11 @@ switch (action) {
     break;
   }
   
-  case 'generate_content':
-    await generateMarketingContent(campaign_id, userSupabase, settings, effectiveConfig);
-    response = 'Content generated successfully for campaign!';
+  case 'generate_content': {
+    const createdCount = await generateMarketingContent(campaign_id, serviceSupabase, settings, effectiveConfig);
+    response = `Content generated: ${createdCount} items.`;
     break;
+  }
   
   case 'generate_image':
         try {
@@ -671,17 +672,18 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
       keywords: ['family', 'safety', 'technology']
     };
 
-    const { error: insertError } = await supabase
+    const { data: basicInsert, error: insertError } = await supabase
       .from('marketing_content')
-      .insert(basicContent);
+      .insert(basicContent)
+      .select('id');
 
     if (insertError) {
       console.error('❌ Failed to create basic content:', insertError);
       throw new Error('Failed to create basic content: ' + insertError.message);
     }
 
-    console.log('✅ Basic content created (no AI provider)');
-    return true;
+    console.log('✅ Basic content created (no AI provider)', basicInsert?.[0]?.id);
+    return (basicInsert?.length || 1);
   }
 
   try {
@@ -701,6 +703,8 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
     const contentTypes = ['blog_post']; // Keep it simple and reliable first
 
     console.log(`🎯 Generating content for platforms: ${platforms.join(', ')}`);
+
+    let createdCount = 0;
 
     for (const platform of platforms) {
       for (const contentType of contentTypes) {
@@ -731,13 +735,15 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
             insertData.seo_score = content.blogData.seo_score;
           }
 
-          const { error: genInsertError } = await supabase
+          const { data: ins, error: genInsertError } = await supabase
             .from('marketing_content')
-            .insert(insertData);
+            .insert(insertData)
+            .select('id');
 
           if (genInsertError) throw genInsertError;
+          createdCount += ins?.length || 1;
 
-          console.log(`✅ Inserted generated ${contentType} for ${platform}`);
+          console.log(`✅ Inserted generated ${contentType} for ${platform}`, ins?.[0]?.id);
         } catch (genErr) {
           console.error(`❌ Failed to generate ${contentType} for ${platform}:`, genErr);
 
@@ -755,16 +761,26 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
             keywords: ['family', 'safety', 'technology']
           };
 
-          await supabase
+          const { data: fbIns, error: fbErr } = await supabase
             .from('marketing_content')
-            .insert(fallbackContent);
+            .insert(fallbackContent)
+            .select('id');
 
-          console.log(`✅ Created fallback ${contentType} for ${platform}`);
+          if (fbErr) {
+            console.error('❌ Fallback insert failed:', fbErr);
+          } else {
+            createdCount += fbIns?.length || 1;
+            console.log(`✅ Created fallback ${contentType} for ${platform}`, fbIns?.[0]?.id);
+          }
         }
       }
     }
 
-    return true;
+    if (createdCount === 0) {
+      throw new Error('No content created for this campaign');
+    }
+
+    return createdCount;
   } catch (error) {
     console.error('Error generating marketing content:', error);
     throw error;
@@ -912,7 +928,7 @@ async function publishGeneratedContent(campaignId: string, supabase: any) {
     // Mark all content as published
     const { error } = await supabase
       .from('marketing_content')
-      .update({ status: 'published', scheduled_time: new Date().toISOString(), published_at: new Date().toISOString() })
+      .update({ status: 'published', scheduled_time: new Date().toISOString(), posted_at: new Date().toISOString() })
       .eq('campaign_id', campaignId)
       .eq('status', 'draft');
 
