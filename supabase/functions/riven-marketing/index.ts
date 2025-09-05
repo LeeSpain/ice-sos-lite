@@ -126,53 +126,55 @@ switch (action) {
       if (workflow_id) await updateWorkflowStep(workflow_id, 'creating_campaign', 'completed', serviceSupabase);
       
       // CRITICAL: Auto-generate content after campaign creation (100% complete process)
-      if (campaign?.id) {
-        console.log('🎯 Starting automatic content generation for campaign:', campaign.id);
-        
-        // Set campaign to running state
-        await serviceSupabase
-          .from('marketing_campaigns')
-          .update({ status: 'running' })
-          .eq('id', campaign.id);
-        
-        if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'in_progress', serviceSupabase);
-        
-        try {
-          const createdCount = await generateMarketingContent(campaign.id, serviceSupabase, settings, effectiveConfig);
-          console.log('✅ Content generation completed for campaign:', campaign.id, 'items:', createdCount);
-          if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'completed', serviceSupabase);
+        if (campaign?.id) {
+          console.log('🎯 Starting automatic content generation for campaign:', campaign.id);
           
-          // Update campaign status based on created content
+          // Set campaign to running state
           await serviceSupabase
             .from('marketing_campaigns')
-            .update({ 
-              status: createdCount > 0 ? 'completed' : 'failed', 
-              completed_at: new Date().toISOString(), 
-              error_message: createdCount > 0 ? null : 'No content generated' 
-            })
+            .update({ status: 'running' })
             .eq('id', campaign.id);
           
-          // Auto-publish for immediate mode or single post mode
-          if (createdCount > 0 && (scheduling_options?.mode === 'immediate' || settings?.singlePostMode) && !publishing_controls?.approval_required) {
-            if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'in_progress', serviceSupabase);
-            await publishGeneratedContent(campaign.id, serviceSupabase);
-            if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'completed', serviceSupabase);
-          }
-        } catch (contentError) {
-          console.error('❌ Content generation failed:', contentError);
-          if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'failed', serviceSupabase, contentError.message);
-          
-          // Update campaign status to failed
-          await serviceSupabase
-            .from('marketing_campaigns')
-            .update({ 
-              status: 'failed', 
-              completed_at: new Date().toISOString(),
-              error_message: contentError.message 
-            })
-            .eq('id', campaign.id);
+          // Run heavy generation in background to avoid request timeouts; status will be updated when done
+          EdgeRuntime.waitUntil((async () => {
+            try {
+              if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'in_progress', serviceSupabase);
+              const createdCount = await generateMarketingContent(campaign.id, serviceSupabase, settings, effectiveConfig);
+              console.log('✅ Content generation completed for campaign:', campaign.id, 'items:', createdCount);
+              if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'completed', serviceSupabase);
+              
+              // Update campaign status based on created content
+              await serviceSupabase
+                .from('marketing_campaigns')
+                .update({ 
+                  status: createdCount > 0 ? 'completed' : 'failed', 
+                  completed_at: new Date().toISOString(), 
+                  error_message: createdCount > 0 ? null : 'No content generated' 
+                })
+                .eq('id', campaign.id);
+              
+              // Auto-publish for immediate mode or single post mode
+              if (createdCount > 0 && (scheduling_options?.mode === 'immediate' || settings?.singlePostMode) && !publishing_controls?.approval_required) {
+                if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'in_progress', serviceSupabase);
+                await publishGeneratedContent(campaign.id, serviceSupabase);
+                if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'completed', serviceSupabase);
+              }
+            } catch (contentError: any) {
+              console.error('❌ Content generation failed (bg):', contentError);
+              if (workflow_id) await updateWorkflowStep(workflow_id, 'generating_content', 'failed', serviceSupabase, contentError?.message);
+              
+              // Update campaign status to failed
+              await serviceSupabase
+                .from('marketing_campaigns')
+                .update({ 
+                  status: 'failed', 
+                  completed_at: new Date().toISOString(),
+                  error_message: contentError?.message || 'Content generation failed' 
+                })
+                .eq('id', campaign.id);
+            }
+          })());
         }
-      }
       
       response = (analysis?.response || 'Command processed successfully!') + '\n\nCampaign created successfully with content generated automatically.';
       campaign_created = !!campaign;
@@ -193,19 +195,32 @@ switch (action) {
         .update({ status: 'running' })
         .eq('id', campaign_id);
 
-      const createdCount = await generateMarketingContent(campaign_id, serviceSupabase, settings, effectiveConfig);
-      
-      // Update campaign status to completed
-      await serviceSupabase
-        .from('marketing_campaigns')
-        .update({ 
-          status: createdCount > 0 ? 'completed' : 'failed',
-          completed_at: new Date().toISOString(),
-          error_message: createdCount > 0 ? null : 'No content generated'
-        })
-        .eq('id', campaign_id);
+      // Run heavy generation in background to avoid timeouts
+      EdgeRuntime.waitUntil((async () => {
+        try {
+          const createdCount = await generateMarketingContent(campaign_id, serviceSupabase, settings, effectiveConfig);
+          // Update campaign status to completed/failed based on result
+          await serviceSupabase
+            .from('marketing_campaigns')
+            .update({ 
+              status: createdCount > 0 ? 'completed' : 'failed',
+              completed_at: new Date().toISOString(),
+              error_message: createdCount > 0 ? null : 'No content generated'
+            })
+            .eq('id', campaign_id);
+        } catch (error: any) {
+          await serviceSupabase
+            .from('marketing_campaigns')
+            .update({ 
+              status: 'failed',
+              completed_at: new Date().toISOString(),
+              error_message: error?.message || 'Content generation failed'
+            })
+            .eq('id', campaign_id);
+        }
+      })());
 
-      response = `Content generated: ${createdCount} items.`;
+      response = `Content generation started.`;
     } catch (error) {
       // Update campaign status to failed
       await serviceSupabase
@@ -213,7 +228,7 @@ switch (action) {
         .update({ 
           status: 'failed',
           completed_at: new Date().toISOString(),
-          error_message: error.message 
+          error_message: (error as any).message 
         })
         .eq('id', campaign_id);
       throw error;
