@@ -19,31 +19,37 @@ export default function OptimizedRivenMarketingAI() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [rivenResponse, setRivenResponse] = useState('');
   
-  // Default command templates
+  // Emergency/Family Safety focused command templates
   const commandTemplates = [
     {
       id: '1',
-      title: 'Product Launch',
-      description: 'Launch campaign for new product',
-      command: 'Create a comprehensive product launch campaign for our new software tool. Include social media posts, blog content, and email sequences. Target tech-savvy professionals aged 25-45.'
+      title: 'Emergency Preparedness Campaign',
+      description: 'Educate families about emergency readiness',
+      command: 'Create a comprehensive 7-day emergency preparedness campaign for families. Generate content for Instagram, Facebook, and our blog focusing on emergency planning, SOS device setup, and family safety protocols. Include practical tips, safety checklists, and real-world scenarios.'
     },
     {
       id: '2', 
-      title: 'Social Media Boost',
-      description: 'Increase social media engagement',
-      command: 'Generate engaging social media content for the next 2 weeks. Focus on industry insights, tips, and behind-the-scenes content. Optimize for LinkedIn and Twitter.'
+      title: 'Family Safety Tips Series',
+      description: 'Daily safety tips for families',
+      command: 'Develop a 10-part family safety tips series covering personal safety, travel safety, and emergency response. Create engaging social media posts and detailed blog articles with SEO optimization for emergency safety keywords.'
     },
     {
       id: '3',
-      title: 'Blog Content Series',
-      description: 'Create educational blog series',
-      command: 'Develop a 5-part blog series about digital transformation trends. Each post should be 1500+ words, SEO-optimized, and include actionable insights for business leaders.'
+      title: 'Customer Testimonials Campaign',
+      description: 'Real stories of how ICE SOS helped families',
+      command: 'Generate 6 pieces of content featuring real customer testimonials about how ICE SOS Lite helped in emergency situations. Create Instagram stories, Facebook posts, and email content highlighting peace of mind for families and life-saving features.'
     },
     {
       id: '4',
-      title: 'Email Campaign',
-      description: 'Newsletter and nurture sequence',
-      command: 'Create a 7-part email nurture sequence for new subscribers. Include welcome message, educational content, case studies, and soft product introductions.'
+      title: 'SOS Feature Awareness Campaign',
+      description: 'Highlight key app features and benefits',
+      command: 'Create a feature-focused campaign showcasing ICE SOS Lite capabilities. Generate 12 pieces of content including social posts, blog articles, and email sequences explaining emergency contacts, location sharing, family groups, and quick SOS activation.'
+    },
+    {
+      id: '5',
+      title: 'Senior Safety Initiative',
+      description: 'Safety solutions for elderly users',
+      command: 'Develop content specifically for seniors and their families about personal safety technology. Create 8 pieces including blog posts about aging safely, family communication, and how ICE SOS provides peace of mind for adult children.'
     }
   ];
 

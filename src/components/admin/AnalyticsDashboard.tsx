@@ -84,11 +84,29 @@ export const AnalyticsDashboard: React.FC = () => {
       const content = contentData || [];
       const campaigns = campaignData || [];
 
-      // Simulate engagement metrics
-      const totalViews = content.reduce((sum, item) => sum + Math.floor(Math.random() * 1000) + 100, 0);
-      const totalEngagement = content.reduce((sum, item) => sum + Math.floor(Math.random() * 50) + 10, 0);
-      const totalClicks = content.reduce((sum, item) => sum + Math.floor(Math.random() * 25) + 5, 0);
-      const conversionRate = totalClicks > 0 ? ((totalClicks * 0.1) / totalClicks) * 100 : 0;
+      // Calculate real engagement metrics from marketing analytics table if available
+      let totalViews = 0;
+      let totalEngagement = 0;
+      let totalClicks = 0;
+
+      // Try to get real analytics data
+      const { data: analyticsData } = await supabase
+        .from('marketing_analytics')
+        .select('*')
+        .gte('recorded_at', startDate.toISOString());
+
+      if (analyticsData && analyticsData.length > 0) {
+        totalViews = analyticsData.filter(a => a.metric_type === 'views').reduce((sum, a) => sum + (a.metric_value || 0), 0);
+        totalEngagement = analyticsData.filter(a => a.metric_type === 'engagement').reduce((sum, a) => sum + (a.metric_value || 0), 0);
+        totalClicks = analyticsData.filter(a => a.metric_type === 'clicks').reduce((sum, a) => sum + (a.metric_value || 0), 0);
+      } else {
+        // Fallback to content-based estimates for family safety niche
+        totalViews = content.length * 250; // More conservative estimates
+        totalEngagement = content.length * 15;
+        totalClicks = content.length * 8;
+      }
+
+      const conversionRate = totalClicks > 0 ? ((totalClicks * 0.12) / totalViews) * 100 : 0;
 
       // Platform statistics
       const platformStats = content.reduce((stats, item) => {
@@ -192,10 +210,10 @@ export const AnalyticsDashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Marketing Analytics
+            Family Safety Marketing Analytics
           </h2>
           <p className="text-muted-foreground">
-            Performance metrics and insights for all Riven-generated content
+            Performance metrics and insights for emergency preparedness and family safety content
           </p>
         </div>
         <div className="flex items-center gap-3">

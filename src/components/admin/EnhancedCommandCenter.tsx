@@ -276,26 +276,28 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   ];
 
   const contentTypes = [
-    { id: 'post', name: 'Social Post', description: 'Regular social media posts' },
-    { id: 'story', name: 'Story', description: 'Instagram/Facebook stories' },
-    { id: 'reel', name: 'Reel/Video', description: 'Short-form video content' },
-    { id: 'article', name: 'Article', description: 'Long-form content' },
-    { id: 'how-to-guide', name: 'How-to Guide', description: 'Step-by-step educational content' },
-    { id: 'case-study', name: 'Case Study', description: 'Customer success stories' },
-    { id: 'industry-insights', name: 'Industry Insights', description: 'Thought leadership articles' },
-    { id: 'product-features', name: 'Product Features', description: 'Detailed product explanations' },
-    { id: 'safety-tips', name: 'Safety Tips', description: 'Emergency preparedness content' },
-    { id: 'email-welcome', name: 'Welcome Email', description: 'New user onboarding emails' },
-    { id: 'email-newsletter', name: 'Newsletter', description: 'Regular email newsletters' },
-    { id: 'email-campaign', name: 'Email Campaign', description: 'Promotional email sequences' }
+    { id: 'social-post', name: 'Social Post', description: 'Emergency safety tips and family updates' },
+    { id: 'story', name: 'Story', description: 'Instagram/Facebook safety stories' },
+    { id: 'reel', name: 'Safety Reel', description: 'Quick safety tip videos' },
+    { id: 'safety-guide', name: 'Safety Guide', description: 'Emergency preparedness guides' },
+    { id: 'how-to-emergency', name: 'Emergency How-to', description: 'Step-by-step emergency procedures' },
+    { id: 'testimonial', name: 'Customer Testimonial', description: 'Real family safety success stories' },
+    { id: 'feature-highlight', name: 'Feature Spotlight', description: 'ICE SOS app feature explanations' },
+    { id: 'safety-tips', name: 'Safety Tips', description: 'Daily family safety advice' },
+    { id: 'emergency-checklist', name: 'Emergency Checklist', description: 'Printable safety checklists' },
+    { id: 'email-onboarding', name: 'Safety Onboarding', description: 'New user safety setup emails' },
+    { id: 'email-newsletter', name: 'Safety Newsletter', description: 'Monthly family safety updates' },
+    { id: 'email-alerts', name: 'Safety Alerts', description: 'Emergency awareness campaigns' }
   ];
 
   const audiences = [
-    { id: 'family_safety', name: 'Family Safety', description: 'Parents concerned about family security' },
-    { id: 'seniors', name: 'Senior Citizens', description: 'Elderly individuals and their families' },
-    { id: 'young_families', name: 'Young Families', description: 'Families with young children' },
-    { id: 'business', name: 'Business Users', description: 'Companies needing security solutions' },
-    { id: 'travelers', name: 'Travelers', description: 'People who travel frequently' }
+    { id: 'families_with_children', name: 'Families with Children', description: 'Parents prioritizing child safety' },
+    { id: 'seniors', name: 'Senior Citizens', description: 'Elderly users and their families' },
+    { id: 'young_adults', name: 'Young Adults', description: 'College students and young professionals' },
+    { id: 'frequent_travelers', name: 'Frequent Travelers', description: 'People who travel for work or leisure' },
+    { id: 'outdoor_enthusiasts', name: 'Outdoor Enthusiasts', description: 'Hikers, campers, and adventure seekers' },
+    { id: 'elderly_caregivers', name: 'Elderly Caregivers', description: 'Adult children caring for aging parents' },
+    { id: 'single_women', name: 'Women Living Alone', description: 'Women prioritizing personal safety' }
   ];
 
   const togglePlatform = (platformId: string) => {
@@ -315,8 +317,22 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   };
 
   const calculateEstimatedReach = () => {
-    const baseReach = selectedPlatforms.length * totalPosts[0] * 1000;
-    return Math.round(baseReach);
+    // More realistic reach calculation for family safety niche
+    const platformMultipliers = {
+      'facebook': 800,
+      'instagram': 600,
+      'twitter': 400,
+      'linkedin': 300,
+      'youtube': 1200,
+      'blog': 500,
+      'email': 200
+    };
+    
+    const totalReach = selectedPlatforms.reduce((sum, platform) => {
+      return sum + (platformMultipliers[platform] || 500) * totalPosts[0];
+    }, 0);
+    
+    return Math.round(totalReach);
   };
 
   const handleSendCommand = () => {
@@ -349,7 +365,7 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
             Riven AI Command Center
           </CardTitle>
           <p className="text-muted-foreground mt-2">
-            Give Riven a marketing command and watch AI create professional campaigns across all platforms
+            Give Riven a family safety marketing command and watch AI create professional emergency preparedness campaigns across all platforms
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -363,12 +379,14 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
             </Label>
             <Textarea
               id="command"
-              placeholder="Tell Riven what you want to achieve...
+              placeholder="Tell Riven what you want to achieve for family safety and emergency preparedness...
 
 💡 Examples:
-• Create a week-long family safety campaign for Instagram & Facebook
-• Generate 10 blog posts about emergency preparedness with SEO optimization
-• Launch a social media series highlighting customer testimonials"
+• Create a week-long emergency preparedness campaign for families on Instagram & Facebook
+• Generate 10 blog posts about family safety planning with SEO optimization for emergency keywords
+• Launch a social media series featuring real ICE SOS customer testimonials
+• Develop content about SOS features for seniors and their adult children
+• Create educational content about family emergency communication plans"
               value={currentCommand}
               onChange={(e) => setCurrentCommand(e.target.value)}
               className="mt-2 min-h-[120px] bg-background/50 border-primary/20 focus:border-primary/50 transition-colors"

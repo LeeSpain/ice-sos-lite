@@ -86,11 +86,13 @@ export const SocialHub: React.FC<SocialHubProps> = ({ socialAccounts, onAccounts
         content: item.body_text || item.title || '',
         posted_at: item.posted_at || item.created_at,
         status: item.status,
-        engagement_metrics: {
-          likes: Math.floor(Math.random() * 50),
-          shares: Math.floor(Math.random() * 20),
-          comments: Math.floor(Math.random() * 15)
-        }
+        engagement_metrics: (typeof item.engagement_metrics === 'object' && item.engagement_metrics !== null) 
+          ? item.engagement_metrics as { likes: number; shares: number; comments: number; }
+          : {
+              likes: 0,
+              shares: 0,
+              comments: 0
+            }
       }));
 
       setSocialPosts(posts);
@@ -173,10 +175,10 @@ export const SocialHub: React.FC<SocialHubProps> = ({ socialAccounts, onAccounts
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Social Media Hub
+            Family Safety Social Hub
           </h2>
           <p className="text-muted-foreground">
-            Manage social media accounts and track cross-platform performance
+            Manage social media accounts and share emergency preparedness content across platforms
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -266,7 +268,7 @@ export const SocialHub: React.FC<SocialHubProps> = ({ socialAccounts, onAccounts
               </div>
               <h3 className="text-lg font-medium mb-2">No social accounts connected</h3>
               <p className="text-muted-foreground mb-6">
-                Connect your social media accounts to start managing and posting content
+                Connect your social media accounts to start sharing family safety and emergency preparedness content
               </p>
             </div>
           ) : (
@@ -353,9 +355,9 @@ export const SocialHub: React.FC<SocialHubProps> = ({ socialAccounts, onAccounts
           {socialPosts.length === 0 ? (
             <div className="text-center py-8">
               <Share2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-medium mb-2">No posts yet</h3>
+              <h3 className="text-lg font-medium mb-2">No safety content posted yet</h3>
               <p className="text-muted-foreground">
-                Create content using the Command Center to see posts here
+                Create family safety content using the Riven Command Center to see posts here
               </p>
             </div>
           ) : (
