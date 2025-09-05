@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Send, 
   Settings, 
@@ -27,7 +29,14 @@ import {
   Timer,
   BarChart3,
   Globe,
-  BookOpen
+  BookOpen,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  PlayCircle,
+  PauseCircle,
+  Eye,
+  TrendingUp
 } from 'lucide-react';
 
 interface CommandCenterProps {
@@ -38,6 +47,32 @@ interface CommandCenterProps {
   commandTemplates: any[];
   useTemplate: (template: any) => void;
   rivenResponse: string;
+  campaignId?: string;
+}
+
+interface CampaignStatus {
+  id: string;
+  name: string;
+  status: 'draft' | 'running' | 'paused' | 'completed' | 'failed';
+  progress: number;
+  totalContent: number;
+  publishedContent: number;
+  scheduledContent: number;
+  platforms: string[];
+  createdAt: string;
+  metrics?: {
+    reach: number;
+    engagement: number;
+    clicks: number;
+  };
+}
+
+interface SocialMediaAccount {
+  id: string;
+  platform: string;
+  username: string;
+  isConnected: boolean;
+  lastSync: string;
 }
 
 interface CommandConfiguration {
@@ -63,8 +98,14 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   onSendCommand,
   commandTemplates,
   useTemplate,
-  rivenResponse
+  rivenResponse,
+  campaignId
 }) => {
+  const { toast } = useToast();
+  const [activeCampaigns, setActiveCampaigns] = useState<CampaignStatus[]>([]);
+  const [socialAccounts, setSocialAccounts] = useState<SocialMediaAccount[]>([]);
+  const [showCampaignManager, setShowCampaignManager] = useState(false);
+  const [realTimeUpdates, setRealTimeUpdates] = useState(true);
   const [totalPosts, setTotalPosts] = useState([10]);
   const [postsPerDay, setPostsPerDay] = useState([2]);
   const [campaignDuration, setCampaignDuration] = useState([7]);
@@ -78,6 +119,152 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   const [wordCount, setWordCount] = useState([1000]);
   const [seoDifficulty, setSeoDifficulty] = useState('intermediate');
   const [contentDepth, setContentDepth] = useState('detailed');
+
+  // Load campaigns and social accounts
+  useEffect(() => {
+    loadActiveCampaigns();
+    loadSocialAccounts();
+    
+    if (realTimeUpdates) {
+      const interval = setInterval(() => {
+        loadActiveCampaigns();
+      }, 30000); // Update every 30 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [realTimeUpdates]);
+
+  const loadActiveCampaigns = async () => {
+    try {
+      const { data: campaigns, error } = await supabase
+        .from('marketing_campaigns')
+        .select('*')
+        .in('status', ['running', 'scheduled'])
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const campaignStatuses: CampaignStatus[] = campaigns?.map(campaign => ({
+        id: campaign.id,
+        name: campaign.title || 'Untitled Campaign',
+        status: campaign.status as CampaignStatus['status'],
+        progress: 0, // Will calculate from content
+        totalContent: 0,
+        publishedContent: 0,
+        scheduledContent: 0,
+        platforms: [],
+        createdAt: campaign.created_at,
+        metrics: {
+          reach: 0,
+          engagement: 0,
+          clicks: 0
+        }
+      })) || [];
+
+      setActiveCampaigns(campaignStatuses);
+    } catch (error) {
+      console.error('Error loading campaigns:', error);
+    }
+  };
+
+  const loadSocialAccounts = async () => {
+    try {
+      const { data: accounts, error } = await supabase
+        .from('social_media_oauth')
+        .select('*')
+        .eq('connection_status', 'connected');
+
+      if (error) throw error;
+
+      const socialAccountStatuses: SocialMediaAccount[] = accounts?.map(account => ({
+        id: account.id,
+        platform: account.platform,
+        username: account.platform_name || 'Connected',
+        isConnected: account.connection_status === 'connected',
+        lastSync: account.updated_at
+      })) || [];
+
+      setSocialAccounts(socialAccountStatuses);
+    } catch (error) {
+      console.error('Error loading social accounts:', error);
+    }
+  };
+
+  const connectSocialAccount = async (platform: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('social-media-oauth', {
+        body: {
+          action: 'initiate',
+          platform,
+          userId: (await supabase.auth.getUser()).data.user?.id
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.authUrl) {
+        window.open(data.authUrl, '_blank', 'width=600,height=600');
+        toast({
+          title: "OAuth Flow Started",
+          description: `Please complete authentication for ${platform}`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Connection Failed",
+        description: `Failed to connect ${platform}: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const pauseCampaign = async (campaignId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketing_campaigns')
+        .update({ status: 'paused' })
+        .eq('id', campaignId);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Campaign Paused",
+        description: "Campaign has been paused successfully",
+      });
+      
+      loadActiveCampaigns();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to pause campaign",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const resumeCampaign = async (campaignId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketing_campaigns')
+        .update({ status: 'running' })
+        .eq('id', campaignId);
+
+      if (error) throw error;
+      
+      toast({
+        title: "Campaign Resumed",
+        description: "Campaign is now running",
+      });
+      
+      loadActiveCampaigns();
+    } catch (error) {
+      toast({
+        title: "Error", 
+        description: "Failed to resume campaign",
+        variant: "destructive"
+      });
+    }
+  };
 
   const platforms = [
     { id: 'facebook', name: 'Facebook', icon: Facebook, color: '#1877F2' },
@@ -161,6 +348,144 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Real-time Campaign Status */}
+      {activeCampaigns.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Active Campaigns
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowCampaignManager(!showCampaignManager)}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Manage
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {activeCampaigns.slice(0, 3).map((campaign) => (
+                <Card key={campaign.id} className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium truncate">{campaign.name}</h4>
+                    <Badge 
+                      variant={campaign.status === 'running' ? 'default' : 'secondary'}
+                      className="ml-2"
+                    >
+                      {campaign.status}
+                    </Badge>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Progress</span>
+                      <span>{campaign.progress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full transition-all"
+                        style={{ width: `${campaign.progress}%` }}
+                      />
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{campaign.publishedContent} published</span>
+                      <span>{campaign.scheduledContent} scheduled</span>
+                    </div>
+                    <div className="flex gap-1 mt-2">
+                      {campaign.platforms.map((platform) => {
+                        const platformInfo = platforms.find(p => p.id === platform);
+                        if (!platformInfo) return null;
+                        const Icon = platformInfo.icon;
+                        return (
+                          <Icon 
+                            key={platform} 
+                            className="h-4 w-4" 
+                            style={{ color: platformInfo.color }}
+                          />
+                        );
+                      })}
+                    </div>
+                    <div className="flex gap-2 mt-3">
+                      {campaign.status === 'running' ? (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => pauseCampaign(campaign.id)}
+                        >
+                          <PauseCircle className="h-3 w-3 mr-1" />
+                          Pause
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => resumeCampaign(campaign.id)}
+                        >
+                          <PlayCircle className="h-3 w-3 mr-1" />
+                          Resume
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Social Media Account Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5" />
+            Social Media Accounts
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {platforms.filter(p => p.id !== 'blog' && p.id !== 'email').map((platform) => {
+              const connectedAccount = socialAccounts.find(acc => acc.platform === platform.id);
+              const Icon = platform.icon;
+              
+              return (
+                <Card key={platform.id} className="p-3 text-center">
+                  <Icon 
+                    className="h-8 w-8 mx-auto mb-2" 
+                    style={{ color: platform.color }}
+                  />
+                  <div className="text-sm font-medium">{platform.name}</div>
+                  {connectedAccount ? (
+                    <div className="mt-2">
+                      <Badge variant="default" className="bg-green-500">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Connected
+                      </Badge>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {connectedAccount.username}
+                      </div>
+                    </div>
+                  ) : (
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="mt-2"
+                      onClick={() => connectSocialAccount(platform.id)}
+                    >
+                      Connect
+                    </Button>
+                  )}
+                </Card>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -485,6 +810,15 @@ Example: Create a week-long campaign about family emergency preparedness for Ins
           )}
         </CardContent>
       </Card>
+
+      {/* Import and render the monitoring components */}
+      <RealTimeCampaignMonitor 
+        isOpen={showCampaignManager} 
+        onClose={() => setShowCampaignManager(false)} 
+      />
     </div>
   );
 };
+
+// Import the monitoring components at the top level
+import { RealTimeCampaignMonitor } from './RealTimeCampaignMonitor';
