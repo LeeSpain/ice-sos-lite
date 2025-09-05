@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -14,7 +15,9 @@ import {
   RefreshCw,
   PlayCircle,
   PauseCircle,
-  Trash2
+  Trash2,
+  Edit,
+  MoreVertical
 } from 'lucide-react';
 
 interface RealTimeCampaignMonitorProps {
@@ -29,6 +32,7 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
   const { toast } = useToast();
   const [campaigns, setCampaigns] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [editingCampaign, setEditingCampaign] = useState<any>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -83,6 +87,65 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
       setIsLoading(false);
     }
   };
+
+  const handleEditCampaign = (campaign: any) => {
+    setEditingCampaign(campaign);
+  };
+
+  const handleDeleteCampaign = async (campaignId: string) => {
+    if (!confirm('Are you sure you want to delete this campaign? This cannot be undone.')) return;
+    
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('marketing_campaigns')
+        .delete()
+        .eq('id', campaignId);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Campaign deleted',
+        description: 'Campaign has been permanently removed.',
+      });
+      await loadCampaigns();
+    } catch (err) {
+      console.error('Delete error:', err);
+      toast({ title: 'Delete failed', description: 'Could not delete campaign', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSaveCampaign = async (updatedData: any) => {
+    if (!editingCampaign) return;
+    
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from('marketing_campaigns')
+        .update({
+          title: updatedData.title,
+          description: updatedData.description,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingCampaign.id);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Campaign updated',
+        description: 'Campaign details have been saved.',
+      });
+      setEditingCampaign(null);
+      await loadCampaigns();
+    } catch (err) {
+      console.error('Update error:', err);
+      toast({ title: 'Update failed', description: 'Could not update campaign', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl">
@@ -107,7 +170,7 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
             campaigns.map((campaign) => (
               <Card key={campaign.id} className="p-4">
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div className="flex-1">
                     <h3 className="font-medium">{campaign.title || 'Campaign'}</h3>
                     <p className="text-sm text-muted-foreground">
                       Created: {new Date(campaign.created_at).toLocaleDateString()}
@@ -126,6 +189,26 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
                     {campaign.status === 'running' && (
                       <div className="animate-pulse h-2 w-2 bg-green-500 rounded-full" />
                     )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEditCampaign(campaign)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Campaign
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => handleDeleteCampaign(campaign.id)}
+                          className="text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete Campaign
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
                 {campaign.error_message && (
@@ -137,6 +220,44 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
             ))
           )}
         </div>
+
+        {/* Edit Campaign Dialog */}
+        {editingCampaign && (
+          <Dialog open={!!editingCampaign} onOpenChange={() => setEditingCampaign(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Campaign</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium">Title</label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border rounded"
+                    defaultValue={editingCampaign.title}
+                    onChange={(e) => setEditingCampaign({...editingCampaign, title: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Description</label>
+                  <textarea
+                    className="w-full p-2 border rounded h-20"
+                    defaultValue={editingCampaign.description}
+                    onChange={(e) => setEditingCampaign({...editingCampaign, description: e.target.value})}
+                  />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setEditingCampaign(null)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={() => handleSaveCampaign(editingCampaign)}>
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </DialogContent>
     </Dialog>
   );
