@@ -608,7 +608,7 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
           <div>
             <Label className="text-base font-medium">Quick Templates</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-              {commandTemplates.slice(0, 4).map((template) => (
+              {(commandTemplates || []).slice(0, 4).map((template) => (
                 <Button
                   key={template.id}
                   variant="outline"
