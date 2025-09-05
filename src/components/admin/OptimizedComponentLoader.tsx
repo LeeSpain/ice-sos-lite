@@ -12,18 +12,26 @@ interface OptimizedComponentLoaderProps {
 }
 
 export default function OptimizedComponentLoader({ type, props }: OptimizedComponentLoaderProps) {
-  switch (type) {
-    case 'command-center':
-      return <EnhancedCommandCenter {...props} />;
-    case 'content-approval':
-      return <ContentApprovalDashboard {...props} />;
-    case 'social-hub':
-      return <SocialHub {...props} />;
-    case 'analytics':
-      return <AnalyticsDashboard {...props} />;
-    case 'monitor':
-      return <CampaignMonitor {...props} />;
-    default:
-      return null;
+  console.log('Loading component type:', type);
+  
+  try {
+    switch (type) {
+      case 'command-center':
+        return <EnhancedCommandCenter {...props} />;
+      case 'content-approval':
+        return <ContentApprovalDashboard {...props} />;
+      case 'social-hub':
+        return <SocialHub {...props} />;
+      case 'analytics':
+        return <AnalyticsDashboard {...props} />;
+      case 'monitor':
+        return <CampaignMonitor {...props} />;
+      default:
+        console.warn('Unknown component type:', type);
+        return null;
+    }
+  } catch (error) {
+    console.error('Error loading component:', type, error);
+    return <div>Error loading component: {type}</div>;
   }
 }
