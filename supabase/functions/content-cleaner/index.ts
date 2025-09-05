@@ -45,37 +45,24 @@ serve(async (req) => {
       return new Response(JSON.stringify({ success: false, error: 'Admin privileges required' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // 1) Count non-published marketing content
-    const { count: nonPublishedCount, error: countErr } = await serviceSupabase
+    // AGGRESSIVE CLEANUP - Remove ALL Riven marketing content and campaigns
+    const { count: allContentCount, error: countErr } = await serviceSupabase
       .from('marketing_content')
-      .select('id', { count: 'exact', head: true })
-      .neq('status', 'published');
+      .select('id', { count: 'exact', head: true });
 
     if (countErr) throw countErr;
 
-    // 2) Determine campaigns that have published content
-    const { data: pubRows, error: pubErr } = await serviceSupabase
-      .from('marketing_content')
-      .select('campaign_id')
-      .eq('status', 'published');
-    if (pubErr) throw pubErr;
-
-    const publishedCampaignIds = new Set<string>((pubRows || []).map(r => r.campaign_id).filter(Boolean));
-
-    // 3) Fetch campaigns not running
-    const { data: campaignRows, error: cErr } = await serviceSupabase
+    const { count: allCampaignCount, error: campCountErr } = await serviceSupabase
       .from('marketing_campaigns')
-      .select('id,status');
-    if (cErr) throw cErr;
+      .select('id', { count: 'exact', head: true });
 
-    const campaignsToDelete = (campaignRows || [])
-      .filter(c => c.status !== 'running' && !publishedCampaignIds.has(c.id));
+    if (campCountErr) throw campCountErr;
 
     const result = {
       action,
       candidates: {
-        nonPublishedContent: nonPublishedCount || 0,
-        campaignsWithoutPublished: campaignsToDelete.length,
+        allContent: allContentCount || 0,
+        allCampaigns: allCampaignCount || 0,
       },
       deleted: { content: 0, campaigns: 0 },
       success: true,
@@ -86,25 +73,24 @@ serve(async (req) => {
         return new Response(JSON.stringify({ success: false, error: 'Confirmation required. Pass { confirm: true }.' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
 
-      // Delete non-published content first
-      if ((nonPublishedCount || 0) > 0) {
+      // Delete ALL marketing content
+      if ((allContentCount || 0) > 0) {
         const { error: delContentErr } = await serviceSupabase
           .from('marketing_content')
           .delete()
-          .neq('status', 'published');
+          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
         if (delContentErr) throw delContentErr;
-        result.deleted.content = nonPublishedCount || 0;
+        result.deleted.content = allContentCount || 0;
       }
 
-      // Then delete campaigns that have no published content and are not running
-      const ids = campaignsToDelete.map(c => c.id);
-      if (ids.length > 0) {
+      // Delete ALL marketing campaigns  
+      if ((allCampaignCount || 0) > 0) {
         const { error: delCampErr } = await serviceSupabase
           .from('marketing_campaigns')
           .delete()
-          .in('id', ids);
+          .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all
         if (delCampErr) throw delCampErr;
-        result.deleted.campaigns = ids.length;
+        result.deleted.campaigns = allCampaignCount || 0;
       }
     }
 

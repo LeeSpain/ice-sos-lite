@@ -72,8 +72,8 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
       if (error) throw error;
 
       toast({
-        title: 'Cleanup complete',
-        description: `Removed ${data?.deleted?.content ?? 0} drafts and ${data?.deleted?.campaigns ?? 0} campaigns without published content.`,
+        title: 'Complete cleanup done',
+        description: `Removed ALL ${data?.deleted?.content ?? 0} content items and ${data?.deleted?.campaigns ?? 0} campaigns from Riven.`,
       });
       await loadCampaigns();
     } catch (err) {
@@ -96,7 +96,7 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
           <div className="flex items-center justify-end">
             <Button variant="destructive" onClick={handleCleanSystem} disabled={isLoading} className="gap-2">
               <Trash2 className="h-4 w-4" />
-              Clean Unpublished
+              Delete ALL Riven Content
             </Button>
           </div>
           {campaigns.length === 0 ? (
