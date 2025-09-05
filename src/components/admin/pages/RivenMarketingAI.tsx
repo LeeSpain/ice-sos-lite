@@ -1,8 +1,8 @@
 import React from 'react';
-import UnifiedRivenMarketingAI from '@/components/admin/UnifiedRivenMarketingAI';
+import OptimizedRivenMarketingAI from '@/components/admin/OptimizedRivenMarketingAI';
 
 const RivenMarketingAI: React.FC = () => {
-  return <UnifiedRivenMarketingAI />;
+  return <OptimizedRivenMarketingAI />;
 };
 
 export default RivenMarketingAI;
