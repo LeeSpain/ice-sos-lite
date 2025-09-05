@@ -38,6 +38,11 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
   const loadCampaigns = async () => {
     setIsLoading(true);
     try {
+      // Auto-cleanup stale campaigns first
+      await supabase.functions.invoke('campaign-manager', {
+        body: { action: 'cleanup_stale' }
+      });
+
       const { data, error } = await supabase
         .from('marketing_campaigns')
         .select('*')
@@ -67,14 +72,37 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {campaigns.map((campaign) => (
-            <Card key={campaign.id} className="p-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium">{campaign.title || 'Campaign'}</h3>
-                <Badge>{campaign.status}</Badge>
-              </div>
+          {campaigns.length === 0 ? (
+            <Card className="p-8 text-center">
+              <p className="text-muted-foreground">No campaigns found. All systems operational!</p>
             </Card>
-          ))}
+          ) : (
+            campaigns.map((campaign) => (
+              <Card key={campaign.id} className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium">{campaign.title || 'Campaign'}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Created: {new Date(campaign.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={campaign.status === 'running' ? 'default' : campaign.status === 'failed' ? 'destructive' : 'secondary'}>
+                      {campaign.status}
+                    </Badge>
+                    {campaign.status === 'running' && (
+                      <div className="animate-pulse h-2 w-2 bg-green-500 rounded-full" />
+                    )}
+                  </div>
+                </div>
+                {campaign.error_message && (
+                  <div className="mt-2 p-2 bg-destructive/10 text-destructive text-sm rounded">
+                    Error: {campaign.error_message}
+                  </div>
+                )}
+              </Card>
+            ))
+          )}
         </div>
       </DialogContent>
     </Dialog>

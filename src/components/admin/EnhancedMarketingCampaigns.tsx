@@ -28,7 +28,8 @@ import {
   MoreVertical,
   Clock,
   Users,
-  Activity
+  Activity,
+  Square
 } from 'lucide-react';
 
 interface Campaign {
@@ -165,6 +166,84 @@ export const EnhancedMarketingCampaigns: React.FC = () => {
     }
   };
 
+  const handleForceComplete = async (campaignId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('campaign-manager', {
+        body: { action: 'force_complete', campaign_id: campaignId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Campaign Completed",
+        description: "Campaign has been marked as completed successfully"
+      });
+
+      loadCampaigns();
+    } catch (error) {
+      console.error('Error force completing campaign:', error);
+      toast({
+        title: "Force Complete Failed",
+        description: "Failed to force complete campaign",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCancelCampaign = async (campaignId: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('campaign-manager', {
+        body: { action: 'cancel', campaign_id: campaignId }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Campaign Cancelled",
+        description: "Campaign has been cancelled successfully"
+      });
+
+      loadCampaigns();
+    } catch (error) {
+      console.error('Error cancelling campaign:', error);
+      toast({
+        title: "Cancel Failed",
+        description: "Failed to cancel campaign",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const cleanupStaleCampaigns = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('campaign-manager', {
+        body: { action: 'cleanup_stale' }
+      });
+
+      if (error) throw error;
+
+      if (data?.cleaned_count > 0) {
+        toast({
+          title: "Cleanup Complete",
+          description: `Cleaned up ${data.cleaned_count} stale campaigns`
+        });
+        loadCampaigns();
+      } else {
+        toast({
+          title: "No Cleanup Needed",
+          description: "No stale campaigns found"
+        });
+      }
+    } catch (error) {
+      console.error('Error cleaning up campaigns:', error);
+      toast({
+        title: "Cleanup Failed",
+        description: "Failed to cleanup stale campaigns",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDeleteCampaign = async () => {
     if (!campaignToDelete) return;
     
@@ -293,6 +372,10 @@ export const EnhancedMarketingCampaigns: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Button onClick={cleanupStaleCampaigns} variant="outline" className="hover-scale">
+            <AlertTriangle className="h-4 w-4 mr-2" />
+            Cleanup Stale
+          </Button>
           <Button onClick={loadCampaigns} variant="outline" className="hover-scale">
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
@@ -507,30 +590,52 @@ export const EnhancedMarketingCampaigns: React.FC = () => {
                   View Details
                 </Button>
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => updateCampaignStatus(
-                    campaign.id,
-                    campaign.status === 'running' || campaign.status === 'active' ? 'paused' : 'running'
-                  )}
-                  className="hover:bg-blue-500 hover:text-white transition-colors"
-                >
-                  {campaign.status === 'running' || campaign.status === 'active' ? (
-                    <Pause className="h-4 w-4" />
-                  ) : (
+                {campaign.status === 'running' ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateCampaignStatus(campaign.id, 'paused')}
+                      className="hover:bg-yellow-500 hover:text-white transition-colors"
+                    >
+                      <Pause className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleForceComplete(campaign.id)}
+                      className="hover:bg-green-500 hover:text-white transition-colors"
+                    >
+                      <Square className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCancelCampaign(campaign.id)}
+                      className="hover:bg-red-500 hover:text-white transition-colors"
+                    >
+                      <AlertTriangle className="h-4 w-4" />
+                    </Button>
+                  </>
+                ) : campaign.status === 'paused' ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateCampaignStatus(campaign.id, 'running')}
+                    className="hover:bg-blue-500 hover:text-white transition-colors"
+                  >
                     <Play className="h-4 w-4" />
-                  )}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => confirmDeleteCampaign(campaign)}
-                  className="hover:bg-red-500 hover:text-white transition-colors"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => confirmDeleteCampaign(campaign)}
+                    className="hover:bg-red-500 hover:text-white transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

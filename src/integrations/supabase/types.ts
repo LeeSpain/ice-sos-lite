@@ -4495,6 +4495,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      cleanup_stuck_campaigns: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_communication_metrics_summary: {
         Args: Record<PropertyKey, never>
         Returns: {
