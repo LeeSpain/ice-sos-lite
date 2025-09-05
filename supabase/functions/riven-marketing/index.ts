@@ -321,7 +321,7 @@ async function callLLM(
 ) {
   const provider = chooseProviderForStage(aiConfig, stage);
   let model = options?.model || aiConfig?.providers?.[provider]?.model || (provider === 'openai' ? 'gpt-4.1-2025-04-14' : 'grok-beta');
-  const maxTokens = options?.maxTokens ?? (stage === 'text' ? 500 : 1000);
+  const maxTokens = options?.maxTokens ?? (stage === 'text' ? 2000 : 1500);
   console.log(`🤖 AI routing -> stage=${stage} provider=${provider} model=${model}`);
   // Sanitize/normalize model for OpenAI to avoid unsupported IDs
   if (provider === 'openai') {
@@ -538,7 +538,7 @@ Be specific, professional, and focus on end-to-end automation and measurable out
 
     const rivenResponse = await callLLM(aiConfig, 'overview', messages, {
       model: settings?.ai_model,
-      maxTokens: settings?.max_tokens || 1000
+      maxTokens: settings?.max_tokens || 2000
     });
 
     const campaignData = extractCampaignData(rivenResponse, command);
@@ -721,7 +721,7 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
   try {
     const content = await callLLM(aiConfig, 'text', [
       { role: 'user', content: prompt }
-    ], { maxTokens: 500 });
+    ], { maxTokens: 2000 });
 
     const contentStr = (content || '').toString();
     if (!contentStr) {
@@ -766,7 +766,7 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
         const finalized = await callLLM(aiConfig, 'finalize', [
           { role: 'system', content: 'Polish and finalize this marketing copy. Keep the same meaning, improve clarity and the call-to-action. Return only the refined text.' },
           { role: 'user', content: contentStr }
-        ], { maxTokens: 500 });
+        ], { maxTokens: 1000 });
         if (finalized && typeof finalized === 'string') {
           finalText = finalized.trim();
         }

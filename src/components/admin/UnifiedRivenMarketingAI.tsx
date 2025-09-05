@@ -30,6 +30,7 @@ import {
   Plus,
   Activity
 } from 'lucide-react';
+import BlogPreviewModal from './BlogPreviewModal';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useSiteContent } from '@/hooks/useSiteContent';
@@ -88,6 +89,8 @@ const UnifiedRivenMarketingAI: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<UnifiedContentItem | null>(null);
 
   // Command Center state
   const [currentCommand, setCurrentCommand] = useState('');
@@ -555,7 +558,14 @@ const [rivenResponse, setRivenResponse] = useState('');
                               </div>
                             </div>
                             <div className="flex items-center gap-2 ml-4">
-                              <Button variant="outline" size="sm">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedContent(content);
+                                  setPreviewModalOpen(true);
+                                }}
+                              >
                                 <Eye className="h-4 w-4 mr-1" />
                                 Preview
                               </Button>
@@ -690,22 +700,135 @@ const [rivenResponse, setRivenResponse] = useState('');
         </TabsContent>
 
         {/* Settings Tab */}
-        <TabsContent value="settings" className="space-y-4">
+        <TabsContent value="settings" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5" />
-                Riven AI Settings
+                AI Provider Settings
               </CardTitle>
               <CardDescription>
-                Configure AI behavior, automation, and brand settings
+                Configure which AI providers to use for different content generation stages
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <Settings className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-medium">Settings Coming Soon</h3>
-                <p className="text-muted-foreground">AI configuration and automation settings will be available here</p>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Overview Analysis</label>
+                  <Select defaultValue="openai">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openai">OpenAI (Emma)</SelectItem>
+                      <SelectItem value="xai">xAI (Grok)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Text Generation</label>
+                  <Select defaultValue="xai">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openai">OpenAI (Emma)</SelectItem>
+                      <SelectItem value="xai">xAI (Grok)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Content Finalization</label>
+                  <Select defaultValue="xai">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openai">OpenAI (Emma)</SelectItem>
+                      <SelectItem value="xai">xAI (Grok)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Image Generation</label>
+                  <Select defaultValue="openai">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="openai">OpenAI (DALL-E)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h4 className="font-semibold mb-2">Provider Information</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">OpenAI (Emma):</span>
+                    <p className="text-muted-foreground">Best for analysis, structured content, and image generation</p>
+                  </div>
+                  <div>
+                    <span className="font-medium">xAI (Grok):</span>
+                    <p className="text-muted-foreground">Excellent for creative writing and content finalization</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5" />
+                Content Quality Settings
+              </CardTitle>
+              <CardDescription>
+                Configure content generation parameters for optimal quality
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Token Limit</label>
+                  <Select defaultValue="2000">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1000">1,000 tokens</SelectItem>
+                      <SelectItem value="2000">2,000 tokens</SelectItem>
+                      <SelectItem value="4000">4,000 tokens</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Content Style</label>
+                  <Select defaultValue="professional">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="professional">Professional</SelectItem>
+                      <SelectItem value="conversational">Conversational</SelectItem>
+                      <SelectItem value="technical">Technical</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">SEO Focus</label>
+                  <Select defaultValue="high">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Basic</SelectItem>
+                      <SelectItem value="medium">Standard</SelectItem>
+                      <SelectItem value="high">Optimized</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -722,6 +845,19 @@ const [rivenResponse, setRivenResponse] = useState('');
             setSelectedCampaign(null);
           }}
           onCampaignUpdate={loadAllData}
+        />
+      )}
+
+      {/* Blog Preview Modal */}
+      {selectedContent && (
+        <BlogPreviewModal
+          content={selectedContent}
+          isOpen={previewModalOpen}
+          onClose={() => {
+            setPreviewModalOpen(false);
+            setSelectedContent(null);
+          }}
+          onPublish={handlePublishContent}
         />
       )}
     </div>
