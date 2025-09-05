@@ -13,6 +13,39 @@ export default function OptimizedRivenMarketingAI() {
   const [activeTab, setActiveTab] = useState('command-center');
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  
+  // Command Center state
+  const [currentCommand, setCurrentCommand] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [rivenResponse, setRivenResponse] = useState('');
+  
+  // Default command templates
+  const commandTemplates = [
+    {
+      id: '1',
+      title: 'Product Launch',
+      description: 'Launch campaign for new product',
+      command: 'Create a comprehensive product launch campaign for our new software tool. Include social media posts, blog content, and email sequences. Target tech-savvy professionals aged 25-45.'
+    },
+    {
+      id: '2', 
+      title: 'Social Media Boost',
+      description: 'Increase social media engagement',
+      command: 'Generate engaging social media content for the next 2 weeks. Focus on industry insights, tips, and behind-the-scenes content. Optimize for LinkedIn and Twitter.'
+    },
+    {
+      id: '3',
+      title: 'Blog Content Series',
+      description: 'Create educational blog series',
+      command: 'Develop a 5-part blog series about digital transformation trends. Each post should be 1500+ words, SEO-optimized, and include actionable insights for business leaders.'
+    },
+    {
+      id: '4',
+      title: 'Email Campaign',
+      description: 'Newsletter and nurture sequence',
+      command: 'Create a 7-part email nurture sequence for new subscribers. Include welcome message, educational content, case studies, and soft product introductions.'
+    }
+  ];
 
   // Error boundary effect
   React.useEffect(() => {
@@ -172,6 +205,46 @@ export default function OptimizedRivenMarketingAI() {
       });
     }
   }, [toast, handleContentUpdate]);
+
+  // Command Center handlers
+  const handleSendCommand = useCallback(async (command: string, config: any) => {
+    setIsProcessing(true);
+    setRivenResponse('');
+    
+    try {
+      const response = await supabase.functions.invoke('riven-marketing', {
+        body: {
+          action: 'process_command',
+          command,
+          configuration: config
+        }
+      });
+
+      if (response.error) throw response.error;
+
+      setRivenResponse(response.data?.message || 'Command processed successfully');
+      handleCampaignUpdate(); // Refresh campaigns list
+      
+      toast({
+        title: "Command Executed",
+        description: "Riven is processing your marketing command.",
+      });
+    } catch (error) {
+      console.error('Error executing command:', error);
+      setRivenResponse('Error: ' + (error as Error).message);
+      toast({
+        title: "Error",
+        description: "Failed to execute command",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [toast, handleCampaignUpdate]);
+
+  const handleUseTemplate = useCallback((template: any) => {
+    setCurrentCommand(template.command);
+  }, []);
 
   // Loading state and error checking
   const isLoading = campaignsLoading || contentsLoading || socialAccountsLoading || metricsLoading;
@@ -347,7 +420,15 @@ export default function OptimizedRivenMarketingAI() {
             props={{
               campaigns,
               onCampaignUpdate: handleCampaignUpdate,
-              isLoading
+              isLoading,
+              commandTemplates,
+              useTemplate: handleUseTemplate,
+              currentCommand,
+              setCurrentCommand,
+              isProcessing,
+              onSendCommand: handleSendCommand,
+              rivenResponse,
+              campaignId: campaigns[0]?.id || null
             }}
           />
         </TabsContent>
