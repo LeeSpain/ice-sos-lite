@@ -14,8 +14,13 @@ import AdvancedAnalyticsDashboard from './enhanced/AdvancedAnalyticsDashboard';
 import ProfessionalSocialHub from './enhanced/ProfessionalSocialHub';
 import AdvancedCampaignMonitor from './enhanced/AdvancedCampaignMonitor';
 
+// AI & Configuration Components
+import AIModelSettingsPage from '../pages/AIModelSettingsPage';
+import AITrainingPage from '../pages/AITrainingPage';
+import RivenConfigurationPage from '../pages/RivenConfigurationPage';
+
 interface OptimizedComponentLoaderProps {
-  type: 'command-center' | 'content-approval' | 'social-hub' | 'analytics' | 'monitor';
+  type: 'command-center' | 'content-approval' | 'social-hub' | 'analytics' | 'monitor' | 'ai-settings' | 'training-data' | 'riven-config';
   props: any;
   enhanced?: boolean; // Flag to use enhanced components
 }
@@ -61,6 +66,12 @@ export default function OptimizedComponentLoader({ type, props, enhanced = true 
         ) : (
           <CampaignMonitor {...props} />
         );
+      case 'ai-settings':
+        return <AIModelSettingsPage {...props} />;
+      case 'training-data':
+        return <AITrainingPage {...props} />;
+      case 'riven-config':
+        return <RivenConfigurationPage {...props} />;
       default:
         console.warn('Unknown component type:', type);
         return null;

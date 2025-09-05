@@ -510,9 +510,31 @@ export default function OptimizedRivenMarketingAI() {
             type="monitor"
             props={{
               campaigns,
-              onCampaignUpdate: handleCampaignUpdate,
-              isLoading: campaignsLoading
+              contents,
+              socialAccounts,
+              isLoading
             }}
+          />
+        </TabsContent>
+
+        <TabsContent value="ai-settings">
+          <OptimizedComponentLoader
+            type="ai-settings"
+            props={{}}
+          />
+        </TabsContent>
+
+        <TabsContent value="training-data">
+          <OptimizedComponentLoader
+            type="training-data"
+            props={{}}
+          />
+        </TabsContent>
+
+        <TabsContent value="riven-config">
+          <OptimizedComponentLoader
+            type="riven-config"
+            props={{}}
           />
         </TabsContent>
       </Tabs>
