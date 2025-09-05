@@ -437,21 +437,41 @@ async function processMarketingCommand(command: string, userId: string, supabase
   }
 
   try {
-    // Auto-generate content if enabled and campaign exists
-    if (settings?.auto_approve_content && campaign && (schedulingOptions?.mode === 'immediate' || schedulingOptions?.mode === 'optimal')) {
+    // ALWAYS generate content for campaigns - this was the missing piece!
+    if (campaign?.id) {
+      console.log('🎯 Starting content generation for campaign:', campaign.id);
       if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'in_progress', supabase);
-      await generateMarketingContent(campaign.id, supabase, settings, aiConfig);
-      if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'completed', supabase);
       
-      // Auto-publish for immediate mode
-      if (schedulingOptions?.mode === 'immediate' && !publishingControls?.approval_required) {
-        if (workflowId) await updateWorkflowStep(workflowId, 'publishing_content', 'in_progress', supabase);
-        await publishGeneratedContent(campaign.id, supabase);
-        if (workflowId) await updateWorkflowStep(workflowId, 'publishing_content', 'completed', supabase);
+      try {
+        await generateMarketingContent(campaign.id, supabase, settings, aiConfig);
+        console.log('✅ Content generation completed for campaign:', campaign.id);
+        if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'completed', supabase);
+        
+        // Update campaign status to completed
+        await supabase
+          .from('marketing_campaigns')
+          .update({ status: 'completed', completed_at: new Date().toISOString() })
+          .eq('id', campaign.id);
+        
+        // Auto-publish for immediate mode
+        if (schedulingOptions?.mode === 'immediate' && !publishingControls?.approval_required) {
+          if (workflowId) await updateWorkflowStep(workflowId, 'publishing_content', 'in_progress', supabase);
+          await publishGeneratedContent(campaign.id, supabase);
+          if (workflowId) await updateWorkflowStep(workflowId, 'publishing_content', 'completed', supabase);
+        }
+      } catch (contentError) {
+        console.error('❌ Content generation failed:', contentError);
+        if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'failed', supabase, contentError.message);
+        
+        // Update campaign status to failed
+        await supabase
+          .from('marketing_campaigns')
+          .update({ status: 'failed', error_message: contentError.message })
+          .eq('id', campaign.id);
       }
     }
   } catch (error) {
-    console.error('❌ Error in content generation:', error);
+    console.error('❌ Error in content workflow:', error);
     if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'failed', supabase, error.message);
   }
   
