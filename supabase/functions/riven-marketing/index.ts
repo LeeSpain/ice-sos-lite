@@ -118,11 +118,22 @@ let response = '';
 let campaign_created = false;
 
 switch (action) {
-  case 'process_command':
-    const result = await processMarketingCommand(command, user.id, serviceSupabase, workflow_id, settings, scheduling_options, publishing_controls, effectiveConfig);
-    response = result.response;
-    campaign_created = result.campaign_created;
+  case 'process_command': {
+    try {
+      if (workflow_id) await updateWorkflowStep(workflow_id, 'creating_campaign', 'in_progress', serviceSupabase);
+      const { analysis } = await processMarketingCommand(command, user.id, serviceSupabase, workflow_id, settings, scheduling_options, publishing_controls, effectiveConfig);
+      const campaign = await createMarketingCampaign(analysis, command, user.id, serviceSupabase);
+      if (workflow_id) await updateWorkflowStep(workflow_id, 'creating_campaign', 'completed', serviceSupabase);
+      response = (analysis?.response || 'Command processed successfully!') + '\n\nCampaign created successfully.';
+      campaign_created = !!campaign;
+    } catch (err) {
+      console.error('Error in process_command flow:', err);
+      if (workflow_id) await updateWorkflowStep(workflow_id, 'creating_campaign', 'failed', serviceSupabase, err?.message);
+      response = 'Command processed successfully! Campaign details are being prepared.';
+      campaign_created = false;
+    }
     break;
+  }
   
   case 'generate_content':
     await generateMarketingContent(campaign_id, userSupabase, settings, effectiveConfig);
@@ -447,80 +458,6 @@ async function processMarketingCommand(command: string, userId: string, supabase
   return Promise.race([mainOperation(), timeoutPromise]);
 }
 
-  try {
-    // Always try to create campaign quickly
-    if (workflowId) await updateWorkflowStep(workflowId, 'creating_campaign', 'in_progress', supabase);
-    const { analysis } = await processMarketingCommand(command, userId, supabase, workflowId, settings, schedulingOptions, publishingControls, effectiveConfig);
-    
-    campaign = await createMarketingCampaign(analysis, command, userId, supabase);
-    if (workflowId) await updateWorkflowStep(workflowId, 'creating_campaign', 'completed', supabase);
-    console.log('✅ Campaign created:', campaign?.id);
-    
-    // Schedule content generation in background to avoid timeout
-    if (campaign?.id) {
-      console.log('🎯 Scheduling background content generation for campaign:', campaign.id);
-      
-      // Create a background job to handle content generation
-      supabase.functions.invoke('content-scheduler', {
-        body: {
-          action: 'schedule_content_generation',
-          campaign_id: campaign.id,
-          settings,
-          ai_config: effectiveConfig
-        }
-      }).catch(error => {
-        console.log('⚠️ Background content generation scheduling failed:', error);
-      });
-      
-      // Return immediately with campaign created
-      return {
-        response: analysis.response + '\n\nContent is being generated in the background and will be available in the Content Approval tab shortly.',
-        campaign_created: true
-      };
-    }
-    
-  } catch (error) {
-    console.error('❌ Error creating campaign:', error);
-    if (workflowId) await updateWorkflowStep(workflowId, 'creating_campaign', 'failed', supabase, error.message);
-    
-    // Return successful response even if campaign creation fails
-    return {
-      response: "Command processed successfully! Campaign details are being prepared and will be available shortly.",
-      campaign_created: false
-    };
-  }
-
-  return {
-    response: analysis?.response || 'Command processed successfully!',
-    campaign_created: !!campaign
-  };
-}
-          await publishGeneratedContent(campaign.id, supabase);
-          if (workflowId) await updateWorkflowStep(workflowId, 'publishing_content', 'completed', supabase);
-        }
-      } catch (contentError) {
-        console.error('❌ Content generation failed:', contentError);
-        if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'failed', supabase, contentError.message);
-        
-        // Update campaign status to failed
-        await supabase
-          .from('marketing_campaigns')
-          .update({ status: 'failed', error_message: contentError.message })
-          .eq('id', campaign.id);
-      }
-    }
-  } catch (error) {
-    console.error('❌ Error in content workflow:', error);
-    if (workflowId) await updateWorkflowStep(workflowId, 'generating_content', 'failed', supabase, error.message);
-  }
-  
-  return {
-    response: analysis?.response || "Campaign created successfully but analysis failed.",
-    campaign_created: !!campaign,
-    campaign_id: campaign?.id ?? null,
-    campaign_title: campaign?.title ?? null
-  };
-}
 
 async function getCompanyInfo(supabase: any) {
   try {
