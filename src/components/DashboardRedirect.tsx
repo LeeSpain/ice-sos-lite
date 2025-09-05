@@ -1,25 +1,21 @@
 import React from 'react';
-import { useUserRole } from '@/hooks/useUserRole';
-import { useAuth } from '@/contexts/AuthContext';
+import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { Navigate } from 'react-router-dom';
 
 const DashboardRedirect = () => {
-  const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading, isAdmin } = useUserRole();
+  const { user, loading, isAdmin } = useOptimizedAuth();
 
   console.log('🔄 DashboardRedirect:', {
     user: user?.id || 'none',
     userEmail: user?.email,
-    role,
     isAdmin,
-    authLoading,
-    roleLoading,
+    loading,
     currentPath: window.location.pathname,
     href: window.location.href
   });
 
   // Show loading while checking authentication and role
-  if (authLoading || roleLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
         <div className="text-white text-center">
@@ -39,7 +35,7 @@ const DashboardRedirect = () => {
   if (isAdmin) {
     return <Navigate to="/admin-dashboard" replace />;
   } else {
-    return <Navigate to="/full-dashboard" replace />;
+    return <Navigate to="/member-dashboard" replace />;
   }
 };
 

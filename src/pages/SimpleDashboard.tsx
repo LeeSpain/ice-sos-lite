@@ -1,29 +1,26 @@
 import React, { useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useUserRole } from "@/hooks/useUserRole";
+import { useOptimizedAuth } from "@/hooks/useOptimizedAuth";
+import { Navigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 
 const SimpleDashboard = () => {
-  const { user, loading: authLoading } = useAuth();
-  const { role, loading: roleLoading, isAdmin } = useUserRole();
+  const { user, loading, isAdmin } = useOptimizedAuth();
 
   // Debug logging to track the authentication flow
   useEffect(() => {
     console.log('🏠 SimpleDashboard Debug:', {
       user: user?.id || 'none',
       email: user?.email || 'none',
-      role,
       isAdmin,
-      authLoading,
-      roleLoading,
+      loading,
       currentPath: window.location.pathname,
       timestamp: new Date().toISOString()
     });
-  }, [user, role, isAdmin, authLoading, roleLoading]);
+  }, [user, isAdmin, loading]);
 
   // Show loading while checking authentication and role
-  if (authLoading || roleLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
         <div className="text-white text-center">
@@ -46,7 +43,12 @@ const SimpleDashboard = () => {
     );
   }
 
-  // Directly render the Dashboard component for members with email verification banner
+  // Redirect admin users to admin dashboard
+  if (isAdmin) {
+    return <Navigate to="/admin-dashboard" replace />;
+  }
+
+  // Render member dashboard with simplified interface
   return (
     <div>
       <div className="container mx-auto px-4 pt-4">
