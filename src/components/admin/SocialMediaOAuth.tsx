@@ -25,7 +25,7 @@ interface SocialAccount {
 }
 
 interface SocialMediaOAuthProps {
-  accounts: SocialAccount[];
+  accounts: any[];
   onAccountsUpdate: () => void;
 }
 

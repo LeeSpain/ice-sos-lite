@@ -70,12 +70,14 @@ interface Campaign {
   command_input?: string;
 }
 
-interface SocialAccount {
+interface UnifiedSocialAccount {
   id: string;
   platform: string;
-  platform_name: string;
+  platform_name?: string;
+  platform_username?: string;
   connection_status: string;
   updated_at: string;
+  follower_count?: number;
 }
 
 const UnifiedRivenMarketingAI: React.FC = () => {
@@ -85,7 +87,7 @@ const UnifiedRivenMarketingAI: React.FC = () => {
   // State management
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [contents, setContents] = useState<UnifiedContentItem[]>([]);
-  const [socialAccounts, setSocialAccounts] = useState<SocialAccount[]>([]);
+  const [socialAccounts, setSocialAccounts] = useState<UnifiedSocialAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -115,7 +117,7 @@ const [rivenResponse, setRivenResponse] = useState('');
       await Promise.all([
         loadCampaigns(),
         loadContents(),
-        loadSocialAccounts()
+        fetchSocialAccounts()
       ]);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -149,14 +151,27 @@ const [rivenResponse, setRivenResponse] = useState('');
     setContents(data || []);
   };
 
-  const loadSocialAccounts = async () => {
-    const { data, error } = await supabase
-      .from('social_media_oauth')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-    setSocialAccounts(data || []);
+  const fetchSocialAccounts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('social_media_accounts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      // Map database fields to component expected fields
+      const mappedAccounts = (data || []).map((account: any) => ({
+        id: account.id,
+        platform: account.platform,
+        platform_name: account.platform_name || account.platform_username || account.platform,
+        connection_status: account.connection_status || 'disconnected',
+        updated_at: account.updated_at || account.created_at,
+        follower_count: account.follower_count || 0
+      }));
+      setSocialAccounts(mappedAccounts);
+    } catch (error) {
+      console.error('Error fetching social accounts:', error);
+    }
   };
 
   const setupRealtimeSubscriptions = () => {
@@ -694,6 +709,56 @@ const [rivenResponse, setRivenResponse] = useState('');
 
         {/* Settings Tab */}
         <TabsContent value="settings" className="space-y-6">
+          {/* API Configuration Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                API Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-blue-800 mb-2">Required API Keys & Secrets</h4>
+                  <p className="text-sm text-blue-700 mb-3">
+                    To enable social media connections and AI features, configure these API keys in your Supabase Edge Functions secrets:
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <h5 className="font-medium text-blue-800">Social Media APIs:</h5>
+                      <ul className="text-blue-700 ml-4 list-disc">
+                        <li>FACEBOOK_CLIENT_ID</li>
+                        <li>FACEBOOK_CLIENT_SECRET</li>
+                        <li>TWITTER_CLIENT_ID</li>
+                        <li>TWITTER_CLIENT_SECRET</li>
+                        <li>LINKEDIN_CLIENT_ID</li>
+                        <li>LINKEDIN_CLIENT_SECRET</li>
+                        <li>YOUTUBE_CLIENT_ID</li>
+                        <li>YOUTUBE_CLIENT_SECRET</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h5 className="font-medium text-blue-800">AI APIs:</h5>
+                      <ul className="text-blue-700 ml-4 list-disc">
+                        <li>OPENAI_API_KEY ✓</li>
+                        <li>XAI_API_KEY ✓</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="mt-3"
+                    onClick={() => window.open('https://supabase.com/dashboard/project/mqroziggaalltuzoyyao/settings/functions', '_blank')}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Configure API Keys in Supabase
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -839,7 +904,7 @@ const [rivenResponse, setRivenResponse] = useState('');
             <CardContent>
               <SocialMediaOAuth 
                 accounts={socialAccounts}
-                onAccountsUpdate={loadSocialAccounts}
+                onAccountsUpdate={fetchSocialAccounts}
               />
             </CardContent>
           </Card>

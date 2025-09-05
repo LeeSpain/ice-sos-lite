@@ -88,8 +88,8 @@ async function initiateOAuth(platform: string, userId: string, supabase: any) {
       throw new Error(`Unsupported platform: ${platform}`);
   }
 
-  return new Response(JSON.stringify({ 
-    auth_url: authUrl,
+  return new Response(JSON.stringify({
+    authUrl: authUrl,
     state,
     success: true 
   }), {
@@ -122,22 +122,21 @@ async function handleOAuthCallback(platform: string, code: string, state: string
 
   // Store the OAuth data
   const { error } = await supabase
-    .from('social_media_oauth')
+    .from('social_media_accounts')
     .upsert({
       user_id: userId,
       platform,
       platform_user_id: tokenData.platform_user_id,
+      platform_name: tokenData.name,
+      platform_username: tokenData.username,
       access_token: tokenData.access_token,
       refresh_token: tokenData.refresh_token,
       token_expires_at: tokenData.expires_at,
-      platform_username: tokenData.username,
-      platform_name: tokenData.name,
       follower_count: tokenData.follower_count || 0,
-      connection_status: 'active',
-      permissions: tokenData.permissions || [],
-      last_used_at: new Date().toISOString()
+      connection_status: 'connected',
+      last_synced_at: new Date().toISOString()
     }, {
-      onConflict: 'user_id,platform,platform_user_id'
+      onConflict: 'user_id,platform'
     });
 
   if (error) throw error;
@@ -299,7 +298,7 @@ async function exchangeTwitterToken(code: string, state: string, supabase: any) 
 
 async function disconnectAccount(platform: string, userId: string, supabase: any) {
   const { error } = await supabase
-    .from('social_media_oauth')
+    .from('social_media_accounts')
     .update({ connection_status: 'disconnected' })
     .eq('user_id', userId)
     .eq('platform', platform);
