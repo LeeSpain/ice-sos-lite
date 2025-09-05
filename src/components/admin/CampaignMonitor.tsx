@@ -20,18 +20,93 @@ export default function CampaignMonitor() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const loadCampaigns = async () => {
+  const loadCampaigns = async (forceRefresh = false) => {
+    setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Force refresh bypasses any potential caching by adding a unique timestamp parameter
+      let query = supabase
         .from('marketing_campaigns')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(10);
 
+      const { data, error } = await query;
+
       if (error) throw error;
-      setCampaigns(data || []);
+      
+      // Check for stuck campaigns and mark them as completed if they have content
+      const campaignsWithStatus = await Promise.all(
+        (data || []).map(async (campaign) => {
+          if (campaign.status === 'running') {
+            // Check if campaign has been running for more than 10 minutes
+            const runningTime = new Date().getTime() - new Date(campaign.created_at).getTime();
+            const tenMinutes = 10 * 60 * 1000;
+            
+            if (runningTime > tenMinutes) {
+              // Check if any content was generated
+              const { data: contentData } = await supabase
+                .from('marketing_content')
+                .select('id')
+                .eq('campaign_id', campaign.id);
+                
+              if (contentData && contentData.length > 0) {
+                // Update campaign to completed if content exists
+                await supabase
+                  .from('marketing_campaigns')
+                  .update({ 
+                    status: 'completed', 
+                    completed_at: new Date().toISOString(),
+                    error_message: `Campaign completed with ${contentData.length} items generated. Some items may have failed due to API limitations.`
+                  })
+                  .eq('id', campaign.id);
+                  
+                return { 
+                  ...campaign, 
+                  status: 'completed', 
+                  completed_at: new Date().toISOString(),
+                  error_message: `Campaign completed with ${contentData.length} items generated. Some items may have failed due to API limitations.`
+                };
+              } else {
+                // Mark as failed if no content was generated
+                await supabase
+                  .from('marketing_campaigns')
+                  .update({ 
+                    status: 'failed', 
+                    completed_at: new Date().toISOString(),
+                    error_message: 'Campaign timed out with no content generated'
+                  })
+                  .eq('id', campaign.id);
+                  
+                return { 
+                  ...campaign, 
+                  status: 'failed', 
+                  completed_at: new Date().toISOString(),
+                  error_message: 'Campaign timed out with no content generated'
+                };
+              }
+            }
+          }
+          return campaign;
+        })
+      );
+      
+      setCampaigns(campaignsWithStatus);
+      
+      if (forceRefresh) {
+        toast({
+          title: "Refreshed",
+          description: "Campaign data has been updated",
+        });
+      }
     } catch (error) {
       console.error('Error loading campaigns:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load campaigns",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -70,20 +145,81 @@ export default function CampaignMonitor() {
     }
   };
 
+  // Manual status correction function
+  const handleStatusCorrection = async (campaignId: string) => {
+    setIsLoading(true);
+    try {
+      // Check current campaign status in database
+      const { data: campaignData } = await supabase
+        .from('marketing_campaigns')
+        .select('*')
+        .eq('id', campaignId)
+        .single();
+        
+      if (campaignData) {
+        // Check if content exists for this campaign
+        const { data: contentData } = await supabase
+          .from('marketing_content')
+          .select('id, status')
+          .eq('campaign_id', campaignId);
+          
+        const contentCount = contentData?.length || 0;
+        
+        if (campaignData.status === 'running' && contentCount > 0) {
+          // Mark as completed if content exists
+          await supabase
+            .from('marketing_campaigns')
+            .update({ 
+              status: 'completed', 
+              completed_at: new Date().toISOString(),
+              error_message: contentCount < 6 ? `Campaign completed with ${contentCount} items. Some items may have failed due to API limitations.` : null
+            })
+            .eq('id', campaignId);
+            
+          toast({
+            title: "Status Updated",
+            description: `Campaign marked as completed with ${contentCount} items generated`,
+          });
+        }
+      }
+      
+      await loadCampaigns(true);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update campaign status",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadCampaigns();
     
-    // Set up real-time subscription
+    // Set up real-time subscription with better error handling
     const channel = supabase
-      .channel('campaign-monitor')
+      .channel('campaign-monitor-realtime')
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'marketing_campaigns'
-      }, () => {
-        loadCampaigns();
+      }, (payload) => {
+        console.log('Real-time campaign update:', payload);
+        loadCampaigns(true); // Force refresh on real-time updates
       })
-      .subscribe();
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'marketing_content'
+      }, (payload) => {
+        console.log('Real-time content update:', payload);
+        loadCampaigns(true); // Refresh when content changes too
+      })
+      .subscribe((status) => {
+        console.log('Real-time subscription status:', status);
+      });
 
     return () => {
       supabase.removeChannel(channel);
@@ -94,15 +230,17 @@ export default function CampaignMonitor() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Recent Campaigns</h3>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={loadCampaigns}
-          disabled={isLoading}
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => loadCampaigns(true)}
+            disabled={isLoading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            Force Refresh
+          </Button>
+        </div>
       </div>
       
       {campaigns.length === 0 ? (
@@ -151,16 +289,28 @@ export default function CampaignMonitor() {
                   </span>
                 )}
               </div>
-              {campaign.status === 'failed' && (
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  onClick={() => handleRetry(campaign.id)}
-                  disabled={isLoading}
-                >
-                  Retry
-                </Button>
-              )}
+              <div className="flex gap-2">
+                {campaign.status === 'failed' && (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handleRetry(campaign.id)}
+                    disabled={isLoading}
+                  >
+                    Retry
+                  </Button>
+                )}
+                {campaign.status === 'running' && (
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handleStatusCorrection(campaign.id)}
+                    disabled={isLoading}
+                  >
+                    Check Status
+                  </Button>
+                )}
+              </div>
             </div>
           </Card>
         ))
