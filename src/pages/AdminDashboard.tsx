@@ -45,6 +45,13 @@ const AdminDashboard: React.FC = () => {
   useScrollToTop();
   
   console.log('🚀 AdminDashboard component is rendering at:', window.location.pathname);
+  console.log('🚀 AdminDashboard: Full URL details:', {
+    pathname: window.location.pathname,
+    href: window.location.href,
+    search: window.location.search,
+    hash: window.location.hash,
+    timestamp: new Date().toISOString()
+  });
   
   return (
     <Routes>

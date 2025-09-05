@@ -7,19 +7,23 @@ interface AdminProtectedRouteProps {
 }
 
 const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
-  const { user, loading, isAdmin } = useOptimizedAuth();
+  const { user, loading, isAdmin, role } = useOptimizedAuth();
 
-  console.log('🔐 AdminProtectedRoute:', {
+  console.log('🔐 AdminProtectedRoute - Enhanced Debug:', {
     user: user?.id || 'none',
+    userEmail: user?.email,
     isAdmin,
+    role,
     loading,
     currentPath: window.location.pathname,
-    shouldRedirect: !loading && user && !isAdmin
+    href: window.location.href,
+    shouldRedirect: !loading && user && !isAdmin,
+    timestamp: new Date().toISOString()
   });
 
   // Show loading while checking authentication and role
   if (loading) {
-    console.log('🔐 AdminProtectedRoute: Still loading, showing spinner');
+    console.log('🔐 AdminProtectedRoute: Still loading auth/role, showing spinner');
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
         <div className="text-white text-center">
@@ -32,16 +36,26 @@ const AdminProtectedRoute = ({ children }: AdminProtectedRouteProps) => {
 
   // Redirect to auth if not logged in
   if (!user) {
-    console.log('🔐 AdminProtectedRoute: No user, redirecting to auth');
+    console.log('🔐 AdminProtectedRoute: No user found, redirecting to auth');
     return <Navigate to="/auth" replace />;
   }
 
+  // Enhanced admin check with explicit role verification
+  const isDefinitelyAdmin = role === 'admin' || isAdmin;
+  console.log('🔐 AdminProtectedRoute: Admin check result:', { 
+    role, 
+    isAdmin, 
+    isDefinitelyAdmin,
+    willRedirect: !isDefinitelyAdmin 
+  });
+
   // Only redirect if we have a definitive role and it's not admin
-  if (!isAdmin) {
+  if (!isDefinitelyAdmin) {
     console.log('🔐 AdminProtectedRoute: User is not admin, redirecting to member dashboard');
     return <Navigate to="/member-dashboard" replace />;
   }
 
+  console.log('🔐 AdminProtectedRoute: Admin verified, rendering children');
   return <>{children}</>;
 };
 
