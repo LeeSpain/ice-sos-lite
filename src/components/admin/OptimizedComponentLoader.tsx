@@ -2,7 +2,9 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { EnhancedCommandCenter } from './EnhancedCommandCenter';
 import { ContentApprovalDashboard } from './ContentApprovalDashboard';
+import { RealContentApproval } from './RealContentApproval';
 import { SocialHub } from './SocialHub';
+import { RealSocialMediaOAuth } from './RealSocialMediaOAuth';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import CampaignMonitor from './CampaignMonitor';
 
@@ -19,9 +21,14 @@ export default function OptimizedComponentLoader({ type, props }: OptimizedCompo
       case 'command-center':
         return <EnhancedCommandCenter {...props} />;
       case 'content-approval':
-        return <ContentApprovalDashboard {...props} />;
+        return <RealContentApproval 
+          contents={props.contents || []}
+          onContentApproval={props.onContentApproval || (() => {})}
+          onPublishContent={props.onPublishContent || (() => {})}
+          isLoading={props.isLoading || false}
+        />;
       case 'social-hub':
-        return <SocialHub {...props} />;
+        return <RealSocialMediaOAuth onAccountsUpdate={props.onAccountsUpdate || (() => {})} />;
       case 'analytics':
         return <AnalyticsDashboard {...props} />;
       case 'monitor':

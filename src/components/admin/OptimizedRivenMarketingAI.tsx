@@ -129,13 +129,15 @@ export default function OptimizedRivenMarketingAI() {
     
     return {
       totalCampaigns: campaignList.length,
-      activeCampaigns: campaignList.filter((c: any) => ['running', 'scheduled'].includes(c?.status)).length,
+      activeCampaigns: campaignList.filter((c: any) => ['running', 'active'].includes(c?.status)).length,
       completedCampaigns: campaignList.filter((c: any) => c?.status === 'completed').length,
       totalContent: contentList.length,
       publishedContent: contentList.filter((c: any) => c?.status === 'published').length,
-      pendingContent: metrics.pendingContent || 0,
-      connectedAccounts: metrics.connectedAccounts || 0,
-      totalAccounts: accountList.length
+      pendingContent: contentList.filter((c: any) => ['draft', 'pending'].includes(c?.status)).length,
+      connectedAccounts: accountList.filter((a: any) => a?.connection_status === 'connected').length,
+      totalAccounts: accountList.length,
+      totalReach: metrics?.total_reach || 0,
+      totalEngagement: metrics?.total_engagement || 0
     };
   }, [campaigns, contents, socialAccounts, metrics]);
 
@@ -434,7 +436,8 @@ export default function OptimizedRivenMarketingAI() {
               isProcessing,
               onSendCommand: handleSendCommand,
               rivenResponse,
-              campaignId: (campaigns && campaigns.length > 0) ? campaigns[0]?.id : null
+              campaignId: (campaigns && campaigns.length > 0) ? campaigns[0]?.id : null,
+              metrics: stats
             }}
           />
         </TabsContent>

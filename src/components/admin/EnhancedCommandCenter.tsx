@@ -49,6 +49,7 @@ interface CommandCenterProps {
   useTemplate: (template: any) => void;
   rivenResponse: string;
   campaignId?: string;
+  metrics?: any;
 }
 
 interface CampaignStatus {
@@ -99,7 +100,8 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   commandTemplates,
   useTemplate,
   rivenResponse,
-  campaignId
+  campaignId,
+  metrics
 }) => {
   const { toast } = useToast();
   const [activeCampaigns, setActiveCampaigns] = useState<CampaignStatus[]>([]);
@@ -317,22 +319,16 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   };
 
   const calculateEstimatedReach = () => {
-    // More realistic reach calculation for family safety niche
-    const platformMultipliers = {
-      'facebook': 800,
-      'instagram': 600,
-      'twitter': 400,
-      'linkedin': 300,
-      'youtube': 1200,
-      'blog': 500,
-      'email': 200
-    };
+    // Calculate real reach from actual analytics data
+    const realAnalytics = metrics?.totalReach || 0;
     
-    const totalReach = selectedPlatforms.reduce((sum, platform) => {
-      return sum + (platformMultipliers[platform] || 500) * totalPosts[0];
-    }, 0);
+    if (realAnalytics > 0) {
+      // Use real analytics data if available
+      return realAnalytics;
+    }
     
-    return Math.round(totalReach);
+    // Show zero or "No data yet" instead of fake calculations
+    return 0;
   };
 
   const handleSendCommand = () => {
@@ -496,8 +492,10 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
               <div className="text-sm text-muted-foreground">Platforms</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{calculateEstimatedReach().toLocaleString()}</div>
-              <div className="text-sm text-muted-foreground">Est. Reach</div>
+              <div className="text-2xl font-bold text-green-600">
+                {calculateEstimatedReach() > 0 ? calculateEstimatedReach().toLocaleString() : 'No data yet'}
+              </div>
+              <div className="text-sm text-muted-foreground">Real Reach</div>
             </div>
           </div>
 
@@ -664,11 +662,11 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
             </Button>
             <div className="grid grid-cols-2 gap-4 text-center text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
               <div>
-                <div className="font-medium text-primary">Est. Reach</div>
-                <div>{calculateEstimatedReach().toLocaleString()}</div>
+                <div className="font-medium text-primary">Real Reach</div>
+                <div>{calculateEstimatedReach() > 0 ? calculateEstimatedReach().toLocaleString() : 'No data yet'}</div>
               </div>
               <div>
-                <div className="font-medium text-primary">Est. Platforms</div>
+                <div className="font-medium text-primary">Selected Platforms</div>
                 <div>{selectedPlatforms.length}</div>
               </div>
             </div>
