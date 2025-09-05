@@ -82,29 +82,59 @@ const AdvancedCampaignMonitor: React.FC = () => {
   const loadCampaigns = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch campaigns with real content and analytics data
+      const { data: campaignsData, error: campaignsError } = await supabase
         .from('marketing_campaigns')
         .select('*')
         .order(sortBy, { ascending: sortOrder === 'asc' });
 
-      if (error) throw error;
-      
-      // Enhanced campaigns with mock metrics
-      const enhancedCampaigns = (data || []).map(campaign => ({
-        ...campaign,
-        content_generated: Math.floor(Math.random() * 20) + 5,
-        content_approved: Math.floor(Math.random() * 15) + 3,
-        content_published: Math.floor(Math.random() * 10) + 2,
-        performance_metrics: {
-          views: Math.floor(Math.random() * 10000) + 1000,
-          engagement: Math.floor(Math.random() * 500) + 100,
-          clicks: Math.floor(Math.random() * 200) + 50,
-          conversions: Math.floor(Math.random() * 20) + 5,
-          reach: Math.floor(Math.random() * 15000) + 2000,
-          ctr: Math.random() * 5 + 1,
-          engagement_rate: Math.random() * 8 + 2
-        }
-      }));
+      if (campaignsError) throw campaignsError;
+
+      // Fetch real content counts and analytics for each campaign
+      const enhancedCampaigns = await Promise.all(
+        (campaignsData || []).map(async (campaign) => {
+          // Get real content counts
+          const { data: contentData } = await supabase
+            .from('marketing_content')
+            .select('status')
+            .eq('campaign_id', campaign.id);
+
+          const content_generated = contentData?.length || 0;
+          const content_approved = contentData?.filter(c => c.status === 'approved').length || 0;
+          const content_published = contentData?.filter(c => c.status === 'published').length || 0;
+
+          // Get real analytics data
+          const { data: analyticsData } = await supabase
+            .from('marketing_analytics')
+            .select('metric_type, metric_value')
+            .eq('campaign_id', campaign.id);
+
+          // Aggregate analytics by metric type
+          const analytics = analyticsData?.reduce((acc, metric) => {
+            if (!acc[metric.metric_type]) acc[metric.metric_type] = 0;
+            acc[metric.metric_type] += Number(metric.metric_value) || 0;
+            return acc;
+          }, {} as Record<string, number>) || {};
+
+          const performance_metrics = {
+            views: analytics.views || 0,
+            engagement: analytics.engagement || 0,
+            clicks: analytics.clicks || 0,
+            conversions: analytics.conversions || 0,
+            reach: analytics.reach || 0,
+            ctr: analytics.clicks && analytics.views ? (analytics.clicks / analytics.views * 100) : 0,
+            engagement_rate: analytics.engagement && analytics.reach ? (analytics.engagement / analytics.reach * 100) : 0
+          };
+
+          return {
+            ...campaign,
+            content_generated,
+            content_approved,
+            content_published,
+            performance_metrics
+          };
+        })
+      );
       
       setCampaigns(enhancedCampaigns);
     } catch (error) {
