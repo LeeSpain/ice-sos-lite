@@ -3238,6 +3238,144 @@ export type Database = {
           },
         ]
       }
+      social_media_engagement: {
+        Row: {
+          content_id: string
+          id: string
+          metadata: Json | null
+          metric_type: string
+          metric_value: number
+          platform: string
+          platform_post_id: string
+          recorded_at: string
+        }
+        Insert: {
+          content_id: string
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          metric_value?: number
+          platform: string
+          platform_post_id: string
+          recorded_at?: string
+        }
+        Update: {
+          content_id?: string
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          metric_value?: number
+          platform?: string
+          platform_post_id?: string
+          recorded_at?: string
+        }
+        Relationships: []
+      }
+      social_media_oauth: {
+        Row: {
+          access_token: string
+          connection_status: string
+          created_at: string
+          follower_count: number | null
+          id: string
+          last_used_at: string | null
+          permissions: Json | null
+          platform: string
+          platform_name: string | null
+          platform_user_id: string
+          platform_username: string | null
+          refresh_token: string | null
+          token_expires_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          connection_status?: string
+          created_at?: string
+          follower_count?: number | null
+          id?: string
+          last_used_at?: string | null
+          permissions?: Json | null
+          platform: string
+          platform_name?: string | null
+          platform_user_id: string
+          platform_username?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          connection_status?: string
+          created_at?: string
+          follower_count?: number | null
+          id?: string
+          last_used_at?: string | null
+          permissions?: Json | null
+          platform?: string
+          platform_name?: string | null
+          platform_user_id?: string
+          platform_username?: string | null
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_media_posting_queue: {
+        Row: {
+          content_id: string
+          created_at: string
+          engagement_metrics: Json | null
+          error_message: string | null
+          id: string
+          max_retries: number | null
+          oauth_account_id: string | null
+          platform: string
+          platform_post_id: string | null
+          posted_at: string | null
+          retry_count: number | null
+          scheduled_time: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          engagement_metrics?: Json | null
+          error_message?: string | null
+          id?: string
+          max_retries?: number | null
+          oauth_account_id?: string | null
+          platform: string
+          platform_post_id?: string | null
+          posted_at?: string | null
+          retry_count?: number | null
+          scheduled_time: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          engagement_metrics?: Json | null
+          error_message?: string | null
+          id?: string
+          max_retries?: number | null
+          oauth_account_id?: string | null
+          platform?: string
+          platform_post_id?: string | null
+          posted_at?: string | null
+          retry_count?: number | null
+          scheduled_time?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       social_platform_configs: {
         Row: {
           api_version: string | null

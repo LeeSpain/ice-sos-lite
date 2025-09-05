@@ -143,12 +143,12 @@ serve(async (req) => {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${openaiApiKey}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'gpt-image-1',
+              model: 'dall-e-3',
               prompt: improvedPrompt,
               n: 1,
               size: '1024x1024',
-              response_format: 'b64_json',
-              background: 'transparent',
+              quality: 'hd',
+              response_format: 'b64_json'
             })
           });
           const imgData = await imgRes.json();
@@ -167,7 +167,7 @@ serve(async (req) => {
             prompt: improvedPrompt,
             generated_image_url: dataUrl,
             status: 'completed',
-            generation_metadata: { model: 'gpt-image-1', size: '1024x1024', provider: 'openai' }
+            generation_metadata: { model: 'dall-e-3', size: '1024x1024', provider: 'openai' }
           });
 
           return new Response(JSON.stringify({
@@ -235,7 +235,7 @@ serve(async (req) => {
 async function loadAiConfig(supabase: any) {
   const fallback = {
     providers: {
-      openai: { enabled: true, model: 'gpt-4o-mini' },
+      openai: { enabled: true, model: 'gpt-4.1-2025-04-14' },
       xai: { enabled: false, model: 'grok-beta' }
     },
     stages: {
@@ -279,13 +279,13 @@ async function callLLM(
   options?: { model?: string; maxTokens?: number }
 ) {
   const provider = chooseProviderForStage(aiConfig, stage);
-  let model = options?.model || aiConfig?.providers?.[provider]?.model || (provider === 'openai' ? 'gpt-4o-mini' : 'grok-beta');
+  let model = options?.model || aiConfig?.providers?.[provider]?.model || (provider === 'openai' ? 'gpt-4.1-2025-04-14' : 'grok-beta');
   const maxTokens = options?.maxTokens ?? (stage === 'text' ? 500 : 1000);
   console.log(`🤖 AI routing -> stage=${stage} provider=${provider} model=${model}`);
   // Sanitize/normalize model for OpenAI to avoid unsupported IDs
   if (provider === 'openai') {
-    const unsafeModels = ['gpt-5-2025-08-07', 'gpt-5-mini-2025-08-07'];
-    if (unsafeModels.includes(model)) model = 'gpt-4o-mini';
+    const validModels = ['gpt-4.1-2025-04-14', 'gpt-4.1-mini-2025-04-14', 'gpt-4o', 'gpt-4o-mini'];
+    if (!validModels.includes(model)) model = 'gpt-4.1-2025-04-14';
     return await openAIChat(messages, model, maxTokens);
   }
   if (provider === 'xai') {
