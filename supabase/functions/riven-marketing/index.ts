@@ -624,11 +624,8 @@ async function createMarketingCampaign(analysis: any, command: string, userId: s
 async function generateMarketingContent(campaignId: string, supabase: any, settings?: any, aiConfig?: any) {
   console.log('🎯 Generating marketing content for campaign:', campaignId);
   
-  // Check if we have AI providers available
+  // If no AI providers are configured, create basic draft content so the UI has something to show
   if (!openaiApiKey && !xaiApiKey) {
-    console.error('❌ No AI providers configured - creating basic content');
-    
-    // Create basic content without AI
     const basicContent = {
       campaign_id: campaignId,
       platform: 'blog',
@@ -641,98 +638,97 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
       slug: `content-${Date.now()}`,
       keywords: ['family', 'safety', 'technology']
     };
-    
-    const { data: content, error: insertError } = await supabase
+
+    const { error: insertError } = await supabase
       .from('marketing_content')
-      .insert(basicContent)
-      .select()
-      .single();
-      
+      .insert(basicContent);
+
     if (insertError) {
       console.error('❌ Failed to create basic content:', insertError);
-      throw new Error('Failed to create content: ' + insertError.message);
+      throw new Error('Failed to create basic content: ' + insertError.message);
     }
-    
-    console.log('✅ Basic content created:', content.id);
-    return content;
-  }
-  
-  // Get campaign details
-  const { data: campaign, error: campaignError } = await supabase
-    .from('marketing_campaigns')
-    .select('*')
-    .eq('id', campaignId)
-    .single();
-    
-  if (campaignError || !campaign) {
-    console.error('Failed to get campaign:', campaignError);
-    throw new Error('Campaign not found');
+
+    console.log('✅ Basic content created (no AI provider)');
+    return true;
   }
 
-  // Generate content for different platforms
-  const platforms = campaign.target_audience?.platforms || ['Facebook', 'Instagram'];
-  const contentTypes = ['blog_post']; // Start with blog posts only to ensure success
-  
-  console.log(`🎯 Generating content for platforms: ${platforms.join(', ')}`);
-  
-  for (const platform of platforms) {
-    for (const contentType of contentTypes) {
-      try {
-        console.log(`📝 Generating ${contentType} for ${platform}...`);
-        const content = await generatePlatformContent(campaign, platform, contentType, supabase, aiConfig);
-        console.log(`✅ Generated ${contentType} for ${platform}:`, content?.id);
-      } catch (error) {
-        console.error(`❌ Failed to generate ${contentType} for ${platform}:`, error);
-        
-        // Create fallback content even if AI fails
-        const fallbackContent = {
-          campaign_id: campaignId,
-          platform: platform.toLowerCase(),
-          content_type: contentType,
-          title: `${campaign.title} - ${platform} Content`,
-          body_text: `Content for ${campaign.title}. Please edit this content to match your campaign goals.`,
-          status: 'draft',
-          seo_title: campaign.title,
-          meta_description: campaign.description || 'Please edit this meta description',
-          slug: `${campaign.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`,
-          keywords: ['family', 'safety', 'technology']
-        };
-        
-        const { data: fallback, error: fallbackError } = await supabase
-          .from('marketing_content')
-          .insert(fallbackContent)
-          .select()
-          .single();
-          
-        if (!fallbackError) {
-          console.log(`✅ Created fallback content for ${platform}:`, fallback.id);
-        }
-      }
+  try {
+    // Get campaign details
+    const { data: campaign, error: campaignError } = await supabase
+      .from('marketing_campaigns')
+      .select('*')
+      .eq('id', campaignId)
+      .single();
+
+    if (campaignError || !campaign) {
+      throw new Error('Campaign not found');
     }
-  }
-}
+
+    // Generate content for different platforms
+    const platforms = campaign.target_audience?.platforms || ['Facebook', 'Instagram'];
+    const contentTypes = ['blog_post']; // Keep it simple and reliable first
+
+    console.log(`🎯 Generating content for platforms: ${platforms.join(', ')}`);
+
+    for (const platform of platforms) {
+      for (const contentType of contentTypes) {
+        try {
+          console.log(`📝 Generating ${contentType} for ${platform}...`);
+          const content = await generatePlatformContent(campaign, platform, contentType, supabase, aiConfig);
+
+          // Insert generated content
+          const insertData: any = {
+            campaign_id: campaignId,
+            platform: platform.toLowerCase(),
             content_type: contentType,
-            title: content.title,
-            body_text: content.body || content.content,
-            hashtags: content.hashtags,
-            status: platform === 'blog' ? 'pending_review' : 'draft'
+            title: content?.title || `${campaign.title} - ${platform}`,
+            body_text: content?.body || content?.content || '',
+            hashtags: content?.hashtags || null,
+            status: 'draft'
           };
 
-        // Add blog-specific fields if it's a blog post
-        if (platform === 'blog' && content.blogData) {
-          insertData.seo_title = content.blogData.seo_title;
-          insertData.meta_description = content.blogData.meta_description;
-          insertData.slug = content.blogData.slug;
-          insertData.keywords = content.blogData.keywords;
-          insertData.featured_image_alt = content.blogData.featured_image_alt;
-          insertData.content_sections = content.blogData.content_sections;
-          insertData.reading_time = content.blogData.reading_time;
-          insertData.seo_score = content.blogData.seo_score;
+          // Blog-specific fields (when provided)
+          if (platform === 'blog' && content?.blogData) {
+            insertData.seo_title = content.blogData.seo_title;
+            insertData.meta_description = content.blogData.meta_description;
+            insertData.slug = content.blogData.slug;
+            insertData.keywords = content.blogData.keywords;
+            insertData.featured_image_alt = content.blogData.featured_image_alt;
+            insertData.content_sections = content.blogData.content_sections;
+            insertData.reading_time = content.blogData.reading_time;
+            insertData.seo_score = content.blogData.seo_score;
+          }
+
+          const { error: genInsertError } = await supabase
+            .from('marketing_content')
+            .insert(insertData);
+
+          if (genInsertError) throw genInsertError;
+
+          console.log(`✅ Inserted generated ${contentType} for ${platform}`);
+        } catch (genErr) {
+          console.error(`❌ Failed to generate ${contentType} for ${platform}:`, genErr);
+
+          // Fallback content so UX continues
+          const fallbackContent = {
+            campaign_id: campaignId,
+            platform: platform.toLowerCase(),
+            content_type: contentType,
+            title: `${campaign.title} - ${platform} Content`,
+            body_text: `Content for ${campaign.title}. Please edit to match your goals.`,
+            status: 'draft',
+            seo_title: campaign.title,
+            meta_description: campaign.description || 'Please edit this meta description',
+            slug: `${campaign.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`,
+            keywords: ['family', 'safety', 'technology']
+          };
+
+          await supabase
+            .from('marketing_content')
+            .insert(fallbackContent);
+
+          console.log(`✅ Created fallback ${contentType} for ${platform}`);
         }
-        
-        await supabase
-          .from('marketing_content')
-          .insert(insertData);
       }
     }
 
