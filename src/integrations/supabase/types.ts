@@ -3862,6 +3862,7 @@ export type Database = {
       training_data: {
         Row: {
           answer: string
+          audience: string | null
           category: string
           confidence_score: number | null
           created_at: string
@@ -3870,11 +3871,13 @@ export type Database = {
           last_used_at: string | null
           question: string
           status: string
+          tags: string[] | null
           updated_at: string
           usage_count: number | null
         }
         Insert: {
           answer: string
+          audience?: string | null
           category?: string
           confidence_score?: number | null
           created_at?: string
@@ -3883,11 +3886,13 @@ export type Database = {
           last_used_at?: string | null
           question: string
           status?: string
+          tags?: string[] | null
           updated_at?: string
           usage_count?: number | null
         }
         Update: {
           answer?: string
+          audience?: string | null
           category?: string
           confidence_score?: number | null
           created_at?: string
@@ -3896,6 +3901,7 @@ export type Database = {
           last_used_at?: string | null
           question?: string
           status?: string
+          tags?: string[] | null
           updated_at?: string
           usage_count?: number | null
         }

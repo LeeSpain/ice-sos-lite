@@ -21,6 +21,8 @@ interface TrainingData {
   usage_count?: number;
   last_used_at?: string;
   created_by?: string;
+  audience?: string;
+  tags?: string[];
 }
 
 interface TrainingManagerProps {
@@ -37,12 +39,16 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
   const [newQuestion, setNewQuestion] = useState('');
   const [newAnswer, setNewAnswer] = useState('');
   const [newCategory, setNewCategory] = useState('general');
+  const [newAudience, setNewAudience] = useState<'customer' | 'internal' | 'admin'>('customer');
+  const [newTags, setNewTags] = useState('');
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editQuestion, setEditQuestion] = useState('');
   const [editAnswer, setEditAnswer] = useState('');
   const [editCategory, setEditCategory] = useState('general');
   const [editStatus, setEditStatus] = useState('pending');
+  const [editAudience, setEditAudience] = useState<'customer' | 'internal' | 'admin'>('customer');
+  const [editTags, setEditTags] = useState('');
 
   useEffect(() => {
     loadTrainingData();
