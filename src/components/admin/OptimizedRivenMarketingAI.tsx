@@ -82,18 +82,18 @@ export default function OptimizedRivenMarketingAI() {
 
   const { data: metrics = {}, loading: metricsLoading } = useBatchQueries(additionalQueries);
 
-  // Memoized computed values
+  // Memoized computed values with proper null checks
   const stats = useMemo(() => {
-    const campaignList = campaigns as any[];
-    const contentList = contents as any[];
-    const accountList = socialAccounts as any[];
+    const campaignList = Array.isArray(campaigns) ? campaigns : [];
+    const contentList = Array.isArray(contents) ? contents : [];
+    const accountList = Array.isArray(socialAccounts) ? socialAccounts : [];
     
     return {
       totalCampaigns: campaignList.length,
-      activeCampaigns: campaignList.filter((c: any) => ['running', 'scheduled'].includes(c.status)).length,
-      completedCampaigns: campaignList.filter((c: any) => c.status === 'completed').length,
+      activeCampaigns: campaignList.filter((c: any) => ['running', 'scheduled'].includes(c?.status)).length,
+      completedCampaigns: campaignList.filter((c: any) => c?.status === 'completed').length,
       totalContent: contentList.length,
-      publishedContent: contentList.filter((c: any) => c.status === 'published').length,
+      publishedContent: contentList.filter((c: any) => c?.status === 'published').length,
       pendingContent: metrics.pendingContent || 0,
       connectedAccounts: metrics.connectedAccounts || 0,
       totalAccounts: accountList.length
