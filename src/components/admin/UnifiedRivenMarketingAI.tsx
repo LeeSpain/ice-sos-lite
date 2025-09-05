@@ -39,6 +39,7 @@ import { useSiteContent } from '@/hooks/useSiteContent';
 import { EnhancedCommandCenter } from '@/components/admin/EnhancedCommandCenter';
 import { EnhancedMarketingCampaigns } from '@/components/admin/EnhancedMarketingCampaigns';
 import { CampaignDetailsModal } from '@/components/admin/CampaignDetailsModal';
+import SocialMediaOAuth from '@/components/admin/SocialMediaOAuth';
 
 interface UnifiedContentItem {
   id: string;
@@ -72,10 +73,9 @@ interface Campaign {
 interface SocialAccount {
   id: string;
   platform: string;
-  account_name: string;
-  is_active: boolean;
-  follower_count?: number;
-  last_sync_at?: string;
+  platform_name: string;
+  connection_status: string;
+  updated_at: string;
 }
 
 const UnifiedRivenMarketingAI: React.FC = () => {
@@ -151,7 +151,7 @@ const [rivenResponse, setRivenResponse] = useState('');
 
   const loadSocialAccounts = async () => {
     const { data, error } = await supabase
-      .from('social_media_accounts')
+      .from('social_media_oauth')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -377,7 +377,7 @@ const [rivenResponse, setRivenResponse] = useState('');
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <Badge className="bg-orange-500 text-white px-3 py-1">
+            <Badge className="bg-orange-500 text-white px-3 py-1">
             {stats.pendingApproval} Pending Approval
           </Badge>
           <Button onClick={loadAllData} variant="outline">
@@ -447,7 +447,7 @@ const [rivenResponse, setRivenResponse] = useState('');
           <CardContent className="p-4">
             <div className="text-center">
               <Users className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-              <p className="text-2xl font-bold text-purple-600">{socialAccounts.filter(a => a.is_active).length}</p>
+              <p className="text-2xl font-bold text-purple-600">{socialAccounts.filter(a => a.connection_status === 'connected').length}</p>
               <p className="text-xs text-muted-foreground">Connected</p>
             </div>
           </CardContent>
@@ -640,24 +640,17 @@ const [rivenResponse, setRivenResponse] = useState('');
                   <Card key={account.id}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <Badge variant={account.is_active ? "default" : "secondary"}>
+                        <Badge variant={account.connection_status === 'connected' ? "default" : "secondary"}>
                           {account.platform}
                         </Badge>
-                        <Badge variant={account.is_active ? "default" : "outline"}>
-                          {account.is_active ? 'Active' : 'Inactive'}
+                        <Badge variant={account.connection_status === 'connected' ? "default" : "outline"}>
+                          {account.connection_status === 'connected' ? 'Connected' : 'Disconnected'}
                         </Badge>
                       </div>
-                      <h3 className="font-medium">{account.account_name}</h3>
-                      {account.follower_count && (
-                        <p className="text-sm text-muted-foreground">
-                          {account.follower_count.toLocaleString()} followers
-                        </p>
-                      )}
-                      {account.last_sync_at && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Last sync: {formatDate(account.last_sync_at)}
-                        </p>
-                      )}
+                      <h3 className="font-medium">{account.platform_name}</h3>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Last updated: {formatDate(account.updated_at)}
+                      </p>
                     </CardContent>
                   </Card>
                 ))}
@@ -830,6 +823,24 @@ const [rivenResponse, setRivenResponse] = useState('');
                   </Select>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Share2 className="h-5 w-5" />
+                Social Media Connections
+              </CardTitle>
+              <CardDescription>
+                Connect your social media accounts to enable automated posting and engagement
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SocialMediaOAuth 
+                accounts={socialAccounts}
+                onAccountsUpdate={loadSocialAccounts}
+              />
             </CardContent>
           </Card>
         </TabsContent>

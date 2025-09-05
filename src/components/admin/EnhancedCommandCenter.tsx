@@ -348,162 +348,38 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Real-time Campaign Status */}
-      {activeCampaigns.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Active Campaigns
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowCampaignManager(!showCampaignManager)}
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Manage
-              </Button>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {activeCampaigns.slice(0, 3).map((campaign) => (
-                <Card key={campaign.id} className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium truncate">{campaign.name}</h4>
-                    <Badge 
-                      variant={campaign.status === 'running' ? 'default' : 'secondary'}
-                      className="ml-2"
-                    >
-                      {campaign.status}
-                    </Badge>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Progress</span>
-                      <span>{campaign.progress}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-primary h-2 rounded-full transition-all"
-                        style={{ width: `${campaign.progress}%` }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-xs text-muted-foreground">
-                      <span>{campaign.publishedContent} published</span>
-                      <span>{campaign.scheduledContent} scheduled</span>
-                    </div>
-                    <div className="flex gap-1 mt-2">
-                      {campaign.platforms.map((platform) => {
-                        const platformInfo = platforms.find(p => p.id === platform);
-                        if (!platformInfo) return null;
-                        const Icon = platformInfo.icon;
-                        return (
-                          <Icon 
-                            key={platform} 
-                            className="h-4 w-4" 
-                            style={{ color: platformInfo.color }}
-                          />
-                        );
-                      })}
-                    </div>
-                    <div className="flex gap-2 mt-3">
-                      {campaign.status === 'running' ? (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => pauseCampaign(campaign.id)}
-                        >
-                          <PauseCircle className="h-3 w-3 mr-1" />
-                          Pause
-                        </Button>
-                      ) : (
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => resumeCampaign(campaign.id)}
-                        >
-                          <PlayCircle className="h-3 w-3 mr-1" />
-                          Resume
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))}
+      <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-2xl font-bold flex items-center gap-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Wand2 className="h-6 w-6 text-primary" />
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Social Media Account Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Globe className="h-5 w-5" />
-            Social Media Accounts
+            Riven AI Command Center
           </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {platforms.filter(p => p.id !== 'blog' && p.id !== 'email').map((platform) => {
-              const connectedAccount = socialAccounts.find(acc => acc.platform === platform.id);
-              const Icon = platform.icon;
-              
-              return (
-                <Card key={platform.id} className="p-3 text-center">
-                  <Icon 
-                    className="h-8 w-8 mx-auto mb-2" 
-                    style={{ color: platform.color }}
-                  />
-                  <div className="text-sm font-medium">{platform.name}</div>
-                  {connectedAccount ? (
-                    <div className="mt-2">
-                      <Badge variant="default" className="bg-green-500">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Connected
-                      </Badge>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {connectedAccount.username}
-                      </div>
-                    </div>
-                  ) : (
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      className="mt-2"
-                      onClick={() => connectSocialAccount(platform.id)}
-                    >
-                      Connect
-                    </Button>
-                  )}
-                </Card>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Wand2 className="h-5 w-5" />
-            Riven Command Center
-          </CardTitle>
+          <p className="text-muted-foreground mt-2">
+            Give Riven a marketing command and watch AI create professional campaigns across all platforms
+          </p>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Command Input */}
-          <div>
-            <Label htmlFor="command">Marketing Command</Label>
+          <div className="space-y-3">
+            <Label htmlFor="command" className="text-lg font-semibold flex items-center gap-2">
+              <div className="p-1 rounded bg-primary/10">
+                <Send className="h-4 w-4 text-primary" />
+              </div>
+              Marketing Command
+            </Label>
             <Textarea
               id="command"
-              placeholder="Tell Riven what you want to achieve... 
-Example: Create a week-long campaign about family emergency preparedness for Instagram and Facebook, posting twice daily with educational content and testimonials."
+              placeholder="Tell Riven what you want to achieve...
+
+💡 Examples:
+• Create a week-long family safety campaign for Instagram & Facebook
+• Generate 10 blog posts about emergency preparedness with SEO optimization
+• Launch a social media series highlighting customer testimonials"
               value={currentCommand}
               onChange={(e) => setCurrentCommand(e.target.value)}
-              className="mt-2 min-h-[100px]"
+              className="mt-2 min-h-[120px] bg-background/50 border-primary/20 focus:border-primary/50 transition-colors"
             />
           </div>
 
@@ -773,24 +649,36 @@ Example: Create a week-long campaign about family emergency preparedness for Ins
           </div>
 
           {/* Send Command */}
-          <Button 
-            onClick={handleSendCommand}
-            disabled={isProcessing || !currentCommand.trim()}
-            className="w-full"
-            size="lg"
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Riven is Processing...
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                Send Command to Riven
-              </>
-            )}
-          </Button>
+          <div className="space-y-4">
+            <Button 
+              onClick={handleSendCommand}
+              disabled={isProcessing || !currentCommand.trim()}
+              className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+              size="lg"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+                  Riven is Processing...
+                </>
+              ) : (
+                <>
+                  <Zap className="h-5 w-5 mr-3" />
+                  Execute Command
+                </>
+              )}
+            </Button>
+            <div className="grid grid-cols-2 gap-4 text-center text-sm text-muted-foreground bg-muted/30 p-3 rounded-lg">
+              <div>
+                <div className="font-medium text-primary">Est. Reach</div>
+                <div>{calculateEstimatedReach().toLocaleString()}</div>
+              </div>
+              <div>
+                <div className="font-medium text-primary">Est. Cost</div>
+                <div>${calculateEstimatedCost()}</div>
+              </div>
+            </div>
+          </div>
 
           {/* Riven Response */}
           {rivenResponse && (
