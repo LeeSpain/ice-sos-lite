@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Bot, Activity, BarChart3, Settings, Users, Target } from 'lucide-react';
+import { Bot, Activity, BarChart3, Settings, Users, Target, Brain, Database, Cpu } from 'lucide-react';
 import { useOptimizedSupabaseQuery, useBatchQueries, clearCache } from '@/hooks/useOptimizedQuery';
 import OptimizedComponentLoader from './OptimizedComponentLoader';
 
@@ -414,7 +414,7 @@ export default function OptimizedRivenMarketingAI() {
 
       {/* Main Tabs with Lazy Loading */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="command-center" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
             Command Center
@@ -434,6 +434,18 @@ export default function OptimizedRivenMarketingAI() {
           <TabsTrigger value="monitor" className="flex items-center gap-2">
             <Activity className="h-4 w-4" />
             Monitor
+          </TabsTrigger>
+          <TabsTrigger value="ai-settings" className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            AI Settings
+          </TabsTrigger>
+          <TabsTrigger value="training-data" className="flex items-center gap-2">
+            <Database className="h-4 w-4" />
+            Training Data
+          </TabsTrigger>
+          <TabsTrigger value="riven-config" className="flex items-center gap-2">
+            <Cpu className="h-4 w-4" />
+            Riven Config
           </TabsTrigger>
         </TabsList>
 
