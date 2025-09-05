@@ -11,9 +11,23 @@ import OptimizedComponentLoader from './OptimizedComponentLoader';
 export default function OptimizedRivenMarketingAI() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('command-center');
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  // Optimized data fetching with caching
-  const { data: campaigns = [], loading: campaignsLoading, invalidate: invalidateCampaigns } = useOptimizedSupabaseQuery(
+  // Error boundary effect
+  React.useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      console.error('Riven AI Error:', event.error);
+      setHasError(true);
+      setErrorMessage(event.error?.message || 'An unexpected error occurred');
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
+  // Optimized data fetching with caching and error handling
+  const { data: campaigns = [], loading: campaignsLoading, invalidate: invalidateCampaigns, error: campaignsError } = useOptimizedSupabaseQuery(
     'marketing_campaigns',
     '*',
     { 
@@ -23,7 +37,7 @@ export default function OptimizedRivenMarketingAI() {
     }
   );
 
-  const { data: contents = [], loading: contentsLoading, invalidate: invalidateContents } = useOptimizedSupabaseQuery(
+  const { data: contents = [], loading: contentsLoading, invalidate: invalidateContents, error: contentsError } = useOptimizedSupabaseQuery(
     'marketing_content',
     '*',
     { 
@@ -33,7 +47,7 @@ export default function OptimizedRivenMarketingAI() {
     }
   );
 
-  const { data: socialAccounts = [], loading: socialAccountsLoading, invalidate: invalidateSocialAccounts } = useOptimizedSupabaseQuery(
+  const { data: socialAccounts = [], loading: socialAccountsLoading, invalidate: invalidateSocialAccounts, error: socialAccountsError } = useOptimizedSupabaseQuery(
     'social_media_accounts',
     '*',
     { 
@@ -159,8 +173,75 @@ export default function OptimizedRivenMarketingAI() {
     }
   }, [toast, handleContentUpdate]);
 
-  // Loading state
+  // Loading state and error checking
   const isLoading = campaignsLoading || contentsLoading || socialAccountsLoading || metricsLoading;
+  const hasAnyError = hasError || campaignsError || contentsError || socialAccountsError;
+
+  // Show error state if there are any errors
+  if (hasAnyError) {
+    return (
+      <div className="space-y-6">
+        <Card className="border-destructive">
+          <CardHeader>
+            <CardTitle className="text-destructive flex items-center gap-2">
+              <Bot className="h-5 w-5" />
+              Riven Marketing AI - Error Detected
+            </CardTitle>
+            <CardDescription>
+              We've detected some issues that need to be resolved:
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {errorMessage && (
+              <div className="p-4 bg-destructive/10 rounded-lg">
+                <p className="text-sm font-medium text-destructive">Application Error:</p>
+                <p className="text-sm text-muted-foreground">{errorMessage}</p>
+              </div>
+            )}
+            
+            {campaignsError && (
+              <div className="p-4 bg-destructive/10 rounded-lg">
+                <p className="text-sm font-medium text-destructive">Campaigns Error:</p>
+                <p className="text-sm text-muted-foreground">{campaignsError.message}</p>
+              </div>
+            )}
+            
+            {contentsError && (
+              <div className="p-4 bg-destructive/10 rounded-lg">
+                <p className="text-sm font-medium text-destructive">Content Error:</p>
+                <p className="text-sm text-muted-foreground">{contentsError.message}</p>
+              </div>
+            )}
+            
+            {socialAccountsError && (
+              <div className="p-4 bg-destructive/10 rounded-lg">
+                <p className="text-sm font-medium text-destructive">Social Accounts Error:</p>
+                <p className="text-sm text-muted-foreground">{socialAccountsError.message}</p>
+              </div>
+            )}
+
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <p className="text-sm font-medium text-blue-900">Known Issues:</p>
+              <ul className="text-sm text-blue-800 mt-2 space-y-1">
+                <li>• OpenAI API quota has been exceeded - check your billing</li>
+                <li>• Some database permissions may need to be configured</li>
+                <li>• Edge functions may be experiencing connectivity issues</li>
+              </ul>
+            </div>
+
+            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <p className="text-sm font-medium text-yellow-900">Quick Fixes:</p>
+              <ul className="text-sm text-yellow-800 mt-2 space-y-1">
+                <li>• Check your OpenAI account billing and quota</li>
+                <li>• Refresh the page to retry connections</li>
+                <li>• Contact support if issues persist</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
