@@ -8,31 +8,59 @@ import { RealSocialMediaOAuth } from './RealSocialMediaOAuth';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import CampaignMonitor from './CampaignMonitor';
 
+// Enhanced Professional Components
+import EnhancedContentApproval from './enhanced/ContentApprovalDashboard';
+import AdvancedAnalyticsDashboard from './enhanced/AdvancedAnalyticsDashboard';
+import ProfessionalSocialHub from './enhanced/ProfessionalSocialHub';
+import AdvancedCampaignMonitor from './enhanced/AdvancedCampaignMonitor';
+
 interface OptimizedComponentLoaderProps {
   type: 'command-center' | 'content-approval' | 'social-hub' | 'analytics' | 'monitor';
   props: any;
+  enhanced?: boolean; // Flag to use enhanced components
 }
 
-export default function OptimizedComponentLoader({ type, props }: OptimizedComponentLoaderProps) {
-  console.log('Loading component type:', type);
+export default function OptimizedComponentLoader({ type, props, enhanced = true }: OptimizedComponentLoaderProps) {
+  console.log('Loading component type:', type, 'Enhanced:', enhanced);
   
   try {
     switch (type) {
       case 'command-center':
         return <EnhancedCommandCenter {...props} />;
       case 'content-approval':
-        return <RealContentApproval 
-          contents={props.contents || []}
-          onContentApproval={props.onContentApproval || (() => {})}
-          onPublishContent={props.onPublishContent || (() => {})}
-          isLoading={props.isLoading || false}
-        />;
+        return enhanced ? (
+          <EnhancedContentApproval 
+            contents={props.contents || []}
+            onContentApproval={props.onContentApproval || (() => {})}
+            onPublishContent={props.onPublishContent || (() => {})}
+            isLoading={props.isLoading || false}
+          />
+        ) : (
+          <RealContentApproval 
+            contents={props.contents || []}
+            onContentApproval={props.onContentApproval || (() => {})}
+            onPublishContent={props.onPublishContent || (() => {})}
+            isLoading={props.isLoading || false}
+          />
+        );
       case 'social-hub':
-        return <RealSocialMediaOAuth onAccountsUpdate={props.onAccountsUpdate || (() => {})} />;
+        return enhanced ? (
+          <ProfessionalSocialHub onAccountsUpdate={props.onAccountsUpdate || (() => {})} />
+        ) : (
+          <RealSocialMediaOAuth onAccountsUpdate={props.onAccountsUpdate || (() => {})} />
+        );
       case 'analytics':
-        return <AnalyticsDashboard {...props} />;
+        return enhanced ? (
+          <AdvancedAnalyticsDashboard {...props} />
+        ) : (
+          <AnalyticsDashboard {...props} />
+        );
       case 'monitor':
-        return <CampaignMonitor {...props} />;
+        return enhanced ? (
+          <AdvancedCampaignMonitor {...props} />
+        ) : (
+          <CampaignMonitor {...props} />
+        );
       default:
         console.warn('Unknown component type:', type);
         return null;
