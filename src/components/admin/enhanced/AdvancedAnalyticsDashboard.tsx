@@ -506,7 +506,7 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            {chartType === 'area' && (
+            {chartType === 'area' ? (
               <RechartsAreaChart data={analyticsData.timeSeriesData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
@@ -520,8 +520,7 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
                 />
                 <Area type="monotone" dataKey={metricType} stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.3} />
               </RechartsAreaChart>
-            )}
-            {chartType === 'line' && (
+            ) : chartType === 'line' ? (
               <RechartsLineChart data={analyticsData.timeSeriesData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
@@ -535,8 +534,7 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
                 />
                 <Line type="monotone" dataKey={metricType} stroke="hsl(var(--primary))" strokeWidth={3} />
               </RechartsLineChart>
-            )}
-            {chartType === 'bar' && (
+            ) : (
               <RechartsBarChart data={analyticsData.timeSeriesData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
@@ -615,10 +613,10 @@ const AdvancedAnalyticsDashboard: React.FC = () => {
                         <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-primary rounded-full" 
-                            style={{ width: `${percentage}%` }}
+                            style={{ width: `${Number(percentage)}%` }}
                           />
                         </div>
-                        <span className="text-sm font-medium w-8">{percentage}%</span>
+                        <span className="text-sm font-medium w-8">{Number(percentage)}%</span>
                       </div>
                     </div>
                   ))}
