@@ -22,7 +22,10 @@ import {
   Brain,
   MessageSquare,
   Shield,
-  Cpu
+  Cpu,
+  CheckCircle,
+  AlertCircle,
+  TestTube
 } from 'lucide-react';
 
 interface RivenSettings {
@@ -73,6 +76,8 @@ export default function RivenConfigurationPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [aiConfig, setAiConfig] = useState<any>(null);
+  const [testingProvider, setTestingProvider] = useState(false);
   const { toast } = useToast();
 
   const availableModels = [
@@ -106,7 +111,24 @@ export default function RivenConfigurationPage() {
 
   useEffect(() => {
     loadSettings();
+    loadAiProviderConfig();
   }, []);
+
+  const loadAiProviderConfig = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('value')
+        .eq('key', 'ai_providers_config')
+        .maybeSingle();
+      
+      if (!error && data) {
+        setAiConfig(data.value);
+      }
+    } catch (error) {
+      console.error('Error loading AI provider config:', error);
+    }
+  };
 
   const loadSettings = async () => {
     try {
@@ -196,6 +218,34 @@ export default function RivenConfigurationPage() {
     }
   };
 
+  const testProviderConnection = async () => {
+    setTestingProvider(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('riven-marketing', {
+        body: { 
+          action: 'provider_status'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Provider Test Results",
+        description: data.success ? "All AI providers are working correctly!" : "Some AI providers may have issues. Check Edge Function logs.",
+        variant: data.success ? "default" : "destructive"
+      });
+    } catch (error) {
+      console.error('Provider test failed:', error);
+      toast({
+        title: "Provider Test Failed",
+        description: "Unable to test AI providers. Check your configuration.",
+        variant: "destructive"
+      });
+    } finally {
+      setTestingProvider(false);
+    }
+  };
+
   const resetToDefaults = () => {
     setSettings({
       ai_model: 'gpt-4.1-2025-04-14',
@@ -239,6 +289,10 @@ export default function RivenConfigurationPage() {
           <p className="text-muted-foreground">Configure Riven's AI behavior, brand voice, and content generation preferences</p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={testProviderConnection} disabled={testingProvider}>
+            <TestTube className="h-4 w-4 mr-2" />
+            {testingProvider ? 'Testing...' : 'Test Providers'}
+          </Button>
           <Button variant="outline" onClick={resetToDefaults}>
             <RotateCcw className="h-4 w-4 mr-2" />
             Reset to Defaults
@@ -250,12 +304,104 @@ export default function RivenConfigurationPage() {
         </div>
       </div>
 
+      {/* Active AI Provider Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Cpu className="h-5 w-5" />
+            Active AI Provider Configuration
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Primary Content Generation</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  {aiConfig?.stages?.text?.provider === 'xai' ? (
+                    <>
+                      <Badge variant="default" className="bg-green-100 text-green-800">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Grok (xAI) Active
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">Using {aiConfig?.providers?.xai?.model || 'grok-beta'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Badge variant="outline">
+                        <Bot className="h-3 w-3 mr-1" />
+                        OpenAI Active
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">Using {aiConfig?.providers?.openai?.model || 'gpt-4.1'}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Command Analysis</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  {aiConfig?.stages?.overview?.provider === 'xai' ? (
+                    <Badge variant="default" className="bg-green-100 text-green-800">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Grok (xAI)
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">
+                      <Bot className="h-3 w-3 mr-1" />
+                      OpenAI
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">Image Generation</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant="outline">
+                    <Bot className="h-3 w-3 mr-1" />
+                    OpenAI DALL-E
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">Image generation always uses OpenAI</span>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Final Review</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  {aiConfig?.stages?.finalize?.provider === 'xai' ? (
+                    <Badge variant="default" className="bg-green-100 text-green-800">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Grok (xAI)
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">
+                      <Bot className="h-3 w-3 mr-1" />
+                      OpenAI
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              <AlertCircle className="h-4 w-4 inline mr-1" />
+              To change AI providers, go to <strong>Admin → System Settings → AI Providers</strong>. 
+              Current configuration shows {aiConfig?.stages?.text?.provider === 'xai' ? 'Grok is actively being used' : 'OpenAI is being used'} for content generation.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* AI Model Configuration */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5" />
             AI Model & Intelligence
+            {aiConfig?.stages?.text?.provider === 'xai' && (
+              <Badge variant="outline" className="ml-2">Grok Active - Limited Configuration</Badge>
+            )}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -263,21 +409,33 @@ export default function RivenConfigurationPage() {
             <div className="space-y-4">
               <div>
                 <Label>Primary AI Model</Label>
-                <Select value={settings.ai_model} onValueChange={(value) => setSettings({...settings, ai_model: value})}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availableModels.map(model => (
-                      <SelectItem key={model.value} value={model.value}>
-                        <div>
-                          <div className="font-medium">{model.label}</div>
-                          <div className="text-xs text-muted-foreground">{model.description}</div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {aiConfig?.stages?.text?.provider === 'xai' ? (
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <span className="font-medium">Grok ({aiConfig?.providers?.xai?.model || 'grok-beta'})</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Grok model is configured in System Settings. This setting only applies when OpenAI is the active provider.
+                    </p>
+                  </div>
+                ) : (
+                  <Select value={settings.ai_model} onValueChange={(value) => setSettings({...settings, ai_model: value})}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableModels.map(model => (
+                        <SelectItem key={model.value} value={model.value}>
+                          <div>
+                            <div className="font-medium">{model.label}</div>
+                            <div className="text-xs text-muted-foreground">{model.description}</div>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
 
               <div>
