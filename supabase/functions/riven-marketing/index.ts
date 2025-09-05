@@ -591,7 +591,7 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
             title: content.title,
             body_text: content.body || content.content,
             hashtags: content.hashtags,
-            status: 'draft'
+            status: platform === 'blog' ? 'pending_review' : 'draft'
           };
 
         // Add blog-specific fields if it's a blog post

@@ -40,10 +40,12 @@ import {
   Navigation,
   History,
   Phone,
-  Building
+  Building,
+  BookOpen
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
+import { BlogNotificationBadge } from '@/components/admin/BlogNotificationBadge';
 import { useTranslation } from 'react-i18next';
 import SupabaseSecurityReminder from '@/components/admin/SupabaseSecurityReminder';
 
@@ -66,6 +68,7 @@ const useAdminMenuItems = () => {
       items: [
         { title: t('admin.emmaAiAgent'), url: "/admin-dashboard/ai-agent", icon: Bot },
         { title: t('admin.rivenMarketingAi'), url: "/admin-dashboard/riven-marketing", icon: Brain },
+        { title: 'Blog Management', url: "/admin-dashboard/blog-management", icon: BookOpen },
       ]
     },
     {
@@ -239,6 +242,7 @@ export default function AdminLayout() {
               </div>
             </div>
             <div className="ml-auto flex items-center gap-4">
+              <BlogNotificationBadge />
               <AdminNotificationCenter />
               <LanguageCurrencySelector compact />
             </div>
