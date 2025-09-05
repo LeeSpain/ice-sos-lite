@@ -101,28 +101,40 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
   const fetchProducts = async () => {
     try {
+      console.log('🔄 Pricing: Fetching products...');
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .in('status', ['active', 'coming_soon'])
         .order('sort_order', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Pricing: Error fetching products:', error);
+        throw error;
+      }
+      
+      console.log('✅ Pricing: Products loaded:', data?.length || 0, 'products', data);
       setProducts(data || []);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('❌ Pricing: Error in fetchProducts:', error);
     }
   };
 
   const fetchSubscriptionPlans = async () => {
     try {
+      console.log('🔄 Pricing: Fetching subscription plans...');
       const { data, error } = await supabase
         .from('subscription_plans')
         .select('*')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Pricing: Error fetching subscription plans:', error);
+        throw error;
+      }
+      
+      console.log('✅ Pricing: Raw subscription plans data:', data);
       
       // Transform the data to match our interface
       const transformedPlans = (data || []).map(plan => ({
@@ -135,25 +147,31 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
         stripe_price_id: plan.stripe_price_id || undefined
       }));
       
+      console.log('✅ Pricing: Transformed subscription plans:', transformedPlans.length, 'plans');
       setSubscriptionPlans(transformedPlans);
     } catch (error) {
-      console.error('Error fetching subscription plans:', error);
+      console.error('❌ Pricing: Error in fetchSubscriptionPlans:', error);
     }
   };
 
   const fetchRegionalServices = async () => {
     try {
+      console.log('🔄 Pricing: Fetching regional services...');
       const { data, error } = await supabase
         .from('regional_services')
         .select('*')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
 
-      if (error) throw error;
-      console.log('Regional services data loaded:', data);
+      if (error) {
+        console.error('❌ Pricing: Error fetching regional services:', error);
+        throw error;
+      }
+      
+      console.log('✅ Pricing: Regional services loaded:', data?.length || 0, 'services', data);
       setRegionalServices(data || []);
     } catch (error) {
-      console.error('Error fetching regional services:', error);
+      console.error('❌ Pricing: Error in fetchRegionalServices:', error);
     }
   };
 
