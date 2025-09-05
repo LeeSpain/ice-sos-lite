@@ -13,7 +13,8 @@ import {
   Eye,
   RefreshCw,
   PlayCircle,
-  PauseCircle
+  PauseCircle,
+  Trash2
 } from 'lucide-react';
 
 interface RealTimeCampaignMonitorProps {
@@ -62,6 +63,26 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
     }
   };
 
+  const handleCleanSystem = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('content-cleaner', {
+        body: { action: 'execute', confirm: true }
+      });
+      if (error) throw error;
+
+      toast({
+        title: 'Cleanup complete',
+        description: `Removed ${data?.deleted?.content ?? 0} drafts and ${data?.deleted?.campaigns ?? 0} campaigns without published content.`,
+      });
+      await loadCampaigns();
+    } catch (err) {
+      console.error('Cleanup error:', err);
+      toast({ title: 'Cleanup failed', description: 'Could not clean unpublished items', variant: 'destructive' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl">
@@ -72,6 +93,12 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          <div className="flex items-center justify-end">
+            <Button variant="destructive" onClick={handleCleanSystem} disabled={isLoading} className="gap-2">
+              <Trash2 className="h-4 w-4" />
+              Clean Unpublished
+            </Button>
+          </div>
           {campaigns.length === 0 ? (
             <Card className="p-8 text-center">
               <p className="text-muted-foreground">No campaigns found. All systems operational!</p>
