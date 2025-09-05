@@ -428,7 +428,7 @@ export default function OptimizedRivenMarketingAI() {
               isProcessing,
               onSendCommand: handleSendCommand,
               rivenResponse,
-              campaignId: campaigns[0]?.id || null
+              campaignId: (campaigns && campaigns.length > 0) ? campaigns[0]?.id : null
             }}
           />
         </TabsContent>
