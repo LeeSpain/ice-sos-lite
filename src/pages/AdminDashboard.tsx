@@ -65,8 +65,6 @@ const AdminDashboard: React.FC = () => {
         <Route path="growth" element={<UserGrowthPage />} />
         <Route path="ai-agent" element={<AIAgentPage />} />
         <Route path="riven-marketing" element={<RivenMarketingAI />} />
-        <Route path="marketing-campaigns" element={<EnhancedMarketingCampaigns />} />
-        <Route path="blog-management" element={<BlogManagementPage />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="subscriptions" element={<SubscriptionsPage />} />
         <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />
