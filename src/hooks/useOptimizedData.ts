@@ -145,7 +145,12 @@ export function useOptimizedUserRole() {
   return useQuery({
     queryKey: QUERY_KEYS.userRole,
     queryFn: async () => {
-      if (!user?.id) return null;
+      if (!user?.id) {
+        console.log('🔧 useOptimizedUserRole: No user ID available');
+        return null;
+      }
+      
+      console.log('🔧 useOptimizedUserRole: Fetching role for user:', user.id);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -153,11 +158,19 @@ export function useOptimizedUserRole() {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (error) throw error;
-      return data?.role || 'user';
+      if (error) {
+        console.error('🔧 useOptimizedUserRole: Error fetching role:', error);
+        throw error;
+      }
+      
+      const role = data?.role || 'user';
+      console.log('🔧 useOptimizedUserRole: Retrieved role:', role);
+      return role;
     },
     enabled: !!user?.id,
-    staleTime: 15 * 60 * 1000, // 15 minutes - role rarely changes
+    staleTime: 5 * 60 * 1000, // 5 minutes - reduced for better debugging
+    refetchOnWindowFocus: false,
+    retry: 3,
   });
 }
 

@@ -45,6 +45,7 @@ const SimpleDashboard = () => {
 
   // Redirect admin users to admin dashboard
   if (isAdmin) {
+    console.log('🏠 SimpleDashboard: Admin user detected, redirecting to admin dashboard');
     return <Navigate to="/admin-dashboard" replace />;
   }
 
