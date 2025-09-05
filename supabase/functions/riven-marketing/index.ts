@@ -106,31 +106,37 @@ serve(async (req) => {
 
     console.log('✅ Admin verified:', user.id);
 
-    const aiConfig = await loadAiConfig(userSupabase);
+const baseAiConfig = await loadAiConfig(userSupabase);
 
-    let response = '';
-    let campaign_created = false;
+// Resolve provider overrides: global < section < per-run
+const section = requestBody.section;
+const perRunOverride = requestBody.ai_override || settings?.ai_override;
+const sectionOverride = await loadSectionOverride(userSupabase, section);
+const effectiveConfig = mergeAiConfigs(baseAiConfig, sectionOverride, perRunOverride);
 
-    switch (action) {
-      case 'process_command':
-        const result = await processMarketingCommand(command, user.id, userSupabase, workflow_id, settings, scheduling_options, publishing_controls, aiConfig);
-        response = result.response;
-        campaign_created = result.campaign_created;
-        break;
-      
-      case 'generate_content':
-        await generateMarketingContent(campaign_id, userSupabase, settings, aiConfig);
-        response = 'Content generated successfully for campaign!';
-        break;
-      
-      case 'generate_image':
+let response = '';
+let campaign_created = false;
+
+switch (action) {
+  case 'process_command':
+    const result = await processMarketingCommand(command, user.id, userSupabase, workflow_id, settings, scheduling_options, publishing_controls, effectiveConfig);
+    response = result.response;
+    campaign_created = result.campaign_created;
+    break;
+  
+  case 'generate_content':
+    await generateMarketingContent(campaign_id, userSupabase, settings, effectiveConfig);
+    response = 'Content generated successfully for campaign!';
+    break;
+  
+  case 'generate_image':
         try {
           if (!openaiApiKey) throw new Error('OpenAI API key not configured');
           const basePrompt = prompt || 'Generate an on-brand marketing image for ICE SOS.';
           // Improve prompt using configured provider for the image stage
           let improvedPrompt = basePrompt;
           try {
-            improvedPrompt = await callLLM(aiConfig, 'image', [
+            improvedPrompt = await callLLM(effectiveConfig, 'image', [
               { role: 'system', content: 'Return a concise, vivid prompt for photorealistic marketing image generation. Avoid quotes.' },
               { role: 'user', content: basePrompt }
             ], { maxTokens: 200 });
@@ -270,6 +276,41 @@ function chooseProviderForStage(aiConfig: any, stage: 'overview'|'text'|'image'|
   if (!!openaiApiKey && aiConfig?.providers?.openai?.enabled !== false) return 'openai';
   if (!!xaiApiKey && aiConfig?.providers?.xai?.enabled) return 'xai';
   throw new Error('No AI provider configured or API key missing');
+}
+
+// Provider override helpers
+async function loadSectionOverride(supabase: any, section?: string) {
+  try {
+    if (!section) return null;
+    const { data, error } = await supabase
+      .from('site_content')
+      .select('value')
+      .eq('key', 'ai_providers_overrides')
+      .maybeSingle();
+    if (error) {
+      console.error('loadSectionOverride error', error);
+      return null;
+    }
+    const sections = data?.value?.sections || {};
+    return sections?.[section] || null;
+  } catch (e) {
+    console.error('loadSectionOverride exception', e);
+    return null;
+  }
+}
+
+function mergeAiConfigs(base: any, ...overrides: any[]) {
+  const out = JSON.parse(JSON.stringify(base || {}));
+  for (const ov of overrides) {
+    if (!ov) continue;
+    if (ov.providers) {
+      out.providers = { ...(out.providers || {}), ...ov.providers };
+    }
+    if (ov.stages) {
+      out.stages = { ...(out.stages || {}), ...ov.stages };
+    }
+  }
+  return out;
 }
 
 async function callLLM(

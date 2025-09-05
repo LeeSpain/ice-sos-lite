@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   Brain,
   Target,
@@ -31,6 +32,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useSiteContent } from '@/hooks/useSiteContent';
 
 // Import existing components
 import { EnhancedCommandCenter } from '@/components/admin/EnhancedCommandCenter';
@@ -89,7 +91,13 @@ const UnifiedRivenMarketingAI: React.FC = () => {
   // Command Center state
   const [currentCommand, setCurrentCommand] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [rivenResponse, setRivenResponse] = useState('');
+const [rivenResponse, setRivenResponse] = useState('');
+
+  // AI provider overrides
+  const [aiRunOverride, setAiRunOverride] = useState<{ overview?: 'openai' | 'xai'; text?: 'openai' | 'xai'; finalize?: 'openai' | 'xai'; image?: 'openai' | 'xai'; }>({});
+  const { value: providerOverrides, save: saveProviderOverrides, isSaving: isSavingOverrides } = useSiteContent<any>('ai_providers_overrides', { sections: {} });
+  const [localOverrides, setLocalOverrides] = useState<any>(providerOverrides || { sections: {} });
+  useEffect(() => { setLocalOverrides(providerOverrides || { sections: {} }); }, [providerOverrides]);
 
   // Load all data
   useEffect(() => {
@@ -195,6 +203,10 @@ const UnifiedRivenMarketingAI: React.FC = () => {
           command: currentCommand,
           action: 'process_command',
           workflow_id: crypto.randomUUID(),
+          // Top-level overrides recognized by the function
+          section: config?.section,
+          ai_override: config?.ai_override,
+          // Also pass full config under settings for backwards-compat
           settings: config || {}
         }
       });
@@ -270,6 +282,21 @@ const UnifiedRivenMarketingAI: React.FC = () => {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
+    });
+};
+
+  const rivenSections = ['command-center','campaigns','content-approval','social-hub','analytics','settings'] as const;
+  type Stage = 'overview' | 'text' | 'image' | 'finalize';
+  type Provider = 'openai' | 'xai';
+  const stageLabels: Record<Stage, string> = { overview: 'Overview', text: 'Text', image: 'Image', finalize: 'Finalize' };
+
+  const updateSectionProvider = (section: string, stage: Stage, provider: Provider) => {
+    setLocalOverrides((prev: any) => {
+      const next = { ...(prev || { sections: {} }) } as any;
+      const sec = { ...(next.sections?.[section] || { stages: {} }) } as any;
+      sec.stages = { ...(sec.stages || {}), [stage]: { provider } };
+      next.sections = { ...(next.sections || {}), [section]: sec };
+      return next;
     });
   };
 
