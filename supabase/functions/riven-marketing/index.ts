@@ -141,8 +141,8 @@ switch (action) {
             .update({ status: createdCount > 0 ? 'completed' : 'failed', completed_at: new Date().toISOString(), error_message: createdCount > 0 ? null : 'No content generated' })
             .eq('id', campaign.id);
           
-          // Auto-publish for immediate mode
-          if (createdCount > 0 && scheduling_options?.mode === 'immediate' && !publishing_controls?.approval_required) {
+          // Auto-publish for immediate mode or single post mode
+          if (createdCount > 0 && (scheduling_options?.mode === 'immediate' || settings?.singlePostMode) && !publishing_controls?.approval_required) {
             if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'in_progress', serviceSupabase);
             await publishGeneratedContent(campaign.id, serviceSupabase);
             if (workflow_id) await updateWorkflowStep(workflow_id, 'publishing_content', 'completed', serviceSupabase);

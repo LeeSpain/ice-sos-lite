@@ -90,6 +90,7 @@ interface CommandConfiguration {
   wordCount?: number;
   seoDifficulty?: string;
   contentDepth?: string;
+  singlePostMode?: boolean;
 }
 
 export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
@@ -120,6 +121,7 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   const [wordCount, setWordCount] = useState([1000]);
   const [seoDifficulty, setSeoDifficulty] = useState('intermediate');
   const [contentDepth, setContentDepth] = useState('detailed');
+  const [singlePostMode, setSinglePostMode] = useState(false);
 
   // Load campaigns and social accounts
   useEffect(() => {
@@ -334,17 +336,18 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   const handleSendCommand = () => {
     const config: CommandConfiguration = {
       command: currentCommand,
-      totalPosts: totalPosts[0],
-      postsPerDay: postsPerDay[0],
-      campaignDuration: campaignDuration[0],
+      totalPosts: singlePostMode ? 1 : totalPosts[0],
+      postsPerDay: singlePostMode ? 1 : postsPerDay[0],
+      campaignDuration: singlePostMode ? 1 : campaignDuration[0],
       platforms: selectedPlatforms,
       contentTypes: selectedContentTypes,
-      schedulingMode,
+      schedulingMode: singlePostMode ? 'immediate' : schedulingMode,
       targetAudience,
-      urgency,
+      urgency: singlePostMode ? 'high' : urgency,
       wordCount: selectedPlatforms.includes('blog') ? wordCount[0] : undefined,
       seoDifficulty: selectedPlatforms.includes('blog') ? seoDifficulty : undefined,
-      contentDepth: selectedPlatforms.includes('blog') ? contentDepth : undefined
+      contentDepth: selectedPlatforms.includes('blog') ? contentDepth : undefined,
+      singlePostMode
     };
     
     onSendCommand(config);
@@ -389,53 +392,85 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
             />
           </div>
 
-          {/* Quick Configuration */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Target className="h-4 w-4" />
-                Total Posts: {totalPosts[0]}
-              </Label>
-              <Slider
-                value={totalPosts}
-                onValueChange={setTotalPosts}
-                min={1}
-                max={50}
-                step={1}
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Timer className="h-4 w-4" />
-                Posts per Day: {postsPerDay[0]}
-              </Label>
-              <Slider
-                value={postsPerDay}
-                onValueChange={setPostsPerDay}
-                min={1}
-                max={5}
-                step={1}
-                className="w-full"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Duration: {campaignDuration[0]} days
-              </Label>
-              <Slider
-                value={campaignDuration}
-                onValueChange={setCampaignDuration}
-                min={1}
-                max={30}
-                step={1}
-                className="w-full"
-              />
+          {/* Single Post Mode Toggle */}
+          <div className="flex items-center space-x-2 p-4 bg-muted/30 rounded-lg border-l-4 border-primary">
+            <Checkbox
+              id="single-post-mode"
+              checked={singlePostMode}
+              onCheckedChange={(checked) => setSinglePostMode(checked === true)}
+            />
+            <Label htmlFor="single-post-mode" className="cursor-pointer flex items-center gap-2">
+              <Zap className="h-4 w-4 text-primary" />
+              <span className="font-medium">Single Post Mode</span>
+              <Badge variant="secondary" className="ml-2">Quick Publish</Badge>
+            </Label>
+            <div className="text-sm text-muted-foreground ml-auto">
+              Create one post for immediate publishing
             </div>
           </div>
+
+          {/* Quick Configuration */}
+          {!singlePostMode && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Total Posts: {totalPosts[0]}
+                </Label>
+                <Slider
+                  value={totalPosts}
+                  onValueChange={setTotalPosts}
+                  min={1}
+                  max={50}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Timer className="h-4 w-4" />
+                  Posts per Day: {postsPerDay[0]}
+                </Label>
+                <Slider
+                  value={postsPerDay}
+                  onValueChange={setPostsPerDay}
+                  min={1}
+                  max={5}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Duration: {campaignDuration[0]} days
+                </Label>
+                <Slider
+                  value={campaignDuration}
+                  onValueChange={setCampaignDuration}
+                  min={1}
+                  max={30}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+            </div>
+          )}
+
+          {singlePostMode && (
+            <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <div className="flex items-center gap-2 mb-2">
+                <PlayCircle className="h-5 w-5 text-primary" />
+                <span className="font-medium text-primary">Single Post Configuration</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                This will create a single, high-quality post that can be published immediately. 
+                Perfect for quick content needs or testing new ideas.
+              </p>
+            </div>
+          )}
 
           {/* Platform Selection */}
           <div>
