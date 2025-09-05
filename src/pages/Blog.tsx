@@ -223,7 +223,11 @@ const Blog = () => {
                         <Calendar className="h-4 w-4" />
                         {formatDate(featuredPost.created_at)}
                       </div>
-                      <Button size="lg" className="group">
+                      <Button 
+                        size="lg" 
+                        className="group"
+                        onClick={() => window.location.href = `/blog/${featuredPost.slug || featuredPost.title?.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
                         Read Full Article
                         <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                       </Button>
@@ -314,7 +318,12 @@ const Blog = () => {
                         <Calendar className="h-3 w-3" />
                         {formatDate(post.created_at)}
                       </div>
-                      <Button variant="ghost" size="sm" className="group-hover:text-primary text-xs px-0">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="group-hover:text-primary text-xs px-0"
+                        onClick={() => window.location.href = `/blog/${post.slug || post.title?.toLowerCase().replace(/\s+/g, '-')}`}
+                      >
                         Read More
                         <ArrowRight className="h-3 w-3 ml-1 group-hover:translate-x-1 transition-transform" />
                       </Button>

@@ -55,6 +55,7 @@ interface UnifiedContentItem {
   keywords?: string[];
   reading_time?: number;
   seo_score?: number;
+  slug?: string;
 }
 
 interface Campaign {
@@ -255,6 +256,54 @@ const [rivenResponse, setRivenResponse] = useState('');
       toast({
         title: "Error",
         description: "Failed to update content status",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePublishContent = async (contentId: string) => {
+    try {
+      // Get the content details
+      const { data: content, error: fetchError } = await supabase
+        .from('marketing_content')
+        .select('*')
+        .eq('id', contentId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Generate slug if not exists
+      let slug = content.slug;
+      if (!slug && content.title) {
+        slug = content.title.toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, '');
+      }
+
+      const { error } = await supabase
+        .from('marketing_content')
+        .update({ 
+          status: 'published',
+          slug: slug,
+          posted_at: new Date().toISOString()
+        })
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Content published successfully! It's now live on your blog.",
+      });
+
+      loadContents();
+    } catch (error) {
+      console.error('Error publishing content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to publish content",
         variant: "destructive"
       });
     }
@@ -515,13 +564,33 @@ const [rivenResponse, setRivenResponse] = useState('');
                                 Edit
                               </Button>
                               {(content.status === 'draft' || content.status === 'pending_review') && (
+                                <>
+                                  <Button 
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleContentApproval(content.id, 'published')}
+                                  >
+                                    <CheckCircle className="h-4 w-4 mr-1" />
+                                    Approve
+                                  </Button>
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => handlePublishContent(content.id)}
+                                    className="bg-green-600 hover:bg-green-700 text-white"
+                                  >
+                                    <CheckCircle className="h-4 w-4 mr-1" />
+                                    Publish Live
+                                  </Button>
+                                </>
+                              )}
+                              {content.status === 'published' && content.platform === 'Blog' && content.slug && (
                                 <Button 
+                                  variant="outline"
                                   size="sm"
-                                  onClick={() => handleContentApproval(content.id, 'published')}
-                                  className="bg-green-600 hover:bg-green-700"
+                                  onClick={() => window.open(`/blog/${content.slug}`, '_blank')}
                                 >
-                                  <CheckCircle className="h-4 w-4 mr-1" />
-                                  Approve
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  View Live
                                 </Button>
                               )}
                               <Button 

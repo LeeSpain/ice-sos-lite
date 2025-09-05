@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from "@/contexts/AuthContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
 import { EmmaChatProvider } from "@/contexts/EmmaChatContext";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import { queryClient } from "@/lib/queryClient";
@@ -12,6 +12,7 @@ import { usePageTracking } from '@/hooks/usePageTracking';
 // Import all pages
 import Index from "./pages/Index";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 import AuthPage from "./pages/AuthPage";
 
 // Live Map Pages
@@ -21,366 +22,261 @@ import PlacesManager from "./pages/PlacesManager";
 import LocationHistoryPage from "./pages/LocationHistoryPage";
 import MapDemo from "./pages/MapDemo";
 
-import AIRegister from "./pages/AIRegister";
-import Contact from "./pages/Contact";
-import Videos from "./pages/Videos";
+// Dashboard Pages
+import DashboardRedirect from "./components/DashboardRedirect";
+import Dashboard from "./pages/Dashboard";
+import FamilyDashboard from "./pages/FamilyDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+
+// Support & Info Pages
+import Support from "./pages/Support";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
-import NotFound from "./pages/NotFound";
+import Contact from "./pages/Contact";
+import Videos from "./pages/Videos";
+import FamilyCarerAccess from "./components/FamilyCarerAccess";
+
+// Interactive and Mobile Pages
+import FamilyAccessSetup from "./pages/FamilyAccessSetup";
+import AIRegister from "./pages/AIRegister";
+
+// Payment Pages
 import PaymentSuccess from "./pages/PaymentSuccess";
 import FamilyCheckoutSuccess from "./pages/FamilyCheckoutSuccess";
 import FamilyCheckoutCanceled from "./pages/FamilyCheckoutCanceled";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
-import Support from "./pages/Support";
+
+// Test Pages  
 import TestPage from "./pages/TestPage";
-import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
-import RegionalCenterSpain from "./pages/RegionalCenterSpain";
-import FamilyCarerAccess from "./pages/FamilyCarerAccess";
-import FamilyAccessSetup from "./pages/FamilyAccessSetup";
-import FamilyInviteAccept from "./pages/FamilyInviteAccept";
-import AdminSetupPage from "./pages/AdminSetupPage";
-import SOSHome from "./pages/SOSHome";
-import FamilyDashboard from "./pages/FamilyDashboard";
-import RegionalDashboard from "./pages/RegionalDashboard";
-import { ConnectionAcceptPage } from "./pages/ConnectionAcceptPage";
 
-// Import protected routes and components
-import ProtectedRoute from "@/components/ProtectedRoute";
-import AdminProtectedRoute from "@/components/AdminProtectedRoute";
-import ProtectedSOSRoute from "@/components/ProtectedSOSRoute";
-import RegionalProtectedRoute from "@/components/RegionalProtectedRoute";
-import DashboardRedirect from "@/components/DashboardRedirect";
-import SmartAppRedirect from "@/components/SmartAppRedirect";
-import SimpleDashboard from "./pages/SimpleDashboard";
-import Dashboard from "./pages/Dashboard";
-import { ConnectionsPage } from "./components/dashboard/ConnectionsPage";
-import TrustedContactView from "@/pages/TrustedContactView";
-import AdminDashboard from "./pages/AdminDashboard";
-import FamilyTrackingApp from "./pages/FamilyTrackingApp";
-import GlobalEmmaChat from "@/components/GlobalEmmaChat";
-import ScrollToTop from "@/components/ScrollToTop";
-import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+// Protected Route Components
+import ProtectedRoute from "./components/ProtectedRoute";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import RegionalProtectedRoute from "./components/RegionalProtectedRoute";
+import ProtectedSOSRoute from "./components/ProtectedSOSRoute";
+import SmartAppRedirect from "./components/SmartAppRedirect";
 
+import ScrollToTop from "./components/ScrollToTop";
 
-// Component that handles page tracking inside Router context
-const PageTrackingWrapper = ({ children }: { children: React.ReactNode }) => {
+function App() {
   usePageTracking();
-  return <>{children}</>;
-};
 
-const App = () => {
   return (
-    <EnhancedErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <EnhancedErrorBoundary>
           <EmmaChatProvider>
-          <BrowserRouter>
-            <PageTrackingWrapper>
-              <ScrollToTop />
-            <Routes>
-              {/* Main Homepage */}
-              <Route path="/" element={
-                <OptimizedSuspense skeletonType="card">
-                  <Index />
-                </OptimizedSuspense>
-              } />
+            <ScrollToTop />
+            <div className="min-h-screen bg-background text-foreground">
+              <Routes>
+                {/* Public Landing Page */}
+                <Route path="/" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <Index />
+                  </OptimizedSuspense>
+                } />
+                
+                {/* Auth Page */}
+                <Route path="/auth" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <AuthPage />
+                  </OptimizedSuspense>
+                } />
+                <Route path="/ai-register" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <AIRegister />
+                  </OptimizedSuspense>
+                } />
 
-              {/* Authentication Routes */}
-              <Route path="/auth" element={
-                <OptimizedSuspense skeletonType="card">
-                  <AuthPage />
-                </OptimizedSuspense>
-              } />
-              <Route path="/ai-register" element={
-                <OptimizedSuspense skeletonType="card">
-                  <AIRegister />
-                </OptimizedSuspense>
-              } />
+                {/* Blog Pages */}
+                <Route path="/blog" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <Blog />
+                  </OptimizedSuspense>
+                } />
+                <Route path="/blog/:slug" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <BlogPost />
+                  </OptimizedSuspense>
+                } />
 
-              {/* Blog Page */}
-              <Route path="/blog" element={
-                <OptimizedSuspense skeletonType="card">
-                  <Blog />
-                </OptimizedSuspense>
-              } />
+                {/* Public Pages */}
+                <Route path="/contact" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <Contact />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/videos" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <Videos />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/privacy" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <Privacy />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/terms" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <Terms />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/support" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <Support />
+                  </OptimizedSuspense>
+                } />
+                
+                
+                <Route path="/family-carer-access" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <FamilyCarerAccess />
+                  </OptimizedSuspense>
+                } />
 
-              {/* Public Pages */}
-              <Route path="/contact" element={
-                <OptimizedSuspense skeletonType="card">
-                  <Contact />
-                </OptimizedSuspense>
-              } />
-              <Route path="/videos" element={
-                <OptimizedSuspense skeletonType="card">
-                  <Videos />
-                </OptimizedSuspense>
-              } />
-              <Route path="/privacy" element={
-                <OptimizedSuspense skeletonType="card">
-                  <Privacy />
-                </OptimizedSuspense>
-              } />
-              <Route path="/terms" element={
-                <OptimizedSuspense skeletonType="card">
-                  <Terms />
-                </OptimizedSuspense>
-              } />
-              <Route path="/support" element={
-                <OptimizedSuspense skeletonType="card">
-                  <Support />
-                </OptimizedSuspense>
-              } />
-              <Route path="/devices/ice-sos-pendant" element={
-                <OptimizedSuspense skeletonType="card">
-                  <DeviceIceSosPendant />
-                </OptimizedSuspense>
-              } />
-              <Route path="/regional-center/spain" element={
-                <OptimizedSuspense skeletonType="card">
-                  <RegionalCenterSpain />
-                </OptimizedSuspense>
-              } />
-              <Route path="/family-carer-access" element={
-                <OptimizedSuspense skeletonType="card">
-                  <FamilyCarerAccess />
-                </OptimizedSuspense>
-              } />
+                {/* Payment Success Pages */}
+                <Route path="/payment-success" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <PaymentSuccess />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/family-checkout-success" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <FamilyCheckoutSuccess />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/family-checkout-canceled" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <FamilyCheckoutCanceled />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/registration-success" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <RegistrationSuccess />
+                  </OptimizedSuspense>
+                } />
 
-              {/* Success Pages */}
-              <Route path="/payment-success" element={
-                <OptimizedSuspense skeletonType="card">
-                  <PaymentSuccess />
-                </OptimizedSuspense>
-              } />
-              <Route path="/family-checkout-success" element={
-                <OptimizedSuspense skeletonType="card">
-                  <FamilyCheckoutSuccess />
-                </OptimizedSuspense>
-              } />
-              <Route path="/family-checkout-canceled" element={
-                <OptimizedSuspense skeletonType="card">
-                  <FamilyCheckoutCanceled />
-                </OptimizedSuspense>
-              } />
-              <Route path="/registration-success" element={
-                <OptimizedSuspense skeletonType="card">
-                  <RegistrationSuccess />
-                </OptimizedSuspense>
-              } />
-
-              {/* Smart Dashboard Routing */}
-              <Route path="/dashboard" element={
-                <OptimizedSuspense skeletonType="card">
+                {/* Protected Dashboard Routes */}
+                <Route path="/dashboard" element={
                   <ProtectedRoute>
-                    <DashboardRedirect />
+                    <OptimizedSuspense skeletonType="dashboard">
+                      <DashboardRedirect />
+                    </OptimizedSuspense>
                   </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
-              
-              {/* Connections Management */}
-              <Route path="/dashboard/connections" element={
-                <OptimizedSuspense skeletonType="card">
-                  <ProtectedRoute>
-                    <ConnectionsPage />
-                  </ProtectedRoute>
-                </OptimizedSuspense>
-               } />
-
-              {/* Member Dashboard */}
-              <Route path="/member-dashboard/*" element={
-                <OptimizedSuspense skeletonType="card">
-                  <ProtectedRoute>
-                    <SimpleDashboard />
-                  </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
-              <Route path="/full-dashboard/*" element={
-                <OptimizedSuspense skeletonType="card">
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
-
-              {/* Admin Routes */}
-              <Route path="/admin-setup" element={
-                <OptimizedSuspense skeletonType="card">
-                  <AdminSetupPage />
-                </OptimizedSuspense>
-              } />
-              <Route path="/admin-dashboard/*" element={
-                <OptimizedSuspense skeletonType="card">
+                } />
+                
+                {/* Admin Routes */}
+                <Route path="/admin-dashboard/*" element={
                   <AdminProtectedRoute>
-                    <AdminDashboard />
+                    <OptimizedSuspense skeletonType="dashboard">
+                      <AdminDashboard />
+                    </OptimizedSuspense>
                   </AdminProtectedRoute>
-                </OptimizedSuspense>
-              } />
+                } />
 
-               {/* Owner's SOS Emergency App */}
-              <Route path="/app" element={
-                <OptimizedSuspense skeletonType="card">
-                  <ProtectedSOSRoute>
-                    <SOSHome />
-                  </ProtectedSOSRoute>
-                </OptimizedSuspense>
-              } />
-              <Route path="/sos-app" element={
-                <OptimizedSuspense skeletonType="card">
-                  <ProtectedSOSRoute>
-                    <SOSHome />
-                  </ProtectedSOSRoute>
-                </OptimizedSuspense>
-              } />
-              <Route path="/sos" element={
-                <OptimizedSuspense skeletonType="card">
-                  <ProtectedSOSRoute>
-                    <SOSHome />
-                  </ProtectedSOSRoute>
-                </OptimizedSuspense>
-              } />
-              <Route path="/mobile-app" element={
-                <OptimizedSuspense skeletonType="card">
-                  <SmartAppRedirect />
-                </OptimizedSuspense>
-              } />
-
-              {/* Family Tracking App */}
-              <Route path="/family-app" element={
-                <OptimizedSuspense skeletonType="card">
+                {/* Mobile Apps */}
+                <Route path="/app" element={
                   <ProtectedRoute>
-                    <FamilyTrackingApp />
+                    <OptimizedSuspense skeletonType="card">
+                      <SmartAppRedirect />
+                    </OptimizedSuspense>
                   </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
-
-               {/* Family Dashboard Routes */}
-              <Route path="/family-dashboard/*" element={
-                <OptimizedSuspense skeletonType="card">
+                } />
+                
+                <Route path="/mobile-app" element={
                   <ProtectedRoute>
-                    <FamilyDashboard />
+                    <OptimizedSuspense skeletonType="card">
+                      <Dashboard />
+                    </OptimizedSuspense>
                   </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
-              <Route path="/family-sos" element={
-                <OptimizedSuspense skeletonType="card">
+                } />
+
+                {/* Family Dashboard */}
+                <Route path="/family-dashboard/*" element={
                   <ProtectedRoute>
-                    <FamilyTrackingApp />
+                    <OptimizedSuspense skeletonType="dashboard">
+                      <FamilyDashboard />
+                    </OptimizedSuspense>
                   </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
+                } />
 
-              {/* Family Access Setup */}
-              <Route path="/family-access-setup" element={
-                <OptimizedSuspense skeletonType="card">
-                  <FamilyAccessSetup />
-                </OptimizedSuspense>
-              } />
-
-              {/* Regional Dashboard */}
-              <Route path="/regional-dashboard" element={
-                <OptimizedSuspense skeletonType="card">
-                  <RegionalProtectedRoute>
-                    <RegionalDashboard />
-                  </RegionalProtectedRoute>
-                </OptimizedSuspense>
-              } />
-
-               {/* Connection Accept */}
-               <Route path="/invite/accept" element={
-                 <OptimizedSuspense skeletonType="card">
-                   <ConnectionAcceptPage />
-                 </OptimizedSuspense>
-               } />
-               
-               {/* Family Invite Accept */}
-               <Route path="/family-invite/:token" element={
-                 <OptimizedSuspense skeletonType="card">
-                   <FamilyInviteAccept />
-                 </OptimizedSuspense>
-               } />
-
-              {/* Live Map Routes */}
-              <Route path="/map" element={
-                <OptimizedSuspense skeletonType="card">
+                {/* Family Setup and Access */}
+                <Route path="/family-access-setup" element={
                   <ProtectedRoute>
-                    <MapScreen />
+                    <OptimizedSuspense skeletonType="card">
+                      <FamilyAccessSetup />
+                    </OptimizedSuspense>
                   </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
-              <Route path="/circles" element={
-                <OptimizedSuspense skeletonType="card">
+                } />
+
+                {/* Live Map Routes */}
+                <Route path="/map" element={
                   <ProtectedRoute>
-                    <MyCirclesPage />
+                    <OptimizedSuspense skeletonType="card">
+                      <MapScreen />
+                    </OptimizedSuspense>
                   </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
-              <Route path="/places" element={
-                <OptimizedSuspense skeletonType="card">
+                } />
+                
+                <Route path="/circles" element={
                   <ProtectedRoute>
-                    <PlacesManager />
+                    <OptimizedSuspense skeletonType="card">
+                      <MyCirclesPage />
+                    </OptimizedSuspense>
                   </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
-
-              <Route path="/history" element={
-                <OptimizedSuspense skeletonType="card">
+                } />
+                
+                <Route path="/places" element={
                   <ProtectedRoute>
-                    <LocationHistoryPage />
+                    <OptimizedSuspense skeletonType="card">
+                      <PlacesManager />
+                    </OptimizedSuspense>
                   </ProtectedRoute>
-                </OptimizedSuspense>
-              } />
+                } />
 
-              <Route path="/map-demo" element={
-                <OptimizedSuspense skeletonType="card">
-                  <MapDemo />
-                </OptimizedSuspense>
-              } />
+                <Route path="/history" element={
+                  <ProtectedRoute>
+                    <OptimizedSuspense skeletonType="card">
+                      <LocationHistoryPage />
+                    </OptimizedSuspense>
+                  </ProtectedRoute>
+                } />
 
-               {/* Trusted Contact View */}
-               <Route path="/trusted-contact/:eventId" element={
-                 <OptimizedSuspense skeletonType="card">
-                   <TrustedContactView />
-                 </OptimizedSuspense>
-               } />
+                {/* Demo and Test Pages */}
+                <Route path="/map-demo" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <MapDemo />
+                  </OptimizedSuspense>
+                } />
 
+                 <Route path="/test" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <TestPage />
+                  </OptimizedSuspense>
+                } />
 
-               {/* Test Page */}
-               <Route path="/test" element={
-                 <OptimizedSuspense skeletonType="card">
-                   <TestPage />
-                 </OptimizedSuspense>
-               } />
-
-              {/* 404 Page */}
-              <Route path="*" element={
-                <OptimizedSuspense skeletonType="card">
-                  <NotFound />
-                </OptimizedSuspense>
-              } />
-            </Routes>
-            
-            {/* Global Emma Chat - appears only on frontend/marketing pages */}
-            {(window.location.pathname === '/' || 
-              window.location.pathname === '/contact' || 
-              window.location.pathname === '/support' || 
-              window.location.pathname === '/blog' || 
-              window.location.pathname === '/videos' || 
-              window.location.pathname === '/privacy' || 
-              window.location.pathname === '/terms') && 
-             <GlobalEmmaChat />}
-            
-            {/* Show device manager only in SOS apps */}
-            {(window.location.pathname === '/app' || window.location.pathname === '/sos-app') && <DeviceManagerButton />}
-            
-            {/* PWA Install Prompt - Disabled */}
-            {/* <PWAInstallPrompt /> */}
-            </PageTrackingWrapper>
-          </BrowserRouter>
+                {/* Catch all route */}
+                <Route path="*" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <Index />
+                  </OptimizedSuspense>
+                } />
+              </Routes>
+              <DeviceManagerButton />
+            </div>
+            <Toaster />
           </EmmaChatProvider>
-        </AuthProvider>
-      </QueryClientProvider>
-    </EnhancedErrorBoundary>
+        </EnhancedErrorBoundary>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
-};
+}
 
 export default App;
