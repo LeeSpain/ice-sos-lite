@@ -757,6 +757,36 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
           console.log(`📝 Generating ${contentType} for ${platform}...`);
           const content = await generatePlatformContent(campaign, platform, contentType, supabase, aiConfig);
 
+          // Generate featured image for blog posts
+          let imageUrl = null;
+          if (contentType === 'blog_post' && openaiApiKey) {
+            try {
+              console.log('🎨 Generating DALL-E featured image...');
+              const imagePrompt = `Professional featured image for blog post: "${content?.title || campaign.title}". Modern, clean design with ICE SOS branding. Family safety and emergency preparedness theme.`;
+              
+              const imgRes = await fetch('https://api.openai.com/v1/images/generations', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${openaiApiKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  model: 'dall-e-3',
+                  prompt: imagePrompt,
+                  n: 1,
+                  size: '1024x1024',
+                  quality: 'hd',
+                  response_format: 'b64_json'
+                })
+              });
+              
+              const imgData = await imgRes.json();
+              if (imgRes.ok && imgData?.data?.[0]?.b64_json) {
+                imageUrl = `data:image/png;base64,${imgData.data[0].b64_json}`;
+                console.log('✅ DALL-E image generated successfully');
+              }
+            } catch (imageError) {
+              console.error('⚠️ Image generation failed, continuing without image:', imageError);
+            }
+          }
+
           // Insert generated content
           const insertData: any = {
             campaign_id: campaignId,
@@ -765,6 +795,7 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
             title: content?.title || `${campaign.title} - ${platform}`,
             body_text: content?.body || content?.content || '',
             hashtags: content?.hashtags || null,
+            image_url: imageUrl,
             status: 'draft'
           };
 

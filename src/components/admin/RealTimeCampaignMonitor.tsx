@@ -85,6 +85,12 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
                     <p className="text-sm text-muted-foreground">
                       Created: {new Date(campaign.created_at).toLocaleDateString()}
                     </p>
+                    {campaign.status === 'running' && (
+                      <div className="flex items-center gap-2 text-xs text-blue-600 mt-1">
+                        <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full"></div>
+                        Generating blog content & DALL-E image...
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant={campaign.status === 'running' ? 'default' : campaign.status === 'failed' ? 'destructive' : 'secondary'}>

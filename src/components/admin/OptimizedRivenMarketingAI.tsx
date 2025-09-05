@@ -298,13 +298,62 @@ export default function OptimizedRivenMarketingAI() {
       if (response.error) throw response.error;
 
       setRivenResponse(response.data?.message || 'Command processed successfully');
-      handleCampaignUpdate(); // Refresh campaigns list
-      handleContentUpdate(); // Refresh content list
       
       toast({
         title: "Command Executed",
-        description: "Riven is processing your marketing command.",
+        description: "Content generation started. You'll be automatically taken to monitor progress.",
       });
+      
+      // Auto-navigate to monitor tab to track progress
+      setActiveTab('monitor');
+      
+      // Start monitoring the campaign progress
+      handleCampaignUpdate();
+      handleContentUpdate();
+      
+      // Set up polling to check for completion and auto-navigate to approval
+      const pollForCompletion = async () => {
+        const campaignId = response.data?.campaign_id;
+        if (!campaignId) return;
+        
+        const checkInterval = setInterval(async () => {
+          try {
+            const { data: campaign } = await supabase
+              .from('marketing_campaigns')
+              .select('status, completed_at')
+              .eq('id', campaignId)
+              .single();
+              
+            if (campaign?.status === 'completed') {
+              clearInterval(checkInterval);
+              // Wait a moment for content to be fully processed
+              setTimeout(() => {
+                setActiveTab('content-approval');
+                toast({
+                  title: "Content Ready!",
+                  description: "Your blog post with image has been generated and is ready for approval.",
+                });
+                handleContentUpdate();
+              }, 2000);
+            } else if (campaign?.status === 'failed') {
+              clearInterval(checkInterval);
+              toast({
+                title: "Generation Failed",
+                description: "Content generation encountered an error. Please try again.",
+                variant: "destructive"
+              });
+            }
+          } catch (error) {
+            console.error('Error checking campaign status:', error);
+          }
+        }, 3000); // Check every 3 seconds
+        
+        // Stop polling after 5 minutes to prevent infinite polling
+        setTimeout(() => clearInterval(checkInterval), 300000);
+      };
+      
+      pollForCompletion();
+      
     } catch (error) {
       console.error('Error executing command:', error);
       setRivenResponse('Error: ' + (error as Error).message);
@@ -316,7 +365,7 @@ export default function OptimizedRivenMarketingAI() {
     } finally {
       setIsProcessing(false);
     }
-  }, [toast, handleCampaignUpdate, handleContentUpdate, currentCommand]);
+  }, [toast, handleCampaignUpdate, handleContentUpdate, currentCommand, setActiveTab]);
 
   const handleUseTemplate = useCallback((template: any) => {
     setCurrentCommand(template.command);
