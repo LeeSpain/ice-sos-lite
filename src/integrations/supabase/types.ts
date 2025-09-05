@@ -3325,6 +3325,36 @@ export type Database = {
         }
         Relationships: []
       }
+      social_media_oauth_state: {
+        Row: {
+          code_verifier: string
+          created_at: string
+          expires_at: string
+          id: string
+          platform: string
+          state: string
+          user_id: string
+        }
+        Insert: {
+          code_verifier: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          platform: string
+          state: string
+          user_id: string
+        }
+        Update: {
+          code_verifier?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          platform?: string
+          state?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       social_media_posting_queue: {
         Row: {
           content_id: string
@@ -4447,6 +4477,10 @@ export type Database = {
       check_spain_rule: {
         Args: { p_user_id: string }
         Returns: boolean
+      }
+      cleanup_expired_oauth_states: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       cleanup_old_security_data: {
         Args: Record<PropertyKey, never>
