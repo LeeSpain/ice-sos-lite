@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { format } from 'date-fns';
 import {
   Activity,
   Users,
@@ -168,57 +169,59 @@ export const RealTimeCampaignMonitor: React.FC<RealTimeCampaignMonitorProps> = (
             </Card>
           ) : (
             campaigns.map((campaign) => (
-              <Card key={campaign.id} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-medium">{campaign.title || 'Campaign'}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Created: {new Date(campaign.created_at).toLocaleDateString()}
-                    </p>
-                    {campaign.status === 'running' && (
-                      <div className="flex items-center gap-2 text-xs text-blue-600 mt-1">
-                        <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full"></div>
-                        Generating blog content & DALL-E image...
-                      </div>
-                    )}
+              <Card key={campaign.id}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <div className="space-y-1">
+                    <CardTitle className="text-base">{campaign.title || 'Campaign'}</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={campaign.status === 'running' ? 'default' : campaign.status === 'failed' ? 'destructive' : 'secondary'}>
+                        {campaign.status}
+                      </Badge>
+                      {campaign.status === 'running' && (
+                        <div className="animate-pulse h-2 w-2 bg-green-500 rounded-full" />
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={campaign.status === 'running' ? 'default' : campaign.status === 'failed' ? 'destructive' : 'secondary'}>
-                      {campaign.status}
-                    </Badge>
-                    {campaign.status === 'running' && (
-                      <div className="animate-pulse h-2 w-2 bg-green-500 rounded-full" />
-                    )}
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48 bg-background border shadow-lg z-50">
-                        <DropdownMenuItem 
-                          onClick={() => handleEditCampaign(campaign)}
-                          className="cursor-pointer"
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Campaign
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDeleteCampaign(campaign.id)}
-                          className="text-destructive cursor-pointer focus:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete Campaign
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-                {campaign.error_message && (
-                  <div className="mt-2 p-2 bg-destructive/10 text-destructive text-sm rounded">
-                    Error: {campaign.error_message}
-                  </div>
-                )}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48 bg-background border shadow-lg z-[100]">
+                      <DropdownMenuItem 
+                        onClick={() => handleEditCampaign(campaign)}
+                        className="cursor-pointer"
+                      >
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Campaign
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDeleteCampaign(campaign.id)}
+                        className="text-destructive cursor-pointer focus:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Campaign
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Created: {format(new Date(campaign.created_at), 'PPp')}
+                  </p>
+                  {campaign.status === 'running' && (
+                    <div className="flex items-center gap-2 text-xs text-blue-600 mb-3">
+                      <div className="animate-spin h-3 w-3 border border-current border-t-transparent rounded-full"></div>
+                      Generating blog content & DALL-E image...
+                    </div>
+                  )}
+                  {campaign.error_message && (
+                    <div className="p-2 bg-destructive/10 text-destructive text-sm rounded">
+                      Error: {campaign.error_message}
+                    </div>
+                  )}
+                </CardContent>
               </Card>
             ))
           )}
