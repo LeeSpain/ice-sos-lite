@@ -58,23 +58,21 @@ import SmartAppRedirect from "./components/SmartAppRedirect";
 
 import ScrollToTop from "./components/ScrollToTop";
 
-function App() {
+// Component to handle page tracking inside Router context
+function AppWithTracking() {
   usePageTracking();
-
+  
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <EnhancedErrorBoundary>
-          <EmmaChatProvider>
-            <ScrollToTop />
-            <div className="min-h-screen bg-background text-foreground">
-              <Routes>
-                {/* Public Landing Page */}
-                <Route path="/" element={
-                  <OptimizedSuspense skeletonType="card">
-                    <Index />
-                  </OptimizedSuspense>
-                } />
+    <>
+      <ScrollToTop />
+      <div className="min-h-screen bg-background text-foreground">
+        <Routes>
+          {/* Public Landing Page */}
+          <Route path="/" element={
+            <OptimizedSuspense skeletonType="card">
+              <Index />
+            </OptimizedSuspense>
+          } />
                 
                 {/* Auth Page */}
                 <Route path="/auth" element={
@@ -272,6 +270,17 @@ function App() {
               <DeviceManagerButton />
             </div>
             <Toaster />
+          </>
+        );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <EnhancedErrorBoundary>
+          <EmmaChatProvider>
+            <AppWithTracking />
           </EmmaChatProvider>
         </EnhancedErrorBoundary>
       </BrowserRouter>
