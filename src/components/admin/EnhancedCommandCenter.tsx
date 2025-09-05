@@ -82,7 +82,6 @@ interface CommandConfiguration {
   campaignDuration: number;
   platforms: string[];
   contentTypes: string[];
-  budget: number;
   schedulingMode: string;
   targetAudience: string;
   urgency: string;
@@ -111,7 +110,6 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
   const [campaignDuration, setCampaignDuration] = useState([7]);
   const [selectedPlatforms, setSelectedPlatforms] = useState(['facebook', 'instagram']);
   const [selectedContentTypes, setSelectedContentTypes] = useState(['post']);
-  const [budget, setBudget] = useState([500]);
   const [schedulingMode, setSchedulingMode] = useState('optimal');
   const [targetAudience, setTargetAudience] = useState('family_safety');
   const [urgency, setUrgency] = useState('normal');
@@ -317,13 +315,7 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
 
   const calculateEstimatedReach = () => {
     const baseReach = selectedPlatforms.length * totalPosts[0] * 1000;
-    const multiplier = budget[0] / 500;
-    return Math.round(baseReach * multiplier);
-  };
-
-  const calculateEstimatedCost = () => {
-    const baseCost = totalPosts[0] * selectedPlatforms.length * 5;
-    return Math.min(baseCost, budget[0]);
+    return Math.round(baseReach);
   };
 
   const handleSendCommand = () => {
@@ -334,7 +326,6 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
       campaignDuration: campaignDuration[0],
       platforms: selectedPlatforms,
       contentTypes: selectedContentTypes,
-      budget: budget[0],
       schedulingMode,
       targetAudience,
       urgency,
@@ -476,7 +467,7 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">{totalPosts[0]}</div>
               <div className="text-sm text-muted-foreground">Total Posts</div>
@@ -488,10 +479,6 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">{calculateEstimatedReach().toLocaleString()}</div>
               <div className="text-sm text-muted-foreground">Est. Reach</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">${calculateEstimatedCost()}</div>
-              <div className="text-sm text-muted-foreground">Est. Cost</div>
             </div>
           </div>
 
@@ -564,18 +551,6 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
               </DialogHeader>
               
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Budget Range: ${budget[0]}</Label>
-                  <Slider
-                    value={budget}
-                    onValueChange={setBudget}
-                    min={100}
-                    max={2000}
-                    step={50}
-                    className="w-full"
-                  />
-                </div>
-
                 <div>
                   <Label>Scheduling Mode</Label>
                   <Select value={schedulingMode} onValueChange={setSchedulingMode}>
@@ -674,8 +649,8 @@ export const EnhancedCommandCenter: React.FC<CommandCenterProps> = ({
                 <div>{calculateEstimatedReach().toLocaleString()}</div>
               </div>
               <div>
-                <div className="font-medium text-primary">Est. Cost</div>
-                <div>${calculateEstimatedCost()}</div>
+                <div className="font-medium text-primary">Est. Platforms</div>
+                <div>{selectedPlatforms.length}</div>
               </div>
             </div>
           </div>
