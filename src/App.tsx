@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { EmmaChatProvider } from "@/contexts/EmmaChatContext";
+import GlobalEmmaChat from "@/components/GlobalEmmaChat";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import { queryClient } from "@/lib/queryClient";
 import OptimizedSuspense from '@/components/OptimizedSuspense';
@@ -301,6 +302,7 @@ function App() {
         <EnhancedErrorBoundary>
           <EmmaChatProvider>
             <AppWithTracking />
+            <GlobalEmmaChat />
           </EmmaChatProvider>
         </EnhancedErrorBoundary>
       </BrowserRouter>
