@@ -1,352 +1,170 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+interface QueueRow {
+  id: string;
+  content_id: string;
+  scheduled_time: string;
+  posted_at: string | null;
+  platform: string;
+  status: string; // queued | retry_scheduled | posted | failed
+  retry_count: number | null;
+  max_retries: number | null;
+}
+
+interface ContentRow {
+  id: string;
+  title: string | null;
+  body_text: string | null;
+  platform: string | null;
+}
+
+const PLATFORM_LIMITS: Record<string, number> = {
+  twitter: 280,
+  x: 280,
+  instagram: 2200,
+  facebook: 63206,
+  linkedin: 3000,
+  youtube: 5000,
+};
+
+function nowISO() {
+  return new Date().toISOString();
+}
+
+function minutesFromNow(mins: number) {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() + mins);
+  return d.toISOString();
+}
+
+function validateContent(platform: string, text: string) {
+  const key = platform.toLowerCase();
+  const limit = PLATFORM_LIMITS[key] ?? 3000;
+  if (text.length > limit) {
+    throw new Error(`Content exceeds ${key} limit (${text.length}/${limit})`);
+  }
+}
+
+Deno.serve(async (req: Request) => {
+  // CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabaseUrl = Deno.env.get('SUPABASE_URL');
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+  if (!supabaseUrl || !serviceKey) {
+    console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env');
+    return new Response(
+      JSON.stringify({ error: 'Server misconfigured: missing env vars' }),
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
+  }
+
+  const admin = createClient(supabaseUrl, serviceKey);
+
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
-    const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const now = nowISO();
 
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+    // Load up to 10 items ready to process
+    const { data: items, error: loadErr } = await admin
+      .from('social_media_posting_queue')
+      .select('*')
+      .in('status', ['queued', 'retry_scheduled'])
+      .lte('scheduled_time', now)
+      .order('scheduled_time', { ascending: true })
+      .limit(10);
+
+    if (loadErr) throw new Error(`Load queue failed: ${loadErr.message}`);
+
+    let processed = 0;
+    let succeeded = 0;
+    let failed = 0;
+    const details: Array<Record<string, unknown>> = [];
+
+    for (const item of (items as QueueRow[] | null) ?? []) {
+      processed++;
+      try {
+        const { data: content, error: cErr } = await admin
+          .from('marketing_content')
+          .select('*')
+          .eq('id', item.content_id)
+          .maybeSingle();
+        if (cErr) throw new Error(`Load content failed: ${cErr.message}`);
+        if (!content) throw new Error('Related content not found');
+
+        const c = content as ContentRow;
+        const platform = (item.platform || c.platform || 'unknown').toLowerCase();
+        const text = `${c.title ?? ''}\n\n${c.body_text ?? ''}`.trim();
+
+        // Validation
+        validateContent(platform, text);
+
+        // Simulated publish - replace with real API calls later
+        // e.g., await publishToPlatform(platform, text, media)
+        const simulatedPostId = `sim_${crypto.randomUUID()}`;
+
+        const { error: upQueueErr } = await admin
+          .from('social_media_posting_queue')
+          .update({
+            status: 'posted',
+            posted_at: now,
+            platform_post_id: simulatedPostId,
+            error_message: null,
+          })
+          .eq('id', item.id);
+        if (upQueueErr) throw new Error(`Update queue failed: ${upQueueErr.message}`);
+
+        const { error: upContentErr } = await admin
+          .from('marketing_content')
+          .update({ status: 'posted', posted_at: now })
+          .eq('id', item.content_id);
+        if (upContentErr) throw new Error(`Update content failed: ${upContentErr.message}`);
+
+        succeeded++;
+        details.push({ id: item.id, platform, status: 'posted', simulatedPostId });
+      } catch (e: any) {
+        console.error('posting-processor error on item', item.id, e?.message || e);
+        const nextRetry = (item.retry_count ?? 0) + 1;
+        const max = item.max_retries ?? 3;
+        const willRetry = nextRetry <= max;
+        const newStatus = willRetry ? 'retry_scheduled' : 'failed';
+        const newTime = willRetry ? minutesFromNow(Math.min(30, nextRetry * 5)) : item.scheduled_time;
+
+        const { error: upErr } = await admin
+          .from('social_media_posting_queue')
+          .update({
+            status: newStatus,
+            retry_count: nextRetry,
+            scheduled_time: newTime,
+            error_message: e?.message || 'unknown_error',
+          })
+          .eq('id', item.id);
+        if (upErr) console.error('Failed to update queue after error', upErr.message);
+
+        if (!willRetry) failed++;
+        details.push({ id: item.id, status: newStatus, retry_count: nextRetry, error: e?.message });
+      }
     }
 
-    const token = authHeader.replace(/^Bearer\s+/i, '');
+    const result = { ok: true, processed, succeeded, failed, details };
+    console.log('posting-processor result', result);
 
-    // Validate user via anon client and token
-    const userSupabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false },
-      global: { headers: { Authorization: `Bearer ${token}` } },
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
-
-    const { data: { user }, error: userError } = await userSupabase.auth.getUser(token);
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Invalid token' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Service client for DB operations
-    const serviceSupabase = createClient(supabaseUrl, supabaseServiceRoleKey, { auth: { persistSession: false } });
-
-    // Ensure user is admin
-    const { data: profile, error: profileError } = await serviceSupabase
-      .from('profiles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
-
-    if (profileError || profile?.role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Forbidden: admin only' }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Parse request payload once
-    const payload = await req.json().catch(() => ({}));
-    const { action, contentId } = payload as { action?: string; contentId?: string };
-
-    switch (action) {
-      case 'process_queue':
-        return await processPostingQueue(serviceSupabase);
-      case 'post_now':
-        if (!contentId) {
-          return new Response(JSON.stringify({ error: 'contentId is required' }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-          });
-        }
-        return await postContentNow(contentId, serviceSupabase);
-      default:
-        throw new Error('Invalid action');
-    }
-  } catch (error) {
-    console.error('Posting processor error:', error);
-    return new Response(JSON.stringify({ error: (error as Error).message || 'Unknown error' }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
+  } catch (err: any) {
+    console.error('posting-processor fatal error', err?.message || err);
+    return new Response(
+      JSON.stringify({ ok: false, error: err?.message || 'unknown_error' }),
+      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    );
   }
 });
-
-async function processPostingQueue(supabase: any) {
-  console.log('Processing posting queue...');
-  
-  // Get scheduled posts that are ready to be published
-  const { data: queueItems, error } = await supabase
-    .from('posting_queue')
-    .select(`
-      *,
-      marketing_content (*)
-    `)
-    .eq('status', 'scheduled')
-    .lte('scheduled_time', new Date().toISOString())
-    .limit(10);
-
-  if (error) {
-    console.error('Error fetching queue items:', error);
-    throw error;
-  }
-
-  const processed = [];
-  
-  for (const item of queueItems || []) {
-    try {
-      await postToSocialMedia(item.marketing_content, item.platform);
-      
-      // Update queue item status
-      await supabase
-        .from('posting_queue')
-        .update({
-          status: 'completed',
-          posted_at: new Date().toISOString()
-        })
-        .eq('id', item.id);
-
-      // Update content status
-      await supabase
-        .from('marketing_content')
-        .update({
-          status: 'published',
-          posted_at: new Date().toISOString()
-        })
-        .eq('id', item.content_id);
-
-      processed.push(item.id);
-      console.log(`Posted content ${item.content_id} to ${item.platform}`);
-      
-    } catch (error) {
-      console.error(`Error posting ${item.id}:`, error);
-      
-      // Update with error status
-      await supabase
-        .from('posting_queue')
-        .update({
-          status: 'failed',
-          error_message: error.message,
-          retry_count: (item.retry_count || 0) + 1
-        })
-        .eq('id', item.id);
-    }
-  }
-
-  return new Response(JSON.stringify({ 
-    processed: processed.length,
-    failed: (queueItems?.length || 0) - processed.length 
-  }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-  });
-}
-
-async function postContentNow(contentId: string, supabase: any) {
-  console.log(`Posting content ${contentId} immediately`);
-  
-  const { data: content, error } = await supabase
-    .from('marketing_content')
-    .select('*')
-    .eq('id', contentId)
-    .single();
-
-  if (error || !content) {
-    throw new Error('Content not found');
-  }
-
-  await postToSocialMedia(content, content.platform);
-
-  // Update content status
-  await supabase
-    .from('marketing_content')
-    .update({
-      status: 'published',
-      posted_at: new Date().toISOString()
-    })
-    .eq('id', contentId);
-
-  return new Response(JSON.stringify({ success: true }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-  });
-}
-
-async function postToSocialMedia(content: any, platform: string) {
-  console.log(`Posting to ${platform}:`, content.title);
-  
-  // Get user's OAuth tokens for the platform
-  const { data: accountData, error: accountError } = await supabase
-    .from('social_media_accounts')
-    .select('*')
-    .eq('platform', platform)
-    .eq('connection_status', 'connected')
-    .single();
-
-  if (accountError || !accountData) {
-    throw new Error(`No connected ${platform} account found`);
-  }
-
-  // Check if token needs refresh
-  if (accountData.token_expires_at && new Date(accountData.token_expires_at) <= new Date()) {
-    throw new Error(`${platform} token expired. Please reconnect your account.`);
-  }
-
-  const platformAPIs = {
-    facebook: postToFacebook,
-    twitter: postToTwitter,
-    linkedin: postToLinkedIn,
-    instagram: postToInstagram,
-    youtube: postToYouTube
-  };
-
-  const postFunction = platformAPIs[platform];
-  if (!postFunction) {
-    throw new Error(`Unsupported platform: ${platform}`);
-  }
-
-  return await postFunction(content, accountData);
-}
-
-async function postToFacebook(content: any, oauth: any) {
-  console.log('Posting to Facebook:', content.title);
-  
-  try {
-    const postData = {
-      message: `${content.title}\n\n${content.body_text}`,
-      access_token: oauth.access_token
-    };
-
-    // Add image if available
-    if (content.image_url) {
-      postData.link = content.image_url;
-    }
-
-    const response = await fetch(`https://graph.facebook.com/me/feed`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(postData)
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error?.message || 'Facebook API error');
-    }
-
-    return { platform_post_id: result.id };
-  } catch (error) {
-    console.error('Facebook posting error:', error);
-    throw error;
-  }
-}
-
-async function postToTwitter(content: any, oauth: any) {
-  console.log('Posting to Twitter:', content.title);
-  
-  try {
-    let tweetText = `${content.title}\n\n${content.body_text}`;
-    
-    // Twitter character limit
-    if (tweetText.length > 280) {
-      tweetText = content.title.length > 250 ? 
-        content.title.substring(0, 250) + '...' : 
-        `${content.title}\n\n${content.body_text.substring(0, 280 - content.title.length - 5)}...`;
-    }
-
-    const response = await fetch('https://api.twitter.com/2/tweets', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${oauth.access_token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ text: tweetText })
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.detail || result.title || 'Twitter API error');
-    }
-
-    return { platform_post_id: result.data.id };
-  } catch (error) {
-    console.error('Twitter posting error:', error);
-    throw error;
-  }
-}
-
-async function postToLinkedIn(content: any, oauth: any) {
-  console.log('Posting to LinkedIn:', content.title);
-  
-  try {
-    const postData = {
-      author: `urn:li:person:${oauth.platform_user_id}`,
-      lifecycleState: 'PUBLISHED',
-      specificContent: {
-        'com.linkedin.ugc.ShareContent': {
-          shareCommentary: {
-            text: `${content.title}\n\n${content.body_text}`
-          },
-          shareMediaCategory: 'NONE'
-        }
-      },
-      visibility: {
-        'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'
-      }
-    };
-
-    if (content.image_url) {
-      postData.specificContent['com.linkedin.ugc.ShareContent'].shareMediaCategory = 'IMAGE';
-      postData.specificContent['com.linkedin.ugc.ShareContent'].media = [{
-        status: 'READY',
-        description: {
-          text: content.title
-        },
-        media: content.image_url,
-        title: {
-          text: content.title
-        }
-      }];
-    }
-
-    const response = await fetch('https://api.linkedin.com/v2/ugcPosts', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${oauth.access_token}`,
-        'Content-Type': 'application/json',
-        'X-Restli-Protocol-Version': '2.0.0'
-      },
-      body: JSON.stringify(postData)
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'LinkedIn API error');
-    }
-
-    return { platform_post_id: result.id };
-  } catch (error) {
-    console.error('LinkedIn posting error:', error);
-    throw error;
-  }
-}
-
-async function postToInstagram(content: any, oauth: any) {
-  console.log('Posting to Instagram:', content.title);
-  throw new Error('Instagram posting requires Instagram Business API and Facebook Page connection. Please use Facebook posting for now.');
-}
-
-async function postToYouTube(content: any, oauth: any) {
-  console.log('Posting to YouTube:', content.title);
-  throw new Error('YouTube posting requires video content and YouTube Data API v3. Text-only posting not supported.');
-}
