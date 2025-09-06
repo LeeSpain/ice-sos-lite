@@ -186,7 +186,23 @@ async function postContentNow(contentId: string, supabase: any) {
 async function postToSocialMedia(content: any, platform: string) {
   console.log(`Posting to ${platform}:`, content.title);
   
-  // Mock implementation - in real app, would use platform APIs
+  // Get user's OAuth tokens for the platform
+  const { data: accountData, error: accountError } = await supabase
+    .from('social_media_accounts')
+    .select('*')
+    .eq('platform', platform)
+    .eq('connection_status', 'connected')
+    .single();
+
+  if (accountError || !accountData) {
+    throw new Error(`No connected ${platform} account found`);
+  }
+
+  // Check if token needs refresh
+  if (accountData.token_expires_at && new Date(accountData.token_expires_at) <= new Date()) {
+    throw new Error(`${platform} token expired. Please reconnect your account.`);
+  }
+
   const platformAPIs = {
     facebook: postToFacebook,
     twitter: postToTwitter,
@@ -200,36 +216,137 @@ async function postToSocialMedia(content: any, platform: string) {
     throw new Error(`Unsupported platform: ${platform}`);
   }
 
-  return await postFunction(content);
+  return await postFunction(content, accountData);
 }
 
-async function postToFacebook(content: any) {
+async function postToFacebook(content: any, oauth: any) {
   console.log('Posting to Facebook:', content.title);
-  // Mock delay to simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return { platform_post_id: `fb_${Date.now()}` };
+  
+  try {
+    const postData = {
+      message: `${content.title}\n\n${content.body_text}`,
+      access_token: oauth.access_token
+    };
+
+    // Add image if available
+    if (content.image_url) {
+      postData.link = content.image_url;
+    }
+
+    const response = await fetch(`https://graph.facebook.com/me/feed`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(postData)
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error?.message || 'Facebook API error');
+    }
+
+    return { platform_post_id: result.id };
+  } catch (error) {
+    console.error('Facebook posting error:', error);
+    throw error;
+  }
 }
 
-async function postToTwitter(content: any) {
+async function postToTwitter(content: any, oauth: any) {
   console.log('Posting to Twitter:', content.title);
-  await new Promise(resolve => setTimeout(resolve, 800));
-  return { platform_post_id: `tw_${Date.now()}` };
+  
+  try {
+    let tweetText = `${content.title}\n\n${content.body_text}`;
+    
+    // Twitter character limit
+    if (tweetText.length > 280) {
+      tweetText = content.title.length > 250 ? 
+        content.title.substring(0, 250) + '...' : 
+        `${content.title}\n\n${content.body_text.substring(0, 280 - content.title.length - 5)}...`;
+    }
+
+    const response = await fetch('https://api.twitter.com/2/tweets', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${oauth.access_token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ text: tweetText })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.detail || result.title || 'Twitter API error');
+    }
+
+    return { platform_post_id: result.data.id };
+  } catch (error) {
+    console.error('Twitter posting error:', error);
+    throw error;
+  }
 }
 
-async function postToLinkedIn(content: any) {
+async function postToLinkedIn(content: any, oauth: any) {
   console.log('Posting to LinkedIn:', content.title);
-  await new Promise(resolve => setTimeout(resolve, 1200));
-  return { platform_post_id: `li_${Date.now()}` };
+  
+  try {
+    const postData = {
+      author: `urn:li:person:${oauth.platform_user_id}`,
+      lifecycleState: 'PUBLISHED',
+      specificContent: {
+        'com.linkedin.ugc.ShareContent': {
+          shareCommentary: {
+            text: `${content.title}\n\n${content.body_text}`
+          },
+          shareMediaCategory: 'NONE'
+        }
+      },
+      visibility: {
+        'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'
+      }
+    };
+
+    if (content.image_url) {
+      postData.specificContent['com.linkedin.ugc.ShareContent'].shareMediaCategory = 'IMAGE';
+      postData.specificContent['com.linkedin.ugc.ShareContent'].media = [{
+        status: 'READY',
+        description: {
+          text: content.title
+        },
+        media: content.image_url,
+        title: {
+          text: content.title
+        }
+      }];
+    }
+
+    const response = await fetch('https://api.linkedin.com/v2/ugcPosts', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${oauth.access_token}`,
+        'Content-Type': 'application/json',
+        'X-Restli-Protocol-Version': '2.0.0'
+      },
+      body: JSON.stringify(postData)
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || 'LinkedIn API error');
+    }
+
+    return { platform_post_id: result.id };
+  } catch (error) {
+    console.error('LinkedIn posting error:', error);
+    throw error;
+  }
 }
 
-async function postToInstagram(content: any) {
+async function postToInstagram(content: any, oauth: any) {
   console.log('Posting to Instagram:', content.title);
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return { platform_post_id: `ig_${Date.now()}` };
+  throw new Error('Instagram posting requires Instagram Business API and Facebook Page connection. Please use Facebook posting for now.');
 }
 
-async function postToYouTube(content: any) {
+async function postToYouTube(content: any, oauth: any) {
   console.log('Posting to YouTube:', content.title);
-  await new Promise(resolve => setTimeout(resolve, 2000));
-  return { platform_post_id: `yt_${Date.now()}` };
+  throw new Error('YouTube posting requires video content and YouTube Data API v3. Text-only posting not supported.');
 }
