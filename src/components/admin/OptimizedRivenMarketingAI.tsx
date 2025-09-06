@@ -238,29 +238,152 @@ export default function OptimizedRivenMarketingAI() {
     }
   }, [toast, handleContentUpdate]);
 
-  const handlePublishContent = useCallback(async (contentId: string) => {
+  const handlePublishContent = useCallback(async (contentId: string, options?: {
+    platforms?: string[];
+    publishType?: 'social' | 'blog' | 'email' | 'all';
+    scheduledTime?: string;
+  }) => {
     try {
-      const { error } = await supabase
+      const { platforms = [], publishType = 'social', scheduledTime } = options || {};
+      
+      // Get content details
+      const { data: content, error: fetchError } = await supabase
         .from('marketing_content')
-        .update({ 
-          status: 'published',
-          posted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', contentId);
+        .select('*')
+        .eq('id', contentId)
+        .single();
 
-      if (error) throw error;
+      if (fetchError) throw fetchError;
 
-      toast({
-        title: "Content Published",
-        description: "Content has been published successfully.",
-      });
+      let publishResults: any[] = [];
+
+      // Handle different publish types
+      switch (publishType) {
+        case 'social':
+          const targetPlatforms = platforms.length > 0 ? platforms : [content.platform];
+          
+          for (const platform of targetPlatforms) {
+            try {
+              if (scheduledTime) {
+                // Schedule for later
+                await supabase
+                  .from('social_media_posting_queue')
+                  .insert({
+                    content_id: contentId,
+                    platform,
+                    scheduled_time: scheduledTime,
+                    status: 'scheduled'
+                  });
+                publishResults.push({ platform, success: true, scheduled: true });
+              } else {
+                // Publish immediately
+                const { data, error } = await supabase.functions.invoke('posting-processor', {
+                  body: { action: 'post_now', contentId, platform }
+                });
+
+                if (error) throw error;
+                publishResults.push({ platform, success: true, data });
+              }
+            } catch (platformError) {
+              console.error(`Error with ${platform}:`, platformError);
+              publishResults.push({ platform, success: false, error: platformError.message });
+            }
+          }
+          break;
+
+        case 'blog':
+          try {
+            const { data, error } = await supabase.functions.invoke('blog-publisher', {
+              body: { action: 'publish_blog', contentId }
+            });
+            
+            if (error) throw error;
+            publishResults.push({ type: 'blog', success: true, data });
+          } catch (error) {
+            publishResults.push({ type: 'blog', success: false, error: error.message });
+          }
+          break;
+
+        case 'email':
+          try {
+            const { data, error } = await supabase.functions.invoke('email-publisher', {
+              body: { 
+                action: scheduledTime ? 'schedule_campaign' : 'send_campaign',
+                contentId,
+                campaignData: {
+                  name: `Campaign: ${content.title}`,
+                  subject: content.title,
+                  scheduled_time: scheduledTime
+                }
+              }
+            });
+            
+            if (error) throw error;
+            publishResults.push({ type: 'email', success: true, data });
+          } catch (error) {
+            publishResults.push({ type: 'email', success: false, error: error.message });
+          }
+          break;
+
+        case 'all':
+          // Publish to blog first
+          try {
+            await supabase.functions.invoke('blog-publisher', {
+              body: { action: 'publish_blog', contentId }
+            });
+            publishResults.push({ type: 'blog', success: true });
+          } catch (error) {
+            publishResults.push({ type: 'blog', success: false, error: error.message });
+          }
+
+          // Then social media
+          const allPlatforms = platforms.length > 0 ? platforms : ['facebook', 'twitter', 'linkedin'];
+          for (const platform of allPlatforms) {
+            try {
+              const { data, error } = await supabase.functions.invoke('posting-processor', {
+                body: { action: 'post_now', contentId, platform }
+              });
+              if (error) throw error;
+              publishResults.push({ platform, success: true, data });
+            } catch (error) {
+              publishResults.push({ platform, success: false, error: error.message });
+            }
+          }
+          break;
+      }
+
+      // Update content status
+      const successCount = publishResults.filter(r => r.success).length;
+      if (successCount > 0) {
+        await supabase
+          .from('marketing_content')
+          .update({ 
+            status: scheduledTime ? 'scheduled' : 'published',
+            posted_at: scheduledTime ? null : new Date().toISOString(),
+            scheduled_time: scheduledTime || null,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', contentId);
+
+        toast({
+          title: scheduledTime ? "Content Scheduled" : "Publishing Complete",
+          description: scheduledTime 
+            ? `Content scheduled for ${new Date(scheduledTime).toLocaleString()}`
+            : `Published successfully to ${successCount} destination(s)`,
+        });
+      } else {
+        toast({
+          title: "Publishing Failed",
+          description: "Failed to publish content. Check your connections and try again.",
+          variant: "destructive"
+        });
+      }
 
       handleContentUpdate();
     } catch (error) {
-      console.error('Error publishing content:', error);
+      console.error('Error in publish flow:', error);
       toast({
-        title: "Error",
+        title: "Error", 
         description: "Failed to publish content",
         variant: "destructive"
       });

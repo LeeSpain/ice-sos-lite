@@ -7,9 +7,10 @@ import { SocialHub } from './SocialHub';
 import { RealSocialMediaOAuth } from './RealSocialMediaOAuth';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import CampaignMonitor from './CampaignMonitor';
+import { EnhancedContentApproval } from './content/EnhancedContentApproval';
 
 // Enhanced Professional Components
-import EnhancedContentApproval from './enhanced/ContentApprovalDashboard';
+import EnhancedContentApprovalDashboard from './enhanced/ContentApprovalDashboard';
 import AdvancedAnalyticsDashboard from './enhanced/AdvancedAnalyticsDashboard';
 import ProfessionalSocialHub from './enhanced/ProfessionalSocialHub';
 import AdvancedCampaignMonitor from './enhanced/AdvancedCampaignMonitor';
@@ -36,20 +37,14 @@ export default function OptimizedComponentLoader({ type, props, enhanced = true 
       case 'workflow-pipeline':
         return <WorkflowPipeline {...props} />;
       case 'content-approval':
-        return enhanced ? (
+        return (
           <EnhancedContentApproval 
             contents={props.contents || []}
+            onContentUpdate={props.onContentUpdate || (() => {})}
             onContentApproval={props.onContentApproval || (() => {})}
             onPublishContent={props.onPublishContent || (() => {})}
             onDeleteContent={props.onDeleteContent || (() => {})}
             onEditContent={props.onEditContent || (() => {})}
-            isLoading={props.isLoading || false}
-          />
-        ) : (
-          <RealContentApproval 
-            contents={props.contents || []}
-            onContentApproval={props.onContentApproval || (() => {})}
-            onPublishContent={props.onPublishContent || (() => {})}
             isLoading={props.isLoading || false}
           />
         );
