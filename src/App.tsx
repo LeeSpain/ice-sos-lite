@@ -186,6 +186,24 @@ function AppWithTracking() {
                   </AdminProtectedRoute>
                 } />
 
+                {/* Member Dashboard - Main user dashboard */}
+                <Route path="/member-dashboard/*" element={
+                  <ProtectedRoute>
+                    <OptimizedSuspense skeletonType="dashboard">
+                      <Dashboard />
+                    </OptimizedSuspense>
+                  </ProtectedRoute>
+                } />
+
+                {/* Family Dashboard */}
+                <Route path="/family-dashboard/*" element={
+                  <ProtectedRoute>
+                    <OptimizedSuspense skeletonType="dashboard">
+                      <FamilyDashboard />
+                    </OptimizedSuspense>
+                  </ProtectedRoute>
+                } />
+
                 {/* Mobile Apps */}
                 <Route path="/app" element={
                   <ProtectedRoute>
@@ -199,15 +217,6 @@ function AppWithTracking() {
                   <ProtectedRoute>
                     <OptimizedSuspense skeletonType="card">
                       <Dashboard />
-                    </OptimizedSuspense>
-                  </ProtectedRoute>
-                } />
-
-                {/* Family Dashboard */}
-                <Route path="/family-dashboard/*" element={
-                  <ProtectedRoute>
-                    <OptimizedSuspense skeletonType="dashboard">
-                      <FamilyDashboard />
                     </OptimizedSuspense>
                   </ProtectedRoute>
                 } />
