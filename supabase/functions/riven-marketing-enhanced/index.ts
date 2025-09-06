@@ -67,10 +67,10 @@ async function createCampaign(supabaseClient: any, command: string, title?: stri
   const campaignData = {
     title: title || `Marketing Campaign: ${command.substring(0, 50)}...`,
     description: command,
-    command: command,
+    command_input: command,
     status: 'running',
-    priority: 'medium',
-    metadata: {
+    created_by: '00000000-0000-0000-0000-000000000000', // System user for now
+    target_audience: {
       created_via: 'enhanced_workflow',
       command_original: command
     }
