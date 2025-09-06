@@ -14,7 +14,10 @@ import {
   CheckCircle, 
   ArrowRight,
   Activity,
-  Zap
+  Zap,
+  Clock,
+  Bell,
+  TrendingUp
 } from 'lucide-react';
 
 const WorkflowContent: React.FC = () => {
@@ -26,7 +29,10 @@ const WorkflowContent: React.FC = () => {
     contentItems,
     isRealTimeConnected,
     processingStage,
-    sendCommand
+    sendCommand,
+    notifications,
+    estimatedTimeRemaining,
+    analytics
   } = useWorkflow();
 
   const [currentCommand, setCurrentCommand] = useState('');
@@ -72,30 +78,61 @@ const WorkflowContent: React.FC = () => {
       {/* Real-time Status Header */}
       <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className={`h-3 w-3 rounded-full ${isRealTimeConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-                <span className="text-sm font-medium">
-                  {isRealTimeConnected ? 'Live' : 'Disconnected'}
-                </span>
-              </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className={`h-3 w-3 rounded-full ${isRealTimeConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                  <span className="text-sm font-medium">
+                    {isRealTimeConnected ? 'Live' : 'Disconnected'}
+                  </span>
+                </div>
+
+                {/* Real-time Analytics */}
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3 text-green-600" />
+                    <span className="text-muted-foreground">{analytics.completionRate}% Success</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Activity className="h-3 w-3 text-primary" />
+                    <span className="text-muted-foreground">{analytics.activeAgents} Agents</span>
+                  </div>
+                </div>
               
               {currentCampaignId && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Badge variant="outline" className="bg-primary/10">Active Campaign</Badge>
                   <Progress value={getWorkflowProgress()} className="w-32" />
                   <span className="text-sm text-muted-foreground">{Math.round(getWorkflowProgress())}%</span>
+                  
+                  {estimatedTimeRemaining && estimatedTimeRemaining > 0 && (
+                    <Badge variant="secondary">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {Math.floor(estimatedTimeRemaining / 60)}:{(estimatedTimeRemaining % 60).toString().padStart(2, '0')}
+                    </Badge>
+                  )}
                 </div>
               )}
             </div>
 
-            {processingStage && (
-              <div className="flex items-center gap-2 text-primary animate-pulse">
-                <Activity className="h-4 w-4" />
-                <span className="text-sm font-medium">Processing: {processingStage.replace('_', ' ')}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-4">
+              {processingStage && (
+                <div className="flex items-center gap-2 text-primary animate-pulse">
+                  <Activity className="h-4 w-4" />
+                  <span className="text-sm font-medium">Processing: {processingStage.replace('_', ' ')}</span>
+                </div>
+              )}
+
+              {/* Notifications Bell */}
+              {notifications.filter(n => !n.read).length > 0 && (
+                <div className="flex items-center gap-2">
+                  <Bell className="h-4 w-4 text-orange-600 animate-pulse" />
+                  <Badge variant="destructive" className="text-xs">
+                    {notifications.filter(n => !n.read).length}
+                  </Badge>
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

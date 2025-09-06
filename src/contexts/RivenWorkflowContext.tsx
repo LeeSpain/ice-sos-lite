@@ -20,6 +20,7 @@ interface Campaign {
   created_at: string;
   updated_at: string;
   completed_at?: string;
+  priority?: string;
 }
 
 interface MarketingContent {
@@ -47,6 +48,23 @@ interface WorkflowState {
   activeTab: string;
   isRealTimeConnected: boolean;
   processingStage?: string;
+  livePreview?: any;
+  workflowQueue: Campaign[];
+  estimatedTimeRemaining?: number;
+  notifications: Array<{
+    id: string;
+    type: 'success' | 'info' | 'warning' | 'error';
+    title: string;
+    message: string;
+    timestamp: string;
+    read: boolean;
+  }>;
+  analytics: {
+    totalCampaigns: number;
+    completionRate: number;
+    averageTime: number;
+    activeAgents: number;
+  };
 }
 
 type WorkflowAction =
@@ -60,7 +78,14 @@ type WorkflowAction =
   | { type: 'SET_CURRENT_CAMPAIGN'; payload: string }
   | { type: 'SET_ACTIVE_TAB'; payload: string }
   | { type: 'SET_REALTIME_STATUS'; payload: boolean }
-  | { type: 'SET_PROCESSING_STAGE'; payload: string | undefined };
+  | { type: 'SET_PROCESSING_STAGE'; payload: string | undefined }
+  | { type: 'SET_LIVE_PREVIEW'; payload: any }
+  | { type: 'ADD_TO_QUEUE'; payload: Campaign }
+  | { type: 'REMOVE_FROM_QUEUE'; payload: string }
+  | { type: 'SET_ESTIMATED_TIME'; payload: number }
+  | { type: 'ADD_NOTIFICATION'; payload: { id: string; type: 'success' | 'info' | 'warning' | 'error'; title: string; message: string; timestamp: string; read: boolean } }
+  | { type: 'MARK_NOTIFICATION_READ'; payload: string }
+  | { type: 'UPDATE_ANALYTICS'; payload: Partial<WorkflowState['analytics']> };
 
 const initialState: WorkflowState = {
   campaigns: [],
@@ -68,6 +93,14 @@ const initialState: WorkflowState = {
   contentItems: [],
   activeTab: 'command-center',
   isRealTimeConnected: false,
+  workflowQueue: [],
+  notifications: [],
+  analytics: {
+    totalCampaigns: 0,
+    completionRate: 0,
+    averageTime: 0,
+    activeAgents: 0
+  }
 };
 
 function workflowReducer(state: WorkflowState, action: WorkflowAction): WorkflowState {
@@ -134,6 +167,41 @@ function workflowReducer(state: WorkflowState, action: WorkflowAction): Workflow
     case 'SET_PROCESSING_STAGE':
       return { ...state, processingStage: action.payload };
     
+    case 'SET_LIVE_PREVIEW':
+      return { ...state, livePreview: action.payload };
+    
+    case 'ADD_TO_QUEUE':
+      return { ...state, workflowQueue: [...state.workflowQueue, action.payload] };
+    
+    case 'REMOVE_FROM_QUEUE':
+      return { 
+        ...state, 
+        workflowQueue: state.workflowQueue.filter(c => c.id !== action.payload) 
+      };
+    
+    case 'SET_ESTIMATED_TIME':
+      return { ...state, estimatedTimeRemaining: action.payload };
+    
+    case 'ADD_NOTIFICATION':
+      return { 
+        ...state, 
+        notifications: [action.payload, ...state.notifications.slice(0, 19)] 
+      };
+    
+    case 'MARK_NOTIFICATION_READ':
+      return {
+        ...state,
+        notifications: state.notifications.map(n => 
+          n.id === action.payload ? { ...n, read: true } : n
+        )
+      };
+    
+    case 'UPDATE_ANALYTICS':
+      return {
+        ...state,
+        analytics: { ...state.analytics, ...action.payload }
+      };
+    
     default:
       return state;
   }
@@ -146,6 +214,10 @@ interface WorkflowContextType extends WorkflowState {
   loadContentItems: () => Promise<void>;
   sendCommand: (command: string, config: any) => Promise<string | undefined>;
   autoNavigateBasedOnProgress: () => void;
+  addNotification: (type: 'success' | 'info' | 'warning' | 'error', title: string, message: string) => void;
+  calculateEstimatedTime: (workflow: WorkflowStage[]) => number;
+  prioritizeCampaign: (campaignId: string) => void;
+  retryFailedStage: (campaignId: string, stageName: string) => Promise<void>;
 }
 
 const WorkflowContext = createContext<WorkflowContextType | undefined>(undefined);
@@ -250,12 +322,76 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (inProgressStage) {
       dispatch({ type: 'SET_PROCESSING_STAGE', payload: inProgressStage.stage_name });
       
-      // Auto-navigate based on stage
+      // Enhanced auto-navigation with live preview
       if (inProgressStage.stage_name === 'content_creation' && state.activeTab === 'command-center') {
         dispatch({ type: 'SET_ACTIVE_TAB', payload: 'creation-pipeline' });
-      } else if (inProgressStage.stage_name === 'approval_ready' && state.activeTab !== 'content-approval') {
+        addNotification('info', 'Content Creation Started', 'AI is now generating your content');
+      } else if (inProgressStage.stage_name === 'quality_assembly' && state.activeTab === 'creation-pipeline') {
+        // Update live preview with partial content
+        if (inProgressStage.output_data) {
+          dispatch({ type: 'SET_LIVE_PREVIEW', payload: inProgressStage.output_data });
+        }
+      } else if (completedStages.length >= 4 && state.activeTab !== 'content-approval') {
         dispatch({ type: 'SET_ACTIVE_TAB', payload: 'content-approval' });
+        addNotification('success', 'Content Ready', 'Your content is ready for review and approval');
       }
+    }
+
+    // Calculate estimated time remaining
+    const estimatedTime = calculateEstimatedTime(workflow);
+    dispatch({ type: 'SET_ESTIMATED_TIME', payload: estimatedTime });
+  };
+
+  const addNotification = (type: 'success' | 'info' | 'warning' | 'error', title: string, message: string) => {
+    const notification = {
+      id: crypto.randomUUID(),
+      type,
+      title,
+      message,
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+    dispatch({ type: 'ADD_NOTIFICATION', payload: notification });
+    
+    toast({
+      title,
+      description: message,
+    });
+  };
+
+  const calculateEstimatedTime = (workflow: WorkflowStage[]): number => {
+    const avgStageTime = 45; // seconds per stage
+    const pendingStages = workflow.filter(stage => 
+      stage.status === 'pending' || stage.status === 'in_progress'
+    ).length;
+    return pendingStages * avgStageTime;
+  };
+
+  const prioritizeCampaign = (campaignId: string) => {
+    const campaign = state.campaigns.find(c => c.id === campaignId);
+    if (campaign) {
+      dispatch({ type: 'REMOVE_FROM_QUEUE', payload: campaignId });
+      dispatch({ type: 'ADD_TO_QUEUE', payload: { ...campaign, priority: 'high' } });
+      addNotification('info', 'Campaign Prioritized', 'This campaign will be processed next');
+    }
+  };
+
+  const retryFailedStage = async (campaignId: string, stageName: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('riven-marketing-enhanced', {
+        body: { 
+          command: 'retry_stage', 
+          campaignId, 
+          stageName 
+        }
+      });
+
+      if (error) throw error;
+      
+      addNotification('info', 'Stage Retry', `Retrying ${stageName.replace('_', ' ')}`);
+    } catch (error) {
+      console.error('Error retrying stage:', error);
+      addNotification('error', 'Retry Failed', 'Failed to retry the failed stage');
     }
   };
 
@@ -337,6 +473,10 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     loadContentItems,
     sendCommand,
     autoNavigateBasedOnProgress,
+    addNotification,
+    calculateEstimatedTime,
+    prioritizeCampaign,
+    retryFailedStage,
   };
 
   return (
