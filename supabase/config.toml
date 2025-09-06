@@ -25,3 +25,12 @@ verify_jwt = true
 
 [functions.riven-marketing-enhanced]
 verify_jwt = true
+
+[functions.setup-stripe-products]
+verify_jwt = true
+
+[functions.setup-family-stripe-products]
+verify_jwt = true
+
+[functions.twilio-status-webhook]
+verify_jwt = false

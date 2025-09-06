@@ -42,6 +42,8 @@ import RegionalOrganizationsPage from '@/components/admin/pages/RegionalOrganiza
 import RegionalUsersPage from '@/components/admin/pages/RegionalUsersPage';
 import RegionalAuditPage from '@/components/admin/pages/RegionalAuditPage';
 import RegionalHubPage from '@/components/admin/pages/RegionalHubPage';
+import ProductionReadinessPanel from '@/components/admin/ProductionReadinessPanel';
+import StripeSetupPage from '@/components/admin/pages/StripeSetupPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -92,6 +94,8 @@ const AdminDashboard: React.FC = () => {
         <Route path="reports" element={<ReportsPage />} />
         <Route path="app-testing" element={<AppTestingPage />} />
         <Route path="flic-control" element={<FlicControlAdminPage />} />
+        <Route path="production-check" element={<ProductionReadinessPanel />} />
+        <Route path="stripe-setup" element={<StripeSetupPage />} />
         <Route path="*" element={<Navigate to="/admin-dashboard" replace />} />
       </Route>
     </Routes>
