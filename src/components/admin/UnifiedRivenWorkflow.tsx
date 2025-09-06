@@ -8,6 +8,7 @@ import { EnhancedCommandCenter } from './EnhancedCommandCenter';
 import { ContentGenerationPipeline } from './ContentGenerationPipeline';
 import { ContentApprovalDashboard } from './ContentApprovalDashboard';
 import { RealTimeWorkflowVisualizer } from './RealTimeWorkflowVisualizer';
+import { WorkflowTester } from './WorkflowTester';
 import { SocialHub } from './SocialHub';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import { SystemMonitor } from './SystemMonitor';
@@ -191,16 +192,19 @@ const WorkflowContent: React.FC = () => {
               {/* Tab Content */}
               <div className="px-6 pb-6">
                 <TabsContent value="command-center" className="mt-0">
-                  <EnhancedCommandCenter
-                    currentCommand={currentCommand}
-                    setCurrentCommand={setCurrentCommand}
-                    isProcessing={isProcessing}
-                    onSendCommand={handleSendCommand}
-                    commandTemplates={[]}
-                    useTemplate={() => {}}
-                    rivenResponse=""
-                    campaignId={currentCampaignId}
-                  />
+                  <div className="space-y-6">
+                    <EnhancedCommandCenter
+                      currentCommand={currentCommand}
+                      setCurrentCommand={setCurrentCommand}
+                      isProcessing={isProcessing}
+                      onSendCommand={handleSendCommand}
+                      commandTemplates={[]}
+                      useTemplate={() => {}}
+                      rivenResponse=""
+                      campaignId={currentCampaignId}
+                    />
+                    <WorkflowTester />
+                  </div>
                 </TabsContent>
 
                 <TabsContent value="creation-pipeline" className="mt-0">
