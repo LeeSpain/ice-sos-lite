@@ -4372,6 +4372,51 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_stages: {
+        Row: {
+          campaign_id: string
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          output_data: Json | null
+          stage_name: string
+          stage_order: number
+          started_at: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          campaign_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          output_data?: Json | null
+          stage_name: string
+          stage_order: number
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          output_data?: Json | null
+          stage_name?: string
+          stage_order?: number
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       workflow_steps: {
         Row: {
           completed_at: string | null
