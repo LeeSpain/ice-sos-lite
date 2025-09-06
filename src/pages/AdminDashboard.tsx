@@ -44,6 +44,8 @@ import RegionalAuditPage from '@/components/admin/pages/RegionalAuditPage';
 import RegionalHubPage from '@/components/admin/pages/RegionalHubPage';
 import ProductionReadinessPanel from '@/components/admin/ProductionReadinessPanel';
 import StripeSetupPage from '@/components/admin/pages/StripeSetupPage';
+import MobileAppLaunchPage from '@/components/admin/pages/MobileAppLaunchPage';
+import GoLivePreparationPage from '@/components/admin/pages/GoLivePreparationPage';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -96,6 +98,8 @@ const AdminDashboard: React.FC = () => {
         <Route path="flic-control" element={<FlicControlAdminPage />} />
         <Route path="production-check" element={<ProductionReadinessPanel />} />
         <Route path="stripe-setup" element={<StripeSetupPage />} />
+        <Route path="mobile-launch" element={<MobileAppLaunchPage />} />
+        <Route path="go-live" element={<GoLivePreparationPage />} />
         <Route path="*" element={<Navigate to="/admin-dashboard" replace />} />
       </Route>
     </Routes>
