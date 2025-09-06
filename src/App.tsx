@@ -49,6 +49,9 @@ import RegistrationSuccess from "./pages/RegistrationSuccess";
 // Test Pages  
 import TestPage from "./pages/TestPage";
 
+// Device Pages
+import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
+
 // Protected Route Components
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
@@ -257,6 +260,13 @@ function AppWithTracking() {
                  <Route path="/test" element={
                   <OptimizedSuspense skeletonType="card">
                     <TestPage />
+                  </OptimizedSuspense>
+                } />
+
+                {/* Device Pages */}
+                <Route path="/devices/ice-sos-pendant" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <DeviceIceSosPendant />
                   </OptimizedSuspense>
                 } />
 

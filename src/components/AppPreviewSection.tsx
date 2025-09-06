@@ -76,11 +76,11 @@ const AppPreviewSection: React.FC = () => {
                   >
                     <Link to="/devices/ice-sos-pendant">
                       <Bluetooth className="h-5 w-5 mr-2" />
-                      {t('common.viewDevices')}
+                      {t('common.learnMore')}
                     </Link>
                   </Button>
                   <IntroVideoModal 
-                    defaultVideoId="all-ages"
+                    defaultVideoId="ice-sos-pendant"
                     trigger={
                       <Button 
                         size="lg" 
