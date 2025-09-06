@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import { WorkflowProvider } from '@/contexts/RivenWorkflowContext';
 import { EnhancedCommandCenter } from './EnhancedCommandCenter';
 import { ContentApprovalDashboard } from './ContentApprovalDashboard';
 import { RealContentApproval } from './RealContentApproval';
@@ -36,19 +37,25 @@ export default function OptimizedComponentLoader({ type, props, enhanced = true 
   try {
     switch (type) {
       case 'command-center':
-        return <EnhancedCommandCenter {...props} />;
+        return (
+          <WorkflowProvider>
+            <EnhancedCommandCenter {...props} />
+          </WorkflowProvider>
+        );
       case 'workflow-pipeline':
         return <WorkflowPipeline {...props} />;
       case 'content-approval':
         return (
-          <EnhancedContentApproval 
-            content={props.contents || []}
-            onApprove={props.onContentApproval || (() => {})}
-            onReject={props.onRejectContent || (() => {})}
-            onPublish={props.onPublishContent || (() => {})}
-            onDelete={props.onDeleteContent || (() => {})}
-            onEdit={props.onEditContent || (() => {})}
-          />
+          <WorkflowProvider>
+            <EnhancedContentApproval 
+              content={props.contents || []}
+              onApprove={props.onContentApproval || (() => {})}
+              onReject={props.onRejectContent || (() => {})}
+              onPublish={props.onPublishContent || (() => {})}
+              onDelete={props.onDeleteContent || (() => {})}
+              onEdit={props.onEditContent || (() => {})}
+            />
+          </WorkflowProvider>
         );
       case 'social-hub':
         return enhanced ? (
