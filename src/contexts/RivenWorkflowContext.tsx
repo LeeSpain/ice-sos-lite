@@ -29,7 +29,12 @@ interface MarketingContent {
   content_type: string;
   title?: string;
   body_text?: string;
+  image_url?: string;
   status: string;
+  hashtags?: string[];
+  seo_title?: string;
+  meta_description?: string;
+  keywords?: string[];
   created_at: string;
   updated_at: string;
 }
