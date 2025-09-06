@@ -76,7 +76,7 @@ const FamilyCarerAccess = () => {
                       className="bg-warning hover:bg-warning/90 text-white font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
                       asChild
                     >
-                      <Link to="/dashboard?tab=family">{t('familyCarerAccess.learnMore')}</Link>
+                      <Link to="/family-access-setup">{t('familyCarerAccess.learnMore')}</Link>
                     </Button>
                     
                     <IntroVideoModal 
