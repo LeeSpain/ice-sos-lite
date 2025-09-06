@@ -4,6 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import { useWorkflow } from '@/contexts/RivenWorkflowContext';
 import { 
   Wand2, 
@@ -19,7 +23,23 @@ import {
   Loader2,
   Clock,
   ArrowRight,
-  Lightbulb
+  Lightbulb,
+  Settings,
+  Facebook,
+  Instagram,
+  Twitter,
+  Linkedin,
+  Youtube,
+  Mail,
+  FileText,
+  Eye,
+  Video,
+  MessageSquare,
+  Shield,
+  CheckSquare,
+  UserCheck,
+  AlertTriangle,
+  BarChart3
 } from 'lucide-react';
 
 interface EnhancedCommandCenterProps {
@@ -51,12 +71,44 @@ export const EnhancedCommandCenter: React.FC<EnhancedCommandCenterProps> = ({
     addNotification 
   } = useWorkflow();
 
-  const [aiSuggestions, setAiSuggestions] = useState<string[]>([]);
-  const [commandAnalysis, setCommandAnalysis] = useState<any>(null);
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  // Publishing settings state
+  const [publishMode, setPublishMode] = useState('campaign');
+  const [totalPosts, setTotalPosts] = useState([10]);
+  const [postsPerDay, setPostsPerDay] = useState([2]);
+  const [campaignDuration, setCampaignDuration] = useState([7]);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['facebook', 'instagram']);
+  const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>(['social_post', 'safety_tips']);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
-  // AI Marketing Command Center focused on emergency/family safety
-  const emergencyFocusedTemplates = [
+  // Platform options
+  const platforms = [
+    { id: 'facebook', name: 'Facebook', icon: Facebook, color: 'text-blue-600' },
+    { id: 'instagram', name: 'Instagram', icon: Instagram, color: 'text-pink-600' },
+    { id: 'twitter', name: 'Twitter', icon: Twitter, color: 'text-sky-600' },
+    { id: 'linkedin', name: 'LinkedIn', icon: Linkedin, color: 'text-blue-700' },
+    { id: 'youtube', name: 'YouTube', icon: Youtube, color: 'text-red-600' },
+    { id: 'blog', name: 'Blog', icon: FileText, color: 'text-green-600' },
+    { id: 'email', name: 'Email Marketing', icon: Mail, color: 'text-purple-600' }
+  ];
+
+  // Content types focused on family safety
+  const contentTypes = [
+    { id: 'social_post', name: 'Social Post', description: 'Emergency safety tips and family updates', icon: MessageSquare },
+    { id: 'story', name: 'Story', description: 'Instagram/Facebook safety stories', icon: Eye },
+    { id: 'safety_reel', name: 'Safety Reel', description: 'Quick safety tip videos', icon: Video },
+    { id: 'safety_guide', name: 'Safety Guide', description: 'Emergency preparedness guides', icon: Shield },
+    { id: 'emergency_howto', name: 'Emergency How-to', description: 'Step-by-step emergency procedures', icon: CheckSquare },
+    { id: 'customer_testimonial', name: 'Customer Testimonial', description: 'Real family safety success stories', icon: UserCheck },
+    { id: 'feature_spotlight', name: 'Feature Spotlight', description: 'ICE SOS app feature explanations', icon: Sparkles },
+    { id: 'safety_tips', name: 'Safety Tips', description: 'Daily family safety advice', icon: Lightbulb },
+    { id: 'emergency_checklist', name: 'Emergency Checklist', description: 'Printable safety checklists', icon: CheckSquare },
+    { id: 'safety_onboarding', name: 'Safety Onboarding', description: 'New user safety setup emails', icon: Target },
+    { id: 'safety_newsletter', name: 'Safety Newsletter', description: 'Monthly family safety updates', icon: Mail },
+    { id: 'safety_alerts', name: 'Safety Alerts', description: 'Emergency awareness campaigns', icon: AlertTriangle }
+  ];
+
+  // Quick templates
+  const quickTemplates = [
     {
       id: 'emergency-preparedness',
       title: 'Emergency Preparedness Campaign',
@@ -71,263 +123,338 @@ export const EnhancedCommandCenter: React.FC<EnhancedCommandCenterProps> = ({
     },
     {
       id: 'customer-testimonials',
-      title: 'Customer Testimonials Campaign', 
+      title: 'Customer Success Stories',
       description: 'Real stories of how ICE SOS helped families',
       command: 'Generate 6 pieces of content featuring real customer testimonials about how ICE SOS Lite helped in emergency situations. Create Instagram stories, Facebook posts, and email content highlighting peace of mind for families and life-saving features.'
+    },
+    {
+      id: 'feature-spotlight',
+      title: 'App Feature Highlights',
+      description: 'Highlight key app features and benefits',
+      command: 'Create a feature-focused campaign showcasing ICE SOS Lite capabilities. Generate 12 pieces of content including social posts, blog articles, and email sequences explaining emergency contacts, location sharing, family groups, and quick SOS activation.'
     }
   ];
 
-  // AI-powered command suggestions
-  useEffect(() => {
-    if (currentCommand.length > 20) {
-      const suggestions = generateSmartSuggestions(currentCommand);
-      setAiSuggestions(suggestions);
-    } else {
-      setAiSuggestions([]);
-    }
-  }, [currentCommand]);
-
-  const generateSmartSuggestions = (command: string): string[] => {
-    const suggestions = [];
-    
-    if (command.toLowerCase().includes('product')) {
-      suggestions.push('Include product benefits and unique selling points');
-      suggestions.push('Add customer testimonials and social proof');
-    }
-    
-    if (command.toLowerCase().includes('social')) {
-      suggestions.push('Consider optimal posting times for each platform');
-      suggestions.push('Include relevant hashtags and mentions');
-    }
-    
-    if (command.toLowerCase().includes('email')) {
-      suggestions.push('Segment audience for personalized messaging');
-      suggestions.push('Include clear call-to-action buttons');
-    }
-
-    return suggestions.slice(0, 3);
+  const togglePlatform = (platformId: string) => {
+    setSelectedPlatforms(prev => 
+      prev.includes(platformId) 
+        ? prev.filter(p => p !== platformId)
+        : [...prev, platformId]
+    );
   };
 
-  const analyzeCommand = async (command: string) => {
-    // Simulate AI analysis
-    const analysis = {
-      confidence: Math.random() * 30 + 70,
-      targetAudience: 'Young professionals aged 25-40',
-      recommendedPlatforms: ['Instagram', 'LinkedIn', 'Email'],
-      estimatedReach: Math.floor(Math.random() * 50000) + 10000,
-      contentTypes: ['Social Posts', 'Blog Article', 'Email Campaign'],
-      keywords: ['innovation', 'technology', 'solution', 'efficiency']
-    };
-    
-    setCommandAnalysis(analysis);
+  const toggleContentType = (typeId: string) => {
+    setSelectedContentTypes(prev => 
+      prev.includes(typeId) 
+        ? prev.filter(t => t !== typeId)
+        : [...prev, typeId]
+    );
   };
 
-  const handleSendCommand = () => {
+  const useQuickTemplate = (template: any) => {
+    setCurrentCommand(template.command);
+  };
+
+  const handleExecuteCommand = () => {
     if (!currentCommand.trim()) {
       addNotification('warning', 'Empty Command', 'Please enter a marketing command first');
       return;
     }
 
-    analyzeCommand(currentCommand);
-    onSendCommand({
+    const config = {
       command: currentCommand,
-      analysis: commandAnalysis,
-      templates: emergencyFocusedTemplates,
+      publishMode,
+      totalPosts: totalPosts[0],
+      postsPerDay: postsPerDay[0],
+      campaignDuration: campaignDuration[0],
+      platforms: selectedPlatforms,
+      contentTypes: selectedContentTypes,
       priority: 'normal'
-    });
-  };
+    };
 
-  const useEmergencyTemplate = (template: any) => {
-    setCurrentCommand(template.command);
-    setShowAdvancedOptions(true);
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    onSendCommand(config);
   };
 
   return (
     <div className="space-y-6">
-      {/* Analytics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-blue-700">Active Campaigns</p>
-                <p className="text-2xl font-bold text-blue-900">{analytics.totalCampaigns}</p>
-              </div>
-              <Brain className="h-8 w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
+      {/* Header */}
+      <Card className="bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 border-primary/20">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-2xl">
+            <Brain className="h-8 w-8 text-primary" />
+            Riven AI Command Center
+          </CardTitle>
+          <p className="text-muted-foreground">
+            Give Riven a family safety marketing command and watch AI create professional emergency preparedness campaigns across all platforms
+          </p>
+        </CardHeader>
+      </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-green-700">Success Rate</p>
-                <p className="text-2xl font-bold text-green-900">{analytics.completionRate}%</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-purple-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-purple-700">Avg. Time</p>
-                <p className="text-2xl font-bold text-purple-900">{analytics.averageTime}m</p>
-              </div>
-              <Clock className="h-8 w-8 text-purple-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-orange-700">AI Agents</p>
-                <p className="text-2xl font-bold text-orange-900">{analytics.activeAgents}</p>
-              </div>
-              <Zap className="h-8 w-8 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Command Input Section */}
-      <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+      {/* Main Command Interface */}
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wand2 className="h-5 w-5 text-primary" />
-            AI Marketing Command Center
-            {isProcessing && (
-              <Badge variant="secondary" className="ml-2 animate-pulse">
-                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-                Processing
-              </Badge>
-            )}
+            Marketing Command
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Your Marketing Command</label>
-            <Textarea
-              value={currentCommand}
-              onChange={(e) => setCurrentCommand(e.target.value)}
-              placeholder="Describe your marketing goals... (e.g., 'Create a social media campaign for our new eco-friendly product launch targeting millennials')"
-              className="min-h-[100px] resize-none"
-              disabled={isProcessing}
-            />
-            
-            {/* AI Suggestions */}
-            {aiSuggestions.length > 0 && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-yellow-600" />
-                  <span className="text-sm font-medium text-yellow-700">AI Suggestions</span>
-                </div>
-                {aiSuggestions.map((suggestion, index) => (
-                  <div key={index} className="text-xs bg-yellow-50 border border-yellow-200 rounded p-2">
-                    {suggestion}
-                  </div>
-                ))}
-              </div>
-            )}
+        <CardContent className="space-y-6">
+          <Textarea
+            placeholder="Describe your family safety marketing campaign..."
+            value={currentCommand}
+            onChange={(e) => setCurrentCommand(e.target.value)}
+            className="min-h-[120px] text-base"
+          />
+
+          {/* Publishing Mode */}
+          <div className="space-y-4">
+            <h3 className="font-semibold flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              Publishing Mode
+            </h3>
+            <div className="flex gap-4">
+              <Button
+                variant={publishMode === 'single' ? 'default' : 'outline'}
+                onClick={() => setPublishMode('single')}
+                className="flex-1"
+              >
+                Single Post Mode
+              </Button>
+              <Button
+                variant={publishMode === 'quick' ? 'default' : 'outline'}
+                onClick={() => setPublishMode('quick')}
+                className="flex-1"
+              >
+                Quick Publish
+              </Button>
+              <Button
+                variant={publishMode === 'campaign' ? 'default' : 'outline'}
+                onClick={() => setPublishMode('campaign')}
+                className="flex-1"
+              >
+                Campaign Mode
+              </Button>
+            </div>
           </div>
 
-          {/* Command Analysis */}
-          {commandAnalysis && (
-            <Card className="bg-muted/20">
+          {publishMode === 'single' && (
+            <Card className="bg-muted/20 border-dashed">
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Target className="h-4 w-4 text-primary" />
-                  <span className="font-medium">Command Analysis</span>
-                  <Badge variant="secondary">{Math.round(commandAnalysis.confidence)}% Confidence</Badge>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="text-muted-foreground">Target Audience:</span>
-                    <p className="font-medium">{commandAnalysis.targetAudience}</p>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Estimated Reach:</span>
-                    <p className="font-medium">{commandAnalysis.estimatedReach.toLocaleString()}</p>
-                  </div>
-                </div>
-                
-                <div className="mt-3">
-                  <span className="text-muted-foreground text-sm">Recommended Platforms:</span>
-                  <div className="flex gap-1 mt-1">
-                    {commandAnalysis.recommendedPlatforms.map((platform: string) => (
-                      <Badge key={platform} variant="outline" className="text-xs">{platform}</Badge>
-                    ))}
-                  </div>
-                </div>
+                <p className="text-sm text-muted-foreground">Create one post for immediate publishing</p>
               </CardContent>
             </Card>
           )}
 
-          {/* Estimated Time */}
-          {estimatedTimeRemaining && estimatedTimeRemaining > 0 && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Clock className="h-4 w-4" />
-              <span>Estimated completion: {formatTime(estimatedTimeRemaining)}</span>
+          {(publishMode === 'campaign' || publishMode === 'quick') && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Total Posts: {totalPosts[0]}</Label>
+                <Slider
+                  value={totalPosts}
+                  onValueChange={setTotalPosts}
+                  max={50}
+                  min={1}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Posts per Day: {postsPerDay[0]}</Label>
+                <Slider
+                  value={postsPerDay}
+                  onValueChange={setPostsPerDay}
+                  max={10}
+                  min={1}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Duration: {campaignDuration[0]} days</Label>
+                <Slider
+                  value={campaignDuration}
+                  onValueChange={setCampaignDuration}
+                  max={30}
+                  min={1}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
             </div>
           )}
-
-          <Button 
-            onClick={handleSendCommand}
-            disabled={isProcessing || !currentCommand.trim()}
-            className="w-full"
-            size="lg"
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Processing Command...
-              </>
-            ) : (
-              <>
-                <Send className="h-4 w-4 mr-2" />
-                Launch AI Campaign
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </>
-            )}
-          </Button>
         </CardContent>
       </Card>
 
-      {/* Smart Templates */}
+      {/* Target Platforms */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            AI Marketing Command Center
+            <Globe className="h-5 w-5 text-primary" />
+            Target Platforms
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {platforms.map((platform) => {
+              const IconComponent = platform.icon;
+              return (
+                <Button
+                  key={platform.id}
+                  variant={selectedPlatforms.includes(platform.id) ? 'default' : 'outline'}
+                  onClick={() => togglePlatform(platform.id)}
+                  className="h-auto p-3 flex flex-col items-center gap-2"
+                >
+                  <IconComponent className={`h-5 w-5 ${platform.color}`} />
+                  <span className="text-xs">{platform.name}</span>
+                </Button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Content Types */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Content Types
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {contentTypes.map((type) => {
+              const IconComponent = type.icon;
+              return (
+                <div
+                  key={type.id}
+                  className={`border rounded-lg p-3 cursor-pointer transition-all ${
+                    selectedContentTypes.includes(type.id)
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                  onClick={() => toggleContentType(type.id)}
+                >
+                  <div className="flex items-start gap-3">
+                    <Checkbox 
+                      checked={selectedContentTypes.includes(type.id)}
+                      onChange={() => {}}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <IconComponent className="h-4 w-4 text-primary" />
+                        <span className="font-medium text-sm">{type.name}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{type.description}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="text-center">
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-primary">{totalPosts[0]}</div>
+            <div className="text-sm text-muted-foreground">Total Posts</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center">
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-primary">{selectedPlatforms.length}</div>
+            <div className="text-sm text-muted-foreground">Platforms</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center">
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-muted-foreground">No data yet</div>
+            <div className="text-sm text-muted-foreground">Real Reach</div>
+          </CardContent>
+        </Card>
+        <Card className="text-center">
+          <CardContent className="p-4">
+            <div className="text-2xl font-bold text-muted-foreground">--</div>
+            <div className="text-sm text-muted-foreground">Analytics</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Advanced Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              Advanced Settings
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+            >
+              {showAdvancedSettings ? 'Hide' : 'Show'}
+            </Button>
+          </CardTitle>
+        </CardHeader>
+        {showAdvancedSettings && (
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Content Tone</Label>
+                <Select defaultValue="professional">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="professional">Professional</SelectItem>
+                    <SelectItem value="friendly">Friendly</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                    <SelectItem value="educational">Educational</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>SEO Focus</Label>
+                <Select defaultValue="high">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="high">High SEO</SelectItem>
+                    <SelectItem value="medium">Medium SEO</SelectItem>
+                    <SelectItem value="low">Low SEO</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Quick Templates */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Lightbulb className="h-5 w-5 text-primary" />
+            Quick Templates
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {emergencyFocusedTemplates.map((template) => (
+            {quickTemplates.map((template) => (
               <Card key={template.id} className="border-l-4 border-l-primary hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-medium">{template.title}</h4>
-                  </div>
-                  
+                  <h4 className="font-medium mb-2">{template.title}</h4>
                   <p className="text-sm text-muted-foreground mb-3">{template.description}</p>
-                  
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => useEmergencyTemplate(template)}
+                    onClick={() => useQuickTemplate(template)}
                     className="w-full"
                   >
                     Use Template
@@ -339,37 +466,78 @@ export const EnhancedCommandCenter: React.FC<EnhancedCommandCenterProps> = ({
         </CardContent>
       </Card>
 
-      {/* Workflow Queue */}
-      {workflowQueue.length > 0 && (
+      {/* Execute Command */}
+      <Card className="border-primary/50 bg-gradient-to-r from-primary/5 to-secondary/5">
+        <CardContent className="p-6">
+          <Button 
+            onClick={handleExecuteCommand}
+            disabled={isProcessing || !currentCommand.trim()}
+            className="w-full h-12 text-lg"
+            size="lg"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                Processing Command...
+              </>
+            ) : (
+              <>
+                <Send className="h-5 w-5 mr-2" />
+                Execute Command
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </>
+            )}
+          </Button>
+          
+          {estimatedTimeRemaining && estimatedTimeRemaining > 0 && (
+            <div className="flex items-center justify-center gap-2 mt-3 text-sm text-muted-foreground">
+              <Clock className="h-4 w-4" />
+              <span>Estimated completion: {Math.floor(estimatedTimeRemaining / 60)}:{(estimatedTimeRemaining % 60).toString().padStart(2, '0')}</span>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Real Reach & Selected Platforms Info */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              Campaign Queue ({workflowQueue.length})
+              <BarChart3 className="h-5 w-5 text-primary" />
+              Real Reach
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {workflowQueue.slice(0, 3).map((campaign) => (
-                <div key={campaign.id} className="flex items-center justify-between p-3 bg-muted/30 rounded">
-                  <div>
-                    <span className="font-medium">{campaign.title}</span>
-                    <div className="text-sm text-muted-foreground">
-                      Created {new Date(campaign.created_at).toLocaleTimeString()}
-                    </div>
-                  </div>
-                  <Badge variant="outline">{campaign.status}</Badge>
-                </div>
-              ))}
-              {workflowQueue.length > 3 && (
-                <div className="text-center text-sm text-muted-foreground">
-                  +{workflowQueue.length - 3} more campaigns in queue
-                </div>
+            <div className="text-center text-muted-foreground">
+              No data yet
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-primary" />
+              Selected Platforms
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {selectedPlatforms.map(platformId => {
+                const platform = platforms.find(p => p.id === platformId);
+                return platform ? (
+                  <Badge key={platformId} variant="secondary">
+                    {platform.name}
+                  </Badge>
+                ) : null;
+              })}
+              {selectedPlatforms.length === 0 && (
+                <span className="text-muted-foreground text-sm">No platforms selected</span>
               )}
             </div>
           </CardContent>
         </Card>
-      )}
+      </div>
     </div>
   );
 };
