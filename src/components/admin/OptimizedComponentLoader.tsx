@@ -18,9 +18,10 @@ import AdvancedCampaignMonitor from './enhanced/AdvancedCampaignMonitor';
 import AIModelSettingsPage from './pages/AIModelSettingsPage';
 import AITrainingPage from './pages/AITrainingPage';
 import RivenConfigurationPage from './pages/RivenConfigurationPage';
+import WorkflowPipeline from './workflow/WorkflowPipeline';
 
 interface OptimizedComponentLoaderProps {
-  type: 'command-center' | 'content-approval' | 'social-hub' | 'analytics' | 'monitor' | 'ai-settings' | 'training-data' | 'riven-config';
+  type: 'command-center' | 'workflow-pipeline' | 'content-approval' | 'social-hub' | 'analytics' | 'monitor' | 'ai-settings' | 'training-data' | 'riven-config';
   props: any;
   enhanced?: boolean; // Flag to use enhanced components
 }
@@ -32,6 +33,8 @@ export default function OptimizedComponentLoader({ type, props, enhanced = true 
     switch (type) {
       case 'command-center':
         return <EnhancedCommandCenter {...props} />;
+      case 'workflow-pipeline':
+        return <WorkflowPipeline {...props} />;
       case 'content-approval':
         return enhanced ? (
           <EnhancedContentApproval 

@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Bot, Activity, BarChart3, Settings, Users, Target, Brain, Database, Cpu } from 'lucide-react';
+import { Bot, Activity, BarChart3, Settings, Users, Target, Brain, Database, Cpu, Zap } from 'lucide-react';
 import { useOptimizedSupabaseQuery, useBatchQueries, clearCache } from '@/hooks/useOptimizedQuery';
 import OptimizedComponentLoader from './OptimizedComponentLoader';
 
@@ -273,10 +273,10 @@ export default function OptimizedRivenMarketingAI() {
     setRivenResponse('');
     
     try {
-      const response = await supabase.functions.invoke('riven-marketing', {
+      const response = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: {
-          action: 'process_command',
           command: currentCommand,
+          campaignId: crypto.randomUUID(),
           settings: {
             word_count: config?.wordCount,
             seo_difficulty: config?.seoDifficulty,
@@ -516,10 +516,14 @@ export default function OptimizedRivenMarketingAI() {
 
       {/* Main Tabs with Lazy Loading */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="command-center" className="flex items-center gap-2">
             <Bot className="h-4 w-4" />
             Command Center
+          </TabsTrigger>
+          <TabsTrigger value="workflow-pipeline" className="flex items-center gap-2">
+            <Zap className="h-4 w-4" />
+            Creation Pipeline
           </TabsTrigger>
           <TabsTrigger value="content-approval" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
@@ -567,6 +571,16 @@ export default function OptimizedRivenMarketingAI() {
               rivenResponse,
               campaignId: (campaigns && campaigns.length > 0) ? campaigns[0]?.id : null,
               metrics: stats
+            }}
+          />
+        </TabsContent>
+
+        <TabsContent value="workflow-pipeline">
+          <OptimizedComponentLoader
+            type="workflow-pipeline"
+            props={{
+              campaignId: (campaigns && campaigns.length > 0) ? campaigns[0]?.id : null,
+              isVisible: activeTab === 'workflow-pipeline'
             }}
           />
         </TabsContent>
