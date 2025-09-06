@@ -21,14 +21,18 @@ serve(async (req) => {
   }
 
   try {
-    const { command, campaignId } = await req.json();
+    const { command, title } = await req.json();
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log(`Processing enhanced marketing command: ${command} for campaign: ${campaignId}`);
+    console.log(`Processing enhanced marketing command: ${command}`);
+
+    // Create campaign first
+    const campaignId = await createCampaign(supabaseClient, command, title);
+    console.log(`Created campaign with ID: ${campaignId}`);
 
     // Initialize workflow stages
     await initializeWorkflowStages(supabaseClient, campaignId);
@@ -56,6 +60,35 @@ serve(async (req) => {
     );
   }
 });
+
+async function createCampaign(supabaseClient: any, command: string, title?: string) {
+  console.log('Creating new campaign:', title || command);
+
+  const campaignData = {
+    title: title || `Marketing Campaign: ${command.substring(0, 50)}...`,
+    description: command,
+    command: command,
+    status: 'running',
+    priority: 'medium',
+    metadata: {
+      created_via: 'enhanced_workflow',
+      command_original: command
+    }
+  };
+
+  const { data, error } = await supabaseClient
+    .from('marketing_campaigns')
+    .insert([campaignData])
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to create campaign: ${error.message}`);
+  }
+
+  console.log('Campaign created successfully:', data.id);
+  return data.id;
+}
 
 async function initializeWorkflowStages(supabaseClient: any, campaignId: string) {
   console.log('Initializing workflow stages for campaign:', campaignId);
@@ -180,7 +213,7 @@ async function executeContentCreation(analysisResult: any, originalCommand: stri
 
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   if (!openAIApiKey) {
-    throw new Error('OpenAI API key not configured');
+    console.warn('OpenAI API key not configured, using mock content');
   }
 
   // Simulate content generation with OpenAI

@@ -48,10 +48,18 @@ const WorkflowContent: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSendCommand = async (config: any) => {
+    if (!currentCommand.trim()) return;
+    
     setIsProcessing(true);
     try {
-      const campaignId = await sendCommand(currentCommand, config);
+      console.log('Sending command via UI:', currentCommand);
+      const campaignId = await sendCommand(currentCommand, {
+        title: config?.title || `Marketing Campaign: ${currentCommand.substring(0, 50)}...`,
+        ...config
+      });
       if (campaignId) {
+        setCurrentCommand('');
+        console.log('Command sent successfully, campaign ID:', campaignId);
         setTimeout(() => {
           dispatch({ type: 'SET_ACTIVE_TAB', payload: 'creation-pipeline' });
         }, 2000);
