@@ -55,43 +55,25 @@ export const EnhancedCommandCenter: React.FC<EnhancedCommandCenterProps> = ({
   const [commandAnalysis, setCommandAnalysis] = useState<any>(null);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
-  // Smart command templates
-  const smartTemplates = [
+  // AI Marketing Command Center focused on emergency/family safety
+  const emergencyFocusedTemplates = [
     {
-      id: 'product-launch',
-      title: 'Product Launch Campaign',
-      description: 'Multi-platform launch with social, email, and blog content',
-      command: 'Create a comprehensive product launch campaign for [product name] targeting [audience]. Include social media posts, email sequences, blog articles, and promotional materials. Focus on benefits: [key benefits].',
-      tags: ['product', 'launch', 'multi-platform'],
-      estimatedTime: '8-12 minutes',
-      platforms: ['Instagram', 'Facebook', 'LinkedIn', 'Email', 'Blog']
+      id: 'emergency-preparedness',
+      title: 'Emergency Preparedness Campaign',
+      description: 'Educate families about emergency readiness',
+      command: 'Create a comprehensive 7-day emergency preparedness campaign for families. Generate content for Instagram, Facebook, and our blog focusing on emergency planning, SOS device setup, and family safety protocols. Include practical tips, safety checklists, and real-world scenarios.'
     },
     {
-      id: 'brand-awareness',
-      title: 'Brand Awareness Boost',
-      description: 'Increase brand visibility across all channels',
-      command: 'Develop a brand awareness campaign for [company name] in [industry]. Create engaging content that showcases our values: [brand values]. Target demographic: [target audience].',
-      tags: ['branding', 'awareness', 'engagement'],
-      estimatedTime: '6-10 minutes',
-      platforms: ['Instagram', 'Twitter', 'LinkedIn', 'Blog']
+      id: 'family-safety-series', 
+      title: 'Family Safety Tips Series',
+      description: 'Daily safety tips for families',
+      command: 'Develop a 10-part family safety tips series covering personal safety, travel safety, and emergency response. Create engaging social media posts and detailed blog articles with SEO optimization for emergency safety keywords.'
     },
     {
-      id: 'seasonal-promotion',
-      title: 'Seasonal Promotion',
-      description: 'Holiday and seasonal marketing campaigns',
-      command: 'Create a seasonal marketing campaign for [holiday/season] promoting [products/services]. Include urgency, special offers, and seasonal themes. Target: [customer segment].',
-      tags: ['seasonal', 'promotion', 'urgency'],
-      estimatedTime: '5-8 minutes',
-      platforms: ['Instagram', 'Facebook', 'Email']
-    },
-    {
-      id: 'thought-leadership',
-      title: 'Thought Leadership',
-      description: 'Establish industry authority with expert content',
-      command: 'Develop thought leadership content about [industry topic] for [company/person]. Create insightful articles, social posts, and expert commentary. Focus on trends: [current trends].',
-      tags: ['leadership', 'expertise', 'industry'],
-      estimatedTime: '10-15 minutes',
-      platforms: ['LinkedIn', 'Blog', 'Twitter']
+      id: 'customer-testimonials',
+      title: 'Customer Testimonials Campaign', 
+      description: 'Real stories of how ICE SOS helped families',
+      command: 'Generate 6 pieces of content featuring real customer testimonials about how ICE SOS Lite helped in emergency situations. Create Instagram stories, Facebook posts, and email content highlighting peace of mind for families and life-saving features.'
     }
   ];
 
@@ -150,12 +132,12 @@ export const EnhancedCommandCenter: React.FC<EnhancedCommandCenterProps> = ({
     onSendCommand({
       command: currentCommand,
       analysis: commandAnalysis,
-      templates: smartTemplates,
+      templates: emergencyFocusedTemplates,
       priority: 'normal'
     });
   };
 
-  const useSmartTemplate = (template: any) => {
+  const useEmergencyTemplate = (template: any) => {
     setCurrentCommand(template.command);
     setShowAdvancedOptions(true);
   };
@@ -328,34 +310,24 @@ export const EnhancedCommandCenter: React.FC<EnhancedCommandCenterProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Smart Campaign Templates
+            AI Marketing Command Center
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {smartTemplates.map((template) => (
+            {emergencyFocusedTemplates.map((template) => (
               <Card key={template.id} className="border-l-4 border-l-primary hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-medium">{template.title}</h4>
-                    <Badge variant="outline" className="text-xs">{template.estimatedTime}</Badge>
                   </div>
                   
                   <p className="text-sm text-muted-foreground mb-3">{template.description}</p>
                   
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {template.platforms.slice(0, 3).map((platform) => (
-                      <Badge key={platform} variant="secondary" className="text-xs">{platform}</Badge>
-                    ))}
-                    {template.platforms.length > 3 && (
-                      <Badge variant="secondary" className="text-xs">+{template.platforms.length - 3}</Badge>
-                    )}
-                  </div>
-                  
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => useSmartTemplate(template)}
+                    onClick={() => useEmergencyTemplate(template)}
                     className="w-full"
                   >
                     Use Template

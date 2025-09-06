@@ -163,6 +163,63 @@ export const ContentGenerationPipeline: React.FC<ContentGenerationPipelineProps>
 
   return (
     <div className="space-y-6">
+      {/* Process Metrics Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-blue-700">Pipeline Efficiency</p>
+                <p className="text-2xl font-bold text-blue-900">{Math.round(getOverallProgress())}%</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-green-50 to-green-100/50 border-green-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-green-700">Time Remaining</p>
+                <p className="text-2xl font-bold text-green-900">
+                  {estimatedTimeRemaining ? formatTime(estimatedTimeRemaining) : '--:--'}
+                </p>
+              </div>
+              <Clock className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-purple-50 to-purple-100/50 border-purple-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-purple-700">Active Stage</p>
+                <p className="text-lg font-bold text-purple-900">
+                  {getCurrentStage()?.stage_name?.replace('_', ' ') || 'Waiting'}
+                </p>
+              </div>
+              <Zap className="h-8 w-8 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-orange-700">Quality Score</p>
+                <p className="text-2xl font-bold text-orange-900">
+                  {qualityMetrics ? Math.round((qualityMetrics.seoScore + qualityMetrics.readabilityScore) / 2) : '--'}
+                </p>
+              </div>
+              <Stars className="h-8 w-8 text-orange-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Pipeline Overview */}
       <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
         <CardHeader>
