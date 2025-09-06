@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}'],
-        maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 8MB to allow optimized images
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB to handle large bundles
         globIgnores: ['lovable-uploads/**'], // avoid precaching large uploads initially
         runtimeCaching: [
           {
