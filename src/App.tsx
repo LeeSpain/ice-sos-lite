@@ -52,6 +52,9 @@ import TestPage from "./pages/TestPage";
 // Device Pages
 import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
 
+// Regional Pages
+import RegionalCenterSpain from "./pages/RegionalCenterSpain";
+
 // Protected Route Components
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
@@ -267,6 +270,13 @@ function AppWithTracking() {
                 <Route path="/devices/ice-sos-pendant" element={
                   <OptimizedSuspense skeletonType="card">
                     <DeviceIceSosPendant />
+                  </OptimizedSuspense>
+                } />
+
+                {/* Regional Pages */}
+                <Route path="/regional-center/spain" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <RegionalCenterSpain />
                   </OptimizedSuspense>
                 } />
 
