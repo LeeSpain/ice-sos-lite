@@ -34,7 +34,7 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import Videos from "./pages/Videos";
-import FamilyCarerAccess from "./components/FamilyCarerAccess";
+import FamilyCarerAccessPage from "./pages/FamilyCarerAccess";
 
 // Interactive and Mobile Pages
 import FamilyAccessSetup from "./pages/FamilyAccessSetup";
@@ -138,7 +138,7 @@ function AppWithTracking() {
                 
                 <Route path="/family-carer-access" element={
                   <OptimizedSuspense skeletonType="card">
-                    <FamilyCarerAccess />
+                    <FamilyCarerAccessPage />
                   </OptimizedSuspense>
                 } />
 
