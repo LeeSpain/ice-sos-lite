@@ -8,6 +8,12 @@ import { EnhancedCommandCenter } from './EnhancedCommandCenter';
 import { ContentGenerationPipeline } from './ContentGenerationPipeline';
 import { ContentApprovalDashboard } from './ContentApprovalDashboard';
 import { RealTimeWorkflowVisualizer } from './RealTimeWorkflowVisualizer';
+import { SocialHub } from './SocialHub';
+import { AnalyticsDashboard } from './AnalyticsDashboard';
+import { SystemMonitor } from './SystemMonitor';
+import { AISettings } from './AISettings';
+import { TrainingDataManager } from './TrainingDataManager';
+import { RivenConfiguration } from './RivenConfiguration';
 import { 
   Wand2, 
   Cog, 
@@ -17,7 +23,8 @@ import {
   Zap,
   Clock,
   Bell,
-  TrendingUp
+  TrendingUp,
+  Users
 } from 'lucide-react';
 
 const WorkflowContent: React.FC = () => {
@@ -67,10 +74,16 @@ const WorkflowContent: React.FC = () => {
     return (completed / workflow.length) * 100;
   };
 
-  const autoFlowTabs = [
+  const allTabs = [
     { id: 'command-center', label: 'Command Center', description: 'Start your AI marketing campaign' },
     { id: 'creation-pipeline', label: 'Creation Pipeline', description: 'Watch content being generated' },
-    { id: 'content-approval', label: 'Content Approval', description: 'Review and publish content' }
+    { id: 'content-approval', label: 'Content Approval', description: 'Review and publish content' },
+    { id: 'social-hub', label: 'Social Hub', description: 'Manage social media accounts' },
+    { id: 'analytics', label: 'Analytics', description: 'Track campaign performance' },
+    { id: 'monitor', label: 'Monitor', description: 'Real-time system monitoring' },
+    { id: 'ai-settings', label: 'AI Settings', description: 'Configure AI parameters' },
+    { id: 'training-data', label: 'Training Data', description: 'Manage AI training datasets' },
+    { id: 'riven-config', label: 'Riven Config', description: 'System configuration' }
   ];
 
   return (
@@ -145,37 +158,39 @@ const WorkflowContent: React.FC = () => {
         />
       )}
 
-      {/* Auto-flowing Workflow Tabs */}
+      {/* Complete Riven Workflow Tabs */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-primary" />
-            Professional AI Marketing Workflow
+            Riven AI Marketing System
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={(value) => dispatch({ type: 'SET_ACTIVE_TAB', payload: value })}>
-            <TabsList className="grid w-full grid-cols-3 mb-6">
-              {autoFlowTabs.map((tab, index) => (
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-9 mb-6">
+              {allTabs.map((tab, index) => (
                 <TabsTrigger 
                   key={tab.id} 
                   value={tab.id} 
-                  className="relative flex items-center gap-2 data-[state=active]:bg-primary/10"
+                  className="relative flex items-center gap-1 data-[state=active]:bg-primary/10 text-xs lg:text-sm"
                 >
-                  {tab.id === 'command-center' && <Wand2 className="h-4 w-4" />}
-                  {tab.id === 'creation-pipeline' && <Cog className="h-4 w-4" />}
-                  {tab.id === 'content-approval' && <CheckCircle className="h-4 w-4" />}
+                  {tab.id === 'command-center' && <Wand2 className="h-3 w-3 lg:h-4 lg:w-4" />}
+                  {tab.id === 'creation-pipeline' && <Cog className="h-3 w-3 lg:h-4 lg:w-4" />}
+                  {tab.id === 'content-approval' && <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4" />}
+                  {tab.id === 'social-hub' && <Users className="h-3 w-3 lg:h-4 lg:w-4" />}
+                  {tab.id === 'analytics' && <TrendingUp className="h-3 w-3 lg:h-4 lg:w-4" />}
+                  {tab.id === 'monitor' && <Activity className="h-3 w-3 lg:h-4 lg:w-4" />}
+                  {tab.id === 'ai-settings' && <Zap className="h-3 w-3 lg:h-4 lg:w-4" />}
+                  {tab.id === 'training-data' && <Bell className="h-3 w-3 lg:h-4 lg:w-4" />}
+                  {tab.id === 'riven-config' && <Cog className="h-3 w-3 lg:h-4 lg:w-4" />}
                   
                   <div className="flex flex-col items-start">
                     <span className="font-medium">{tab.label}</span>
-                    <span className="text-xs text-muted-foreground hidden sm:block">
+                    <span className="text-xs text-muted-foreground hidden xl:block">
                       {tab.description}
                     </span>
                   </div>
-                  
-                  {index < autoFlowTabs.length - 1 && (
-                    <ArrowRight className="h-4 w-4 absolute -right-2 text-muted-foreground" />
-                  )}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -199,6 +214,30 @@ const WorkflowContent: React.FC = () => {
 
             <TabsContent value="content-approval" className="space-y-6">
               <ContentApprovalDashboard />
+            </TabsContent>
+
+            <TabsContent value="social-hub" className="space-y-6">
+              <SocialHub />
+            </TabsContent>
+
+            <TabsContent value="analytics" className="space-y-6">
+              <AnalyticsDashboard />
+            </TabsContent>
+
+            <TabsContent value="monitor" className="space-y-6">
+              <SystemMonitor />
+            </TabsContent>
+
+            <TabsContent value="ai-settings" className="space-y-6">
+              <AISettings />
+            </TabsContent>
+
+            <TabsContent value="training-data" className="space-y-6">
+              <TrainingDataManager />
+            </TabsContent>
+
+            <TabsContent value="riven-config" className="space-y-6">
+              <RivenConfiguration />
             </TabsContent>
           </Tabs>
         </CardContent>
