@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SocialMediaManager } from './SocialMediaManager';
 import { 
   Facebook, 
   Instagram, 
@@ -12,7 +14,9 @@ import {
   Settings,
   Activity,
   Users,
-  Eye
+  Eye,
+  Calendar,
+  TrendingUp
 } from 'lucide-react';
 
 export const SocialHub: React.FC = () => {
@@ -26,91 +30,89 @@ export const SocialHub: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5 text-primary" />
-            Social Media Accounts
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {connectedAccounts.map((account) => {
-              const IconComponent = account.icon;
-              return (
-                <Card key={account.id} className="border">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <IconComponent className="h-8 w-8 text-primary" />
-                        <div>
-                          <h4 className="font-medium">{account.name}</h4>
-                          <p className="text-sm text-muted-foreground">{account.platform}</p>
-                        </div>
-                      </div>
-                      <Badge 
-                        variant={account.status === 'connected' ? 'default' : 
-                                account.status === 'pending' ? 'secondary' : 'destructive'}
-                      >
-                        {account.status}
-                      </Badge>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm text-muted-foreground">Followers</span>
-                      <span className="font-medium">{account.followers}</span>
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Settings className="h-3 w-3 mr-1" />
-                        Settings
-                      </Button>
-                      <Button variant="outline" size="sm" className="flex-1">
-                        <Eye className="h-3 w-3 mr-1" />
-                        View
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-            
-            {/* Add Account Card */}
-            <Card className="border-dashed border-2 border-muted-foreground/25 hover:border-primary/50 transition-colors cursor-pointer">
-              <CardContent className="p-4 flex flex-col items-center justify-center h-full text-center">
-                <Plus className="h-8 w-8 text-muted-foreground mb-2" />
-                <h4 className="font-medium text-muted-foreground">Add Account</h4>
-                <p className="text-xs text-muted-foreground">Connect new social platform</p>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="accounts" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="accounts" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Accounts
+          </TabsTrigger>
+          <TabsTrigger value="queue" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Queue
+          </TabsTrigger>
+          <TabsTrigger value="activity" className="flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Activity
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Analytics
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-primary" />
-            Recent Activity
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[1,2,3,4,5].map((i) => (
-              <div key={i} className="flex items-center gap-4 p-3 bg-muted/20 rounded">
-                <Facebook className="h-5 w-5 text-blue-600" />
-                <div className="flex-1">
-                  <p className="font-medium">Posted: Family Safety Tips #{i}</p>
-                  <p className="text-sm text-muted-foreground">2 hours ago • 45 likes, 12 comments</p>
-                </div>
-                <Badge variant="outline">Published</Badge>
+        <TabsContent value="accounts">
+          <SocialMediaManager />
+        </TabsContent>
+
+        <TabsContent value="queue">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Posting Schedule
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Posting schedule will be displayed here</p>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="activity">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-primary" />
+                Recent Activity
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[1,2,3,4,5].map((i) => (
+                  <div key={i} className="flex items-center gap-4 p-3 bg-muted/20 rounded">
+                    <Facebook className="h-5 w-5 text-blue-600" />
+                    <div className="flex-1">
+                      <p className="font-medium">Posted: Family Safety Tips #{i}</p>
+                      <p className="text-sm text-muted-foreground">2 hours ago • 45 likes, 12 comments</p>
+                    </div>
+                    <Badge variant="outline">Published</Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Social Media Analytics
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Analytics dashboard will be displayed here</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

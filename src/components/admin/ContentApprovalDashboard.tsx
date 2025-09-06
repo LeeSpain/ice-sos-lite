@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useWorkflow } from '@/contexts/RivenWorkflowContext';
+import { BlogPublisher } from './BlogPublisher';
 import { 
   Eye,
   CheckCircle,
@@ -482,46 +483,48 @@ export const ContentApprovalDashboard: React.FC = () => {
                           </Button>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-col gap-2">
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handleApprove(content.id)}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Approve
+                            </Button>
+                            
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleReject(content.id)}
+                            >
+                              <XCircle className="h-4 w-4 mr-1" />
+                              Reject
+                            </Button>
+                          </div>
+
                           <Button
                             size="sm"
-                            onClick={() => handleApprove(content.id)}
-                            className="bg-green-600 hover:bg-green-700"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedContent(content);
+                              setScheduleModalOpen(true);
+                            }}
                           >
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            Approve
+                            <Calendar className="h-4 w-4 mr-1" />
+                            Schedule
                           </Button>
-                          
+
                           <Button
                             size="sm"
-                            variant="destructive"
-                            onClick={() => handleReject(content.id)}
-                          >
-                            <XCircle className="h-4 w-4 mr-1" />
-                            Reject
-                          </Button>
-                        </div>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedContent(content);
-                            setScheduleModalOpen(true);
-                          }}
-                        >
-                          <Calendar className="h-4 w-4 mr-1" />
-                          Schedule
-                        </Button>
-
-                        <Button
-                          size="sm"
                           className="bg-primary"
                           onClick={() => handlePublishNow(content.id)}
                         >
                           <Share2 className="h-4 w-4 mr-1" />
                           Publish Now
                         </Button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>

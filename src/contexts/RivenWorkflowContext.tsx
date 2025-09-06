@@ -282,8 +282,13 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const sendCommand = async (command: string, config: any): Promise<string | undefined> => {
     try {
+      dispatch({ type: 'SET_PROCESSING_STAGE', payload: 'initializing' });
+      
       const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
-        body: { command, campaignId: crypto.randomUUID() }
+        body: { 
+          command, 
+          title: config?.title || `Campaign: ${command.substring(0, 50)}...`
+        }
       });
 
       if (error) throw error;
@@ -291,17 +296,28 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const campaignId = data?.campaignId;
       if (campaignId) {
         dispatch({ type: 'SET_CURRENT_CAMPAIGN', payload: campaignId });
-        await loadWorkflowStages(campaignId);
+        
+        // Load campaign and workflow data
+        await Promise.all([
+          loadCampaigns(),
+          loadWorkflowStages(campaignId)
+        ]);
         
         toast({
           title: "Workflow Started",
           description: "Riven is now processing your command",
         });
+
+        // Auto-refresh content when workflow completes
+        setTimeout(() => {
+          loadContentItems();
+        }, 5000);
       }
 
       return campaignId;
     } catch (error) {
       console.error('Error sending command:', error);
+      dispatch({ type: 'SET_PROCESSING_STAGE', payload: undefined });
       toast({
         title: "Command Failed",
         description: "Failed to send command to Riven",
