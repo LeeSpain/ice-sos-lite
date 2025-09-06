@@ -43,7 +43,7 @@ class ContentQualityAnalyzer {
     };
   }
 
-  private analyzeSEO(content: string, title: string, description?: string, issues: QualityIssue[], recommendations: string[]): number {
+  private analyzeSEO(content: string, title: string, description: string | undefined, issues: QualityIssue[], recommendations: string[]): number {
     let score = 100;
 
     // Title length check

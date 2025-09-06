@@ -21,8 +21,11 @@ import AITrainingPage from './pages/AITrainingPage';
 import RivenConfigurationPage from './pages/RivenConfigurationPage';
 import WorkflowPipeline from './workflow/WorkflowPipeline';
 
+// Quality Assurance Components
+import QualityAssuranceDashboard from './monitoring/QualityAssuranceDashboard';
+
 interface OptimizedComponentLoaderProps {
-  type: 'command-center' | 'workflow-pipeline' | 'content-approval' | 'social-hub' | 'analytics' | 'monitor' | 'ai-settings' | 'training-data' | 'riven-config';
+  type: 'command-center' | 'workflow-pipeline' | 'content-approval' | 'social-hub' | 'analytics' | 'monitor' | 'ai-settings' | 'training-data' | 'riven-config' | 'quality-assurance-dashboard';
   props: any;
   enhanced?: boolean; // Flag to use enhanced components
 }
@@ -71,6 +74,8 @@ export default function OptimizedComponentLoader({ type, props, enhanced = true 
         return <AITrainingPage {...props} />;
       case 'riven-config':
         return <RivenConfigurationPage {...props} />;
+      case 'quality-assurance-dashboard':
+        return <QualityAssuranceDashboard {...props} />;
       default:
         console.warn('Unknown component type:', type);
         return null;
