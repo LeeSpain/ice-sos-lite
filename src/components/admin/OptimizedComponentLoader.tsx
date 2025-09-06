@@ -7,7 +7,7 @@ import { SocialHub } from './SocialHub';
 import { RealSocialMediaOAuth } from './RealSocialMediaOAuth';
 import { AnalyticsDashboard } from './AnalyticsDashboard';
 import CampaignMonitor from './CampaignMonitor';
-import { EnhancedContentApproval } from './content/EnhancedContentApproval';
+import EnhancedContentApproval from './content/EnhancedContentApproval';
 
 // Enhanced Professional Components
 import EnhancedContentApprovalDashboard from './enhanced/ContentApprovalDashboard';
@@ -39,13 +39,12 @@ export default function OptimizedComponentLoader({ type, props, enhanced = true 
       case 'content-approval':
         return (
           <EnhancedContentApproval 
-            contents={props.contents || []}
-            onContentUpdate={props.onContentUpdate || (() => {})}
-            onContentApproval={props.onContentApproval || (() => {})}
-            onPublishContent={props.onPublishContent || (() => {})}
-            onDeleteContent={props.onDeleteContent || (() => {})}
-            onEditContent={props.onEditContent || (() => {})}
-            isLoading={props.isLoading || false}
+            content={props.contents || []}
+            onApprove={props.onContentApproval || (() => {})}
+            onReject={props.onRejectContent || (() => {})}
+            onPublish={props.onPublishContent || (() => {})}
+            onDelete={props.onDeleteContent || (() => {})}
+            onEdit={props.onEditContent || (() => {})}
           />
         );
       case 'social-hub':

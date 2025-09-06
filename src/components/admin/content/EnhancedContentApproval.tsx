@@ -12,6 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import RealTimePublishingDashboard from './RealTimePublishingDashboard';
+import ContentPreviewModal from './ContentPreviewModal';
+import PublishingCalendar from './PublishingCalendar';
 import { 
   Calendar as CalendarIcon,
   Clock,
@@ -49,466 +52,585 @@ interface ContentApprovalItem {
 }
 
 interface EnhancedContentApprovalProps {
-  contents: ContentApprovalItem[];
-  onContentUpdate: () => void;
-  onContentApproval: (contentId: string) => void;
-  onPublishContent: (contentId: string, options?: any) => void;
-  onDeleteContent: (contentId: string) => void;
-  onEditContent: (contentId: string) => void;
-  isLoading?: boolean;
+  content: ContentApprovalItem[];
+  onApprove: (contentId: string) => Promise<void>;
+  onReject: (contentId: string, reason?: string) => Promise<void>;
+  onPublish: (contentId: string, publishType: string, platforms?: string[], scheduledTime?: Date) => Promise<void>;
+  onEdit: (contentId: string) => void;
+  onDelete: (contentId: string) => Promise<void>;
 }
 
-const platformIcons = {
-  facebook: Facebook,
-  twitter: Twitter,
-  linkedin: Linkedin,
-  instagram: Instagram,
-  blog: FileText,
-  email: Mail
-};
-
-const platformColors = {
-  facebook: '#1877F2',
-  twitter: '#1DA1F2', 
-  linkedin: '#0A66C2',
-  instagram: '#E4405F',
-  blog: '#6B7280',
-  email: '#10B981'
-};
-
-export const EnhancedContentApproval: React.FC<EnhancedContentApprovalProps> = ({
-  contents,
-  onContentUpdate,
-  onContentApproval,
-  onPublishContent,
-  onDeleteContent,
-  onEditContent,
-  isLoading
+const EnhancedContentApproval: React.FC<EnhancedContentApprovalProps> = ({
+  content,
+  onApprove,
+  onReject,
+  onPublish,
+  onEdit,
+  onDelete
 }) => {
   const { toast } = useToast();
+  const [selectedPublishType, setSelectedPublishType] = useState<string>('');
+  const [scheduledDate, setScheduledDate] = useState<Date>();
+  const [scheduledTime, setScheduledTime] = useState<string>('');
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+  const [bulkSelectedItems, setBulkSelectedItems] = useState<string[]>([]);
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [selectedContent, setSelectedContent] = useState<ContentApprovalItem | null>(null);
-  const [publishOptions, setPublishOptions] = useState({
-    platforms: [] as string[],
-    publishType: 'social' as 'social' | 'blog' | 'email' | 'all',
-    scheduleDate: undefined as Date | undefined,
-    scheduleTime: '09:00',
-    emailSubject: '',
-    emailSegments: ['all'] as string[]
-  });
-  const [publishing, setPublishing] = useState<string | null>(null);
+  const [previewContent, setPreviewContent] = useState<ContentApprovalItem | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('approval');
 
-  const approvedContents = contents.filter(c => c.status === 'approved');
-  const draftContents = contents.filter(c => c.status === 'draft');
+  const handleBulkAction = async (action: string, items: string[]) => {
+    switch (action) {
+      case 'approve':
+        for (const itemId of items) {
+          await onApprove(itemId);
+        }
+        break;
+      case 'delete':
+        for (const itemId of items) {
+          await onDelete(itemId);
+        }
+        break;
+      case 'schedule':
+        setIsScheduleDialogOpen(true);
+        break;
+      case 'publish_now':
+        for (const itemId of items) {
+          await publishContent(itemId, 'social', ['facebook', 'twitter']);
+        }
+        break;
+    }
+  };
 
-  const handlePublish = async (content: ContentApprovalItem, immediate = false) => {
-    if (!immediate && !publishOptions.scheduleDate) {
+  const handleScheduleUpdate = async (contentId: string, newTime: Date) => {
+    await publishContent(contentId, 'social', [], newTime);
+  };
+
+  const handleScheduleContent = async (contentId: string, scheduledTime: Date) => {
+    await publishContent(contentId, 'social', [], scheduledTime);
+  };
+
+  const publishContent = async (contentId: string, publishType: string = 'social', platforms: string[] = [], scheduledTime?: Date) => {
+    try {
+      await onPublish(contentId, publishType, platforms, scheduledTime);
       toast({
-        title: "Schedule Required",
-        description: "Please select a date and time for publishing",
+        title: "Content published successfully",
+        description: scheduledTime 
+          ? `Content scheduled for ${format(scheduledTime, 'PPP p')}`
+          : "Content has been published immediately",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Publishing failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleQuickApprove = async (contentId: string) => {
+    try {
+      await onApprove(contentId);
+      toast({
+        title: "Content approved",
+        description: "Content has been approved and is ready for publishing.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Approval failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleQuickReject = async (contentId: string, reason: string = 'Quality issues') => {
+    try {
+      await onReject(contentId, reason);
+      toast({
+        title: "Content rejected",
+        description: `Content rejected: ${reason}`,
+        variant: "destructive"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Rejection failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleBulkPublish = async () => {
+    if (bulkSelectedItems.length === 0) {
+      toast({
+        title: "No items selected",
+        description: "Please select content items to publish.",
         variant: "destructive"
       });
       return;
     }
 
-    setPublishing(content.id);
-    
+    const platforms = selectedPlatforms.length > 0 ? selectedPlatforms : ['social'];
+    let scheduledDateTime: Date | undefined;
+
+    if (scheduledDate && scheduledTime) {
+      scheduledDateTime = new Date(scheduledDate);
+      const [hours, minutes] = scheduledTime.split(':').map(Number);
+      scheduledDateTime.setHours(hours, minutes);
+    }
+
     try {
-      const scheduledTime = immediate ? undefined : 
-        publishOptions.scheduleDate ? 
-          new Date(`${format(publishOptions.scheduleDate, 'yyyy-MM-dd')}T${publishOptions.scheduleTime}:00`).toISOString() :
-          undefined;
-
-      await onPublishContent(content.id, {
-        platforms: publishOptions.platforms,
-        publishType: publishOptions.publishType,
-        scheduledTime,
-        campaignData: {
-          subject: publishOptions.emailSubject || content.title,
-          segments: publishOptions.emailSegments
-        }
+      for (const contentId of bulkSelectedItems) {
+        await publishContent(contentId, selectedPublishType || 'social', platforms, scheduledDateTime);
+      }
+      
+      setBulkSelectedItems([]);
+      setSelectedPlatforms([]);
+      setScheduledDate(undefined);
+      setScheduledTime('');
+      
+      toast({
+        title: "Bulk publishing completed",
+        description: `Successfully published ${bulkSelectedItems.length} items.`,
       });
-
-      setSelectedContent(null);
-      setPublishOptions({
-        platforms: [],
-        publishType: 'social',
-        scheduleDate: undefined,
-        scheduleTime: '09:00',
-        emailSubject: '',
-        emailSegments: ['all']
+    } catch (error: any) {
+      toast({
+        title: "Bulk publishing failed",
+        description: error.message,
+        variant: "destructive"
       });
-    } catch (error) {
-      console.error('Publishing error:', error);
-    } finally {
-      setPublishing(null);
     }
   };
 
-  const renderContentCard = (content: ContentApprovalItem) => {
-    const PlatformIcon = platformIcons[content.platform] || Globe;
-    const platformColor = platformColors[content.platform] || '#6B7280';
-
-    return (
-      <Card key={content.id} className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center space-x-2">
-              <PlatformIcon 
-                className="h-5 w-5" 
-                style={{ color: platformColor }}
-              />
-              <Badge variant={content.status === 'approved' ? 'default' : 'secondary'}>
-                {content.status}
-              </Badge>
-            </div>
-            <div className="flex items-center space-x-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedContent(content)}
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onEditContent(content.id)}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onDeleteContent(content.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <CardTitle className="text-lg">{content.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-            {content.body_text?.substring(0, 150)}...
-          </p>
-          
-          {content.image_url && (
-            <img 
-              src={content.image_url} 
-              alt={content.title}
-              className="w-full h-32 object-cover rounded-md mb-4"
-            />
-          )}
-
-          {content.hashtags && content.hashtags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-4">
-              {content.hashtags.slice(0, 3).map((tag, i) => (
-                <Badge key={i} variant="outline" className="text-xs">
-                  #{tag}
-                </Badge>
-              ))}
-              {content.hashtags.length > 3 && (
-                <Badge variant="outline" className="text-xs">
-                  +{content.hashtags.length - 3}
-                </Badge>
-              )}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">
-              {format(new Date(content.created_at), 'MMM dd, yyyy')}
-            </span>
-            
-            {content.status === 'approved' && (
-              <div className="flex space-x-2">
-                <Button
-                  size="sm"
-                  onClick={() => handlePublish(content, true)}
-                  disabled={publishing === content.id}
-                >
-                  {publishing === content.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Send className="h-4 w-4 mr-2" />
-                  )}
-                  Publish Now
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setSelectedContent(content)}
-                >
-                  <Clock className="h-4 w-4 mr-2" />
-                  Schedule
-                </Button>
-              </div>
-            )}
-            
-            {content.status === 'draft' && (
-              <Button
-                size="sm"
-                onClick={() => onContentApproval(content.id)}
-              >
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Approve
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    );
+  const getPlatformIcon = (platform: string) => {
+    switch (platform.toLowerCase()) {
+      case 'facebook': return <Facebook className="w-4 h-4" />;
+      case 'twitter': case 'x': return <Twitter className="w-4 h-4" />;
+      case 'linkedin': return <Linkedin className="w-4 h-4" />;
+      case 'instagram': return <Instagram className="w-4 h-4" />;
+      case 'blog': return <Globe className="w-4 h-4" />;
+      case 'email': return <Mail className="w-4 h-4" />;
+      default: return <Share2 className="w-4 h-4" />;
+    }
   };
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin mr-2" />
-          Loading content...
-        </CardContent>
-      </Card>
-    );
-  }
+  const getStatusBadge = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'pending_review':
+        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pending Review</Badge>;
+      case 'approved':
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Approved</Badge>;
+      case 'rejected':
+        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Rejected</Badge>;
+      case 'draft':
+        return <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">Draft</Badge>;
+      case 'published':
+        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Published</Badge>;
+      case 'scheduled':
+        return <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">Scheduled</Badge>;
+      default:
+        return <Badge variant="outline">{status}</Badge>;
+    }
+  };
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Content Approval & Publishing</h2>
-        <p className="text-muted-foreground">
-          Review, approve, and publish content across multiple platforms
-        </p>
-      </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span>Content Approval & Publishing</span>
+            <Badge variant="outline">
+              {content.filter(c => c.status === 'pending_review' || c.status === 'draft').length} items pending
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+            <TabsList className="grid grid-cols-4 w-fit">
+              <TabsTrigger value="approval">Content Approval</TabsTrigger>
+              <TabsTrigger value="dashboard">Publishing Dashboard</TabsTrigger>
+              <TabsTrigger value="calendar">Publishing Calendar</TabsTrigger>
+              <TabsTrigger value="publishing">Bulk Publishing</TabsTrigger>
+            </TabsList>
 
-      <Tabs defaultValue="approved" className="w-full">
-        <TabsList>
-          <TabsTrigger value="approved">
-            Approved ({approvedContents.length})
-          </TabsTrigger>
-          <TabsTrigger value="draft">
-            Pending Approval ({draftContents.length})
-          </TabsTrigger>
-        </TabsList>
+            <TabsContent value="approval" className="space-y-4">
+              <div className="space-y-4">
+                {content
+                  .filter(item => ['pending_review', 'draft', 'approved'].includes(item.status))
+                  .map((item) => (
+                  <Card key={item.id} className="p-4">
+                    <div className="flex items-start justify-between space-x-4">
+                      <div className="flex-1 space-y-2">
+                        <div className="flex items-center space-x-2">
+                          {getPlatformIcon(item.platform)}
+                          <h3 className="font-medium">{item.title || 'Untitled'}</h3>
+                          {getStatusBadge(item.status)}
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {item.body_text?.slice(0, 150)}...
+                        </p>
+                        
+                        <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                          <span>Platform: {item.platform}</span>
+                          <span>Created: {format(new Date(item.created_at), 'MMM d, yyyy')}</span>
+                        </div>
+                      </div>
 
-        <TabsContent value="approved" className="space-y-4">
-          {approvedContents.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">No approved content ready for publishing</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {approvedContents.map(renderContentCard)}
-            </div>
-          )}
-        </TabsContent>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setPreviewContent(item);
+                            setIsPreviewOpen(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Preview
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleQuickApprove(item.id)}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Approve
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleQuickReject(item.id)}
+                        >
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Reject
+                        </Button>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-48">
+                            <div className="space-y-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start"
+                                onClick={() => {
+                                  setSelectedContent(item);
+                                  setIsScheduleDialogOpen(true);
+                                }}
+                              >
+                                <Clock className="w-4 h-4 mr-2" />
+                                Schedule
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start"
+                                onClick={() => publishContent(item.id, 'social', ['facebook', 'twitter'])}
+                              >
+                                <Send className="w-4 h-4 mr-2" />
+                                Publish Now
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start"
+                                onClick={() => onEdit(item.id)}
+                              >
+                                <Edit className="w-4 h-4 mr-2" />
+                                Edit
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="w-full justify-start text-red-600"
+                                onClick={() => onDelete(item.id)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete
+                              </Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </TabsContent>
 
-        <TabsContent value="draft" className="space-y-4">
-          {draftContents.length === 0 ? (
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">No content pending approval</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {draftContents.map(renderContentCard)}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="dashboard" className="space-y-6">
+              <RealTimePublishingDashboard
+                content={content}
+                onBulkAction={handleBulkAction}
+              />
+            </TabsContent>
 
-      {/* Publishing Options Dialog */}
-      {selectedContent && (
-        <Dialog open={!!selectedContent} onOpenChange={() => setSelectedContent(null)}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Publish: {selectedContent.title}</DialogTitle>
-            </DialogHeader>
+            <TabsContent value="calendar" className="space-y-6">
+              <PublishingCalendar
+                content={content}
+                onScheduleUpdate={handleScheduleUpdate}
+                onScheduleContent={handleScheduleContent}
+              />
+            </TabsContent>
+
+            <TabsContent value="publishing" className="space-y-6">
+              {/* Bulk Selection */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Bulk Content Selection</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        checked={bulkSelectedItems.length === content.length}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setBulkSelectedItems(content.map(item => item.id));
+                          } else {
+                            setBulkSelectedItems([]);
+                          }
+                        }}
+                      />
+                      <Label>Select All ({bulkSelectedItems.length} selected)</Label>
+                    </div>
+                    
+                    <div className="grid gap-2 max-h-60 overflow-y-auto">
+                      {content.map((item) => (
+                        <div key={item.id} className="flex items-center space-x-2 p-2 border rounded-lg">
+                          <Checkbox
+                            checked={bulkSelectedItems.includes(item.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setBulkSelectedItems(prev => [...prev, item.id]);
+                              } else {
+                                setBulkSelectedItems(prev => prev.filter(id => id !== item.id));
+                              }
+                            }}
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-2">
+                              {getPlatformIcon(item.platform)}
+                              <span className="text-sm truncate">{item.title}</span>
+                              <Badge variant="outline" className="text-xs">{item.platform}</Badge>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Publishing Options */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Publishing Configuration</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Publish Type Selection */}
+                  <div className="space-y-2">
+                    <Label>Publishing Type</Label>
+                    <Select value={selectedPublishType} onValueChange={setSelectedPublishType}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select publishing type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="social">Social Media</SelectItem>
+                        <SelectItem value="blog">Blog Post</SelectItem>
+                        <SelectItem value="email">Email Campaign</SelectItem>
+                        <SelectItem value="all">All Platforms</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Platform Selection */}
+                  {selectedPublishType === 'social' && (
+                    <div className="space-y-2">
+                      <Label>Select Platforms</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {['facebook', 'twitter', 'linkedin', 'instagram'].map((platform) => (
+                          <div key={platform} className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={selectedPlatforms.includes(platform)}
+                              onCheckedChange={(checked) => {
+                                if (checked) {
+                                  setSelectedPlatforms(prev => [...prev, platform]);
+                                } else {
+                                  setSelectedPlatforms(prev => prev.filter(p => p !== platform));
+                                }
+                              }}
+                            />
+                            <div className="flex items-center space-x-2">
+                              {getPlatformIcon(platform)}
+                              <Label className="capitalize">{platform}</Label>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Scheduling Options */}
+                  <div className="space-y-4">
+                    <Label>Schedule Publishing (Optional)</Label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm">Date</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className="w-full justify-start">
+                              <CalendarIcon className="w-4 h-4 mr-2" />
+                              {scheduledDate ? format(scheduledDate, 'PPP') : 'Select date'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0">
+                            <Calendar
+                              mode="single"
+                              selected={scheduledDate}
+                              onSelect={setScheduledDate}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm">Time</Label>
+                        <Input
+                          type="time"
+                          value={scheduledTime}
+                          onChange={(e) => setScheduledTime(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Publish Button */}
+                  <Button 
+                    onClick={handleBulkPublish}
+                    disabled={bulkSelectedItems.length === 0 || !selectedPublishType}
+                    className="w-full"
+                  >
+                    <Send className="w-4 h-4 mr-2" />
+                    {scheduledDate && scheduledTime ? 'Schedule' : 'Publish'} {bulkSelectedItems.length} Items
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Content Preview Modal */}
+      <ContentPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        content={previewContent}
+        onEdit={() => {
+          if (previewContent) {
+            onEdit(previewContent.id);
+            setIsPreviewOpen(false);
+          }
+        }}
+        onPublish={() => {
+          if (previewContent) {
+            publishContent(previewContent.id, 'social', ['facebook', 'twitter']);
+            setIsPreviewOpen(false);
+          }
+        }}
+        onSchedule={() => {
+          if (previewContent) {
+            setSelectedContent(previewContent);
+            setIsScheduleDialogOpen(true);
+            setIsPreviewOpen(false);
+          }
+        }}
+      />
+
+      {/* Scheduling Dialog */}
+      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Schedule Content</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedContent && (
+              <div className="p-3 border rounded-lg bg-muted/50">
+                <div className="flex items-center space-x-2 mb-2">
+                  {getPlatformIcon(selectedContent.platform)}
+                  <span className="font-medium">{selectedContent.title}</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {selectedContent.body_text?.slice(0, 100)}...
+                </p>
+              </div>
+            )}
             
-            <Tabs value={publishOptions.publishType} onValueChange={(value: any) => 
-              setPublishOptions(prev => ({ ...prev, publishType: value }))
-            }>
-              <TabsList className="grid grid-cols-4 w-full">
-                <TabsTrigger value="social">Social Media</TabsTrigger>
-                <TabsTrigger value="blog">Blog</TabsTrigger>
-                <TabsTrigger value="email">Email</TabsTrigger>
-                <TabsTrigger value="all">All Platforms</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="social" className="space-y-4">
-                <div>
-                  <Label>Select Platforms</Label>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {['facebook', 'twitter', 'linkedin', 'instagram'].map(platform => (
-                      <div key={platform} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={platform}
-                          checked={publishOptions.platforms.includes(platform)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setPublishOptions(prev => ({
-                                ...prev,
-                                platforms: [...prev.platforms, platform]
-                              }));
-                            } else {
-                              setPublishOptions(prev => ({
-                                ...prev,
-                                platforms: prev.platforms.filter(p => p !== platform)
-                              }));
-                            }
-                          }}
-                        />
-                        <Label htmlFor={platform} className="capitalize">
-                          {platform}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="blog" className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  This will publish the content as a blog post with SEO optimization.
-                </p>
-              </TabsContent>
-
-              <TabsContent value="email" className="space-y-4">
-                <div>
-                  <Label htmlFor="emailSubject">Email Subject</Label>
-                  <Input
-                    id="emailSubject"
-                    value={publishOptions.emailSubject}
-                    onChange={(e) => setPublishOptions(prev => ({
-                      ...prev,
-                      emailSubject: e.target.value
-                    }))}
-                    placeholder={selectedContent.title}
-                  />
-                </div>
-                <div>
-                  <Label>Target Segments</Label>
-                  <Select value={publishOptions.emailSegments[0]} onValueChange={(value) =>
-                    setPublishOptions(prev => ({ ...prev, emailSegments: [value] }))
-                  }>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Subscribers</SelectItem>
-                      <SelectItem value="premium">Premium Subscribers</SelectItem>
-                      <SelectItem value="free">Free Subscribers</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="all" className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  This will publish to blog, email subscribers, and selected social platforms.
-                </p>
-                <div>
-                  <Label>Social Platforms</Label>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {['facebook', 'twitter', 'linkedin'].map(platform => (
-                      <div key={platform} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`all-${platform}`}
-                          checked={publishOptions.platforms.includes(platform)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setPublishOptions(prev => ({
-                                ...prev,
-                                platforms: [...prev.platforms, platform]
-                              }));
-                            } else {
-                              setPublishOptions(prev => ({
-                                ...prev,
-                                platforms: prev.platforms.filter(p => p !== platform)
-                              }));
-                            }
-                          }}
-                        />
-                        <Label htmlFor={`all-${platform}`} className="capitalize">
-                          {platform}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
-
-            {/* Scheduling */}
-            <div className="space-y-4">
-              <Label>Schedule Publishing</Label>
-              <div className="flex space-x-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline">
-                      <CalendarIcon className="h-4 w-4 mr-2" />
-                      {publishOptions.scheduleDate ? 
-                        format(publishOptions.scheduleDate, 'MMM dd, yyyy') : 
-                        'Select date'
-                      }
+                    <Button variant="outline" className="w-full justify-start">
+                      <CalendarIcon className="w-4 h-4 mr-2" />
+                      {scheduledDate ? format(scheduledDate, 'PPP') : 'Select date'}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
-                      selected={publishOptions.scheduleDate}
-                      onSelect={(date) => setPublishOptions(prev => ({ 
-                        ...prev, 
-                        scheduleDate: date 
-                      }))}
-                      disabled={(date) => date < new Date()}
+                      selected={scheduledDate}
+                      onSelect={setScheduledDate}
                       initialFocus
                     />
                   </PopoverContent>
                 </Popover>
-                
+              </div>
+              <div className="space-y-2">
+                <Label>Time</Label>
                 <Input
                   type="time"
-                  value={publishOptions.scheduleTime}
-                  onChange={(e) => setPublishOptions(prev => ({
-                    ...prev,
-                    scheduleTime: e.target.value
-                  }))}
-                  className="w-32"
+                  value={scheduledTime}
+                  onChange={(e) => setScheduledTime(e.target.value)}
                 />
               </div>
             </div>
-
+            
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setSelectedContent(null)}>
+              <Button variant="outline" onClick={() => setIsScheduleDialogOpen(false)}>
                 Cancel
               </Button>
               <Button 
-                onClick={() => handlePublish(selectedContent, true)}
-                disabled={publishing === selectedContent.id}
+                onClick={async () => {
+                  if (selectedContent && scheduledDate && scheduledTime) {
+                    const scheduledDateTime = new Date(scheduledDate);
+                    const [hours, minutes] = scheduledTime.split(':').map(Number);
+                    scheduledDateTime.setHours(hours, minutes);
+                    
+                    await publishContent(selectedContent.id, 'social', ['facebook', 'twitter'], scheduledDateTime);
+                    setIsScheduleDialogOpen(false);
+                    setSelectedContent(null);
+                    setScheduledDate(undefined);
+                    setScheduledTime('');
+                  }
+                }}
+                disabled={!selectedContent || !scheduledDate || !scheduledTime}
               >
-                {publishing === selectedContent.id ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Send className="h-4 w-4 mr-2" />
-                )}
-                Publish Now
+                <Clock className="w-4 h-4 mr-2" />
+                Schedule Content
               </Button>
-              {publishOptions.scheduleDate && (
-                <Button 
-                  onClick={() => handlePublish(selectedContent, false)}
-                  disabled={publishing === selectedContent.id}
-                >
-                  <Clock className="h-4 w-4 mr-2" />
-                  Schedule
-                </Button>
-              )}
             </div>
-          </DialogContent>
-        </Dialog>
-      )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
+export default EnhancedContentApproval;
