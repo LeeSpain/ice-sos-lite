@@ -179,6 +179,74 @@ export type Database = {
         }
         Relationships: []
       }
+      blog_posts: {
+        Row: {
+          content: string
+          content_id: string | null
+          created_at: string
+          excerpt: string | null
+          featured_image: string | null
+          featured_image_alt: string | null
+          id: string
+          keywords: string[] | null
+          meta_description: string | null
+          published_at: string | null
+          reading_time: number | null
+          seo_title: string | null
+          slug: string
+          status: string
+          title: string
+          updated_at: string
+          view_count: number | null
+        }
+        Insert: {
+          content: string
+          content_id?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          featured_image_alt?: string | null
+          id?: string
+          keywords?: string[] | null
+          meta_description?: string | null
+          published_at?: string | null
+          reading_time?: number | null
+          seo_title?: string | null
+          slug: string
+          status?: string
+          title: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Update: {
+          content?: string
+          content_id?: string | null
+          created_at?: string
+          excerpt?: string | null
+          featured_image?: string | null
+          featured_image_alt?: string | null
+          id?: string
+          keywords?: string[] | null
+          meta_description?: string | null
+          published_at?: string | null
+          reading_time?: number | null
+          seo_title?: string | null
+          slug?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_posts_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bulk_campaigns: {
         Row: {
           channel: string
@@ -3096,17 +3164,21 @@ export type Database = {
           account_status: string | null
           client_id: string | null
           client_secret: string | null
+          connection_status: string
           created_at: string
           follower_count: number | null
           id: string
           is_active: boolean | null
           last_connected: string | null
           last_sync_at: string | null
+          last_synced_at: string | null
           oauth_state: string | null
           page_id: string | null
           page_name: string | null
           platform: string
+          platform_name: string | null
           platform_user_id: string | null
+          platform_username: string | null
           posting_permissions: Json | null
           rate_limits: Json | null
           refresh_token: string | null
@@ -3121,17 +3193,21 @@ export type Database = {
           account_status?: string | null
           client_id?: string | null
           client_secret?: string | null
+          connection_status?: string
           created_at?: string
           follower_count?: number | null
           id?: string
           is_active?: boolean | null
           last_connected?: string | null
           last_sync_at?: string | null
+          last_synced_at?: string | null
           oauth_state?: string | null
           page_id?: string | null
           page_name?: string | null
           platform: string
+          platform_name?: string | null
           platform_user_id?: string | null
+          platform_username?: string | null
           posting_permissions?: Json | null
           rate_limits?: Json | null
           refresh_token?: string | null
@@ -3146,17 +3222,21 @@ export type Database = {
           account_status?: string | null
           client_id?: string | null
           client_secret?: string | null
+          connection_status?: string
           created_at?: string
           follower_count?: number | null
           id?: string
           is_active?: boolean | null
           last_connected?: string | null
           last_sync_at?: string | null
+          last_synced_at?: string | null
           oauth_state?: string | null
           page_id?: string | null
           page_name?: string | null
           platform?: string
+          platform_name?: string | null
           platform_user_id?: string | null
+          platform_username?: string | null
           posting_permissions?: Json | null
           rate_limits?: Json | null
           refresh_token?: string | null
