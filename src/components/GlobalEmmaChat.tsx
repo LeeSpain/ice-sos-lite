@@ -4,10 +4,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useEmmaChat } from '@/contexts/EmmaChatContext';
+import { useLocation } from 'react-router-dom';
 
 const GlobalEmmaChat: React.FC = () => {
   const { t } = useTranslation();
   const { isEmmaOpen, openEmmaChat, closeEmmaChat } = useEmmaChat();
+  const location = useLocation();
+
+  // Don't show Emma on admin dashboard
+  if (location.pathname.startsWith('/admin-dashboard')) {
+    return null;
+  }
 
   return (
     <>
