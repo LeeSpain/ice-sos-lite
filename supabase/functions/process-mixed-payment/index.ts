@@ -28,12 +28,21 @@ serve(async (req) => {
 
     const { payment_intent_id, customer_id } = await req.json();
     
-    const authHeader = req.headers.get("Authorization")!;
-    const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    // Authentication is optional; resolve if present, otherwise proceed unauthenticated
+    const authHeader = req.headers.get("Authorization");
+    let authedUser: any = null;
+    if (authHeader) {
+      try {
+        const token = authHeader.replace("Bearer ", "");
+        const { data: userData } = await supabaseClient.auth.getUser(token);
+        authedUser = userData?.user ?? null;
+        if (authedUser?.email) {
+          logStep("User authenticated (optional)", { userId: authedUser.id, email: authedUser.email });
+        }
+      } catch (_e) {
+        logStep("Proceeding without authenticated user");
+      }
+    }
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
@@ -46,6 +55,15 @@ serve(async (req) => {
       throw new Error("Payment not completed");
     }
     logStep("Payment verified", { paymentIntentId: payment_intent_id, status: paymentIntent.status });
+
+    // Resolve user email and id
+    const metadataEmail = (paymentIntent.metadata?.email as string) || null;
+    const chargeEmail = (paymentIntent.charges?.data?.[0]?.billing_details?.email as string) || null;
+    const userEmail: string | null = (authedUser?.email as string) || metadataEmail || chargeEmail;
+    const userId: string | null = (authedUser?.id as string) || null;
+    if (!userEmail) {
+      throw new Error("Unable to determine payer email from payment metadata");
+    }
 
     // Extract metadata from payment intent
     const subscriptionPlans = JSON.parse(paymentIntent.metadata.subscription_plans || '[]');
@@ -115,8 +133,8 @@ serve(async (req) => {
       const subscriptionTiers = allSubscriptionData.map((item: any) => item.name).join(", ");
 
       await supabaseClient.from("subscribers").upsert({
-        email: user.email,
-        user_id: user.id,
+        email: userEmail,
+        user_id: userId,
         stripe_customer_id: customer_id,
         subscribed: true,
         subscription_tier: subscriptionTiers,
@@ -138,44 +156,52 @@ serve(async (req) => {
 
       if (productError) throw new Error(`Error fetching products: ${productError.message}`);
 
-      // Create order records for each product
-      for (const product of dbProducts || []) {
-        const { data: order, error: orderError } = await supabaseClient
-          .from('orders')
-          .insert({
-            user_id: user.id,
-            product_id: product.id,
-            quantity: 1,
-            unit_price: parseFloat(product.price.toString()),
-            total_price: parseFloat(product.price.toString()),
-            currency: product.currency,
-            stripe_payment_intent_id: payment_intent_id,
-            status: 'paid',
-          })
-          .select()
-          .single();
+      // Create order records for each product (only if we have a user_id)
+      if (!userId) {
+        logStep("Skipping order creation - no authenticated user available");
+      } else {
+        for (const product of dbProducts || []) {
+          const { data: order, error: orderError } = await supabaseClient
+            .from('orders')
+            .insert({
+              user_id: userId,
+              product_id: product.id,
+              quantity: 1,
+              unit_price: parseFloat(product.price.toString()),
+              total_price: parseFloat(product.price.toString()),
+              currency: product.currency,
+              stripe_payment_intent_id: payment_intent_id,
+              status: 'paid',
+            })
+            .select()
+            .single();
 
-        if (orderError) {
-          logStep("Error creating order", { productId: product.id, error: orderError });
-        } else {
-          orders.push(order);
-          logStep("Created order", { productId: product.id, orderId: order.id });
+          if (orderError) {
+            logStep("Error creating order", { productId: product.id, error: orderError });
+          } else {
+            orders.push(order);
+            logStep("Created order", { productId: product.id, orderId: order.id });
+          }
         }
       }
     }
 
-    // Save registration selections with correct amounts
-    await supabaseClient.from('registration_selections').insert({
-      user_id: user.id,
-      session_id: paymentIntent.id,
-      subscription_plans: subscriptionPlans,
-      selected_products: products,
-      selected_regional_services: regionalServices,
-      total_subscription_amount: subscriptionAmount + regionalAmount,
-      total_product_amount: productAmount,
-      currency: paymentIntent.metadata.payment_currency || 'EUR',
-      registration_completed: true,
-    });
+    // Save registration selections with correct amounts (only if we have a user_id)
+    if (userId) {
+      await supabaseClient.from('registration_selections').insert({
+        user_id: userId,
+        session_id: paymentIntent.id,
+        subscription_plans: subscriptionPlans,
+        selected_products: products,
+        selected_regional_services: regionalServices,
+        total_subscription_amount: subscriptionAmount + regionalAmount,
+        total_product_amount: productAmount,
+        currency: paymentIntent.metadata.payment_currency || 'EUR',
+        registration_completed: true,
+      });
+    } else {
+      logStep("Skipping registration_selections insert - no authenticated user available");
+    }
 
     logStep("Saved registration selections");
 
