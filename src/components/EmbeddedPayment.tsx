@@ -185,6 +185,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const [loading, setLoading] = useState(true);
   const [initializationError, setInitializationError] = useState<string | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
+  const [useTestPayment, setUseTestPayment] = useState(false);
   const { toast } = useToast();
   const { currency: contextCurrency, language } = usePreferences();
   const selectedCurrency = propCurrency || contextCurrency;
@@ -214,22 +215,28 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const [productData, setProductData] = useState<any[]>([]);
   const [serviceData, setServiceData] = useState<any[]>([]);
   
+  // Test plan ID
+  const TEST_PLAN_ID = '1e84c8b0-3101-4dbb-907c-81fd79b9a955';
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Determine which plans to fetch
+        const plansToFetch = useTestPayment ? [TEST_PLAN_ID] : plans;
+        
         // Fetch subscription plans
-        if (plans.length > 0) {
+        if (plansToFetch.length > 0) {
           const { data, error } = await supabase
             .from('subscription_plans')
             .select('*')
-            .in('id', plans);
+            .in('id', plansToFetch);
           
           if (error) throw error;
           setPlanData(data || []);
         }
 
-        // Fetch products
-        if (products.length > 0) {
+        // Fetch products (skip if using test payment)
+        if (products.length > 0 && !useTestPayment) {
           const { data, error } = await supabase
             .from('products')
             .select('*')
@@ -237,10 +244,12 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           
           if (error) throw error;
           setProductData(data || []);
+        } else if (useTestPayment) {
+          setProductData([]);
         }
 
-        // Fetch regional services
-        if (regionalServices.length > 0) {
+        // Fetch regional services (skip if using test payment)
+        if (regionalServices.length > 0 && !useTestPayment) {
           const { data, error } = await supabase
             .from('regional_services')
             .select('*')
@@ -248,6 +257,8 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           
           if (error) throw error;
           setServiceData(data || []);
+        } else if (useTestPayment) {
+          setServiceData([]);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -255,7 +266,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
     };
     
     fetchData();
-  }, [plans, products, regionalServices]);
+  }, [plans, products, regionalServices, useTestPayment]);
 
   // Tax rates to match the registration form
   const PRODUCT_IVA_RATE = 0.21; // 21% for products
@@ -281,10 +292,25 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const grandTotal = subscriptionTotal + productTotal;
 
   const initializePayment = async (retryCount = 0) => {
-    console.log("🚀 Initializing payment...", { plans, products, regionalServices, userEmail, firstName, lastName, retryCount, testingMode });
+    const effectivePlans = useTestPayment ? [TEST_PLAN_ID] : plans;
+    const effectiveProducts = useTestPayment ? [] : products;
+    const effectiveServices = useTestPayment ? [] : regionalServices;
+    
+    console.log("🚀 Initializing payment...", { 
+      effectivePlans, 
+      effectiveProducts, 
+      effectiveServices, 
+      userEmail, 
+      firstName, 
+      lastName, 
+      retryCount, 
+      testingMode,
+      useTestPayment 
+    });
+    
     setInitializationError(null);
     
-    if ((!plans || plans.length === 0) && (!products || products.length === 0) && (!regionalServices || regionalServices.length === 0)) {
+    if ((!effectivePlans || effectivePlans.length === 0) && (!effectiveProducts || effectiveProducts.length === 0) && (!effectiveServices || effectiveServices.length === 0)) {
       const errorMsg = "No items provided to payment initialization";
       console.error("❌", errorMsg);
       setInitializationError(errorMsg);
@@ -293,16 +319,6 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         description: "No items selected for payment. Please go back and select items.",
         variant: "destructive"
       });
-      setLoading(false);
-      return;
-    }
-
-    // In testing mode, skip payment setup entirely
-    if (testingMode) {
-      console.log("🧪 Testing mode enabled - skipping payment initialization");
-      setClientSecret("test_mode_skip_payment");
-      setCustomerId("test_customer");
-      setInitializationError(null);
       setLoading(false);
       return;
     }
@@ -330,9 +346,9 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
       console.log("📡 Calling create-mixed-payment...");
       const { data, error } = await supabase.functions.invoke('create-mixed-payment', {
         body: { 
-          subscriptionPlans: plans, 
-          products, 
-          regionalServices,
+          subscriptionPlans: effectivePlans, 
+          products: effectiveProducts, 
+          regionalServices: effectiveServices,
           email: userEmail, 
           firstName, 
           lastName,
@@ -402,15 +418,16 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
     }
   };
 
-  // Initialize payment on component mount - only once
+  // Initialize payment on component mount and when test mode changes
   useEffect(() => {
-    console.log("🎬 EmbeddedPayment mounted, initializing payment...");
+    console.log("🎬 EmbeddedPayment mounted/updated, initializing payment...");
+    setLoading(true);
     initializePayment();
     
     return () => {
       console.log("🎬 EmbeddedPayment unmounting...");
     };
-  }, []); // Empty dependency array to run only once
+  }, [useTestPayment]); // Re-run when test mode changes
 
   return (
     <div className="space-y-6">
@@ -437,23 +454,24 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         </div>
       </div>
 
-      {/* Test Mode Option */}
-      {testingMode && (
+      {/* Test Mode Indicator */}
+      {useTestPayment && (
         <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg space-y-3">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-            <h4 className="font-medium text-orange-700">Test Mode - €1.00 Payment</h4>
+            <h4 className="font-medium text-orange-700">Test Mode Active - €1.00 Payment</h4>
             <Badge variant="outline" className="text-orange-600 border-orange-300">TEST</Badge>
           </div>
           <p className="text-sm text-orange-600">
-            This is a test payment option for development purposes. Use this to complete the registration flow with minimal cost.
+            You are using the test payment option. You will be charged €1.00 to complete the full payment flow.
           </p>
           <Button
-            onClick={onSuccess}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white"
-            size="lg"
+            onClick={() => setUseTestPayment(false)}
+            variant="outline"
+            className="w-full border-orange-300 text-orange-700 hover:bg-orange-100"
+            size="sm"
           >
-            Complete Test Registration - €1.00
+            Switch Back to Regular Payment
           </Button>
         </div>
       )}
@@ -556,14 +574,14 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           <div className="flex justify-between text-lg font-bold border-t pt-2">
             <span>Total Payment:</span>
             <span className="text-foreground">
-              {testingMode ? `Free (Test Mode)` : formatDisplayCurrency(grandTotal, selectedCurrency, languageToLocale(language))}
+              {formatDisplayCurrency(grandTotal, selectedCurrency, languageToLocale(language))}
             </span>
           </div>
-          {testingMode && (
-            <div className="mt-2 p-3 bg-yellow-100 rounded-md border border-yellow-300">
-              <div className="text-sm font-medium text-yellow-800">⚠️ Test Mode Active</div>
-              <div className="text-xs text-yellow-700 mt-1">
-                Registration will complete without any payment processing
+          {useTestPayment && (
+            <div className="mt-2 p-3 bg-orange-100 rounded-md border border-orange-300">
+              <div className="text-sm font-medium text-orange-800">⚠️ Test Payment Mode Active</div>
+              <div className="text-xs text-orange-700 mt-1">
+                You will pay €1.00 to test the complete registration and payment flow
               </div>
             </div>
           )}
@@ -599,43 +617,29 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
                 Retry Payment Setup
               </Button>
             </div>
-          ) : testingMode && clientSecret === "test_mode_skip_payment" ? (
-            <div className="space-y-4 text-center">
-              <div className="text-lg font-medium text-green-600">
-                ✅ Test Mode - No Payment Required
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Click the button below to complete your registration without payment.
-              </div>
-              <Button
-                onClick={onSuccess}
-                className="w-full bg-emergency hover:bg-emergency/90"
-                size="lg"
-              >
-                Complete Registration (Free)
-              </Button>
-            </div>
           ) : clientSecret && stripeOptions ? (
             <div className="space-y-4">
-              {/* Test Mode Toggle Option */}
-              <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-yellow-700">
-                      Need to test? Use €1.00 test payment instead
-                    </span>
+              {/* Test Mode Toggle Option - only show if not already in test mode */}
+              {!useTestPayment && (
+                <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                      <span className="text-sm font-medium text-yellow-700">
+                        Need to test? Use €1.00 test payment instead
+                      </span>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setUseTestPayment(true)}
+                      className="text-yellow-700 border-yellow-300 hover:bg-yellow-100"
+                    >
+                      Use Test Mode
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onSuccess}
-                    className="text-yellow-700 border-yellow-300 hover:bg-yellow-100"
-                  >
-                    Use Test Mode
-                  </Button>
                 </div>
-              </div>
+              )}
               
               <div className="text-sm text-muted-foreground text-center">
                 🔒 Secure payment powered by Stripe
@@ -648,7 +652,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
                 <PaymentForm
                   clientSecret={clientSecret}
                   customerId={customerId}
-                  plans={plans}
+                  plans={useTestPayment ? [TEST_PLAN_ID] : plans}
                   onSuccess={onSuccess}
                   onError={(error) => {
                     console.error("💳 Payment error:", error);
