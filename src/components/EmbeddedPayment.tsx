@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -187,6 +188,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
   const [useTestPayment, setUseTestPayment] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { currency: contextCurrency, language } = usePreferences();
   const selectedCurrency = propCurrency || contextCurrency;
 
@@ -379,6 +381,18 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           return;
         }
         throw error;
+      }
+
+      // Handle test mode response
+      if (data.test_mode) {
+        console.log("🧪 Test mode response received - proceeding to welcome page");
+        toast({
+          title: "Test Payment Complete",
+          description: "Test mode payment completed successfully!",
+          variant: "default"
+        });
+        navigate('/welcome');
+        return;
       }
 
       if (!data?.client_secret) {
