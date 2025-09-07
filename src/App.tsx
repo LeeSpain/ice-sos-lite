@@ -40,6 +40,7 @@ import FamilyCarerAccessPage from "./pages/FamilyCarerAccess";
 // Interactive and Mobile Pages
 import FamilyAccessSetup from "./pages/FamilyAccessSetup";
 import AIRegister from "./pages/AIRegister";
+import TestRegistration from "./pages/TestRegistration";
 
 // Payment Pages
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -90,6 +91,11 @@ function AppWithTracking() {
                 <Route path="/ai-register" element={
                   <OptimizedSuspense skeletonType="card">
                     <AIRegister />
+                  </OptimizedSuspense>
+                } />
+                <Route path="/test-registration" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <TestRegistration />
                   </OptimizedSuspense>
                 } />
 

@@ -91,6 +91,25 @@ const AIRegister = () => {
   const { t } = useTranslation();
   const { language } = usePreferences();
 
+  // Check for test mode parameter
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('test') === 'true') {
+      setTestingMode(true);
+      // Pre-populate with test data for convenience
+      setPersonalDetails({
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@example.com',
+        password: 'testpass123',
+        phone: '+34123456789',
+        city: 'Madrid',
+        country: 'Spain',
+        acceptTerms: false,
+      });
+    }
+  }, []);
+
 
   // Fetch plans, products, and regional services from database
   useEffect(() => {
@@ -119,10 +138,17 @@ const AIRegister = () => {
 
         setDbPlans(formattedPlans);
         
-        // Set Premium Protection as default (fixed standard plan)
-        const defaultPremiumPlan = formattedPlans.find(p => p.name === 'Premium Protection');
-        if (defaultPremiumPlan) {
-          setSelectedMainPlan(defaultPremiumPlan.id);
+        // Set Premium Protection as default (fixed standard plan) unless in test mode
+        if (testingMode) {
+          const testPlan = formattedPlans.find(p => p.name === 'Test Plan - 1 Euro');
+          if (testPlan) {
+            setSelectedMainPlan(testPlan.id);
+          }
+        } else {
+          const defaultPremiumPlan = formattedPlans.find(p => p.name === 'Premium Protection');
+          if (defaultPremiumPlan) {
+            setSelectedMainPlan(defaultPremiumPlan.id);
+          }
         }
 
         // Fetch products
@@ -495,8 +521,15 @@ const AIRegister = () => {
                   <Shield className="h-8 w-8 text-primary" />
                 </div>
               </div>
+              {testingMode && (
+                <div className="flex justify-center gap-2 mb-4">
+                  <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                    Test Mode - €1.00 Payment
+                  </Badge>
+                </div>
+              )}
               <CardTitle className="text-3xl font-bold text-foreground">
-                {currentStep === 'details' ? 'Emergency Protection Registration' : 'Complete Your Payment'}
+                {currentStep === 'details' ? (testingMode ? 'Test Registration - €1.00' : 'Emergency Protection Registration') : 'Complete Your Payment'}
               </CardTitle>
               <CardDescription className="text-lg">
                 {currentStep === 'details' ? 'Join ICE SOS Lite and secure your emergency protection' : 'Finalize your subscription and start protecting what matters most'}

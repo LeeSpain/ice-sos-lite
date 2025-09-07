@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import FamilyCarerAccess from "@/components/FamilyCarerAccess";
 import Pricing from "@/components/Pricing";
+import TestRegistrationButton from '@/components/TestRegistrationButton';
 
 import AppDownload from "@/components/AppDownload";
 import FinalCTA from "@/components/FinalCTA";
@@ -36,6 +37,10 @@ const Index = () => {
       <FirstVisitPreferencesModal />
       <Navigation />
 
+      {/* Test Registration Button for Development */}
+      <div className="container mx-auto px-4 pt-8">
+        <TestRegistrationButton />
+      </div>
 
       <Hero onEmmaClick={openEmmaChat} />
       
