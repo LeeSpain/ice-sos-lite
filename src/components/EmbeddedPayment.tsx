@@ -343,7 +343,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
     }
     
     try {
-      console.log("📡 Calling create-mixed-payment...");
+      console.log("📡 Calling create-mixed-payment...", { useTestPayment });
       const { data, error } = await supabase.functions.invoke('create-mixed-payment', {
         body: { 
           subscriptionPlans: effectivePlans, 
@@ -353,7 +353,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
           firstName, 
           lastName,
           currency: selectedCurrency,
-          testingMode: false
+          testingMode: useTestPayment
         }
       });
 
