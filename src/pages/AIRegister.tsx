@@ -138,17 +138,10 @@ const AIRegister = () => {
 
         setDbPlans(formattedPlans);
         
-        // Set Premium Protection as default (fixed standard plan) unless in test mode
-        if (testingMode) {
-          const testPlan = formattedPlans.find(p => p.name === 'Test Plan - 1 Euro');
-          if (testPlan) {
-            setSelectedMainPlan(testPlan.id);
-          }
-        } else {
-          const defaultPremiumPlan = formattedPlans.find(p => p.name === 'Premium Protection');
-          if (defaultPremiumPlan) {
-            setSelectedMainPlan(defaultPremiumPlan.id);
-          }
+        // Set Premium Protection as default (fixed standard plan)
+        const defaultPremiumPlan = formattedPlans.find(p => p.name === 'Premium Protection');
+        if (defaultPremiumPlan) {
+          setSelectedMainPlan(defaultPremiumPlan.id);
         }
 
         // Fetch products
@@ -279,13 +272,6 @@ const AIRegister = () => {
       });
       return;
     }
-    
-    // If testing mode is enabled, skip payment and complete registration directly
-    if (testingMode) {
-      handlePaymentSuccess();
-      return;
-    }
-    
     setCurrentStep('payment');
   };
 

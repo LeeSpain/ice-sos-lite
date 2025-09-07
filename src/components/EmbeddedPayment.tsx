@@ -3,6 +3,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
@@ -436,6 +437,27 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
         </div>
       </div>
 
+      {/* Test Mode Option */}
+      {testingMode && (
+        <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+            <h4 className="font-medium text-orange-700">Test Mode - €1.00 Payment</h4>
+            <Badge variant="outline" className="text-orange-600 border-orange-300">TEST</Badge>
+          </div>
+          <p className="text-sm text-orange-600">
+            This is a test payment option for development purposes. Use this to complete the registration flow with minimal cost.
+          </p>
+          <Button
+            onClick={onSuccess}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+            size="lg"
+          >
+            Complete Test Registration - €1.00
+          </Button>
+        </div>
+      )}
+
       {/* Order Summary */}
       <div className="bg-muted/50 p-4 rounded-lg space-y-4">
         <h4 className="font-medium">Order Summary:</h4>
@@ -595,6 +617,26 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
             </div>
           ) : clientSecret && stripeOptions ? (
             <div className="space-y-4">
+              {/* Test Mode Toggle Option */}
+              <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-yellow-700">
+                      Need to test? Use €1.00 test payment instead
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onSuccess}
+                    className="text-yellow-700 border-yellow-300 hover:bg-yellow-100"
+                  >
+                    Use Test Mode
+                  </Button>
+                </div>
+              </div>
+              
               <div className="text-sm text-muted-foreground text-center">
                 🔒 Secure payment powered by Stripe
               </div>
