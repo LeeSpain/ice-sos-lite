@@ -101,8 +101,9 @@ const AnalyticsPage = () => {
     };
   }, [queryClient]);
 
-  // Force cache reset on mount
+  // Force cache reset on mount and add debug logging
   useEffect(() => {
+    console.log('🔄 ANALYTICS DASHBOARD: Clearing cache and forcing refresh...');
     queryClient.clear();
     console.log('Analytics Dashboard: Cache cleared on mount');
   }, []);
