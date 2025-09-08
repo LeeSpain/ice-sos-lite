@@ -121,7 +121,7 @@ export function useRealTimeAnalytics() {
   });
 }
 
-// Hook for Lovable analytics data - now fetches real page view data
+// Hook for Lovable analytics data - now fetches REAL page view data only
 export function useLovableAnalytics() {
   return useQuery({
     queryKey: ['lovable-analytics'],
@@ -130,7 +130,7 @@ export function useLovableAnalytics() {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
-        // Get page views from the last 30 days
+        // Get ACTUAL page views from the last 30 days
         const { data: pageViewData, error } = await supabase
           .from('homepage_analytics')
           .select('session_id, event_data')
@@ -139,14 +139,21 @@ export function useLovableAnalytics() {
 
         if (error) throw error;
 
-        const pageViews = pageViewData?.length || 0;
-        const uniqueVisitors = new Set(pageViewData?.map(item => item.session_id) || []).size;
-        const sessions = uniqueVisitors; // For simplicity, treat unique visitors as sessions
+        const actualPageViews = pageViewData?.length || 0;
+        const actualUniqueVisitors = new Set(pageViewData?.map(item => item.session_id) || []).size;
+        const actualSessions = actualUniqueVisitors; // For simplicity, treat unique visitors as sessions
+
+        console.log('📊 REAL Analytics Data:', {
+          actualPageViews,
+          actualUniqueVisitors,
+          actualSessions,
+          totalRecords: pageViewData?.length
+        });
 
         return {
-          pageViews,
-          uniqueVisitors,
-          sessions
+          pageViews: actualPageViews,
+          uniqueVisitors: actualUniqueVisitors,
+          sessions: actualSessions
         };
       } catch (error) {
         console.error('Error fetching analytics data:', error);
