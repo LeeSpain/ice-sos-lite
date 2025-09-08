@@ -38,9 +38,9 @@ import {
 } from '@/hooks/useEnhancedAnalytics';
 import { 
   usePageAnalytics, 
-  useGeographicAnalytics as usePageGeographicAnalytics, 
   useUserJourneyAnalytics 
 } from '@/hooks/usePageAnalytics';
+import { useGeographicAnalytics } from '@/hooks/useAdvancedAnalytics';
 import { GeographicAnalyticsCard } from '@/components/admin/analytics/GeographicAnalyticsCard';
 import { PopupAnalyticsCard } from '@/components/admin/analytics/PopupAnalyticsCard';
 import { HourlyAnalyticsChart } from '@/components/admin/analytics/HourlyAnalyticsChart';
@@ -49,7 +49,7 @@ import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
 const AnalyticsPage = () => {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [timeRange, setTimeRange] = useState('7d');
+  const [timeRange, setTimeRange] = useState('30d');
   const queryClient = useQueryClient();
 
   // Realtime updates: invalidate queries when new analytics events arrive
@@ -103,10 +103,9 @@ const AnalyticsPage = () => {
   
   // Enhanced analytics hooks
   const { data: pageAnalytics, isLoading: isLoadingPageAnalytics } = usePageAnalytics();
-  const { data: geographicData, isLoading: isLoadingGeographic } = usePageGeographicAnalytics();
   const { data: userJourneys, isLoading: isLoadingJourneys } = useUserJourneyAnalytics();
 
-  const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime || isLoadingTraffic || isLoadingDevices || isLoadingLovable || isLoadingPageAnalytics || isLoadingGeographic || isLoadingJourneys;
+  const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime || isLoadingTraffic || isLoadingDevices || isLoadingLovable || isLoadingPageAnalytics || isLoadingJourneys;
 
   // Refresh all data
   const refreshAllData = async () => {
@@ -385,40 +384,10 @@ const AnalyticsPage = () => {
         </TabsContent>
 
         <TabsContent value="geographic" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Geographic Distribution</CardTitle>
-              <CardDescription>Visitors by country</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoadingGeographic ? (
-                <p className="text-sm text-muted-foreground">Loading geographic data...</p>
-              ) : geographicData && geographicData.length > 0 ? (
-                <div className="space-y-3">
-                  {geographicData.map((country, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-2 h-2 bg-primary rounded-full" />
-                        <span className="font-medium">{country.country}</span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <span className="text-sm text-muted-foreground">{country.visitors} visitors</span>
-                        <span className="text-sm font-medium">{country.percentage}%</span>
-                        <div className="w-16 h-2 bg-secondary rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary rounded-full"
-                            style={{ width: `${country.percentage}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No geographic data available yet</p>
-              )}
-            </CardContent>
-          </Card>
+          <GeographicAnalyticsCard 
+            timeRange={timeRange} 
+            onTimeRangeChange={setTimeRange} 
+          />
         </TabsContent>
 
         <TabsContent value="traffic" className="space-y-4">

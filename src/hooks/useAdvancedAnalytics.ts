@@ -24,7 +24,7 @@ export interface InteractionData {
   topPages: string[];
 }
 
-export function useGeographicAnalytics(timeRange = '7d') {
+export function useGeographicAnalytics(timeRange = '30d') {
   return useQuery({
     queryKey: ['geographic-analytics', timeRange, 'v2'], // Added v2 to force cache refresh
     queryFn: async (): Promise<GeographicData[]> => {
