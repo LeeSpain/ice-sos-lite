@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,14 +33,16 @@ import {
 import { 
   useEnhancedTrafficSources, 
   useEnhancedDeviceData,
+  useSessionMetrics,
   type TrafficSource,
   type DeviceData 
 } from '@/hooks/useEnhancedAnalytics';
 import { 
-  usePageAnalytics, 
-  useUserJourneyAnalytics 
-} from '@/hooks/usePageAnalytics';
-import { useGeographicAnalytics } from '@/hooks/useAdvancedAnalytics';
+  useGeographicAnalytics,
+  usePopupAnalytics,
+  useInteractionAnalytics,
+  useHourlyAnalytics
+} from '@/hooks/useAdvancedAnalytics';
 import { GeographicAnalyticsCard } from '@/components/admin/analytics/GeographicAnalyticsCard';
 import { PopupAnalyticsCard } from '@/components/admin/analytics/PopupAnalyticsCard';
 import { HourlyAnalyticsChart } from '@/components/admin/analytics/HourlyAnalyticsChart';
@@ -101,26 +103,30 @@ const AnalyticsPage = () => {
     };
   }, [queryClient]);
 
-  // Initialize analytics data logging
+  // Stable initialization - no cache invalidation needed
+  const isInitialized = useRef(false);
   useEffect(() => {
-    console.log('🔄 ANALYTICS DASHBOARD: Initializing analytics data...');
-    // Real-time subscriptions will handle data updates, no cache invalidation needed
+    if (!isInitialized.current) {
+      console.log('🔄 ANALYTICS DASHBOARD: Initialized successfully');
+      isInitialized.current = true;
+    }
   }, []);
   
-  // Real-time data hooks - using correct imports from useEnhancedAnalytics
-  const { data: realTimeMetrics, isLoading: isLoadingMetrics, refetch: refetchMetrics } = useRealTimeAnalytics();
-  const { data: lovableAnalytics, isLoading: isLoadingLovable } = useLovableAnalytics();
-  const { data: trafficSources, isLoading: isLoadingTraffic } = useEnhancedTrafficSources();
-  const { data: deviceData, isLoading: isLoadingDevices } = useEnhancedDeviceData();
-  const { data: topPages, isLoading: isLoadingPages } = useTopPages();
-  const { data: customEvents, isLoading: isLoadingEvents } = useCustomEvents();
-  const { data: realTimeData, isLoading: isLoadingRealTime } = useRealTimeActiveUsers();
-  
-  // Enhanced analytics hooks
-  const { data: pageAnalytics, isLoading: isLoadingPageAnalytics } = usePageAnalytics();
-  const { data: userJourneys, isLoading: isLoadingJourneys } = useUserJourneyAnalytics();
+  // Real-time data hooks - stable loading without loops
+  const { data: realTimeData, isLoading: isRealTimeLoading, error: realTimeError } = useRealTimeAnalytics();
+  const { data: lovableData, isLoading: isLovableLoading, error: lovableError } = useLovableAnalytics();
+  const { data: trafficSources, isLoading: isTrafficLoading, error: trafficError } = useEnhancedTrafficSources();
+  const { data: deviceData, isLoading: isDeviceLoading, error: deviceError } = useEnhancedDeviceData();
+  const { data: sessionMetrics, isLoading: isSessionLoading, error: sessionError } = useSessionMetrics();
+  const { data: geographicData, isLoading: isGeographicLoading, error: geographicError } = useGeographicAnalytics(timeRange);
+  const { data: popupData, isLoading: isPopupLoading, error: popupError } = usePopupAnalytics(timeRange);
+  const { data: interactionData, isLoading: isInteractionLoading, error: interactionError } = useInteractionAnalytics(timeRange);
+  const { data: hourlyData, isLoading: isHourlyLoading, error: hourlyError } = useHourlyAnalytics();
+  const { data: topPages, isLoading: isTopPagesLoading, error: topPagesError } = useTopPages();
+  const { data: customEvents, isLoading: isCustomEventsLoading, error: customEventsError } = useCustomEvents();
+  const { data: activeUsers, isLoading: isActiveUsersLoading, error: activeUsersError } = useRealTimeActiveUsers();
 
-  const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime || isLoadingTraffic || isLoadingDevices || isLoadingLovable || isLoadingPageAnalytics || isLoadingJourneys;
+  const isLoading = isRealTimeLoading || isLovableLoading || isTrafficLoading || isDeviceLoading || isSessionLoading || isGeographicLoading || isPopupLoading || isInteractionLoading || isHourlyLoading || isTopPagesLoading || isCustomEventsLoading || isActiveUsersLoading;
 
   // Refresh all data
   const refreshAllData = async () => {
@@ -251,33 +257,33 @@ const AnalyticsPage = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
         <MetricCard
           title="Page Views"
-          value={lovableAnalytics?.pageViews || 0}
+          value={lovableData?.pageViews || 0}
           icon={Eye}
         />
         <MetricCard
           title="Unique Visitors"
-          value={lovableAnalytics?.uniqueVisitors || 0}
+          value={lovableData?.uniqueVisitors || 0}
           icon={Users}
         />
         <MetricCard
           title="Total Users"
-          value={realTimeMetrics?.totalUsers || 0}
+          value={realTimeData?.totalUsers || 0}
           icon={UserPlus}
         />
         <MetricCard
           title="Contacts (30d)"
-          value={realTimeMetrics?.contactsLast30Days || 0}
+          value={realTimeData?.contactsLast30Days || 0}
           icon={Mail}
         />
         <MetricCard
           title="Conversion Rate"
-          value={realTimeMetrics?.conversionRate || 0}
+          value={realTimeData?.conversionRate || 0}
           icon={TrendingUp}
           format="percentage"
         />
         <MetricCard
           title="Revenue"
-          value={realTimeMetrics?.totalRevenue || 0}
+          value={realTimeData?.totalRevenue || 0}
           icon={DollarSign}
           format="currency"
         />
@@ -306,19 +312,19 @@ const AnalyticsPage = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <MetricCard
               title="Bounce Rate"
-              value={realTimeMetrics?.bounceRate || 0}
+              value={sessionMetrics?.bounceRate || 0}
               icon={MousePointer}
               format="percentage"
             />
             <MetricCard
               title="Avg. Session Duration"
-              value={realTimeMetrics?.avgSessionDuration || 0}
+              value={sessionMetrics?.avgSessionDuration || 0}
               icon={Activity}
               format="duration"
             />
             <MetricCard
               title="Sessions"
-              value={lovableAnalytics?.sessions || 0}
+              value={lovableData?.sessions || 0}
               icon={Calendar}
             />
           </div>
@@ -327,17 +333,17 @@ const AnalyticsPage = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <MetricCard
               title="Total Contacts"
-              value={realTimeMetrics?.totalContacts || 0}
+              value={realTimeData?.totalContacts || 0}
               icon={Mail}
             />
             <MetricCard
               title="Completed Orders"
-              value={realTimeMetrics?.totalOrders || 0}
+              value={realTimeData?.totalOrders || 0}
               icon={ShoppingCart}
             />
             <MetricCard
               title="Registrations"
-              value={realTimeMetrics?.totalRegistrations || 0}
+              value={realTimeData?.totalRegistrations || 0}
               icon={UserPlus}
             />
           </div>
@@ -349,7 +355,7 @@ const AnalyticsPage = () => {
               <CardDescription>Most visited pages in the last 30 days</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingPages ? (
+              {isTopPagesLoading ? (
                 <p className="text-sm text-muted-foreground">Loading page data...</p>
               ) : topPages && topPages.length > 0 ? (
                 <div className="space-y-4">
@@ -379,46 +385,26 @@ const AnalyticsPage = () => {
               <CardDescription>Detailed analytics for each page</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingPageAnalytics ? (
+              {isTopPagesLoading ? (
                 <p className="text-sm text-muted-foreground">Loading page analytics...</p>
-              ) : pageAnalytics && pageAnalytics.length > 0 ? (
+              ) : topPages && topPages.length > 0 ? (
                 <div className="space-y-4">
-                  {pageAnalytics.map((page, index) => (
+                  {topPages.map((page, index) => (
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="font-medium">{page.page}</h4>
                         <Badge variant="outline">{page.views} views</Badge>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Unique Visitors</p>
-                          <p className="font-medium">{page.uniqueVisitors}</p>
+                          <p className="text-muted-foreground">Views</p>
+                          <p className="font-medium">{page.views}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Bounce Rate</p>
-                          <p className="font-medium">{page.bounceRate}%</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Avg Time</p>
-                          <p className="font-medium">{page.avgTimeOnPage}s</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Top Country</p>
-                          <p className="font-medium">{page.topCountries[0]?.country || 'N/A'}</p>
+                          <p className="text-muted-foreground">Percentage</p>
+                          <p className="font-medium">{page.percentage}%</p>
                         </div>
                       </div>
-                      {page.topReferrers.length > 0 && (
-                        <div className="mt-3 pt-3 border-t">
-                          <p className="text-xs text-muted-foreground mb-2">Top Referrers:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {page.topReferrers.slice(0, 3).map((ref, i) => (
-                              <Badge key={i} variant="secondary" className="text-xs">
-                                {ref.referrer} ({ref.visitors})
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -443,7 +429,7 @@ const AnalyticsPage = () => {
               <CardDescription>Where your visitors are coming from</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingTraffic ? (
+              {isTrafficLoading ? (
                 <div className="space-y-4">
                   {[1, 2, 3, 4].map((i) => (
                     <div key={i} className="flex items-center justify-between">
@@ -490,7 +476,7 @@ const AnalyticsPage = () => {
               <CardDescription>Sessions by device type</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingDevices ? (
+              {isDeviceLoading ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="flex items-center justify-between">
@@ -550,7 +536,7 @@ const AnalyticsPage = () => {
                 <CardDescription>ICE SOS specific event tracking</CardDescription>
               </CardHeader>
               <CardContent>
-                {isLoadingEvents ? (
+                {isCustomEventsLoading ? (
                   <p className="text-sm text-muted-foreground">Loading event data...</p>
                 ) : customEvents && customEvents.length > 0 ? (
                   <div className="space-y-4">
@@ -583,11 +569,12 @@ const AnalyticsPage = () => {
               <CardDescription>Common paths users take through your site</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingJourneys ? (
-                <p className="text-sm text-muted-foreground">Loading user journey data...</p>
-              ) : userJourneys && userJourneys.length > 0 ? (
-                <div className="space-y-4">
-                  {userJourneys.map((journey, index) => (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">User journey analytics will be available in the next update.</p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
                     <div key={index} className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
@@ -625,25 +612,25 @@ const AnalyticsPage = () => {
               <CardDescription>Live visitors and activity</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoadingRealTime ? (
+              {isActiveUsersLoading ? (
                 <p className="text-sm text-muted-foreground">Loading real-time data...</p>
               ) : (
                 <>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Active Users</p>
-                      <p className="text-3xl font-bold text-emerald-600">{realTimeData?.activeUsers || 0}</p>
+                      <p className="text-3xl font-bold text-emerald-600">{activeUsers?.activeUsers || 0}</p>
                     </div>
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Page Views (last hour)</p>
-                      <p className="text-3xl font-bold">{realTimeData?.pageViewsLastHour || 0}</p>
+                      <p className="text-3xl font-bold">{activeUsers?.pageViewsLastHour || 0}</p>
                     </div>
                   </div>
                   
                   <div className="mt-6 space-y-2">
                     <p className="text-sm font-medium">Top Active Pages</p>
                     <div className="space-y-2">
-                      {realTimeData?.topActivePages.map((item, index) => (
+                      {activeUsers?.topActivePages?.map((item, index) => (
                         <div key={index} className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground">{item.page}</span>
                           <span className="font-medium">{item.users} users</span>
@@ -657,8 +644,8 @@ const AnalyticsPage = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      </div>
-    </AdminErrorBoundary>
+    </div>
+  </AdminErrorBoundary>
   );
 };
 

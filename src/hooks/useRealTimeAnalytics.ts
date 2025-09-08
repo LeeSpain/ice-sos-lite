@@ -51,10 +51,8 @@ export function useRealTimeAnalytics() {
   return useQuery({
     queryKey: ['real-time-analytics'],
     queryFn: async (): Promise<RealTimeMetrics> => {
-      console.log('🔄 Fetching real-time analytics data...');
       try {
         // Get real data from database with error handling
-        // Note: contact_submissions now requires admin access, so we handle gracefully
         const [contactsResult, ordersResult, registrationsResult, profilesResult] = await Promise.allSettled([
           supabase.from('contact_submissions').select('count', { count: 'exact', head: true }),
           supabase.from('orders').select('total_price').eq('status', 'completed').throwOnError(),
@@ -69,8 +67,6 @@ export function useRealTimeAnalytics() {
         // Get contact count (admin-only access now)
         const contactsCount = contactsResult.status === 'fulfilled' ? contactsResult.value.count : 0;
         const totalContacts = (typeof contactsCount === 'number') ? contactsCount : 0;
-        
-        console.log('📊 Analytics data:', { totalUsers, totalContacts });
         
         // For contacts last 30 days, we'll use a simpler approach since we can't fetch detailed data
         // This will need to be enhanced with a dedicated admin-only analytics query later
@@ -119,8 +115,8 @@ export function useRealTimeAnalytics() {
         };
       }
     },
-    refetchInterval: 30 * 1000, // Refetch every 30 seconds
-    staleTime: 30 * 1000, // Data is fresh for 30 seconds
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes  
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
