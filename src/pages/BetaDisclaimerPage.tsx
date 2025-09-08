@@ -130,7 +130,7 @@ export default function BetaDisclaimerPage() {
               <Checkbox 
                 id="beta-agreement" 
                 checked={agreed}
-                onCheckedChange={setAgreed}
+                onCheckedChange={(checked) => setAgreed(checked === true)}
               />
               <label htmlFor="beta-agreement" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 I understand this is a beta version and agree to the terms above. I will call 112 directly in real emergencies.

@@ -10,8 +10,8 @@ import { Phone, MapPin, Clock, AlertTriangle, User, MessageSquare } from "lucide
 interface SOSEvent {
   id: string;
   user_id: string;
-  status: 'open' | 'acknowledged' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: string;
+  priority?: 'low' | 'medium' | 'high' | 'critical';
   created_at: string;
   location_data?: any;
   profiles?: {
@@ -54,14 +54,7 @@ export const CallCentreHub = () => {
           id,
           user_id,
           status,
-          priority,
-          created_at,
-          location_data,
-          profiles (
-            first_name,
-            last_name,
-            phone
-          )
+          created_at
         `)
         .in('status', ['open', 'acknowledged'])
         .order('created_at', { ascending: false });
@@ -103,7 +96,7 @@ export const CallCentreHub = () => {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = (priority?: string) => {
     switch (priority) {
       case 'critical': return 'bg-red-500';
       case 'high': return 'bg-orange-500';
@@ -183,7 +176,7 @@ export const CallCentreHub = () => {
                       
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="capitalize">
-                          {event.priority}
+                          {event.priority ?? 'medium'}
                         </Badge>
                         <Badge variant={event.status === 'open' ? 'destructive' : 'default'}>
                           {event.status}
@@ -236,7 +229,7 @@ export const CallCentreHub = () => {
                     <h4 className="font-semibold mb-2">Personal Information</h4>
                     <p><strong>Name:</strong> {selectedEvent.profiles?.first_name} {selectedEvent.profiles?.last_name}</p>
                     <p><strong>Phone:</strong> {selectedEvent.profiles?.phone || 'Not provided'}</p>
-                    <p><strong>Priority:</strong> <Badge className={getPriorityColor(selectedEvent.priority)}>{selectedEvent.priority}</Badge></p>
+                    <p><strong>Priority:</strong> <Badge className={getPriorityColor(selectedEvent.priority ?? 'medium')}>{selectedEvent.priority ?? 'medium'}</Badge></p>
                   </div>
                   
                   <div>
