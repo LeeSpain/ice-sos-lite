@@ -45,7 +45,7 @@ export function useGeographicAnalytics(timeRange = '7d') {
       
       data?.forEach(record => {
         const eventData = record.event_data as any;
-        const location = eventData?.location;
+        const location = eventData?.location?.data;
         if (location?.country) {
           const key = `${location.country}-${location.region || 'Unknown'}-${location.city || 'Unknown'}`;
           const existing = geographicMap.get(key);
