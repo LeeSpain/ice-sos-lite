@@ -55,7 +55,7 @@ const AnalyticsPage = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const queryClient = useQueryClient();
 
-  // Realtime updates: invalidate queries when new analytics events arrive
+  // Optimized real-time updates: selective invalidation to prevent loops
   useEffect(() => {
     const channel = supabase
       .channel('analytics-live')
@@ -63,36 +63,9 @@ const AnalyticsPage = () => {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'homepage_analytics' },
         () => {
+          // Only invalidate essential queries to prevent infinite loops
           queryClient.invalidateQueries({ queryKey: ['lovable-analytics'] });
-          queryClient.invalidateQueries({ queryKey: ['enhanced-traffic-sources'] });
-          queryClient.invalidateQueries({ queryKey: ['enhanced-device-data'] });
-          queryClient.invalidateQueries({ queryKey: ['top-pages'] });
-          queryClient.invalidateQueries({ queryKey: ['custom-events'] });
           queryClient.invalidateQueries({ queryKey: ['real-time-active-users'] });
-          queryClient.invalidateQueries({ queryKey: ['session-metrics'] });
-          queryClient.invalidateQueries({ queryKey: ['page-analytics'] });
-          // Invalidate all geographic analytics queries regardless of time range
-          queryClient.invalidateQueries({ predicate: (query) => 
-            Array.isArray(query.queryKey) && query.queryKey[0] === 'geographic-analytics' 
-          });
-          queryClient.invalidateQueries({ queryKey: ['user-journey-analytics'] });
-          queryClient.invalidateQueries({ queryKey: ['real-time-analytics'] });
-          // Add missing query invalidations
-          queryClient.invalidateQueries({ predicate: (query) => 
-            Array.isArray(query.queryKey) && query.queryKey[0] === 'popup-analytics' 
-          });
-          queryClient.invalidateQueries({ predicate: (query) => 
-            Array.isArray(query.queryKey) && query.queryKey[0] === 'interaction-analytics' 
-          });
-          queryClient.invalidateQueries({ queryKey: ['hourly-analytics'] });
-          setLastUpdated(new Date());
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'video_analytics' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['custom-events'] });
           setLastUpdated(new Date());
         }
       )
@@ -128,55 +101,40 @@ const AnalyticsPage = () => {
 
   const isLoading = isRealTimeLoading || isLovableLoading || isTrafficLoading || isDeviceLoading || isSessionLoading || isGeographicLoading || isPopupLoading || isInteractionLoading || isHourlyLoading || isTopPagesLoading || isCustomEventsLoading || isActiveUsersLoading;
 
-  // Refresh all data
-  const refreshAllData = async () => {
+  // Optimized refresh function with throttling
+  const refreshAllData = useCallback(async () => {
     setLastUpdated(new Date());
     
-    // Complete cache invalidation for all analytics - updated patterns
-    queryClient.invalidateQueries({ predicate: (query) => {
-      const key = query.queryKey[0] as string;
-      return key.includes('analytics') || 
-             key.includes('realtime') || 
-             key.includes('lovable') || 
-             key.includes('page') ||
-             key.includes('traffic') ||
-             key.includes('device') ||
-             key.includes('journey') ||
-             key.includes('events') ||
-             key.includes('users') ||
-             key.includes('session') ||
-             key.includes('geographic') ||
-             key.includes('popup') ||
-             key.includes('hourly') ||
-             key.includes('interaction') ||
-             key.includes('enhanced');
-    }});
+    // Selective invalidation to prevent performance issues
+    const analyticsQueries = [
+      'real-time-analytics',
+      'lovable-analytics', 
+      'enhanced-traffic-sources',
+      'enhanced-device-data',
+      'top-pages',
+      'custom-events',
+      'real-time-active-users',
+      'session-metrics',
+      'hourly-analytics'
+    ];
     
-    console.log('Analytics Dashboard: Complete cache refresh executed');
-    // Invalidate all query types to ensure complete refresh
-    queryClient.invalidateQueries({ queryKey: ['real-time-analytics'] });
-    queryClient.invalidateQueries({ queryKey: ['lovable-analytics'] });
-    queryClient.invalidateQueries({ queryKey: ['enhanced-traffic-sources'] });
-    queryClient.invalidateQueries({ queryKey: ['enhanced-device-data'] });
-    queryClient.invalidateQueries({ queryKey: ['top-pages'] });
-    queryClient.invalidateQueries({ queryKey: ['custom-events'] });
-    queryClient.invalidateQueries({ queryKey: ['real-time-active-users'] });
-    queryClient.invalidateQueries({ queryKey: ['session-metrics'] });
-    queryClient.invalidateQueries({ queryKey: ['page-analytics'] });
-    queryClient.invalidateQueries({ queryKey: ['user-journey-analytics'] });
-    // Invalidate all geographic analytics queries with any time range
-    queryClient.invalidateQueries({ predicate: (query) => 
-      Array.isArray(query.queryKey) && query.queryKey[0] === 'geographic-analytics' 
+    analyticsQueries.forEach(queryKey => {
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
     });
-    // Add missing analytics types
-    queryClient.invalidateQueries({ predicate: (query) => 
-      Array.isArray(query.queryKey) && query.queryKey[0] === 'popup-analytics' 
+    
+    // Invalidate geographic and popup analytics with predicate
+    queryClient.invalidateQueries({ 
+      predicate: (query) => {
+        if (!Array.isArray(query.queryKey)) return false;
+        const key = query.queryKey[0] as string;
+        return key === 'geographic-analytics' || 
+               key === 'popup-analytics' || 
+               key === 'interaction-analytics';
+      }
     });
-    queryClient.invalidateQueries({ predicate: (query) => 
-      Array.isArray(query.queryKey) && query.queryKey[0] === 'interaction-analytics' 
-    });
-    queryClient.invalidateQueries({ queryKey: ['hourly-analytics'] });
-  };
+    
+    console.log('✅ Analytics Dashboard: Optimized cache refresh completed');
+  }, [queryClient]);
 
   const MetricCard = ({ 
     title, 

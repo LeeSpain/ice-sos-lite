@@ -115,8 +115,8 @@ export function useRealTimeAnalytics() {
         };
       }
     },
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes  
-    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
+    staleTime: 8 * 60 * 1000, // Data is fresh for 8 minutes
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
@@ -157,8 +157,8 @@ export function useLovableAnalytics() {
         };
       }
     },
-    refetchInterval: 30 * 1000, // Refetch every 30 seconds
-    staleTime: 30 * 1000, // Data is fresh for 30 seconds
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
+    staleTime: 90 * 1000, // Data is fresh for 90 seconds
     refetchIntervalInBackground: false,
   });
 }
@@ -229,8 +229,8 @@ export function useTopPages() {
         ];
       }
     },
-    refetchInterval: 30 * 1000, // Refetch every 30 seconds
-    staleTime: 30 * 1000, // Data is fresh for 30 seconds
+    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes
+    staleTime: 2 * 60 * 1000, // Data is fresh for 2 minutes
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
@@ -294,8 +294,8 @@ export function useCustomEvents() {
         ];
       }
     },
-    refetchInterval: 30 * 1000, // Refetch every 30 seconds
-    staleTime: 30 * 1000, // Data is fresh for 30 seconds
+    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes
+    staleTime: 2 * 60 * 1000, // Data is fresh for 2 minutes
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
@@ -357,8 +357,8 @@ export function useRealTimeActiveUsers() {
         };
       }
     },
-    refetchInterval: 30 * 1000, // Refetch every 30 seconds
-    staleTime: 30 * 1000, // Data is fresh for 30 seconds
+    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes  
+    staleTime: 90 * 1000, // Data is fresh for 90 seconds
     refetchIntervalInBackground: false, // Don't refetch when tab is not active
   });
 }
