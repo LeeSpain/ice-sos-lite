@@ -38,13 +38,17 @@ import {
 } from '@/hooks/useEnhancedAnalytics';
 import { 
   usePageAnalytics, 
-  useGeographicAnalytics, 
+  useGeographicAnalytics as usePageGeographicAnalytics, 
   useUserJourneyAnalytics 
 } from '@/hooks/usePageAnalytics';
+import { GeographicAnalyticsCard } from '@/components/admin/analytics/GeographicAnalyticsCard';
+import { PopupAnalyticsCard } from '@/components/admin/analytics/PopupAnalyticsCard';
+import { HourlyAnalyticsChart } from '@/components/admin/analytics/HourlyAnalyticsChart';
 import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
 const AnalyticsPage = () => {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [timeRange, setTimeRange] = useState('7d');
   const queryClient = useQueryClient();
 
   // Realtime updates: invalidate queries when new analytics events arrive
@@ -66,6 +70,9 @@ const AnalyticsPage = () => {
           queryClient.invalidateQueries({ queryKey: ['geographic-analytics'] });
           queryClient.invalidateQueries({ queryKey: ['user-journey-analytics'] });
           queryClient.invalidateQueries({ queryKey: ['real-time-analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['popup-analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['interaction-analytics'] });
+          queryClient.invalidateQueries({ queryKey: ['hourly-analytics'] });
           setLastUpdated(new Date());
         }
       )
@@ -95,7 +102,7 @@ const AnalyticsPage = () => {
   
   // Enhanced analytics hooks
   const { data: pageAnalytics, isLoading: isLoadingPageAnalytics } = usePageAnalytics();
-  const { data: geographicData, isLoading: isLoadingGeographic } = useGeographicAnalytics();
+  const { data: geographicData, isLoading: isLoadingGeographic } = usePageGeographicAnalytics();
   const { data: userJourneys, isLoading: isLoadingJourneys } = useUserJourneyAnalytics();
 
   const isLoading = isLoadingMetrics || isLoadingPages || isLoadingEvents || isLoadingRealTime || isLoadingTraffic || isLoadingDevices || isLoadingLovable || isLoadingPageAnalytics || isLoadingGeographic || isLoadingJourneys;
@@ -237,6 +244,8 @@ const AnalyticsPage = () => {
           <TabsTrigger value="geographic">Geographic</TabsTrigger>
           <TabsTrigger value="traffic">Traffic Sources</TabsTrigger>
           <TabsTrigger value="devices">Devices</TabsTrigger>
+          <TabsTrigger value="popups">Popups</TabsTrigger>
+          <TabsTrigger value="hourly">24-Hour View</TabsTrigger>
           <TabsTrigger value="events">Custom Events</TabsTrigger>
           <TabsTrigger value="journeys">User Journeys</TabsTrigger>
           <TabsTrigger value="real-time">Real-time</TabsTrigger>
@@ -501,6 +510,20 @@ const AnalyticsPage = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="popups" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            <PopupAnalyticsCard timeRange={timeRange} />
+            <GeographicAnalyticsCard 
+              timeRange={timeRange} 
+              onTimeRangeChange={setTimeRange} 
+            />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="hourly" className="space-y-4">
+          <HourlyAnalyticsChart />
         </TabsContent>
 
         <TabsContent value="events" className="space-y-4">

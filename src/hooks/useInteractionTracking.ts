@@ -1,98 +1,134 @@
-import { useCallback } from 'react';
+import { useEffect } from 'react';
 import { trackCustomEvent } from '@/hooks/usePageTracking';
-import { useLocation } from 'react-router-dom';
 
+export function useScrollTracking() {
+  useEffect(() => {
+    let scrollDepths = [25, 50, 75, 90];
+    let trackedDepths = new Set<number>();
+
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = (scrollTop / docHeight) * 100;
+
+      scrollDepths.forEach(depth => {
+        if (scrollPercent >= depth && !trackedDepths.has(depth)) {
+          trackedDepths.add(depth);
+          trackCustomEvent('scroll_depth', {
+            depth_percent: depth,
+            page_height: document.documentElement.scrollHeight,
+            viewport_height: window.innerHeight,
+            scroll_position: scrollTop
+          });
+        }
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+}
+
+export function useClickTracking() {
+  useEffect(() => {
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      
+      // Track clicks on buttons, links, and interactive elements
+      if (target.tagName === 'BUTTON' || 
+          target.tagName === 'A' || 
+          target.closest('button') || 
+          target.closest('a') ||
+          target.getAttribute('role') === 'button') {
+        
+        const element = target.closest('button, a, [role="button"]') || target;
+        const elementText = element.textContent?.trim().slice(0, 50) || 'Unknown';
+        const elementType = element.tagName.toLowerCase();
+        const elementClass = element.className;
+        const elementId = element.id;
+        
+        trackCustomEvent('element_click', {
+          element_type: elementType,
+          element_text: elementText,
+          element_class: elementClass,
+          element_id: elementId,
+          page_location: window.location.pathname,
+          click_coordinates: {
+            x: event.clientX,
+            y: event.clientY
+          },
+          viewport_size: {
+            width: window.innerWidth,
+            height: window.innerHeight
+          }
+        });
+      }
+    };
+
+    document.addEventListener('click', handleClick, true);
+    
+    return () => {
+      document.removeEventListener('click', handleClick, true);
+    };
+  }, []);
+}
+
+// Combined hook for easy usage
 export function useInteractionTracking() {
-  const location = useLocation();
-
-  const trackButtonClick = useCallback((buttonType: string, buttonText?: string, additionalData?: Record<string, any>) => {
-    trackCustomEvent('button_click', {
-      button_type: buttonType,
-      button_text: buttonText,
-      page_path: location.pathname,
-      timestamp: new Date().toISOString(),
-      ...additionalData
-    });
-  }, [location.pathname]);
-
-  const trackLinkClick = useCallback((linkType: string, linkDestination: string, linkText?: string) => {
-    trackCustomEvent('link_click', {
-      link_type: linkType,
-      link_destination: linkDestination,
-      link_text: linkText,
-      page_path: location.pathname,
-      timestamp: new Date().toISOString()
-    });
-  }, [location.pathname]);
-
-  const trackFormSubmission = useCallback((formType: string, formName: string, success: boolean, errors?: string[]) => {
-    trackCustomEvent('form_submission', {
-      form_type: formType,
-      form_name: formName,
-      success,
-      errors: errors?.join(', '),
-      page_path: location.pathname,
-      timestamp: new Date().toISOString()
-    });
-  }, [location.pathname]);
-
-  const trackSOSAction = useCallback((action: string, details?: Record<string, any>) => {
-    trackCustomEvent('sos_action', {
-      action,
-      page_path: location.pathname,
-      timestamp: new Date().toISOString(),
-      ...details
-    });
-  }, [location.pathname]);
-
-  const trackChatInteraction = useCallback((action: string, context?: string, messageLength?: number) => {
-    trackCustomEvent('chat_interaction', {
-      action,
-      context,
-      message_length: messageLength,
-      page_path: location.pathname,
-      timestamp: new Date().toISOString()
-    });
-  }, [location.pathname]);
-
-  const trackDownloadAction = useCallback((downloadType: string, fileName?: string) => {
-    trackCustomEvent('download_action', {
-      download_type: downloadType,
-      file_name: fileName,
-      page_path: location.pathname,
-      timestamp: new Date().toISOString()
-    });
-  }, [location.pathname]);
-
-  const trackVideoInteraction = useCallback((action: string, videoId?: string, videoTitle?: string, watchTime?: number) => {
-    trackCustomEvent('video_interaction', {
-      action,
-      video_id: videoId,
-      video_title: videoTitle,
-      watch_time_seconds: watchTime,
-      page_path: location.pathname,
-      timestamp: new Date().toISOString()
-    });
-  }, [location.pathname]);
-
-  const trackRegistrationStep = useCallback((step: string, success: boolean, planType?: string) => {
-    trackCustomEvent('registration_step', {
-      step,
-      success,
-      plan_type: planType,
-      page_path: location.pathname,
-      timestamp: new Date().toISOString()
-    });
-  }, [location.pathname]);
-
+  useScrollTracking();
+  useClickTracking();
+  useFormTracking();
+  
   return {
-    trackButtonClick,
-    trackLinkClick,
-    trackFormSubmission,
-    trackSOSAction,
-    trackChatInteraction,
-    trackDownloadAction,
-    trackVideoInteraction,
-    trackRegistrationStep
+    trackButtonClick: (buttonText: string, event?: any, data?: any) => trackCustomEvent('button_click', { button_text: buttonText, ...data }),
+    trackLinkClick: (linkText: string, event?: any, data?: any) => trackCustomEvent('link_click', { link_text: linkText, ...data }),
+    trackVideoInteraction: (action: string, event?: any, data?: any) => trackCustomEvent('video_interaction', { action, ...data }),
+    trackSOSAction: (action: string, data?: any) => trackCustomEvent('sos_action', { action, ...data }),
+    trackChatInteraction: (action: string, event?: any, data?: any) => trackCustomEvent('chat_interaction', { action, ...data })
   };
+}
+
+export function useFormTracking() {
+  useEffect(() => {
+    const handleFormSubmit = (event: Event) => {
+      const form = event.target as HTMLFormElement;
+      const formData = new FormData(form);
+      const formFields = Array.from(formData.keys());
+      
+      trackCustomEvent('form_submit', {
+        form_id: form.id,
+        form_class: form.className,
+        field_count: formFields.length,
+        field_names: formFields,
+        page_location: window.location.pathname
+      });
+    };
+
+    const handleFormFocus = (event: Event) => {
+      const target = event.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+        const form = target.closest('form');
+        const fieldType = target.getAttribute('type') || target.tagName.toLowerCase();
+        
+        trackCustomEvent('form_field_focus', {
+          field_type: fieldType,
+          field_name: target.getAttribute('name'),
+          field_id: target.id,
+          form_id: form?.id,
+          page_location: window.location.pathname
+        });
+      }
+    };
+
+    document.addEventListener('submit', handleFormSubmit);
+    document.addEventListener('focusin', handleFormFocus);
+    
+    return () => {
+      document.removeEventListener('submit', handleFormSubmit);
+      document.removeEventListener('focusin', handleFormFocus);
+    };
+  }, []);
 }

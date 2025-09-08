@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { trackCustomEvent } from '@/hooks/usePageTracking';
 
 interface FreeTrialPopupProps {
   onClose: () => void;
@@ -19,6 +20,14 @@ export const FreeTrialPopup = ({ onClose }: FreeTrialPopupProps) => {
     phone: ''
   });
   const { toast } = useToast();
+
+  // Track popup shown
+  useEffect(() => {
+    trackCustomEvent('trial_popup_shown', {
+      popup_type: 'free_trial',
+      timestamp: Date.now()
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,6 +63,16 @@ export const FreeTrialPopup = ({ onClose }: FreeTrialPopupProps) => {
         duration: 5000
       });
 
+      // Track successful signup
+      await trackCustomEvent('trial_signup_completed', {
+        popup_type: 'free_trial',
+        signup_data: {
+          has_name: !!formData.name,
+          has_email: !!formData.email,
+          has_phone: !!formData.phone
+        }
+      });
+
       // Store in localStorage to prevent showing again
       localStorage.setItem('icesostrequest-trial-signup', 'true');
       onClose();
@@ -79,7 +98,13 @@ export const FreeTrialPopup = ({ onClose }: FreeTrialPopupProps) => {
       <Card className="w-full max-w-md mx-4 bg-gradient-to-br from-white to-gray-50 border-2 border-primary/20 shadow-2xl animate-scale-in relative z-[10000]">
         <CardHeader className="relative text-center">
           <button
-            onClick={onClose}
+            onClick={() => {
+              trackCustomEvent('trial_popup_closed', {
+                popup_type: 'free_trial',
+                close_method: 'x_button'
+              });
+              onClose();
+            }}
             className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors"
           >
             <X className="h-4 w-4 text-gray-500" />
@@ -168,7 +193,13 @@ export const FreeTrialPopup = ({ onClose }: FreeTrialPopupProps) => {
 
           <div className="mt-4 text-center">
             <button
-              onClick={onClose}
+              onClick={() => {
+                trackCustomEvent('trial_popup_dismissed', {
+                  popup_type: 'free_trial',
+                  dismiss_method: 'not_interested'
+                });
+                onClose();
+              }}
               className="text-sm text-gray-500 hover:text-gray-700 transition-colors underline"
             >
               Not interested right now

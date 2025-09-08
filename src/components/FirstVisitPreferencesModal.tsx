@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Globe, DollarSign, CheckCircle } from 'lucide-react';
 import type { SupportedLanguage, SupportedCurrency } from '@/contexts/PreferencesContext';
+import { trackCustomEvent } from '@/hooks/usePageTracking';
 
 const FIRST_VISIT_KEY = 'hasVisitedBefore';
 
@@ -23,6 +24,11 @@ export const FirstVisitPreferencesModal: React.FC = () => {
     const hasVisited = localStorage.getItem(FIRST_VISIT_KEY);
     if (!hasVisited) {
       setIsOpen(true);
+      // Track modal open
+      trackCustomEvent('preferences_modal_opened', {
+        modal_type: 'first_visit_preferences',
+        user_type: 'new_visitor'
+      });
     }
   }, []);
 
@@ -31,6 +37,14 @@ export const FirstVisitPreferencesModal: React.FC = () => {
     
     try {
       console.log('Applying preferences:', { selectedLanguage, selectedCurrency });
+      
+      // Track preferences selection
+      await trackCustomEvent('preferences_selected', {
+        modal_type: 'first_visit_preferences',
+        language: selectedLanguage,
+        currency: selectedCurrency,
+        completion_time: Date.now()
+      });
       
       // Apply the selected preferences
       setLanguage(selectedLanguage);
