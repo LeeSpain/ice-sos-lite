@@ -26,7 +26,7 @@ export interface InteractionData {
 
 export function useGeographicAnalytics(timeRange = '7d') {
   return useQuery({
-    queryKey: ['geographic-analytics', timeRange],
+    queryKey: ['geographic-analytics', timeRange, 'v2'], // Added v2 to force cache refresh
     queryFn: async (): Promise<GeographicData[]> => {
       const startDate = new Date();
       const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30;
@@ -40,12 +40,23 @@ export function useGeographicAnalytics(timeRange = '7d') {
 
       if (error) throw error;
 
+      console.log('🌍 Raw geographic data:', data?.length, 'records');
+
       // Process geographic data
       const geographicMap = new Map<string, GeographicData>();
       
-      data?.forEach(record => {
+      data?.forEach((record, index) => {
         const eventData = record.event_data as any;
         const location = eventData?.location?.data;
+        
+        if (index < 5) {
+          console.log(`📍 Record ${index}:`, {
+            hasLocation: !!eventData?.location,
+            hasData: !!eventData?.location?.data,
+            locationData: location
+          });
+        }
+        
         if (location?.country) {
           const key = `${location.country}-${location.region || 'Unknown'}-${location.city || 'Unknown'}`;
           const existing = geographicMap.get(key);
@@ -65,8 +76,12 @@ export function useGeographicAnalytics(timeRange = '7d') {
         }
       });
 
-      return Array.from(geographicMap.values())
+      const result = Array.from(geographicMap.values())
         .sort((a, b) => b.visitors - a.visitors);
+      
+      console.log('🗺️ Final geographic results:', result);
+
+      return result;
     },
     refetchInterval: 5 * 60 * 1000, // 5 minutes
   });
