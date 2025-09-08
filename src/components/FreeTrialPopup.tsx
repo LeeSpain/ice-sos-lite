@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { trackCustomEvent } from '@/hooks/usePageTracking';
+import { startTrialFunnel, completeTrialStep } from '@/lib/conversionTracking';
 
 interface FreeTrialPopupProps {
   onClose: () => void;
@@ -23,9 +24,13 @@ export const FreeTrialPopup = ({ onClose }: FreeTrialPopupProps) => {
 
   // Track popup shown
   useEffect(() => {
+    const funnelKey = startTrialFunnel();
+    completeTrialStep(funnelKey, 'popup_shown');
+    
     trackCustomEvent('trial_popup_shown', {
       popup_type: 'free_trial',
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      funnel_key: funnelKey
     });
   }, []);
 
