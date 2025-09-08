@@ -101,11 +101,14 @@ const AnalyticsPage = () => {
     };
   }, [queryClient]);
 
-  // Force cache reset on mount and add debug logging
+  // Cache management without causing loops
   useEffect(() => {
-    console.log('🔄 ANALYTICS DASHBOARD: Clearing cache and forcing refresh...');
-    queryClient.clear();
-    console.log('Analytics Dashboard: Cache cleared on mount');
+    console.log('🔄 ANALYTICS DASHBOARD: Initializing analytics data...');
+    // Only clear specific analytics caches, don't clear auth-related caches
+    queryClient.invalidateQueries({ predicate: (query) => {
+      const key = query.queryKey[0] as string;
+      return key.includes('analytics') && !key.includes('user') && !key.includes('role');
+    }});
   }, []);
   
   // Real-time data hooks - using correct imports from useEnhancedAnalytics

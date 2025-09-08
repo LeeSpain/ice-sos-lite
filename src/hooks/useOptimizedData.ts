@@ -138,7 +138,7 @@ export function useCustomers() {
   });
 }
 
-// Optimized user role hook
+// Optimized user role hook - Fixed to prevent authentication loops
 export function useOptimizedUserRole() {
   const { user } = useAuth();
   
@@ -168,9 +168,12 @@ export function useOptimizedUserRole() {
       return role;
     },
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes - reduced for better debugging
+    staleTime: 15 * 60 * 1000, // 15 minutes - much longer to prevent re-fetching
+    gcTime: 30 * 60 * 1000, // 30 minutes in cache
     refetchOnWindowFocus: false,
-    retry: 3,
+    refetchOnMount: false, // Don't refetch on mount to prevent loops
+    refetchOnReconnect: false, // Don't refetch on network reconnect
+    retry: 1, // Reduce retries to prevent loops
   });
 }
 
