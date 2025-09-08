@@ -6,20 +6,10 @@ export function useOptimizedAuth() {
   const { user, session, loading: authLoading, signOut } = useAuth();
   const { data: role, isLoading: roleLoading, error: roleError } = useOptimizedUserRole();
 
-  console.log('🔧 useOptimizedAuth Debug:', {
-    user: user?.id || 'none',
-    userEmail: user?.email,
-    role,
-    authLoading,
-    roleLoading,
-    roleError: roleError?.message,
-    timestamp: new Date().toISOString()
-  });
+  // Removed debug logs to prevent infinite re-renders
 
   const isAdmin = useMemo(() => {
-    const adminStatus = role === 'admin';
-    console.log('🔧 Admin check:', { role, isAdmin: adminStatus });
-    return adminStatus;
+    return role === 'admin';
   }, [role]);
   
   const isUser = useMemo(() => role === 'user', [role]);

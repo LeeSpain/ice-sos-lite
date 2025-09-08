@@ -55,26 +55,11 @@ const AnalyticsPage = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const queryClient = useQueryClient();
 
-  // Optimized real-time updates: selective invalidation to prevent loops
+  // Completely disable real-time updates to stop infinite loop
   useEffect(() => {
-    const channel = supabase
-      .channel('analytics-live')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'homepage_analytics' },
-        () => {
-          // Only invalidate essential queries to prevent infinite loops
-          queryClient.invalidateQueries({ queryKey: ['lovable-analytics'] });
-          queryClient.invalidateQueries({ queryKey: ['real-time-active-users'] });
-          setLastUpdated(new Date());
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+    // No real-time subscriptions - only manual refresh
+    console.log('🔄 ANALYTICS DASHBOARD: Manual refresh mode only');
+  }, []);
 
   // Stable initialization - no cache invalidation needed
   const isInitialized = useRef(false);
