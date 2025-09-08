@@ -24,13 +24,13 @@ export interface InteractionData {
   topPages: string[];
 }
 
-export function useGeographicAnalytics(timeRange = '45d') {
+export function useGeographicAnalytics(timeRange = '90d') {
   return useQuery({
-    queryKey: ['geographic-analytics', timeRange, 'v4'], // Updated to v4 to force complete cache refresh
+    queryKey: ['geographic-analytics', timeRange, 'v6'], // Updated to v6 to force complete cache refresh and fix data parsing
     queryFn: async (): Promise<GeographicData[]> => {
       console.log(`[Geographic Analytics] Fetching data for time range: ${timeRange}`);
       const startDate = new Date();
-      const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 45;
+      const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : timeRange === '60d' ? 60 : 90;
       startDate.setDate(startDate.getDate() - days);
 
       const { data, error } = await supabase
@@ -43,18 +43,36 @@ export function useGeographicAnalytics(timeRange = '45d') {
 
       console.log('🌍 Raw geographic data:', data?.length, 'records');
 
-      // Process geographic data
+      // Process geographic data with improved JSON parsing
       const geographicMap = new Map<string, GeographicData>();
       
       data?.forEach((record, index) => {
         const eventData = record.event_data as any;
-        const location = eventData?.location?.data;
         
-        if (index < 5) {
+        // Handle different location data formats
+        let location = null;
+        
+        // Try different location data structures
+        if (eventData?.location?.data) {
+          location = eventData.location.data;
+        } else if (eventData?.location && typeof eventData.location === 'string') {
+          try {
+            // Parse JSON string format: {"data": {"country": "Spain", "city": "Albox", "region": "Andalusia"}}
+            const parsedLocation = JSON.parse(eventData.location);
+            location = parsedLocation.data || parsedLocation;
+          } catch (e) {
+            console.log('Failed to parse location JSON:', eventData.location);
+          }
+        } else if (eventData?.location) {
+          location = eventData.location;
+        }
+        
+        if (index < 10) {
           console.log(`📍 Record ${index}:`, {
+            rawEventData: eventData,
             hasLocation: !!eventData?.location,
-            hasData: !!eventData?.location?.data,
-            locationData: location
+            locationStructure: typeof eventData?.location,
+            parsedLocation: location
           });
         }
         
@@ -90,8 +108,9 @@ export function useGeographicAnalytics(timeRange = '45d') {
 
 export function usePopupAnalytics(timeRange = '7d') {
   return useQuery({
-    queryKey: ['popup-analytics-v5', timeRange],
+    queryKey: ['popup-analytics-v6', timeRange],
     queryFn: async (): Promise<PopupAnalytics[]> => {
+      console.log(`[Popup Analytics] Fetching data for time range: ${timeRange}`);
       const startDate = new Date();
       const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30;
       startDate.setDate(startDate.getDate() - days);
@@ -110,19 +129,35 @@ export function usePopupAnalytics(timeRange = '7d') {
 
       if (error) throw error;
 
-      // Process popup analytics
+      console.log('🔔 Raw popup data:', data?.length, 'records');
+      console.log('🔔 Event types found:', [...new Set(data?.map(d => d.event_type))]);
+
+      // Process popup analytics with improved event mapping
       const analytics = new Map<string, any>();
 
-        data?.forEach(record => {
+      data?.forEach((record, index) => {
         const eventData = record.event_data as any;
+        
+        // Improved popup type detection
         let popupType = eventData?.popup_type || eventData?.modal_type;
         
-        // Extract popup type from event name if not in data
-        if (!popupType && record.event_type.includes('modal')) {
-          popupType = record.event_type.replace('_modal_opened', '').replace('_selected', '').replace('_popup_shown', '').replace('_signup_completed', '').replace('_popup_dismissed', '');
+        // Map event types to popup types more accurately
+        if (record.event_type === 'preferences_modal_opened' || record.event_type === 'preferences_selected') {
+          popupType = 'preferences';
+        } else if (record.event_type.includes('trial')) {
+          popupType = 'trial';
         }
         
+        // Default fallback
         popupType = popupType || 'preferences';
+        
+        if (index < 5) {
+          console.log(`🔔 Record ${index}:`, {
+            eventType: record.event_type,
+            eventData: eventData,
+            detectedPopupType: popupType
+          });
+        }
         
         if (!analytics.has(popupType)) {
           analytics.set(popupType, {
@@ -150,12 +185,15 @@ export function usePopupAnalytics(timeRange = '7d') {
         }
       });
 
-      return Array.from(analytics.values()).map(popup => ({
+      const result = Array.from(analytics.values()).map(popup => ({
         ...popup,
         conversionRate: popup.totalShown > 0 
           ? (popup.totalCompleted / popup.totalShown) * 100 
           : 0
       }));
+
+      console.log('🔔 Final popup results:', result);
+      return result;
     },
     refetchInterval: 5 * 60 * 1000,
   });

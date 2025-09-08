@@ -10,10 +10,10 @@ interface GeographicAnalyticsCardProps {
 }
 
 export const GeographicAnalyticsCard: React.FC<GeographicAnalyticsCardProps> = ({
-  timeRange = '60d', // Set default to 60d to include historical Netherlands data
+  timeRange = '90d', // Set default to 90d to include all historical data including Netherlands
   onTimeRangeChange
 }) => {
-  const effectiveTimeRange = timeRange || '60d';
+  const effectiveTimeRange = timeRange || '90d';
   const { data: geoData, isLoading } = useGeographicAnalytics(effectiveTimeRange);
   
   console.log('GeographicAnalyticsCard: Time range:', effectiveTimeRange, 'Data:', geoData);
@@ -60,7 +60,8 @@ export const GeographicAnalyticsCard: React.FC<GeographicAnalyticsCardProps> = (
             <SelectItem value="24h">24 Hours</SelectItem>
             <SelectItem value="7d">7 Days</SelectItem>
             <SelectItem value="30d">30 Days</SelectItem>
-            <SelectItem value="45d">45 Days</SelectItem>
+            <SelectItem value="60d">60 Days</SelectItem>
+            <SelectItem value="90d">90 Days</SelectItem>
           </SelectContent>
         </Select>
       </CardHeader>

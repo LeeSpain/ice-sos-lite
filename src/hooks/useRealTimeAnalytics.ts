@@ -177,62 +177,7 @@ export function useTrafficSources(): TrafficSource[] {
   ];
 }
 
-// Enhanced Traffic Sources with real data
-export function useEnhancedTrafficSources() {
-  return useQuery({
-    queryKey: ['enhanced-traffic-sources'],
-    queryFn: async (): Promise<TrafficSource[]> => {
-      try {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const { data: pageViewData, error } = await supabase
-          .from('homepage_analytics')
-          .select('event_data, session_id')
-          .eq('event_type', 'page_view')
-          .gte('created_at', thirtyDaysAgo.toISOString());
-
-        if (error) throw error;
-
-        const sources: Record<string, Set<string>> = {
-          'Direct': new Set(),
-          'Search': new Set(),
-          'Social': new Set(),
-          'Referral': new Set()
-        };
-
-        pageViewData?.forEach(item => {
-          const eventData = item.event_data as any;
-          const referrer = eventData?.referrer || '';
-          const sessionId = item.session_id;
-          
-          if (!referrer || referrer === 'Direct') {
-            sources['Direct'].add(sessionId);
-          } else if (referrer.includes('google') || referrer.includes('bing') || referrer.includes('search')) {
-            sources['Search'].add(sessionId);
-          } else if (referrer.includes('facebook') || referrer.includes('twitter') || referrer.includes('linkedin')) {
-            sources['Social'].add(sessionId);
-          } else {
-            sources['Referral'].add(sessionId);
-          }
-        });
-
-        const totalVisitors = Object.values(sources).reduce((sum, set) => sum + set.size, 0);
-
-        return Object.entries(sources).map(([source, sessionSet]) => ({
-          source,
-          visitors: sessionSet.size,
-          percentage: totalVisitors > 0 ? parseFloat(((sessionSet.size / totalVisitors) * 100).toFixed(1)) : 0
-        }));
-      } catch (error) {
-        console.error('Error fetching enhanced traffic sources:', error);
-        return [];
-      }
-    },
-    refetchInterval: 5 * 60 * 1000,
-    staleTime: 5 * 60 * 1000,
-  });
-}
+// Enhanced Traffic Sources with real data - REMOVED - use useEnhancedAnalytics.ts instead
 
 // Hook for device data - now deprecated, use useEnhancedDeviceData
 export function useDeviceData(): DeviceData[] {
@@ -243,59 +188,7 @@ export function useDeviceData(): DeviceData[] {
   ];
 }
 
-// Enhanced Device Data with real data
-export function useEnhancedDeviceData() {
-  return useQuery({
-    queryKey: ['enhanced-device-data'],
-    queryFn: async (): Promise<DeviceData[]> => {
-      try {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const { data: pageViewData, error } = await supabase
-          .from('homepage_analytics')
-          .select('event_data, session_id')
-          .eq('event_type', 'page_view')
-          .gte('created_at', thirtyDaysAgo.toISOString());
-
-        if (error) throw error;
-
-        const devices: Record<string, Set<string>> = {
-          'Mobile': new Set(),
-          'Desktop': new Set(),
-          'Tablet': new Set()
-        };
-
-        pageViewData?.forEach(item => {
-          const eventData = item.event_data as any;
-          const userAgent = eventData?.user_agent || '';
-          const sessionId = item.session_id;
-          
-          if (userAgent.includes('Mobile') || userAgent.includes('iPhone') || userAgent.includes('Android')) {
-            devices['Mobile'].add(sessionId);
-          } else if (userAgent.includes('iPad') || userAgent.includes('Tablet')) {
-            devices['Tablet'].add(sessionId);
-          } else {
-            devices['Desktop'].add(sessionId);
-          }
-        });
-
-        const totalSessions = Object.values(devices).reduce((sum, set) => sum + set.size, 0);
-
-        return Object.entries(devices).map(([device, sessionSet]) => ({
-          device,
-          sessions: sessionSet.size,
-          percentage: totalSessions > 0 ? parseFloat(((sessionSet.size / totalSessions) * 100).toFixed(1)) : 0
-        }));
-      } catch (error) {
-        console.error('Error fetching enhanced device data:', error);
-        return [];
-      }
-    },
-    refetchInterval: 5 * 60 * 1000,
-    staleTime: 5 * 60 * 1000,
-  });
-}
+// Enhanced Device Data with real data - REMOVED - use useEnhancedAnalytics.ts instead
 
 // Hook for top pages with real data
 export function useTopPages() {

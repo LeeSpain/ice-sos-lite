@@ -44,6 +44,7 @@ import { useGeographicAnalytics } from '@/hooks/useAdvancedAnalytics';
 import { GeographicAnalyticsCard } from '@/components/admin/analytics/GeographicAnalyticsCard';
 import { PopupAnalyticsCard } from '@/components/admin/analytics/PopupAnalyticsCard';
 import { HourlyAnalyticsChart } from '@/components/admin/analytics/HourlyAnalyticsChart';
+import { InteractionAnalyticsCard } from '@/components/admin/analytics/InteractionAnalyticsCard';
 import { AnalyticsHealthCheck } from '@/components/admin/analytics/AnalyticsHealthCheck';
 import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
@@ -106,7 +107,7 @@ const AnalyticsPage = () => {
     console.log('Analytics Dashboard: Cache cleared on mount');
   }, []);
   
-  // Real-time data hooks
+  // Real-time data hooks - using correct imports from useEnhancedAnalytics
   const { data: realTimeMetrics, isLoading: isLoadingMetrics, refetch: refetchMetrics } = useRealTimeAnalytics();
   const { data: lovableAnalytics, isLoading: isLoadingLovable } = useLovableAnalytics();
   const { data: trafficSources, isLoading: isLoadingTraffic } = useEnhancedTrafficSources();
@@ -125,7 +126,7 @@ const AnalyticsPage = () => {
   const refreshAllData = async () => {
     setLastUpdated(new Date());
     
-    // Complete cache invalidation for all analytics
+    // Complete cache invalidation for all analytics - updated patterns
     queryClient.invalidateQueries({ predicate: (query) => {
       const key = query.queryKey[0] as string;
       return key.includes('analytics') || 
@@ -541,35 +542,38 @@ const AnalyticsPage = () => {
         </TabsContent>
 
         <TabsContent value="events" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Custom Events</CardTitle>
-              <CardDescription>ICE SOS specific event tracking</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoadingEvents ? (
-                <p className="text-sm text-muted-foreground">Loading event data...</p>
-              ) : customEvents && customEvents.length > 0 ? (
-                <div className="space-y-4">
-                  {customEvents.map((event, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium leading-none">{event.event}</p>
-                        <p className="text-sm text-muted-foreground">{event.count} events</p>
+          <div className="grid gap-4 md:grid-cols-2">
+            <InteractionAnalyticsCard timeRange={timeRange} />
+            <Card>
+              <CardHeader>
+                <CardTitle>Custom Events</CardTitle>
+                <CardDescription>ICE SOS specific event tracking</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingEvents ? (
+                  <p className="text-sm text-muted-foreground">Loading event data...</p>
+                ) : customEvents && customEvents.length > 0 ? (
+                  <div className="space-y-4">
+                    {customEvents.map((event, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium leading-none">{event.event}</p>
+                          <p className="text-sm text-muted-foreground">{event.count} events</p>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="outline" className="text-xs">
+                            {event.trend}
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <Badge variant="outline" className="text-xs">
-                          {event.trend}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No custom event data available yet</p>
-              )}
-            </CardContent>
-          </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">No custom event data available yet</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="journeys" className="space-y-4">
