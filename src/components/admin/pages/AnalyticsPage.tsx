@@ -101,14 +101,10 @@ const AnalyticsPage = () => {
     };
   }, [queryClient]);
 
-  // Cache management without causing loops
+  // Initialize analytics data logging
   useEffect(() => {
     console.log('🔄 ANALYTICS DASHBOARD: Initializing analytics data...');
-    // Only clear specific analytics caches, don't clear auth-related caches
-    queryClient.invalidateQueries({ predicate: (query) => {
-      const key = query.queryKey[0] as string;
-      return key.includes('analytics') && !key.includes('user') && !key.includes('role');
-    }});
+    // Real-time subscriptions will handle data updates, no cache invalidation needed
   }, []);
   
   // Real-time data hooks - using correct imports from useEnhancedAnalytics
