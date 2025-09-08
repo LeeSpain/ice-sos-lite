@@ -8,6 +8,7 @@ import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import { queryClient } from "@/lib/queryClient";
 import OptimizedSuspense from '@/components/OptimizedSuspense';
 import EnhancedErrorBoundary from '@/components/EnhancedErrorBoundary';
+import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider';
 import { usePageTracking } from '@/hooks/usePageTracking';
 
 // Import all pages
@@ -315,10 +316,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <EnhancedErrorBoundary>
-          <EmmaChatProvider>
-            <AppWithTracking />
-            <GlobalEmmaChat />
-          </EmmaChatProvider>
+          <AnalyticsProvider>
+            <EmmaChatProvider>
+              <AppWithTracking />
+              <GlobalEmmaChat />
+            </EmmaChatProvider>
+          </AnalyticsProvider>
         </EnhancedErrorBoundary>
       </BrowserRouter>
     </QueryClientProvider>

@@ -44,6 +44,7 @@ import {
 import { GeographicAnalyticsCard } from '@/components/admin/analytics/GeographicAnalyticsCard';
 import { PopupAnalyticsCard } from '@/components/admin/analytics/PopupAnalyticsCard';
 import { HourlyAnalyticsChart } from '@/components/admin/analytics/HourlyAnalyticsChart';
+import { AnalyticsHealthCheck } from '@/components/admin/analytics/AnalyticsHealthCheck';
 import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
 const AnalyticsPage = () => {
@@ -240,6 +241,7 @@ const AnalyticsPage = () => {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="health">Health Check</TabsTrigger>
           <TabsTrigger value="pages">Page Analytics</TabsTrigger>
           <TabsTrigger value="geographic">Geographic</TabsTrigger>
           <TabsTrigger value="traffic">Traffic Sources</TabsTrigger>
@@ -250,6 +252,10 @@ const AnalyticsPage = () => {
           <TabsTrigger value="journeys">User Journeys</TabsTrigger>
           <TabsTrigger value="real-time">Real-time</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="health" className="space-y-4">
+          <AnalyticsHealthCheck />
+        </TabsContent>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
