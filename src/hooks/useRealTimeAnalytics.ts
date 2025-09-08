@@ -115,9 +115,9 @@ export function useRealTimeAnalytics() {
         };
       }
     },
-    refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes
-    staleTime: 8 * 60 * 1000, // Data is fresh for 8 minutes
-    refetchIntervalInBackground: false, // Don't refetch when tab is not active
+    refetchInterval: false, // DISABLE automatic refetching
+    staleTime: Infinity, // Data never becomes stale
+    refetchIntervalInBackground: false,
   });
 }
 
@@ -157,8 +157,8 @@ export function useLovableAnalytics() {
         };
       }
     },
-    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes
-    staleTime: 90 * 1000, // Data is fresh for 90 seconds
+    refetchInterval: false, // DISABLE automatic refetching
+    staleTime: Infinity, // Data never becomes stale 
     refetchIntervalInBackground: false,
   });
 }
@@ -229,9 +229,9 @@ export function useTopPages() {
         ];
       }
     },
-    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes
-    staleTime: 2 * 60 * 1000, // Data is fresh for 2 minutes
-    refetchIntervalInBackground: false, // Don't refetch when tab is not active
+    refetchInterval: false, // DISABLE automatic refetching
+    staleTime: Infinity, // Data never becomes stale
+    refetchIntervalInBackground: false,
   });
 }
 
@@ -294,9 +294,9 @@ export function useCustomEvents() {
         ];
       }
     },
-    refetchInterval: 3 * 60 * 1000, // Refetch every 3 minutes
-    staleTime: 2 * 60 * 1000, // Data is fresh for 2 minutes
-    refetchIntervalInBackground: false, // Don't refetch when tab is not active
+    refetchInterval: false, // DISABLE automatic refetching
+    staleTime: Infinity, // Data never becomes stale
+    refetchIntervalInBackground: false,
   });
 }
 
@@ -357,8 +357,8 @@ export function useRealTimeActiveUsers() {
         };
       }
     },
-    refetchInterval: 2 * 60 * 1000, // Refetch every 2 minutes  
-    staleTime: 90 * 1000, // Data is fresh for 90 seconds
-    refetchIntervalInBackground: false, // Don't refetch when tab is not active
+    refetchInterval: false, // DISABLE automatic refetching
+    staleTime: Infinity, // Data never becomes stale
+    refetchIntervalInBackground: false,
   });
 }

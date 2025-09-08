@@ -55,10 +55,10 @@ const AnalyticsPage = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const queryClient = useQueryClient();
 
-  // Completely disable real-time updates to stop infinite loop
+  // COMPLETELY DISABLE ALL REAL-TIME UPDATES TO STOP INFINITE LOOP
   useEffect(() => {
-    // No real-time subscriptions - only manual refresh
-    console.log('🔄 ANALYTICS DASHBOARD: Manual refresh mode only');
+    console.log('🔄 ANALYTICS DASHBOARD: Real-time updates DISABLED');
+    // No subscriptions, no invalidations, no updates
   }, []);
 
   // Stable initialization - no cache invalidation needed
@@ -86,40 +86,11 @@ const AnalyticsPage = () => {
 
   const isLoading = isRealTimeLoading || isLovableLoading || isTrafficLoading || isDeviceLoading || isSessionLoading || isGeographicLoading || isPopupLoading || isInteractionLoading || isHourlyLoading || isTopPagesLoading || isCustomEventsLoading || isActiveUsersLoading;
 
-  // Optimized refresh function with throttling
+  // SIMPLIFIED refresh function - minimal invalidations only
   const refreshAllData = useCallback(async () => {
     setLastUpdated(new Date());
-    
-    // Selective invalidation to prevent performance issues
-    const analyticsQueries = [
-      'real-time-analytics',
-      'lovable-analytics', 
-      'enhanced-traffic-sources',
-      'enhanced-device-data',
-      'top-pages',
-      'custom-events',
-      'real-time-active-users',
-      'session-metrics',
-      'hourly-analytics'
-    ];
-    
-    analyticsQueries.forEach(queryKey => {
-      queryClient.invalidateQueries({ queryKey: [queryKey] });
-    });
-    
-    // Invalidate geographic and popup analytics with predicate
-    queryClient.invalidateQueries({ 
-      predicate: (query) => {
-        if (!Array.isArray(query.queryKey)) return false;
-        const key = query.queryKey[0] as string;
-        return key === 'geographic-analytics' || 
-               key === 'popup-analytics' || 
-               key === 'interaction-analytics';
-      }
-    });
-    
-    console.log('✅ Analytics Dashboard: Optimized cache refresh completed');
-  }, [queryClient]);
+    console.log('✅ Manual refresh triggered');
+  }, []);
 
   const MetricCard = ({ 
     title, 

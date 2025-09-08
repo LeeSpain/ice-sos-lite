@@ -56,8 +56,8 @@ export function useGeographicAnalytics(timeRange = '90d') {
         return Math.random() < multiplier || location.country === 'Netherlands'; // Always show Netherlands
       });
     },
-    refetchInterval: 10 * 60 * 1000, // 10 minutes
-    staleTime: 8 * 60 * 1000, // 8 minutes
+    refetchInterval: false, // DISABLE to stop infinite loop
+    staleTime: Infinity, // Never refetch automatically
   });
 }
 
