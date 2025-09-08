@@ -99,6 +99,12 @@ const AnalyticsPage = () => {
       supabase.removeChannel(channel);
     };
   }, [queryClient]);
+
+  // Force cache reset on mount
+  useEffect(() => {
+    queryClient.clear();
+    console.log('Analytics Dashboard: Cache cleared on mount');
+  }, []);
   
   // Real-time data hooks
   const { data: realTimeMetrics, isLoading: isLoadingMetrics, refetch: refetchMetrics } = useRealTimeAnalytics();
@@ -118,6 +124,28 @@ const AnalyticsPage = () => {
   // Refresh all data
   const refreshAllData = async () => {
     setLastUpdated(new Date());
+    
+    // Complete cache invalidation for all analytics
+    queryClient.invalidateQueries({ predicate: (query) => {
+      const key = query.queryKey[0] as string;
+      return key.includes('analytics') || 
+             key.includes('realtime') || 
+             key.includes('lovable') || 
+             key.includes('page') ||
+             key.includes('traffic') ||
+             key.includes('device') ||
+             key.includes('journey') ||
+             key.includes('events') ||
+             key.includes('users') ||
+             key.includes('session') ||
+             key.includes('geographic') ||
+             key.includes('popup') ||
+             key.includes('hourly') ||
+             key.includes('interaction') ||
+             key.includes('enhanced');
+    }});
+    
+    console.log('Analytics Dashboard: Complete cache refresh executed');
     // Invalidate all query types to ensure complete refresh
     queryClient.invalidateQueries({ queryKey: ['real-time-analytics'] });
     queryClient.invalidateQueries({ queryKey: ['lovable-analytics'] });
@@ -509,7 +537,7 @@ const AnalyticsPage = () => {
         </TabsContent>
 
         <TabsContent value="hourly" className="space-y-4">
-          <HourlyAnalyticsChart />
+          <HourlyAnalyticsChart timeRange={timeRange} />
         </TabsContent>
 
         <TabsContent value="events" className="space-y-4">

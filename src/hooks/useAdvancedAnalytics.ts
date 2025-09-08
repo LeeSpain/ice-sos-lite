@@ -90,7 +90,7 @@ export function useGeographicAnalytics(timeRange = '45d') {
 
 export function usePopupAnalytics(timeRange = '7d') {
   return useQuery({
-    queryKey: ['popup-analytics', timeRange],
+    queryKey: ['popup-analytics-v5', timeRange],
     queryFn: async (): Promise<PopupAnalytics[]> => {
       const startDate = new Date();
       const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30;
@@ -113,11 +113,16 @@ export function usePopupAnalytics(timeRange = '7d') {
       // Process popup analytics
       const analytics = new Map<string, any>();
 
-      data?.forEach(record => {
+        data?.forEach(record => {
         const eventData = record.event_data as any;
-        const popupType = eventData?.popup_type || 
-                         eventData?.modal_type || 
-                         'unknown';
+        let popupType = eventData?.popup_type || eventData?.modal_type;
+        
+        // Extract popup type from event name if not in data
+        if (!popupType && record.event_type.includes('modal')) {
+          popupType = record.event_type.replace('_modal_opened', '').replace('_selected', '').replace('_popup_shown', '').replace('_signup_completed', '').replace('_popup_dismissed', '');
+        }
+        
+        popupType = popupType || 'preferences';
         
         if (!analytics.has(popupType)) {
           analytics.set(popupType, {

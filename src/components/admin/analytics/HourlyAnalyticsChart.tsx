@@ -4,8 +4,14 @@ import { Clock, Activity } from 'lucide-react';
 import { useHourlyAnalytics } from '@/hooks/useAdvancedAnalytics';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
-export const HourlyAnalyticsChart: React.FC = () => {
+interface HourlyAnalyticsChartProps {
+  timeRange?: string;
+}
+
+export const HourlyAnalyticsChart: React.FC<HourlyAnalyticsChartProps> = ({ timeRange }) => {
   const { data: hourlyData, isLoading } = useHourlyAnalytics();
+  
+  console.log('HourlyAnalyticsChart: Time range:', timeRange, 'Data:', hourlyData?.length);
 
   if (isLoading) {
     return (
