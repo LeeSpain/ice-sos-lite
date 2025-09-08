@@ -575,35 +575,6 @@ const AnalyticsPage = () => {
             </CardContent>
           </Card>
         </TabsContent>
-                    <div key={index} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium">Journey #{index + 1}</span>
-                          <Badge variant="outline">{journey.count} users</Badge>
-                        </div>
-                        <span className="text-sm text-muted-foreground">{journey.conversionRate}% of total</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm">
-                        {journey.path.map((step, stepIndex) => (
-                          <div key={stepIndex} className="flex items-center space-x-2">
-                            <span className="bg-secondary px-2 py-1 rounded text-xs font-mono">
-                              {step}
-                            </span>
-                            {stepIndex < journey.path.length - 1 && (
-                              <span className="text-muted-foreground">→</span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No user journey data available yet</p>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="real-time" className="space-y-4">
           <Card>
