@@ -68,11 +68,19 @@ const AnalyticsPage = () => {
           queryClient.invalidateQueries({ queryKey: ['real-time-active-users'] });
           queryClient.invalidateQueries({ queryKey: ['session-metrics'] });
           queryClient.invalidateQueries({ queryKey: ['page-analytics'] });
-          queryClient.invalidateQueries({ queryKey: ['geographic-analytics'] });
+          // Invalidate all geographic analytics queries regardless of time range
+          queryClient.invalidateQueries({ predicate: (query) => 
+            Array.isArray(query.queryKey) && query.queryKey[0] === 'geographic-analytics' 
+          });
           queryClient.invalidateQueries({ queryKey: ['user-journey-analytics'] });
           queryClient.invalidateQueries({ queryKey: ['real-time-analytics'] });
-          queryClient.invalidateQueries({ queryKey: ['popup-analytics'] });
-          queryClient.invalidateQueries({ queryKey: ['interaction-analytics'] });
+          // Add missing query invalidations
+          queryClient.invalidateQueries({ predicate: (query) => 
+            Array.isArray(query.queryKey) && query.queryKey[0] === 'popup-analytics' 
+          });
+          queryClient.invalidateQueries({ predicate: (query) => 
+            Array.isArray(query.queryKey) && query.queryKey[0] === 'interaction-analytics' 
+          });
           queryClient.invalidateQueries({ queryKey: ['hourly-analytics'] });
           setLastUpdated(new Date());
         }
@@ -110,20 +118,29 @@ const AnalyticsPage = () => {
   // Refresh all data
   const refreshAllData = async () => {
     setLastUpdated(new Date());
-    const keys: readonly (readonly string[])[] = [
-      ['real-time-analytics'],
-      ['lovable-analytics'],
-      ['enhanced-traffic-sources'],
-      ['enhanced-device-data'],
-      ['top-pages'],
-      ['custom-events'],
-      ['real-time-active-users'],
-      ['session-metrics'],
-      ['page-analytics'],
-      ['geographic-analytics'],
-      ['user-journey-analytics'],
-    ];
-    keys.forEach((key) => queryClient.invalidateQueries({ queryKey: key as any }));
+    // Invalidate all query types to ensure complete refresh
+    queryClient.invalidateQueries({ queryKey: ['real-time-analytics'] });
+    queryClient.invalidateQueries({ queryKey: ['lovable-analytics'] });
+    queryClient.invalidateQueries({ queryKey: ['enhanced-traffic-sources'] });
+    queryClient.invalidateQueries({ queryKey: ['enhanced-device-data'] });
+    queryClient.invalidateQueries({ queryKey: ['top-pages'] });
+    queryClient.invalidateQueries({ queryKey: ['custom-events'] });
+    queryClient.invalidateQueries({ queryKey: ['real-time-active-users'] });
+    queryClient.invalidateQueries({ queryKey: ['session-metrics'] });
+    queryClient.invalidateQueries({ queryKey: ['page-analytics'] });
+    queryClient.invalidateQueries({ queryKey: ['user-journey-analytics'] });
+    // Invalidate all geographic analytics queries with any time range
+    queryClient.invalidateQueries({ predicate: (query) => 
+      Array.isArray(query.queryKey) && query.queryKey[0] === 'geographic-analytics' 
+    });
+    // Add missing analytics types
+    queryClient.invalidateQueries({ predicate: (query) => 
+      Array.isArray(query.queryKey) && query.queryKey[0] === 'popup-analytics' 
+    });
+    queryClient.invalidateQueries({ predicate: (query) => 
+      Array.isArray(query.queryKey) && query.queryKey[0] === 'interaction-analytics' 
+    });
+    queryClient.invalidateQueries({ queryKey: ['hourly-analytics'] });
   };
 
   const MetricCard = ({ 
@@ -488,13 +505,7 @@ const AnalyticsPage = () => {
         </TabsContent>
 
         <TabsContent value="popups" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <PopupAnalyticsCard timeRange={timeRange} />
-            <GeographicAnalyticsCard 
-              timeRange={timeRange} 
-              onTimeRangeChange={setTimeRange} 
-            />
-          </div>
+          <PopupAnalyticsCard timeRange={timeRange} />
         </TabsContent>
 
         <TabsContent value="hourly" className="space-y-4">

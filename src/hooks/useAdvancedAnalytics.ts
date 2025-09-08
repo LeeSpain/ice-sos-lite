@@ -24,12 +24,13 @@ export interface InteractionData {
   topPages: string[];
 }
 
-export function useGeographicAnalytics(timeRange = '30d') {
+export function useGeographicAnalytics(timeRange = '45d') {
   return useQuery({
-    queryKey: ['geographic-analytics', timeRange, 'v3'], // Updated to v3 to force complete cache refresh
+    queryKey: ['geographic-analytics', timeRange, 'v4'], // Updated to v4 to force complete cache refresh
     queryFn: async (): Promise<GeographicData[]> => {
+      console.log(`[Geographic Analytics] Fetching data for time range: ${timeRange}`);
       const startDate = new Date();
-      const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30;
+      const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 45;
       startDate.setDate(startDate.getDate() - days);
 
       const { data, error } = await supabase
