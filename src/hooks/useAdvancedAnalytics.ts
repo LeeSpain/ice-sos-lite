@@ -26,7 +26,7 @@ export interface InteractionData {
 
 export function useGeographicAnalytics(timeRange = '30d') {
   return useQuery({
-    queryKey: ['geographic-analytics', timeRange, 'v2'], // Added v2 to force cache refresh
+    queryKey: ['geographic-analytics', timeRange, 'v3'], // Updated to v3 to force complete cache refresh
     queryFn: async (): Promise<GeographicData[]> => {
       const startDate = new Date();
       const days = timeRange === '24h' ? 1 : timeRange === '7d' ? 7 : 30;

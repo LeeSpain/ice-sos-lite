@@ -115,54 +115,8 @@ export function usePageAnalytics() {
   });
 }
 
-// Hook to analyze geographic distribution of visitors
-export function useGeographicAnalytics() {
-  return useQuery({
-    queryKey: ['geographic-analytics'],
-    queryFn: async (): Promise<GeographicData[]> => {
-      try {
-        const thirtyDaysAgo = new Date();
-        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        
-        const { data: pageViewData, error } = await supabase
-          .from('homepage_analytics')
-          .select('event_data')
-          .eq('event_type', 'page_view')
-          .gte('created_at', thirtyDaysAgo.toISOString());
-
-        if (error) throw error;
-
-        // Extract country data
-        const countries: Record<string, number> = {};
-        let totalVisitors = 0;
-
-        pageViewData?.forEach(item => {
-          const eventData = item.event_data as any;
-          const locationData = eventData?.location?.data;
-          if (locationData?.country) {
-            countries[locationData.country] = (countries[locationData.country] || 0) + 1;
-            totalVisitors++;
-          }
-        });
-
-        return Object.entries(countries)
-          .map(([country, visitors]) => ({
-            country,
-            visitors,
-            percentage: totalVisitors > 0 ? parseFloat(((visitors / totalVisitors) * 100).toFixed(1)) : 0
-          }))
-          .sort((a, b) => b.visitors - a.visitors)
-          .slice(0, 10);
-      } catch (error) {
-        console.error('Error fetching geographic analytics:', error);
-        return [];
-      }
-    },
-    refetchInterval: 30 * 1000,
-    staleTime: 30 * 1000,
-    refetchIntervalInBackground: false,
-  });
-}
+// Note: useGeographicAnalytics has been moved to useAdvancedAnalytics.ts
+// This old version has been removed to prevent cache conflicts
 
 // Hook to analyze user journeys through the site
 export function useUserJourneyAnalytics() {
