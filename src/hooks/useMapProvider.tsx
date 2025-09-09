@@ -96,15 +96,23 @@ export function useMapProvider() {
       };
     }, [mapboxgl.accessToken]); // Only depend on access token
 
-    // Update center when it changes without recreating the map
+    // Update center when it changes without recreating the map - debounced for stability
     useEffect(() => {
       if (!map.current || !center) return;
       
-      map.current.easeTo({
-        center: [center.lng, center.lat],
-        duration: 1000
-      });
-    }, [center]);
+      // Use a timeout to debounce rapid location updates
+      const timeoutId = setTimeout(() => {
+        if (map.current) {
+          map.current.easeTo({
+            center: [center.lng, center.lat],
+            duration: 800,
+            essential: true
+          });
+        }
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }, [center?.lat, center?.lng]); // Only update when coordinates actually change
 
     // Handle style changes separately without recreating the map
     const handleStyleChange = (style: MapStyle) => {
@@ -191,9 +199,13 @@ export function useMapProvider() {
       }
     }, [markers]);
 
-    // Update markers when they change
+    // Update markers when they change - debounced to prevent flashing
     useEffect(() => {
-      updateMapMarkers();
+      const timeoutId = setTimeout(() => {
+        updateMapMarkers();
+      }, 150);
+      
+      return () => clearTimeout(timeoutId);
     }, [updateMapMarkers]);
 
     if (tokenError) {

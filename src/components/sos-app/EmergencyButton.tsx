@@ -160,8 +160,8 @@ const EmergencyButton = () => {
           </div>
         </Button>
 
-        {/* Enhanced instructions */}
-        <div className="absolute -bottom-16 left-1/2 transform -translate-x-1/2 text-center text-white/80">
+        {/* Enhanced instructions positioned below button with proper spacing */}
+        <div className="mt-6 text-center text-white/80 max-w-xs">
           {countdown !== null ? (
             <div className="space-y-1">
               <p className="text-sm font-bold text-yellow-400">Activating Emergency SOS</p>
@@ -173,9 +173,9 @@ const EmergencyButton = () => {
               <p className="text-xs">Contacts are being notified</p>
             </div>
           ) : (
-            <div className="space-y-1">
+            <div className="space-y-1 bg-black/30 backdrop-blur-sm rounded-lg p-3 border border-white/10">
               <p className="text-sm font-medium">Hold for 3 seconds to activate</p>
-              <p className="text-xs">Sends alerts to emergency contacts</p>
+              <p className="text-xs text-white/60">Sends alerts to emergency contacts</p>
               {voiceActivated && (
                 <p className="text-xs text-blue-400">Voice: Say "Emergency Help"</p>
               )}
