@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useLocationServices } from '@/hooks/useLocationServices';
 import { useToast } from '@/hooks/use-toast';
 
@@ -25,19 +25,26 @@ export const useEmergencyLocation = (): UseEmergencyLocationReturn => {
   const { getCurrentLocationData, permissionState } = useLocationServices();
   const { toast } = useToast();
 
+  // Stable refresh function without dependency loops
   const refreshLocation = useCallback(async () => {
+    if (!permissionState?.granted) {
+      setLocationError('Location permission not granted');
+      return;
+    }
+
     try {
       setLocationError(null);
       const locationData = await getCurrentLocationData();
       
-      if (locationData) {
+      if (locationData?.latitude && locationData?.longitude) {
         const newLocation: LocationData = {
           lat: locationData.latitude,
           lng: locationData.longitude,
-          accuracy: locationData.accuracy || 0,
+          accuracy: locationData.accuracy || 10,
           timestamp: new Date()
         };
         
+        // Update location - let the map handle stability
         setCurrentLocation(newLocation);
         return;
       }
@@ -47,17 +54,20 @@ export const useEmergencyLocation = (): UseEmergencyLocationReturn => {
       console.error('Failed to get location:', error);
       setLocationError('Failed to get current location');
       
-      // Use default location (user's general area from geo-lookup)
-      if (!currentLocation) {
-        setCurrentLocation({
-          lat: 37.3881024, // Albox, Spain from logs
-          lng: -2.1417503,
-          accuracy: 0,
-          timestamp: new Date()
-        });
-      }
+      // Use default location only once if we don't have any location yet
+      setCurrentLocation(prev => {
+        if (!prev) {
+          return {
+            lat: 37.3881024, // Albox, Spain from logs
+            lng: -2.1417503,
+            accuracy: 0,
+            timestamp: new Date()
+          };
+        }
+        return prev;
+      });
     }
-  }, [getCurrentLocationData, currentLocation]);
+  }, [getCurrentLocationData, permissionState?.granted]);
 
   const startTracking = useCallback(() => {
     if (!permissionState?.granted) {
@@ -87,12 +97,12 @@ export const useEmergencyLocation = (): UseEmergencyLocationReturn => {
     setIsTracking(false);
   }, []);
 
-  // Initial location fetch
+  // Initial location fetch only once
   useEffect(() => {
-    if (!currentLocation) {
+    if (!currentLocation && permissionState?.granted) {
       refreshLocation();
     }
-  }, [refreshLocation]);
+  }, [permissionState?.granted]); // Removed refreshLocation to prevent loops
 
   return {
     currentLocation,
@@ -103,3 +113,5 @@ export const useEmergencyLocation = (): UseEmergencyLocationReturn => {
     locationError
   };
 };
+
+export default useEmergencyLocation;

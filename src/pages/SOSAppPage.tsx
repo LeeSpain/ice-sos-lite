@@ -178,37 +178,51 @@ const SOSAppPage = () => {
     }
   };
 
-  // Memoize map markers to show current location and family members
+  // Stable map markers to prevent re-rendering loops
   const mapMarkers = React.useMemo(() => {
     const markers = [];
     
-    // Add current location marker if available
-    if (currentLocation) {
+    // Add current location marker if available - use stable reference
+    if (currentLocation?.lat && currentLocation?.lng) {
       markers.push({
-        id: 'current-location',
-        lat: currentLocation.lat,
-        lng: currentLocation.lng,
-        render: () => null // Emergency location marker
+        id: 'emergency-location',
+        lat: Number(currentLocation.lat.toFixed(6)), // Round to prevent micro-changes
+        lng: Number(currentLocation.lng.toFixed(6)),
+        render: () => null
       });
     }
     
-    // Add family member markers for visualization
-    const familyLocations = [
-      { id: 'family-1', lat: currentLocation?.lat ? currentLocation.lat + 0.001 : 51.506, lng: currentLocation?.lng ? currentLocation.lng + 0.001 : -0.09, name: 'Sarah' },
-      { id: 'family-2', lat: currentLocation?.lat ? currentLocation.lat - 0.001 : 51.504, lng: currentLocation?.lng ? currentLocation.lng - 0.001 : -0.091, name: 'Mike' },
+    // Add stable family member markers for emergency context
+    const baseLocation = currentLocation || { lat: 37.3881024, lng: -2.1417503 };
+    const familyMembers = [
+      { 
+        id: 'family-sarah', 
+        lat: Number((baseLocation.lat + 0.002).toFixed(6)), 
+        lng: Number((baseLocation.lng + 0.001).toFixed(6)), 
+        name: 'Sarah' 
+      },
+      { 
+        id: 'family-mike', 
+        lat: Number((baseLocation.lat - 0.001).toFixed(6)), 
+        lng: Number((baseLocation.lng - 0.002).toFixed(6)), 
+        name: 'Mike' 
+      },
     ];
     
-    familyLocations.forEach(family => {
+    familyMembers.forEach(family => {
       markers.push({
         id: family.id,
         lat: family.lat,
         lng: family.lng,
-        render: () => null // Family member marker
+        render: () => null
       });
     });
     
     return markers;
-  }, [currentLocation]);
+  }, [
+    currentLocation?.lat?.toFixed(6), // Only depend on rounded coordinates
+    currentLocation?.lng?.toFixed(6)
+  ]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-950 via-red-900 to-orange-900">

@@ -96,23 +96,35 @@ export function useMapProvider() {
       };
     }, [mapboxgl.accessToken]); // Only depend on access token
 
-    // Update center when it changes without recreating the map - debounced for stability
+    // Update center when it changes - heavily debounced and stable
     useEffect(() => {
-      if (!map.current || !center) return;
+      if (!map.current || !center?.lat || !center?.lng) return;
       
-      // Use a timeout to debounce rapid location updates
+      // Use a longer timeout to prevent rapid updates and check for significant changes
       const timeoutId = setTimeout(() => {
-        if (map.current) {
-          map.current.easeTo({
-            center: [center.lng, center.lat],
-            duration: 800,
-            essential: true
-          });
+        if (map.current && center.lat && center.lng) {
+          const currentCenter = map.current.getCenter();
+          const distance = Math.sqrt(
+            Math.pow(currentCenter.lat - center.lat, 2) + 
+            Math.pow(currentCenter.lng - center.lng, 2)
+          );
+          
+          // Only update if the change is significant (>100 meters roughly)
+          if (distance > 0.001) {
+            map.current.easeTo({
+              center: [center.lng, center.lat],
+              duration: 1200,
+              essential: true
+            });
+          }
         }
-      }, 100);
+      }, 500); // Longer debounce
 
       return () => clearTimeout(timeoutId);
-    }, [center?.lat, center?.lng]); // Only update when coordinates actually change
+    }, [
+      center?.lat?.toFixed(5), // Only update on significant coordinate changes
+      center?.lng?.toFixed(5)
+    ]);
 
     // Handle style changes separately without recreating the map
     const handleStyleChange = (style: MapStyle) => {
