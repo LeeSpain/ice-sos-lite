@@ -5,6 +5,7 @@ import { useLocationServices } from '@/hooks/useLocationServices';
 import { useEmergencySOS } from '@/hooks/useEmergencySOS';
 import { useEmergencyDisclaimer } from '@/hooks/useEmergencyDisclaimer';
 import { useEmergencyLocation } from '@/hooks/useEmergencyLocation';
+import { useLiveLocation } from '@/hooks/useLiveLocation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -31,7 +32,7 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
-import { useMapProvider } from '@/hooks/useMapProvider';
+import { useCanvasMap } from '@/hooks/useCanvasMap';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -68,7 +69,7 @@ const SOSAppPage = () => {
     acceptDisclaimer, 
     cancelDisclaimer 
   } = useEmergencyDisclaimer();
-  const { MapView } = useMapProvider();
+  const { MapView } = useCanvasMap();
   const { toast } = useToast();
   const navigate = useNavigate();
 

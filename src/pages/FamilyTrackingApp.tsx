@@ -17,7 +17,7 @@ import {
   Settings,
   UserPlus
 } from 'lucide-react';
-import { useMapProvider } from '@/hooks/useMapProvider';
+import { useCanvasMap } from '@/hooks/useCanvasMap';
 import { useCircleRealtime } from '@/hooks/useCircleRealtime';
 import { useBackgroundLocation } from '@/hooks/useBackgroundLocation';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
@@ -55,7 +55,7 @@ const FamilyTrackingApp = () => {
   const [showMap, setShowMap] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   
-  const { MapView } = useMapProvider();
+  const { MapView } = useCanvasMap();
   const { presences, circles, loadInitial } = useCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(isLocationEnabled);
 

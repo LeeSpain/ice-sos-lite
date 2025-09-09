@@ -1927,6 +1927,54 @@ export type Database = {
         }
         Relationships: []
       }
+      live_locations: {
+        Row: {
+          accuracy: number | null
+          battery_level: number | null
+          created_at: string
+          family_group_id: string | null
+          heading: number | null
+          id: string
+          last_seen: string
+          latitude: number
+          longitude: number
+          speed: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accuracy?: number | null
+          battery_level?: number | null
+          created_at?: string
+          family_group_id?: string | null
+          heading?: number | null
+          id?: string
+          last_seen?: string
+          latitude: number
+          longitude: number
+          speed?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accuracy?: number | null
+          battery_level?: number | null
+          created_at?: string
+          family_group_id?: string | null
+          heading?: number | null
+          id?: string
+          last_seen?: string
+          latitude?: number
+          longitude?: number
+          speed?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       live_presence: {
         Row: {
           battery: number | null
