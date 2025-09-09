@@ -4,6 +4,7 @@ import { useEmergencyContacts } from '@/hooks/useEmergencyContacts';
 import { useLocationServices } from '@/hooks/useLocationServices';
 import { useEmergencySOS } from '@/hooks/useEmergencySOS';
 import { useEmergencyDisclaimer } from '@/hooks/useEmergencyDisclaimer';
+import { useEmergencyLocation } from '@/hooks/useEmergencyLocation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -25,7 +26,8 @@ import {
   PhoneCall,
   MessageSquare,
   History,
-  Navigation
+  Navigation,
+  RefreshCw
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
@@ -57,8 +59,9 @@ interface ActiveIncident {
 const SOSAppPage = () => {
   const { user } = useAuth();
   const { contacts, loading: contactsLoading } = useEmergencyContacts();
-  const { permissionState, getCurrentLocationData } = useLocationServices();
+  const { permissionState } = useLocationServices();
   const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
+  const { currentLocation, isTracking, startTracking, stopTracking, refreshLocation, locationError } = useEmergencyLocation();
   const { 
     showDisclaimer, 
     requestDisclaimerAcceptance, 
@@ -78,7 +81,6 @@ const SOSAppPage = () => {
     battery: 85 // Mock battery level
   });
   const [activeIncident, setActiveIncident] = useState<ActiveIncident | null>(null);
-  const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   // Update emergency status
   useEffect(() => {
@@ -100,23 +102,11 @@ const SOSAppPage = () => {
     setEmergencyStatus(newStatus);
   }, [permissionState, contacts]);
 
-  // Get current location for map
+  // Start location tracking for emergency purposes
   useEffect(() => {
-    const getLocation = async () => {
-      try {
-        const locationData = await getCurrentLocationData();
-        if (locationData) {
-          setCurrentLocation({ lat: locationData.latitude, lng: locationData.longitude });
-        }
-      } catch (error) {
-        console.error('Failed to get location:', error);
-        // Use default location (NYC)
-        setCurrentLocation({ lat: 40.7589, lng: -73.9851 });
-      }
-    };
-
-    getLocation();
-  }, [getCurrentLocationData]);
+    startTracking();
+    return () => stopTracking();
+  }, [startTracking, stopTracking]);
 
   const handleEmergencyTrigger = async () => {
     if (!requestDisclaimerAcceptance()) {
@@ -188,17 +178,17 @@ const SOSAppPage = () => {
     }
   };
 
-  const mapMarkers = currentLocation ? [{
-    id: 'current-location',
-    lat: currentLocation.lat,
-    lng: currentLocation.lng,
-    render: () => (
-      <div className="relative">
-        <div className="w-4 h-4 bg-red-500 rounded-full border-2 border-white shadow-lg animate-pulse"></div>
-        <div className="absolute inset-0 w-4 h-4 bg-red-500/30 rounded-full animate-ping"></div>
-      </div>
-    )
-  }] : [];
+  // Memoize map markers to prevent unnecessary re-renders
+  const mapMarkers = React.useMemo(() => {
+    if (!currentLocation) return [];
+    
+    return [{
+      id: 'current-location',
+      lat: currentLocation.lat,
+      lng: currentLocation.lng,
+      render: () => null // We handle styling in the map hook
+    }];
+  }, [currentLocation]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-950 via-red-900 to-orange-900">
@@ -228,6 +218,12 @@ const SOSAppPage = () => {
               <Signal className="h-4 w-4" />
               <Battery className="h-4 w-4" />
               <span className="text-sm">{emergencyStatus.battery}%</span>
+              {isTracking && (
+                <div className="flex items-center gap-1 text-green-400">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs">Live</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -235,7 +231,17 @@ const SOSAppPage = () => {
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-6 border border-white/20">
             <div className="flex items-center justify-between mb-3">
               <span className="text-white font-medium">System Status</span>
-              {getStatusIcon(emergencyStatus.overall)}
+              <div className="flex items-center gap-2">
+                {getStatusIcon(emergencyStatus.overall)}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={refreshLocation}
+                  className="text-white/70 hover:text-white h-8 w-8 p-0"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-3 text-sm">
@@ -256,6 +262,12 @@ const SOSAppPage = () => {
                 <span>Battery: {emergencyStatus.battery}%</span>
               </div>
             </div>
+            
+            {locationError && (
+              <div className="mt-3 p-2 bg-yellow-500/20 border border-yellow-500/30 rounded text-yellow-200 text-xs">
+                {locationError}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -332,7 +344,10 @@ const SOSAppPage = () => {
                   <div className="flex items-center gap-2 mb-3 text-white">
                     <Navigation className="h-5 w-5" />
                     <span className="font-medium">Live Location</span>
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse ml-auto"></div>
+                    <div className="flex items-center gap-1 ml-auto">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-xs">Live</span>
+                    </div>
                   </div>
                   <div className="h-48 rounded-lg overflow-hidden">
                     <MapView
@@ -342,8 +357,9 @@ const SOSAppPage = () => {
                       zoom={15}
                     />
                   </div>
-                  <div className="mt-3 text-sm text-white/70">
-                    Accuracy: ±5 meters • Last updated: Now
+                  <div className="mt-3 text-sm text-white/70 flex justify-between">
+                    <span>Accuracy: ±{currentLocation.accuracy || 5}m</span>
+                    <span>Updated: {currentLocation.timestamp ? new Date(currentLocation.timestamp).toLocaleTimeString() : 'Now'}</span>
                   </div>
                 </div>
               )}
@@ -420,7 +436,7 @@ const SOSAppPage = () => {
         </div>
       </div>
 
-      {/* Quick Access Floating Button */}
+      {/* Quick Access Floating Buttons */}
       <Link to="/member-dashboard" className="fixed top-6 left-4 z-20">
         <Button variant="ghost" className="text-white/80 hover:text-white hover:bg-white/10">
           ← Dashboard

@@ -67,8 +67,9 @@ export function useMapProvider() {
       fetchMapboxToken();
     }, []);
 
+    // Initialize map only once
     useEffect(() => {
-      if (!mapContainer.current || !mapboxgl.accessToken) return;
+      if (!mapContainer.current || !mapboxgl.accessToken || map.current) return;
       
       // Calculate center from markers or use provided center
       const mapCenter = center || (markers.length > 0 ? {
@@ -88,11 +89,24 @@ export function useMapProvider() {
       map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
       return () => {
-        map.current?.remove();
+        if (map.current) {
+          map.current.remove();
+          map.current = null;
+        }
       };
-    }, [currentStyle]);
+    }, [mapboxgl.accessToken]); // Only depend on access token
 
-    // Handle style changes - wait for map to be ready before re-adding markers
+    // Update center when it changes without recreating the map
+    useEffect(() => {
+      if (!map.current || !center) return;
+      
+      map.current.easeTo({
+        center: [center.lng, center.lat],
+        duration: 1000
+      });
+    }, [center]);
+
+    // Handle style changes separately without recreating the map
     const handleStyleChange = (style: MapStyle) => {
       setCurrentStyle(style);
       if (map.current) {
@@ -100,37 +114,13 @@ export function useMapProvider() {
         
         // Re-add markers after style loads
         map.current.once('styledata', () => {
-          // Trigger marker re-render by updating the markers dependency
-          if (markers.length > 0) {
-            // Remove and re-add markers
-            markersRef.current.forEach(marker => marker.remove());
-            markersRef.current = [];
-            
-            markers.forEach(markerData => {
-              const el = document.createElement('div');
-              el.style.width = '40px';
-              el.style.height = '40px';
-              el.style.borderRadius = '50%';
-              el.style.cursor = 'pointer';
-              
-              const markerComponent = markerData.render();
-              if (markerComponent) {
-                el.innerHTML = '<div style="width: 40px; height: 40px; background: #3b82f6; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>';
-              }
-
-              const marker = new mapboxgl.Marker(el)
-                .setLngLat([markerData.lng, markerData.lat])
-                .addTo(map.current!);
-
-              markersRef.current.push(marker);
-            });
-          }
+          updateMapMarkers();
         });
       }
     };
 
-    // Update markers when they change or when map style changes
-    useEffect(() => {
+    // Create a stable function to update markers
+    const updateMapMarkers = React.useCallback(() => {
       if (!map.current) return;
 
       // Remove existing markers
@@ -141,17 +131,47 @@ export function useMapProvider() {
       markers.forEach(markerData => {
         // Create a DOM element for the marker
         const el = document.createElement('div');
-        el.style.width = '40px';
-        el.style.height = '40px';
-        el.style.borderRadius = '50%';
-        el.style.cursor = 'pointer';
+        el.className = 'emergency-marker';
+        el.style.cssText = `
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        `;
         
-        // Render the custom marker component
-        const markerComponent = markerData.render();
-        if (markerComponent) {
-          const tempDiv = document.createElement('div');
-          // This is a simplified approach - in production you'd want to use ReactDOM.render
-          el.innerHTML = '<div style="width: 40px; height: 40px; background: #3b82f6; border: 3px solid white; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.3);"></div>';
+        // Create emergency marker styling
+        if (markerData.id === 'current-location') {
+          el.innerHTML = `
+            <div style="
+              width: 16px;
+              height: 16px;
+              background: #ef4444;
+              border: 2px solid white;
+              border-radius: 50%;
+              box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+              animation: pulse 2s infinite;
+            "></div>
+            <style>
+              @keyframes pulse {
+                0%, 100% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.2); opacity: 0.8; }
+              }
+            </style>
+          `;
+        } else {
+          el.innerHTML = `
+            <div style="
+              width: 16px;
+              height: 16px;
+              background: #3b82f6;
+              border: 2px solid white;
+              border-radius: 50%;
+              box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+            "></div>
+          `;
         }
 
         const marker = new mapboxgl.Marker(el)
@@ -161,7 +181,7 @@ export function useMapProvider() {
         markersRef.current.push(marker);
       });
 
-      // Fit bounds to show all markers if there are any
+      // Fit bounds to show all markers if there are multiple
       if (markers.length > 1) {
         const bounds = new mapboxgl.LngLatBounds();
         markers.forEach(marker => {
@@ -169,7 +189,12 @@ export function useMapProvider() {
         });
         map.current.fitBounds(bounds, { padding: 50 });
       }
-    }, [markers, currentStyle]); // Added currentStyle to dependencies
+    }, [markers]);
+
+    // Update markers when they change
+    useEffect(() => {
+      updateMapMarkers();
+    }, [updateMapMarkers]);
 
     if (tokenError) {
       return (
