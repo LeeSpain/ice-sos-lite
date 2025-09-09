@@ -86,6 +86,7 @@ export const useLiveLocation = (familyGroupId?: string) => {
       // Get battery level if not provided
       const batteryLevel = locationData.battery_level ?? await getBatteryLevel();
 
+  // Use INSERT with ON CONFLICT DO UPDATE for proper upsert
       const { error } = await supabase
         .from('live_locations')
         .upsert({
@@ -100,8 +101,6 @@ export const useLiveLocation = (familyGroupId?: string) => {
           status: locationState.isTracking ? 'online' : 'idle',
           last_seen: new Date().toISOString(),
           updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id'
         });
 
       if (error) throw error;

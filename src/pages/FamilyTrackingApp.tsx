@@ -24,6 +24,7 @@ import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { getFamilyGroupId } from '@/utils/familyGroupUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import FamilyInviteQuickSetup from '@/components/family-dashboard/FamilyInviteQuickSetup';
 import { MemberPin } from '@/components/map/MemberPin';
@@ -74,29 +75,10 @@ const FamilyTrackingApp = () => {
     if (!user) return;
 
     try {
-      // First check if user is a family group owner
-      const { data: ownedGroup } = await supabase
-        .from('family_groups')
-        .select('id')
-        .eq('owner_user_id', user.id)
-        .single();
-
-      let groupId = ownedGroup?.id;
-
-      // If not owner, check if they're a member of a family group
-      if (!groupId) {
-        const { data: membership } = await supabase
-          .from('family_memberships')
-          .select('group_id')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .single();
-        
-        groupId = membership?.group_id;
-      }
+      // Get the user's family group ID using the utility function
+      const groupId = await getFamilyGroupId(user.id);
 
       if (!groupId) {
-        // Create a family group for demo purposes if none exists
         console.log('No family group found, creating demo data...');
         await createDemoFamilyData();
         return;
@@ -111,9 +93,7 @@ const FamilyTrackingApp = () => {
 
       // Add the owner to the list if they're not already included
       const allUserIds = new Set(memberships?.map(m => m.user_id) || []);
-      if (ownedGroup) {
-        allUserIds.add(user.id);
-      }
+      allUserIds.add(user.id); // Always include current user
 
       if (allUserIds.size > 0) {
         // Load profiles and presence data

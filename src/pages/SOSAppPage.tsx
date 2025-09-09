@@ -4,8 +4,8 @@ import { useEmergencyContacts } from '@/hooks/useEmergencyContacts';
 import { useLocationServices } from '@/hooks/useLocationServices';
 import { useEmergencySOS } from '@/hooks/useEmergencySOS';
 import { useEmergencyDisclaimer } from '@/hooks/useEmergencyDisclaimer';
-import { useEmergencyLocation } from '@/hooks/useEmergencyLocation';
 import { useLiveLocation } from '@/hooks/useLiveLocation';
+import { getFamilyGroupId } from '@/utils/familyGroupUtils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -62,20 +62,18 @@ const SOSAppPage = () => {
   const { contacts, loading: contactsLoading } = useEmergencyContacts();
   const { permissionState } = useLocationServices();
   const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
-  const { currentLocation, isTracking, startTracking, stopTracking, refreshLocation, locationError } = useEmergencyLocation();
-  
-  // Use demo family group ID for emergency purposes
-  const familyGroupId = 'emergency-demo-group';
+  const [familyGroupId, setFamilyGroupId] = useState<string | null>(null);
   
   const { 
     locations: liveLocations,
     locationState,
     metrics,
-    startTracking: startLiveTracking,
-    stopTracking: stopLiveTracking,
-    refreshLocation: refreshLiveLocation,
-    error: liveLocationError
-  } = useLiveLocation(familyGroupId);
+    startTracking,
+    stopTracking,
+    refreshLocation,
+    error: locationError,
+    getCurrentLocationData
+  } = useLiveLocation(familyGroupId || undefined);
   const { 
     showDisclaimer, 
     requestDisclaimerAcceptance, 
@@ -116,15 +114,27 @@ const SOSAppPage = () => {
     setEmergencyStatus(newStatus);
   }, [permissionState, contacts]);
 
+  // Initialize family group ID
+  useEffect(() => {
+    const initializeFamilyGroup = async () => {
+      if (user && !familyGroupId) {
+        const groupId = await getFamilyGroupId(user.id);
+        setFamilyGroupId(groupId);
+      }
+    };
+    
+    initializeFamilyGroup();
+  }, [user, familyGroupId]);
+
   // Start enhanced location tracking for emergency purposes
   useEffect(() => {
-    startTracking();
-    startLiveTracking({ highAccuracy: true, updateInterval: 10000 }); // 10s updates for emergency
-    return () => {
-      stopTracking();
-      stopLiveTracking();
-    };
-  }, [startTracking, stopTracking, startLiveTracking, stopLiveTracking]);
+    if (familyGroupId) {
+      startTracking({ highAccuracy: true, updateInterval: 10000 }); // 10s updates for emergency
+      return () => {
+        stopTracking();
+      };
+    }
+  }, [familyGroupId, startTracking, stopTracking]);
 
   const handleEmergencyTrigger = async () => {
     if (!requestDisclaimerAcceptance()) {
@@ -196,29 +206,30 @@ const SOSAppPage = () => {
     }
   };
 
+  // Get current location from live tracking
+  const currentLocation = getCurrentLocationData();
+
   // Stable map markers to prevent re-rendering loops
   const mapMarkers = React.useMemo(() => {
-    console.log('🗺️ SOS Page: Recalculating map markers, currentLocation:', currentLocation);
     const markers = [];
     
     // Add current emergency location marker
-    if (currentLocation?.lat && currentLocation?.lng) {
+    if (currentLocation?.latitude && currentLocation?.longitude) {
       const marker = {
         id: 'emergency-location',
-        lat: Number(currentLocation.lat.toFixed(6)),
-        lng: Number(currentLocation.lng.toFixed(6)),
+        lat: Number(currentLocation.latitude.toFixed(6)),
+        lng: Number(currentLocation.longitude.toFixed(6)),
         name: 'Emergency Location',
         isEmergency: true,
         status: 'online' as const,
         render: () => null
       };
-      console.log('🗺️ SOS Page: Adding emergency location marker:', marker);
       markers.push(marker);
     }
     
-    // Add live family member locations
+    // Add live family member locations (exclude own location to avoid duplication)
     liveLocations.forEach(location => {
-      if (location.user_id !== user?.id) { // Don't duplicate user's own location
+      if (location.user_id !== user?.id) {
         markers.push({
           id: `live-${location.user_id}`,
           lat: Number(location.latitude.toFixed(6)),
@@ -230,44 +241,12 @@ const SOSAppPage = () => {
       }
     });
     
-    // Add demo family markers if no live locations
-    if (liveLocations.length === 0) {
-      const baseLocation = currentLocation || { lat: 37.3881024, lng: -2.1417503 };
-      const familyMembers = [
-        { 
-          id: 'family-sarah', 
-          lat: Number((baseLocation.lat + 0.002).toFixed(6)), 
-          lng: Number((baseLocation.lng + 0.001).toFixed(6)), 
-          name: 'Sarah',
-          status: 'online' as const
-        },
-        { 
-          id: 'family-mike', 
-          lat: Number((baseLocation.lat - 0.001).toFixed(6)), 
-          lng: Number((baseLocation.lng - 0.002).toFixed(6)), 
-          name: 'Mike',
-          status: 'idle' as const
-        },
-      ];
-      
-      familyMembers.forEach(family => {
-        console.log('🗺️ SOS Page: Adding family marker:', family);
-        markers.push({
-          id: family.id,
-          lat: family.lat,
-          lng: family.lng,
-          name: family.name,
-          status: family.status,
-          render: () => null
-        });
-      });
-    }
-    
-    console.log('🗺️ SOS Page: Final markers array:', markers);
     return markers;
   }, [
-    currentLocation?.lat?.toFixed(6), // Only depend on rounded coordinates
-    currentLocation?.lng?.toFixed(6)
+    currentLocation?.latitude?.toFixed(6),
+    currentLocation?.longitude?.toFixed(6),
+    liveLocations,
+    user?.id
   ]);
 
   return (
@@ -298,7 +277,7 @@ const SOSAppPage = () => {
               <Signal className="h-4 w-4" />
               <Battery className="h-4 w-4" />
               <span className="text-sm">{emergencyStatus.battery}%</span>
-              {isTracking && (
+               {locationState.isTracking && (
                  <div className="flex items-center gap-1 text-emerald-400">
                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                   <span className="text-xs">Live</span>
@@ -316,10 +295,7 @@ const SOSAppPage = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={async () => {
-                    await refreshLocation();
-                    await refreshLiveLocation();
-                  }}
+                  onClick={refreshLocation}
                   className="text-white/70 hover:text-white h-8 w-8 p-0"
                 >
                   <RefreshCw className="h-4 w-4" />
@@ -349,9 +325,9 @@ const SOSAppPage = () => {
             </div>
             </div>
             
-            {(locationError || liveLocationError) && (
+            {locationError && (
               <div className="mt-3 p-2 bg-yellow-500/20 border border-yellow-500/30 rounded text-yellow-200 text-xs">
-                {locationError || liveLocationError}
+                {locationError}
               </div>
             )}
             
@@ -446,12 +422,7 @@ const SOSAppPage = () => {
                         <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                         <span className="text-xs">Live ({locationState.updateInterval/1000}s)</span>
                       </>
-                    ) : isTracking ? (
-                      <>
-                        <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                        <span className="text-xs">Emergency Only</span>
-                      </>
-                    ) : (
+                     ) : (
                       <>
                         <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
                         <span className="text-xs">Offline</span>
@@ -463,7 +434,7 @@ const SOSAppPage = () => {
                   <MapView
                     className="w-full h-full"
                     markers={mapMarkers}
-                    center={currentLocation || { lat: 51.505, lng: -0.09 }}
+                    center={currentLocation ? { lat: currentLocation.latitude, lng: currentLocation.longitude } : { lat: 37.3881024, lng: -2.1417503 }}
                     zoom={currentLocation ? 16 : 10}
                     showControls={true}
                     interactive={true}
@@ -477,8 +448,8 @@ const SOSAppPage = () => {
                     }
                   </span>
                   <span>
-                    {currentLocation?.timestamp 
-                      ? `Updated: ${new Date(currentLocation.timestamp).toLocaleTimeString()}` 
+                    {currentLocation?.last_seen 
+                      ? `Updated: ${new Date(currentLocation.last_seen).toLocaleTimeString()}` 
                       : 'Waiting for GPS...'
                     }
                   </span>
