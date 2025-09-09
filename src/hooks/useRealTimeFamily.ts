@@ -281,9 +281,9 @@ export function useRealTimeFamily(familyGroupId?: string) {
     const loadInitialData = async () => {
       try {
         // Load family presences
-        const { data: presenceData } = await supabase
+        const { data: presenceData } = await (supabase as any)
           .from('live_presence')
-          .select('*')
+          .select('user_id, lat, lng, last_seen, battery, is_paused')
           .eq('group_id', familyGroupId);
 
         if (presenceData) {
@@ -291,9 +291,9 @@ export function useRealTimeFamily(familyGroupId?: string) {
         }
 
         // Load recent alerts
-        const { data: alertData } = await supabase
+        const { data: alertData } = await (supabase as any)
           .from('sos_events')
-          .select('*')
+          .select('id, user_id, status, created_at')
           .eq('group_id', familyGroupId)
           .eq('status', 'active')
           .order('created_at', { ascending: false })
@@ -313,9 +313,9 @@ export function useRealTimeFamily(familyGroupId?: string) {
         }
 
         // Load recent notifications
-        const { data: notificationData } = await supabase
+        const { data: notificationData } = await (supabase as any)
           .from('family_notifications')
-          .select('*')
+          .select('id, sent_by, message_type, message, sent_at, delivered')
           .eq('client_id', user.id)
           .order('sent_at', { ascending: false })
           .limit(20);
