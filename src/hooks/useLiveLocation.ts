@@ -323,7 +323,7 @@ export const useLiveLocation = (familyGroupId?: string) => {
   // Fetch family locations
   const fetchLocations = useCallback(async () => {
     if (!familyGroupId) return;
-
+    
     try {
       const { data, error } = await supabase
         .from('live_locations')
@@ -331,14 +331,22 @@ export const useLiveLocation = (familyGroupId?: string) => {
         .eq('family_group_id', familyGroupId)
         .gte('last_seen', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()); // Last 24 hours
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error fetching locations:', error);
+        throw error;
+      }
+      
       setLocations((data || []).map(location => ({
         ...location,
         status: location.status as 'online' | 'idle' | 'offline'
       })));
+      setError(null); // Clear any previous errors
     } catch (error) {
       console.error('Failed to fetch locations:', error);
-      setError('Failed to fetch family locations');
+      // Only set error if it's not a network issue (which is common in preview mode)
+      if (!(error instanceof TypeError && error.message.includes('fetch'))) {
+        setError('Failed to fetch family locations');
+      }
     }
   }, [familyGroupId]);
 

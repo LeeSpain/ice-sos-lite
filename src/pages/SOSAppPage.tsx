@@ -85,6 +85,7 @@ const SOSAppPage = () => {
   const navigate = useNavigate();
 
   const [selectedTab, setSelectedTab] = useState('status');
+  const [selectedFamilyMember, setSelectedFamilyMember] = useState<string | null>(null);
   const [emergencyStatus, setEmergencyStatus] = useState<EmergencyStatus>({
     overall: 'ready',
     location: permissionState?.granted || false,
@@ -194,11 +195,11 @@ const SOSAppPage = () => {
       case 'status':
         // Stay on current tab
         break;
+      case 'family':
+        // Stay on current tab to show family list
+        break;
       case 'contacts':
         navigate('/member-dashboard/emergency-contacts');
-        break;
-      case 'history':
-        navigate('/member-dashboard/emergency-history');
         break;
       case 'settings':
         navigate('/member-dashboard/settings');
@@ -230,9 +231,14 @@ const SOSAppPage = () => {
       markers.push(marker);
     }
     
-    // Add live family member locations (exclude own location to avoid duplication)
+    // Add live family member locations (show only selected member or all if none selected)
     liveLocations.forEach(location => {
       if (location.user_id !== user?.id) {
+        // If a specific family member is selected, only show that one
+        if (selectedFamilyMember && location.user_id !== selectedFamilyMember) {
+          return;
+        }
+        
         markers.push({
           id: `live-${location.user_id}`,
           lat: Number(location.latitude.toFixed(6)),
@@ -248,9 +254,8 @@ const SOSAppPage = () => {
       }
     });
 
-    // Add emergency contacts as markers if they have shared location data
-    // For demo purposes, we'll place them near the user's location
-    if (currentLocation?.latitude && currentLocation?.longitude && contacts.length > 0) {
+    // Add emergency contacts as markers only if no family member is selected
+    if (!selectedFamilyMember && currentLocation?.latitude && currentLocation?.longitude && contacts.length > 0) {
       contacts.slice(0, 3).forEach((contact, index) => {
         // Simulate emergency contacts being nearby (in a real app, they'd have actual GPS coordinates)
         const offsetLat = (Math.random() - 0.5) * 0.01; // Random offset within ~1km
@@ -274,6 +279,7 @@ const SOSAppPage = () => {
     currentLocation?.longitude?.toFixed(6),
     liveLocations,
     contacts,
+    selectedFamilyMember,
     user?.id,
     user?.user_metadata?.full_name,
     user?.user_metadata?.avatar_url
@@ -464,8 +470,18 @@ const SOSAppPage = () => {
                   <MapView
                     className="w-full h-full"
                     markers={mapMarkers}
-                    center={currentLocation ? { lat: currentLocation.latitude, lng: currentLocation.longitude } : { lat: 37.3881024, lng: -2.1417503 }}
-                    zoom={currentLocation ? 16 : 10}
+                    center={(() => {
+                      // If a family member is selected, center on them
+                      if (selectedFamilyMember) {
+                        const familyLocation = liveLocations.find(l => l.user_id === selectedFamilyMember);
+                        if (familyLocation) {
+                          return { lat: familyLocation.latitude, lng: familyLocation.longitude };
+                        }
+                      }
+                      // Otherwise center on current user location
+                      return currentLocation ? { lat: currentLocation.latitude, lng: currentLocation.longitude } : { lat: 37.3881024, lng: -2.1417503 };
+                    })()}
+                    zoom={selectedFamilyMember ? 15 : (currentLocation ? 16 : 10)}
                     showControls={true}
                     interactive={true}
                   />
@@ -547,6 +563,54 @@ const SOSAppPage = () => {
               )}
             </div>
           )}
+
+          {selectedTab === 'family' && (
+            <div className="space-y-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                <div className="flex items-center justify-between mb-4 text-white">
+                  <span className="font-medium">Family Members</span>
+                  <Badge variant="secondary" className="bg-white/20 text-white">
+                    {liveLocations.filter(l => l.user_id !== user?.id).length} online
+                  </Badge>
+                </div>
+                <div className="space-y-3">
+                  {liveLocations.filter(l => l.user_id !== user?.id).map((location, index) => (
+                    <div key={location.user_id} className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm">
+                          {`M${index + 1}`}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="text-white font-medium text-sm">Family Member {index + 1}</div>
+                        <div className="text-white/60 text-xs">{location.status}</div>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        onClick={() => {
+                          setSelectedFamilyMember(selectedFamilyMember === location.user_id ? null : location.user_id);
+                          setSelectedTab('status'); // Go back to map view
+                        }}
+                        className={cn(
+                          "h-8 px-3 text-xs",
+                          selectedFamilyMember === location.user_id 
+                            ? "bg-blue-600 text-white" 
+                            : "bg-white/20 text-white hover:bg-white/30"
+                        )}
+                      >
+                        {selectedFamilyMember === location.user_id ? 'Hide' : 'Show on Map'}
+                      </Button>
+                    </div>
+                  ))}
+                  {liveLocations.filter(l => l.user_id !== user?.id).length === 0 && (
+                    <div className="text-center text-white/60 py-4">
+                      No family members online
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -555,8 +619,8 @@ const SOSAppPage = () => {
         <div className="flex items-center justify-around py-3 max-w-md mx-auto">
           {[
             { id: 'status', icon: Shield, label: 'Status' },
+            { id: 'family', icon: Users, label: 'Family' },
             { id: 'contacts', icon: Phone, label: 'Contacts' },
-            { id: 'history', icon: History, label: 'History' },
             { id: 'settings', icon: Settings, label: 'Settings' },
           ].map((tab) => (
             <button
