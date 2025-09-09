@@ -4748,6 +4748,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      upsert_live_location: {
+        Args: {
+          p_accuracy?: number
+          p_battery_level?: number
+          p_family_group_id: string
+          p_heading?: number
+          p_latitude: number
+          p_longitude: number
+          p_speed?: number
+          p_status?: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
