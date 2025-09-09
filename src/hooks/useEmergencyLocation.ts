@@ -33,10 +33,8 @@ export const useEmergencyLocation = (): UseEmergencyLocationReturn => {
     }
 
     try {
-      console.log('🔍 Emergency Location: Fetching location data...');
       setLocationError(null);
       const locationData = await getCurrentLocationData();
-      console.log('📍 Emergency Location: Raw location data:', locationData);
       
       if (locationData?.latitude && locationData?.longitude) {
         const newLocation: LocationData = {
@@ -46,7 +44,6 @@ export const useEmergencyLocation = (): UseEmergencyLocationReturn => {
           timestamp: new Date()
         };
         
-        console.log('📍 Emergency Location: Setting new location:', newLocation);
         // Update location - let the map handle stability
         setCurrentLocation(newLocation);
         return;
@@ -54,7 +51,7 @@ export const useEmergencyLocation = (): UseEmergencyLocationReturn => {
       
       throw new Error('No location data received');
     } catch (error) {
-      console.error('❌ Emergency Location: Failed to get location:', error);
+      console.error('Emergency Location: Failed to get location:', error);
       setLocationError('Failed to get current location');
       
       // Use default location only once if we don't have any location yet

@@ -43,8 +43,10 @@ export function useMapProvider() {
     const [tokenError, setTokenError] = useState<string | null>(null);
     const [currentStyle, setCurrentStyle] = useState<MapStyle>(MAP_STYLES[1]); // Default to terrain
 
-    // Fetch Mapbox token
+    // Fetch Mapbox token - singleton pattern to prevent multiple fetches
     useEffect(() => {
+      if (mapboxgl.accessToken) return; // Don't fetch if already set
+      
       const fetchMapboxToken = async () => {
         try {
           const { data, error } = await supabase.functions.invoke('get-mapbox-token');
@@ -59,15 +61,13 @@ export function useMapProvider() {
         } catch (error) {
           console.error('Failed to fetch Mapbox token:', error);
           setTokenError('Failed to load map token');
-          // Fallback to demo token for development
-          mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbTJ1NGRvN3UwM3d6MnNxcGhoOWJhd2ZwIn0.XSoLIv1rDp_bRgVS3KJ5-g';
         }
       };
       
       fetchMapboxToken();
-    }, []);
+    }, []); // Empty dependency array - fetch once only
 
-    // Initialize map only once
+    // Initialize map only once when token is available
     useEffect(() => {
       if (!mapContainer.current || !mapboxgl.accessToken || map.current) return;
       
@@ -75,18 +75,30 @@ export function useMapProvider() {
       const mapCenter = center || (markers.length > 0 ? {
         lat: markers.reduce((sum, m) => sum + m.lat, 0) / markers.length,
         lng: markers.reduce((sum, m) => sum + m.lng, 0) / markers.length
-      } : { lat: 51.505, lng: -0.09 });
+      } : { lat: 37.3838, lng: -2.1424 }); // Default to user's location
 
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: currentStyle.style,
-        center: [mapCenter.lng, mapCenter.lat],
-        zoom: zoom,
-        attributionControl: false
-      });
+      try {
+        map.current = new mapboxgl.Map({
+          container: mapContainer.current,
+          style: currentStyle.style,
+          center: [mapCenter.lng, mapCenter.lat],
+          zoom: zoom,
+          attributionControl: false,
+          preserveDrawingBuffer: true // Help with rendering issues
+        });
 
-      // Add navigation controls only
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        // Add navigation controls
+        map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+        // Wait for map to load before showing markers
+        map.current.on('load', () => {
+          updateMapMarkers();
+        });
+
+      } catch (error) {
+        console.error('Failed to initialize map:', error);
+        setTokenError('Map initialization failed');
+      }
 
       return () => {
         if (map.current) {
@@ -94,7 +106,7 @@ export function useMapProvider() {
           map.current = null;
         }
       };
-    }, [mapboxgl.accessToken]); // Only depend on access token
+    }, [mapboxgl.accessToken, currentStyle.style]); // Only reinit on token or style change
 
     // Update center when it changes - only once per significant change
     const centerKey = center ? `${center.lat.toFixed(4)}_${center.lng.toFixed(4)}` : null;
