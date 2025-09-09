@@ -130,31 +130,43 @@ export function useLovableAnalytics() {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
-        // Get ACTUAL page views from the last 30 days - FORCE FRESH DATA
-        const { data: pageViewData, error } = await supabase
+        // Use aggregate COUNT to avoid the 1,000-row cap
+        const { count: pageViewCount, error: pageViewCountError } = await supabase
           .from('homepage_analytics')
-          .select('session_id, event_data, created_at')
+          .select('id', { count: 'exact', head: true })
           .eq('event_type', 'page_view')
-          .gte('created_at', thirtyDaysAgo.toISOString())
-          .order('created_at', { ascending: false });
+          .gte('created_at', thirtyDaysAgo.toISOString());
 
-        if (error) {
-          console.error('Database error:', error);
-          throw error;
+        if (pageViewCountError) {
+          console.error('Database error (page view count):', pageViewCountError);
+          throw pageViewCountError;
         }
 
-        const actualPageViews = pageViewData?.length || 0;
-        const actualUniqueVisitors = new Set(pageViewData?.map(item => item.session_id) || []).size;
+        // Fetch session_ids in a wide range to compute unique visitors client-side
+        const { data: sessionsData, error: sessionsError } = await supabase
+          .from('homepage_analytics')
+          .select('session_id')
+          .eq('event_type', 'page_view')
+          .gte('created_at', thirtyDaysAgo.toISOString())
+          .not('session_id', 'is', null)
+          .order('session_id', { ascending: true })
+          .range(0, 49999);
+
+        if (sessionsError) {
+          console.error('Database error (sessions fetch):', sessionsError);
+          throw sessionsError;
+        }
+
+        const actualPageViews = typeof pageViewCount === 'number' ? pageViewCount : 0;
+        const actualUniqueVisitors = new Set((sessionsData || []).map(item => item.session_id)).size;
         const actualSessions = actualUniqueVisitors;
 
-        console.log('📊 FRESH Analytics Data:', {
+        console.log('📊 FRESH Analytics Data (aggregated):', {
           actualPageViews,
           actualUniqueVisitors,
           actualSessions,
-          totalRecords: pageViewData?.length,
+          sessionsFetched: sessionsData?.length || 0,
           timestamp: new Date().toISOString(),
-          firstRecord: pageViewData?.[0]?.created_at,
-          lastRecord: pageViewData?.[pageViewData.length - 1]?.created_at
         });
 
         return {
@@ -212,7 +224,8 @@ export function useTopPages() {
           .from('homepage_analytics')
           .select('event_data, page_context')
           .eq('event_type', 'page_view')
-          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+          .range(0, 99999);
 
         if (error) throw error;
 
@@ -260,7 +273,8 @@ export function useCustomEvents() {
         const { data: eventData, error } = await supabase
           .from('homepage_analytics')
           .select('event_type, created_at')
-          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+          .range(0, 99999);
 
         if (error) throw error;
 
@@ -328,6 +342,7 @@ export function useRealTimeActiveUsers() {
           .from('homepage_analytics')
           .select('session_id, page_context, created_at')
           .gte('created_at', oneHourAgo.toISOString())
+          .range(0, 99999)
           .order('created_at', { ascending: false });
 
         if (error) throw error;

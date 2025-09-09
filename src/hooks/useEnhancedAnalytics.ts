@@ -31,7 +31,8 @@ export function useEnhancedTrafficSources() {
           .from('homepage_analytics')
           .select('event_data')
           .eq('event_type', 'page_view')
-          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+          .range(0, 99999);
 
         if (error) throw error;
 
@@ -90,7 +91,8 @@ export function useEnhancedDeviceData() {
           .from('homepage_analytics')
           .select('event_data')
           .eq('event_type', 'page_view')
-          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+          .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+          .range(0, 99999);
 
         if (error) throw error;
 
@@ -146,6 +148,7 @@ export function useSessionMetrics() {
           .from('homepage_analytics')
           .select('session_id, created_at, event_type')
           .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .range(0, 99999)
           .order('created_at', { ascending: true });
 
         if (error) throw error;

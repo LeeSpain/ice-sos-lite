@@ -36,7 +36,8 @@ export function useGeographicAnalytics(timeRange = '90d') {
         .from('homepage_analytics')
         .select('event_data, session_id')
         .gte('created_at', startDate.toISOString())
-        .eq('event_type', 'page_view');
+        .eq('event_type', 'page_view')
+        .range(0, 99999);
 
       if (error) throw error;
 
@@ -93,7 +94,8 @@ export function usePopupAnalytics(timeRange = '7d') {
           'trial_popup_shown',
           'trial_signup_completed',
           'trial_popup_dismissed'
-        ]);
+        ])
+        .range(0, 99999);
 
       if (error) throw error;
 
@@ -179,7 +181,8 @@ export function useInteractionAnalytics(timeRange = '7d') {
         .from('homepage_analytics')
         .select('event_type, event_data, page_context, created_at')
         .gte('created_at', startDate.toISOString())
-        .neq('event_type', 'page_view');
+        .neq('event_type', 'page_view')
+        .range(0, 99999);
 
       if (error) throw error;
 
@@ -230,6 +233,7 @@ export function useHourlyAnalytics() {
         .from('homepage_analytics')
         .select('created_at, event_type, event_data')
         .gte('created_at', startDate.toISOString())
+        .range(0, 99999)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
