@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEmergencyContacts } from '@/hooks/useEmergencyContacts';
 import { useLocationServices } from '@/hooks/useLocationServices';
@@ -126,15 +126,15 @@ const SOSAppPage = () => {
     initializeFamilyGroup();
   }, [user, familyGroupId]);
 
-  // Start enhanced location tracking for emergency purposes
+  // Initialize location tracking once for emergency purposes
+  const trackingInitialized = useRef(false);
+  
   useEffect(() => {
-    if (familyGroupId) {
+    if (familyGroupId && !trackingInitialized.current) {
+      trackingInitialized.current = true;
       startTracking({ highAccuracy: true, updateInterval: 10000 }); // 10s updates for emergency
-      return () => {
-        stopTracking();
-      };
     }
-  }, [familyGroupId, startTracking, stopTracking]);
+  }, [familyGroupId]);
 
   const handleEmergencyTrigger = async () => {
     if (!requestDisclaimerAcceptance()) {

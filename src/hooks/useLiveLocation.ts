@@ -55,6 +55,8 @@ export const useLiveLocation = (familyGroupId?: string) => {
   const updateIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const lastLocationRef = useRef<GeolocationPosition | null>(null);
   const metricsRef = useRef({ attempts: 0, successes: 0, accuracySum: 0 });
+  const trackingStartedRef = useRef(false);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Get battery level
   const getBatteryLevel = useCallback(async (): Promise<number | undefined> => {
@@ -98,7 +100,7 @@ export const useLiveLocation = (familyGroupId?: string) => {
           heading: locationData.heading,
           speed: locationData.speed,
           battery_level: batteryLevel,
-          status: locationState.isTracking ? 'online' : 'idle',
+          status: 'online', // Always online when actively updating location
           last_seen: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
@@ -125,7 +127,7 @@ export const useLiveLocation = (familyGroupId?: string) => {
       setError(error instanceof Error ? error.message : 'Failed to update location');
       return false;
     }
-  }, [user, familyGroupId, locationState.isTracking, getBatteryLevel]);
+  }, [user, familyGroupId, getBatteryLevel]);
 
   // Get current position and update location
   const getCurrentPosition = useCallback((): Promise<GeolocationPosition> => {
@@ -162,10 +164,17 @@ export const useLiveLocation = (familyGroupId?: string) => {
       return false;
     }
 
-    if (locationState.isTracking) {
-      console.log('Location tracking already active');
+    // Prevent multiple simultaneous starts with debouncing
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    if (trackingStartedRef.current || locationState.isTracking) {
+      console.log('Location tracking already active or starting');
       return true;
     }
+
+    trackingStartedRef.current = true;
 
     try {
       // Update location state
@@ -236,14 +245,19 @@ export const useLiveLocation = (familyGroupId?: string) => {
       }, newState.updateInterval);
 
       setError(null);
-      toast({
-        title: "Live Tracking Started",
-        description: `High-precision tracking active (${newState.updateInterval/1000}s updates)`,
-      });
+      
+      // Debounced success notification to prevent spam
+      debounceTimeoutRef.current = setTimeout(() => {
+        toast({
+          title: "Live Tracking Started",
+          description: `High-precision tracking active (${newState.updateInterval/1000}s updates)`,
+        });
+      }, 1000);
 
       return true;
     } catch (error) {
       console.error('Failed to start tracking:', error);
+      trackingStartedRef.current = false;
       setLocationState(prev => ({ ...prev, isTracking: false }));
       setError(error instanceof Error ? error.message : 'Failed to start tracking');
       toast({
@@ -253,13 +267,19 @@ export const useLiveLocation = (familyGroupId?: string) => {
       });
       return false;
     }
-  }, [user, getCurrentPosition, updateLocation, toast, locationState.isTracking]);
+  }, [user, getCurrentPosition, updateLocation, toast]);
 
-  // Stop tracking with cleanup
-  const stopTracking = useCallback(async () => {
+  // Stop tracking with cleanup - only when explicitly requested
+  const stopTracking = useCallback(async (explicit = false) => {
     if (!user) return;
 
     try {
+      // Clear debounce timeout
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = null;
+      }
+
       // Clear intervals and watchers
       if (watchId.current) {
         navigator.geolocation.clearWatch(watchId.current);
@@ -271,23 +291,28 @@ export const useLiveLocation = (familyGroupId?: string) => {
         updateIntervalRef.current = null;
       }
 
-      // Update database status
-      const { error } = await supabase
-        .from('live_locations')
-        .update({
-          status: 'offline',
-          last_seen: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', user.id);
+      trackingStartedRef.current = false;
 
-      if (error) throw error;
+      // Only set offline status if explicitly stopped by user
+      if (explicit) {
+        const { error } = await supabase
+          .from('live_locations')
+          .update({
+            status: 'offline',
+            last_seen: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Live Tracking Stopped",
+          description: "Location sharing has been disabled"
+        });
+      }
 
       setLocationState(prev => ({ ...prev, isTracking: false }));
-      toast({
-        title: "Live Tracking Stopped",
-        description: "Location sharing has been disabled"
-      });
 
     } catch (error) {
       console.error('Failed to stop tracking:', error);
@@ -355,6 +380,10 @@ export const useLiveLocation = (familyGroupId?: string) => {
       if (updateIntervalRef.current) {
         clearInterval(updateIntervalRef.current);
       }
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+      trackingStartedRef.current = false;
     };
   }, []);
 
