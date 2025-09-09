@@ -305,15 +305,21 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     }));
   }, [center, zoom]);
 
-  // Update center when prop changes
+  // Update center when prop changes (only if significantly different)
   useEffect(() => {
-    setViewport(prev => ({
-      ...prev,
-      centerLat: center.lat,
-      centerLng: center.lng,
-      zoom
-    }));
-  }, [center.lat, center.lng, zoom]);
+    const latDiff = Math.abs(viewport.centerLat - center.lat);
+    const lngDiff = Math.abs(viewport.centerLng - center.lng);
+    
+    // Only update if center changed significantly (> 0.001 degrees ~ 100m)
+    if (latDiff > 0.001 || lngDiff > 0.001 || viewport.zoom !== zoom) {
+      setViewport(prev => ({
+        ...prev,
+        centerLat: center.lat,
+        centerLng: center.lng,
+        zoom
+      }));
+    }
+  }, [center.lat, center.lng, zoom, viewport.centerLat, viewport.centerLng, viewport.zoom]);
 
   // Update canvas size with high DPI support
   useEffect(() => {

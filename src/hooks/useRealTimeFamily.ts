@@ -236,8 +236,8 @@ export function useRealTimeFamily(familyGroupId?: string) {
         {
           event: '*',
           schema: 'public',
-          table: 'live_presence',
-          filter: `group_id=eq.${familyGroupId}`
+          table: 'live_locations',
+          filter: `family_group_id=eq.${familyGroupId}`
         },
         handlePresenceUpdate
       )
@@ -280,14 +280,37 @@ export function useRealTimeFamily(familyGroupId?: string) {
 
     const loadInitialData = async () => {
       try {
-        // Load family presences
-        const { data: presenceData } = await (supabase as any)
-          .from('live_presence')
-          .select('user_id, lat, lng, last_seen, battery, is_paused')
-          .eq('group_id', familyGroupId);
+        // Load family presences from live_locations
+        const { data: presenceData } = await supabase
+          .from('live_locations')
+          .select('user_id, latitude, longitude, last_seen, battery_level, status')
+          .eq('family_group_id', familyGroupId)
+          .order('last_seen', { ascending: false });
 
         if (presenceData) {
-          setPresences(presenceData.map(p => ({ ...p, status: getPresenceStatus(p) })));
+          // Convert to FamilyPresence format and get unique users only
+          const uniqueUsers = new Map();
+          presenceData.forEach(p => {
+            if (!uniqueUsers.has(p.user_id) || new Date(p.last_seen) > new Date(uniqueUsers.get(p.user_id).last_seen)) {
+              uniqueUsers.set(p.user_id, {
+                user_id: p.user_id,
+                lat: p.latitude,
+                lng: p.longitude,
+                last_seen: p.last_seen,
+                battery: p.battery_level,
+                is_paused: p.status === 'paused',
+                status: getPresenceStatus({
+                  user_id: p.user_id,
+                  lat: p.latitude,
+                  lng: p.longitude,
+                  last_seen: p.last_seen,
+                  battery: p.battery_level,
+                  is_paused: p.status === 'paused'
+                })
+              });
+            }
+          });
+          setPresences(Array.from(uniqueUsers.values()));
         }
 
         // Load recent alerts

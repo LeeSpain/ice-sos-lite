@@ -461,7 +461,7 @@ const SOSAppPage = () => {
                     <span>Family Connected:</span>
                     <div className="flex items-center gap-1">
                       <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
-                      <span>{liveLocations.length || 2} members online</span>
+                      <span>{liveLocations.filter(l => l.status === 'online').length || 1} members online</span>
                     </div>
                   </div>
                   {locationState.isTracking && (
