@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFamilyMembers } from '@/hooks/useFamilyMembers';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
@@ -6,11 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Users, MessageSquare, Shield, ChevronDown, ChevronUp, Battery, Clock, CheckCircle2, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { MapPin, Users, MessageSquare, Shield, ChevronDown, ChevronUp, Battery, Clock, CheckCircle2, AlertTriangle, Bell } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
 import { useMapProvider } from '@/hooks/useMapProvider';
 import FamilyMarker from '@/components/map/FamilyMarker';
+import { useEmergencySOS } from '@/hooks/useEmergencySOS';
+import { useEmergencyDisclaimer } from '@/hooks/useEmergencyDisclaimer';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 interface FamilyLocationData {
@@ -30,10 +34,61 @@ const FamilyAppPage = () => {
   const { data: familyRole } = useFamilyRole();
   const { data: familyData, isLoading } = useFamilyMembers(familyRole?.familyGroupId);
   const { MapView } = useMapProvider();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
+  const { 
+    showDisclaimer, 
+    requestDisclaimerAcceptance, 
+    acceptDisclaimer, 
+    cancelDisclaimer 
+  } = useEmergencyDisclaimer();
+  
   const [bottomSheetExpanded, setBottomSheetExpanded] = useState(false);
   const [selectedTab, setSelectedTab] = useState('location');
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   const activeFamilyMembers = familyData?.members?.filter(member => member.status === 'active') || [];
+
+  // Load unread notifications count
+  React.useEffect(() => {
+    if (!user) return;
+    
+    const loadNotificationsCount = async () => {
+      try {
+        const { data } = await supabase
+          .from('family_alerts')
+          .select('id')
+          .eq('family_user_id', user.id)
+          .neq('status', 'read');
+        
+        setUnreadNotifications(data?.length || 0);
+      } catch (error) {
+        console.error('Error loading notifications count:', error);
+      }
+    };
+
+    loadNotificationsCount();
+    
+    // Real-time updates for notifications
+    const channel = supabase
+      .channel('family-notification-count')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'family_alerts',
+          filter: `family_user_id=eq.${user.id}`
+        },
+        () => loadNotificationsCount()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
 
   // Generate mock location data for family members (excluding Emma)
   const generateFamilyLocations = (): FamilyLocationData[] => {
@@ -95,6 +150,62 @@ const FamilyAppPage = () => {
     }
   };
 
+  const handleTabNavigation = (tabId: string) => {
+    setSelectedTab(tabId);
+    
+    switch (tabId) {
+      case 'location':
+        // Stay on current page
+        break;
+      case 'safety':
+        navigate('/family-dashboard/emergency-map');
+        break;
+      case 'membership':
+        navigate('/family-dashboard/profile');
+        break;
+      case 'communication':
+        navigate('/family-dashboard/notifications');
+        break;
+    }
+  };
+
+  const handleCheckIn = async () => {
+    try {
+      // Send check-in notification to family
+      await supabase.functions.invoke('family-sos-alerts', {
+        body: {
+          alert_type: 'family_check_in',
+          message: 'Family member has checked in safely',
+          user_name: user?.user_metadata?.first_name || 'Family Member'
+        }
+      });
+      
+      toast({
+        title: "Check-in Sent",
+        description: "Family has been notified of your safe check-in",
+      });
+    } catch (error) {
+      console.error('Check-in failed:', error);
+      toast({
+        title: "Check-in Failed",
+        description: "Could not send check-in notification",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEmergencySOS = async () => {
+    if (!requestDisclaimerAcceptance()) {
+      return; // Disclaimer will be shown
+    }
+    
+    try {
+      await triggerEmergencySOS();
+    } catch (error) {
+      // Error is already handled by the hook
+    }
+  };
+
   return (
     <div className="relative h-screen overflow-hidden bg-background">
       <SEO 
@@ -134,19 +245,19 @@ const FamilyAppPage = () => {
       <div className="absolute bottom-24 left-4 right-4 z-20 flex gap-3 max-w-md mx-auto">
         <Button 
           className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg"
-          onClick={() => {/* Handle check in */}}
+          onClick={handleCheckIn}
         >
           <CheckCircle2 className="h-5 w-5 mr-2" />
           Check In
         </Button>
-        <Link to="/sos-app" className="flex-1">
-          <Button 
-            className="w-full h-12 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Set Up SOS
-          </Button>
-        </Link>
+        <Button 
+          className="flex-1 h-12 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg"
+          onClick={handleEmergencySOS}
+          disabled={isTriggering}
+        >
+          <AlertTriangle className="h-5 w-5 mr-2" />
+          {isTriggering ? 'Sending SOS...' : 'Emergency SOS'}
+        </Button>
       </div>
 
       {/* Bottom Sheet */}
@@ -256,27 +367,71 @@ const FamilyAppPage = () => {
       <div className="absolute bottom-0 left-0 right-0 z-40 bg-background border-t">
         <div className="flex items-center justify-around py-2 max-w-md mx-auto">
           {[
-            { id: 'location', icon: MapPin, label: 'Location', active: true },
-            { id: 'driving', icon: MessageSquare, label: 'Driving', active: false },
-            { id: 'safety', icon: Shield, label: 'Safety', active: false },
-            { id: 'membership', icon: Users, label: 'Membership', active: false },
+            { id: 'location', icon: MapPin, label: 'Location' },
+            { id: 'communication', icon: MessageSquare, label: 'Communication', badge: unreadNotifications },
+            { id: 'safety', icon: Shield, label: 'Safety' },
+            { id: 'membership', icon: Users, label: 'Membership' },
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setSelectedTab(tab.id)}
+              onClick={() => handleTabNavigation(tab.id)}
               className={cn(
-                "flex flex-col items-center py-2 px-3 rounded-lg transition-colors min-w-0",
+                "relative flex flex-col items-center py-2 px-3 rounded-lg transition-colors min-w-0",
                 selectedTab === tab.id 
                   ? "text-primary bg-primary/10" 
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <tab.icon className="h-5 w-5 mb-1" />
+              <div className="relative">
+                <tab.icon className="h-5 w-5 mb-1" />
+                {tab.badge && tab.badge > 0 && (
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                    {tab.badge > 9 ? '9+' : tab.badge}
+                  </div>
+                )}
+              </div>
               <span className="text-xs truncate">{tab.label}</span>
             </button>
           ))}
         </div>
       </div>
+      
+      {/* Emergency Disclaimer Dialog */}
+      {showDisclaimer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-background p-6 rounded-lg max-w-md mx-4 space-y-4">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="h-6 w-6 text-red-500" />
+              <h2 className="text-xl font-bold">Emergency SOS Disclaimer</h2>
+            </div>
+            <div className="space-y-3 text-sm">
+              <p>This feature will:</p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                <li>Send emergency notifications to your family members</li>
+                <li>Share your current location</li>
+                <li>Alert emergency contacts you have configured</li>
+              </ul>
+              <p className="text-red-600 font-medium">
+                This is for real emergencies only. Do not use if you need immediate emergency services - call 911 directly.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={cancelDisclaimer} className="flex-1">
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  acceptDisclaimer();
+                  handleEmergencySOS();
+                }} 
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                I Understand, Send SOS
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
