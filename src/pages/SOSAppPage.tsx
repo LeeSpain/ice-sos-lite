@@ -1,39 +1,21 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEmergencySOS } from '@/hooks/useEmergencySOS';
-import { useEmergencyDisclaimer } from '@/hooks/useEmergencyDisclaimer';
 import { useEmergencyContacts } from '@/hooks/useEmergencyContacts';
+import { useLocationServices } from '@/hooks/useLocationServices';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, Shield, Phone, MapPin, Settings, Users } from 'lucide-react';
+import { Shield, Phone, MapPin, Settings, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
-import { EmergencyDisclaimerModal } from '@/components/emergency/EmergencyDisclaimerModal';
+import EmergencyButton from '@/components/sos-app/EmergencyButton';
 
 const SOSAppPage = () => {
   const { user } = useAuth();
-  const { triggerEmergencySOS, isTriggering, locationPermissionGranted } = useEmergencySOS();
-  const { 
-    showDisclaimer, 
-    requestDisclaimerAcceptance, 
-    acceptDisclaimer, 
-    cancelDisclaimer 
-  } = useEmergencyDisclaimer();
   const { contacts, loading: contactsLoading } = useEmergencyContacts();
+  const { permissionState } = useLocationServices();
 
-  const handleSOSActivation = async () => {
-    // Check disclaimer first
-    if (!requestDisclaimerAcceptance()) {
-      return; // Disclaimer modal will show
-    }
-
-    try {
-      await triggerEmergencySOS();
-    } catch (error) {
-      console.error('SOS activation failed:', error);
-    }
-  };
+  const locationPermissionGranted = permissionState?.granted;
 
   const getStatusColor = () => {
     if (!locationPermissionGranted) return 'destructive';
@@ -97,26 +79,8 @@ const SOSAppPage = () => {
         </Card>
 
         {/* Main SOS Button */}
-        <div className="relative">
-          <div className="absolute inset-0 bg-red-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
-          <Button
-            onClick={handleSOSActivation}
-            disabled={isTriggering}
-            className="relative w-full h-32 rounded-full bg-red-600 hover:bg-red-700 text-white text-xl font-bold shadow-2xl transform transition-all duration-200 hover:scale-105 active:scale-95"
-          >
-            {isTriggering ? (
-              <div className="flex flex-col items-center gap-2">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-                <span className="text-lg">Activating...</span>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-2">
-                <AlertTriangle className="h-12 w-12" />
-                <span>EMERGENCY SOS</span>
-                <span className="text-sm font-normal">Hold for 3 seconds</span>
-              </div>
-            )}
-          </Button>
+        <div className="flex justify-center">
+          <EmergencyButton />
         </div>
 
         {/* Quick Actions */}
@@ -164,22 +128,19 @@ const SOSAppPage = () => {
         )}
 
         {/* Navigation */}
-        <div className="pt-4">
-          <Link to="/member-dashboard">
+        <div className="flex gap-4">
+          <Link to="/member-dashboard" className="flex-1">
             <Button variant="ghost" className="w-full text-white hover:bg-white/10">
-              ← Back to Dashboard
+              ← Dashboard
+            </Button>
+          </Link>
+          <Link to="/family-app" className="flex-1">
+            <Button variant="outline" className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20">
+              Family Tracker
             </Button>
           </Link>
         </div>
       </div>
-
-      {/* Emergency Disclaimer Modal */}
-      <EmergencyDisclaimerModal
-        isOpen={showDisclaimer}
-        onAccept={acceptDisclaimer}
-        onCancel={cancelDisclaimer}
-        subscriptionTier="basic"
-      />
     </div>
   );
 };

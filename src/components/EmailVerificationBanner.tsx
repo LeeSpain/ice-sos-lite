@@ -22,7 +22,7 @@ const EmailVerificationBanner = () => {
         type: 'signup',
         email: user.email!,
         options: {
-          emailRedirectTo: `${window.location.origin}/sos`
+          emailRedirectTo: `${window.location.origin}/sos-app`
         }
       });
 

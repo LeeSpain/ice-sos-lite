@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFamilyMembers } from '@/hooks/useFamilyMembers';
+import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Users, AlertTriangle, MessageCircle, Shield, Settings, Map } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SEO from '@/components/SEO';
+import FamilyLocationMap from '@/components/family-app/FamilyLocationMap';
+import EmergencyAlertSystem from '@/components/family-app/EmergencyAlertSystem';
 
 const FamilyAppPage = () => {
   const { user } = useAuth();
-  const { data: familyData, isLoading } = useFamilyMembers();
+  const { data: familyRole } = useFamilyRole();
+  const { data: familyData, isLoading } = useFamilyMembers(familyRole?.familyGroupId);
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
 
   const activeFamilyMembers = familyData?.members?.filter(member => member.status === 'active') || [];
@@ -189,11 +193,22 @@ const FamilyAppPage = () => {
           </CardContent>
         </Card>
 
-        {/* Settings Link */}
+        {/* Family Location Map */}
+        <FamilyLocationMap />
+
+        {/* Emergency Alert System */}
+        <EmergencyAlertSystem />
+
+        {/* Navigation Links */}
         <div className="flex gap-4">
           <Link to="/family-dashboard" className="flex-1">
             <Button variant="ghost" className="w-full text-white hover:bg-white/10">
               ← Family Dashboard
+            </Button>
+          </Link>
+          <Link to="/sos-app" className="flex-1">
+            <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
+              Emergency SOS
             </Button>
           </Link>
           <Link to="/family-dashboard/settings">
