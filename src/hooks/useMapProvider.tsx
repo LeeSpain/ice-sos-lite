@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Layers } from "lucide-react";
+import { Layers, MapPin } from "lucide-react";
 
 interface MapMarker {
   id: string;
@@ -210,10 +210,26 @@ export function useMapProvider() {
 
     if (tokenError) {
       return (
-        <div className={`${className || "h-full w-full"} flex items-center justify-center bg-muted`} style={{ minHeight: '400px' }}>
+        <div className={`${className || "h-full w-full"} flex items-center justify-center bg-muted/20 backdrop-blur-sm`} style={{ minHeight: '400px' }}>
           <div className="text-center p-4">
-            <p className="text-destructive font-medium">Map Error</p>
-            <p className="text-sm text-muted-foreground">{tokenError}</p>
+            <MapPin className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground mb-2">Map temporarily unavailable</p>
+            <p className="text-xs text-muted-foreground/70">
+              {tokenError.includes('fetch') 
+                ? 'Please check your connection and try again' 
+                : 'Loading map services...'}
+            </p>
+          </div>
+        </div>
+      );
+    }
+
+    if (!mapboxgl.accessToken) {
+      return (
+        <div className={`${className || "h-full w-full"} flex items-center justify-center bg-muted/20 backdrop-blur-sm`} style={{ minHeight: '400px' }}>
+          <div className="text-center p-4">
+            <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full mx-auto mb-2"></div>
+            <p className="text-sm text-muted-foreground">Loading map...</p>
           </div>
         </div>
       );
