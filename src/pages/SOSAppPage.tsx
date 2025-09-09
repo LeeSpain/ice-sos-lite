@@ -143,19 +143,19 @@ const SOSAppPage = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'ready': return <CheckCircle2 className="h-5 w-5 text-green-500" />;
-      case 'warning': return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+      case 'ready': return <CheckCircle2 className="h-5 w-5 text-emerald-500" />;
+      case 'warning': return <AlertTriangle className="h-5 w-5 text-amber-500" />;
       case 'error': return <AlertTriangle className="h-5 w-5 text-red-500" />;
-      default: return <CheckCircle2 className="h-5 w-5 text-gray-400" />;
+      default: return <CheckCircle2 className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ready': return 'bg-green-500';
-      case 'warning': return 'bg-yellow-500';
+      case 'ready': return 'bg-emerald-500';
+      case 'warning': return 'bg-amber-500';
       case 'error': return 'bg-red-500';
-      default: return 'bg-gray-400';
+      default: return 'bg-muted';
     }
   };
 
@@ -219,8 +219,8 @@ const SOSAppPage = () => {
               <Battery className="h-4 w-4" />
               <span className="text-sm">{emergencyStatus.battery}%</span>
               {isTracking && (
-                <div className="flex items-center gap-1 text-green-400">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                 <div className="flex items-center gap-1 text-emerald-400">
+                   <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                   <span className="text-xs">Live</span>
                 </div>
               )}
@@ -345,7 +345,7 @@ const SOSAppPage = () => {
                     <Navigation className="h-5 w-5" />
                     <span className="font-medium">Live Location</span>
                     <div className="flex items-center gap-1 ml-auto">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                       <span className="text-xs">Live</span>
                     </div>
                   </div>
@@ -436,18 +436,6 @@ const SOSAppPage = () => {
         </div>
       </div>
 
-      {/* Quick Access Floating Buttons */}
-      <Link to="/member-dashboard" className="fixed top-6 left-4 z-20">
-        <Button variant="ghost" className="text-white/80 hover:text-white hover:bg-white/10">
-          ← Dashboard
-        </Button>
-      </Link>
-
-      <Link to="/family-app" className="fixed top-6 right-4 z-20">
-        <Button variant="ghost" className="text-white/80 hover:text-white hover:bg-white/10">
-          Family →
-        </Button>
-      </Link>
 
       {/* Emergency Disclaimer Modal */}
       <EmergencyDisclaimerModal
