@@ -55,13 +55,20 @@ const AnalyticsPage = () => {
   const [timeRange, setTimeRange] = useState('30d');
   const queryClient = useQueryClient();
 
-  // COMPLETELY DISABLE ALL REAL-TIME UPDATES TO STOP INFINITE LOOP
+  // Enable real-time updates with proper refresh intervals
   useEffect(() => {
-    console.log('🔄 ANALYTICS DASHBOARD: Real-time updates DISABLED');
-    // No subscriptions, no invalidations, no updates
+    console.log('🔄 ANALYTICS DASHBOARD: Real-time updates ENABLED');
+    
+    // Set up auto-refresh every 5 minutes
+    const refreshInterval = setInterval(() => {
+      setLastUpdated(new Date());
+      console.log('🔄 Auto-refresh triggered');
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(refreshInterval);
   }, []);
 
-  // Stable initialization - no cache invalidation needed
+  // Stable initialization 
   const isInitialized = useRef(false);
   useEffect(() => {
     if (!isInitialized.current) {
@@ -69,7 +76,6 @@ const AnalyticsPage = () => {
       isInitialized.current = true;
     }
   }, []);
-  
   // Real-time data hooks - stable loading without loops
   const { data: realTimeData, isLoading: isRealTimeLoading, error: realTimeError } = useRealTimeAnalytics();
   const { data: lovableData, isLoading: isLovableLoading, error: lovableError } = useLovableAnalytics();
