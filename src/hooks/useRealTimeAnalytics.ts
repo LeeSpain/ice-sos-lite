@@ -115,8 +115,8 @@ export function useRealTimeAnalytics() {
         };
       }
     },
-    refetchInterval: false, // DISABLE automatic refetching
-    staleTime: Infinity, // Data never becomes stale
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
     refetchIntervalInBackground: false,
   });
 }
@@ -164,8 +164,8 @@ export function useLovableAnalytics() {
         };
       }
     },
-    refetchInterval: false, // DISABLE automatic refetching
-    staleTime: Infinity, // Data never becomes stale 
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
     refetchIntervalInBackground: false,
   });
 }
@@ -236,8 +236,8 @@ export function useTopPages() {
         ];
       }
     },
-    refetchInterval: false, // DISABLE automatic refetching
-    staleTime: Infinity, // Data never becomes stale
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
     refetchIntervalInBackground: false,
   });
 }
@@ -301,8 +301,8 @@ export function useCustomEvents() {
         ];
       }
     },
-    refetchInterval: false, // DISABLE automatic refetching
-    staleTime: Infinity, // Data never becomes stale
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
     refetchIntervalInBackground: false,
   });
 }
@@ -364,8 +364,8 @@ export function useRealTimeActiveUsers() {
         };
       }
     },
-    refetchInterval: false, // DISABLE automatic refetching
-    staleTime: Infinity, // Data never becomes stale
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
     refetchIntervalInBackground: false,
   });
 }

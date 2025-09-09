@@ -40,24 +40,37 @@ export function useGeographicAnalytics(timeRange = '90d') {
 
       if (error) throw error;
 
-      // Return sample Netherlands data since actual location data isn't being captured
-      // This represents the expected Netherlands data mentioned by the user
-      return [
-        { country: 'Spain', region: 'Andalusia', city: 'Albox', visitors: 12, pageViews: 18 },
-        { country: 'Australia', region: 'Queensland', city: 'Brisbane', visitors: 8, pageViews: 12 },
-        { country: 'United States', region: 'California', city: 'Los Angeles', visitors: 7, pageViews: 10 },
-        { country: 'United Kingdom', region: 'England', city: 'London', visitors: 6, pageViews: 9 },
-        { country: 'Netherlands', region: 'Overijssel', city: 'Hardenberg', visitors: 6, pageViews: 8 },
-        { country: 'Germany', region: 'Bavaria', city: 'Munich', visitors: 4, pageViews: 6 },
-        { country: 'France', region: 'Île-de-France', city: 'Paris', visitors: 3, pageViews: 5 }
-      ].filter(location => {
-        // Filter by time range for realistic data simulation
-        const multiplier = days === 1 ? 0.1 : days === 7 ? 0.3 : days === 30 ? 0.7 : days === 60 ? 0.9 : 1;
-        return Math.random() < multiplier || location.country === 'Netherlands'; // Always show Netherlands
+      // Process real geographic data from analytics
+      const locationData: Record<string, { visitors: Set<string>, pageViews: number }> = {};
+      
+      data?.forEach(record => {
+        const sessionId = record.session_id;
+        const eventData = record.event_data as any;
+        
+        // For now, since we don't have actual location data, we'll aggregate session-based data
+        // This shows real visitor activity rather than mock data
+        const location = 'Unknown Location';
+        
+        if (!locationData[location]) {
+          locationData[location] = { visitors: new Set(), pageViews: 0 };
+        }
+        
+        if (sessionId) {
+          locationData[location].visitors.add(sessionId);
+        }
+        locationData[location].pageViews += 1;
       });
+
+      return Object.entries(locationData).map(([location, data]) => ({
+        country: 'Unknown',
+        region: 'Unknown',
+        city: location,
+        visitors: data.visitors.size,
+        pageViews: data.pageViews
+      }));
     },
-    refetchInterval: false, // DISABLE to stop infinite loop
-    staleTime: Infinity, // Never refetch automatically
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
   });
 }
 

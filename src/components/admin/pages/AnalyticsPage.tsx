@@ -86,10 +86,30 @@ const AnalyticsPage = () => {
 
   const isLoading = isRealTimeLoading || isLovableLoading || isTrafficLoading || isDeviceLoading || isSessionLoading || isGeographicLoading || isPopupLoading || isInteractionLoading || isHourlyLoading || isTopPagesLoading || isCustomEventsLoading || isActiveUsersLoading;
 
-  // SIMPLIFIED refresh function - minimal invalidations only
+  // Enhanced refresh function - invalidate all analytics queries
   const refreshAllData = useCallback(async () => {
     setLastUpdated(new Date());
-    console.log('✅ Manual refresh triggered');
+    await queryClient.invalidateQueries({ 
+      predicate: (query) => {
+        const key = query.queryKey[0] as string;
+        return [
+          'real-time-analytics',
+          'lovable-analytics', 
+          'enhanced-traffic-sources',
+          'enhanced-device-data',
+          'session-metrics',
+          'geographic-analytics',
+          'popup-analytics',
+          'interaction-analytics',
+          'hourly-analytics',
+          'top-pages',
+          'custom-events',
+          'real-time-active-users',
+          'family-analytics'
+        ].includes(key);
+      }
+    });
+    console.log('✅ All analytics data refreshed');
   }, []);
 
   const MetricCard = ({ 

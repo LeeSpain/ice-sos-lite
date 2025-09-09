@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { useQueryClient } from '@tanstack/react-query';
 import { 
   Users, MessageSquare, TrendingUp, Target, AlertTriangle, DollarSign, 
   Monitor, Smartphone, Tablet, Globe, Search, Share2, ArrowUpRight, 
   ArrowDownRight, Shield, Phone, Video, Activity, Clock, MousePointer,
-  Zap, Eye, PlayCircle, UserCheck, Calendar, Bell
+  Zap, Eye, PlayCircle, UserCheck, Calendar, Bell, RefreshCw
 } from 'lucide-react';
 import { useRealTimeAnalytics } from '@/hooks/useRealTimeAnalytics';
 import { useFamilyAnalytics } from '@/hooks/useFamilyAnalytics';
@@ -91,6 +93,9 @@ const MetricCard: React.FC<MetricCardProps> = ({
 };
 
 export default function DashboardOverview() {
+  const queryClient = useQueryClient();
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+
   // Real-time analytics hooks
   const { data: realTimeMetrics, isLoading: metricsLoading } = useRealTimeAnalytics();
   const { data: videoAnalytics, isLoading: videoLoading } = useVideoAnalytics();
@@ -101,6 +106,29 @@ export default function DashboardOverview() {
   const { data: customEvents, isLoading: eventsLoading } = useCustomEvents();
   const { data: activeUsers, isLoading: activeLoading } = useRealTimeActiveUsers();
   const { data: familyMetrics, isLoading: familyLoading } = useFamilyAnalytics();
+
+  // Refresh function
+  const refreshAllData = useCallback(async () => {
+    setLastUpdated(new Date());
+    await queryClient.invalidateQueries({ 
+      predicate: (query) => {
+        const key = query.queryKey[0] as string;
+        return [
+          'real-time-analytics',
+          'lovable-analytics', 
+          'enhanced-traffic-sources',
+          'enhanced-device-data',
+          'session-metrics',
+          'top-pages',
+          'custom-events',
+          'real-time-active-users',
+          'family-analytics',
+          'video-analytics'
+        ].includes(key);
+      }
+    });
+    console.log('✅ Dashboard data refreshed');
+  }, [queryClient]);
 
   console.log('📊 DashboardOverview rendering with real-time data');
 
@@ -140,9 +168,20 @@ export default function DashboardOverview() {
             Comprehensive analytics and insights for ICE SOS Platform
           </p>
         </div>
-        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-          <Activity className="h-4 w-4" />
-          <span>Live • Last updated {new Date().toLocaleTimeString()}</span>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <Activity className="h-4 w-4" />
+            <span>Live • Last updated {lastUpdated.toLocaleTimeString()}</span>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={refreshAllData}
+            className="flex items-center space-x-2"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Refresh</span>
+          </Button>
         </div>
       </div>
 
