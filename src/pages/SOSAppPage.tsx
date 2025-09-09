@@ -57,6 +57,7 @@ interface ActiveIncident {
 }
 
 const SOSAppPage = () => {
+  console.log('🔄 SOS Page: Component render');
   const { user } = useAuth();
   const { contacts, loading: contactsLoading } = useEmergencyContacts();
   const { permissionState } = useLocationServices();
@@ -180,16 +181,19 @@ const SOSAppPage = () => {
 
   // Stable map markers to prevent re-rendering loops
   const mapMarkers = React.useMemo(() => {
+    console.log('🗺️ SOS Page: Recalculating map markers, currentLocation:', currentLocation);
     const markers = [];
     
     // Add current location marker if available - use stable reference
     if (currentLocation?.lat && currentLocation?.lng) {
-      markers.push({
+      const marker = {
         id: 'emergency-location',
         lat: Number(currentLocation.lat.toFixed(6)), // Round to prevent micro-changes
         lng: Number(currentLocation.lng.toFixed(6)),
         render: () => null
-      });
+      };
+      console.log('🗺️ SOS Page: Adding emergency location marker:', marker);
+      markers.push(marker);
     }
     
     // Add stable family member markers for emergency context
@@ -210,6 +214,7 @@ const SOSAppPage = () => {
     ];
     
     familyMembers.forEach(family => {
+      console.log('🗺️ SOS Page: Adding family marker:', family);
       markers.push({
         id: family.id,
         lat: family.lat,
@@ -218,6 +223,7 @@ const SOSAppPage = () => {
       });
     });
     
+    console.log('🗺️ SOS Page: Final markers array:', markers);
     return markers;
   }, [
     currentLocation?.lat?.toFixed(6), // Only depend on rounded coordinates

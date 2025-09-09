@@ -98,7 +98,11 @@ export function useMapProvider() {
 
     // Update center when it changes - heavily debounced and stable
     useEffect(() => {
-      if (!map.current || !center?.lat || !center?.lng) return;
+      console.log('🗺️ Map Provider: Center update effect triggered, center:', center);
+      if (!map.current || !center?.lat || !center?.lng) {
+        console.log('🗺️ Map Provider: Skipping center update - missing map or center');
+        return;
+      }
       
       // Use a longer timeout to prevent rapid updates and check for significant changes
       const timeoutId = setTimeout(() => {
@@ -109,13 +113,18 @@ export function useMapProvider() {
             Math.pow(currentCenter.lng - center.lng, 2)
           );
           
+          console.log('🗺️ Map Provider: Distance from current center:', distance);
+          
           // Only update if the change is significant (>100 meters roughly)
           if (distance > 0.001) {
+            console.log('🗺️ Map Provider: Updating map center to:', [center.lng, center.lat]);
             map.current.easeTo({
               center: [center.lng, center.lat],
               duration: 1200,
               essential: true
             });
+          } else {
+            console.log('🗺️ Map Provider: Skipping center update - change too small');
           }
         }
       }, 500); // Longer debounce
@@ -213,7 +222,9 @@ export function useMapProvider() {
 
     // Update markers when they change - debounced to prevent flashing
     useEffect(() => {
+      console.log('🗺️ Map Provider: Markers update effect triggered, markers:', markers);
       const timeoutId = setTimeout(() => {
+        console.log('🗺️ Map Provider: Executing updateMapMarkers');
         updateMapMarkers();
       }, 150);
       
