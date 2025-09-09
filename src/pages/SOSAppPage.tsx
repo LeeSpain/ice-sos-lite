@@ -63,6 +63,19 @@ const SOSAppPage = () => {
   const { permissionState } = useLocationServices();
   const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
   const { currentLocation, isTracking, startTracking, stopTracking, refreshLocation, locationError } = useEmergencyLocation();
+  
+  // Use demo family group ID for emergency purposes
+  const familyGroupId = 'emergency-demo-group';
+  
+  const { 
+    locations: liveLocations,
+    locationState,
+    metrics,
+    startTracking: startLiveTracking,
+    stopTracking: stopLiveTracking,
+    refreshLocation: refreshLiveLocation,
+    error: liveLocationError
+  } = useLiveLocation(familyGroupId);
   const { 
     showDisclaimer, 
     requestDisclaimerAcceptance, 
@@ -103,11 +116,15 @@ const SOSAppPage = () => {
     setEmergencyStatus(newStatus);
   }, [permissionState, contacts]);
 
-  // Start location tracking for emergency purposes
+  // Start enhanced location tracking for emergency purposes
   useEffect(() => {
     startTracking();
-    return () => stopTracking();
-  }, [startTracking, stopTracking]);
+    startLiveTracking({ highAccuracy: true, updateInterval: 10000 }); // 10s updates for emergency
+    return () => {
+      stopTracking();
+      stopLiveTracking();
+    };
+  }, [startTracking, stopTracking, startLiveTracking, stopLiveTracking]);
 
   const handleEmergencyTrigger = async () => {
     if (!requestDisclaimerAcceptance()) {
@@ -184,44 +201,67 @@ const SOSAppPage = () => {
     console.log('🗺️ SOS Page: Recalculating map markers, currentLocation:', currentLocation);
     const markers = [];
     
-    // Add current location marker if available - use stable reference
+    // Add current emergency location marker
     if (currentLocation?.lat && currentLocation?.lng) {
       const marker = {
         id: 'emergency-location',
-        lat: Number(currentLocation.lat.toFixed(6)), // Round to prevent micro-changes
+        lat: Number(currentLocation.lat.toFixed(6)),
         lng: Number(currentLocation.lng.toFixed(6)),
+        name: 'Emergency Location',
+        isEmergency: true,
+        status: 'online' as const,
         render: () => null
       };
       console.log('🗺️ SOS Page: Adding emergency location marker:', marker);
       markers.push(marker);
     }
     
-    // Add stable family member markers for emergency context
-    const baseLocation = currentLocation || { lat: 37.3881024, lng: -2.1417503 };
-    const familyMembers = [
-      { 
-        id: 'family-sarah', 
-        lat: Number((baseLocation.lat + 0.002).toFixed(6)), 
-        lng: Number((baseLocation.lng + 0.001).toFixed(6)), 
-        name: 'Sarah' 
-      },
-      { 
-        id: 'family-mike', 
-        lat: Number((baseLocation.lat - 0.001).toFixed(6)), 
-        lng: Number((baseLocation.lng - 0.002).toFixed(6)), 
-        name: 'Mike' 
-      },
-    ];
-    
-    familyMembers.forEach(family => {
-      console.log('🗺️ SOS Page: Adding family marker:', family);
-      markers.push({
-        id: family.id,
-        lat: family.lat,
-        lng: family.lng,
-        render: () => null
-      });
+    // Add live family member locations
+    liveLocations.forEach(location => {
+      if (location.user_id !== user?.id) { // Don't duplicate user's own location
+        markers.push({
+          id: `live-${location.user_id}`,
+          lat: Number(location.latitude.toFixed(6)),
+          lng: Number(location.longitude.toFixed(6)),
+          name: `Family Member`,
+          status: location.status,
+          render: () => null
+        });
+      }
     });
+    
+    // Add demo family markers if no live locations
+    if (liveLocations.length === 0) {
+      const baseLocation = currentLocation || { lat: 37.3881024, lng: -2.1417503 };
+      const familyMembers = [
+        { 
+          id: 'family-sarah', 
+          lat: Number((baseLocation.lat + 0.002).toFixed(6)), 
+          lng: Number((baseLocation.lng + 0.001).toFixed(6)), 
+          name: 'Sarah',
+          status: 'online' as const
+        },
+        { 
+          id: 'family-mike', 
+          lat: Number((baseLocation.lat - 0.001).toFixed(6)), 
+          lng: Number((baseLocation.lng - 0.002).toFixed(6)), 
+          name: 'Mike',
+          status: 'idle' as const
+        },
+      ];
+      
+      familyMembers.forEach(family => {
+        console.log('🗺️ SOS Page: Adding family marker:', family);
+        markers.push({
+          id: family.id,
+          lat: family.lat,
+          lng: family.lng,
+          name: family.name,
+          status: family.status,
+          render: () => null
+        });
+      });
+    }
     
     console.log('🗺️ SOS Page: Final markers array:', markers);
     return markers;
@@ -276,7 +316,10 @@ const SOSAppPage = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={refreshLocation}
+                  onClick={async () => {
+                    await refreshLocation();
+                    await refreshLiveLocation();
+                  }}
                   className="text-white/70 hover:text-white h-8 w-8 p-0"
                 >
                   <RefreshCw className="h-4 w-4" />
@@ -285,27 +328,41 @@ const SOSAppPage = () => {
             </div>
             
             <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="flex items-center gap-2 text-white/80">
-                <MapPin className="h-4 w-4" />
-                <span>Location: {emergencyStatus.location ? 'Active' : 'Disabled'}</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/80">
-                <Users className="h-4 w-4" />
-                <span>Contacts: {emergencyStatus.contacts}</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/80">
-                <Wifi className="h-4 w-4" />
-                <span>Network: {emergencyStatus.network ? 'Connected' : 'Offline'}</span>
-              </div>
-              <div className="flex items-center gap-2 text-white/80">
-                <Battery className="h-4 w-4" />
-                <span>Battery: {emergencyStatus.battery}%</span>
-              </div>
+            <div className="flex items-center gap-2 text-white/80">
+              <MapPin className="h-4 w-4" />
+              <span>Location: {emergencyStatus.location ? 'Active' : 'Disabled'}</span>
+              {locationState.isTracking && (
+                <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse ml-1"></div>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-white/80">
+              <Users className="h-4 w-4" />
+              <span>Contacts: {emergencyStatus.contacts}</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/80">
+              <Wifi className="h-4 w-4" />
+              <span>Network: {emergencyStatus.network ? 'Connected' : 'Offline'}</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/80">
+              <Battery className="h-4 w-4" />
+              <span>Battery: {emergencyStatus.battery}%</span>
+            </div>
             </div>
             
-            {locationError && (
+            {(locationError || liveLocationError) && (
               <div className="mt-3 p-2 bg-yellow-500/20 border border-yellow-500/30 rounded text-yellow-200 text-xs">
-                {locationError}
+                {locationError || liveLocationError}
+              </div>
+            )}
+            
+            {/* Live tracking metrics */}
+            {locationState.isTracking && metrics.totalUpdates > 0 && (
+              <div className="mt-3 text-xs text-white/60">
+                <div className="flex justify-between">
+                  <span>Updates: {metrics.totalUpdates}</span>
+                  <span>Success: {metrics.successRate}%</span>
+                  <span>Avg Accuracy: ±{metrics.averageAccuracy}m</span>
+                </div>
               </div>
             )}
           </div>
@@ -384,15 +441,20 @@ const SOSAppPage = () => {
                   <Navigation className="h-5 w-5" />
                   <span className="font-medium">Live Location</span>
                   <div className="flex items-center gap-1 ml-auto">
-                    {isTracking ? (
+                    {locationState.isTracking ? (
                       <>
                         <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <span className="text-xs">Live</span>
+                        <span className="text-xs">Live ({locationState.updateInterval/1000}s)</span>
+                      </>
+                    ) : isTracking ? (
+                      <>
+                        <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
+                        <span className="text-xs">Emergency Only</span>
                       </>
                     ) : (
                       <>
-                        <div className="w-2 h-2 bg-amber-500 rounded-full"></div>
-                        <span className="text-xs">Connecting...</span>
+                        <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+                        <span className="text-xs">Offline</span>
                       </>
                     )}
                   </div>
@@ -401,8 +463,10 @@ const SOSAppPage = () => {
                   <MapView
                     className="w-full h-full"
                     markers={mapMarkers}
-                    center={currentLocation || { lat: 51.505, lng: -0.09 }} // Fallback to London if no location
-                    zoom={currentLocation ? 15 : 10}
+                    center={currentLocation || { lat: 51.505, lng: -0.09 }}
+                    zoom={currentLocation ? 16 : 10}
+                    showControls={true}
+                    interactive={true}
                   />
                 </div>
                 <div className="mt-3 text-sm text-white/70 flex justify-between">
@@ -426,9 +490,14 @@ const SOSAppPage = () => {
                     <span>Family Connected:</span>
                     <div className="flex items-center gap-1">
                       <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full"></div>
-                      <span>2 members online</span>
+                      <span>{liveLocations.length || 2} members online</span>
                     </div>
                   </div>
+                  {locationState.isTracking && (
+                    <div className="mt-1 text-xs text-white/60">
+                      High-precision mode • {locationState.highAccuracyMode ? 'GPS' : 'Network'} tracking
+                    </div>
+                  )}
                 </div>
               </div>
 

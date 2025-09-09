@@ -14,12 +14,14 @@ interface MapViewProps {
   center?: { lat: number; lng: number };
   zoom?: number;
   onMapReady?: () => void;
+  showControls?: boolean;
+  interactive?: boolean;
 }
 
 export const useCanvasMap = () => {
   // Memoize the MapView component to prevent unnecessary re-renders
   const MapView = useMemo(() => {
-    return ({ className, markers = [], center, zoom = 13, onMapReady }: MapViewProps) => {
+    return ({ className, markers = [], center, zoom = 13, onMapReady, showControls = true, interactive = true }: MapViewProps) => {
       return (
         <CanvasMap
           className={className}
@@ -27,6 +29,8 @@ export const useCanvasMap = () => {
           center={center}
           zoom={zoom}
           onMapReady={onMapReady}
+          showControls={showControls}
+          interactive={interactive}
         />
       );
     };

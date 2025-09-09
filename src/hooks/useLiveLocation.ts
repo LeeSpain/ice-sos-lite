@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -19,14 +19,57 @@ interface LiveLocationData {
   updated_at: string;
 }
 
+interface LocationState {
+  isTracking: boolean;
+  highAccuracyMode: boolean;
+  updateInterval: number;
+  backgroundSync: boolean;
+}
+
+interface LocationMetrics {
+  totalUpdates: number;
+  successRate: number;
+  averageAccuracy: number;
+  lastSuccessfulUpdate: string | null;
+}
+
 export const useLiveLocation = (familyGroupId?: string) => {
   const [locations, setLocations] = useState<LiveLocationData[]>([]);
-  const [isTracking, setIsTracking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [locationState, setLocationState] = useState<LocationState>({
+    isTracking: false,
+    highAccuracyMode: true,
+    updateInterval: 15000, // 15 seconds for high precision
+    backgroundSync: true
+  });
+  const [metrics, setMetrics] = useState<LocationMetrics>({
+    totalUpdates: 0,
+    successRate: 100,
+    averageAccuracy: 0,
+    lastSuccessfulUpdate: null
+  });
+  
   const { user } = useAuth();
   const { toast } = useToast();
+  const watchId = useRef<number | null>(null);
+  const updateIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const lastLocationRef = useRef<GeolocationPosition | null>(null);
+  const metricsRef = useRef({ attempts: 0, successes: 0, accuracySum: 0 });
 
-  // Update user's location
+  // Get battery level
+  const getBatteryLevel = useCallback(async (): Promise<number | undefined> => {
+    try {
+      if ('getBattery' in navigator) {
+        const battery = await (navigator as any).getBattery();
+        return Math.round(battery.level * 100);
+      }
+    } catch (error) {
+      console.warn('Battery API not available:', error);
+    }
+    return undefined;
+  }, []);
+
+  // Update location with enhanced tracking
   const updateLocation = useCallback(async (locationData: {
     latitude: number;
     longitude: number;
@@ -34,10 +77,15 @@ export const useLiveLocation = (familyGroupId?: string) => {
     heading?: number;
     speed?: number;
     battery_level?: number;
-  }) => {
-    if (!user) return;
+  }, isManual = false) => {
+    if (!user) return false;
+
+    metricsRef.current.attempts++;
 
     try {
+      // Get battery level if not provided
+      const batteryLevel = locationData.battery_level ?? await getBatteryLevel();
+
       const { error } = await supabase
         .from('live_locations')
         .upsert({
@@ -48,8 +96,8 @@ export const useLiveLocation = (familyGroupId?: string) => {
           accuracy: locationData.accuracy,
           heading: locationData.heading,
           speed: locationData.speed,
-          battery_level: locationData.battery_level,
-          status: 'online',
+          battery_level: batteryLevel,
+          status: locationState.isTracking ? 'online' : 'idle',
           last_seen: new Date().toISOString(),
           updated_at: new Date().toISOString()
         }, {
@@ -57,11 +105,28 @@ export const useLiveLocation = (familyGroupId?: string) => {
         });
 
       if (error) throw error;
+
+      // Update metrics
+      metricsRef.current.successes++;
+      if (locationData.accuracy) {
+        metricsRef.current.accuracySum += locationData.accuracy;
+      }
+
+      setMetrics(prev => ({
+        totalUpdates: prev.totalUpdates + 1,
+        successRate: Math.round((metricsRef.current.successes / metricsRef.current.attempts) * 100),
+        averageAccuracy: Math.round(metricsRef.current.accuracySum / metricsRef.current.successes),
+        lastSuccessfulUpdate: new Date().toISOString()
+      }));
+
+      setError(null);
+      return true;
     } catch (error) {
       console.error('Failed to update location:', error);
-      setError('Failed to update location');
+      setError(error instanceof Error ? error.message : 'Failed to update location');
+      return false;
     }
-  }, [user, familyGroupId]);
+  }, [user, familyGroupId, locationState.isTracking, getBatteryLevel]);
 
   // Get current position and update location
   const getCurrentPosition = useCallback((): Promise<GeolocationPosition> => {
@@ -83,65 +148,131 @@ export const useLiveLocation = (familyGroupId?: string) => {
     });
   }, []);
 
-  // Start live tracking
-  const startTracking = useCallback(async () => {
+  // Enhanced location tracking with watch position
+  const startTracking = useCallback(async (options?: {
+    highAccuracy?: boolean;
+    updateInterval?: number;
+    backgroundSync?: boolean;
+  }) => {
     if (!user) {
       toast({
         title: "Authentication Required",
         description: "Please log in to start location tracking",
         variant: "destructive"
       });
-      return;
+      return false;
+    }
+
+    if (locationState.isTracking) {
+      console.log('Location tracking already active');
+      return true;
     }
 
     try {
-      // Get initial position
-      const position = await getCurrentPosition();
-      
-      // Get battery level if available
-      let batteryLevel;
-      if ('getBattery' in navigator) {
-        try {
-          const battery = await (navigator as any).getBattery();
-          batteryLevel = Math.round(battery.level * 100);
-        } catch (e) {
-          // Battery API not supported
-        }
-      }
+      // Update location state
+      const newState = {
+        isTracking: true,
+        highAccuracyMode: options?.highAccuracy ?? true,
+        updateInterval: options?.updateInterval ?? 15000,
+        backgroundSync: options?.backgroundSync ?? true
+      };
+      setLocationState(newState);
 
-      await updateLocation({
+      // Get initial position with high accuracy
+      const position = await getCurrentPosition();
+      lastLocationRef.current = position;
+
+      const success = await updateLocation({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         accuracy: position.coords.accuracy,
         heading: position.coords.heading || undefined,
         speed: position.coords.speed || undefined,
-        battery_level: batteryLevel
-      });
+      }, true);
 
-      setIsTracking(true);
+      if (!success) {
+        throw new Error('Failed to initialize location tracking');
+      }
+
+      // Start continuous tracking with watchPosition
+      if (navigator.geolocation && newState.highAccuracyMode) {
+        watchId.current = navigator.geolocation.watchPosition(
+          async (position) => {
+            lastLocationRef.current = position;
+            await updateLocation({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+              heading: position.coords.heading || undefined,
+              speed: position.coords.speed || undefined,
+            });
+          },
+          (error) => {
+            console.error('Watch position error:', error);
+            setError(`Location tracking error: ${error.message}`);
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 10000,
+            timeout: 30000
+          }
+        );
+      }
+
+      // Fallback periodic updates
+      updateIntervalRef.current = setInterval(async () => {
+        try {
+          const position = await getCurrentPosition();
+          lastLocationRef.current = position;
+          await updateLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            heading: position.coords.heading || undefined,
+            speed: position.coords.speed || undefined,
+          });
+        } catch (error) {
+          console.error('Periodic location update failed:', error);
+        }
+      }, newState.updateInterval);
+
       setError(null);
-
       toast({
-        title: "Location Tracking Started",
-        description: "Your location is now being shared with family members"
+        title: "Live Tracking Started",
+        description: `High-precision tracking active (${newState.updateInterval/1000}s updates)`,
       });
 
+      return true;
     } catch (error) {
       console.error('Failed to start tracking:', error);
+      setLocationState(prev => ({ ...prev, isTracking: false }));
       setError(error instanceof Error ? error.message : 'Failed to start tracking');
       toast({
         title: "Location Access Required",
-        description: "Please enable location access to use live tracking",
+        description: "Please enable location access for live tracking",
         variant: "destructive"
       });
+      return false;
     }
-  }, [user, getCurrentPosition, updateLocation, toast]);
+  }, [user, getCurrentPosition, updateLocation, toast, locationState.isTracking]);
 
-  // Stop tracking
+  // Stop tracking with cleanup
   const stopTracking = useCallback(async () => {
     if (!user) return;
 
     try {
+      // Clear intervals and watchers
+      if (watchId.current) {
+        navigator.geolocation.clearWatch(watchId.current);
+        watchId.current = null;
+      }
+      
+      if (updateIntervalRef.current) {
+        clearInterval(updateIntervalRef.current);
+        updateIntervalRef.current = null;
+      }
+
+      // Update database status
       const { error } = await supabase
         .from('live_locations')
         .update({
@@ -153,10 +284,10 @@ export const useLiveLocation = (familyGroupId?: string) => {
 
       if (error) throw error;
 
-      setIsTracking(false);
+      setLocationState(prev => ({ ...prev, isTracking: false }));
       toast({
-        title: "Location Tracking Stopped",
-        description: "Your location is no longer being shared"
+        title: "Live Tracking Stopped",
+        description: "Location sharing has been disabled"
       });
 
     } catch (error) {
@@ -216,48 +347,82 @@ export const useLiveLocation = (familyGroupId?: string) => {
     };
   }, [familyGroupId, fetchLocations]);
 
-  // Set up periodic location updates when tracking
+  // Cleanup on unmount
   useEffect(() => {
-    if (!isTracking) return;
-
-    const interval = setInterval(async () => {
-      try {
-        const position = await getCurrentPosition();
-        
-        // Get battery level if available
-        let batteryLevel;
-        if ('getBattery' in navigator) {
-          try {
-            const battery = await (navigator as any).getBattery();
-            batteryLevel = Math.round(battery.level * 100);
-          } catch (e) {
-            // Battery API not supported
-          }
-        }
-
-        await updateLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-          heading: position.coords.heading || undefined,
-          speed: position.coords.speed || undefined,
-          battery_level: batteryLevel
-        });
-      } catch (error) {
-        console.error('Failed to update location:', error);
+    return () => {
+      if (watchId.current) {
+        navigator.geolocation.clearWatch(watchId.current);
       }
-    }, 30000); // Update every 30 seconds
+      if (updateIntervalRef.current) {
+        clearInterval(updateIntervalRef.current);
+      }
+    };
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [isTracking, getCurrentPosition, updateLocation]);
+  // Manual location refresh
+  const refreshLocation = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const position = await getCurrentPosition();
+      lastLocationRef.current = position;
+      
+      const success = await updateLocation({
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        accuracy: position.coords.accuracy,
+        heading: position.coords.heading || undefined,
+        speed: position.coords.speed || undefined,
+      }, true);
+
+      if (success) {
+        toast({
+          title: "Location Updated",
+          description: "Your location has been refreshed"
+        });
+      }
+      
+      return success;
+    } catch (error) {
+      console.error('Failed to refresh location:', error);
+      setError(error instanceof Error ? error.message : 'Failed to refresh location');
+      return false;
+    }
+  }, [user, getCurrentPosition, updateLocation, toast]);
+
+  // Get current location without updating database
+  const getCurrentLocationData = useCallback((): LiveLocationData | null => {
+    if (!lastLocationRef.current || !user) return null;
+
+    const position = lastLocationRef.current;
+    return {
+      id: user.id,
+      user_id: user.id,
+      family_group_id: familyGroupId,
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      heading: position.coords.heading || undefined,
+      speed: position.coords.speed || undefined,
+      battery_level: undefined,
+      status: locationState.isTracking ? 'online' : 'idle',
+      last_seen: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+  }, [user, familyGroupId, locationState.isTracking]);
 
   return {
     locations,
-    isTracking,
+    locationState,
+    metrics,
     error,
+    isTracking: locationState.isTracking,
     startTracking,
     stopTracking,
     updateLocation,
+    refreshLocation,
+    getCurrentLocationData,
     refetch: fetchLocations
   };
 };
