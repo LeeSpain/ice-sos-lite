@@ -42,33 +42,59 @@ export function useGeographicAnalytics(timeRange = '90d') {
       if (error) throw error;
 
       // Process real geographic data from analytics
-      const locationData: Record<string, { visitors: Set<string>, pageViews: number }> = {};
+      const locationData: Record<string, { visitors: Set<string>, pageViews: number, country: string, region: string, city: string }> = {};
       
       data?.forEach(record => {
         const sessionId = record.session_id;
         const eventData = record.event_data as any;
         
-        // For now, since we don't have actual location data, we'll aggregate session-based data
-        // This shows real visitor activity rather than mock data
-        const location = 'Unknown Location';
+        // Extract real location data from event_data.location.data
+        const locationInfo = eventData?.location?.data;
+        let locationKey: string;
+        let country: string;
+        let region: string;
+        let city: string;
         
-        if (!locationData[location]) {
-          locationData[location] = { visitors: new Set(), pageViews: 0 };
+        if (locationInfo && locationInfo.city && locationInfo.country) {
+          // Real location data exists
+          country = locationInfo.country || 'Unknown';
+          region = locationInfo.region || 'Unknown';
+          city = locationInfo.city || 'Unknown';
+          locationKey = `${city}, ${region}, ${country}`;
+        } else {
+          // Fallback to unknown location
+          country = 'Unknown';
+          region = 'Unknown';
+          city = 'Unknown Location';
+          locationKey = 'Unknown Location, Unknown, Unknown';
+        }
+        
+        if (!locationData[locationKey]) {
+          locationData[locationKey] = { 
+            visitors: new Set(), 
+            pageViews: 0,
+            country,
+            region,
+            city
+          };
         }
         
         if (sessionId) {
-          locationData[location].visitors.add(sessionId);
+          locationData[locationKey].visitors.add(sessionId);
         }
-        locationData[location].pageViews += 1;
+        locationData[locationKey].pageViews += 1;
       });
 
-      return Object.entries(locationData).map(([location, data]) => ({
-        country: 'Unknown',
-        region: 'Unknown',
-        city: location,
-        visitors: data.visitors.size,
-        pageViews: data.pageViews
-      }));
+      // Sort by visitor count (highest first)
+      return Object.entries(locationData)
+        .sort(([,a], [,b]) => b.visitors.size - a.visitors.size)
+        .map(([locationKey, data]) => ({
+          country: data.country,
+          region: data.region,
+          city: data.city,
+          visitors: data.visitors.size,
+          pageViews: data.pageViews
+        }));
     },
     refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
     staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
