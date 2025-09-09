@@ -26,7 +26,15 @@ export function initAnalytics() {
       replaysSessionSampleRate: 0.0,
       replaysOnErrorSampleRate: 0.1,
     });
+    if (typeof window !== 'undefined') {
+      (window as any).__sentryInitialized = true;
+    }
     console.info('[Analytics] Sentry initialized');
+  } else {
+    console.warn('[Analytics] Sentry DSN missing; skipping Sentry setup');
+    if (typeof window !== 'undefined') {
+      (window as any).__sentryInitialized = false;
+    }
   }
 
   // GA4 init (injects script if ID present)

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, AlertTriangle, ExternalLink } from 'lucide-react';
-import { GA_MEASUREMENT_ID, SENTRY_DSN } from '@/config/analytics';
+import { GA_MEASUREMENT_ID } from '@/config/analytics';
 
 interface AnalyticsStatus {
   supabaseTracking: boolean;
@@ -34,7 +34,7 @@ export const AnalyticsHealthCheck: React.FC = () => {
       const googleAnalytics = !!(typeof window !== 'undefined' && window.gtag);
 
       // Check Sentry
-      const sentryMonitoring = !!SENTRY_DSN;
+      const sentryMonitoring = !!(typeof window !== 'undefined' && (window as any).__sentryInitialized);
 
       // Check real-time updates (presence of channel subscription)
       const realTimeUpdates = true; // Our app has real-time listeners
