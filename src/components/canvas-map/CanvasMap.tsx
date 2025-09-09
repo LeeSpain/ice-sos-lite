@@ -1,7 +1,9 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { MapPin, Loader2, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
+import { MapPin, Loader2, RotateCcw, ZoomIn, ZoomOut, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { tileCache } from './TileCache';
+import { MarkerRenderer } from './MarkerRenderer';
 
 interface CanvasMapProps {
   className?: string;
@@ -22,6 +24,10 @@ interface MapMarker {
   name?: string;
   status?: 'online' | 'idle' | 'offline';
   isEmergency?: boolean;
+  accuracy?: number;
+  speed?: number;
+  heading?: number;
+  batteryLevel?: number;
 }
 
 interface Viewport {
@@ -32,12 +38,10 @@ interface Viewport {
   height: number;
 }
 
-interface Tile {
-  x: number;
-  y: number;
-  z: number;
-  image: HTMLImageElement | null;
-  loading: boolean;
+interface RenderStats {
+  tilesLoaded: number;
+  totalTiles: number;
+  cacheHitRate: number;
 }
 
 const CanvasMap: React.FC<CanvasMapProps> = ({
@@ -51,6 +55,9 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const markerRenderer = useRef<MarkerRenderer>(new MarkerRenderer());
+  const animationFrameRef = useRef<number | null>(null);
+  
   const [viewport, setViewport] = useState<Viewport>({
     centerLat: center.lat,
     centerLng: center.lng,
@@ -60,9 +67,14 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   });
   const [isDragging, setIsDragging] = useState(false);
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
-  const [tiles, setTiles] = useState<Map<string, Tile>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [mapMode, setMapMode] = useState<'standard' | 'satellite'>('standard');
+  const [renderStats, setRenderStats] = useState<RenderStats>({ 
+    tilesLoaded: 0, 
+    totalTiles: 0, 
+    cacheHitRate: 0 
+  });
+  const [showAccuracy, setShowAccuracy] = useState(true);
 
   // Convert lat/lng to pixel coordinates
   const latLngToPixel = useCallback((lat: number, lng: number): { x: number; y: number } => {
@@ -102,46 +114,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     return { x, y, z: zoom };
   }, []);
 
-  // Load OSM tile
-  const loadTile = useCallback(async (x: number, y: number, z: number): Promise<HTMLImageElement | null> => {
-    const tileKey = `${x}-${y}-${z}`;
-    
-    // Check if tile already exists
-    const existingTile = tiles.get(tileKey);
-    if (existingTile?.image) return existingTile.image;
-
-    // Create new tile entry
-    setTiles(prev => new Map(prev.set(tileKey, { x, y, z, image: null, loading: true })));
-
-    try {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      
-      return new Promise((resolve) => {
-        img.onload = () => {
-          setTiles(prev => new Map(prev.set(tileKey, { x, y, z, image: img, loading: false })));
-          resolve(img);
-        };
-        img.onerror = () => {
-          setTiles(prev => new Map(prev.set(tileKey, { x, y, z, image: null, loading: false })));
-          resolve(null);
-        };
-        
-        // Use OpenStreetMap tiles
-        const baseUrl = mapMode === 'satellite' 
-          ? `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`
-          : `https://tile.openstreetmap.org/${z}/${x}/${y}.png`;
-        
-        img.src = baseUrl;
-      });
-    } catch (error) {
-      console.error('Failed to load tile:', error);
-      setTiles(prev => new Map(prev.set(tileKey, { x, y, z, image: null, loading: false })));
-      return null;
-    }
-  }, [tiles, mapMode]);
-
-  // Draw professional map with OSM tiles
+  // Professional map rendering with enhanced caching
   const drawMap = useCallback(async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -149,21 +122,22 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    const dpr = window.devicePixelRatio || 1;
+
     // Clear canvas with ocean blue background
     ctx.fillStyle = '#a7c8ed';
-    ctx.fillRect(0, 0, viewport.width, viewport.height);
+    ctx.fillRect(0, 0, viewport.width * dpr, viewport.height * dpr);
 
     const tileSize = 256;
-    const scale = Math.pow(2, viewport.zoom);
-    
-    // Calculate tile bounds
     const centerTile = getTileCoords(viewport.centerLat, viewport.centerLng, Math.floor(viewport.zoom));
     const tilesNeeded = Math.ceil(Math.max(viewport.width, viewport.height) / tileSize) + 2;
 
     let tilesLoaded = 0;
     let totalTiles = 0;
 
-    // Load and draw tiles
+    // Load and draw tiles using professional caching
+    const tilePromises: Promise<void>[] = [];
+    
     for (let dx = -tilesNeeded; dx <= tilesNeeded; dx++) {
       for (let dy = -tilesNeeded; dy <= tilesNeeded; dy++) {
         const tileX = centerTile.x + dx;
@@ -175,97 +149,82 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         totalTiles++;
         
         // Calculate tile position on screen
-        const pixelX = ((tileX * tileSize) - (centerTile.x * tileSize)) + viewport.width / 2;
-        const pixelY = ((tileY * tileSize) - (centerTile.y * tileSize)) + viewport.height / 2;
+        const pixelX = ((tileX * tileSize) - (centerTile.x * tileSize)) + (viewport.width * dpr) / 2;
+        const pixelY = ((tileY * tileSize) - (centerTile.y * tileSize)) + (viewport.height * dpr) / 2;
 
-        const tileKey = `${tileX}-${tileY}-${tileZ}`;
-        const tile = tiles.get(tileKey);
-
-        if (tile?.image) {
-          ctx.drawImage(tile.image, pixelX, pixelY, tileSize, tileSize);
+        // Check if tile is already loaded in cache
+        const cachedTile = tileCache.getTile(tileX, tileY, tileZ, mapMode);
+        
+        if (cachedTile) {
+          ctx.drawImage(cachedTile, pixelX, pixelY, tileSize, tileSize);
           tilesLoaded++;
-        } else if (!tile?.loading) {
-          loadTile(tileX, tileY, tileZ);
+        } else if (!tileCache.isLoading(tileX, tileY, tileZ, mapMode)) {
+          // Load tile asynchronously
+          const tilePromise = tileCache.loadTile(tileX, tileY, tileZ, mapMode).then((img) => {
+            if (img && canvas.parentElement) { // Only draw if component still mounted
+              requestAnimationFrame(() => drawMap()); // Redraw when tile loads
+            }
+          });
+          tilePromises.push(tilePromise);
         }
       }
     }
 
-    // Update loading state
-    setIsLoading(tilesLoaded < totalTiles * 0.5);
+    // Update loading state and stats
+    const isMapLoading = tilesLoaded < totalTiles * 0.7; // Consider loaded when 70% tiles are ready
+    setIsLoading(isMapLoading);
+    
+    const cacheStats = tileCache.getStats();
+    setRenderStats({
+      tilesLoaded,
+      totalTiles,
+      cacheHitRate: cacheStats.hitRate
+    });
 
-    // Draw markers with professional styling
-    markers.forEach(marker => {
+    // Render markers with professional rendering
+    const markerPromises = markers.map(async (marker) => {
       const { x, y } = latLngToPixel(marker.lat, marker.lng);
       
-      if (x >= -40 && x <= viewport.width + 40 && y >= -40 && y <= viewport.height + 40) {
-        // Draw marker shadow
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.beginPath();
-        ctx.arc(x + 2, y + 2, 14, 0, 2 * Math.PI);
-        ctx.fill();
-
-        // Draw marker background based on status/type
-        let markerColor = '#3b82f6';
-        if (marker.isEmergency) {
-          markerColor = '#ef4444';
-        } else if (marker.status === 'online') {
-          markerColor = '#10b981';
-        } else if (marker.status === 'idle') {
-          markerColor = '#f59e0b';
-        } else if (marker.status === 'offline') {
-          markerColor = '#6b7280';
-        }
-
-        ctx.fillStyle = markerColor;
-        ctx.beginPath();
-        ctx.arc(x, y, 12, 0, 2 * Math.PI);
-        ctx.fill();
-
-        // Draw marker border
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Draw inner icon or status indicator
-        if (marker.isEmergency) {
-          // Emergency icon
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 14px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText('!', x, y + 5);
-        } else if (marker.status === 'online') {
-          // Online pulse
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath();
-          ctx.arc(x, y, 4, 0, 2 * Math.PI);
-          ctx.fill();
-        }
-
-        // Draw name label if provided
-        if (marker.name) {
-          ctx.fillStyle = '#000000';
-          ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-          ctx.textAlign = 'center';
-          const textY = y + 25;
-          
-          // Text background
-          const textWidth = ctx.measureText(marker.name).width;
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-          ctx.fillRect(x - textWidth/2 - 4, textY - 12, textWidth + 8, 16);
-          
-          // Text
-          ctx.fillStyle = '#1f2937';
-          ctx.fillText(marker.name, x, textY);
-        }
+      // Only render visible markers (with some buffer)
+      if (x >= -50 && x <= viewport.width + 50 && y >= -50 && y <= viewport.height + 50) {
+        await markerRenderer.current.renderMarker(
+          ctx,
+          {
+            id: marker.id,
+            lat: marker.lat,
+            lng: marker.lng,
+            name: marker.name,
+            avatar: marker.avatar,
+            status: marker.status,
+            isEmergency: marker.isEmergency,
+            accuracy: marker.accuracy,
+            speed: marker.speed,
+            heading: marker.heading,
+            batteryLevel: marker.batteryLevel
+          },
+          x * dpr,
+          y * dpr,
+          viewport.zoom,
+          {
+            size: 32,
+            showAccuracy,
+            showLabel: true,
+            animateStatus: true,
+            pixelRatio: dpr
+          }
+        );
       }
     });
 
-    // Draw center cross for debugging (smaller and less intrusive)
-    if (showControls) {
+    // Wait for all markers to render
+    await Promise.all(markerPromises);
+
+    // Draw center cross for debugging (optional)
+    if (showControls && process.env.NODE_ENV === 'development') {
       ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
       ctx.lineWidth = 1;
-      const centerX = viewport.width / 2;
-      const centerY = viewport.height / 2;
+      const centerX = (viewport.width * dpr) / 2;
+      const centerY = (viewport.height * dpr) / 2;
       ctx.beginPath();
       ctx.moveTo(centerX - 5, centerY);
       ctx.lineTo(centerX + 5, centerY);
@@ -273,7 +232,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       ctx.lineTo(centerX, centerY + 5);
       ctx.stroke();
     }
-  }, [viewport, markers, latLngToPixel, tiles, getTileCoords, loadTile, showControls, mapMode]);
+  }, [viewport, markers, latLngToPixel, getTileCoords, showControls, mapMode, showAccuracy]);
 
   // Handle mouse down
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -342,7 +301,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     }));
   }, [center.lat, center.lng, zoom]);
 
-  // Update canvas size
+  // Update canvas size with high DPI support
   useEffect(() => {
     const updateSize = () => {
       if (containerRef.current && canvasRef.current) {
@@ -373,10 +332,41 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     return () => window.removeEventListener('resize', updateSize);
   }, []);
 
-  // Draw map when viewport or markers change
+  // Start marker animations
   useEffect(() => {
-    drawMap();
-  }, [drawMap]);
+    markerRenderer.current.startAnimation();
+    return () => markerRenderer.current.stopAnimation();
+  }, []);
+
+  // Smooth animation loop for redraws
+  useEffect(() => {
+    let lastDrawTime = 0;
+    const fps = 30; // Limit to 30fps for performance
+    const frameTime = 1000 / fps;
+
+    const animate = (currentTime: number) => {
+      if (currentTime - lastDrawTime >= frameTime) {
+        drawMap();
+        lastDrawTime = currentTime;
+      }
+      
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    // Only animate if there are emergency markers or online users
+    const hasAnimatedMarkers = markers.some(m => m.isEmergency || m.status === 'online');
+    if (hasAnimatedMarkers) {
+      animationFrameRef.current = requestAnimationFrame(animate);
+    } else {
+      drawMap(); // Single draw for static markers
+    }
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [drawMap, markers]);
 
   // Call onMapReady when component is ready
   useEffect(() => {
@@ -404,11 +394,11 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         onWheel={handleWheel}
       />
       
-      {/* Loading indicator */}
+      {/* Loading indicator with progress */}
       {isLoading && (
         <div className="absolute top-4 left-4 flex items-center gap-2 bg-background/90 backdrop-blur-sm border rounded-lg px-3 py-2 text-sm">
           <Loader2 className="h-4 w-4 animate-spin" />
-          <span>Loading map...</span>
+          <span>Loading tiles... ({renderStats.tilesLoaded}/{renderStats.totalTiles})</span>
         </div>
       )}
       
@@ -444,6 +434,16 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
             >
               <RotateCcw className="h-4 w-4" />
             </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setShowAccuracy(!showAccuracy)}
+              className="w-8 h-8 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
+              disabled={!interactive}
+              title="Toggle accuracy circles"
+            >
+              <Layers className="h-4 w-4" />
+            </Button>
           </div>
 
           {/* Map mode toggle */}
@@ -468,14 +468,19 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
             </Button>
           </div>
 
-          {/* Map info */}
+          {/* Map info and cache stats */}
           <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm border rounded-lg px-3 py-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-1">
               <MapPin className="h-3 w-3" />
               <span>
                 {viewport.centerLat.toFixed(4)}, {viewport.centerLng.toFixed(4)} • Z{Math.floor(viewport.zoom)}
               </span>
             </div>
+            {process.env.NODE_ENV === 'development' && (
+              <div className="text-xs text-muted-foreground/70">
+                Cache: {Math.round(renderStats.cacheHitRate * 100)}% • {renderStats.tilesLoaded}/{renderStats.totalTiles}
+              </div>
+            )}
           </div>
         </>
       )}
