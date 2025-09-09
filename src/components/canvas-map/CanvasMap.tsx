@@ -114,7 +114,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     return { x, y, z: zoom };
   }, []);
 
-  // Professional map rendering with enhanced caching
+  // Professional map rendering with enhanced caching and optimizations
   const drawMap = useCallback(async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -124,8 +124,15 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
 
     const dpr = window.devicePixelRatio || 1;
 
-    // Clear canvas with ocean blue background
-    ctx.fillStyle = '#a7c8ed';
+    // High-performance canvas optimizations
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // Clear canvas with professional ocean background
+    const gradient = ctx.createLinearGradient(0, 0, 0, viewport.height * dpr);
+    gradient.addColorStop(0, '#a7c8ed');
+    gradient.addColorStop(1, '#8bb5e8');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, viewport.width * dpr, viewport.height * dpr);
 
     const tileSize = 256;
@@ -219,20 +226,27 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     // Wait for all markers to render
     await Promise.all(markerPromises);
 
-    // Draw center cross for debugging (optional)
-    if (showControls && process.env.NODE_ENV === 'development') {
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
-      ctx.lineWidth = 1;
+    // Add subtle performance indicators
+    if (showControls) {
+      // Draw GPS accuracy indicator
+      ctx.strokeStyle = 'rgba(34, 197, 94, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([2, 2]);
       const centerX = (viewport.width * dpr) / 2;
       const centerY = (viewport.height * dpr) / 2;
       ctx.beginPath();
-      ctx.moveTo(centerX - 5, centerY);
-      ctx.lineTo(centerX + 5, centerY);
-      ctx.moveTo(centerX, centerY - 5);
-      ctx.lineTo(centerX, centerY + 5);
+      ctx.arc(centerX, centerY, 8 * dpr, 0, 2 * Math.PI);
       ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Performance debug info (development only)
+      if (process.env.NODE_ENV === 'development') {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.font = `${10 * dpr}px monospace`;
+        ctx.fillText(`FPS: ${Math.round(1000 / 33)} | Tiles: ${renderStats.tilesLoaded}/${renderStats.totalTiles}`, 10 * dpr, 20 * dpr);
+      }
     }
-  }, [viewport, markers, latLngToPixel, getTileCoords, showControls, mapMode, showAccuracy]);
+  }, [viewport, markers, latLngToPixel, getTileCoords, showControls, mapMode, showAccuracy, renderStats]);
 
   // Handle mouse down
   const handleMouseDown = useCallback((e: React.MouseEvent) => {

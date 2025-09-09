@@ -23,6 +23,9 @@ import { useBackgroundLocation } from '@/hooks/useBackgroundLocation';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useRealTimeFamily } from '@/hooks/useRealTimeFamily';
+import { RealTimeStatusBar } from '@/components/family-dashboard/RealTimeStatusBar';
+import { EmergencyActionPanel } from '@/components/family-dashboard/EmergencyActionPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { getFamilyGroupId } from '@/utils/familyGroupUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -59,6 +62,21 @@ const FamilyTrackingApp = () => {
   const { MapView } = useCanvasMap();
   const { presences, circles, loadInitial } = useCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(isLocationEnabled);
+  
+  // Real-time family communication
+  const {
+    presences: livePresences,
+    alerts,
+    notifications,
+    isConnected,
+    lastUpdate,
+    sendCheckIn,
+    triggerEmergency,
+    onlineMembers,
+    totalMembers,
+    activeAlerts,
+    unreadNotifications
+  } = useRealTimeFamily(activeCircleId);
 
   useEffect(() => {
     loadInitial();
@@ -371,15 +389,15 @@ const FamilyTrackingApp = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Header */}
-      <div className="bg-white shadow-sm p-4">
+      {/* Enhanced Header with Real-time Status */}
+      <div className="bg-white shadow-sm p-4 space-y-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-lg font-semibold">
               {user?.user_metadata?.first_name ? `${user.user_metadata.first_name}'s Family` : 'My Family'}
             </h1>
             <p className="text-sm text-gray-600">
-              {familyMembers.length} {familyMembers.length === 1 ? 'member' : 'members'} connected
+              {totalMembers || familyMembers.length} {(totalMembers || familyMembers.length) === 1 ? 'member' : 'members'} • {onlineMembers} online
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -389,6 +407,19 @@ const FamilyTrackingApp = () => {
             </Badge>
             <Settings className="w-5 h-5 text-gray-400" />
           </div>
+        </div>
+        
+        {/* Real-time Status Bar */}
+        <div className="max-w-md mx-auto">
+          <RealTimeStatusBar
+            isConnected={isConnected}
+            onlineMembers={onlineMembers}
+            totalMembers={totalMembers || familyMembers.length}
+            activeAlerts={activeAlerts}
+            unreadNotifications={unreadNotifications}
+            lastUpdate={lastUpdate}
+            compact={true}
+          />
         </div>
       </div>
 
@@ -432,79 +463,89 @@ const FamilyTrackingApp = () => {
         </div>
       </div>
 
-      {/* Family Members List */}
-      <div className="p-4 max-w-md mx-auto space-y-3">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Family Members</h2>
-          <Button 
-            size="sm" 
-            variant="outline"
-            onClick={() => setShowInviteModal(true)}
-          >
-            <Users className="w-4 h-4 mr-1" />
-            Add
-          </Button>
-        </div>
-
-        {familyMembers.length === 0 ? (
-          <Card className="p-6 text-center">
-            <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-            <h3 className="font-medium mb-2">No Family Members Yet</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Start by inviting family members to join your tracking circle
-            </p>
-            <Button onClick={() => setShowInviteModal(true)}>
-              <UserPlus className="w-4 h-4 mr-2" />
-              Invite Family Member
-            </Button>
-          </Card>
-        ) : (
-          familyMembers.map((member) => {
-          const statusInfo = getStatusInfo(member);
-          return (
-            <Card 
-              key={member.user_id} 
-              className="p-3 cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => handleMemberSelect(member)}
+      {/* Enhanced Content Section */}
+      <div className="p-4 max-w-md mx-auto space-y-4">
+        {/* Emergency Actions Panel */}
+        <EmergencyActionPanel
+          onEmergencyTrigger={triggerEmergency}
+          onCheckIn={sendCheckIn}
+          isConnected={isConnected}
+        />
+        
+        {/* Family Members List */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Family Members</h2>
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => setShowInviteModal(true)}
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src={member.avatar_url} />
-                      <AvatarFallback>
-                        {member.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${statusInfo.color} rounded-full border border-white`} />
-                  </div>
-                  <div>
-                    <p className="font-medium">{member.name}</p>
-                    <div className="flex items-center gap-2 text-xs text-gray-600">
-                      {getActivityIcon(member.activity)}
-                      <span className="capitalize">{member.activity}</span>
-                      {member.activity === 'driving' && member.speed && (
-                        <span>• {member.speed} km/h</span>
+              <Users className="w-4 h-4 mr-1" />
+              Add
+            </Button>
+          </div>
+
+          {familyMembers.length === 0 ? (
+            <Card className="p-6 text-center">
+              <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+              <h3 className="font-medium mb-2">No Family Members Yet</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Start by inviting family members to join your tracking circle
+              </p>
+              <Button onClick={() => setShowInviteModal(true)}>
+                <UserPlus className="w-4 h-4 mr-2" />
+                Invite Family Member
+              </Button>
+            </Card>
+          ) : (
+            familyMembers.map((member) => {
+              const statusInfo = getStatusInfo(member);
+              return (
+                <Card 
+                  key={member.user_id} 
+                  className="p-3 cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => handleMemberSelect(member)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={member.avatar_url} />
+                          <AvatarFallback>
+                            {member.name.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${statusInfo.color} rounded-full border border-white`} />
+                      </div>
+                      <div>
+                        <p className="font-medium">{member.name}</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          {getActivityIcon(member.activity)}
+                          <span className="capitalize">{member.activity}</span>
+                          {member.activity === 'driving' && member.speed && (
+                            <span>• {member.speed} km/h</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant="outline" className="text-xs">
+                        {statusInfo.text}
+                      </Badge>
+                      {member.battery && (
+                        <div className="flex items-center gap-1 mt-1 text-xs text-gray-600">
+                          <Battery className="w-3 h-3" />
+                          {member.battery}%
+                        </div>
                       )}
                     </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <Badge variant="outline" className="text-xs">
-                    {statusInfo.text}
-                  </Badge>
-                  {member.battery && (
-                    <div className="flex items-center gap-1 mt-1 text-xs text-gray-600">
-                      <Battery className="w-3 h-3" />
-                      {member.battery}%
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Card>
-          );
-          })
-        )}
+                </Card>
+              );
+            })
+          )}
+        </div>
       </div>
 
       {/* Invite Modal */}
