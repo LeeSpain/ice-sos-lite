@@ -46,7 +46,7 @@ interface RenderStats {
 
 const CanvasMap: React.FC<CanvasMapProps> = ({
   className,
-  center = { lat: 51.505, lng: -0.09 },
+  center = { lat: 0, lng: 0 }, // Will be updated by parent component
   zoom = 13,
   markers = [],
   onMapReady,
@@ -305,8 +305,10 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     }));
   }, [center, zoom]);
 
-  // Update center when prop changes (only if significantly different)
+  // Update center when prop changes (only if not being dragged and significantly different)
   useEffect(() => {
+    if (isDragging) return; // Don't update center while user is interacting
+    
     const latDiff = Math.abs(viewport.centerLat - center.lat);
     const lngDiff = Math.abs(viewport.centerLng - center.lng);
     
@@ -319,7 +321,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         zoom
       }));
     }
-  }, [center.lat, center.lng, zoom, viewport.centerLat, viewport.centerLng, viewport.zoom]);
+  }, [center.lat, center.lng, zoom, viewport.centerLat, viewport.centerLng, viewport.zoom, isDragging]);
 
   // Update canvas size with high DPI support
   useEffect(() => {

@@ -213,15 +213,18 @@ const SOSAppPage = () => {
   const mapMarkers = React.useMemo(() => {
     const markers = [];
     
-    // Add current emergency location marker
+    // Add current user location marker (normal user avatar, not emergency)
     if (currentLocation?.latitude && currentLocation?.longitude) {
       const marker = {
-        id: 'emergency-location',
+        id: 'current-user-location',
         lat: Number(currentLocation.latitude.toFixed(6)),
         lng: Number(currentLocation.longitude.toFixed(6)),
-        name: 'Emergency Location',
-        isEmergency: true,
+        name: user?.user_metadata?.full_name || 'You',
+        avatar: user?.user_metadata?.avatar_url,
+        isEmergency: false, // Changed to false - only emergency during actual SOS
         status: 'online' as const,
+        accuracy: currentLocation.accuracy,
+        batteryLevel: emergencyStatus.battery,
         render: () => null
       };
       markers.push(marker);
@@ -236,17 +239,44 @@ const SOSAppPage = () => {
           lng: Number(location.longitude.toFixed(6)),
           name: `Family Member`,
           status: location.status,
+          accuracy: location.accuracy,
+          speed: location.speed,
+          heading: location.heading,
+          batteryLevel: location.battery_level,
           render: () => null
         });
       }
     });
+
+    // Add emergency contacts as markers if they have shared location data
+    // For demo purposes, we'll place them near the user's location
+    if (currentLocation?.latitude && currentLocation?.longitude && contacts.length > 0) {
+      contacts.slice(0, 3).forEach((contact, index) => {
+        // Simulate emergency contacts being nearby (in a real app, they'd have actual GPS coordinates)
+        const offsetLat = (Math.random() - 0.5) * 0.01; // Random offset within ~1km
+        const offsetLng = (Math.random() - 0.5) * 0.01;
+        
+        markers.push({
+          id: `contact-${contact.id || index}`,
+          lat: currentLocation.latitude + offsetLat,
+          lng: currentLocation.longitude + offsetLng,
+          name: contact.name,
+          status: 'idle' as const, // Emergency contacts shown as idle
+          isEmergency: false,
+          render: () => null
+        });
+      });
+    }
     
     return markers;
   }, [
     currentLocation?.latitude?.toFixed(6),
     currentLocation?.longitude?.toFixed(6),
     liveLocations,
-    user?.id
+    contacts,
+    user?.id,
+    user?.user_metadata?.full_name,
+    user?.user_metadata?.avatar_url
   ]);
 
   return (
