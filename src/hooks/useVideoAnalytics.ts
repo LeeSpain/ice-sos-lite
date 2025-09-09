@@ -95,10 +95,10 @@ export function useVideoKpis24h() {
     queryFn: async () => {
       const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-      // Plays in last 24h (event_type = 'play')
-      const { data: playsData, error: playsError } = await supabase
+      // Plays in last 24h (event_type = 'play') - use count from headers
+      const { count: playsCount, error: playsError } = await supabase
         .from('video_analytics')
-        .select('id', { count: 'exact', head: true })
+        .select('*', { count: 'exact', head: true })
         .gte('created_at', since)
         .eq('event_type', 'play');
 
@@ -109,7 +109,8 @@ export function useVideoKpis24h() {
         .from('video_analytics')
         .select('watch_duration_seconds')
         .gte('created_at', since)
-        .not('watch_duration_seconds', 'is', null);
+        .not('watch_duration_seconds', 'is', null)
+        .range(0, 99999);
 
       if (wtError) throw wtError;
 
@@ -120,16 +121,15 @@ export function useVideoKpis24h() {
         .from('video_analytics')
         .select('session_id')
         .gte('created_at', since)
-        .not('session_id', 'is', null);
+        .not('session_id', 'is', null)
+        .range(0, 99999);
 
       if (sessionsError) throw sessionsError;
 
       const uniqueSessions24h = new Set((sessionsData || []).map((r: any) => r.session_id)).size;
 
       return {
-        plays24h: playsData?.length ?? 0, // when head:true + count:'exact', data length is 0, we can't read count directly here reliably
-        // Note: Supabase head:true returns no rows; to get exact count reliably, we could issue RPC or select count with grouped query.
-        // Fallback: approximate by fetching ids without head (kept simple for now)
+        plays24h: playsCount ?? 0,
         watchSeconds24h,
         uniqueSessions24h,
       };

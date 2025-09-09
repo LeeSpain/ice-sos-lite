@@ -52,3 +52,10 @@ verify_jwt = false
 
 [functions.process-mixed-payment]
 verify_jwt = false
+
+# Allow public ingestion of video analytics and geo lookups (needed for anonymous viewers)
+[functions.video-analytics-ingest]
+verify_jwt = false
+
+[functions.geo-lookup]
+verify_jwt = false
