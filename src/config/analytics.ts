@@ -1,4 +1,4 @@
-export const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || '';
+export const GA_MEASUREMENT_ID = (import.meta.env.VITE_GA_MEASUREMENT_ID || (import.meta.env.MODE !== 'production' ? 'G-XWNSKESY1C' : ''));
 export const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || '';
 
 // Enhanced Google Analytics configuration

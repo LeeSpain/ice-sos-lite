@@ -31,7 +31,7 @@ export const AnalyticsHealthCheck: React.FC = () => {
       const supabaseTracking = true; // Always enabled in our setup
 
       // Check Google Analytics
-      const googleAnalytics = !!(GA_MEASUREMENT_ID && window.gtag);
+      const googleAnalytics = !!(typeof window !== 'undefined' && window.gtag);
 
       // Check Sentry
       const sentryMonitoring = !!SENTRY_DSN;
