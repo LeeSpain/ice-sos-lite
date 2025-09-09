@@ -130,24 +130,31 @@ export function useLovableAnalytics() {
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
-        // Get ACTUAL page views from the last 30 days
+        // Get ACTUAL page views from the last 30 days - FORCE FRESH DATA
         const { data: pageViewData, error } = await supabase
           .from('homepage_analytics')
-          .select('session_id, event_data')
+          .select('session_id, event_data, created_at')
           .eq('event_type', 'page_view')
-          .gte('created_at', thirtyDaysAgo.toISOString());
+          .gte('created_at', thirtyDaysAgo.toISOString())
+          .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Database error:', error);
+          throw error;
+        }
 
         const actualPageViews = pageViewData?.length || 0;
         const actualUniqueVisitors = new Set(pageViewData?.map(item => item.session_id) || []).size;
-        const actualSessions = actualUniqueVisitors; // For simplicity, treat unique visitors as sessions
+        const actualSessions = actualUniqueVisitors;
 
-        console.log('📊 REAL Analytics Data:', {
+        console.log('📊 FRESH Analytics Data:', {
           actualPageViews,
           actualUniqueVisitors,
           actualSessions,
-          totalRecords: pageViewData?.length
+          totalRecords: pageViewData?.length,
+          timestamp: new Date().toISOString(),
+          firstRecord: pageViewData?.[0]?.created_at,
+          lastRecord: pageViewData?.[pageViewData.length - 1]?.created_at
         });
 
         return {
@@ -164,8 +171,9 @@ export function useLovableAnalytics() {
         };
       }
     },
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-    staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+    staleTime: 0, // Force immediate refetch
+    gcTime: 0, // No caching
+    refetchInterval: 30 * 1000, // Refetch every 30 seconds for testing
     refetchIntervalInBackground: false,
   });
 }
