@@ -57,7 +57,6 @@ interface ActiveIncident {
 }
 
 const SOSAppPage = () => {
-  console.log('🔄 SOS Page: Component render');
   const { user } = useAuth();
   const { contacts, loading: contactsLoading } = useEmergencyContacts();
   const { permissionState } = useLocationServices();

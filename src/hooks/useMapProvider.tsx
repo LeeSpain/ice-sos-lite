@@ -35,7 +35,7 @@ const MAP_STYLES: MapStyle[] = [
 ];
 
 export function useMapProvider() {
-  const MapView: React.FC<MapViewProps> = ({ className, markers, center, zoom = 13 }) => {
+  const MapView: React.FC<MapViewProps> = React.memo(({ className, markers, center, zoom = 13 }) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const markersRef = useRef<mapboxgl.Marker[]>([]);
@@ -96,44 +96,27 @@ export function useMapProvider() {
       };
     }, [mapboxgl.accessToken]); // Only depend on access token
 
-    // Update center when it changes - heavily debounced and stable
+    // Update center when it changes - only once per significant change
+    const centerKey = center ? `${center.lat.toFixed(4)}_${center.lng.toFixed(4)}` : null;
+    const [lastCenterKey, setLastCenterKey] = useState<string | null>(null);
+    
     useEffect(() => {
-      console.log('🗺️ Map Provider: Center update effect triggered, center:', center);
-      if (!map.current || !center?.lat || !center?.lng) {
-        console.log('🗺️ Map Provider: Skipping center update - missing map or center');
-        return;
-      }
+      if (!map.current || !center?.lat || !center?.lng || centerKey === lastCenterKey) return;
       
-      // Use a longer timeout to prevent rapid updates and check for significant changes
+      setLastCenterKey(centerKey);
+      
       const timeoutId = setTimeout(() => {
         if (map.current && center.lat && center.lng) {
-          const currentCenter = map.current.getCenter();
-          const distance = Math.sqrt(
-            Math.pow(currentCenter.lat - center.lat, 2) + 
-            Math.pow(currentCenter.lng - center.lng, 2)
-          );
-          
-          console.log('🗺️ Map Provider: Distance from current center:', distance);
-          
-          // Only update if the change is significant (>100 meters roughly)
-          if (distance > 0.001) {
-            console.log('🗺️ Map Provider: Updating map center to:', [center.lng, center.lat]);
-            map.current.easeTo({
-              center: [center.lng, center.lat],
-              duration: 1200,
-              essential: true
-            });
-          } else {
-            console.log('🗺️ Map Provider: Skipping center update - change too small');
-          }
+          map.current.easeTo({
+            center: [center.lng, center.lat],
+            duration: 800,
+            essential: true
+          });
         }
-      }, 500); // Longer debounce
+      }, 200);
 
       return () => clearTimeout(timeoutId);
-    }, [
-      center?.lat?.toFixed(5), // Only update on significant coordinate changes
-      center?.lng?.toFixed(5)
-    ]);
+    }, [centerKey]);
 
     // Handle style changes separately without recreating the map
     const handleStyleChange = (style: MapStyle) => {
@@ -220,16 +203,16 @@ export function useMapProvider() {
       }
     }, [markers]);
 
-    // Update markers when they change - debounced to prevent flashing
+    // Update markers when they change - prevent loops
+    const markersKey = markers.map(m => `${m.id}_${m.lat.toFixed(4)}_${m.lng.toFixed(4)}`).join('|');
+    const [lastMarkersKey, setLastMarkersKey] = useState<string>('');
+    
     useEffect(() => {
-      console.log('🗺️ Map Provider: Markers update effect triggered, markers:', markers);
-      const timeoutId = setTimeout(() => {
-        console.log('🗺️ Map Provider: Executing updateMapMarkers');
-        updateMapMarkers();
-      }, 150);
+      if (markersKey === lastMarkersKey) return;
       
-      return () => clearTimeout(timeoutId);
-    }, [updateMapMarkers]);
+      setLastMarkersKey(markersKey);
+      updateMapMarkers();
+    }, [markersKey]);
 
     if (tokenError) {
       return (
@@ -289,7 +272,7 @@ export function useMapProvider() {
         </div>
       </div>
     );
-  };
+  });
   
   return { MapView };
 }
