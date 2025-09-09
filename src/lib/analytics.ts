@@ -9,6 +9,14 @@ declare global {
 }
 
 export function initAnalytics() {
+  // Guard: only run once per page
+  if (typeof window !== 'undefined') {
+    if ((window as any).__analyticsInitialized) {
+      return;
+    }
+    (window as any).__analyticsInitialized = true;
+  }
+
   // Sentry init (safe if DSN missing)
   if (SENTRY_DSN) {
     Sentry.init({
@@ -18,6 +26,7 @@ export function initAnalytics() {
       replaysSessionSampleRate: 0.0,
       replaysOnErrorSampleRate: 0.1,
     });
+    console.info('[Analytics] Sentry initialized');
   }
 
   // GA4 init (injects script if ID present)
@@ -26,13 +35,24 @@ export function initAnalytics() {
     if (!window.gtag) {
       window.gtag = function () { window.dataLayer!.push(arguments); } as any;
     }
-    const gtagScript = document.createElement('script');
-    gtagScript.async = true;
-    gtagScript.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
-    document.head.appendChild(gtagScript);
+
+    // Avoid duplicate script injection
+    const existing = document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}"]`);
+    if (!existing) {
+      const gtagScript = document.createElement('script');
+      gtagScript.async = true;
+      gtagScript.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+      gtagScript.addEventListener('load', () => {
+        console.info(`[Analytics] GA tag loaded: ${GA_MEASUREMENT_ID}`);
+      });
+      document.head.appendChild(gtagScript);
+    }
 
     window.gtag('js', new Date());
     window.gtag('config', GA_MEASUREMENT_ID, { send_page_view: false });
+    console.info(`[Analytics] GA initialized: ${GA_MEASUREMENT_ID}`);
+  } else {
+    console.warn('[Analytics] GA Measurement ID missing; skipping GA setup');
   }
 }
 
