@@ -30,6 +30,10 @@ import Dashboard from "./pages/Dashboard";
 import FamilyDashboard from "./pages/FamilyDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 
+// App Pages
+import SOSAppPage from "./pages/SOSAppPage";
+import FamilyAppPage from "./pages/FamilyAppPage";
+
 // Support & Info Pages
 import Support from "./pages/Support";
 import Privacy from "./pages/Privacy";
@@ -207,6 +211,24 @@ function AppWithTracking() {
                   <ProtectedRoute>
                     <OptimizedSuspense skeletonType="dashboard">
                       <FamilyDashboard />
+                    </OptimizedSuspense>
+                  </ProtectedRoute>
+                } />
+
+                {/* SOS App */}
+                <Route path="/sos-app" element={
+                  <ProtectedSOSRoute>
+                    <OptimizedSuspense skeletonType="card">
+                      <SOSAppPage />
+                    </OptimizedSuspense>
+                  </ProtectedSOSRoute>
+                } />
+
+                {/* Family App */}
+                <Route path="/family-app" element={
+                  <ProtectedRoute>
+                    <OptimizedSuspense skeletonType="card">
+                      <FamilyAppPage />
                     </OptimizedSuspense>
                   </ProtectedRoute>
                 } />
