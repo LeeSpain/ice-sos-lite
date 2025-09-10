@@ -385,13 +385,13 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
 
       // Handle test mode response
       if (data.test_mode) {
-        console.log("🧪 Test mode response received - proceeding to welcome page");
+        console.log("🧪 Test mode response received - invoking onSuccess callback");
         toast({
           title: "Test Payment Complete",
           description: "Test mode payment completed successfully!",
           variant: "default"
         });
-        navigate('/welcome');
+        onSuccess();
         return;
       }
 

@@ -11,6 +11,7 @@ import Navigation from '@/components/Navigation';
 import EmbeddedPayment from '@/components/EmbeddedPayment';
 import { Badge } from '@/components/ui/badge';
 import SEO from '@/components/SEO';
+import { notifyPaymentSuccess } from '@/utils/paymentSuccess';
 
 interface TestPlan {
   id: string;
@@ -127,15 +128,28 @@ const TestRegistration = () => {
         throw authError;
       }
 
+      // Prepare welcome data for success page
+      const welcomeData = {
+        firstName: personalDetails.firstName,
+        lastName: personalDetails.lastName,
+        email: personalDetails.email,
+        subscriptionPlans: testPlan ? [testPlan] : [],
+        products: [],
+        regionalServices: [],
+        totalAmount: testPlan ? testPlan.price : 0
+      };
+      sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
+      notifyPaymentSuccess('subscription');
+
       toast({
         title: 'Test Registration Complete!',
-        description: 'Test payment processed successfully. You can now access the dashboard.',
+        description: 'Test payment processed successfully. Redirecting...',
       });
 
-      // Redirect to welcome page
+      // Redirect to payment success page
       setTimeout(() => {
-        window.location.href = '/welcome';
-      }, 2000);
+        window.location.href = '/payment-success';
+      }, 1500);
     } catch (error) {
       console.error('Test registration error:', error);
       toast({
