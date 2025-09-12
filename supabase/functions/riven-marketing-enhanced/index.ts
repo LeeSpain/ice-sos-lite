@@ -202,7 +202,7 @@ async function executeWorkflowStages(supabase: any, campaignId: string, command:
           result = await executeCommandAnalysis(command, settings, aiConfig);
           break;
         case 'content_creation':
-          result = await executeContentCreation(supabase, command, settings, aiConfig);
+          result = await executeContentCreation(supabase, campaignId, command, settings, aiConfig);
           break;
         case 'image_generation':
           result = await executeImageGeneration(command, settings, aiConfig);
@@ -280,7 +280,7 @@ async function updateStageStatus(supabase: any, campaignId: string, stageName: s
 async function executeCommandAnalysis(command: string, settings: any, aiConfig: any) {
   console.log('Executing command analysis stage');
   
-  const overviewProvider = aiConfig?.overview_provider || 'openai';
+  const overviewProvider = aiConfig?.stages?.overview?.provider || 'openai';
   console.log(`Using ${overviewProvider} for command analysis`);
   
   if (overviewProvider === 'xai' && xaiApiKey) {
@@ -292,7 +292,7 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'grok-beta',
+          model: (aiConfig?.providers?.xai?.model || 'grok-beta'),
           messages: [
             {
               role: 'system',
@@ -354,18 +354,19 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
   return analysisResult;
 }
 
-async function executeContentCreation(supabase: any, originalCommand: string, settings: any, aiConfig: any) {
+async function executeContentCreation(supabase: any, campaignId: string, originalCommand: string, settings: any, aiConfig: any) {
   console.log('Executing content creation stage');
   
   // Get the analysis result from the previous stage
   const { data: analysisStage } = await supabase
     .from('workflow_stages')
     .select('output_data')
+    .eq('campaign_id', campaignId)
     .eq('stage_name', 'command_analysis')
     .single();
   
   const analysisResult = analysisStage?.output_data || {};
-  const textProvider = aiConfig?.text_provider || 'openai';
+  const textProvider = aiConfig?.stages?.text?.provider || 'openai';
   
   console.log(`Using ${textProvider} for content creation`);
   
@@ -480,7 +481,7 @@ Focus on family safety, emergency preparedness, and practical advice that relate
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: aiConfig?.text_model || 'gpt-4o-mini',
+        model: (aiConfig?.providers?.openai?.model || 'gpt-4o-mini'),
         messages: [
           {
             role: 'system',
@@ -559,7 +560,7 @@ Focus on family safety, emergency preparedness, and practical advice that relate
 async function executeImageGeneration(command: string, settings: any, aiConfig: any) {
   console.log('Executing image generation stage');
   
-  const imageProvider = aiConfig?.image_provider || 'openai';
+  const imageProvider = aiConfig?.stages?.image?.provider || 'openai';
   console.log(`Using ${imageProvider} for image generation`);
   
   // Always use OpenAI for image generation as it's the configured provider
