@@ -4,9 +4,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const xaiApiKey = Deno.env.get('XAI_API_KEY');
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -31,6 +30,10 @@ serve(async (req) => {
   try {
     const body = await req.json();
     
+    // Load env for Supabase client
+    const supabaseUrlEnv = Deno.env.get('SUPABASE_URL') || '';
+    const supabaseServiceKeyEnv = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+
     // Handle provider status check
     if (body.action === 'provider_status') {
       console.log('Checking provider status...');
