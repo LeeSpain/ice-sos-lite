@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0';
+// Dynamic import used for supabase-js to improve cold start reliability
+// import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const xaiApiKey = Deno.env.get('XAI_API_KEY');
@@ -98,8 +99,9 @@ serve(async (req) => {
 
     const { command, title, settings, scheduling_options, publishing_controls } = body;
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
+    // Create Supabase client via dynamic import (faster, avoids cold-boot import on preflight)
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.57.0');
+    const supabase = createClient(supabaseUrlEnv || supabaseUrl, supabaseServiceKeyEnv || supabaseServiceKey);
     console.log(`Processing marketing command: ${command}`);
 
     // Create campaign first
