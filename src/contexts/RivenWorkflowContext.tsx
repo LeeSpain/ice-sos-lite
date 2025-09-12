@@ -287,7 +287,22 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: { 
           command, 
-          title: config?.title || `Campaign: ${command.substring(0, 50)}...`
+          title: config?.title || `Campaign: ${command.substring(0, 50)}...`,
+          settings: {
+            word_count: config?.word_count || 900,
+            content_depth: config?.content_depth || 'high',
+            seo_difficulty: config?.seo_difficulty || 'medium'
+          },
+          scheduling_options: {
+            mode: config?.scheduling_mode || 'spread',
+            spread_days: config?.spread_days || 7,
+            posts_per_day: config?.posts_per_day || 1,
+            total_posts: config?.total_posts || 3
+          },
+          publishing_controls: {
+            platforms: config?.platforms || ['blog'],
+            approval_required: config?.approval_required !== false
+          }
         }
       });
 

@@ -221,7 +221,7 @@ export default function RivenConfigurationPage() {
   const testProviderConnection = async () => {
     setTestingProvider(true);
     try {
-      const { data, error } = await supabase.functions.invoke('riven-marketing', {
+      const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: { 
           action: 'provider_status'
         }

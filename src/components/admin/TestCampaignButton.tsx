@@ -16,10 +16,10 @@ export default function TestCampaignButton({ onSuccess }: TestButtonProps) {
     try {
       console.log('🧪 Running test campaign...');
       
-      const response = await supabase.functions.invoke('riven-marketing', {
+      const response = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: {
           command: 'Create a test blog post about family safety and emergency preparedness for parents',
-          action: 'process_command',
+          title: 'Test Family Safety Blog Post',
           workflow_id: `test-workflow-${Date.now()}`,
           settings: {
             auto_approve_content: true,

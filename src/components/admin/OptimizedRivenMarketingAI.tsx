@@ -399,21 +399,21 @@ export default function OptimizedRivenMarketingAI() {
       const response = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: {
           command: currentCommand,
-          campaignId: crypto.randomUUID(),
+          title: config?.title || `Marketing Campaign: ${currentCommand.substring(0, 50)}...`,
           settings: {
-            word_count: config?.wordCount,
-            seo_difficulty: config?.seoDifficulty,
-            content_depth: config?.contentDepth,
+            word_count: config?.word_count || config?.wordCount || 900,
+            content_depth: config?.content_depth || config?.contentDepth || 'high',
+            seo_difficulty: config?.seo_difficulty || config?.seoDifficulty || 'medium'
           },
           scheduling_options: {
-            mode: config?.schedulingMode,
-            spread_days: config?.campaignDuration,
-            posts_per_day: config?.postsPerDay,
-            total_posts: config?.totalPosts,
+            mode: config?.scheduling_mode || config?.schedulingMode || 'spread',
+            spread_days: config?.spread_days || config?.campaignDuration || 7,
+            posts_per_day: config?.posts_per_day || config?.postsPerDay || 1,
+            total_posts: config?.total_posts || config?.totalPosts || 3
           },
           publishing_controls: {
-            platforms: config?.platforms,
-            approval_required: true,
+            platforms: config?.platforms || ['blog'],
+            approval_required: config?.approval_required !== false
           }
         }
       });

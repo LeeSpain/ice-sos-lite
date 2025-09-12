@@ -152,7 +152,7 @@ const AdvancedCampaignMonitor: React.FC = () => {
   const handleRetry = async (campaignId: string) => {
     setIsLoading(true);
     try {
-      const response = await supabase.functions.invoke('riven-marketing', {
+      const response = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: {
           action: 'generate_content',
           campaign_id: campaignId,

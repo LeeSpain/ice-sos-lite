@@ -47,7 +47,7 @@ export default function SystemSettingsPage() {
       
       console.log('🔍 Testing providers with session:', !!session?.access_token);
       
-      const { data, error } = await supabase.functions.invoke('riven-marketing', {
+      const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: { action: 'provider_status' },
         headers: {
           Authorization: `Bearer ${session?.access_token}`,

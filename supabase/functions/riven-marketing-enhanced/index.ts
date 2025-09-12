@@ -21,7 +21,37 @@ serve(async (req) => {
   }
 
   try {
-    const { command, title } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    
+    // Health Check Handler
+    if (body?.action === 'provider_status') {
+      const okOpenAI = !!Deno.env.get('OPENAI_API_KEY');
+      const okSvcKey = !!Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+      const okUrl = !!Deno.env.get('SUPABASE_URL');
+
+      try {
+        const client = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        );
+        const { error } = await client.from('profiles').select('id', { count: 'exact', head: true }).limit(1);
+        return new Response(JSON.stringify({
+          success: okOpenAI && okSvcKey && okUrl && !error,
+          ok: okOpenAI && okSvcKey && okUrl && !error,
+          providers: { openai: { configured: okOpenAI } },
+          database: { reachable: !error, error: error?.message || null }
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+      } catch (e) {
+        return new Response(JSON.stringify({
+          success: false,
+          ok: false,
+          providers: { openai: { configured: okOpenAI } },
+          database: { reachable: false, error: String(e?.message || e) }
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }});
+      }
+    }
+
+    const { command, title, settings, scheduling_options, publishing_controls } = body || {};
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -38,12 +68,14 @@ serve(async (req) => {
     await initializeWorkflowStages(supabaseClient, campaignId);
 
     // Execute stages sequentially with updates
-    await executeWorkflowStages(supabaseClient, campaignId, command);
+    await executeWorkflowStages(supabaseClient, campaignId, command, settings);
 
     return new Response(
       JSON.stringify({
         success: true,
+        ok: true,
         message: 'Enhanced marketing workflow completed successfully',
+        campaign_id: campaignId,
         campaignId
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -65,14 +97,17 @@ async function createCampaign(supabaseClient: any, command: string, title?: stri
   console.log('Creating new campaign:', title || command);
 
   const campaignData = {
-    title: title || `Marketing Campaign: ${command.substring(0, 50)}...`,
+    title: title || `Marketing Campaign: ${String(command || '').slice(0, 50)}...`,
     description: command,
     command_input: command,
     status: 'running',
     created_by: '00000000-0000-0000-0000-000000000000', // System user for now
     target_audience: {
       created_via: 'enhanced_workflow',
-      command_original: command
+      command_original: command,
+      settings: settings || null,
+      scheduling_options: scheduling_options || null,
+      publishing_controls: publishing_controls || null
     }
   };
 
@@ -114,7 +149,7 @@ async function initializeWorkflowStages(supabaseClient: any, campaignId: string)
   console.log('Workflow stages initialized successfully');
 }
 
-async function executeWorkflowStages(supabaseClient: any, campaignId: string, command: string) {
+async function executeWorkflowStages(supabaseClient: any, campaignId: string, command: string, settings?: any) {
   console.log('Starting workflow execution for campaign:', campaignId);
 
   // Stage 1: Command Analysis
@@ -127,7 +162,7 @@ async function executeWorkflowStages(supabaseClient: any, campaignId: string, co
 
   // Stage 2: Content Creation
   await updateStageStatus(supabaseClient, campaignId, 'content_creation', 'in_progress');
-  const contentResult = await executeContentCreation(analysisResult, command);
+  const contentResult = await executeContentCreation(analysisResult, command, settings);
   await updateStageStatus(supabaseClient, campaignId, 'content_creation', 'completed', contentResult);
 
   await new Promise(resolve => setTimeout(resolve, 2000));
@@ -173,6 +208,11 @@ async function updateStageStatus(
     if (outputData) {
       updateData.output_data = outputData;
     }
+  } else if (status === 'failed') {
+    updateData.completed_at = new Date().toISOString();
+    if (outputData) {
+      updateData.error_message = outputData.error || 'Unknown error';
+    }
   }
 
   const { error } = await supabaseClient
@@ -208,46 +248,176 @@ async function executeCommandAnalysis(command: string) {
   return analysis;
 }
 
-async function executeContentCreation(analysisResult: any, originalCommand: string) {
+async function executeContentCreation(analysisResult: any, originalCommand: string, settings?: any) {
   console.log('Executing content creation based on analysis');
 
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   if (!openAIApiKey) {
-    console.warn('OpenAI API key not configured, using mock content');
+    throw new Error('OpenAI API key not configured');
   }
 
-  // Simulate content generation with OpenAI
-  await new Promise(resolve => setTimeout(resolve, 4000));
+  try {
+    // Extract settings with defaults
+    const targetWords = Number(settings?.word_count) || 800;
+    const depth = (settings?.content_depth || 'standard');
+    const seoLevel = (settings?.seo_difficulty || 'medium');
+    
+    const prompt = `
+Write a ${targetWords}-word blog post about "${originalCommand}".
+Content depth: ${depth}. SEO difficulty: ${seoLevel}.
 
-  const content = {
-    title: `Ultimate Guide: ${originalCommand}`,
-    body_text: `This is a comprehensive guide about ${originalCommand}. This content has been generated by our AI system to provide valuable insights and actionable advice for our readers.`,
-    meta_description: `Learn everything about ${originalCommand} in this comprehensive guide.`,
-    seo_title: `${originalCommand} - Complete Guide 2024`,
-    word_count: 1200,
-    seo_score: 85,
-    readability_score: 78
-  };
+Requirements:
+- Include H2/H3 structure for better readability
+- Create a compelling introduction that hooks readers
+- Use skimmable sections with clear headings
+- Include a strong call-to-action for ICE SOS emergency services
+- Focus on safety, family protection, and emergency preparedness
+- Make it actionable and valuable for families
 
-  console.log('Content creation completed:', content);
-  return content;
+Return a JSON object with these exact keys:
+{
+  "title": "Compelling blog title",
+  "body_text": "Full HTML blog content with proper headings and structure",
+  "seo_title": "SEO-optimized title under 60 characters",
+  "meta_description": "SEO meta description under 160 characters",
+  "content_sections": [
+    {"heading": "Section heading", "summary": "Brief summary"}
+  ],
+  "word_count": ${targetWords},
+  "keywords": ["keyword1", "keyword2", "keyword3"],
+  "featured_image_alt": "Alt text for the featured image"
+}
+`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-2025-04-14',
+        messages: [
+          { role: 'system', content: 'You are an expert content writer specializing in family safety and emergency preparedness. Always return valid JSON.' },
+          { role: 'user', content: prompt }
+        ],
+        max_completion_tokens: 3000,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const generatedText = data.choices[0].message.content;
+    
+    // Try to parse JSON, fallback to structured content if parsing fails
+    let content;
+    try {
+      content = JSON.parse(generatedText);
+    } catch (parseError) {
+      console.warn('Failed to parse OpenAI JSON response, creating structured content');
+      content = {
+        title: `Ultimate Guide: ${originalCommand}`,
+        body_text: generatedText,
+        seo_title: `${originalCommand} - Complete Guide 2025`,
+        meta_description: `Learn everything about ${originalCommand} in this comprehensive guide for families.`,
+        content_sections: [
+          { heading: "Introduction", summary: "Overview and importance" },
+          { heading: "Main Content", summary: "Detailed information and tips" },
+          { heading: "Conclusion", summary: "Key takeaways and next steps" }
+        ],
+        word_count: targetWords,
+        keywords: originalCommand.split(' ').slice(0, 5),
+        featured_image_alt: `Professional image representing ${originalCommand}`
+      };
+    }
+
+    // Calculate reading time and SEO score
+    const actualWordCount = content.body_text.split(/\s+/).length;
+    content.reading_time = Math.ceil(actualWordCount / 200);
+    content.seo_score = Math.min(95, 60 + (content.keywords?.length || 0) * 5 + (content.meta_description?.length > 120 ? 10 : 0));
+
+    console.log('Content creation completed:', { title: content.title, wordCount: actualWordCount });
+    return content;
+  } catch (error) {
+    console.error('Content creation failed:', error);
+    throw new Error(`Content creation failed: ${error.message}`);
+  }
 }
 
 async function executeImageGeneration(contentResult: any) {
   console.log('Executing image generation for content');
 
-  // Simulate image generation
-  await new Promise(resolve => setTimeout(resolve, 5000));
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!openAIApiKey) {
+    console.warn('OpenAI API key not configured, using placeholder image');
+    return {
+      image_url: `https://picsum.photos/800/600?random=${Date.now()}`,
+      image_prompt: `Professional illustration for: ${contentResult.title}`,
+      alt_text: contentResult.featured_image_alt || `Professional image representing ${contentResult.title}`,
+      dimensions: { width: 800, height: 600 }
+    };
+  }
 
-  const imageResult = {
-    image_url: `https://picsum.photos/800/600?random=${Date.now()}`,
-    image_prompt: `Professional illustration for: ${contentResult.title}`,
-    alt_text: `Professional image representing ${contentResult.title}`,
-    dimensions: { width: 800, height: 600 }
-  };
+  try {
+    const imagePrompt = `Professional, high-quality illustration representing "${contentResult.title}". 
+    Style: Clean, modern, family-friendly. 
+    Theme: Family safety, emergency preparedness, technology for protection.
+    No text overlay. Suitable for blog header image.`;
 
-  console.log('Image generation completed:', imageResult);
-  return imageResult;
+    const response = await fetch('https://api.openai.com/v1/images/generations', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-image-1',
+        prompt: imagePrompt,
+        n: 1,
+        size: '1024x1024',
+        quality: 'high',
+        output_format: 'png'
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI Image API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    // Handle both URL and base64 responses
+    let imageUrl;
+    if (data.data?.[0]?.url) {
+      imageUrl = data.data[0].url;
+    } else if (data.data?.[0]?.b64_json) {
+      imageUrl = `data:image/png;base64,${data.data[0].b64_json}`;
+    } else {
+      throw new Error('No image data received from OpenAI');
+    }
+
+    const imageResult = {
+      image_url: imageUrl,
+      image_prompt: imagePrompt,
+      alt_text: contentResult.featured_image_alt || `Professional image representing ${contentResult.title}`,
+      dimensions: { width: 1024, height: 1024 }
+    };
+
+    console.log('Image generation completed successfully');
+    return imageResult;
+  } catch (error) {
+    console.error('Image generation failed:', error);
+    // Fallback to placeholder image
+    return {
+      image_url: `https://picsum.photos/800/600?random=${Date.now()}`,
+      image_prompt: `Professional illustration for: ${contentResult.title}`,
+      alt_text: contentResult.featured_image_alt || `Professional image representing ${contentResult.title}`,
+      dimensions: { width: 800, height: 600 }
+    };
+  }
 }
 
 async function executeQualityAssembly(contentResult: any, imageResult: any) {
@@ -286,8 +456,9 @@ async function createFinalContent(supabaseClient: any, campaignId: string, assem
     meta_description: assemblyResult.meta_description,
     featured_image_alt: assemblyResult.alt_text,
     content_sections: assemblyResult.content_sections,
-    reading_time: Math.ceil(assemblyResult.word_count / 200),
-    seo_score: assemblyResult.seo_score,
+    reading_time: assemblyResult.reading_time || Math.ceil((assemblyResult.word_count || 800) / 200),
+    seo_score: assemblyResult.seo_score || 75,
+    keywords: assemblyResult.keywords || [],
     status: 'draft'
   };
 
