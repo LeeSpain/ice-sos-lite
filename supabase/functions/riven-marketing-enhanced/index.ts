@@ -354,6 +354,18 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
   return analysisResult;
 }
 
+// Helper function to determine if model uses newer API parameters
+function isNewerModel(model: string): boolean {
+  const newerModels = ['gpt-5', 'gpt-4.1', 'o3', 'o4'];
+  return newerModels.some(prefix => model.startsWith(prefix));
+}
+
+// Helper function to determine if model uses newer API parameters
+function isNewerModel(model: string): boolean {
+  const newerModels = ['gpt-5', 'gpt-4.1', 'o3', 'o4'];
+  return newerModels.some(prefix => model.startsWith(prefix));
+}
+
 async function executeContentCreation(supabase: any, campaignId: string, originalCommand: string, settings: any, aiConfig: any) {
   console.log('Executing content creation stage');
   
@@ -678,8 +690,8 @@ async function executeQualityAssembly(supabase: any, campaignId: string) {
   
   const assemblyResult = {
     ...contentResult,
-    featured_image_url: imageResult.image_url,
-    featured_image_alt: imageResult.alt_text,
+    featured_image_url: imageResult.image_url,  // This will be mapped to image_url in createFinalContent
+    featured_image_alt: imageResult.alt_text || '',
     quality_score: 92,
     status: 'ready_for_approval',
     assembled_at: new Date().toISOString()
@@ -702,29 +714,36 @@ async function createFinalContent(supabase: any, campaignId: string) {
 
   const assembledContent = assemblyStage?.output_data || {};
   
-  // Create the final content record
+  console.log('Assembled content:', JSON.stringify(assembledContent, null, 2));
+  
+  // Create the final content record with correct schema mapping
+  const contentPayload = {
+    campaign_id: campaignId,
+    platform: 'blog',  // Required field
+    content_type: 'blog_post',  // Required field
+    title: assembledContent.title || 'Untitled Blog Post',
+    body_text: assembledContent.body_text || '',
+    seo_title: assembledContent.seo_title || assembledContent.title,
+    meta_description: assembledContent.meta_description || '',
+    image_url: assembledContent.featured_image_url,  // Map to image_url column
+    featured_image_alt: assembledContent.featured_image_alt || '',
+    content_sections: assembledContent.content_sections || {},
+    reading_time: assembledContent.reading_time || 0,
+    seo_score: assembledContent.seo_score || 0,
+    keywords: assembledContent.keywords || [],
+    status: 'pending_review'  // Use status that exists in enum
+  };
+  
+  console.log('Content payload for insert:', JSON.stringify(contentPayload, null, 2));
+
   const { data, error } = await supabase
     .from('marketing_content')
-    .insert({
-      campaign_id: campaignId,
-      title: assembledContent.title,
-      body_text: assembledContent.body_text,
-      seo_title: assembledContent.seo_title,
-      meta_description: assembledContent.meta_description,
-      featured_image_url: assembledContent.featured_image_url,
-      featured_image_alt: assembledContent.featured_image_alt,
-      content_sections: assembledContent.content_sections,
-      word_count: assembledContent.word_count,
-      reading_time: assembledContent.reading_time,
-      seo_score: assembledContent.seo_score,
-      keywords: assembledContent.keywords,
-      status: 'pending_approval',
-      created_by: '00000000-0000-0000-0000-000000000000'
-    })
+    .insert(contentPayload)
     .select()
     .single();
 
   if (error) {
+    console.error('Insert error details:', error);
     throw new Error(`Failed to create final content: ${error.message}`);
   }
 
@@ -737,6 +756,6 @@ async function createFinalContent(supabase: any, campaignId: string) {
     })
     .eq('id', campaignId);
 
-  console.log('Final content created successfully');
+  console.log('Final content created successfully with ID:', data.id);
   return { content_id: data.id, status: 'completed' };
 }
