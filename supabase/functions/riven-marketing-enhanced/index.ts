@@ -61,7 +61,7 @@ serve(async (req) => {
     console.log(`Processing enhanced marketing command: ${command}`);
 
     // Create campaign first
-    const campaignId = await createCampaign(supabaseClient, command, title);
+    const campaignId = await createCampaign(supabaseClient, command, title, settings, scheduling_options, publishing_controls);
     console.log(`Created campaign with ID: ${campaignId}`);
 
     // Initialize workflow stages
@@ -93,7 +93,7 @@ serve(async (req) => {
   }
 });
 
-async function createCampaign(supabaseClient: any, command: string, title?: string) {
+async function createCampaign(supabaseClient: any, command: string, title?: string, settings?: any, scheduling_options?: any, publishing_controls?: any) {
   console.log('Creating new campaign:', title || command);
 
   const campaignData = {
