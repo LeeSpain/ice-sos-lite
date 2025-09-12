@@ -6,6 +6,13 @@ const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const xaiApiKey = Deno.env.get('XAI_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+
+console.log('🔧 Environment check:', {
+  openAI: openAIApiKey ? '✅ configured' : '❌ missing',
+  xai: xaiApiKey ? '✅ configured' : '❌ missing', 
+  supabaseUrl: supabaseUrl ? '✅ configured' : '❌ missing',
+  supabaseKey: supabaseServiceKey ? '✅ configured' : '❌ missing'
+});
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -21,13 +28,19 @@ const WORKFLOW_STAGES = [
   { name: 'final_content_creation', order: 5 }
 ];
 
+console.log('🚀 Riven Marketing Enhanced function starting...');
+
 serve(async (req) => {
+  console.log(`📝 Request received: ${req.method} ${req.url}`);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('✅ Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('⚡ Processing request body...');
     const body = await req.json();
     
     // Load env for Supabase client
@@ -108,16 +121,20 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error in riven-marketing-enhanced function:', error);
+    console.error('❌ Error in riven-marketing-enhanced function:', error);
+    console.error('❌ Error stack:', error.stack);
     return new Response(JSON.stringify({ 
       error: 'Command Failed', 
-      details: error.message 
+      details: error.message,
+      stack: error.stack 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500
     });
   }
 });
+
+console.log('🎉 Function initialized successfully');
 
 async function createCampaign(supabase: any, command: string, title: string, settings: any, scheduling_options: any, publishing_controls: any) {
   console.log('Creating campaign...');
@@ -509,8 +526,11 @@ Focus on family safety, emergency preparedness, and practical advice that relate
             content: prompt
           }
         ],
-        max_tokens: 2000,
-        temperature: aiConfig?.temperature || 0.7,
+        // Use correct parameters based on model type
+        ...(isNewerModel(aiConfig?.providers?.openai?.model || 'gpt-4o-mini') 
+          ? { max_completion_tokens: 2000 }
+          : { max_tokens: 2000, temperature: 0.7 }
+        )
       }),
     });
 
