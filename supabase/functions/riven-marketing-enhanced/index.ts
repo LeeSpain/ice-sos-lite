@@ -60,17 +60,15 @@ serve(async (req) => {
       }
 
       const status = {
-        openai: { 
-          status: openaiStatus,
-          models: openaiStatus === 'connected' ? ['gpt-4o-mini', 'gpt-4o', 'dall-e-3'] : []
+        success: true,
+        providers: {
+          openai: openaiStatus === 'connected',
+          xai: xaiStatus === 'connected'
         },
-        xai: {
-          status: xaiStatus,
-          models: xaiStatus === 'connected' ? ['grok-beta', 'grok-vision-beta'] : []
-        },
-        supabase: {
-          status: 'connected',
-          url: supabaseUrl
+        details: {
+          openai: { status: openaiStatus, models: openaiStatus === 'connected' ? ['gpt-4o-mini', 'gpt-4o', 'dall-e-3'] : [] },
+          xai: { status: xaiStatus, models: xaiStatus === 'connected' ? ['grok-beta', 'grok-vision-beta'] : [] },
+          supabase: { status: 'connected', url: supabaseUrl }
         }
       };
 
@@ -168,10 +166,12 @@ async function executeWorkflowStages(supabase: any, campaignId: string, command:
   console.log(`Starting workflow execution for campaign ${campaignId}`);
   
   // Get AI provider configuration
-  const { data: aiConfig } = await supabase
-    .from('ai_providers_config')
-    .select('*')
-    .single();
+  const { data: configRow } = await supabase
+    .from('site_content')
+    .select('value')
+    .eq('key', 'ai_providers_config')
+    .maybeSingle();
+  const aiConfig = (configRow?.value as any) ?? {};
   
   console.log('AI Provider Config:', aiConfig);
   
