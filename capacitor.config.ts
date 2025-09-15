@@ -1,15 +1,14 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.icesosinternational.app',
-  appName: 'ICE SOS - Emergency Protection',
+  appId: 'app.lovable.a856a70f639b4212b411d2cdb524d754',
+  appName: 'ice-sos-lite',
   webDir: 'dist',
   bundledWebRuntime: false,
-  server: {
-    // Production: Remove or comment this section for production builds
+  server: process.env.NODE_ENV === 'development' ? {
     url: 'https://a856a70f-639b-4212-b411-d2cdb524d754.lovableproject.com?forceHideBadge=true',
     cleartext: true
-  },
+  } : undefined,
   plugins: {
     SplashScreen: {
       launchShowDuration: 2500,
@@ -28,32 +27,19 @@ const config: CapacitorConfig = {
       maximumAge: 30000,
       permissions: {
         android: [
-          "android.permission.ACCESS_COARSE_LOCATION",
-          "android.permission.ACCESS_FINE_LOCATION",
-          "android.permission.ACCESS_BACKGROUND_LOCATION"
+          "android.permission.ACCESS_FINE_LOCATION"
         ],
         ios: [
-          "NSLocationWhenInUseUsageDescription",
-          "NSLocationAlwaysAndWhenInUseUsageDescription",
-          "NSLocationAlwaysUsageDescription"
+          "NSLocationWhenInUseUsageDescription"
         ]
       }
-    },
-    PushNotifications: {
-      presentationOptions: ["badge", "sound", "alert"]
     },
     App: {
       permissions: {
         android: [
           "android.permission.INTERNET",
           "android.permission.ACCESS_NETWORK_STATE",
-          "android.permission.WAKE_LOCK",
-          "android.permission.VIBRATE",
-          "android.permission.CALL_PHONE",
-          "android.permission.CAMERA",
-          "android.permission.RECORD_AUDIO",
-          "android.permission.WRITE_EXTERNAL_STORAGE",
-          "android.permission.READ_EXTERNAL_STORAGE"
+          "android.permission.VIBRATE"
         ]
       }
     },
