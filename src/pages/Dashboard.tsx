@@ -158,7 +158,7 @@ const Dashboard = () => {
           <div className="flex-1 overflow-auto">
             <Routes>
               {/* Main Dashboard Overview - Family Circle Focused */}
-              <Route index element={
+              <Route path="/" element={
                 <div className="p-6">
                   <div className="max-w-none">
                     {/* Welcome Header */}
