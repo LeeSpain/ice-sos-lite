@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { CircleSwitcher } from "@/components/map/CircleSwitcher";
 import { MemberPin } from "@/components/map/MemberPin";
 import { MemberSheet } from "@/components/map/MemberSheet";
-import { useMapProvider } from "@/hooks/useMapProvider";
+import { useUnifiedMap } from "@/hooks/useUnifiedMap";
 import { useCircleRealtime } from "@/hooks/useCircleRealtime";
 import { useBackgroundLocation } from "@/hooks/useBackgroundLocation";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export default function MapScreen() {
   const [sosHoldTimer, setSosHoldTimer] = useState<number | null>(null);
   const [sosProgress, setSosProgress] = useState(0);
   
-  const { MapView } = useMapProvider();
+  const { MapView } = useUnifiedMap();
   const { presences, circles, recentEvents, loadInitial, refresh } = useCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(locationEnabled);
   const { toast } = useToast();

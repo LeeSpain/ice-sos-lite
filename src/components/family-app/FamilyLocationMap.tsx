@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useMapProvider } from '@/hooks/useMapProvider';
+import { useUnifiedMap } from '@/hooks/useUnifiedMap';
 import FamilyMarker from '@/components/map/FamilyMarker';
 import { useLocationServices } from '@/hooks/useLocationServices';
 import { useFamilyMembers } from '@/hooks/useFamilyMembers';
@@ -18,7 +18,7 @@ interface FamilyLocationData {
 }
 
 const FamilyLocationMap = () => {
-  const { MapView } = useMapProvider();
+  const { MapView } = useUnifiedMap();
   const { getCurrentLocationData } = useLocationServices();
   const { data: familyRole } = useFamilyRole();
   const { data: familyData, isLoading, refetch } = useFamilyMembers(familyRole?.familyGroupId);

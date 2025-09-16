@@ -1,5 +1,5 @@
 import React from "react";
-import { useMapProvider } from "@/hooks/useMapProvider";
+import { useUnifiedMap } from "@/hooks/useUnifiedMap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -66,7 +66,7 @@ export function MemberPin({ presence, onClick }: MemberPinProps) {
 
 // Interactive Map Demo Component
 export default function MapDemo() {
-  const { MapView } = useMapProvider();
+  const { MapView } = useUnifiedMap();
   const [selectedMember, setSelectedMember] = React.useState<Presence | null>(null);
 
   // Demo data - family members in different locations around London
