@@ -97,7 +97,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ 
         success: true,
         connection: updatedConnection,
-        redirect_url: connection.type === 'family_circle' ? '/family-dashboard' : '/dashboard'
+        redirect_url: connection.type === 'family_circle' ? '/family-dashboard' : '/member-dashboard'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
