@@ -186,7 +186,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   const [loading, setLoading] = useState(true);
   const [initializationError, setInitializationError] = useState<string | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
-  const [useTestPayment, setUseTestPayment] = useState(false);
+  const [useTestPayment, setUseTestPayment] = useState(testingMode);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { currency: contextCurrency, language } = usePreferences();
@@ -434,7 +434,7 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
 
   // Initialize payment on component mount and when test mode changes
   useEffect(() => {
-    console.log("🎬 EmbeddedPayment mounted/updated, initializing payment...");
+    console.log("🎬 EmbeddedPayment mounted/updated, initializing payment...", { testingMode, useTestPayment });
     setLoading(true);
     initializePayment();
     
