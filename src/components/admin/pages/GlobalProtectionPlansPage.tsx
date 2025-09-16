@@ -67,6 +67,27 @@ const GlobalProtectionPlansPage = () => {
 
   useEffect(() => {
     loadPlans();
+    
+    // Defensive cleanup for modal states
+    return () => {
+      setShowCreateDialog(false);
+      setShowEditDialog(false);
+      setEditingPlan(null);
+    };
+  }, []);
+
+  // Force close all dialogs when component mounts (defensive cleanup)
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowCreateDialog(false);
+        setShowEditDialog(false);
+        setEditingPlan(null);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, []);
 
   const loadPlans = async () => {
@@ -391,14 +412,19 @@ const GlobalProtectionPlansPage = () => {
           <h1 className="text-3xl font-bold">Global Protection Plans</h1>
           <p className="text-muted-foreground">Manage subscription pricing and plan features</p>
         </div>
-        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <Dialog open={showCreateDialog} onOpenChange={(open) => {
+          setShowCreateDialog(open);
+          if (!open) {
+            resetForm();
+          }
+        }}>
           <DialogTrigger asChild>
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" />
               Add Plan
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border border-border shadow-2xl z-50">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border border-border shadow-2xl z-[70]">
             <DialogHeader>
               <DialogTitle>Create New Protection Plan</DialogTitle>
               <DialogDescription>
@@ -541,7 +567,7 @@ const GlobalProtectionPlansPage = () => {
                             <Edit className="h-4 w-4" />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border border-border shadow-2xl z-50">
+                        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background border border-border shadow-2xl z-[70]">
                           <DialogHeader>
                             <DialogTitle>Edit Protection Plan</DialogTitle>
                             <DialogDescription>

@@ -225,6 +225,39 @@ export default function AdminLayout() {
   console.log('🏗️ AdminLayout is rendering');
   const { t } = useTranslation();
   
+  // Emergency cleanup for stuck modal overlays
+  React.useEffect(() => {
+    const handleGlobalEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && e.ctrlKey) {
+        // Emergency cleanup - remove any stuck modal overlays
+        const overlays = document.querySelectorAll('[data-state="open"][role="dialog"]');
+        const backdrops = document.querySelectorAll('[data-radix-popper-content-wrapper]');
+        
+        overlays.forEach(overlay => {
+          const parent = overlay.parentElement;
+          if (parent) parent.style.display = 'none';
+        });
+        
+        backdrops.forEach(backdrop => {
+          const element = backdrop as HTMLElement;
+          element.style.display = 'none';
+        });
+        
+        // Force remove any backdrop blur overlays
+        const blurOverlays = document.querySelectorAll('.fixed.inset-0.z-\\[60\\]');
+        blurOverlays.forEach(overlay => {
+          (overlay as HTMLElement).style.display = 'none';
+        });
+        
+        console.log('🧹 Emergency modal cleanup triggered');
+      }
+    };
+    
+    document.addEventListener('keydown', handleGlobalEscape);
+    return () => document.removeEventListener('keydown', handleGlobalEscape);
+  }, []);
+  
+  
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
