@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { CircleSwitcher } from "@/components/map/CircleSwitcher";
 import { MemberPin } from "@/components/map/MemberPin";
 import { MemberSheet } from "@/components/map/MemberSheet";
@@ -28,7 +28,7 @@ export default function MapScreen() {
   const [sosHoldTimer, setSosHoldTimer] = useState<number | null>(null);
   const [sosProgress, setSosProgress] = useState(0);
   
-  const { MapView, currentBackend } = useUnifiedMap();
+  const { MapView, currentBackend, hasMapboxToken, switchToCanvas, switchToMapbox } = useUnifiedMap();
   const { presences, circles, recentEvents, loadInitial, refresh, metrics, connectionHealth } = useEnhancedCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(locationEnabled);
   const { toast } = useToast();
@@ -43,6 +43,12 @@ export default function MapScreen() {
       setActiveCircleId(circles[0].id);
     }
   }, [circles, activeCircleId]);
+
+  const mapCenter = useMemo(() => {
+    if (presences.length === 0) return { lat: 37.7749, lng: -122.4194 };
+    const sums = presences.reduce((acc, p) => ({ lat: acc.lat + p.lat, lng: acc.lng + p.lng }), { lat: 0, lng: 0 });
+    return { lat: sums.lat / presences.length, lng: sums.lng / presences.length };
+  }, [presences]);
 
   const handleLocationToggle = async () => {
     if (!locationEnabled && permission !== 'granted') {
@@ -157,8 +163,14 @@ export default function MapScreen() {
 
       {/* Map */}
       {import.meta.env.DEV && (
-        <div className="absolute top-4 right-4 z-30">
+        <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
           <Badge variant="outline">Map: {currentBackend}</Badge>
+          {hasMapboxToken ? (
+            <Button size="sm" variant="outline" onClick={() => { switchToMapbox(); }}>Use Mapbox</Button>
+          ) : (
+            <Badge variant="secondary">No Mapbox token</Badge>
+          )}
+          <Button size="sm" variant="outline" onClick={() => { switchToCanvas(); }}>Use Canvas</Button>
         </div>
       )}
       <MapView
@@ -174,6 +186,8 @@ export default function MapScreen() {
             />
           )
         }))}
+        center={mapCenter}
+        preferCanvas={true}
       />
 
       {/* SOS Button */}

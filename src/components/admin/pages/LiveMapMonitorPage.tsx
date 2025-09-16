@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -28,7 +28,7 @@ export default function LiveMapMonitorPage() {
   const [locationPings, setLocationPings] = useState<any[]>([]);
   const [placeEvents, setPlaceEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { MapView } = useUnifiedMap();
+  const { MapView, currentBackend, hasMapboxToken, switchToCanvas, switchToMapbox } = useUnifiedMap();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -188,6 +188,12 @@ export default function LiveMapMonitorPage() {
     )
   }));
 
+  const mapCenter = useMemo(() => {
+    if (activePresences.length === 0) return { lat: 37.7749, lng: -122.4194 };
+    const sums = activePresences.reduce((acc, p) => ({ lat: acc.lat + p.lat, lng: acc.lng + p.lng }), { lat: 0, lng: 0 });
+    return { lat: sums.lat / activePresences.length, lng: sums.lng / activePresences.length };
+  }, [activePresences]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -296,10 +302,23 @@ export default function LiveMapMonitorPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {import.meta.env.DEV && (
+            <div className="flex justify-end mb-2 gap-2">
+              <Badge variant="outline">Map: {currentBackend}</Badge>
+              {hasMapboxToken ? (
+                <Button size="sm" variant="outline" onClick={() => { switchToMapbox(); }}>Use Mapbox</Button>
+              ) : (
+                <Badge variant="secondary">No Mapbox token</Badge>
+              )}
+              <Button size="sm" variant="outline" onClick={() => { switchToCanvas(); }}>Use Canvas</Button>
+            </div>
+          )}
           <div className="h-96 rounded-lg overflow-hidden border">
             <MapView
               markers={markers}
               className="w-full h-full"
+              center={mapCenter}
+              preferCanvas={true}
             />
           </div>
         </CardContent>
