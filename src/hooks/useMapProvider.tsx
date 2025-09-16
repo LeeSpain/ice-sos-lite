@@ -116,6 +116,17 @@ export function useMapProvider() {
           map.current?.resize();
         });
 
+        // Surface style/source errors clearly instead of rendering a blank map
+        map.current.on('error', (e) => {
+          const message = (e as any)?.error?.message || '';
+          if (typeof message === 'string' && (message.toLowerCase().includes('unauthorized') || message.includes('401') || message.includes('403'))) {
+            setTokenError('Map authorization failed');
+          } else {
+            setTokenError('Map failed to load');
+          }
+          console.error('Mapbox error:', e);
+        });
+
       } catch (error) {
         console.error('Failed to initialize map:', error);
         setTokenError('Map initialization failed');
