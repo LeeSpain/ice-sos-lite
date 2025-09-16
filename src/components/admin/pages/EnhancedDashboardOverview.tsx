@@ -142,6 +142,12 @@ const EnhancedDashboardOverview: React.FC = () => {
         .select('id, name, price, currency, billing_interval, is_active')
         .eq('is_active', true);
       
+      // Subscribers (actuals)
+      const { data: subscribers } = await supabase
+        .from('subscribers')
+        .select('id, user_id, subscribed, subscription_tier, created_at, subscription_end')
+        .eq('subscribed', true);
+      
       // Growth Metrics - Real data
       const { data: leads } = await supabase
         .from('leads')
@@ -187,11 +193,25 @@ const EnhancedDashboardOverview: React.FC = () => {
         new Date(p.created_at) >= startDate
       ).length || 0;
       
-      // Subscription calculations (based on subscription plans data)
-      const avgSubscriptionPrice = subscriptionPlans?.reduce((sum, plan) => sum + (plan.price || 0), 0) / Math.max(subscriptionPlans?.length || 1, 1);
-      const estimatedActiveSubscribers = Math.floor(totalUsers * 0.15); // 15% conversion estimate
-      const monthlyRevenue = estimatedActiveSubscribers * avgSubscriptionPrice;
-      const arpu = estimatedActiveSubscribers > 0 ? monthlyRevenue / estimatedActiveSubscribers : avgSubscriptionPrice;
+      // Subscription calculations (actuals from subscribers table)
+      const activeSubscribersList = (subscribers || []).filter((s: any) => {
+        const end = s.subscription_end ? new Date(s.subscription_end) : null;
+        return s.subscribed && (!end || end > now);
+      });
+      const planPriceMap = new Map((subscriptionPlans || []).map((p: any) => [p.name, { price: Number(p.price) || 0, interval: p.billing_interval }]));
+      const mrrCalc = activeSubscribersList.reduce((sum: number, s: any) => {
+        const plan = planPriceMap.get(s.subscription_tier || '');
+        if (!plan) return sum;
+        const monthly = plan.interval === 'year' ? plan.price / 12 : plan.price;
+        return sum + monthly;
+      }, 0);
+      const estimatedActiveSubscribers = activeSubscribersList.length;
+      const monthlyRevenue = mrrCalc;
+      const arpu = estimatedActiveSubscribers > 0 
+        ? monthlyRevenue / estimatedActiveSubscribers 
+        : ((subscriptionPlans && subscriptionPlans.length) 
+            ? (subscriptionPlans.reduce((sum: number, p: any) => sum + (p.price || 0), 0) / subscriptionPlans.length) 
+            : 0);
       
       // Lead conversion calculations
       const leadsCount = leads?.length || 0;
