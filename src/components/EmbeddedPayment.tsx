@@ -4,7 +4,7 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
@@ -177,16 +177,15 @@ interface EmbeddedPaymentProps {
   currency?: SupportedCurrency;
   onSuccess: () => void;
   onBack: () => void;
-  testingMode?: boolean;
 }
 
-const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmail, firstName, lastName, password, phone, city, country, currency: propCurrency, onSuccess, onBack, testingMode = false }: EmbeddedPaymentProps) => {
+
+const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmail, firstName, lastName, password, phone, city, country, currency: propCurrency, onSuccess, onBack }: EmbeddedPaymentProps) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [customerId, setCustomerId] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [initializationError, setInitializationError] = useState<string | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<any> | null>(null);
-  const [useTestPayment, setUseTestPayment] = useState(testingMode);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { currency: contextCurrency, language } = usePreferences();
@@ -220,55 +219,49 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
   // Test plan ID
   const TEST_PLAN_ID = '1e84c8b0-3101-4dbb-907c-81fd79b9a955';
   
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Determine which plans to fetch
-        const plansToFetch = useTestPayment ? [TEST_PLAN_ID] : plans;
-        
-        // Fetch subscription plans
-        if (plansToFetch.length > 0) {
-          const { data, error } = await supabase
-            .from('subscription_plans')
-            .select('*')
-            .in('id', plansToFetch);
-          
-          if (error) throw error;
-          setPlanData(data || []);
-        }
-
-        // Fetch products (skip if using test payment)
-        if (products.length > 0 && !useTestPayment) {
-          const { data, error } = await supabase
-            .from('products')
-            .select('*')
-            .in('id', products);
-          
-          if (error) throw error;
-          setProductData(data || []);
-        } else if (useTestPayment) {
-          setProductData([]);
-        }
-
-        // Fetch regional services (skip if using test payment)
-        if (regionalServices.length > 0 && !useTestPayment) {
-          const { data, error } = await supabase
-            .from('regional_services')
-            .select('*')
-            .in('id', regionalServices);
-          
-          if (error) throw error;
-          setServiceData(data || []);
-        } else if (useTestPayment) {
-          setServiceData([]);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      // Fetch subscription plans
+      if (plans.length > 0) {
+        const { data, error } = await supabase
+          .from('subscription_plans')
+          .select('*')
+          .in('id', plans);
+        if (error) throw error;
+        setPlanData(data || []);
       }
-    };
-    
-    fetchData();
-  }, [plans, products, regionalServices, useTestPayment]);
+
+      // Fetch products
+      if (products.length > 0) {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .in('id', products);
+        if (error) throw error;
+        setProductData(data || []);
+      } else {
+        setProductData([]);
+      }
+
+      // Fetch regional services
+      if (regionalServices.length > 0) {
+        const { data, error } = await supabase
+          .from('regional_services')
+          .select('*')
+          .in('id', regionalServices);
+        if (error) throw error;
+        setServiceData(data || []);
+      } else {
+        setServiceData([]);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+  
+  fetchData();
+}, [plans, products, regionalServices]);
 
   // Tax rates to match the registration form
   const PRODUCT_IVA_RATE = 0.21; // 21% for products
@@ -293,144 +286,125 @@ const EmbeddedPayment = ({ plans, products = [], regionalServices = [], userEmai
 
   const grandTotal = subscriptionTotal + productTotal;
 
-  const initializePayment = async (retryCount = 0) => {
-    const effectivePlans = useTestPayment ? [TEST_PLAN_ID] : plans;
-    const effectiveProducts = useTestPayment ? [] : products;
-    const effectiveServices = useTestPayment ? [] : regionalServices;
-    
-    console.log("🚀 Initializing payment...", { 
-      effectivePlans, 
-      effectiveProducts, 
-      effectiveServices, 
-      userEmail, 
-      firstName, 
-      lastName, 
-      retryCount, 
-      testingMode,
-      useTestPayment 
+const initializePayment = async (retryCount = 0) => {
+  console.log("🚀 Initializing payment...", {
+    plans,
+    products,
+    regionalServices,
+    userEmail,
+    firstName,
+    lastName,
+    retryCount,
+  });
+  
+  setInitializationError(null);
+  
+  if ((!plans || plans.length === 0) && (!products || products.length === 0) && (!regionalServices || regionalServices.length === 0)) {
+    const errorMsg = "No items provided to payment initialization";
+    console.error("❌", errorMsg);
+    setInitializationError(errorMsg);
+    toast({
+      title: "Error",
+      description: "No items selected for payment. Please go back and select items.",
+      variant: "destructive"
     });
-    
-    setInitializationError(null);
-    
-    if ((!effectivePlans || effectivePlans.length === 0) && (!effectiveProducts || effectiveProducts.length === 0) && (!effectiveServices || effectiveServices.length === 0)) {
-      const errorMsg = "No items provided to payment initialization";
-      console.error("❌", errorMsg);
-      setInitializationError(errorMsg);
-      toast({
-        title: "Error",
-        description: "No items selected for payment. Please go back and select items.",
-        variant: "destructive"
-      });
-      setLoading(false);
-      return;
-    }
+    setLoading(false);
+    return;
+  }
 
-    // Initialize Stripe for real payments
-    try {
-      const publishableKey = await getStripeConfig();
-      const stripe = loadStripe(publishableKey);
-      setStripePromise(stripe);
-      console.log("✅ Stripe initialized successfully");
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Failed to initialize Stripe";
-      console.error("❌", errorMsg);
-      setInitializationError(errorMsg);
-      toast({
-        title: "Configuration Error",
-        description: "Payment system is not properly configured. Please contact support.",
-        variant: "destructive"
-      });
-      setLoading(false);
-      return;
-    }
-    
-    try {
-      console.log("📡 Calling create-mixed-payment...", { useTestPayment });
-      const { data, error } = await supabase.functions.invoke('create-mixed-payment', {
-        body: { 
-          subscriptionPlans: effectivePlans, 
-          products: effectiveProducts, 
-          regionalServices: effectiveServices,
-          email: userEmail, 
-          firstName, 
-          lastName,
-          currency: selectedCurrency,
-          testingMode: useTestPayment
-        }
-      });
-
-      console.log("📦 Payment intent response:", { 
-        hasData: !!data, 
-        hasError: !!error, 
-        clientSecret: data?.client_secret?.slice(-10),
-        customerId: data?.customer_id
-      });
-
-      if (error) {
-        // Check for specific client_secret mismatch error
-        if (error.message && error.message.includes('client_secret')) {
-          const errorMsg = "Client secret mismatch error - likely Stripe key configuration issue";
-          console.error("❌", errorMsg);
-          setInitializationError(errorMsg);
-          toast({
-            title: "Payment Configuration Error",
-            description: "There's a mismatch in payment configuration. Please contact support.",
-            variant: "destructive"
-          });
-          setLoading(false);
-          return;
-        }
-        throw error;
+  // Initialize Stripe for real payments
+  try {
+    const publishableKey = await getStripeConfig();
+    const stripe = loadStripe(publishableKey);
+    setStripePromise(stripe);
+    console.log("✅ Stripe initialized successfully");
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : "Failed to initialize Stripe";
+    console.error("❌", errorMsg);
+    setInitializationError(errorMsg);
+    toast({
+      title: "Configuration Error",
+      description: "Payment system is not properly configured. Please contact support.",
+      variant: "destructive"
+    });
+    setLoading(false);
+    return;
+  }
+  
+  try {
+    console.log("📡 Calling create-mixed-payment...");
+    const { data, error } = await supabase.functions.invoke('create-mixed-payment', {
+      body: { 
+        subscriptionPlans: plans, 
+        products, 
+        regionalServices,
+        email: userEmail, 
+        firstName, 
+        lastName,
+        currency: selectedCurrency
       }
+    });
 
-      // Handle test mode response
-      if (data.test_mode) {
-        console.log("🧪 Test mode response received - invoking onSuccess callback");
+    console.log("📦 Payment intent response:", { 
+      hasData: !!data, 
+      hasError: !!error, 
+      clientSecret: data?.client_secret?.slice(-10),
+      customerId: data?.customer_id
+    });
+
+    if (error) {
+      // Check for specific client_secret mismatch error
+      if (error.message && error.message.includes('client_secret')) {
+        const errorMsg = "Client secret mismatch error - likely Stripe key configuration issue";
+        console.error("❌", errorMsg);
+        setInitializationError(errorMsg);
         toast({
-          title: "Test Payment Complete",
-          description: "Test mode payment completed successfully!",
-          variant: "default"
+          title: "Payment Configuration Error",
+          description: "There's a mismatch in payment configuration. Please contact support.",
+          variant: "destructive"
         });
-        onSuccess();
+        setLoading(false);
         return;
       }
-
-      if (!data?.client_secret) {
-        throw new Error("No client secret received from payment service");
-      }
-
-      // Validate client secret format
-      if (!data.client_secret.startsWith('pi_')) {
-        throw new Error("Invalid client secret format received");
-      }
-
-      console.log("✅ Setting client secret and customer ID");
-      setClientSecret(data.client_secret);
-      setCustomerId(data.customer_id);
-      setInitializationError(null);
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Unknown error";
-      console.error("❌ Payment initialization error:", errorMsg);
-      setInitializationError(errorMsg);
-      
-      // Retry logic with exponential backoff for network errors
-      if (retryCount < 2 && error instanceof Error && 
-          (error.message.includes('network') || error.message.includes('timeout') || error.message.includes('fetch'))) {
-        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
-        console.log(`🔄 Retrying payment initialization in ${delay}ms...`);
-        setTimeout(() => initializePayment(retryCount + 1), delay);
-        return;
-      }
-      
-      toast({
-        title: "Payment Error",
-        description: "Failed to initialize payment. Please try again or contact support.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+      throw error;
     }
-  };
+
+    if (!data?.client_secret) {
+      throw new Error("No client secret received from payment service");
+    }
+
+    // Validate client secret format
+    if (!data.client_secret.startsWith('pi_')) {
+      throw new Error("Invalid client secret format received");
+    }
+
+    console.log("✅ Setting client secret and customer ID");
+    setClientSecret(data.client_secret);
+    setCustomerId(data.customer_id);
+    setInitializationError(null);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : "Unknown error";
+    console.error("❌ Payment initialization error:", errorMsg);
+    setInitializationError(errorMsg);
+    
+    // Retry logic with exponential backoff for network errors
+    if (retryCount < 2 && error instanceof Error && 
+        (error.message.includes('network') || error.message.includes('timeout') || error.message.includes('fetch'))) {
+      const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+      console.log(`🔄 Retrying payment initialization in ${delay}ms...`);
+      setTimeout(() => initializePayment(retryCount + 1), delay);
+      return;
+    }
+    
+    toast({
+      title: "Payment Error",
+      description: "Failed to initialize payment. Please try again or contact support.",
+      variant: "destructive"
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Initialize payment on component mount and when test mode changes
   useEffect(() => {
