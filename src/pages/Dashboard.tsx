@@ -157,42 +157,45 @@ const Dashboard = () => {
           {/* Dashboard Content */}
           <div className="flex-1 overflow-auto">
             <Routes>
-              {/* Main Dashboard Overview - Family Circle Focused */}
-              <Route path="/" element={
-                <div className="p-6">
-                  <div className="max-w-none">
-                    {/* Welcome Header */}
-                    <div className="mb-6">
-                      <h1 className="text-3xl font-bold">
-                        Welcome back, {profile?.first_name || 'Member'}!
-                      </h1>
-                      <p className="text-muted-foreground mt-1">
-                        Here's your protection status at a glance
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                      {/* Main Content - Family Circle Focus */}
-                      <div className="xl:col-span-2 space-y-6">
-                        {/* Family Circle Overview - Prominent */}
-                        <FamilyCircleOverview />
-                        
-                        {/* Emergency Preparedness */}
-                        <EmergencyPreparedness 
-                          profile={profile} 
-                          subscription={subscription}
-                        />
+              {/* Main Dashboard Overview - Default route */}
+              <Route 
+                index 
+                element={
+                  <div className="p-6">
+                    <div className="max-w-none">
+                      {/* Welcome Header */}
+                      <div className="mb-6">
+                        <h1 className="text-3xl font-bold">
+                          Welcome back, {profile?.first_name || 'Member'}!
+                        </h1>
+                        <p className="text-muted-foreground mt-1">
+                          Here's your protection status at a glance
+                        </p>
                       </div>
-                      
-                      {/* Sidebar - Live Status & Actions */}
-                      <div className="space-y-6">
-                        <LiveFamilyStatus />
-                        <EmergencyActionsWidget profile={profile} subscription={subscription} />
+
+                      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+                        {/* Main Content - Family Circle Focus */}
+                        <div className="xl:col-span-2 space-y-6">
+                          {/* Family Circle Overview - Prominent */}
+                          <FamilyCircleOverview />
+                          
+                          {/* Emergency Preparedness */}
+                          <EmergencyPreparedness 
+                            profile={profile} 
+                            subscription={subscription}
+                          />
+                        </div>
+                        
+                        {/* Sidebar - Live Status & Actions */}
+                        <div className="space-y-6">
+                          <LiveFamilyStatus />
+                          <EmergencyActionsWidget profile={profile} subscription={subscription} />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              } />
+                } 
+              />
 
               {/* Products Page */}
                <Route path="products" element={
