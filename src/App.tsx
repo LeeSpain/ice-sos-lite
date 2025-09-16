@@ -52,6 +52,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import FamilyCheckoutSuccess from "./pages/FamilyCheckoutSuccess";
 import FamilyCheckoutCanceled from "./pages/FamilyCheckoutCanceled";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
+import WelcomeQuestionnaire from "./components/WelcomeQuestionnaire";
 
 // Test Pages  
 import TestPage from "./pages/TestPage";
@@ -177,6 +178,14 @@ function AppWithTracking() {
                   <OptimizedSuspense skeletonType="card">
                     <RegistrationSuccess />
                   </OptimizedSuspense>
+                } />
+                
+                <Route path="/welcome-questionnaire" element={
+                  <ProtectedRoute>
+                    <OptimizedSuspense skeletonType="card">
+                      <WelcomeQuestionnaire />
+                    </OptimizedSuspense>
+                  </ProtectedRoute>
                 } />
 
                 {/* Protected Dashboard Routes */}

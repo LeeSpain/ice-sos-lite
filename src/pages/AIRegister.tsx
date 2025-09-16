@@ -15,6 +15,7 @@ import { PrivacyDialog } from '@/components/legal/PrivacyDialog';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { usePreferences } from '@/contexts/PreferencesContext';
+import { notifyPaymentSuccess } from '@/utils/paymentSuccess';
 
 import SEO from '@/components/SEO';
 import { isValidEmail, isValidPhone, validatePasswordStrength } from '@/utils/security';
@@ -367,15 +368,18 @@ const AIRegister = () => {
       };
       
       sessionStorage.setItem('welcomeData', JSON.stringify(welcomeData));
+      
+      // Notify payment success for cross-tab updates
+      notifyPaymentSuccess('subscription');
 
       toast({
         title: t('register.successTitle', { defaultValue: 'Registration Complete!' }),
         description: t('register.successDesc', { defaultValue: 'Welcome to ICE SOS Lite. You can now access your dashboard.' }),
       });
       
-      // Redirect to welcome page instead of dashboard
+      // Redirect to payment success page
       setTimeout(() => {
-        window.location.href = '/welcome';
+        window.location.href = '/payment-success';
       }, 2000);
     } catch (error) {
       console.error('Registration error:', error);
