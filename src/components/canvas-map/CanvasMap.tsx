@@ -523,6 +523,15 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
       />
+
+      {/* Diagnostic: container size */}
+      {(viewport.width < 100 || viewport.height < 100) && (
+        <div className="absolute inset-0 flex items-center justify-center z-20">
+          <div className="bg-background/90 backdrop-blur-sm border rounded-md px-3 py-2 text-sm">
+            Map container has no size. Add min-h-[500px] to the map container.
+          </div>
+        </div>
+      )}
       
       {/* Loading indicator with progress */}
       {isLoading && (

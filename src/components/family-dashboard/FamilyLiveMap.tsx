@@ -11,7 +11,7 @@ const FamilyLiveMap: React.FC<FamilyLiveMapProps> = ({ className }) => {
   return (
     <div className={`min-h-[calc(100vh-64px)] ${className || ''}`}>
       <MapView
-        className="h-full w-full"
+        className="h-full min-h-[500px] w-full"
         markers={[]}
         center={{ lat: 37.7749, lng: -122.4194 }}
         zoom={13}
