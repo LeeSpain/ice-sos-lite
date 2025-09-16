@@ -199,12 +199,20 @@ const EnhancedDashboardOverview: React.FC = () => {
         return s.subscribed && (!end || end > now);
       });
       const planPriceMap = new Map((subscriptionPlans || []).map((p: any) => [p.name, { price: Number(p.price) || 0, interval: p.billing_interval }]));
+      
+      console.log('Active subscribers:', activeSubscribersList);
+      console.log('Plan price map:', planPriceMap);
+      
       const mrrCalc = activeSubscribersList.reduce((sum: number, s: any) => {
         const plan = planPriceMap.get(s.subscription_tier || '');
+        console.log(`Processing subscriber ${s.id} with tier ${s.subscription_tier}, plan:`, plan);
         if (!plan) return sum;
         const monthly = plan.interval === 'year' ? plan.price / 12 : plan.price;
+        console.log(`Adding ${monthly} to MRR`);
         return sum + monthly;
       }, 0);
+      
+      console.log('Calculated MRR:', mrrCalc);
       const estimatedActiveSubscribers = activeSubscribersList.length;
       const monthlyRevenue = mrrCalc;
       const arpu = estimatedActiveSubscribers > 0 
@@ -323,11 +331,11 @@ const EnhancedDashboardOverview: React.FC = () => {
   }, [timeRange, realTimeMetrics, familyMetrics, sessionMetrics]);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-EU', {
       style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
