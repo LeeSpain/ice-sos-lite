@@ -17,7 +17,7 @@ import {
   Settings,
   UserPlus
 } from 'lucide-react';
-import { useCanvasMap } from '@/hooks/useCanvasMap';
+import { useUnifiedMap } from '@/hooks/useUnifiedMap';
 import { useCircleRealtime } from '@/hooks/useCircleRealtime';
 import { useBackgroundLocation } from '@/hooks/useBackgroundLocation';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
@@ -59,7 +59,7 @@ const FamilyTrackingApp = () => {
   const [showMap, setShowMap] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   
-  const { MapView } = useCanvasMap();
+  const { MapView } = useUnifiedMap();
   const { presences, circles, loadInitial } = useCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(isLocationEnabled);
   
@@ -423,8 +423,8 @@ const FamilyTrackingApp = () => {
         </div>
       </div>
 
-      {/* Map View */}
-      <div className="relative h-96">
+      {/* Map View - Fixed container height */}
+      <div className="min-h-[calc(100vh-200px)] max-h-96">
         <MapView
           className="h-full w-full"
           markers={familyMembers.map(member => ({
@@ -448,6 +448,7 @@ const FamilyTrackingApp = () => {
               />
             )
           }))}
+          preferCanvas={true}
         />
         
         {/* Map Overlay Controls */}
@@ -489,9 +490,9 @@ const FamilyTrackingApp = () => {
           {familyMembers.length === 0 ? (
             <Card className="p-6 text-center">
               <Users className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-              <h3 className="font-medium mb-2">No Family Members Yet</h3>
+              <h3 className="font-semibold mb-2">No family members yet</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Start by inviting family members to join your tracking circle
+                Invite family members to start tracking their location and staying connected.
               </p>
               <Button onClick={() => setShowInviteModal(true)}>
                 <UserPlus className="w-4 h-4 mr-2" />
@@ -499,99 +500,83 @@ const FamilyTrackingApp = () => {
               </Button>
             </Card>
           ) : (
-            familyMembers.map((member) => {
-              const statusInfo = getStatusInfo(member);
-              return (
-                <Card 
-                  key={member.user_id} 
-                  className="p-3 cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => handleMemberSelect(member)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={member.avatar_url} />
-                          <AvatarFallback>
-                            {member.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 ${statusInfo.color} rounded-full border border-white`} />
-                      </div>
-                      <div>
-                        <p className="font-medium">{member.name}</p>
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
-                          {getActivityIcon(member.activity)}
-                          <span className="capitalize">{member.activity}</span>
-                          {member.activity === 'driving' && member.speed && (
-                            <span>• {member.speed} km/h</span>
+            <div className="space-y-2">
+              {familyMembers.map((member, index) => {
+                const statusInfo = getStatusInfo(member);
+                return (
+                  <Card 
+                    key={member.user_id}
+                    className="p-4 cursor-pointer hover:bg-accent/50 transition-colors"
+                    onClick={() => handleMemberSelect(member)}
+                  >
+                    <CardContent className="p-0">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="relative">
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage src={member.avatar_url} />
+                              <AvatarFallback>
+                                {member.name.split(' ').map(n => n[0]).join('')}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className={`absolute -bottom-1 -right-1 w-4 h-4 ${statusInfo.color} rounded-full border-2 border-white`}>
+                              {statusInfo.status === 'live' && (
+                                <div className="w-2 h-2 bg-white rounded-full animate-pulse mx-auto mt-0.5" />
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium">{member.name}</h3>
+                              {member.user_id === user?.id && (
+                                <Badge variant="secondary" className="text-xs">You</Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Badge variant="outline" className="text-xs">
+                                {statusInfo.text}
+                              </Badge>
+                              <span>•</span>
+                              {getActivityIcon(member.activity)}
+                              <span className="capitalize">{member.activity}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="text-right">
+                          {member.battery && (
+                            <div className="flex items-center gap-1 text-sm">
+                              <Battery className="w-3 h-3" />
+                              <span>{member.battery}%</span>
+                            </div>
                           )}
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {member.last_seen ? new Date(member.last_seen).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="text-right">
-                      <Badge variant="outline" className="text-xs">
-                        {statusInfo.text}
-                      </Badge>
-                      {member.battery && (
-                        <div className="flex items-center gap-1 mt-1 text-xs text-gray-600">
-                          <Battery className="w-3 h-3" />
-                          {member.battery}%
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              );
-            })
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           )}
         </div>
+
+        {/* Bottom spacing for mobile navigation */}
+        <div className="h-4" />
       </div>
 
-      {/* Invite Modal */}
+      {/* Family Invite Modal */}
       <Dialog open={showInviteModal} onOpenChange={setShowInviteModal}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Invite Family Member</DialogTitle>
           </DialogHeader>
-          <FamilyInviteQuickSetup 
-            onMemberAdded={() => {
-              setShowInviteModal(false);
-              loadFamilyMembers();
-            }} 
-          />
+          <FamilyInviteQuickSetup onSuccess={() => setShowInviteModal(false)} />
         </DialogContent>
       </Dialog>
-
-      {/* Bottom Actions */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t p-4">
-        <div className="max-w-md mx-auto grid grid-cols-3 gap-3">
-          <Button 
-            variant="outline" 
-            onClick={handleCheckIn}
-            className="flex flex-col gap-1 h-16"
-          >
-            <CheckCircle className="w-5 h-5" />
-            <span className="text-xs">Check In</span>
-          </Button>
-          <Button 
-            variant="destructive"
-            onClick={handleEmergencySOS}
-            className="flex flex-col gap-1 h-16"
-          >
-            <AlertTriangle className="w-5 h-5" />
-            <span className="text-xs">Emergency</span>
-          </Button>
-          <Button 
-            variant="outline"
-            onClick={() => window.location.href = '/family-dashboard'}
-            className="flex flex-col gap-1 h-16"
-          >
-            <Shield className="w-5 h-5" />
-            <span className="text-xs">Dashboard</span>
-          </Button>
-        </div>
-      </div>
     </div>
   );
 };

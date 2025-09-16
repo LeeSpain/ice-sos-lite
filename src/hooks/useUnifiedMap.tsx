@@ -23,87 +23,121 @@ interface UnifiedMapViewProps {
 export const useUnifiedMap = () => {
   const mapboxProvider = useMapProvider();
   const canvasProvider = useCanvasMap();
-  const [hasMapboxError, setHasMapboxError] = useState(false);
+  const [mapbackend, setMapBackend] = useState<'canvas' | 'mapbox' | 'auto'>('auto');
+  const [mapboxReady, setMapboxReady] = useState(false);
+  const [mapboxTimeout, setMapboxTimeout] = useState(false);
 
-  // Monitor mapbox errors - useMapProvider doesn't return error, so track internal state
+  // Monitor Mapbox readiness with timeout
   useEffect(() => {
-    // Assume mapbox works by default unless we explicitly switch to canvas
-  }, []);
-
-  // Unified MapView component that intelligently switches between backends
-  const MapView = useMemo(() => {
-    return ({ 
-      className, 
-      markers = [], 
-      center, 
-      zoom = 13, 
-      onMapReady, 
-      showControls = true, 
-      interactive = true,
-      preferCanvas = false
-    }: UnifiedMapViewProps) => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (mapbackend === 'auto') {
+      // Set a timeout for Mapbox to be ready
+      timeoutId = setTimeout(() => {
+        if (!mapboxReady) {
+          console.log('Mapbox timeout - falling back to Canvas');
+          setMapboxTimeout(true);
+          setMapBackend('canvas');
+        }
+      }, 800); // 800ms timeout for Mapbox to initialize
       
-      // Use Canvas if preferred or if Mapbox fails
-      if (preferCanvas || hasMapboxError) {
-        const CanvasComponent = canvasProvider.MapView as any;
-        return (
-          <CanvasComponent
-            className={className}
-            markers={markers}
-            center={center}
-            zoom={zoom}
-            onMapReady={onMapReady}
-            showControls={showControls}
-            interactive={interactive}
-          />
-        );
-      }
-
-      // Default to Mapbox with Canvas fallback - adjust props for mapbox
-      const mapboxProps = {
-        className,
-        markers: markers || [],
-        center,
-        zoom,
-      } as any;
-
-      // Support both return shapes from useMapProvider: either an object with MapView or the component directly
-      const MapboxComponent = (mapboxProvider as any)?.MapView || (mapboxProvider as any);
-      if (typeof MapboxComponent !== 'function' && typeof MapboxComponent !== 'object') {
-        // Fallback to Canvas if Mapbox component isn't available
-        const CanvasComponent = canvasProvider.MapView as any;
-        return (
-          <CanvasComponent
-            className={className}
-            markers={markers}
-            center={center}
-            zoom={zoom}
-            onMapReady={onMapReady}
-            showControls={showControls}
-            interactive={interactive}
-          />
-        );
-      }
-
-      return <MapboxComponent {...mapboxProps} />;
+      // Check if Mapbox token is available
+      const checkMapboxToken = async () => {
+        try {
+          const response = await fetch('/api/mapbox-token');
+          if (response.ok) {
+            setMapboxReady(true);
+            setMapBackend('mapbox');
+          } else {
+            throw new Error('Token fetch failed');
+          }
+        } catch (error) {
+          console.log('Mapbox token unavailable, using Canvas');
+          setMapBackend('canvas');
+        }
+      };
+      
+      checkMapboxToken();
+    }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [mapboxProvider, canvasProvider, hasMapboxError]);
+  }, [mapbackend, mapboxReady]);
+
+  // Unified MapView component using JSX for stability
+  const MapView = useCallback(({ 
+    className, 
+    markers = [], 
+    center, 
+    zoom = 13, 
+    onMapReady, 
+    showControls = true, 
+    interactive = true,
+    preferCanvas = false
+  }: UnifiedMapViewProps) => {
+    
+    // Force Canvas if preferred or if we decided to use Canvas
+    const useCanvas = preferCanvas || mapbackend === 'canvas' || mapboxTimeout;
+    
+    if (useCanvas) {
+      const CanvasComponent = canvasProvider.MapView;
+      return (
+        <CanvasComponent
+          className={className}
+          markers={markers}
+          center={center}
+          zoom={zoom}
+          onMapReady={onMapReady}
+          showControls={showControls}
+          interactive={interactive}
+        />
+      );
+    }
+
+    // Use Mapbox if ready and no preference for Canvas
+    if (mapbackend === 'mapbox' && mapboxReady) {
+      const MapboxComponent = mapboxProvider.MapView;
+      return (
+        <MapboxComponent
+          className={className}
+          markers={markers}
+          center={center}
+          zoom={zoom}
+        />
+      );
+    }
+    
+    // Loading state while determining backend
+    return (
+      <div className={`${className || "h-full w-full"} flex items-center justify-center bg-muted/20`}>
+        <div className="text-center p-4">
+          <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">Loading map...</p>
+        </div>
+      </div>
+    );
+  }, [mapboxProvider, canvasProvider, mapbackend, mapboxReady, mapboxTimeout]);
 
   const switchToCanvas = useCallback(() => {
-    setHasMapboxError(true);
+    setMapBackend('canvas');
     return canvasProvider.MapView;
   }, [canvasProvider]);
 
   const switchToMapbox = useCallback(() => {
-    setHasMapboxError(false);
-    return mapboxProvider.MapView;
-  }, [mapboxProvider]);
+    if (mapboxReady) {
+      setMapBackend('mapbox');
+      return mapboxProvider.MapView;
+    }
+    return null;
+  }, [mapboxProvider, mapboxReady]);
 
   return {
     MapView,
-    isLoading: canvasProvider.isLoading,
-    error: hasMapboxError ? 'Mapbox unavailable' : null,
-    hasMapboxToken: !hasMapboxError,
+    isLoading: mapbackend === 'auto' && !mapboxReady && !mapboxTimeout,
+    error: mapboxTimeout ? 'Mapbox unavailable' : null,
+    hasMapboxToken: mapboxReady,
+    currentBackend: mapbackend,
     switchToCanvas,
     switchToMapbox,
     mapboxProvider,
