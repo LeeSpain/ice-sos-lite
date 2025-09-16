@@ -69,10 +69,19 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
     setIsProcessing(true);
 
     try {
-      // Confirm payment
+      // Confirm payment with required billing details since we disabled collection
       const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
         elements,
         redirect: "if_required",
+        confirmParams: {
+          payment_method_data: {
+            billing_details: {
+              address: {
+                country: "NL", // Default to Netherlands since we disabled country collection
+              }
+            }
+          }
+        }
       });
 
       if (paymentError) {
