@@ -2,7 +2,9 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { MapPin, Loader2, RotateCcw, ZoomIn, ZoomOut, Layers } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { tileCache } from './TileCache';
+import { enhancedTileCache } from './EnhancedTileCache';
+import { MapSearch } from './MapSearch';
+import { MapDirections } from './MapDirections';
 import { MarkerRenderer } from './MarkerRenderer';
 
 interface CanvasMapProps {
@@ -58,7 +60,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   const markerRenderer = useRef<MarkerRenderer>(new MarkerRenderer());
   const animationFrameRef = useRef<number | null>(null);
   const prevViewportKeyRef = useRef<string | null>(null);
-  const prevMapModeRef = useRef<'standard' | 'satellite' | null>(null);
+  const prevMapModeRef = useRef<'standard' | 'satellite' | 'dark' | null>(null);
   const bufferCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const isDrawingRef = useRef(false);
   const redrawScheduledRef = useRef(false);
@@ -75,7 +77,11 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
   const [isLoading, setIsLoading] = useState(true);
-  const [mapMode, setMapMode] = useState<'standard' | 'satellite'>('standard');
+  const [mapMode, setMapMode] = useState<'standard' | 'satellite' | 'dark'>('standard');
+  const [showSearch, setShowSearch] = useState(false);
+  const [showDirections, setShowDirections] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number; name: string } | null>(null);
+  const [routeData, setRouteData] = useState<any>(null);
   const [renderStats, setRenderStats] = useState<RenderStats>({ 
     tilesLoaded: 0, 
     totalTiles: 0, 
@@ -178,16 +184,29 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         const pixelX = ((tileX * tileSize) - (centerTile.x * tileSize)) + (viewport.width) / 2;
         const pixelY = ((tileY * tileSize) - (centerTile.y * tileSize)) + (viewport.height) / 2;
 
-        const cachedTile = tileCache.getTile(tileX, tileY, tileZ, mapMode);
-        if (cachedTile) {
-          bctx.drawImage(cachedTile, pixelX, pixelY, tileSize, tileSize);
-          tilesLoaded++;
-        } else if (!tileCache.isLoading(tileX, tileY, tileZ, mapMode)) {
-          const tilePromise = tileCache.loadTile(tileX, tileY, tileZ, mapMode).then(() => {
-            // Redraw when the tile is ready
-            scheduleDraw();
-          });
-          tilePromises.push(tilePromise);
+        // Handle satellite mode with labels overlay
+        if (mapMode === 'satellite') {
+          const cachedSatellite = enhancedTileCache.getTile(tileX, tileY, tileZ, 'satellite');
+          if (cachedSatellite) {
+            bctx.drawImage(cachedSatellite, pixelX, pixelY, tileSize, tileSize);
+            tilesLoaded++;
+          } else if (!enhancedTileCache.isLoading(tileX, tileY, tileZ, 'satellite')) {
+            const tilePromise = enhancedTileCache.loadTile(tileX, tileY, tileZ, 'satellite').then(() => {
+              scheduleDraw();
+            });
+            tilePromises.push(tilePromise);
+          }
+        } else {
+          const cachedTile = enhancedTileCache.getTile(tileX, tileY, tileZ, mapMode);
+          if (cachedTile) {
+            bctx.drawImage(cachedTile, pixelX, pixelY, tileSize, tileSize);
+            tilesLoaded++;
+          } else if (!enhancedTileCache.isLoading(tileX, tileY, tileZ, mapMode)) {
+            const tilePromise = enhancedTileCache.loadTile(tileX, tileY, tileZ, mapMode).then(() => {
+              scheduleDraw();
+            });
+            tilePromises.push(tilePromise);
+          }
         }
       }
     }
@@ -198,7 +217,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       setIsLoading(isMapLoading);
     }
 
-    const cacheStats = tileCache.getStats();
+    const cacheStats = enhancedTileCache.getStats();
     const nextStats = { tilesLoaded, totalTiles, cacheHitRate: cacheStats.hitRate };
     const prevStats = prevRenderStatsRef.current;
     if (prevStats.tilesLoaded !== nextStats.tilesLoaded || prevStats.totalTiles !== nextStats.totalTiles || prevStats.cacheHitRate !== nextStats.cacheHitRate) {
@@ -239,6 +258,37 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     });
 
     await Promise.all(markerPromises);
+
+    // Draw route if available
+    if (routeData && routeData.coordinates) {
+      bctx.strokeStyle = '#3b82f6';
+      bctx.lineWidth = 3;
+      bctx.lineCap = 'round';
+      bctx.lineJoin = 'round';
+      bctx.beginPath();
+      
+      routeData.coordinates.forEach((coord: [number, number], index: number) => {
+        const { x, y } = latLngToPixel(coord[1], coord[0]); // coord is [lng, lat]
+        if (index === 0) {
+          bctx.moveTo(x, y);
+        } else {
+          bctx.lineTo(x, y);
+        }
+      });
+      bctx.stroke();
+    }
+
+    // Draw selected location
+    if (selectedLocation) {
+      const { x, y } = latLngToPixel(selectedLocation.lat, selectedLocation.lng);
+      bctx.fillStyle = '#ef4444';
+      bctx.beginPath();
+      bctx.arc(x, y, 8, 0, 2 * Math.PI);
+      bctx.fill();
+      bctx.strokeStyle = '#ffffff';
+      bctx.lineWidth = 2;
+      bctx.stroke();
+    }
 
     prevViewportKeyRef.current = viewportKey;
     prevMapModeRef.current = mapMode;
@@ -342,6 +392,22 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     }));
   }, [center, zoom]);
 
+  // Handle location search
+  const handleLocationSelect = useCallback((lat: number, lng: number, name: string) => {
+    setSelectedLocation({ lat, lng, name });
+    setViewport(prev => ({
+      ...prev,
+      centerLat: lat,
+      centerLng: lng,
+      zoom: Math.max(prev.zoom, 15) // Zoom in when searching
+    }));
+  }, []);
+
+  // Handle directions
+  const handleDirectionsCalculated = useCallback((route: any) => {
+    setRouteData(route);
+  }, []);
+
   // Update center when prop changes (only if not being dragged and significantly different)
   useEffect(() => {
     if (isDragging) return; // Don't update center while user is interacting
@@ -430,7 +496,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   // Redraw on view-related changes (without RAF flood thanks to scheduler)
   useEffect(() => {
     scheduleDraw();
-  }, [viewport, mapMode, showAccuracy, markers, scheduleDraw]);
+  }, [viewport, mapMode, showAccuracy, markers, routeData, selectedLocation, scheduleDraw]);
 
   // Call onMapReady when component is ready
   useEffect(() => {
@@ -510,26 +576,60 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
             </Button>
           </div>
 
-          {/* Map mode toggle */}
-          <div className="absolute top-4 left-4 flex gap-1">
-            <Button
-              variant={mapMode === 'standard' ? 'default' : 'secondary'}
-              size="sm"
-              onClick={() => setMapMode('standard')}
-              className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
-              disabled={!interactive}
-            >
-              Map
-            </Button>
-            <Button
-              variant={mapMode === 'satellite' ? 'default' : 'secondary'}
-              size="sm"
-              onClick={() => setMapMode('satellite')}
-              className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
-              disabled={!interactive}
-            >
-              Satellite
-            </Button>
+          {/* Enhanced controls */}
+          <div className="absolute top-4 left-4 space-y-2">
+            {/* Map mode toggle */}
+            <div className="flex gap-1">
+              <Button
+                variant={mapMode === 'standard' ? 'default' : 'secondary'}
+                size="sm"
+                onClick={() => setMapMode('standard')}
+                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                disabled={!interactive}
+              >
+                Map
+              </Button>
+              <Button
+                variant={mapMode === 'satellite' ? 'default' : 'secondary'}
+                size="sm"
+                onClick={() => setMapMode('satellite')}
+                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                disabled={!interactive}
+              >
+                Satellite
+              </Button>
+              <Button
+                variant={mapMode === 'dark' ? 'default' : 'secondary'}
+                size="sm"
+                onClick={() => setMapMode('dark')}
+                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                disabled={!interactive}
+              >
+                Dark
+              </Button>
+            </div>
+
+            {/* Search and Directions toggles */}
+            <div className="flex gap-1">
+              <Button
+                variant={showSearch ? 'default' : 'secondary'}
+                size="sm"
+                onClick={() => setShowSearch(!showSearch)}
+                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                disabled={!interactive}
+              >
+                Search
+              </Button>
+              <Button
+                variant={showDirections ? 'default' : 'secondary'}
+                size="sm"
+                onClick={() => setShowDirections(!showDirections)}
+                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                disabled={!interactive}
+              >
+                Routes
+              </Button>
+            </div>
           </div>
 
           {/* Map info and cache stats */}
@@ -545,7 +645,32 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
                 Cache: {Math.round(renderStats.cacheHitRate * 100)}% • {renderStats.tilesLoaded}/{renderStats.totalTiles}
               </div>
             )}
+            <div className="text-xs text-muted-foreground/70 mt-1">
+              {enhancedTileCache.getAttribution(mapMode)}
+            </div>
           </div>
+
+          {/* Search Panel */}
+          {showSearch && (
+            <div className="absolute top-16 left-4 w-80 max-w-[calc(100vw-2rem)]">
+              <MapSearch
+                onLocationSelect={handleLocationSelect}
+                className="w-full"
+              />
+            </div>
+          )}
+
+          {/* Directions Panel */}
+          {showDirections && (
+            <div className="absolute top-16 right-4 w-80 max-w-[calc(100vw-2rem)]">
+              <MapDirections
+                fromLocation={selectedLocation ? { lat: viewport.centerLat, lng: viewport.centerLng, name: 'Current View' } : undefined}
+                toLocation={selectedLocation}
+                onDirectionsCalculated={handleDirectionsCalculated}
+                className="w-full"
+              />
+            </div>
+          )}
         </>
       )}
     </div>
