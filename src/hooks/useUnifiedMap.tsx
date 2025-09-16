@@ -26,7 +26,7 @@ export const useUnifiedMap = () => {
   const canvasProvider = useCanvasMap();
   const [mapbackend, setMapBackend] = useState<'canvas' | 'mapbox'>('canvas'); // Default to canvas for stability
   const [mapboxReady, setMapboxReady] = useState(false);
-  const [decided, setDecided] = useState(false);
+  const [decided] = useState(true);
 
   // Check for Mapbox token only when explicitly requested
   const checkMapboxAvailability = useCallback(async () => {
@@ -54,7 +54,7 @@ export const useUnifiedMap = () => {
   }, []);
 
 
-  // Decide backend once on mount to avoid flicker
+  // Try enabling Mapbox in the background; start with Canvas immediately
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -62,10 +62,7 @@ export const useUnifiedMap = () => {
       if (!mounted) return;
       if (available) {
         setMapBackend('mapbox');
-      } else {
-        setMapBackend('canvas');
       }
-      setDecided(true);
     })();
     return () => { mounted = false; };
   }, [checkMapboxAvailability]);
@@ -97,14 +94,29 @@ export const useUnifiedMap = () => {
     const backend = preferCanvas ? 'canvas' : mapbackend;
 
     if (backend === 'mapbox') {
-      return (
-        <MapboxComponent
-          className={className}
-          markers={markers}
-          center={center}
-          zoom={zoom}
-        />
-      );
+      try {
+        return (
+          <MapboxComponent
+            className={className}
+            markers={markers}
+            center={center}
+            zoom={zoom}
+          />
+        );
+      } catch (e) {
+        console.error('Mapbox render failed, falling back to Canvas:', e);
+        return (
+          <CanvasComponent
+            className={className}
+            markers={markers}
+            center={center}
+            zoom={zoom}
+            onMapReady={onMapReady}
+            showControls={showControls}
+            interactive={interactive}
+          />
+        );
+      }
     }
 
     return (

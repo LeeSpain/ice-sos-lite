@@ -187,6 +187,7 @@ export default function MapScreen() {
           )
         }))}
         center={mapCenter}
+        preferCanvas={true}
       />
 
       {/* SOS Button */}
