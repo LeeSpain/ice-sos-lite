@@ -3,7 +3,7 @@ import { CircleSwitcher } from "@/components/map/CircleSwitcher";
 import { MemberPin } from "@/components/map/MemberPin";
 import { MemberSheet } from "@/components/map/MemberSheet";
 import { useUnifiedMap } from "@/hooks/useUnifiedMap";
-import { useCircleRealtime } from "@/hooks/useCircleRealtime";
+import { useEnhancedCircleRealtime } from "@/hooks/useEnhancedCircleRealtime";
 import { useBackgroundLocation } from "@/hooks/useBackgroundLocation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -29,7 +29,7 @@ export default function MapScreen() {
   const [sosProgress, setSosProgress] = useState(0);
   
   const { MapView } = useUnifiedMap();
-  const { presences, circles, recentEvents, loadInitial, refresh } = useCircleRealtime(activeCircleId);
+  const { presences, circles, recentEvents, loadInitial, refresh, metrics, connectionHealth } = useEnhancedCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(locationEnabled);
   const { toast } = useToast();
 
@@ -225,9 +225,9 @@ export default function MapScreen() {
                     {event.user_id.slice(0, 8)}
                   </span>
                   {' '}
-                  {event.event === 'enter' ? 'arrived at' : 'left'}
+                  {event.event_type === 'enter' ? 'arrived at' : 'left'}
                   {' '}
-                  <span className="font-medium">{event.place?.name}</span>
+                  <span className="font-medium">{event.place_name}</span>
                 </div>
               ))}
             </div>
