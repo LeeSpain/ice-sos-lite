@@ -18,6 +18,10 @@ export interface RealTimeMetrics {
   familyConnections: number;
   activeSosEvents: number;
   familyRevenue: number;
+  // Subscription metrics
+  totalSubscriptions: number;
+  subscriptionRevenue: number;
+  monthlyRecurringRevenue: number;
 }
 
 export interface TrafficSource {
@@ -53,11 +57,13 @@ export function useRealTimeAnalytics() {
     queryFn: async (): Promise<RealTimeMetrics> => {
       try {
         // Get real data from database with error handling
-        const [contactsResult, ordersResult, registrationsResult, profilesResult] = await Promise.allSettled([
+        const [contactsResult, ordersResult, registrationsResult, profilesResult, subscribersResult, subscriptionPlansResult] = await Promise.allSettled([
           supabase.from('contact_submissions').select('count', { count: 'exact', head: true }),
           supabase.from('orders').select('total_price').eq('status', 'completed').throwOnError(),
           supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true),
-          supabase.from('profiles').select('count', { count: 'exact', head: true }).throwOnError()
+          supabase.from('profiles').select('count', { count: 'exact', head: true }).throwOnError(),
+          supabase.from('subscribers').select('subscription_tier, subscribed, created_at').eq('subscribed', true).throwOnError(),
+          supabase.from('subscription_plans').select('id, name, price').throwOnError()
         ]);
 
         // Get actual user count from profiles
@@ -74,10 +80,34 @@ export function useRealTimeAnalytics() {
 
         const orders = ordersResult.status === 'fulfilled' ? (ordersResult.value.data || []) : [];
         const totalOrders = orders.length;
-        const totalRevenue = orders.reduce((sum, order) => sum + (parseFloat(order.total_price?.toString() || '0') || 0), 0);
+        const orderRevenue = orders.reduce((sum, order) => sum + (parseFloat(order.total_price?.toString() || '0') || 0), 0);
         
         const registrationsCount = registrationsResult.status === 'fulfilled' ? registrationsResult.value.count : 0;
         const totalRegistrations = (typeof registrationsCount === 'number') ? registrationsCount : 0;
+
+        // Process subscription data
+        const subscribers = subscribersResult.status === 'fulfilled' ? (subscribersResult.value.data || []) : [];
+        const subscriptionPlans = subscriptionPlansResult.status === 'fulfilled' ? (subscriptionPlansResult.value.data || []) : [];
+        
+        // Create pricing map from subscription plans
+        const pricingMap = subscriptionPlans.reduce((acc, plan) => {
+          acc[plan.name] = parseFloat(plan.price?.toString() || '0');
+          return acc;
+        }, {} as Record<string, number>);
+
+        // Calculate subscription metrics
+        const totalSubscriptions = subscribers.length;
+        const monthlyRecurringRevenue = subscribers.reduce((sum, subscriber) => {
+          const tierPrice = pricingMap[subscriber.subscription_tier] || 0;
+          return sum + tierPrice;
+        }, 0);
+        
+        // For total subscription revenue, we'll use MRR as baseline
+        // (In a real scenario, you'd calculate based on actual subscription duration)
+        const subscriptionRevenue = monthlyRecurringRevenue;
+        
+        // Total revenue combines orders and subscriptions
+        const totalRevenue = orderRevenue + subscriptionRevenue;
 
         // Calculate conversion rate (registrations / total users)
         const conversionRate = totalUsers > 0 ? (totalRegistrations / totalUsers) * 100 : 0;
@@ -95,7 +125,11 @@ export function useRealTimeAnalytics() {
           // Family system metrics - set to 0 since we removed the circular dependency
           familyConnections: 0,
           activeSosEvents: 0,
-          familyRevenue: 0
+          familyRevenue: 0,
+          // Subscription metrics
+          totalSubscriptions,
+          subscriptionRevenue,
+          monthlyRecurringRevenue
         };
       } catch (error) {
         console.error('Error fetching real-time analytics:', error);
@@ -111,7 +145,10 @@ export function useRealTimeAnalytics() {
           conversionRate: 0,
           familyConnections: 0,
           activeSosEvents: 0,
-          familyRevenue: 0
+          familyRevenue: 0,
+          totalSubscriptions: 0,
+          subscriptionRevenue: 0,
+          monthlyRecurringRevenue: 0
         };
       }
     },

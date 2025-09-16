@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -9,7 +9,7 @@ import {
   Users, MessageSquare, TrendingUp, Target, AlertTriangle, DollarSign, 
   Monitor, Smartphone, Tablet, Globe, Search, Share2, ArrowUpRight, 
   ArrowDownRight, Shield, Phone, Video, Activity, Clock, MousePointer,
-  Zap, Eye, PlayCircle, UserCheck, Calendar, Bell, RefreshCw
+  Zap, Eye, PlayCircle, UserCheck, Calendar, Bell, RefreshCw, CreditCard, ShoppingCart
 } from 'lucide-react';
 import { useRealTimeAnalytics } from '@/hooks/useRealTimeAnalytics';
 import { useFamilyAnalytics } from '@/hooks/useFamilyAnalytics';
@@ -130,6 +130,32 @@ export default function DashboardOverview() {
     console.log('✅ Dashboard data refreshed');
   }, [queryClient]);
 
+  // Listen for payment success events and auto-refresh
+  useEffect(() => {
+    const handlePaymentSuccess = (event: any) => {
+      console.log('💳 Payment success detected, refreshing dashboard...', event.detail);
+      refreshAllData();
+    };
+
+    // Listen for custom events
+    window.addEventListener('data-updated', handlePaymentSuccess);
+
+    // Listen for storage events (cross-tab updates)
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key?.includes('-updated')) {
+        console.log('💳 Payment success detected from another tab, refreshing dashboard...');
+        refreshAllData();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('data-updated', handlePaymentSuccess);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [refreshAllData]);
+
   console.log('📊 DashboardOverview rendering with real-time data');
 
   // Helper function to format numbers
@@ -202,7 +228,7 @@ export default function DashboardOverview() {
           change="+8.2%"
           changeType="increase"
           icon={<DollarSign className="h-8 w-8 text-green-500" />}
-          subtext="From completed orders"
+          subtext="Orders + Subscriptions combined"
         />
         
         <MetricCard
@@ -260,6 +286,45 @@ export default function DashboardOverview() {
           changeType="increase"
           icon={<UserCheck className="h-8 w-8 text-blue-500" />}
           subtext={`${familyMetrics?.pendingInvites || 0} pending invites`}
+        />
+      </div>
+
+      {/* Subscription Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard
+          title="Active Subscriptions"
+          value={formatNumber(realTimeMetrics?.totalSubscriptions || 0)}
+          change="+18.5%"
+          changeType="increase"
+          icon={<Shield className="h-8 w-8 text-purple-500" />}
+          subtext="Premium Protection plans"
+        />
+        
+        <MetricCard
+          title="Monthly Recurring Revenue"
+          value={formatCurrency(realTimeMetrics?.monthlyRecurringRevenue || 0)}
+          change="+15.3%"
+          changeType="increase"
+          icon={<DollarSign className="h-8 w-8 text-emerald-500" />}
+          subtext="MRR from subscriptions"
+        />
+        
+        <MetricCard
+          title="Subscription Revenue"
+          value={formatCurrency(realTimeMetrics?.subscriptionRevenue || 0)}
+          change="+12.8%"
+          changeType="increase"
+          icon={<CreditCard className="h-8 w-8 text-blue-500" />}
+          subtext="Total subscription income"
+        />
+        
+        <MetricCard
+          title="Product Orders"
+          value={formatNumber(realTimeMetrics?.totalOrders || 0)}
+          change="+6.4%"
+          changeType="increase"
+          icon={<ShoppingCart className="h-8 w-8 text-orange-500" />}
+          subtext="One-time product sales"
         />
       </div>
 
