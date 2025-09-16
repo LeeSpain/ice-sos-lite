@@ -45,15 +45,18 @@ export const useUnifiedMap = () => {
       
       // Use Canvas if preferred or if Mapbox fails
       if (preferCanvas || hasMapboxError) {
-        return canvasProvider.MapView({
-          className,
-          markers,
-          center,
-          zoom,
-          onMapReady,
-          showControls,
-          interactive
-        });
+        const CanvasComponent = canvasProvider.MapView as any;
+        return (
+          <CanvasComponent
+            className={className}
+            markers={markers}
+            center={center}
+            zoom={zoom}
+            onMapReady={onMapReady}
+            showControls={showControls}
+            interactive={interactive}
+          />
+        );
       }
 
       // Default to Mapbox with Canvas fallback - adjust props for mapbox
@@ -61,25 +64,28 @@ export const useUnifiedMap = () => {
         className,
         markers: markers || [],
         center,
-        zoom
-      };
+        zoom,
+      } as any;
 
       // Support both return shapes from useMapProvider: either an object with MapView or the component directly
       const MapboxComponent = (mapboxProvider as any)?.MapView || (mapboxProvider as any);
-      if (typeof MapboxComponent !== 'function') {
+      if (typeof MapboxComponent !== 'function' && typeof MapboxComponent !== 'object') {
         // Fallback to Canvas if Mapbox component isn't available
-        return canvasProvider.MapView({
-          className,
-          markers,
-          center,
-          zoom,
-          onMapReady,
-          showControls,
-          interactive
-        });
+        const CanvasComponent = canvasProvider.MapView as any;
+        return (
+          <CanvasComponent
+            className={className}
+            markers={markers}
+            center={center}
+            zoom={zoom}
+            onMapReady={onMapReady}
+            showControls={showControls}
+            interactive={interactive}
+          />
+        );
       }
 
-      return MapboxComponent(mapboxProps);
+      return <MapboxComponent {...mapboxProps} />;
     };
   }, [mapboxProvider, canvasProvider, hasMapboxError]);
 
