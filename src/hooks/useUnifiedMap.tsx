@@ -42,6 +42,21 @@ export const useUnifiedMap = () => {
     }
   }, []);
 
+  // Decide backend once on mount to avoid flicker
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const available = await checkMapboxAvailability();
+      if (!mounted) return;
+      if (available) {
+        setMapBackend('mapbox');
+      } else {
+        setMapBackend('canvas');
+      }
+    })();
+    return () => { mounted = false; };
+  }, [checkMapboxAvailability]);
+
   // Unified MapView component - choose backend deterministically
   const MapView = useCallback(({ 
     className, 
@@ -53,31 +68,35 @@ export const useUnifiedMap = () => {
     interactive = true,
     preferCanvas = false
   }: UnifiedMapViewProps) => {
-    if (preferCanvas) {
-      const CanvasComponent = canvasProvider.MapView;
+    const CanvasComponent = canvasProvider.MapView;
+    const MapboxComponent = mapboxProvider.MapView;
+
+    // Lock backend: preferCanvas overrides, otherwise use decided backend
+    const backend = preferCanvas ? 'canvas' : mapbackend;
+
+    if (backend === 'mapbox') {
       return (
-        <CanvasComponent
+        <MapboxComponent
           className={className}
           markers={markers}
           center={center}
           zoom={zoom}
-          onMapReady={onMapReady}
-          showControls={showControls}
-          interactive={interactive}
         />
       );
     }
 
-    const MapboxComponent = mapboxProvider.MapView;
     return (
-      <MapboxComponent
+      <CanvasComponent
         className={className}
         markers={markers}
         center={center}
         zoom={zoom}
+        onMapReady={onMapReady}
+        showControls={showControls}
+        interactive={interactive}
       />
     );
-  }, [canvasProvider, mapboxProvider]);
+  }, [canvasProvider, mapboxProvider, mapbackend]);
 
   const switchToCanvas = useCallback(() => {
     setMapBackend('canvas');
