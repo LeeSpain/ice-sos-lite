@@ -28,7 +28,7 @@ export default function MapScreen() {
   const [sosHoldTimer, setSosHoldTimer] = useState<number | null>(null);
   const [sosProgress, setSosProgress] = useState(0);
   
-  const { MapView } = useUnifiedMap();
+  const { MapView, currentBackend } = useUnifiedMap();
   const { presences, circles, recentEvents, loadInitial, refresh, metrics, connectionHealth } = useEnhancedCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(locationEnabled);
   const { toast } = useToast();
@@ -156,6 +156,11 @@ export default function MapScreen() {
       </div>
 
       {/* Map */}
+      {import.meta.env.DEV && (
+        <div className="absolute top-4 right-4 z-30">
+          <Badge variant="outline">Map: {currentBackend}</Badge>
+        </div>
+      )}
       <MapView
         className="h-full w-full"
         markers={presences.map(p => ({
@@ -169,7 +174,6 @@ export default function MapScreen() {
             />
           )
         }))}
-        preferCanvas={true}
       />
 
       {/* SOS Button */}

@@ -300,7 +300,6 @@ export default function LiveMapMonitorPage() {
             <MapView
               markers={markers}
               className="w-full h-full"
-              preferCanvas={true}
             />
           </div>
         </CardContent>

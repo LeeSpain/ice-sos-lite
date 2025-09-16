@@ -50,17 +50,36 @@ export function useMapProvider() {
       const fetchMapboxToken = async () => {
         try {
           const { data, error } = await supabase.functions.invoke('get-mapbox-token');
-          if (error) throw error;
-          
-          if (data?.token) {
-            setMapboxToken(data.token);
-            mapboxgl.accessToken = data.token;
-          } else {
-            throw new Error('No token received');
+          let token = (data as any)?.token as string | undefined;
+          if (error) {
+            console.warn('Mapbox token function error:', error);
           }
-        } catch (error) {
-          console.error('Failed to fetch Mapbox token:', error);
-          setTokenError('Failed to load map token');
+
+          // Fallback to VITE_MAPBOX_PUBLIC_TOKEN if function didn't return
+          if (!token) {
+            const viteToken = (import.meta as any).env?.VITE_MAPBOX_PUBLIC_TOKEN;
+            if (viteToken && viteToken !== 'undefined') {
+              token = viteToken as string;
+            }
+          }
+
+          if (token) {
+            setMapboxToken(token);
+            mapboxgl.accessToken = token;
+            setTokenError(null);
+          } else {
+            setTokenError('Failed to load map token');
+          }
+        } catch (err) {
+          console.error('Failed to fetch Mapbox token:', err);
+          const viteToken = (import.meta as any).env?.VITE_MAPBOX_PUBLIC_TOKEN;
+          if (viteToken && viteToken !== 'undefined') {
+            setMapboxToken(viteToken);
+            mapboxgl.accessToken = viteToken;
+            setTokenError(null);
+          } else {
+            setTokenError('Failed to load map token');
+          }
         }
       };
       
