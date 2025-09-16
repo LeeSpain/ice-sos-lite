@@ -574,7 +574,7 @@ const FamilyTrackingApp = () => {
           <DialogHeader>
             <DialogTitle>Invite Family Member</DialogTitle>
           </DialogHeader>
-          <FamilyInviteQuickSetup onSuccess={() => setShowInviteModal(false)} />
+          <FamilyInviteQuickSetup onMemberAdded={() => setShowInviteModal(false)} />
         </DialogContent>
       </Dialog>
     </div>
