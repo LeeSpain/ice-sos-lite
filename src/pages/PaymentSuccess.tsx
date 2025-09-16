@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,17 +32,78 @@ const PaymentSuccess = () => {
   const androidPlayStoreUrl = 'https://play.google.com/store/apps/details?id=your.app.id';
 
   useEffect(() => {
-    // Get welcome data from sessionStorage
-    const storedData = sessionStorage.getItem('welcomeData');
-    if (storedData) {
-      const data = JSON.parse(storedData);
-      setWelcomeData(data);
-      // Clear the data so it only shows once
-      sessionStorage.removeItem('welcomeData');
-    } else {
-      // If no welcome data, redirect to dashboard
-      navigate('/dashboard');
-    }
+    const initializeWelcomePage = async () => {
+      if (!user) {
+        navigate('/dashboard');
+        return;
+      }
+
+      try {
+        // Get user profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        console.log('Profile data:', profile, 'Error:', profileError);
+
+        // Get user's active subscriptions from subscribers table
+        const { data: subscription, error: subError } = await supabase
+          .from('subscribers')
+          .select('subscription_tier, subscription_end')
+          .eq('user_id', user.id)
+          .eq('subscribed', true)
+          .maybeSingle();
+
+        console.log('Subscription data:', subscription, 'Error:', subError);
+
+        // Get subscription plan details
+        const subscriptionPlans = [];
+        if (subscription?.subscription_tier) {
+          const { data: planData, error: planError } = await supabase
+            .from('subscription_plans')
+            .select('id, name, price, billing_interval')
+            .eq('name', subscription.subscription_tier)
+            .maybeSingle();
+          
+          console.log('Plan data for', subscription.subscription_tier, ':', planData, 'Error:', planError);
+          
+          if (planData) {
+            subscriptionPlans.push(planData);
+          }
+        }
+
+        // Create updated welcome data
+        const welcomeDataFromDB: WelcomeData = {
+          firstName: profile?.first_name || user.user_metadata?.first_name || 'User',
+          lastName: profile?.last_name || user.user_metadata?.last_name || '',
+          email: user.email || '',
+          subscriptionPlans,
+          products: [], // For now, empty - would need to fetch if there are product purchases
+          regionalServices: [], // For now, empty - would need to fetch if there are regional services
+          totalAmount: subscriptionPlans.reduce((sum, plan) => sum + (Number(plan.price) || 0), 0)
+        };
+
+        console.log('Final welcome data:', welcomeDataFromDB);
+        setWelcomeData(welcomeDataFromDB);
+
+        // Clear any old session storage data
+        sessionStorage.removeItem('welcomeData');
+
+      } catch (error) {
+        console.error('Error fetching welcome data:', error);
+        // Fallback to stored data or redirect
+        const storedData = sessionStorage.getItem('welcomeData');
+        if (storedData) {
+          const data = JSON.parse(storedData);
+          setWelcomeData(data);
+          sessionStorage.removeItem('welcomeData');
+        } else {
+          navigate('/dashboard');
+        }
+      }
+    };
 
     // Generate QR codes
     const generateQRCodes = async () => {
@@ -55,8 +117,9 @@ const PaymentSuccess = () => {
       }
     };
 
+    initializeWelcomePage();
     generateQRCodes();
-  }, [navigate]);
+  }, [user, navigate]);
 
   if (!welcomeData || !user) {
     return (
@@ -73,22 +136,32 @@ const PaymentSuccess = () => {
   const PRODUCT_IVA_RATE = 0.21; // 21% for products
   const SERVICE_IVA_RATE = 0.10; // 10% for regional services
 
-  const subscriptionTotal = (welcomeData.subscriptionPlans || []).reduce((sum, plan) => {
+  console.log('Calculating totals with welcome data:', welcomeData);
+
+  const subscriptionTotal = (welcomeData?.subscriptionPlans || []).reduce((sum, plan) => {
     const price = plan?.price;
-    return sum + (price ? parseFloat(price.toString()) : 0);
-  }, 0) + (welcomeData.regionalServices || []).reduce((sum, service) => {
+    const monthlyPrice = price ? Number(price) : 0;
+    console.log('Processing plan:', plan, 'Monthly price:', monthlyPrice);
+    return sum + monthlyPrice;
+  }, 0) + (welcomeData?.regionalServices || []).reduce((sum, service) => {
     const price = service?.price;
-    const servicePrice = price ? parseFloat(price.toString()) : 0;
-    return sum + (servicePrice * (1 + SERVICE_IVA_RATE));
+    const servicePrice = price ? Number(price) : 0;
+    const totalServicePrice = servicePrice * (1 + SERVICE_IVA_RATE);
+    console.log('Processing service:', service, 'Service price with IVA:', totalServicePrice);
+    return sum + totalServicePrice;
   }, 0);
 
-  const productTotal = (welcomeData.products || []).reduce((sum, product) => {
+  const productTotal = (welcomeData?.products || []).reduce((sum, product) => {
     const price = product?.price;
-    const productPrice = price ? parseFloat(price.toString()) : 0;
-    return sum + (productPrice * (1 + PRODUCT_IVA_RATE));
+    const productPrice = price ? Number(price) : 0;
+    const totalProductPrice = productPrice * (1 + PRODUCT_IVA_RATE);
+    console.log('Processing product:', product, 'Product price with IVA:', totalProductPrice);
+    return sum + totalProductPrice;
   }, 0);
 
   const grandTotal = subscriptionTotal + productTotal;
+  
+  console.log('Final totals:', { subscriptionTotal, productTotal, grandTotal });
 
   const handleDashboardAccess = () => {
     // Set flag to indicate payment was completed for proper flow handling
