@@ -73,15 +73,18 @@ const PaymentSuccess = () => {
   const PRODUCT_IVA_RATE = 0.21; // 21% for products
   const SERVICE_IVA_RATE = 0.10; // 10% for regional services
 
-  const subscriptionTotal = welcomeData.subscriptionPlans.reduce((sum, plan) => {
-    return sum + parseFloat(plan.price.toString());
-  }, 0) + welcomeData.regionalServices.reduce((sum, service) => {
-    const servicePrice = parseFloat(service.price.toString());
+  const subscriptionTotal = (welcomeData.subscriptionPlans || []).reduce((sum, plan) => {
+    const price = plan?.price;
+    return sum + (price ? parseFloat(price.toString()) : 0);
+  }, 0) + (welcomeData.regionalServices || []).reduce((sum, service) => {
+    const price = service?.price;
+    const servicePrice = price ? parseFloat(price.toString()) : 0;
     return sum + (servicePrice * (1 + SERVICE_IVA_RATE));
   }, 0);
 
-  const productTotal = welcomeData.products.reduce((sum, product) => {
-    const productPrice = parseFloat(product.price.toString());
+  const productTotal = (welcomeData.products || []).reduce((sum, product) => {
+    const price = product?.price;
+    const productPrice = price ? parseFloat(price.toString()) : 0;
     return sum + (productPrice * (1 + PRODUCT_IVA_RATE));
   }, 0);
 
