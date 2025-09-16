@@ -40,11 +40,15 @@ interface PaymentFormProps {
   clientSecret: string;
   customerId: string;
   plans: string[];
+  firstName: string;
+  lastName: string;
+  userEmail: string;
+  country?: string;
   onSuccess: () => void;
   onError: (error: string) => void;
 }
 
-const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: PaymentFormProps) => {
+const PaymentForm = ({ clientSecret, customerId, plans, firstName, lastName, userEmail, country, onSuccess, onError }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -69,19 +73,10 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
     setIsProcessing(true);
 
     try {
-      // Confirm payment with required billing details since we disabled collection
+      // Confirm payment - billing details now collected by PaymentElement
       const { error: paymentError, paymentIntent } = await stripe.confirmPayment({
         elements,
-        redirect: "if_required",
-        confirmParams: {
-          payment_method_data: {
-            billing_details: {
-              address: {
-                country: "NL", // Default to Netherlands since we disabled country collection
-              }
-            }
-          }
-        }
+        redirect: "if_required"
       });
 
       if (paymentError) {
@@ -119,18 +114,27 @@ const PaymentForm = ({ clientSecret, customerId, plans, onSuccess, onError }: Pa
     }
   };
 
-  // PaymentElement options - memoized to prevent re-renders
+  // PaymentElement options - allow collection with defaults
   const paymentElementOptions = useMemo(() => ({
     layout: "tabs" as const,
     fields: {
       billingDetails: {
         address: {
-          country: "never" as const,
-          postalCode: "never" as const
+          country: "auto" as const,
+          postalCode: "auto" as const
+        }
+      }
+    },
+    defaultValues: {
+      billingDetails: {
+        name: `${firstName} ${lastName}`,
+        email: userEmail,
+        address: {
+          country: country || "NL" // Default to Netherlands if no country provided
         }
       }
     }
-  }), []);
+  }), [firstName, lastName, userEmail, country]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -598,6 +602,10 @@ const initializePayment = async (retryCount = 0) => {
                   clientSecret={clientSecret}
                   customerId={customerId}
                   plans={plans}
+                  firstName={firstName}
+                  lastName={lastName}
+                  userEmail={userEmail}
+                  country={country}
                   onSuccess={onSuccess}
                   onError={(error) => {
                     console.error("💳 Payment error:", error);
