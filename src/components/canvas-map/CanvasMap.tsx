@@ -88,6 +88,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     cacheHitRate: 0 
   });
   const [showAccuracy, setShowAccuracy] = useState(true);
+  const [loadingTooLong, setLoadingTooLong] = useState(false);
 
   // Convert lat/lng to pixel coordinates
   const latLngToPixel = useCallback((lat: number, lng: number): { x: number; y: number } => {
@@ -498,6 +499,16 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     scheduleDraw();
   }, [viewport, mapMode, showAccuracy, markers, routeData, selectedLocation, scheduleDraw]);
 
+  // Detect prolonged tile loading
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadingTooLong(false);
+      return;
+    }
+    const t = setTimeout(() => setLoadingTooLong(true), 6000);
+    return () => clearTimeout(t);
+  }, [isLoading]);
+
   // Call onMapReady when component is ready
   useEffect(() => {
     if (onMapReady) {
@@ -538,6 +549,15 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         <div className="absolute top-4 left-4 flex items-center gap-2 bg-background/90 backdrop-blur-sm border rounded-lg px-3 py-2 text-sm">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>Loading tiles... ({renderStats.tilesLoaded}/{renderStats.totalTiles})</span>
+        </div>
+      )}
+
+      {/* Prolonged-loading hint */}
+      {loadingTooLong && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20">
+          <div className="bg-background/95 backdrop-blur-sm border rounded-md px-3 py-2 text-xs">
+            Tiles are taking longer than usual to load. Try zooming or refreshing.
+          </div>
         </div>
       )}
       

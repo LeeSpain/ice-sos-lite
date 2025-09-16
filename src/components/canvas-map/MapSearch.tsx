@@ -40,14 +40,9 @@ export const MapSearch: React.FC<MapSearchProps> = ({ onLocationSelect, classNam
     setIsLoading(true);
     try {
       // Using Nominatim OSM search API (free)
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&addressdetails=1&extratags=1`,
-        {
-          headers: {
-            'User-Agent': 'FamilyMapApp/1.0'
-          }
-        }
-      );
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=5&addressdetails=1&extratags=1`
+        );
 
       if (response.ok) {
         const data: SearchResult[] = await response.json();

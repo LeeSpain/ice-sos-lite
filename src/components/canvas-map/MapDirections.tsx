@@ -41,52 +41,13 @@ export const MapDirections: React.FC<DirectionsProps> = ({
     setError(null);
 
     try {
-      // Using OpenRouteService API (free with registration)
-      // For demo purposes, we'll use a simple direct route calculation
-      // In production, you'd use a proper routing service
-
-      const response = await fetch(
-        `https://api.openrouteservice.org/v2/directions/driving-car?api_key=YOUR_API_KEY&start=${fromLocation.lng},${fromLocation.lat}&end=${toLocation.lng},${toLocation.lat}`,
-        {
-          headers: {
-            'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8'
-          }
-        }
-      );
-
-      if (!response.ok) {
-        // Fallback to simple straight-line route for demo
-        const directRoute = calculateDirectRoute(fromLocation, toLocation);
-        setRoute(directRoute);
-        onDirectionsCalculated(directRoute);
-        return;
-      }
-
-      const data = await response.json();
-      const feature = data.features[0];
-      const coordinates = feature.geometry.coordinates;
-      const properties = feature.properties;
-
-      const routeData: RouteData = {
-        coordinates,
-        distance: properties.summary.distance,
-        duration: properties.summary.duration,
-        instructions: properties.segments[0].steps.map((step: any) => ({
-          instruction: step.instruction,
-          distance: step.distance,
-          time: step.duration
-        }))
-      };
-
-      setRoute(routeData);
-      onDirectionsCalculated(routeData);
-
-    } catch (err) {
-      console.error('Directions error:', err);
-      // Fallback to direct route
+      // No external API configured: use a direct route approximation
       const directRoute = calculateDirectRoute(fromLocation, toLocation);
       setRoute(directRoute);
       onDirectionsCalculated(directRoute);
+    } catch (err) {
+      console.error('Directions error:', err);
+      setError('Failed to calculate route');
     } finally {
       setIsLoading(false);
     }
