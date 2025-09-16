@@ -42,6 +42,7 @@ export function useMapProvider() {
     const [mapboxToken, setMapboxToken] = useState<string | null>(null);
     const [tokenError, setTokenError] = useState<string | null>(null);
     const [currentStyle, setCurrentStyle] = useState<MapStyle>(MAP_STYLES[2]); // Default to Streets
+    const [isLoaded, setIsLoaded] = useState(false);
 
     // Fetch Mapbox token - singleton pattern to prevent multiple fetches
     useEffect(() => {
@@ -103,7 +104,7 @@ export function useMapProvider() {
           center: [mapCenter.lng, mapCenter.lat],
           zoom: zoom,
           attributionControl: false,
-          preserveDrawingBuffer: true // Help with rendering issues
+          antialias: true
         });
 
         // Add navigation controls
@@ -111,6 +112,7 @@ export function useMapProvider() {
 
         // Wait for map to load before showing markers
         map.current.on('load', () => {
+          setIsLoaded(true);
           updateMapMarkers();
           // Ensure correct sizing after initial render
           map.current?.resize();
@@ -287,6 +289,27 @@ export function useMapProvider() {
 
     return (
       <div className={`relative ${className || "h-full w-full"}`} style={{ minHeight: '400px' }}>
+        {/* Static image fallback while vector tiles load */}
+        {!isLoaded && mapboxToken && (
+          (() => {
+            const fbCenter = center || (markers.length > 0
+              ? {
+                  lat: markers.reduce((sum, m) => sum + m.lat, 0) / markers.length,
+                  lng: markers.reduce((sum, m) => sum + m.lng, 0) / markers.length,
+                }
+              : { lat: 37.7749, lng: -122.4194 });
+            const staticUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/${fbCenter.lng},${fbCenter.lat},${zoom ?? 13}/1280x720?access_token=${mapboxToken}`;
+            return (
+              <img
+                src={staticUrl}
+                alt="Map loading preview"
+                className="absolute inset-0 w-full h-full object-cover"
+                aria-hidden
+              />
+            );
+          })()
+        )}
+
         <div 
           ref={mapContainer} 
           className="absolute inset-0"
