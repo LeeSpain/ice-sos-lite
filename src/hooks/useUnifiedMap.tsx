@@ -1,5 +1,5 @@
 import { useMemo, useCallback, useState, useEffect } from 'react';
-import { getMapboxToken, hasCachedMapboxToken } from '@/hooks/mapboxToken';
+import { getMapboxToken, hasCachedMapboxToken, validateMapboxAccess } from '@/hooks/mapboxToken';
 import { useMapProvider } from './useMapProvider';
 import { useCanvasMap } from './useCanvasMap';
 
@@ -31,14 +31,21 @@ export const useUnifiedMap = () => {
   // Check for Mapbox token only when explicitly requested
   const checkMapboxAvailability = useCallback(async () => {
     try {
+      // If we already have a token, validate actual access (catches URL whitelist issues)
       if (hasCachedMapboxToken()) {
-        setMapboxReady(true);
-        return true;
+        const valid = await validateMapboxAccess();
+        setMapboxReady(valid);
+        return valid;
       }
+      // Otherwise fetch token, then validate
       const token = await getMapboxToken();
-      const ok = !!token;
-      setMapboxReady(ok);
-      return ok;
+      if (!token) {
+        setMapboxReady(false);
+        return false;
+      }
+      const valid = await validateMapboxAccess(token);
+      setMapboxReady(valid);
+      return valid;
     } catch (error) {
       console.log('Mapbox token not available, using Canvas');
       setMapboxReady(false);

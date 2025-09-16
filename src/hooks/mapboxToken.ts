@@ -62,3 +62,24 @@ export function hasCachedMapboxToken() {
 export function clearMapboxTokenCache() {
   cachedToken = null;
 }
+
+/**
+ * Validate that the current environment can access Mapbox styles with the token.
+ * Returns false if the token is invalid or the current origin is not whitelisted.
+ */
+export async function validateMapboxAccess(token?: string, styleId: string = 'mapbox/streets-v12'): Promise<boolean> {
+  try {
+    const t = token || cachedToken || (typeof mapboxgl.accessToken === 'string' ? mapboxgl.accessToken : '');
+    if (!t) return false;
+    const resp = await fetch(`https://api.mapbox.com/styles/v1/${styleId}?access_token=${t}`);
+    if (!resp.ok) {
+      console.warn('Mapbox style check failed:', resp.status, resp.statusText);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    console.error('Mapbox validation error:', e);
+    return false;
+  }
+}
+
