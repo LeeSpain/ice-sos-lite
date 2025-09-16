@@ -57,6 +57,8 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const markerRenderer = useRef<MarkerRenderer>(new MarkerRenderer());
   const animationFrameRef = useRef<number | null>(null);
+  const prevViewportKeyRef = useRef<string | null>(null);
+  const prevMapModeRef = useRef<'standard' | 'satellite' | null>(null);
   
   const [viewport, setViewport] = useState<Viewport>({
     centerLat: center.lat,
@@ -128,12 +130,18 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // Clear canvas with professional ocean background
-    const gradient = ctx.createLinearGradient(0, 0, 0, viewport.height);
-    gradient.addColorStop(0, '#a7c8ed');
-    gradient.addColorStop(1, '#8bb5e8');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, viewport.width, viewport.height);
+    // Clear canvas only when viewport or mode changed to reduce flicker
+    const viewportKey = `${viewport.centerLat.toFixed(5)}_${viewport.centerLng.toFixed(5)}_${Math.floor(viewport.zoom)}_${viewport.width}x${viewport.height}`;
+    const shouldClear = prevViewportKeyRef.current !== viewportKey || prevMapModeRef.current !== mapMode;
+
+    if (shouldClear) {
+      // Clear canvas with professional ocean background
+      const gradient = ctx.createLinearGradient(0, 0, 0, viewport.height);
+      gradient.addColorStop(0, '#a7c8ed');
+      gradient.addColorStop(1, '#8bb5e8');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, viewport.width, viewport.height);
+    }
 
     const tileSize = 256;
     const centerTile = getTileCoords(viewport.centerLat, viewport.centerLng, Math.floor(viewport.zoom));
@@ -226,7 +234,9 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     // Wait for all markers to render
     await Promise.all(markerPromises);
 
-    // Add subtle performance indicators
+    // Update refs for next frame
+    prevViewportKeyRef.current = viewportKey;
+    prevMapModeRef.current = mapMode;
     if (showControls) {
       // Draw GPS accuracy indicator
       ctx.strokeStyle = 'rgba(34, 197, 94, 0.6)';

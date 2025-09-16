@@ -15,7 +15,7 @@ const FamilyLiveMap: React.FC<FamilyLiveMapProps> = ({ className }) => {
         markers={[]}
         center={{ lat: 37.7749, lng: -122.4194 }}
         zoom={13}
-        preferCanvas={false}
+        preferCanvas={true}
       />
     </div>
   );
