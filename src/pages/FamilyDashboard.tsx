@@ -10,7 +10,7 @@ import { Navigate } from 'react-router-dom';
 import FamilyDashboardHome from '@/components/family-dashboard/FamilyDashboardHome';
 import FamilyEmergencyMap from '@/components/family-dashboard/FamilyEmergencyMap';
 import FamilyLiveMap from '@/components/family-dashboard/FamilyLiveMap';
-import FamilyNotifications from '@/components/family-dashboard/FamilyNotifications';
+import { AdvancedMapFeatures } from '@/components/family-dashboard/AdvancedMapFeatures';
 import ConnectionDashboard from '@/components/family-dashboard/ConnectionDashboard';
 import FamilyDashboardSidebar from '@/components/family-dashboard/FamilyDashboardSidebar';
 
@@ -78,9 +78,9 @@ const FamilyDashboard = () => {
             <Routes>
               <Route index element={<FamilyDashboardHome />} />
               <Route path="/connections" element={<ConnectionDashboard />} />
+              <Route path="/advanced-map" element={<AdvancedMapFeatures />} />
               <Route path="/emergency-map" element={<FamilyEmergencyMap />} />
               <Route path="/live-map" element={<FamilyLiveMap />} />
-              <Route path="/notifications" element={<FamilyNotifications />} />
             </Routes>
       </main>
     </div>
