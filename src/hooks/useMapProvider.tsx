@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { supabase } from "@/integrations/supabase/client";
+import { getMapboxToken } from '@/hooks/mapboxToken';
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Layers, MapPin } from "lucide-react";
@@ -44,48 +44,28 @@ export function useMapProvider() {
     const [currentStyle, setCurrentStyle] = useState<MapStyle>(MAP_STYLES[2]); // Default to Streets
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Fetch Mapbox token - singleton pattern to prevent multiple fetches
+    // Fetch Mapbox token via shared singleton
     useEffect(() => {
-      if (mapboxgl.accessToken) return; // Don't fetch if already set
-      
-      const fetchMapboxToken = async () => {
+      let mounted = true;
+      (async () => {
         try {
-          const { data, error } = await supabase.functions.invoke('get-mapbox-token');
-          let token = (data as any)?.token as string | undefined;
-          if (error) {
-            console.warn('Mapbox token function error:', error);
-          }
-
-          // Fallback to VITE_MAPBOX_PUBLIC_TOKEN if function didn't return
-          if (!token) {
-            const viteToken = (import.meta as any).env?.VITE_MAPBOX_PUBLIC_TOKEN;
-            if (viteToken && viteToken !== 'undefined') {
-              token = viteToken as string;
-            }
-          }
-
+          const token = await getMapboxToken();
+          if (!mounted) return;
           if (token) {
             setMapboxToken(token);
-            mapboxgl.accessToken = token;
             setTokenError(null);
           } else {
-            setTokenError('Failed to load map token');
+            setTokenError('Missing Mapbox token');
           }
         } catch (err) {
+          if (!mounted) return;
           console.error('Failed to fetch Mapbox token:', err);
-          const viteToken = (import.meta as any).env?.VITE_MAPBOX_PUBLIC_TOKEN;
-          if (viteToken && viteToken !== 'undefined') {
-            setMapboxToken(viteToken);
-            mapboxgl.accessToken = viteToken;
-            setTokenError(null);
-          } else {
-            setTokenError('Failed to load map token');
-          }
+          setTokenError('Failed to load map token');
         }
-      };
-      
-      fetchMapboxToken();
-    }, []); // Empty dependency array - fetch once only
+      })();
+      return () => { mounted = false; };
+    }, []);
+
 
     // Initialize map only once when token is available
     useEffect(() => {
@@ -263,14 +243,28 @@ export function useMapProvider() {
     if (tokenError) {
       return (
         <div className={`${className || "h-full w-full"} flex items-center justify-center bg-muted/20 backdrop-blur-sm`} style={{ minHeight: '400px' }}>
-          <div className="text-center p-4">
+          <div className="text-center p-4 max-w-md">
             <MapPin className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground mb-2">Map temporarily unavailable</p>
-            <p className="text-xs text-muted-foreground/70">
-              {tokenError.includes('fetch') 
-                ? 'Please check your connection and try again' 
-                : 'Loading map services...'}
+            <p className="font-medium mb-2">Map unavailable</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              {tokenError.toLowerCase().includes('authorization') || tokenError.includes('401') || tokenError.includes('403')
+                ? 'Authorization failed. Check your Mapbox token and Allowed URLs.'
+                : 'We couldn’t load Mapbox. You can retry or switch to Canvas in settings.'}
             </p>
+            <div className="text-xs text-left bg-background/60 rounded-md p-3 border">
+              <p className="mb-1 font-medium">Whitelist these URLs in Mapbox Tokens → Allowed URLs:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>{window.location.origin}</li>
+                <li>https://*.lovableproject.com</li>
+                <li>http://localhost:5173</li>
+              </ul>
+            </div>
+            <div className="mt-3">
+              <Button size="sm" variant="outline" onClick={async () => {
+                const token = await getMapboxToken();
+                if (token) { setMapboxToken(token); setTokenError(null); }
+              }}>Retry</Button>
+            </div>
           </div>
         </div>
       );
