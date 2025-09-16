@@ -152,14 +152,14 @@ const PaymentSuccess = () => {
                 </div>
 
                 {/* Monthly Subscriptions */}
-                {welcomeData.subscriptionPlans.length > 0 && (
+                {(welcomeData.subscriptionPlans?.length ?? 0) > 0 && (
                   <div>
                     <h5 className="text-sm font-medium text-muted-foreground mb-2">Monthly Subscriptions:</h5>
                     <ul className="space-y-2">
                       {welcomeData.subscriptionPlans.map(plan => (
                         <li key={plan.id} className="flex justify-between p-2 bg-secondary rounded border">
                           <span className="font-medium text-foreground">{plan.name}</span>
-                          <span className="text-foreground">€{parseFloat(plan.price.toString()).toFixed(2)}/month</span>
+                          <span className="text-foreground">€{(plan?.price != null ? Number(plan.price) : 0).toFixed(2)}/month</span>
                         </li>
                       ))}
                     </ul>
@@ -167,12 +167,12 @@ const PaymentSuccess = () => {
                 )}
 
                 {/* Regional Services */}
-                {welcomeData.regionalServices.length > 0 && (
+                {(welcomeData.regionalServices?.length ?? 0) > 0 && (
                   <div>
                     <h5 className="text-sm font-medium text-muted-foreground mb-2">Regional Services:</h5>
                     <ul className="space-y-2">
                       {welcomeData.regionalServices.map(service => {
-                        const netPrice = parseFloat(service.price.toString());
+                        const netPrice = service?.price != null ? Number(service.price) : 0;
                         const totalPrice = netPrice * (1 + SERVICE_IVA_RATE);
                         return (
                           <li key={service.id} className="p-2 bg-secondary rounded border">
@@ -188,12 +188,12 @@ const PaymentSuccess = () => {
                 )}
 
                 {/* Safety Products */}
-                {welcomeData.products.length > 0 && (
+                {(welcomeData.products?.length ?? 0) > 0 && (
                   <div>
                     <h5 className="text-sm font-medium text-muted-foreground mb-2">Safety Products (One-time):</h5>
                     <ul className="space-y-2">
                       {welcomeData.products.map(product => {
-                        const netPrice = parseFloat(product.price.toString());
+                        const netPrice = product?.price != null ? Number(product.price) : 0;
                         const totalPrice = netPrice * (1 + PRODUCT_IVA_RATE);
                         return (
                           <li key={product.id} className="p-2 bg-secondary rounded border">
