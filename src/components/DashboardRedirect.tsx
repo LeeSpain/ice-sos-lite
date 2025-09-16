@@ -35,6 +35,17 @@ const DashboardRedirect = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  // Check if user just completed payment - allow payment flow to complete
+  const justCompletedPayment = sessionStorage.getItem('payment-completed');
+  const fromPaymentSuccess = document.referrer.includes('/payment-success');
+  
+  if (justCompletedPayment || fromPaymentSuccess) {
+    console.log('🔄 DashboardRedirect: Payment flow detected, allowing welcome questionnaire');
+    // Clear the payment flag and redirect to welcome questionnaire
+    sessionStorage.removeItem('payment-completed');
+    return <Navigate to="/welcome-questionnaire" replace />;
+  }
+
   // Enhanced role-based routing with explicit admin check
   if (role === 'admin' || isAdmin) {
     console.log('🔄 DashboardRedirect: Admin user detected, redirecting to admin dashboard');

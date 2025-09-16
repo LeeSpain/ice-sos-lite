@@ -91,6 +91,8 @@ const PaymentSuccess = () => {
   const grandTotal = subscriptionTotal + productTotal;
 
   const handleDashboardAccess = () => {
+    // Set flag to indicate payment was completed for proper flow handling
+    sessionStorage.setItem('payment-completed', 'true');
     navigate('/welcome-questionnaire');
   };
 
