@@ -37,27 +37,27 @@ const useDashboardItems = () => {
   const dashboardItems = [
     {
       title: t('dashboard.overview'),
-      url: "/full-dashboard",
+      url: "/member-dashboard",
       icon: LayoutDashboard
     },
     {
       title: t('dashboard.profile'),
-      url: "/full-dashboard/profile",
+      url: "/member-dashboard/profile",
       icon: User
     },
     {
       title: t('dashboard.myProducts'),
-      url: "/full-dashboard/products",
+      url: "/member-dashboard/products",
       icon: Package
     },
     {
       title: t('dashboard.activity'),
-      url: "/full-dashboard/activity",
+      url: "/member-dashboard/activity",
       icon: Activity
     },
     {
       title: t('dashboard.mobileApp'),
-      url: "/full-dashboard/mobile-app",
+      url: "/member-dashboard/mobile-app",
       icon: Smartphone
     }
   ];
@@ -65,27 +65,27 @@ const useDashboardItems = () => {
   const familyCircleItems = [
     {
       title: "Family Connections",
-      url: "/full-dashboard/connections",
+      url: "/member-dashboard/connections",
       icon: UserPlus
     },
     {
       title: t('dashboard.liveFamilyMap'),
-      url: "/full-dashboard/live-map",
+      url: "/member-dashboard/live-map",
       icon: Map
     },
     {
       title: t('dashboard.myCircles'),
-      url: "/full-dashboard/circles",
+      url: "/member-dashboard/circles",
       icon: Users
     },
     {
       title: t('dashboard.placesGeofences'),
-      url: "/full-dashboard/places",
+      url: "/member-dashboard/places",
       icon: Navigation
     },
     {
       title: t('dashboard.locationHistory'),
-      url: "/full-dashboard/location-history",
+      url: "/member-dashboard/location-history",
       icon: History
     }
   ];
@@ -93,27 +93,27 @@ const useDashboardItems = () => {
   const settingsItems = [
     {
       title: t('dashboard.subscription'),
-      url: "/full-dashboard/subscription",
+      url: "/member-dashboard/subscription",
       icon: CreditCard
     },
     {
       title: t('dashboard.notifications'),
-      url: "/full-dashboard/notifications",
+      url: "/member-dashboard/notifications",
       icon: Bell
     },
     {
       title: t('dashboard.security'),
-      url: "/full-dashboard/security",
+      url: "/member-dashboard/security",
       icon: Shield
     },
     {
       title: t('dashboard.settings'),
-      url: "/full-dashboard/settings",
+      url: "/member-dashboard/settings",
       icon: Settings
     },
     {
       title: t('dashboard.support'),
-      url: "/full-dashboard/support",
+      url: "/member-dashboard/support",
       icon: HelpCircle
     }
   ];
@@ -130,8 +130,8 @@ export function DashboardSidebar() {
   const { dashboardItems, familyCircleItems, settingsItems } = useDashboardItems();
 
   const isActive = (path: string) => {
-    if (path === '/full-dashboard') {
-      return currentPath === '/full-dashboard';
+    if (path === '/member-dashboard') {
+      return currentPath === '/member-dashboard';
     }
     return currentPath.startsWith(path);
   };
@@ -178,11 +178,11 @@ export function DashboardSidebar() {
               {dashboardItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink 
-                       to={item.url} 
-                       end={item.url === '/full-dashboard'}
-                      className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
-                    >
+                     <NavLink 
+                        to={item.url} 
+                        end={item.url === '/member-dashboard'}
+                       className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${getNavCls(item.url)}`}
+                     >
                       <div className={`p-1.5 rounded-lg transition-colors ${
                         isActive(item.url) 
                           ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm' 
