@@ -1,23 +1,16 @@
 import React, { useEffect } from "react";
 import { useOptimizedAuth } from "@/hooks/useOptimizedAuth";
+import { useDashboardData } from "@/hooks/useDashboardData";
 import { Navigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 
 const SimpleDashboard = () => {
-  const { user, loading, isAdmin } = useOptimizedAuth();
+  const { user, loading: authLoading, isAdmin } = useOptimizedAuth();
+  const { isLoading: dashboardLoading, loadingStates } = useDashboardData();
 
-  // Debug logging to track the authentication flow
-  useEffect(() => {
-    console.log('🏠 SimpleDashboard Debug:', {
-      user: user?.id || 'none',
-      email: user?.email || 'none',
-      isAdmin,
-      loading,
-      currentPath: window.location.pathname,
-      timestamp: new Date().toISOString()
-    });
-  }, [user, isAdmin, loading]);
+  // Optimize loading - show content as soon as we have basic auth
+  const loading = authLoading;
 
   // Show loading while checking authentication and role
   if (loading) {

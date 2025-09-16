@@ -4,21 +4,21 @@ import { useMemo } from 'react';
 
 export function useOptimizedAuth() {
   const { user, session, loading: authLoading, signOut } = useAuth();
-  const { data: role, isLoading: roleLoading, error: roleError } = useOptimizedUserRole();
-
-  // Removed debug logs to prevent infinite re-renders
+  const { data: role, isLoading: roleLoading } = useOptimizedUserRole();
 
   const isAdmin = useMemo(() => {
     return role === 'admin';
   }, [role]);
   
   const isUser = useMemo(() => role === 'user', [role]);
-  const loading = authLoading || roleLoading;
+  
+  // Optimize loading state - don't show loading if we have basic auth data
+  const loading = authLoading || (roleLoading && !user);
 
   return {
     user,
     session,
-    role,
+    role: role || 'user', // Default to 'user' to prevent undefined states
     isAdmin,
     isUser,
     loading,
