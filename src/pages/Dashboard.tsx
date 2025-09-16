@@ -288,7 +288,7 @@ const Dashboard = () => {
               
               {/* Live Map Routes */}
               <Route path="live-map" element={
-                <div className="h-full">
+                <div className="min-h-[calc(100vh-64px)]">
                   <MapScreen />
                 </div>
               } />

@@ -108,7 +108,7 @@ export default function MapScreen() {
   };
 
   return (
-    <div className="h-screen w-full relative bg-background">
+    <div className="min-h-[calc(100vh-64px)] w-full relative bg-background">
       {/* Top Controls */}
       <div className="absolute top-4 left-4 right-4 z-20 space-y-3">
         <CircleSwitcher
@@ -162,7 +162,7 @@ export default function MapScreen() {
         </div>
       )}
       <MapView
-        className="h-full w-full"
+        className="h-full min-h-[500px] w-full"
         markers={presences.map(p => ({
           id: p.user_id,
           lat: p.lat,
