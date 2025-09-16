@@ -23,49 +23,26 @@ interface UnifiedMapViewProps {
 export const useUnifiedMap = () => {
   const mapboxProvider = useMapProvider();
   const canvasProvider = useCanvasMap();
-  const [mapbackend, setMapBackend] = useState<'canvas' | 'mapbox' | 'auto'>('auto');
+  const [mapbackend, setMapBackend] = useState<'canvas' | 'mapbox'>('canvas'); // Default to canvas for stability
   const [mapboxReady, setMapboxReady] = useState(false);
-  const [mapboxTimeout, setMapboxTimeout] = useState(false);
 
-  // Monitor Mapbox readiness with timeout
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
-    if (mapbackend === 'auto') {
-      // Set a timeout for Mapbox to be ready
-      timeoutId = setTimeout(() => {
-        if (!mapboxReady) {
-          console.log('Mapbox timeout - falling back to Canvas');
-          setMapboxTimeout(true);
-          setMapBackend('canvas');
-        }
-      }, 800); // 800ms timeout for Mapbox to initialize
-      
-      // Check if Mapbox token is available
-      const checkMapboxToken = async () => {
-        try {
-          const response = await fetch('/api/mapbox-token');
-          if (response.ok) {
-            setMapboxReady(true);
-            setMapBackend('mapbox');
-          } else {
-            throw new Error('Token fetch failed');
-          }
-        } catch (error) {
-          console.log('Mapbox token unavailable, using Canvas');
-          setMapBackend('canvas');
-        }
-      };
-      
-      checkMapboxToken();
+  // Check for Mapbox token only when explicitly requested
+  const checkMapboxAvailability = useCallback(async () => {
+    try {
+      // Check if we have the MAPBOX_PUBLIC_TOKEN secret
+      const token = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
+      if (token && token !== 'undefined') {
+        setMapboxReady(true);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.log('Mapbox token not available, using Canvas');
+      return false;
     }
-    
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [mapbackend, mapboxReady]);
+  }, []);
 
-  // Unified MapView component using JSX for stability
+  // Unified MapView component - always use Canvas for stability
   const MapView = useCallback(({ 
     className, 
     markers = [], 
@@ -77,47 +54,20 @@ export const useUnifiedMap = () => {
     preferCanvas = false
   }: UnifiedMapViewProps) => {
     
-    // Force Canvas if preferred or if we decided to use Canvas
-    const useCanvas = preferCanvas || mapbackend === 'canvas' || mapboxTimeout;
-    
-    if (useCanvas) {
-      const CanvasComponent = canvasProvider.MapView;
-      return (
-        <CanvasComponent
-          className={className}
-          markers={markers}
-          center={center}
-          zoom={zoom}
-          onMapReady={onMapReady}
-          showControls={showControls}
-          interactive={interactive}
-        />
-      );
-    }
-
-    // Use Mapbox if ready and no preference for Canvas
-    if (mapbackend === 'mapbox' && mapboxReady) {
-      const MapboxComponent = mapboxProvider.MapView;
-      return (
-        <MapboxComponent
-          className={className}
-          markers={markers}
-          center={center}
-          zoom={zoom}
-        />
-      );
-    }
-    
-    // Loading state while determining backend
+    // Always use Canvas for now to prevent flashing
+    const CanvasComponent = canvasProvider.MapView;
     return (
-      <div className={`${className || "h-full w-full"} flex items-center justify-center bg-muted/20`}>
-        <div className="text-center p-4">
-          <div className="animate-spin h-6 w-6 border-2 border-current border-t-transparent rounded-full mx-auto mb-2"></div>
-          <p className="text-sm text-muted-foreground">Loading map...</p>
-        </div>
-      </div>
+      <CanvasComponent
+        className={className}
+        markers={markers}
+        center={center}
+        zoom={zoom}
+        onMapReady={onMapReady}
+        showControls={showControls}
+        interactive={interactive}
+      />
     );
-  }, [mapboxProvider, canvasProvider, mapbackend, mapboxReady, mapboxTimeout]);
+  }, [canvasProvider]);
 
   const switchToCanvas = useCallback(() => {
     setMapBackend('canvas');
@@ -134,12 +84,13 @@ export const useUnifiedMap = () => {
 
   return {
     MapView,
-    isLoading: mapbackend === 'auto' && !mapboxReady && !mapboxTimeout,
-    error: mapboxTimeout ? 'Mapbox unavailable' : null,
+    isLoading: false, // No loading state needed since we always use Canvas
+    error: null,
     hasMapboxToken: mapboxReady,
     currentBackend: mapbackend,
     switchToCanvas,
     switchToMapbox,
+    checkMapboxAvailability,
     mapboxProvider,
     canvasProvider
   };
