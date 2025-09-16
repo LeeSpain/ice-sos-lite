@@ -112,6 +112,8 @@ export function useMapProvider() {
         // Wait for map to load before showing markers
         map.current.on('load', () => {
           updateMapMarkers();
+          // Ensure correct sizing after initial render
+          map.current?.resize();
         });
 
       } catch (error) {

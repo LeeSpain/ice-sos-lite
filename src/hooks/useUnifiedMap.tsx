@@ -26,6 +26,7 @@ export const useUnifiedMap = () => {
   const canvasProvider = useCanvasMap();
   const [mapbackend, setMapBackend] = useState<'canvas' | 'mapbox'>('canvas'); // Default to canvas for stability
   const [mapboxReady, setMapboxReady] = useState(false);
+  const [decided, setDecided] = useState(false);
 
   // Check for Mapbox token only when explicitly requested
   const checkMapboxAvailability = useCallback(async () => {
@@ -66,6 +67,7 @@ export const useUnifiedMap = () => {
       } else {
         setMapBackend('canvas');
       }
+      setDecided(true);
     })();
     return () => { mounted = false; };
   }, [checkMapboxAvailability]);
@@ -83,6 +85,15 @@ export const useUnifiedMap = () => {
   }: UnifiedMapViewProps) => {
     const CanvasComponent = canvasProvider.MapView;
     const MapboxComponent = mapboxProvider.MapView;
+
+    // While deciding, show a stable placeholder to avoid flicker
+    if (!decided) {
+      return (
+        <div className={className || ''}>
+          <div className="h-full w-full min-h-[300px] bg-muted/20 animate-pulse" />
+        </div>
+      );
+    }
 
     // Lock backend: preferCanvas overrides, otherwise use decided backend
     const backend = preferCanvas ? 'canvas' : mapbackend;
@@ -109,7 +120,7 @@ export const useUnifiedMap = () => {
         interactive={interactive}
       />
     );
-  }, [canvasProvider, mapboxProvider, mapbackend]);
+  }, [canvasProvider, mapboxProvider, mapbackend, decided]);
 
   const switchToCanvas = useCallback(() => {
     setMapBackend('canvas');
@@ -126,7 +137,7 @@ export const useUnifiedMap = () => {
 
   return {
     MapView,
-    isLoading: false, // No loading state needed since we always use Canvas
+    isLoading: !decided,
     error: null,
     hasMapboxToken: mapboxReady,
     currentBackend: mapbackend,
