@@ -11,7 +11,7 @@ import FamilyDashboardHome from '@/components/family-dashboard/FamilyDashboardHo
 import FamilyEmergencyMap from '@/components/family-dashboard/FamilyEmergencyMap';
 import FamilyLiveMap from '@/components/family-dashboard/FamilyLiveMap';
 import FamilyNotifications from '@/components/family-dashboard/FamilyNotifications';
-import FamilyProfile from '@/components/family-dashboard/FamilyProfile';
+import ConnectionDashboard from '@/components/family-dashboard/ConnectionDashboard';
 import FamilyDashboardSidebar from '@/components/family-dashboard/FamilyDashboardSidebar';
 
 const FamilyDashboard = () => {
@@ -75,13 +75,13 @@ const FamilyDashboard = () => {
       
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
-        <Routes>
-          <Route path="/" element={<FamilyDashboardHome />} />
-          <Route path="/emergency-map" element={<FamilyEmergencyMap />} />
-          <Route path="/live-map" element={<FamilyLiveMap />} />
-          <Route path="/notifications" element={<FamilyNotifications />} />
-          <Route path="/profile" element={<FamilyProfile />} />
-        </Routes>
+            <Routes>
+              <Route index element={<FamilyDashboardHome />} />
+              <Route path="/connections" element={<ConnectionDashboard />} />
+              <Route path="/emergency-map" element={<FamilyEmergencyMap />} />
+              <Route path="/live-map" element={<FamilyLiveMap />} />
+              <Route path="/notifications" element={<FamilyNotifications />} />
+            </Routes>
       </main>
     </div>
   );
