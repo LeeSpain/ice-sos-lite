@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, Users, MessageSquare, Shield, ChevronDown, ChevronUp, Battery, Clock, CheckCircle2, AlertTriangle, Bell } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
-import { useMapProvider } from '@/hooks/useMapProvider';
+import { useUnifiedMap } from '@/hooks/useUnifiedMap';
 import FamilyMarker from '@/components/map/FamilyMarker';
 import { useEmergencySOS } from '@/hooks/useEmergencySOS';
 import { useEmergencyDisclaimer } from '@/hooks/useEmergencyDisclaimer';
@@ -33,7 +33,7 @@ const FamilyAppPage = () => {
   const { user } = useAuth();
   const { data: familyRole } = useFamilyRole();
   const { data: familyData, isLoading } = useFamilyMembers(familyRole?.familyGroupId);
-  const { MapView } = useMapProvider();
+  const { MapView } = useUnifiedMap();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
@@ -238,6 +238,7 @@ const FamilyAppPage = () => {
           markers={mapMarkers}
           center={{ lat: 40.7589, lng: -73.9851 }}
           zoom={13}
+          preferCanvas={true}
         />
       </div>
 

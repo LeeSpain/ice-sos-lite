@@ -129,11 +129,11 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     ctx.imageSmoothingQuality = 'high';
 
     // Clear canvas with professional ocean background
-    const gradient = ctx.createLinearGradient(0, 0, 0, viewport.height * dpr);
+    const gradient = ctx.createLinearGradient(0, 0, 0, viewport.height);
     gradient.addColorStop(0, '#a7c8ed');
     gradient.addColorStop(1, '#8bb5e8');
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, viewport.width * dpr, viewport.height * dpr);
+    ctx.fillRect(0, 0, viewport.width, viewport.height);
 
     const tileSize = 256;
     const centerTile = getTileCoords(viewport.centerLat, viewport.centerLng, Math.floor(viewport.zoom));
@@ -156,8 +156,8 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         totalTiles++;
         
         // Calculate tile position on screen
-        const pixelX = ((tileX * tileSize) - (centerTile.x * tileSize)) + (viewport.width * dpr) / 2;
-        const pixelY = ((tileY * tileSize) - (centerTile.y * tileSize)) + (viewport.height * dpr) / 2;
+        const pixelX = ((tileX * tileSize) - (centerTile.x * tileSize)) + (viewport.width) / 2;
+        const pixelY = ((tileY * tileSize) - (centerTile.y * tileSize)) + (viewport.height) / 2;
 
         // Check if tile is already loaded in cache
         const cachedTile = tileCache.getTile(tileX, tileY, tileZ, mapMode);
@@ -209,8 +209,8 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
             heading: marker.heading,
             batteryLevel: marker.batteryLevel
           },
-          x * dpr,
-          y * dpr,
+          x,
+          y,
           viewport.zoom,
           {
             size: 32,
@@ -232,18 +232,18 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       ctx.strokeStyle = 'rgba(34, 197, 94, 0.6)';
       ctx.lineWidth = 2;
       ctx.setLineDash([2, 2]);
-      const centerX = (viewport.width * dpr) / 2;
-      const centerY = (viewport.height * dpr) / 2;
+      const centerX = (viewport.width) / 2;
+      const centerY = (viewport.height) / 2;
       ctx.beginPath();
-      ctx.arc(centerX, centerY, 8 * dpr, 0, 2 * Math.PI);
+      ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
       ctx.stroke();
       ctx.setLineDash([]);
 
       // Performance debug info (development only)
       if (process.env.NODE_ENV === 'development') {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.font = `${10 * dpr}px monospace`;
-        ctx.fillText(`FPS: ${Math.round(1000 / 33)} | Tiles: ${renderStats.tilesLoaded}/${renderStats.totalTiles}`, 10 * dpr, 20 * dpr);
+        ctx.font = `10px monospace`;
+        ctx.fillText(`FPS: ${Math.round(1000 / 33)} | Tiles: ${renderStats.tilesLoaded}/${renderStats.totalTiles}`, 10, 20);
       }
     }
   }, [viewport, markers, latLngToPixel, getTileCoords, showControls, mapMode, showAccuracy, renderStats]);
@@ -338,6 +338,8 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         
         const ctx = canvas.getContext('2d');
         if (ctx) {
+          // Reset any previous transforms before applying DPR scale
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
           ctx.scale(dpr, dpr);
         }
         

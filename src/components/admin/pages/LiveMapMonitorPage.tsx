@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useMapProvider } from '@/hooks/useMapProvider';
+import { useUnifiedMap } from '@/hooks/useUnifiedMap';
 import { Map, Users, MapPin, Activity, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,7 +28,7 @@ export default function LiveMapMonitorPage() {
   const [locationPings, setLocationPings] = useState<any[]>([]);
   const [placeEvents, setPlaceEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { MapView } = useMapProvider();
+  const { MapView } = useUnifiedMap();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -300,6 +300,7 @@ export default function LiveMapMonitorPage() {
             <MapView
               markers={markers}
               className="w-full h-full"
+              preferCanvas={true}
             />
           </div>
         </CardContent>
