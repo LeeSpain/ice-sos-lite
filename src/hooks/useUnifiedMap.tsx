@@ -1,4 +1,5 @@
 import { useMemo, useCallback, useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useMapProvider } from './useMapProvider';
 import { useCanvasMap } from './useCanvasMap';
 
@@ -29,12 +30,24 @@ export const useUnifiedMap = () => {
   // Check for Mapbox token only when explicitly requested
   const checkMapboxAvailability = useCallback(async () => {
     try {
-      // Check if we have the MAPBOX_PUBLIC_TOKEN secret
-      const token = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
-      if (token && token !== 'undefined') {
+      // Prefer fetching token from Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+      if (error) {
+        console.warn('Mapbox token fetch error:', error);
+      }
+      const token = (data as any)?.token;
+      if (token && typeof token === 'string' && token.length > 0) {
         setMapboxReady(true);
         return true;
       }
+
+      // Fallback to VITE_MAPBOX_PUBLIC_TOKEN if present
+      const viteToken = (import.meta as any).env?.VITE_MAPBOX_PUBLIC_TOKEN;
+      if (viteToken && viteToken !== 'undefined') {
+        setMapboxReady(true);
+        return true;
+      }
+
       return false;
     } catch (error) {
       console.log('Mapbox token not available, using Canvas');

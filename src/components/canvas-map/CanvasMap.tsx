@@ -149,15 +149,12 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     const viewportKey = `${viewport.centerLat.toFixed(5)}_${viewport.centerLng.toFixed(5)}_${Math.floor(viewport.zoom)}_${viewport.width}x${viewport.height}`;
     const shouldClear = prevViewportKeyRef.current !== viewportKey || prevMapModeRef.current !== mapMode;
 
-    if (shouldClear) {
-      const gradient = bctx.createLinearGradient(0, 0, 0, viewport.height);
-      gradient.addColorStop(0, '#a7c8ed');
-      gradient.addColorStop(1, '#8bb5e8');
-      bctx.fillStyle = gradient;
-      bctx.fillRect(0, 0, viewport.width, viewport.height);
-    } else {
-      bctx.clearRect(0, 0, viewport.width, viewport.height);
-    }
+    // Always paint a solid background to avoid transparent frames
+    const gradient = bctx.createLinearGradient(0, 0, 0, viewport.height);
+    gradient.addColorStop(0, '#a7c8ed');
+    gradient.addColorStop(1, '#8bb5e8');
+    bctx.fillStyle = gradient;
+    bctx.fillRect(0, 0, viewport.width, viewport.height);
 
     const tileSize = 256;
     const centerTile = getTileCoords(viewport.centerLat, viewport.centerLng, Math.floor(viewport.zoom));
