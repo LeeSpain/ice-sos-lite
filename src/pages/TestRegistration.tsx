@@ -339,7 +339,6 @@ const TestRegistration = () => {
                     city={personalDetails.city}
                     onSuccess={handlePaymentSuccess}
                     onBack={() => setCurrentStep('details')}
-                    testingMode={true}
                   />
                 </div>
               )}

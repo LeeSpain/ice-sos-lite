@@ -1094,7 +1094,6 @@ const AIRegister = () => {
                   country={personalDetails.country}
                   onSuccess={handlePaymentSuccess}
                   onBack={() => setCurrentStep('details')}
-                  testingMode={testingMode}
                 />
               )}
             </CardContent>
