@@ -11,8 +11,9 @@ const GlobalEmmaChat: React.FC = () => {
   const { isEmmaOpen, openEmmaChat, closeEmmaChat } = useEmmaChat();
   const location = useLocation();
 
-  // Don't show Emma on admin dashboard, family-app page, or SOS app page
+  // Don't show Emma on admin dashboard, member dashboard, family-app page, or SOS app page
   if (location.pathname.startsWith('/admin-dashboard') || 
+      location.pathname.startsWith('/member-dashboard') ||
       location.pathname === '/family-app' || 
       location.pathname === '/sos-app') {
     return null;
