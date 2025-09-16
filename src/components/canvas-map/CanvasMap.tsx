@@ -59,6 +59,11 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   const animationFrameRef = useRef<number | null>(null);
   const prevViewportKeyRef = useRef<string | null>(null);
   const prevMapModeRef = useRef<'standard' | 'satellite' | null>(null);
+  const bufferCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const isDrawingRef = useRef(false);
+  const redrawScheduledRef = useRef(false);
+  const prevIsLoadingRef = useRef<boolean>(true);
+  const prevRenderStatsRef = useRef<RenderStats>({ tilesLoaded: 0, totalTiles: 0, cacheHitRate: 0 });
   
   const [viewport, setViewport] = useState<Viewport>({
     centerLat: center.lat,
@@ -116,31 +121,42 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     return { x, y, z: zoom };
   }, []);
 
-  // Professional map rendering with enhanced caching and optimizations
-  const drawMap = useCallback(async () => {
+  // Offscreen buffer to prevent flicker and a single-flight scheduler
+  const ensureBufferCanvas = useCallback(() => {
+    if (!bufferCanvasRef.current) {
+      bufferCanvasRef.current = document.createElement('canvas');
+    }
+    const buf = bufferCanvasRef.current;
+    if (!buf) return null;
+    if (buf.width !== viewport.width || buf.height !== viewport.height) {
+      buf.width = viewport.width;
+      buf.height = viewport.height;
+    }
+    return buf.getContext('2d');
+  }, [viewport.width, viewport.height]);
+
+  const drawScene = useCallback(async () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const bctx = ensureBufferCanvas();
+    if (!canvas || !bctx) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    // Draw everything to the offscreen buffer in CSS pixels
+    const dpr = 1;
+    bctx.imageSmoothingEnabled = true;
+    bctx.imageSmoothingQuality = 'high';
 
-    const dpr = window.devicePixelRatio || 1;
-
-    // High-performance canvas optimizations
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-
-    // Clear canvas only when viewport or mode changed to reduce flicker
+    // Clear only when needed to reduce flicker
     const viewportKey = `${viewport.centerLat.toFixed(5)}_${viewport.centerLng.toFixed(5)}_${Math.floor(viewport.zoom)}_${viewport.width}x${viewport.height}`;
     const shouldClear = prevViewportKeyRef.current !== viewportKey || prevMapModeRef.current !== mapMode;
 
     if (shouldClear) {
-      // Clear canvas with professional ocean background
-      const gradient = ctx.createLinearGradient(0, 0, 0, viewport.height);
+      const gradient = bctx.createLinearGradient(0, 0, 0, viewport.height);
       gradient.addColorStop(0, '#a7c8ed');
       gradient.addColorStop(1, '#8bb5e8');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, viewport.width, viewport.height);
+      bctx.fillStyle = gradient;
+      bctx.fillRect(0, 0, viewport.width, viewport.height);
+    } else {
+      bctx.clearRect(0, 0, viewport.width, viewport.height);
     }
 
     const tileSize = 256;
@@ -150,9 +166,8 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     let tilesLoaded = 0;
     let totalTiles = 0;
 
-    // Load and draw tiles using professional caching
     const tilePromises: Promise<void>[] = [];
-    
+
     for (let dx = -tilesNeeded; dx <= tilesNeeded; dx++) {
       for (let dy = -tilesNeeded; dy <= tilesNeeded; dy++) {
         const tileX = centerTile.x + dx;
@@ -162,48 +177,43 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         if (tileX < 0 || tileY < 0 || tileX >= Math.pow(2, tileZ) || tileY >= Math.pow(2, tileZ)) continue;
 
         totalTiles++;
-        
-        // Calculate tile position on screen
+
         const pixelX = ((tileX * tileSize) - (centerTile.x * tileSize)) + (viewport.width) / 2;
         const pixelY = ((tileY * tileSize) - (centerTile.y * tileSize)) + (viewport.height) / 2;
 
-        // Check if tile is already loaded in cache
         const cachedTile = tileCache.getTile(tileX, tileY, tileZ, mapMode);
-        
         if (cachedTile) {
-          ctx.drawImage(cachedTile, pixelX, pixelY, tileSize, tileSize);
+          bctx.drawImage(cachedTile, pixelX, pixelY, tileSize, tileSize);
           tilesLoaded++;
         } else if (!tileCache.isLoading(tileX, tileY, tileZ, mapMode)) {
-          // Load tile asynchronously
-          const tilePromise = tileCache.loadTile(tileX, tileY, tileZ, mapMode).then((img) => {
-            if (img && canvas.parentElement) { // Only draw if component still mounted
-              requestAnimationFrame(() => drawMap()); // Redraw when tile loads
-            }
+          const tilePromise = tileCache.loadTile(tileX, tileY, tileZ, mapMode).then(() => {
+            // Redraw when the tile is ready
+            scheduleDraw();
           });
           tilePromises.push(tilePromise);
         }
       }
     }
 
-    // Update loading state and stats
-    const isMapLoading = tilesLoaded < totalTiles * 0.7; // Consider loaded when 70% tiles are ready
-    setIsLoading(isMapLoading);
-    
-    const cacheStats = tileCache.getStats();
-    setRenderStats({
-      tilesLoaded,
-      totalTiles,
-      cacheHitRate: cacheStats.hitRate
-    });
+    const isMapLoading = tilesLoaded < totalTiles * 0.7;
+    if (isMapLoading !== prevIsLoadingRef.current) {
+      prevIsLoadingRef.current = isMapLoading;
+      setIsLoading(isMapLoading);
+    }
 
-    // Render markers with professional rendering
+    const cacheStats = tileCache.getStats();
+    const nextStats = { tilesLoaded, totalTiles, cacheHitRate: cacheStats.hitRate };
+    const prevStats = prevRenderStatsRef.current;
+    if (prevStats.tilesLoaded !== nextStats.tilesLoaded || prevStats.totalTiles !== nextStats.totalTiles || prevStats.cacheHitRate !== nextStats.cacheHitRate) {
+      prevRenderStatsRef.current = nextStats;
+      setRenderStats(nextStats);
+    }
+
     const markerPromises = markers.map(async (marker) => {
       const { x, y } = latLngToPixel(marker.lat, marker.lng);
-      
-      // Only render visible markers (with some buffer)
       if (x >= -50 && x <= viewport.width + 50 && y >= -50 && y <= viewport.height + 50) {
         await markerRenderer.current.renderMarker(
-          ctx,
+          bctx,
           {
             id: marker.id,
             lat: marker.lat,
@@ -231,32 +241,52 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       }
     });
 
-    // Wait for all markers to render
     await Promise.all(markerPromises);
 
-    // Update refs for next frame
     prevViewportKeyRef.current = viewportKey;
     prevMapModeRef.current = mapMode;
+
     if (showControls) {
-      // Draw GPS accuracy indicator
-      ctx.strokeStyle = 'rgba(34, 197, 94, 0.6)';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([2, 2]);
+      bctx.strokeStyle = 'rgba(34, 197, 94, 0.6)';
+      bctx.lineWidth = 2;
+      bctx.setLineDash([2, 2]);
       const centerX = (viewport.width) / 2;
       const centerY = (viewport.height) / 2;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
-      ctx.stroke();
-      ctx.setLineDash([]);
+      bctx.beginPath();
+      bctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
+      bctx.stroke();
+      bctx.setLineDash([]);
 
-      // Performance debug info (development only)
       if (process.env.NODE_ENV === 'development') {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        ctx.font = `10px monospace`;
-        ctx.fillText(`FPS: ${Math.round(1000 / 33)} | Tiles: ${renderStats.tilesLoaded}/${renderStats.totalTiles}`, 10, 20);
+        bctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        bctx.font = `10px monospace`;
+        bctx.fillText(`Tiles: ${tilesLoaded}/${totalTiles}` , 10, 20);
       }
     }
-  }, [viewport, markers, latLngToPixel, getTileCoords, showControls, mapMode, showAccuracy, renderStats]);
+
+    // Blit buffer to visible canvas (which is DPR-scaled already)
+    const vctx = canvas.getContext('2d');
+    if (vctx) {
+      vctx.clearRect(0, 0, viewport.width, viewport.height);
+      vctx.drawImage(bufferCanvasRef.current!, 0, 0, viewport.width, viewport.height);
+    }
+  }, [ensureBufferCanvas, viewport, markers, latLngToPixel, getTileCoords, showControls, mapMode, showAccuracy]);
+
+  const scheduleDraw = useCallback(() => {
+    if (isDrawingRef.current) {
+      redrawScheduledRef.current = true;
+      return;
+    }
+    isDrawingRef.current = true;
+    animationFrameRef.current = requestAnimationFrame(async () => {
+      await drawScene();
+      isDrawingRef.current = false;
+      if (redrawScheduledRef.current) {
+        redrawScheduledRef.current = false;
+        scheduleDraw();
+      }
+    });
+  }, [drawScene]);
 
   // Handle mouse down
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -380,19 +410,17 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
 
     const animate = (currentTime: number) => {
       if (currentTime - lastDrawTime >= frameTime) {
-        drawMap();
+        scheduleDraw();
         lastDrawTime = currentTime;
       }
-      
       animationFrameRef.current = requestAnimationFrame(animate);
     };
 
-    // Only animate if there are emergency markers or online users
     const hasAnimatedMarkers = markers.some(m => m.isEmergency || m.status === 'online');
     if (hasAnimatedMarkers) {
       animationFrameRef.current = requestAnimationFrame(animate);
     } else {
-      drawMap(); // Single draw for static markers
+      scheduleDraw(); // Single draw for static markers
     }
 
     return () => {
@@ -400,7 +428,12 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [drawMap, markers]);
+  }, [scheduleDraw, markers]);
+
+  // Redraw on view-related changes (without RAF flood thanks to scheduler)
+  useEffect(() => {
+    scheduleDraw();
+  }, [viewport, mapMode, showAccuracy, markers, scheduleDraw]);
 
   // Call onMapReady when component is ready
   useEffect(() => {
