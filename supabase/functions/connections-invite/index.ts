@@ -163,7 +163,7 @@ serve(async (req) => {
       `;
 
       const { error: emailError } = await resend.emails.send({
-        from: 'Emergency Contacts <noreply@resend.dev>',
+        from: 'Emergency Contacts <onboarding@resend.dev>',
         to: [invite_email],
         subject: `${inviterName} invited you to their ${type === 'family_circle' ? 'Family Circle' : 'Emergency Contacts'}`,
         html: emailHtml,

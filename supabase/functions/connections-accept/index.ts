@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { Resend } from 'npm:resend@2.0.0';
-import { Resend } from 'npm:resend@2.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -193,7 +192,7 @@ serve(async (req) => {
 
         // Send welcome email to accepter
         await resend.emails.send({
-          from: 'Emergency Contacts <noreply@resend.dev>',
+          from: 'Emergency Contacts <onboarding@resend.dev>',
           to: [connection.invite_email],
           subject: `Welcome to ${inviterName}'s ${connection.type === 'family_circle' ? 'Family Circle' : 'Emergency Contacts'}`,
           html: welcomeEmailHtml,
@@ -203,7 +202,7 @@ serve(async (req) => {
         const { data: inviterUser } = await supabaseServiceClient.auth.admin.getUserById(connection.owner_id);
         if (inviterUser?.user?.email) {
           await resend.emails.send({
-            from: 'Emergency Contacts <noreply@resend.dev>',
+            from: 'Emergency Contacts <onboarding@resend.dev>',
             to: [inviterUser.user.email],
             subject: `${accepterName} accepted your invitation`,
             html: notificationEmailHtml,
