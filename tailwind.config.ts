@@ -106,13 +106,16 @@ export default {
 				'gradient-emergency': 'var(--gradient-emergency)',
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-guardian': 'var(--gradient-guardian)',
+				'gradient-wellness': 'var(--gradient-wellness)',
 				'gradient-hero': 'var(--gradient-hero)'
 			},
 			boxShadow: {
 				'emergency': 'var(--shadow-emergency)',
 				'primary': 'var(--shadow-primary)',
 				'guardian': 'var(--shadow-guardian)',
-				'glow': 'var(--shadow-glow)'
+				'wellness': 'var(--shadow-wellness)',
+				'glow': 'var(--shadow-glow)',
+				'wellness-glow': 'var(--shadow-wellness-glow)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'var(--transition-smooth)',
