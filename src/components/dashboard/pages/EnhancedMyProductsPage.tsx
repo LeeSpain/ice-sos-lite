@@ -393,7 +393,7 @@ const EnhancedMyProductsPage = () => {
                 <Button 
                   variant="outline" 
                   className="justify-start"
-                  onClick={() => window.location.href = '/full-dashboard/subscription'}
+                  onClick={() => window.location.href = '/member-dashboard/subscription'}
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
                   Manage Subscription
@@ -554,7 +554,7 @@ const EnhancedMyProductsPage = () => {
                 <div className="p-4 bg-muted/50 rounded-lg border text-center">
                   <h3 className="font-semibold text-lg mb-2">No Active Subscription</h3>
                   <p className="text-sm text-muted-foreground mb-4">Subscribe to activate emergency protection</p>
-                  <Button onClick={() => window.location.href = '/full-dashboard/subscription'}>
+                  <Button onClick={() => window.location.href = '/member-dashboard/subscription'}>
                     Subscribe Now
                   </Button>
                 </div>

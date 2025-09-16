@@ -130,7 +130,7 @@ export const FamilyCircleOverview = () => {
         {/* Quick Actions - Compact */}
         <div className="grid grid-cols-2 gap-2">
           <Button 
-            onClick={() => navigate('/full-dashboard/connections')} 
+            onClick={() => navigate('/member-dashboard/connections')}
             className="text-xs h-8"
             size="sm"
           >
@@ -138,7 +138,7 @@ export const FamilyCircleOverview = () => {
             Add Connection
           </Button>
           <Button 
-            onClick={() => navigate('/full-dashboard/live-map')} 
+            onClick={() => navigate('/member-dashboard/live-map')} 
             variant="outline" 
             className="text-xs h-8"
             size="sm"
@@ -173,7 +173,7 @@ export const FamilyCircleOverview = () => {
             <p className="text-xs text-muted-foreground mb-3">
               Add family members and trusted contacts for emergency alerts
             </p>
-            <Button onClick={() => navigate('/full-dashboard/connections')} size="sm" className="h-8 text-xs">
+            <Button onClick={() => navigate('/member-dashboard/connections')} size="sm" className="h-8 text-xs">
               <Plus className="h-3 w-3 mr-1" />
               Get Started
             </Button>

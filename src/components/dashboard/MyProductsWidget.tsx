@@ -425,7 +425,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => window.location.href = '/full-dashboard/flic'}
+                    onClick={() => window.location.href = '/member-dashboard/mobile-dashboard'}
                   >
                     Manage
                   </Button>
@@ -461,7 +461,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
               </div>
               <Button 
                 size="sm" 
-                onClick={() => window.location.href = '/dashboard/subscription'}
+                onClick={() => window.location.href = '/member-dashboard/subscription'}
                 className="bg-emergency text-black hover:bg-emergency/90"
               >
                 Subscribe
@@ -677,7 +677,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => window.location.href = '/dashboard/products'}
+              onClick={() => window.location.href = '/member-dashboard/products'}
               className="flex-1"
             >
               <ShoppingCart className="h-4 w-4 mr-1" />

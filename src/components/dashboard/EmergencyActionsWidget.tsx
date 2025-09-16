@@ -30,7 +30,7 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
       title: "Activate Protection",
       description: "Subscribe to emergency services",
       icon: Shield,
-      action: () => window.location.href = '/dashboard/subscription',
+      action: () => window.location.href = '/member-dashboard/subscription',
       priority: "high"
     });
   }
@@ -40,7 +40,7 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
       title: "Add Emergency Contacts",
       description: `Add ${5 - emergencyContactsCount} more contacts`,
       icon: Phone,
-      action: () => window.location.href = '/dashboard/emergency',
+      action: () => window.location.href = '/member-dashboard/connections',
       priority: "medium"
     });
   }
@@ -50,7 +50,7 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
       title: "Complete Profile",
       description: "Fill in remaining details",
       icon: CheckCircle,
-      action: () => window.location.href = '/dashboard/profile',
+      action: () => window.location.href = '/member-dashboard/profile',
       priority: "low"
     });
   }

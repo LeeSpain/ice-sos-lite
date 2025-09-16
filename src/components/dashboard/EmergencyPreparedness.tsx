@@ -72,35 +72,35 @@ export const EmergencyPreparedness = ({ profile, subscription }: EmergencyPrepar
       title: 'Active Protection',
       status: subscription?.subscribed,
       icon: Shield,
-      action: () => navigate('/full-dashboard/subscription'),
+      action: () => navigate('/member-dashboard/subscription'),
       description: subscription?.subscribed ? 'Emergency services active' : 'Activate emergency monitoring'
     },
     {
       title: 'Emergency Contacts',
       status: activeTrusted.length >= 3,
       icon: Phone,
-      action: () => navigate('/full-dashboard/connections'),
+      action: () => navigate('/member-dashboard/connections'),
       description: `${activeTrusted.length}/3+ emergency contacts configured`
     },
     {
       title: 'Family Network',
       status: activeFamily.length >= 2,
       icon: Users,
-      action: () => navigate('/full-dashboard/connections'),
+      action: () => navigate('/member-dashboard/connections'),
       description: `${activeFamily.length}/2+ family members connected`
     },
     {
       title: 'Medical Information',
       status: profile?.medical_conditions?.length > 0,
       icon: Heart,
-      action: () => navigate('/full-dashboard/health'),
+      action: () => navigate('/member-dashboard/profile'),
       description: profile?.medical_conditions?.length > 0 ? 'Medical info configured' : 'Add medical information'
     },
     {
       title: 'Location Sharing',
       status: profile?.location_sharing_enabled,
       icon: MapPin,
-      action: () => navigate('/full-dashboard/settings'),
+      action: () => navigate('/member-dashboard/settings'),
       description: profile?.location_sharing_enabled ? 'Location sharing enabled' : 'Enable location sharing'
     }
   ];
@@ -191,7 +191,7 @@ export const EmergencyPreparedness = ({ profile, subscription }: EmergencyPrepar
         {/* Quick Setup Action */}
         {preparednessScore < 80 && (
           <Button 
-            onClick={() => navigate('/full-dashboard/connections')} 
+            onClick={() => navigate('/member-dashboard/connections')} 
             className="w-full" 
             size="sm"
           >

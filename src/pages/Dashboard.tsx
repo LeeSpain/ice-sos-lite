@@ -158,7 +158,7 @@ const Dashboard = () => {
           <div className="flex-1 overflow-auto">
             <Routes>
               {/* Main Dashboard Overview - Family Circle Focused */}
-              <Route path="/" element={
+              <Route index element={
                 <div className="p-6">
                   <div className="max-w-none">
                     {/* Welcome Header */}
@@ -195,49 +195,49 @@ const Dashboard = () => {
               } />
 
               {/* Products Page */}
-               <Route path="/products" element={
+               <Route path="products" element={
                  <div className="p-6">
                   <EnhancedMyProductsPage />
                 </div>
               } />
 
               {/* Profile Page */}
-               <Route path="/profile" element={
+               <Route path="profile" element={
                  <div className="p-6">
                   <EnhancedProfilePage />
                 </div>
               } />
 
               {/* Family SOS Live View */}
-               <Route path="/family-sos" element={
+               <Route path="family-sos" element={
                  <div className="p-6">
                    <LiveSOSFamily />
                  </div>
                } />
 
                {/* Activity Page */}
-               <Route path="/activity" element={
+               <Route path="activity" element={
                  <div className="p-6">
                    <ActivityCard />
                  </div>
                } />
 
                {/* Subscription Page */}
-               <Route path="/subscription" element={
+               <Route path="subscription" element={
                  <div className="p-6">
                    <SubscriptionCard subscription={subscription} />
                  </div>
                } />
 
                {/* Mobile App Page */}
-                <Route path="/mobile-app" element={
+                <Route path="mobile-app" element={
                   <div className="p-6">
                     <MobileAppCard />
                   </div>
                 } />
 
                {/* Mobile Dashboard Page */}
-                <Route path="/mobile-dashboard" element={
+                <Route path="mobile-dashboard" element={
                   <div className="p-6">
                     <div className="mb-6">
                       <h1 className="text-2xl font-bold">Mobile Development Dashboard</h1>
@@ -253,60 +253,60 @@ const Dashboard = () => {
                 } />
 
               {/* Dashboard pages with full width */}
-              <Route path="/family" element={<FamilyPage />} />
-               <Route path="/family-setup" element={
+              <Route path="family" element={<FamilyPage />} />
+               <Route path="family-setup" element={
                  <div className="p-6">
                    <div className="max-w-4xl mx-auto">
                      <FamilyAccessSetup />
                    </div>
                  </div>
                } />
-               <Route path="/location" element={<LocationPage />} />
-               <Route path="/notifications" element={
+               <Route path="location" element={<LocationPage />} />
+               <Route path="notifications" element={
                  <div className="p-6">
                    <NotificationsPage />
                  </div>
                } />
-               <Route path="/security" element={
+               <Route path="security" element={
                  <div className="p-6">
                    <SecurityPage />
                  </div>
                } />
-               <Route path="/settings" element={
+               <Route path="settings" element={
                  <div className="p-6">
                    <SettingsPage />
                  </div>
                } />
-               <Route path="/support" element={
+               <Route path="support" element={
                  <div className="p-6">
                    <SupportPage />
                  </div>
                } />
               
               {/* Live Map Routes */}
-              <Route path="/live-map" element={
+              <Route path="live-map" element={
                 <div className="h-full">
                   <MapScreen />
                 </div>
               } />
-               <Route path="/circles" element={
+               <Route path="circles" element={
                  <div className="p-6">
                    <MyCirclesPage />
                  </div>
                } />
-               <Route path="/places" element={
+               <Route path="places" element={
                  <div className="p-6">
                    <PlacesManager />
                  </div>
                } />
-               <Route path="/location-history" element={
+               <Route path="location-history" element={
                  <div className="p-6">
                    <LocationHistoryPage />
                  </div>
                 } />
                 
                 {/* Connections Page */}
-                <Route path="/connections" element={
+                <Route path="connections" element={
                   <div className="p-6">
                     <ConnectionsPage />
                   </div>

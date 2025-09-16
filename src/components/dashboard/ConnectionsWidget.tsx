@@ -21,7 +21,7 @@ export const ConnectionsWidget = () => {
   const totalPending = [...familyConnections, ...trustedConnections].filter(c => c.status === 'pending').length;
 
   const handleManageConnections = () => {
-    navigate('/dashboard/connections');
+    navigate('/member-dashboard/connections');
   };
 
   if (!user) return null;

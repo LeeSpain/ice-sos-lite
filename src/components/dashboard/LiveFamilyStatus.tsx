@@ -70,7 +70,7 @@ export const LiveFamilyStatus = () => {
             Live Family Status
           </CardTitle>
           <Button 
-            onClick={() => navigate('/full-dashboard/live-map')} 
+            onClick={() => navigate('/member-dashboard/live-map')}
             variant="outline" 
             size="sm"
           >
@@ -160,7 +160,7 @@ export const LiveFamilyStatus = () => {
 
             {/* Quick Action */}
             <Button 
-              onClick={() => navigate('/full-dashboard/live-map')} 
+              onClick={() => navigate('/member-dashboard/live-map')} 
               className="w-full" 
               size="sm"
             >
@@ -177,7 +177,7 @@ export const LiveFamilyStatus = () => {
               Add family members to see their live status
             </p>
             <Button 
-              onClick={() => navigate('/full-dashboard/connections')} 
+              onClick={() => navigate('/member-dashboard/connections')} 
               size="sm"
             >
               Add Family Members
