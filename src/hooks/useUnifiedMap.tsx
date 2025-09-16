@@ -42,7 +42,7 @@ export const useUnifiedMap = () => {
     }
   }, []);
 
-  // Unified MapView component - always use Canvas for stability
+  // Unified MapView component - choose backend deterministically
   const MapView = useCallback(({ 
     className, 
     markers = [], 
@@ -53,21 +53,31 @@ export const useUnifiedMap = () => {
     interactive = true,
     preferCanvas = false
   }: UnifiedMapViewProps) => {
-    
-    // Always use Canvas for now to prevent flashing
-    const CanvasComponent = canvasProvider.MapView;
+    if (preferCanvas) {
+      const CanvasComponent = canvasProvider.MapView;
+      return (
+        <CanvasComponent
+          className={className}
+          markers={markers}
+          center={center}
+          zoom={zoom}
+          onMapReady={onMapReady}
+          showControls={showControls}
+          interactive={interactive}
+        />
+      );
+    }
+
+    const MapboxComponent = mapboxProvider.MapView;
     return (
-      <CanvasComponent
+      <MapboxComponent
         className={className}
         markers={markers}
         center={center}
         zoom={zoom}
-        onMapReady={onMapReady}
-        showControls={showControls}
-        interactive={interactive}
       />
     );
-  }, [canvasProvider]);
+  }, [canvasProvider, mapboxProvider]);
 
   const switchToCanvas = useCallback(() => {
     setMapBackend('canvas');
