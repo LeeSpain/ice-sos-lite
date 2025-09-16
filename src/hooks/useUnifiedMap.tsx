@@ -64,7 +64,22 @@ export const useUnifiedMap = () => {
         zoom
       };
 
-      return mapboxProvider.MapView(mapboxProps);
+      // Support both return shapes from useMapProvider: either an object with MapView or the component directly
+      const MapboxComponent = (mapboxProvider as any)?.MapView || (mapboxProvider as any);
+      if (typeof MapboxComponent !== 'function') {
+        // Fallback to Canvas if Mapbox component isn't available
+        return canvasProvider.MapView({
+          className,
+          markers,
+          center,
+          zoom,
+          onMapReady,
+          showControls,
+          interactive
+        });
+      }
+
+      return MapboxComponent(mapboxProps);
     };
   }, [mapboxProvider, canvasProvider, hasMapboxError]);
 
