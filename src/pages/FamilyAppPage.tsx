@@ -238,7 +238,6 @@ const FamilyAppPage = () => {
           markers={mapMarkers}
           center={{ lat: 40.7589, lng: -73.9851 }}
           zoom={13}
-          preferCanvas={true}
         />
       </div>
 

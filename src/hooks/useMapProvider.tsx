@@ -41,7 +41,7 @@ export function useMapProvider() {
     const markersRef = useRef<mapboxgl.Marker[]>([]);
     const [mapboxToken, setMapboxToken] = useState<string | null>(null);
     const [tokenError, setTokenError] = useState<string | null>(null);
-    const [currentStyle, setCurrentStyle] = useState<MapStyle>(MAP_STYLES[1]); // Default to terrain
+    const [currentStyle, setCurrentStyle] = useState<MapStyle>(MAP_STYLES[2]); // Default to Streets
 
     // Fetch Mapbox token - singleton pattern to prevent multiple fetches
     useEffect(() => {

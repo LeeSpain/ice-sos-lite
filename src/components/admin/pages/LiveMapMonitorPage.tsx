@@ -318,7 +318,6 @@ export default function LiveMapMonitorPage() {
               markers={markers}
               className="w-full h-full"
               center={mapCenter}
-              preferCanvas={true}
             />
           </div>
         </CardContent>

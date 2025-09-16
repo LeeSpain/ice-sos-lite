@@ -448,7 +448,6 @@ const FamilyTrackingApp = () => {
               />
             )
           }))}
-          preferCanvas={true}
         />
         
         {/* Map Overlay Controls */}
