@@ -563,9 +563,33 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">Riven AI Marketing System</h1>
-        <p className="text-muted-foreground text-lg">
+        <p className="text-muted-foreground text-lg mb-4">
           Advanced AI-powered content creation and marketing automation
         </p>
+        
+        {/* Quick Access to Published Content */}
+        <div className="flex justify-center gap-3">
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setCurrentStage('success');
+              loadAllPublishedContent();
+            }}
+            className="flex items-center gap-2"
+          >
+            <CheckCircle className="h-4 w-4" />
+            View All Published Content
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            onClick={() => setCurrentStage('command')}
+            className="flex items-center gap-2"
+          >
+            <Wand2 className="h-4 w-4" />
+            Create New Content
+          </Button>
+        </div>
       </div>
 
       <Card className="mb-8">
@@ -588,29 +612,39 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                 { id: 'command', label: 'Command Centre', icon: Wand2 },
                 { id: 'process', label: 'AI Processing', icon: Activity },
                 { id: 'approval', label: 'Review & Approve', icon: Eye },
-                { id: 'success', label: 'Published', icon: CheckCircle }
+                { id: 'success', label: 'Published Content', icon: CheckCircle }
               ].map((stage, index) => {
                 const StageIcon = stage.icon;
                 const isActive = currentStage === stage.id;
                 const isCompleted = ['command', 'process', 'approval', 'success'].indexOf(currentStage) > index;
                 const isClickable = stage.id === 'command' || 
+                  stage.id === 'success' || // Always allow access to published content
                   (stage.id === 'approval' && generatedContent.length > 0) ||
-                  (stage.id === 'success' && generatedContent.some(c => c.status === 'published'));
+                  (stage.id === 'process' && isProcessing);
                 
                 return (
                   <div key={stage.id} className="flex items-center">
                     <Button
                       variant={isActive ? "default" : "ghost"}
                       size="sm"
-                      onClick={() => isClickable && setCurrentStage(stage.id as WorkflowStage)}
+                      onClick={() => {
+                        if (isClickable) {
+                          setCurrentStage(stage.id as WorkflowStage);
+                          if (stage.id === 'success') {
+                            loadAllPublishedContent(); // Refresh published content when accessing
+                          }
+                        }
+                      }}
                       disabled={!isClickable}
                       className={`flex items-center gap-2 transition-all ${
                         isActive 
                           ? 'bg-primary text-primary-foreground' 
                           : isCompleted 
                           ? 'bg-green-100 text-green-700 hover:bg-green-200' 
-                          : 'text-muted-foreground'
-                      } ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
+                          : isClickable
+                          ? 'text-foreground hover:bg-accent'
+                          : 'text-muted-foreground cursor-not-allowed opacity-50'
+                      }`}
                     >
                       <StageIcon className="h-4 w-4" />
                       <span className="text-sm font-medium">{stage.label}</span>
