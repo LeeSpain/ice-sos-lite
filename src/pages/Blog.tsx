@@ -17,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { BlogPostModal } from '@/components/blog/BlogPostModal';
 
 interface BlogPost {
   id: string;
@@ -44,6 +45,8 @@ const Blog = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
+  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -141,9 +144,13 @@ const Blog = () => {
   };
 
   const handleReadMore = (post: BlogPost) => {
-    // For now, show an alert with the full content
-    // In the future, this could navigate to a dedicated blog post page
-    alert(`Full post content:\n\n${post.body_text?.replace(/<[^>]*>/g, '')}`);
+    setSelectedPost(post);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
   };
 
   if (isLoading) {
@@ -429,6 +436,15 @@ const Blog = () => {
           </Card>
         </section>
       </main>
+      
+      {/* Blog Post Modal */}
+      {selectedPost && (
+        <BlogPostModal
+          post={selectedPost}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      )}
       
       <Footer />
     </div>
