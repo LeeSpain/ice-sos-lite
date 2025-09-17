@@ -419,6 +419,38 @@ const SimplifiedRivenContent: React.FC = () => {
     }
   };
 
+  const handleDeleteContent = async (contentId: string) => {
+    try {
+      // Delete from database
+      const { error } = await supabase
+        .from('marketing_content')
+        .delete()
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      // Update local state
+      setGeneratedContent(prev => 
+        prev.filter(item => item.id !== contentId)
+      );
+
+      // Reload content to sync
+      await loadContentItems();
+      
+      toast({
+        title: "Content Deleted",
+        description: "Content has been permanently removed.",
+      });
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      toast({
+        title: "Delete Failed",
+        description: "Failed to delete content. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleStartOver = () => {
     setCurrentStage('command');
     setCommand('');
@@ -670,14 +702,49 @@ const SimplifiedRivenContent: React.FC = () => {
 
         {currentStage === 'approval' && (
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-primary" />
-                Review & Approve
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Review your AI-generated content with full preview and editing capabilities
-              </p>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  Review & Approve
+                </CardTitle>
+                <p className="text-muted-foreground">
+                  Review your AI-generated content with full preview and editing capabilities
+                </p>
+              </div>
+              {generatedContent.length > 0 && (
+                <Button 
+                  variant="outline" 
+                  onClick={async () => {
+                    try {
+                      // Delete all content
+                      for (const content of generatedContent) {
+                        await supabase
+                          .from('marketing_content')
+                          .delete()
+                          .eq('id', content.id);
+                      }
+                      setGeneratedContent([]);
+                      await loadContentItems();
+                      toast({
+                        title: "All Content Cleared",
+                        description: "All generated content has been removed.",
+                      });
+                    } catch (error) {
+                      console.error('Error clearing content:', error);
+                      toast({
+                        title: "Clear Failed",
+                        description: "Failed to clear all content.",
+                        variant: "destructive"
+                      });
+                    }
+                  }}
+                  className="text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear All
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="space-y-6">
               {generatedContent.length === 0 ? (
@@ -800,6 +867,14 @@ const SimplifiedRivenContent: React.FC = () => {
                           >
                             <Wand2 className="h-4 w-4 mr-2" />
                             Regenerate
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            onClick={() => handleDeleteContent(content.id)}
+                            className="text-red-600 border-red-200 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
                           </Button>
                           <Button 
                             variant="outline" 
