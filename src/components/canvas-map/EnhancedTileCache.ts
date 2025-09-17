@@ -22,6 +22,7 @@ class EnhancedTileCache {
   private readonly maxSize: number;
   private readonly maxAge: number;
   private loadingPromises = new Map<string, Promise<HTMLImageElement | null>>();
+  private loggedProviders = new Set<string>();
 
   // Enhanced tile providers with better labeling
   private providers: Record<string, TileProvider> = {
@@ -115,7 +116,7 @@ class EnhancedTileCache {
       case 'dark':
         return 'cartodb-dark';
       default:
-        return 'cartodb-light'; // Better labels than standard OSM
+        return 'osm-standard'; // Default to resilient OSM standard provider
     }
   }
 
@@ -165,8 +166,13 @@ class EnhancedTileCache {
         resolve(null);
         return;
       }
+      const url = tileProvider.url(x, y, z);
+      if (!this.loggedProviders.has(provider)) {
+        try { console.info('[Map] Tiles provider:', provider, '-', tileProvider.name, '| sample:', url); } catch {}
+        this.loggedProviders.add(provider);
+      }
 
-      img.src = tileProvider.url(x, y, z);
+      img.src = url;
     });
   }
 
