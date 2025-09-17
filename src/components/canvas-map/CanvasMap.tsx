@@ -604,6 +604,16 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         onWheel={handleWheel}
       />
 
+      {useEmbedFallback && (
+        <iframe
+          title="Map fallback"
+          src={getOsmEmbedUrl()}
+          className="absolute inset-0 w-full h-full border-0 z-10"
+          loading="lazy"
+          referrerPolicy="no-referrer"
+        />
+      )}
+
       {/* Diagnostic: container size */}
       {(viewport.width < 100 || viewport.height < 100) && (
         <div className="absolute inset-0 flex items-center justify-center z-20">
@@ -614,7 +624,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       )}
       
       {/* Loading indicator with progress */}
-      {isLoading && (
+      {isLoading && !useEmbedFallback && (
         <div className="absolute top-4 left-4 flex items-center gap-2 bg-background/90 backdrop-blur-sm border rounded-lg px-3 py-2 text-sm">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>Loading tiles... ({renderStats.tilesLoaded}/{renderStats.totalTiles})</span>
@@ -622,7 +632,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       )}
 
       {/* Prolonged-loading hint */}
-      {loadingTooLong && (
+      {loadingTooLong && !useEmbedFallback && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20">
           <div className="bg-background/95 backdrop-blur-sm border rounded-md px-3 py-2 text-xs flex items-center gap-2">
             <span>Tiles are taking longer than usual to load.</span>
