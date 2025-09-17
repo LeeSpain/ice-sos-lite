@@ -55,7 +55,7 @@ const BlogPost = () => {
       const { data: posts, error } = await supabase
         .from('marketing_content')
         .select('*')
-        .eq('platform', 'Blog')
+        .eq('platform', 'blog')
         .eq('status', 'published')
         .or(`slug.eq.${slug},title.ilike.%${slug?.replace(/-/g, ' ')}%`);
 
