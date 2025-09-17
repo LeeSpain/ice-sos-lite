@@ -30,7 +30,7 @@ export default function SystemSettingsPage() {
     providers: {
       openai: { enabled: true, model: 'gpt-5' },
       xai: { enabled: false, model: 'grok-beta' },
-      openrouter: { enabled: false, model: 'meta-llama/llama-3.1-8b-instruct:free' }
+      openrouter: { enabled: false, model: 'google/gemma-2-9b-it:free' }
     },
     stages: {
       overview: { provider: 'openai' },
@@ -394,7 +394,7 @@ export default function SystemSettingsPage() {
               <div>
                 <Label>Model</Label>
                 <Select
-                  value={aiProvidersConfig?.providers?.openrouter?.model || 'meta-llama/llama-3.1-8b-instruct:free'}
+                  value={aiProvidersConfig?.providers?.openrouter?.model || 'google/gemma-2-9b-it:free'}
                   onValueChange={async (value) => {
                     const next = {
                       ...aiProvidersConfig!,

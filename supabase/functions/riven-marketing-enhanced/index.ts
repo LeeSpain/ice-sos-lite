@@ -126,7 +126,7 @@ serve(async (req) => {
               'X-Title': 'ICE SOS Marketing'
             },
       body: JSON.stringify({
-        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        model: 'google/gemma-2-9b-it:free',
               messages: [{ role: 'user', content: 'ping' }],
               max_tokens: 1
             })
@@ -155,7 +155,7 @@ serve(async (req) => {
         details: {
           openai: { status: openaiStatus, models: openaiStatus === 'connected' ? ['gpt-4o-mini', 'gpt-4o'] : [], error: openaiError },
           xai: { status: xaiStatus, models: xaiStatus === 'connected' ? ['grok-2-mini', 'grok-2-latest'] : [], error: xaiError },
-          openrouter: { status: openrouterStatus, models: openrouterStatus === 'connected' ? ['meta-llama/llama-3.1-8b-instruct:free', 'microsoft/phi-3-mini-128k-instruct:free'] : [], error: openrouterError },
+          openrouter: { status: openrouterStatus, models: openrouterStatus === 'connected' ? ['google/gemma-2-9b-it:free', 'qwen/qwen-2-7b-instruct:free'] : [], error: openrouterError },
           supabase: { status: 'connected', url: supabaseUrl }
         }
       };
@@ -505,7 +505,7 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
           'X-Title': 'ICE SOS Marketing'
         },
         body: JSON.stringify({
-          model: (aiConfig?.providers?.openrouter?.model || 'meta-llama/llama-3.1-8b-instruct:free'),
+          model: (aiConfig?.providers?.openrouter?.model || 'google/gemma-2-9b-it:free'),
           messages: [
             {
               role: 'system',
@@ -1060,7 +1060,7 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
           'X-Title': 'ICE SOS Marketing'
         },
         body: JSON.stringify({
-          model: (aiConfig?.providers?.openrouter?.model || 'meta-llama/llama-3.1-8b-instruct:free'),
+          model: (aiConfig?.providers?.openrouter?.model || 'google/gemma-2-9b-it:free'),
           messages: [
             {
               role: 'system',
