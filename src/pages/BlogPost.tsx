@@ -334,7 +334,19 @@ const BlogPost = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               {/* Article Body */}
-              <div className="prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-p:leading-relaxed prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:text-base prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-blockquote:border-l-primary prose-blockquote:bg-slate-50 dark:prose-blockquote:bg-slate-900/50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:text-slate-700 dark:prose-blockquote:text-slate-300 prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-li:text-base">
+              <div className="prose prose-lg max-w-none prose-slate dark:prose-invert 
+                prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-headings:mb-6 prose-headings:mt-8
+                prose-p:leading-loose prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:text-base prose-p:mb-6
+                prose-a:text-primary prose-a:no-underline hover:prose-a:underline 
+                prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-strong:font-semibold
+                prose-blockquote:border-l-primary prose-blockquote:bg-slate-50 dark:prose-blockquote:bg-slate-900/50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:not-italic prose-blockquote:text-slate-700 dark:prose-blockquote:text-slate-300 prose-blockquote:my-8
+                prose-h1:text-2xl prose-h1:mb-8 prose-h1:mt-12
+                prose-h2:text-xl prose-h2:mb-6 prose-h2:mt-10 
+                prose-h3:text-lg prose-h3:mb-4 prose-h3:mt-8
+                prose-h4:text-base prose-h4:mb-4 prose-h4:mt-6
+                prose-li:text-base prose-li:leading-relaxed prose-li:mb-2
+                prose-ul:my-6 prose-ol:my-6
+                [&>*]:mb-6 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4">
                 {blogPost.body_text ? (
                   <div 
                     dangerouslySetInnerHTML={{ __html: blogPost.body_text }}
