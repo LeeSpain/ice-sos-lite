@@ -6,8 +6,19 @@ export function useOptimizedAuth() {
   const { user, session, loading: authLoading, signOut } = useAuth();
   const { data: role, isLoading: roleLoading } = useOptimizedUserRole();
 
+  console.log('🔧 useOptimizedAuth Debug:', {
+    userId: user?.id,
+    userEmail: user?.email,
+    fetchedRole: role,
+    roleLoading,
+    authLoading,
+    timestamp: new Date().toISOString()
+  });
+
   const isAdmin = useMemo(() => {
-    return role === 'admin';
+    const adminStatus = role === 'admin';
+    console.log('🔧 useOptimizedAuth: isAdmin calculation:', { role, adminStatus });
+    return adminStatus;
   }, [role]);
   
   const isUser = useMemo(() => role === 'user', [role]);
@@ -15,10 +26,19 @@ export function useOptimizedAuth() {
   // Optimize loading state - don't show loading if we have basic auth data
   const loading = authLoading || (roleLoading && !user);
 
+  const finalRole = role || 'user'; // Default to 'user' to prevent undefined states
+  
+  console.log('🔧 useOptimizedAuth Final Values:', {
+    role: finalRole,
+    isAdmin,
+    loading,
+    userHasId: !!user?.id
+  });
+
   return {
     user,
     session,
-    role: role || 'user', // Default to 'user' to prevent undefined states
+    role: finalRole,
     isAdmin,
     isUser,
     loading,
