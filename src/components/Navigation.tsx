@@ -47,6 +47,10 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
   const handleRegionalCenterClick = () => {
     trackLinkClick('navigation', '/regional-center/spain', 'Regional Center Spain');
   };
+
+  const handleBlogClick = () => {
+    trackLinkClick('navigation', '/blog', 'Blog');
+  };
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-border">
       <div className="container mx-auto px-4">
@@ -73,6 +77,11 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
                 </Button>
               }
             />
+            <Button asChild size="sm" className="bg-wellness hover:bg-wellness/90 text-black font-medium shadow-sm" onClick={handleBlogClick}>
+              <Link to="/blog">
+                {t('nav.blog', 'Blog')}
+              </Link>
+            </Button>
             {language === 'es' && (
               <Link 
                 to="/regional-center/spain" 
@@ -134,6 +143,11 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
                   }
                 />
               </div>
+              <Button asChild size="sm" className="bg-wellness hover:bg-wellness/90 text-white font-medium shadow-sm mx-4">
+                <Link to="/blog" onClick={() => setIsMenuOpen(false)}>
+                  {t('nav.blog', 'Blog')}
+                </Link>
+              </Button>
               {language === 'es' && (
                 <Link 
                   to="/regional-center/spain" 
