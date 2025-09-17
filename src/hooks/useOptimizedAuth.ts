@@ -23,8 +23,8 @@ export function useOptimizedAuth() {
   
   const isUser = useMemo(() => role === 'user', [role]);
   
-  // Optimize loading state - don't show loading if we have basic auth data
-  const loading = authLoading || (roleLoading && !user);
+  // Wait for both auth and role; avoid defaulting to 'user' while role is loading
+  const loading = authLoading || roleLoading;
 
   const finalRole = role || 'user'; // Default to 'user' to prevent undefined states
   
