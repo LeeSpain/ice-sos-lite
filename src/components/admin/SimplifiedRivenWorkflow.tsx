@@ -36,9 +36,11 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const [workflowStages, setWorkflowStages] = useState<WorkflowStageData[]>([]);
   const [currentCampaignId, setCurrentCampaignId] = useState<string | null>(null);
   const [generatedContent, setGeneratedContent] = useState<ContentItem[]>([]);
+  const [allPublishedContent, setAllPublishedContent] = useState<ContentItem[]>([]);
   const [currentStage, setCurrentStage] = useState<WorkflowStage>('command');
   const [realTimeStages, setRealTimeStages] = useState<any[]>([]);
   const [apiProviderStatus, setApiProviderStatus] = useState<{ openai: boolean; xai: boolean }>({ openai: false, xai: false });
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
 
   // Form data state
   const [formData, setFormData] = useState({
@@ -114,7 +116,24 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
     };
     
     checkProviderStatus();
+    loadAllPublishedContent();
   }, []);
+
+  // Load all published content for the Published stage
+  const loadAllPublishedContent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('marketing_content')
+        .select('*')
+        .eq('status', 'published')
+        .order('posted_at', { ascending: false });
+
+      if (error) throw error;
+      setAllPublishedContent(data || []);
+    } catch (error) {
+      console.error('Error loading published content:', error);
+    }
+  };
 
   // Real-time subscription for workflow stages
   useEffect(() => {
@@ -321,6 +340,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
       
       // Reload content to sync
       await loadContentItems();
+      await loadAllPublishedContent(); // Refresh published content list
       
       toast({
         title: "Content Published",
@@ -426,6 +446,41 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const handleCancelEdit = () => {
     setSelectedContent(null);
     setShowEditModal(false);
+  };
+
+  // Handle deleting published content
+  const handleDeleteContent = async (contentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('marketing_content')
+        .delete()
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      // Update local state
+      setAllPublishedContent(prev => prev.filter(content => content.id !== contentId));
+      setGeneratedContent(prev => prev.filter(content => content.id !== contentId));
+      setShowDeleteConfirm(null);
+
+      toast({
+        title: "Content Deleted",
+        description: "Content has been permanently deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete content. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Handle creating new content manually
+  const handleCreateNewContent = () => {
+    setCurrentStage('command');
+    resetWorkflow();
   };
 
   const handleRegenerateContent = async (contentId: string) => {
@@ -1003,41 +1058,159 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           )}
 
           {currentStage === 'success' && (
-            <div className="text-center space-y-6">
-              <div className="flex items-center justify-center gap-3 mb-4">
-                <CheckCircle className="h-8 w-8 text-green-500" />
-                <h3 className="text-2xl font-semibold text-green-700">Campaign Published Successfully!</h3>
-              </div>
-              
-              <p className="text-muted-foreground text-lg mb-6">
-                Your AI-generated content has been published and is now live.
-              </p>
+            <div className="space-y-6">
+              <div className="text-center mb-8">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <CheckCircle className="h-8 w-8 text-green-500" />
+                  <h3 className="text-3xl font-bold text-foreground">Published Content Manager</h3>
+                </div>
+                
+                <p className="text-muted-foreground text-lg mb-6">
+                  Manage all your published content from this central location.
+                </p>
 
-              <div className="grid gap-4">
-                {generatedContent.filter(c => c.status === 'published').map((content) => (
-                  <Card key={content.id} className="border-green-200">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-semibold">{content.title}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Published on {content.platform} • {new Date(content.posted_at || content.updated_at).toLocaleString()}
-                          </p>
-                        </div>
-                        <Badge className="bg-green-100 text-green-700">Published</Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                <div className="flex justify-center gap-4 mb-8">
+                  <Button onClick={handleCreateNewContent} className="flex items-center gap-2">
+                    <Wand2 className="h-4 w-4" />
+                    Create New Content
+                  </Button>
+                  <Button variant="outline" onClick={loadAllPublishedContent} className="flex items-center gap-2">
+                    <Activity className="h-4 w-4" />
+                    Refresh Content
+                  </Button>
+                </div>
               </div>
 
-              <div className="flex justify-center gap-4 pt-6">
-                <Button onClick={resetWorkflow}>
-                  Create New Campaign
-                </Button>
-                <Button variant="outline" onClick={() => setCurrentStage('approval')}>
-                  Back to Review
-                </Button>
+              {/* Published Content Grid */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xl font-semibold text-foreground">
+                    Published Content ({allPublishedContent.length})
+                  </h4>
+                  <div className="text-sm text-muted-foreground">
+                    Total posts published
+                  </div>
+                </div>
+
+                {allPublishedContent.length > 0 ? (
+                  <div className="grid gap-4">
+                    {allPublishedContent.map((content) => (
+                      <Card key={content.id} className="border hover:shadow-lg transition-shadow">
+                        <CardContent className="pt-6">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start gap-4">
+                                {/* Content Image */}
+                                {content.image_url && (
+                                  <div className="flex-shrink-0">
+                                    <img 
+                                      src={content.image_url} 
+                                      alt={content.featured_image_alt || content.title || 'Content image'} 
+                                      className="w-20 h-20 object-cover rounded-lg border"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = 'none';
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                                
+                                {/* Content Details */}
+                                <div className="flex-1 min-w-0">
+                                  <h5 className="font-semibold text-lg text-foreground mb-2 truncate">
+                                    {content.title}
+                                  </h5>
+                                  
+                                  <div className="flex flex-wrap items-center gap-3 mb-3">
+                                    <Badge variant="outline" className="capitalize">
+                                      {content.platform}
+                                    </Badge>
+                                    <Badge variant="secondary" className="capitalize">
+                                      {content.content_type.replace('_', ' ')}
+                                    </Badge>
+                                    {content.reading_time && (
+                                      <span className="text-sm text-muted-foreground flex items-center gap-1">
+                                        <Clock className="h-3 w-3" />
+                                        {content.reading_time} min
+                                      </span>
+                                    )}
+                                    {content.seo_score && (
+                                      <span className="text-sm text-muted-foreground">
+                                        SEO: {content.seo_score}/100
+                                      </span>
+                                    )}
+                                  </div>
+                                  
+                                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                                    Published on {new Date(content.posted_at || content.updated_at).toLocaleString()}
+                                  </p>
+                                  
+                                  {/* Keywords & Hashtags */}
+                                  {(content.keywords || content.hashtags) && (
+                                    <div className="flex flex-wrap gap-1 mb-3">
+                                      {content.keywords?.slice(0, 3).map((keyword, index) => (
+                                        <Badge key={`keyword-${index}`} variant="outline" className="text-xs">
+                                          {keyword}
+                                        </Badge>
+                                      ))}
+                                      {content.hashtags?.slice(0, 2).map((hashtag, index) => (
+                                        <Badge key={`hashtag-${index}`} variant="secondary" className="text-xs">
+                                          #{hashtag}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Action Buttons */}
+                            <div className="flex flex-col gap-2 ml-4">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePreviewContent(content)}
+                                className="flex items-center gap-2"
+                              >
+                                <Eye className="h-4 w-4" />
+                                Preview
+                              </Button>
+                              
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditContent(content)}
+                                className="flex items-center gap-2"
+                              >
+                                Edit
+                              </Button>
+                              
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => setShowDeleteConfirm(content.id)}
+                                className="flex items-center gap-2"
+                              >
+                                <XCircle className="h-4 w-4" />
+                                Delete
+                              </Button>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+                    <div className="text-muted-foreground mb-4">
+                      <Wand2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <h4 className="text-lg font-medium mb-2">No Published Content Yet</h4>
+                      <p>Create your first piece of content to get started.</p>
+                    </div>
+                    <Button onClick={handleCreateNewContent} className="mt-4">
+                      Create Your First Content
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1271,6 +1444,29 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                 Save Changes
               </Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!showDeleteConfirm} onOpenChange={() => setShowDeleteConfirm(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Content</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete this content? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(null)}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={() => showDeleteConfirm && handleDeleteContent(showDeleteConfirm)}
+            >
+              Delete Permanently
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
