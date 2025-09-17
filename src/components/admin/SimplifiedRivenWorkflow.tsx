@@ -1092,109 +1092,210 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           )}
 
           {currentStage === 'success' && (
-            <div className="space-y-6">
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <CheckCircle className="h-8 w-8 text-green-500" />
-                  <h3 className="text-3xl font-bold text-foreground">Published Content Manager</h3>
-                </div>
-                
-                <p className="text-muted-foreground text-lg mb-6">
-                  Manage all your published content from this central location.
-                </p>
+            <div className="space-y-8">
+              {/* Professional Header Section */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/5 via-accent/10 to-secondary/5 p-8 border">
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-xl bg-primary/10 border border-primary/20">
+                        <CheckCircle className="h-8 w-8 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-3xl font-bold text-foreground mb-1">Published Content Library</h3>
+                        <p className="text-muted-foreground text-lg">
+                          Manage and monitor your published marketing content
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        onClick={loadAllPublishedContent} 
+                        variant="outline" 
+                        className="flex items-center gap-2 border-primary/20 hover:bg-primary/5"
+                      >
+                        <Activity className="h-4 w-4" />
+                        Refresh
+                      </Button>
+                      <Button 
+                        onClick={handleCreateNewContent} 
+                        className="flex items-center gap-2 bg-primary hover:bg-primary/90 shadow-lg"
+                      >
+                        <Wand2 className="h-4 w-4" />
+                        Create New Content
+                      </Button>
+                    </div>
+                  </div>
 
-                <div className="flex justify-center gap-4 mb-8">
-                  <Button onClick={handleCreateNewContent} className="flex items-center gap-2">
-                    <Wand2 className="h-4 w-4" />
-                    Create New Content
-                  </Button>
-                  <Button variant="outline" onClick={loadAllPublishedContent} className="flex items-center gap-2">
-                    <Activity className="h-4 w-4" />
-                    Refresh Content
-                  </Button>
+                  {/* Statistics Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                          <Activity className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-foreground">{allPublishedContent.length}</div>
+                          <div className="text-sm text-muted-foreground">Total Published</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-green-100 text-green-600">
+                          <CheckCircle className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-foreground">
+                            {allPublishedContent.filter(c => c.content_type === 'blog_post').length}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Blog Posts</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+                          <Eye className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-foreground">
+                            {allPublishedContent.reduce((acc, c) => acc + (c.reading_time || 0), 0)}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Total Reading Time</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-orange-100 text-orange-600">
+                          <Wand2 className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-foreground">
+                            {Math.round(allPublishedContent.reduce((acc, c) => acc + (c.seo_score || 0), 0) / Math.max(allPublishedContent.length, 1))}
+                          </div>
+                          <div className="text-sm text-muted-foreground">Avg SEO Score</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Published Content Grid */}
-              <div className="space-y-4">
+              {/* Content Grid Section */}
+              <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xl font-semibold text-foreground">
-                    Published Content ({allPublishedContent.length})
-                  </h4>
-                  <div className="text-sm text-muted-foreground">
-                    Total posts published
+                  <div>
+                    <h4 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                      <Activity className="h-5 w-5 text-primary" />
+                      Content Library
+                    </h4>
+                    <p className="text-muted-foreground mt-1">
+                      All your published marketing content in one place
+                    </p>
                   </div>
+                  
+                  {allPublishedContent.length > 0 && (
+                    <div className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
+                      {allPublishedContent.length} item{allPublishedContent.length !== 1 ? 's' : ''}
+                    </div>
+                  )}
                 </div>
 
                 {allPublishedContent.length > 0 ? (
-                  <div className="grid gap-4">
+                  <div className="grid gap-6">
                     {allPublishedContent.map((content) => (
-                      <Card key={content.id} className="border hover:shadow-lg transition-shadow">
-                        <CardContent className="pt-6">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start gap-4">
-                                {/* Content Image */}
-                                {content.image_url && (
-                                  <div className="flex-shrink-0">
-                                    <img 
-                                      src={content.image_url} 
-                                      alt={content.featured_image_alt || content.title || 'Content image'} 
-                                      className="w-20 h-20 object-cover rounded-lg border"
-                                      onError={(e) => {
-                                        e.currentTarget.style.display = 'none';
-                                      }}
-                                    />
-                                  </div>
-                                )}
+                      <Card key={content.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-r from-white to-accent/5">
+                        <CardContent className="p-6">
+                          <div className="flex gap-6">
+                            {/* Content Thumbnail */}
+                            <div className="flex-shrink-0">
+                              {content.image_url ? (
+                                <div className="relative overflow-hidden rounded-xl border-2 border-border">
+                                  <img 
+                                    src={content.image_url} 
+                                    alt={content.featured_image_alt || content.title || 'Content image'} 
+                                    className="w-32 h-32 object-cover transition-transform duration-300 group-hover:scale-105"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                    }}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-32 h-32 bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl border-2 border-dashed border-primary/20 flex items-center justify-center">
+                                  <Wand2 className="h-8 w-8 text-primary/40" />
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Content Details */}
+                            <div className="flex-1 min-w-0 space-y-4">
+                              {/* Title and Meta */}
+                              <div>
+                                <h5 className="font-bold text-xl text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                                  {content.title}
+                                </h5>
                                 
-                                {/* Content Details */}
-                                <div className="flex-1 min-w-0">
-                                  <h5 className="font-semibold text-lg text-foreground mb-2 truncate">
-                                    {content.title}
-                                  </h5>
+                                <div className="flex flex-wrap items-center gap-3 mb-3">
+                                  <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                                    {content.platform}
+                                  </Badge>
+                                  <Badge variant="secondary" className="bg-accent/20 text-accent-foreground font-medium">
+                                    {content.content_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                  </Badge>
                                   
-                                  <div className="flex flex-wrap items-center gap-3 mb-3">
-                                    <Badge variant="outline" className="capitalize">
-                                      {content.platform}
-                                    </Badge>
-                                    <Badge variant="secondary" className="capitalize">
-                                      {content.content_type.replace('_', ' ')}
-                                    </Badge>
-                                    {content.reading_time && (
-                                      <span className="text-sm text-muted-foreground flex items-center gap-1">
-                                        <Clock className="h-3 w-3" />
-                                        {content.reading_time} min
-                                      </span>
-                                    )}
-                                    {content.seo_score && (
-                                      <span className="text-sm text-muted-foreground">
-                                        SEO: {content.seo_score}/100
-                                      </span>
-                                    )}
-                                  </div>
+                                  {content.reading_time && (
+                                    <div className="flex items-center gap-1 text-sm text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                                      <Clock className="h-3 w-3" />
+                                      {content.reading_time} min read
+                                    </div>
+                                  )}
                                   
-                                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                                    Published on {new Date(content.posted_at || content.updated_at).toLocaleString()}
-                                  </p>
-                                  
-                                  {/* Keywords & Hashtags */}
-                                  {(content.keywords || content.hashtags) && (
-                                    <div className="flex flex-wrap gap-1 mb-3">
-                                      {content.keywords?.slice(0, 3).map((keyword, index) => (
-                                        <Badge key={`keyword-${index}`} variant="outline" className="text-xs">
-                                          {keyword}
-                                        </Badge>
-                                      ))}
-                                      {content.hashtags?.slice(0, 2).map((hashtag, index) => (
-                                        <Badge key={`hashtag-${index}`} variant="secondary" className="text-xs">
-                                          #{hashtag}
-                                        </Badge>
-                                      ))}
+                                  {content.seo_score && (
+                                    <div className={`flex items-center gap-1 text-sm px-2 py-1 rounded-md font-medium ${
+                                      content.seo_score >= 80 ? 'bg-green-100 text-green-700' :
+                                      content.seo_score >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                      'bg-red-100 text-red-700'
+                                    }`}>
+                                      📈 SEO: {content.seo_score}/100
                                     </div>
                                   )}
                                 </div>
+                                
+                                <p className="text-sm text-muted-foreground">
+                                  Published {new Date(content.posted_at || content.updated_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </p>
                               </div>
+                              
+                              {/* Tags Section */}
+                              {(content.keywords || content.hashtags) && (
+                                <div className="space-y-2">
+                                  <div className="flex flex-wrap gap-2">
+                                    {content.keywords?.slice(0, 4).map((keyword, index) => (
+                                      <Badge key={`keyword-${index}`} variant="outline" className="text-xs border-primary/30 text-primary/80">
+                                        🔍 {keyword}
+                                      </Badge>
+                                    ))}
+                                    {content.hashtags?.slice(0, 3).map((hashtag, index) => (
+                                      <Badge key={`hashtag-${index}`} variant="outline" className="text-xs border-blue-300 text-blue-700">
+                                        #{hashtag}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             
                             {/* Action Buttons */}
@@ -1203,7 +1304,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handlePreviewContent(content)}
-                                className="flex items-center gap-2"
+                                className="flex items-center gap-2 hover:bg-primary/5 hover:border-primary/30 transition-all"
                               >
                                 <Eye className="h-4 w-4" />
                                 Preview
@@ -1213,16 +1314,16 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleEditContent(content)}
-                                className="flex items-center gap-2"
+                                className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all"
                               >
-                                Edit
+                                ✏️ Edit
                               </Button>
                               
                               <Button
                                 variant="destructive"
                                 size="sm"
                                 onClick={() => setShowDeleteConfirm(content.id)}
-                                className="flex items-center gap-2"
+                                className="flex items-center gap-2 bg-red-50 text-red-600 border-red-200 hover:bg-red-100 hover:border-red-300"
                               >
                                 <XCircle className="h-4 w-4" />
                                 Delete
@@ -1234,15 +1335,21 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 border-2 border-dashed border-muted-foreground/25 rounded-lg">
-                    <div className="text-muted-foreground mb-4">
-                      <Wand2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <h4 className="text-lg font-medium mb-2">No Published Content Yet</h4>
-                      <p>Create your first piece of content to get started.</p>
+                  <div className="text-center py-16 border-2 border-dashed border-muted-foreground/25 rounded-2xl bg-gradient-to-br from-muted/10 to-accent/5">
+                    <div className="max-w-md mx-auto">
+                      <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <Wand2 className="h-10 w-10 text-primary" />
+                      </div>
+                      <h4 className="text-2xl font-bold text-foreground mb-3">No Published Content Yet</h4>
+                      <p className="text-muted-foreground mb-6 leading-relaxed">
+                        Start creating engaging content with our AI-powered marketing system. 
+                        Your published content will appear here for easy management.
+                      </p>
+                      <Button onClick={handleCreateNewContent} size="lg" className="shadow-lg">
+                        <Wand2 className="h-5 w-5 mr-2" />
+                        Create Your First Content
+                      </Button>
                     </div>
-                    <Button onClick={handleCreateNewContent} className="mt-4">
-                      Create Your First Content
-                    </Button>
                   </div>
                 )}
               </div>
