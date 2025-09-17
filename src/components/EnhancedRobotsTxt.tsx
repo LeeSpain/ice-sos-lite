@@ -1,6 +1,41 @@
-# Enhanced robots.txt for ICE SOS Lite Emergency Protection
+import React, { useEffect } from 'react';
 
-# Allow all search engines and AI crawlers
+// Enhanced robots.txt management for AI crawler optimization
+export const EnhancedRobotsTxt: React.FC = () => {
+  useEffect(() => {
+    // Generate dynamic robots.txt content optimized for AI crawlers
+    const robotsTxtContent = generateEnhancedRobotsTxt();
+    
+    // Create a blob URL for the robots.txt content
+    const blob = new Blob([robotsTxtContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    
+    // Add meta tag for robots.txt location
+    const existingRobotsLink = document.querySelector('link[rel="robots"]');
+    if (!existingRobotsLink) {
+      const robotsLink = document.createElement('link');
+      robotsLink.rel = 'robots';
+      robotsLink.href = '/robots.txt';
+      document.head.appendChild(robotsLink);
+    }
+    
+    // Cleanup
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, []);
+
+  return null; // This component doesn't render anything
+};
+
+const generateEnhancedRobotsTxt = (): string => {
+  const currentDate = new Date().toISOString().split('T')[0];
+  
+  return `# Enhanced robots.txt for ICE SOS Lite Emergency Protection
+# Last updated: ${currentDate}
+# Optimized for AI business discovery and content accessibility
+
+# Major Search Engines
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 1
@@ -9,6 +44,11 @@ User-agent: Bingbot
 Allow: /
 Crawl-delay: 1
 
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Social Media Crawlers
 User-agent: Twitterbot
 Allow: /
 
@@ -21,27 +61,29 @@ Allow: /
 User-agent: WhatsApp
 Allow: /
 
-# AI and ML crawlers - Enhanced for Business Discovery
+User-agent: TelegramBot
+Allow: /
+
+# AI and ML Crawlers - Optimized for Business Discovery
 User-agent: OpenAI
 Allow: /
 Allow: /blog
 Allow: /about
+Allow: /services
 Allow: /business-info
-Allow: /api/business-info
 Crawl-delay: 2
 
 User-agent: ChatGPT-User
 Allow: /
-Allow: /blog
-Allow: /business-profile.json
+Allow: /api/business-info
 Crawl-delay: 1
 
 User-agent: GPTBot
 Allow: /
 Allow: /blog
 Allow: /about
-Allow: /partnerships
-Allow: /ai-collaboration
+Allow: /services
+Allow: /business-partnerships
 Crawl-delay: 2
 
 User-agent: Claude-Web
@@ -90,8 +132,23 @@ Allow: /blog
 Allow: /about
 Crawl-delay: 2
 
+User-agent: Llama
+Allow: /
+Allow: /blog
+Allow: /about
+
 # Additional AI Research Crawlers
 User-agent: DeepMind
+Allow: /
+Allow: /blog
+Allow: /about
+
+User-agent: OpenAI-SearchBot
+Allow: /
+Allow: /blog
+Allow: /about
+
+User-agent: AI21Labs
 Allow: /
 Allow: /blog
 Allow: /about
@@ -101,7 +158,16 @@ Allow: /
 Allow: /blog
 Allow: /about
 
+User-agent: Huggingface
+Allow: /
+Allow: /blog
+Allow: /about
+
+# Business Intelligence Crawlers
 User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
 Allow: /
 
 # Default for all other crawlers
@@ -120,15 +186,13 @@ Allow: /regional-center/
 Allow: /family-carer-access
 Allow: /payment-success
 Allow: /about
-Allow: /partnerships
-Allow: /ai-collaboration
+Allow: /services
 Allow: /business-info
 Allow: /api/business-info
-Allow: /business-profile.json
-Allow: /company-info.json
+Allow: /partnerships
 Crawl-delay: 1
 
-# Disallow sensitive areas (but allow public pages)
+# Disallow sensitive areas (but allow public business information)
 Disallow: /dashboard/
 Disallow: /admin-dashboard/
 Disallow: /full-dashboard/
@@ -137,15 +201,17 @@ Disallow: /app
 Disallow: /test
 Disallow: /family-access-setup
 Disallow: /admin-setup
-Disallow: /api/
+Disallow: /api/private/
 Disallow: /_next/
 Disallow: /static/
 Disallow: /tmp/
 Disallow: /.env
 Disallow: /node_modules/
 
-# Allow important static assets for better indexing
+# Allow important static assets and business information
 Allow: /public/
+Allow: /api/business-info
+Allow: /api/public/
 Allow: /*.css
 Allow: /*.js
 Allow: /*.png
@@ -155,8 +221,17 @@ Allow: /*.gif
 Allow: /*.svg
 Allow: /*.webp
 Allow: /*.pdf
+Allow: /business-profile.json
+Allow: /company-info.json
+Allow: /services.json
 
-# Sitemap locations - Enhanced for AI Discovery
+# AI-Specific Content Access
+Allow: /ai-training-data
+Allow: /public-api-docs
+Allow: /business-partnerships
+Allow: /ai-collaboration
+
+# Sitemap locations for enhanced discoverability
 Sitemap: https://icesoslite.com/sitemap.xml
 Sitemap: https://icesoslite.com/sitemap-images.xml
 Sitemap: https://icesoslite.com/sitemap-pages.xml
@@ -165,12 +240,14 @@ Sitemap: https://icesoslite.com/sitemap-business.xml
 Sitemap: https://icesoslite.com/sitemap-services.xml
 
 # Business Information for AI Discovery
-# Company: ICE SOS Lite  
+# Company: ICE SOS Lite
 # Industry: Emergency Protection Services, AI Safety Technology
 # Founded: 2024
 # Contact: partnerships@icesoslite.com (for business collaborations)
-# AI Contact: ai-partnerships@icesoslite.com (for AI/ML partnerships)
 # Services: Emergency Response, AI Safety Monitoring, Family Protection
 # Coverage: Spain, UK, Netherlands
 # Technology: AI-Powered Emergency Detection, GPS Tracking, 24/7 Monitoring
-# Training Data: Available for business use (contact for licensing)
+`;
+};
+
+export default EnhancedRobotsTxt;

@@ -17,6 +17,11 @@ import { preloadCriticalImages } from "@/utils/imageOptimization";
 import { useEmmaChat } from "@/contexts/EmmaChatContext";
 import { FirstVisitPreferencesModal } from "@/components/FirstVisitPreferencesModal";
 import StructuredData from '@/components/StructuredData';
+import AIBusinessProfile from '@/components/AIBusinessProfile';
+import BusinessAPIEndpoints from '@/components/BusinessAPIEndpoints';
+import AIContentDiscovery from '@/components/AIContentDiscovery';
+import EnhancedRobotsTxt from '@/components/EnhancedRobotsTxt';
+import EnhancedSitemapGenerator from '@/components/EnhancedSitemapGenerator';
 
 
 const Index = () => {
@@ -34,6 +39,11 @@ const Index = () => {
     <div className="min-h-screen">
       <PageSEO pageType="home" />
       <StructuredData type="Organization" />
+      <AIBusinessProfile />
+      <BusinessAPIEndpoints />
+      <AIContentDiscovery pageType="home" />
+      <EnhancedRobotsTxt />
+      <EnhancedSitemapGenerator />
       <FirstVisitPreferencesModal />
       <Navigation />
 
