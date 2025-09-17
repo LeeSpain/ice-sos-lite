@@ -230,6 +230,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         if (retryCount < 3) {
           console.log(`[CanvasMap] No tiles loaded, rotating provider (attempt ${retryCount + 1})`);
           enhancedTileCache.rotateToNextProvider();
+          enhancedTileCache.clear();
           setCurrentProvider(enhancedTileCache.getCurrentProviderName());
           setRetryCount(prev => prev + 1);
           setFailureDetected(false);

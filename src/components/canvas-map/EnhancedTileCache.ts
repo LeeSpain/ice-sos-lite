@@ -23,7 +23,7 @@ class EnhancedTileCache {
   private readonly maxAge: number;
   private loadingPromises = new Map<string, Promise<HTMLImageElement | null>>();
   private loggedProviders = new Set<string>();
-  private fallbackOrder = ['osm-standard', 'cartodb-light', 'osm-hot', 'cartodb-dark'];
+  private fallbackOrder = ['cartodb-light', 'osm-standard', 'osm-hot', 'cartodb-dark'];
   private currentProviderIndex = 0;
 
   // Enhanced tile providers with better labeling
@@ -127,6 +127,8 @@ class EnhancedTileCache {
     this.currentProviderIndex = (this.currentProviderIndex + 1) % this.fallbackOrder.length;
     const newProvider = this.fallbackOrder[this.currentProviderIndex];
     console.info('[Map] Rotated to provider:', newProvider, '-', this.providers[newProvider]?.name);
+    // Clear caches and pending loads when switching providers
+    this.clear();
     return newProvider;
   }
 
