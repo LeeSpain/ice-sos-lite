@@ -19,6 +19,7 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import ImageFallback from '@/components/admin/ImageFallback';
+import { sanitizeHtmlContent } from '@/utils/contentSanitizer';
 
 interface BlogPost {
   id: string;
@@ -45,48 +46,6 @@ const BlogPost = () => {
   const [notFound, setNotFound] = useState(false);
   const { toast } = useToast();
 
-  const sanitizeHtmlContent = (html: string) => {
-    if (!html) return '';
-    
-    // Remove code fences and extract clean HTML
-    let cleanHtml = html
-      .replace(/```html\s*\n?/gi, '') // Remove opening code fence
-      .replace(/```\s*$/gi, '') // Remove closing code fence
-      .replace(/^<!DOCTYPE html>[\s\S]*?<body[^>]*>/i, '') // Remove DOCTYPE and head
-      .replace(/<\/body>[\s\S]*?<\/html>\s*$/i, '') // Remove closing body and html
-      .trim();
-    
-    // If content doesn't have proper HTML structure, convert plain text to proper paragraphs
-    if (!cleanHtml.includes('<p>') && !cleanHtml.includes('<h')) {
-      // Split by double line breaks for paragraphs
-      const paragraphs = cleanHtml.split(/\n\s*\n/);
-      cleanHtml = paragraphs
-        .map(paragraph => {
-          const trimmed = paragraph.trim();
-          if (!trimmed) return '';
-          
-          // Check if it's a heading (starts with capital letter and is short)
-          if (trimmed.length < 100 && /^[A-Z]/.test(trimmed) && !trimmed.endsWith('.')) {
-            return `<h2>${trimmed}</h2>`;
-          }
-          
-          // Check for list items (lines starting with bullet points or numbers)
-          if (trimmed.includes('\n') && /^[\s\-\*\•]/.test(trimmed)) {
-            const listItems = trimmed.split('\n')
-              .filter(item => item.trim())
-              .map(item => `<li>${item.replace(/^[\s\-\*\•]+/, '').trim()}</li>`)
-              .join('');
-            return `<ul>${listItems}</ul>`;
-          }
-          
-          return `<p>${trimmed}</p>`;
-        })
-        .filter(p => p)
-        .join('\n');
-    }
-    
-    return cleanHtml;
-  };
 
   useEffect(() => {
     if (slug) {
