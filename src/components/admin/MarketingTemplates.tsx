@@ -10,7 +10,11 @@ import {
   Heart,
   Star,
   Calendar,
-  Map
+  Map,
+  Sparkles,
+  Mail,
+  Zap,
+  Video
 } from 'lucide-react';
 
 interface Template {
@@ -29,104 +33,256 @@ interface Template {
 interface MarketingTemplatesProps {
   onSelectTemplate: (template: Template) => void;
   selectedTemplate?: Template;
+  contentType: string; // Add content type filter
 }
 
 const MARKETING_TEMPLATES: Template[] = [
+  // ===== BLOG POST TEMPLATES =====
   {
-    id: 'product-promotion-sos',
-    title: 'ICE SOS Features Showcase',
-    description: 'Highlight key features and benefits of ICE SOS Lite',
-    category: 'Product Promotion',
+    id: 'blog-features-showcase',
+    title: 'ICE SOS Complete Features Guide',
+    description: 'Comprehensive overview of all ICE SOS Lite features and benefits',
+    category: 'Product Features',
     icon: Shield,
-    prompt: 'Create a comprehensive blog post showcasing the key features of ICE SOS Lite app. Focus on emergency contact management, real-time location sharing, family safety features, and how it helps families stay connected during emergencies. Include user testimonials and practical scenarios.',
-    imagePrompt: 'Professional mobile app interface showing emergency contact screen with clean modern design, family safety theme, blue and white color scheme',
+    prompt: 'Create a comprehensive blog post showcasing all ICE SOS Lite features. Cover emergency contact management, real-time location sharing, family safety dashboard, SOS button functionality, and cross-platform compatibility. Include screenshots, user scenarios, and step-by-step setup guides.',
+    imagePrompt: 'Professional mobile app interface collage showing multiple ICE SOS screens including emergency contacts, location sharing, and family dashboard, clean modern design',
     contentType: 'blog',
-    estimatedTime: '8-10 min',
-    tags: ['Product Features', 'Safety Tech', 'Family Protection']
+    estimatedTime: '10-12 min',
+    tags: ['Product Features', 'Complete Guide', 'Setup Instructions']
   },
   {
-    id: 'safety-education-emergency',
-    title: 'Emergency Preparedness Guide',
-    description: 'Educational content about family emergency planning',
+    id: 'blog-emergency-preparedness',
+    title: 'Family Emergency Preparedness Blueprint',
+    description: 'Complete guide to emergency planning for modern families',
     category: 'Safety Education',
     icon: BookOpen,
-    prompt: 'Write an educational guide on family emergency preparedness. Cover creating emergency plans, building emergency kits, establishing communication protocols, and how technology like ICE SOS Lite can enhance family safety planning. Include actionable steps and checklists.',
-    imagePrompt: 'Family emergency preparedness kit with first aid supplies, flashlight, emergency contacts list, and mobile phone showing ICE SOS app',
+    prompt: 'Write an in-depth emergency preparedness guide for families. Cover creating emergency plans, building emergency kits, establishing communication protocols, setting up ICE contacts, and how ICE SOS Lite enhances traditional emergency planning. Include downloadable checklists and actionable steps.',
+    imagePrompt: 'Family emergency kit laid out neatly with first aid supplies, emergency contacts list, flashlight, water, and smartphone showing ICE SOS app',
     contentType: 'blog',
-    estimatedTime: '6-8 min',
-    tags: ['Emergency Planning', 'Family Safety', 'Preparedness']
+    estimatedTime: '8-10 min',
+    tags: ['Emergency Planning', 'Family Safety', 'Preparedness Guide']
   },
   {
-    id: 'customer-story-testimonial',
-    title: 'Customer Success Story',
-    description: 'Share real customer experiences and testimonials',
+    id: 'blog-customer-success',
+    title: 'Real Families, Real Stories: ICE SOS Success Stories',
+    description: 'Inspiring customer testimonials and success stories',
     category: 'Customer Stories',
     icon: Heart,
-    prompt: 'Create a compelling customer success story about how ICE SOS Lite helped a family during an emergency situation. Include the challenge they faced, how the app helped, and the positive outcome. Make it emotionally engaging while highlighting practical benefits.',
-    imagePrompt: 'Happy family portrait with parents and children, warm lighting, representing safety and connection',
-    contentType: 'blog',
-    estimatedTime: '5-7 min',
-    tags: ['Testimonials', 'Real Stories', 'Customer Success']
-  },
-  {
-    id: 'seasonal-travel-safety',
-    title: 'Travel Safety Tips',
-    description: 'Seasonal travel safety and preparation advice',
-    category: 'Seasonal Content',
-    icon: Map,
-    prompt: 'Write a comprehensive guide for travel safety during vacation season. Cover pre-travel preparation, staying connected while traveling, emergency contacts management, and how ICE SOS Lite can provide peace of mind for traveling families. Include destination-specific tips.',
-    imagePrompt: 'Family with luggage at airport or travel destination, mobile phone showing location sharing, travel safety theme',
+    prompt: 'Create a compelling blog post featuring real customer success stories about how ICE SOS Lite helped families during emergencies. Include 3-4 detailed case studies, quotes from satisfied customers, and the positive outcomes achieved. Focus on emotional connection while highlighting practical benefits.',
+    imagePrompt: 'Collage of happy families in different scenarios - traveling, at home, outdoor activities - representing safety and connection',
     contentType: 'blog',
     estimatedTime: '6-8 min',
-    tags: ['Travel Safety', 'Family Travel', 'Vacation Tips']
+    tags: ['Customer Stories', 'Testimonials', 'Case Studies']
   },
   {
-    id: 'social-safety-tips',
-    title: 'Daily Safety Reminders',
-    description: 'Quick social media posts about daily safety practices',
-    category: 'Social Engagement',
-    icon: Users,
-    prompt: 'Create engaging social media content with daily safety tips for families. Include quick reminders about emergency contacts, location sharing etiquette, child safety practices, and how small safety habits can make a big difference. Make it shareable and actionable.',
-    imagePrompt: 'Minimalist infographic style image with safety icons, clean design, family-friendly colors',
-    contentType: 'social',
-    estimatedTime: '3-4 min',
-    tags: ['Social Media', 'Daily Tips', 'Safety Habits']
-  },
-  {
-    id: 'comparison-guide',
-    title: 'Safety App Comparison',
-    description: 'Compare ICE SOS Lite with other safety solutions',
-    category: 'Product Promotion',
+    id: 'blog-safety-comparison',
+    title: 'Family Safety Solutions: Complete Comparison Guide',
+    description: 'Objective comparison of family safety apps and traditional methods',
+    category: 'Buyer Guide',
     icon: Star,
-    prompt: 'Create an objective comparison guide showing how ICE SOS Lite compares to other family safety apps and traditional emergency preparedness methods. Highlight unique features, ease of use, affordability, and effectiveness. Include a decision matrix for families.',
-    imagePrompt: 'Professional comparison chart or infographic showing app features side by side, clean business style',
+    prompt: 'Write a comprehensive comparison blog post analyzing ICE SOS Lite against other family safety apps and traditional emergency preparedness methods. Include feature comparison tables, pricing analysis, ease of use ratings, and recommendations for different family types.',
+    imagePrompt: 'Professional comparison chart infographic showing different safety solutions side by side with checkmarks and ratings',
+    contentType: 'blog',
+    estimatedTime: '8-10 min',
+    tags: ['Comparison', 'Buyer Guide', 'Product Analysis']
+  },
+  {
+    id: 'blog-travel-safety',
+    title: 'Ultimate Family Travel Safety Guide',
+    description: 'Complete safety checklist and tips for traveling families',
+    category: 'Travel Safety',
+    icon: Map,
+    prompt: 'Create a comprehensive travel safety guide for families. Cover pre-travel preparation, staying connected while traveling, international emergency contacts, travel insurance considerations, and how ICE SOS Lite provides peace of mind during family trips. Include destination-specific safety tips.',
+    imagePrompt: 'Family at airport with luggage, mobile phones showing location sharing, international travel theme with safety elements',
     contentType: 'blog',
     estimatedTime: '7-9 min',
-    tags: ['Product Comparison', 'Competitive Analysis', 'Buyer Guide']
+    tags: ['Travel Safety', 'Family Travel', 'International Safety']
+  },
+
+  // ===== SOCIAL MEDIA TEMPLATES =====
+  {
+    id: 'social-daily-tips',
+    title: 'Daily Safety Reminders',
+    description: 'Quick, engaging safety tips for daily sharing',
+    category: 'Daily Tips',
+    icon: Users,
+    prompt: 'Create engaging social media posts with daily safety tips for families. Include quick reminders about emergency contacts, location sharing etiquette, child safety practices, and simple safety habits. Make content shareable, visual-friendly, and actionable in under 280 characters.',
+    imagePrompt: 'Minimalist infographic with safety icons, clean colorful design, family-friendly aesthetic, perfect for social media',
+    contentType: 'social',
+    estimatedTime: '3-4 min',
+    tags: ['Daily Tips', 'Social Media', 'Quick Content']
   },
   {
-    id: 'holiday-safety',
-    title: 'Holiday Safety Planning',
-    description: 'Seasonal holiday safety and family gathering tips',
-    category: 'Seasonal Content',
-    icon: Calendar,
-    prompt: 'Write a comprehensive holiday safety guide for families. Cover travel during holidays, large family gatherings, keeping track of children during events, emergency planning for holiday travel, and maintaining family communication during busy holiday schedules.',
-    imagePrompt: 'Holiday family gathering scene with multiple generations, warm festive lighting, subtle safety elements',
-    contentType: 'blog',
-    estimatedTime: '6-8 min',
-    tags: ['Holiday Safety', 'Family Gatherings', 'Seasonal Planning']
+    id: 'social-feature-highlights',
+    title: 'Feature Spotlight Series',
+    description: 'Highlight individual ICE SOS features in bite-sized posts',
+    category: 'Product Features',
+    icon: Sparkles,
+    prompt: 'Create a series of social media posts highlighting individual ICE SOS Lite features. Each post should focus on one feature (emergency contacts, location sharing, SOS button, etc.) with clear benefits, quick setup tips, and engaging visuals. Keep posts concise and shareable.',
+    imagePrompt: 'Clean smartphone mockup showing one specific ICE SOS feature with attractive background and clear UI elements',
+    contentType: 'social',
+    estimatedTime: '2-3 min',
+    tags: ['Feature Highlights', 'Product Demo', 'Visual Content']
   },
   {
-    id: 'email-newsletter',
-    title: 'Safety Newsletter',
-    description: 'Monthly newsletter with safety tips and product updates',
-    category: 'Email Marketing',
-    icon: TrendingUp,
-    prompt: 'Create a monthly email newsletter for ICE SOS Lite users. Include safety tip of the month, app feature spotlight, customer story highlight, upcoming safety awareness dates, and product updates. Make it valuable and engaging for regular reading.',
-    imagePrompt: 'Professional newsletter header design with safety theme, clean layout, family-focused imagery',
+    id: 'social-testimonials',
+    title: 'Customer Quote Cards',
+    description: 'Visual testimonials from satisfied customers',
+    category: 'Social Proof',
+    icon: Heart,
+    prompt: 'Design social media posts featuring customer testimonials and quotes. Create visually appealing quote cards with customer feedback, success stories, and positive experiences. Include customer photos (with permission) and star ratings for credibility.',
+    imagePrompt: 'Professional quote card design with customer photo, testimonial text, star rating, and ICE SOS branding',
+    contentType: 'social',
+    estimatedTime: '4-5 min',
+    tags: ['Testimonials', 'Social Proof', 'Customer Quotes']
+  },
+  {
+    id: 'social-safety-awareness',
+    title: 'Safety Awareness Campaigns',
+    description: 'Educational content about emergency preparedness',
+    category: 'Education',
+    icon: Shield,
+    prompt: 'Create educational social media content about emergency preparedness and family safety. Include statistics, safety facts, emergency preparedness tips, and awareness campaigns. Make content informative yet engaging for social media consumption.',
+    imagePrompt: 'Infographic-style design with safety statistics, emergency icons, and educational content in social media format',
+    contentType: 'social',
+    estimatedTime: '3-4 min',
+    tags: ['Safety Education', 'Awareness', 'Emergency Facts']
+  },
+  {
+    id: 'social-behind-scenes',
+    title: 'Behind the Scenes Stories',
+    description: 'Company culture and team stories from ICE SOS',
+    category: 'Brand Story',
+    icon: Users,
+    prompt: 'Create behind-the-scenes social media content showcasing the ICE SOS team, company culture, development process, and mission. Include team member spotlights, development updates, and company values. Make content personal and relatable.',
+    imagePrompt: 'Casual team photo or office environment showing ICE SOS team members working on safety solutions, warm and professional',
+    contentType: 'social',
+    estimatedTime: '3-4 min',
+    tags: ['Behind the Scenes', 'Team Culture', 'Company Story']
+  },
+
+  // ===== EMAIL CAMPAIGN TEMPLATES =====
+  {
+    id: 'email-welcome-series',
+    title: 'New User Welcome Series',
+    description: 'Multi-part welcome email sequence for new users',
+    category: 'User Onboarding',
+    icon: Mail,
+    prompt: 'Create a comprehensive welcome email series for new ICE SOS Lite users. Include welcome message, setup instructions, feature tutorials, safety tips, and support resources. Design a 5-email sequence that guides users through first-time setup and key features.',
+    imagePrompt: 'Professional email template design with welcome message, step-by-step setup guide, and ICE SOS branding',
     contentType: 'email',
     estimatedTime: '8-10 min',
-    tags: ['Newsletter', 'Email Marketing', 'User Engagement']
+    tags: ['Welcome Series', 'User Onboarding', 'Email Sequence']
+  },
+  {
+    id: 'email-monthly-newsletter',
+    title: 'Monthly Safety Newsletter',
+    description: 'Regular newsletter with safety tips and product updates',
+    category: 'Newsletter',
+    icon: TrendingUp,
+    prompt: 'Create a monthly email newsletter for ICE SOS Lite users. Include safety tip of the month, app feature spotlight, customer story highlight, upcoming safety awareness dates, seasonal safety advice, and product updates. Make it valuable and engaging for regular reading.',
+    imagePrompt: 'Professional newsletter header design with safety theme, clean layout sections, and family-focused imagery',
+    contentType: 'email',
+    estimatedTime: '7-9 min',
+    tags: ['Newsletter', 'Monthly Updates', 'Safety Tips']
+  },
+  {
+    id: 'email-emergency-guide',
+    title: 'Emergency Preparedness Email Course',
+    description: 'Educational email series about emergency planning',
+    category: 'Education',
+    icon: BookOpen,
+    prompt: 'Design an educational email course about family emergency preparedness. Create a 7-part series covering emergency planning basics, communication plans, emergency kits, child safety, travel safety, technology tools, and ICE SOS integration. Include downloadable resources.',
+    imagePrompt: 'Educational email template with course progression, emergency planning graphics, and downloadable resource sections',
+    contentType: 'email',
+    estimatedTime: '9-11 min',
+    tags: ['Email Course', 'Emergency Education', 'Educational Series']
+  },
+  {
+    id: 'email-product-announcements',
+    title: 'Product Update Announcements',
+    description: 'Feature releases and product improvement communications',
+    category: 'Product Updates',
+    icon: Zap,
+    prompt: 'Create email templates for product announcements and feature releases. Include new feature highlights, improvement summaries, how-to guides for new features, user benefits, and call-to-action to try new features. Make content exciting and informative.',
+    imagePrompt: 'Modern email template showcasing new app features with screenshots, before/after comparisons, and update highlights',
+    contentType: 'email',
+    estimatedTime: '5-7 min',
+    tags: ['Product Updates', 'Feature Announcements', 'Release Notes']
+  },
+  {
+    id: 'email-reengagement',
+    title: 'User Re-engagement Campaign',
+    description: 'Win back inactive users with valuable content',
+    category: 'Re-engagement',
+    icon: Heart,
+    prompt: 'Design a re-engagement email campaign for inactive ICE SOS Lite users. Include personalized content, safety reminders, new feature highlights, success stories, exclusive tips, and incentives to return. Focus on the value and peace of mind ICE SOS provides.',
+    imagePrompt: 'Warm, inviting email design with "we miss you" messaging, family safety benefits, and comeback incentives',
+    contentType: 'email',
+    estimatedTime: '6-8 min',
+    tags: ['Re-engagement', 'Win-back Campaign', 'User Retention']
+  },
+
+  // ===== VIDEO SCRIPT TEMPLATES =====
+  {
+    id: 'video-demo-tutorial',
+    title: 'ICE SOS App Demo & Tutorial',
+    description: 'Complete walkthrough of app features and setup',
+    category: 'Product Demo',
+    icon: Video,
+    prompt: 'Create a comprehensive video script for an ICE SOS Lite app demonstration. Include app download and setup, emergency contact configuration, location sharing setup, SOS button demonstration, and family member invitation process. Make it clear, engaging, and easy to follow.',
+    imagePrompt: 'Clean video thumbnail showing smartphone with ICE SOS app interface, play button overlay, professional tutorial aesthetic',
+    contentType: 'video',
+    estimatedTime: '10-12 min',
+    tags: ['App Demo', 'Tutorial', 'Step-by-step Guide']
+  },
+  {
+    id: 'video-customer-testimonial',
+    title: 'Customer Success Story Video',
+    description: 'Real customer sharing their ICE SOS experience',
+    category: 'Testimonial',
+    icon: Star,
+    prompt: 'Write a video script for customer testimonial featuring a real family sharing their ICE SOS Lite experience. Include their safety concerns, how they discovered ICE SOS, setup experience, actual usage during an emergency, and how it provided peace of mind. Keep authentic and emotional.',
+    imagePrompt: 'Authentic family portrait or interview setup with family members, warm lighting, genuine expressions',
+    contentType: 'video',
+    estimatedTime: '6-8 min',
+    tags: ['Customer Story', 'Testimonial Video', 'Real Experience']
+  },
+  {
+    id: 'video-safety-education',
+    title: 'Family Safety Education Series',
+    description: 'Educational content about emergency preparedness',
+    category: 'Safety Education',
+    icon: Shield,
+    prompt: 'Create an educational video script about family emergency preparedness. Cover emergency plan creation, communication strategies, emergency kit essentials, child safety education, and how technology like ICE SOS enhances traditional safety planning. Make it informative yet engaging.',
+    imagePrompt: 'Educational video setup with safety demonstration, family emergency kit display, and clear instructional elements',
+    contentType: 'video',
+    estimatedTime: '8-10 min',
+    tags: ['Safety Education', 'Emergency Planning', 'Family Safety']
+  },
+  {
+    id: 'video-comparison-guide',
+    title: 'ICE SOS vs Other Safety Apps',
+    description: 'Comparison video highlighting ICE SOS advantages',
+    category: 'Product Comparison',
+    icon: Star,
+    prompt: 'Write a video script comparing ICE SOS Lite with other family safety apps. Include side-by-side feature comparisons, ease of use demonstrations, pricing analysis, and unique ICE SOS advantages. Keep objective while highlighting our strengths.',
+    imagePrompt: 'Split-screen comparison showing different safety apps, feature comparison charts, professional analysis setup',
+    contentType: 'video',
+    estimatedTime: '7-9 min',
+    tags: ['Product Comparison', 'Competitive Analysis', 'App Review']
+  },
+  {
+    id: 'video-quick-tips',
+    title: 'Quick Safety Tips Series',
+    description: 'Short-form safety tips for social media',
+    category: 'Safety Tips',
+    icon: Zap,
+    prompt: 'Create scripts for short-form safety tip videos perfect for social media. Each video should cover one specific safety tip in 60 seconds or less. Include emergency contact management, location sharing best practices, child safety tips, travel safety, and ICE SOS quick tips.',
+    imagePrompt: 'Dynamic, colorful video thumbnail with safety tip text overlay, engaging visual elements, social media optimized',
+    contentType: 'video',
+    estimatedTime: '3-4 min',
+    tags: ['Quick Tips', 'Short-form Video', 'Social Media Content']
   }
 ];
 
@@ -144,21 +300,42 @@ const getCategoryColor = (category: string): string => {
 
 export const MarketingTemplates: React.FC<MarketingTemplatesProps> = ({
   onSelectTemplate,
-  selectedTemplate
+  selectedTemplate,
+  contentType
 }) => {
-  const categories = [...new Set(MARKETING_TEMPLATES.map(t => t.category))];
+  // Filter templates by content type
+  const filteredTemplates = MARKETING_TEMPLATES.filter(
+    template => template.contentType === contentType
+  );
+
+  const getContentTypeTitle = (type: string): string => {
+    const titles = {
+      'blog': 'Blog Post Templates',
+      'social': 'Social Media Templates', 
+      'email': 'Email Campaign Templates',
+      'video': 'Video Script Templates'
+    };
+    return titles[type] || 'Marketing Templates';
+  };
 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-lg font-semibold mb-2">Marketing Templates</h3>
+        <h3 className="text-lg font-semibold mb-2">{getContentTypeTitle(contentType)}</h3>
         <p className="text-muted-foreground text-sm">
-          Choose from professionally crafted templates designed for ICE SOS Lite marketing
+          Choose from {filteredTemplates.length} professionally crafted templates for {contentType === 'blog' ? 'blog posts' : contentType === 'social' ? 'social media' : contentType === 'email' ? 'email campaigns' : 'video scripts'}
         </p>
       </div>
 
+      {filteredTemplates.length === 0 && (
+        <div className="text-center py-8 text-muted-foreground">
+          <p>No templates available for {contentType} content type.</p>
+          <p className="text-sm mt-1">Templates will be added soon!</p>
+        </div>
+      )}
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {MARKETING_TEMPLATES.map((template) => {
+        {filteredTemplates.map((template) => {
           const Icon = template.icon;
           const isSelected = selectedTemplate?.id === template.id;
           

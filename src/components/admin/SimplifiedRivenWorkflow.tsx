@@ -336,6 +336,7 @@ const SimplifiedRivenContent: React.FC = () => {
                 <MarketingTemplates 
                   onSelectTemplate={handleTemplateSelect}
                   selectedTemplate={selectedTemplate}
+                  contentType={contentType}
                 />
 
                 {/* Command Input */}
