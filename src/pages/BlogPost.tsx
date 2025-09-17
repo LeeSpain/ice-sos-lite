@@ -332,7 +332,7 @@ const BlogPost = () => {
         {/* Article Content */}
         <article className="py-12">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               {/* Article Body */}
               <div className="prose prose-lg max-w-none prose-slate dark:prose-invert 
                 prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-headings:mb-6 prose-headings:mt-8
@@ -340,6 +340,8 @@ const BlogPost = () => {
                 prose-a:text-primary prose-a:no-underline hover:prose-a:underline 
                 prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-strong:font-semibold
                 prose-blockquote:border-l-primary prose-blockquote:bg-slate-50 dark:prose-blockquote:bg-slate-900/50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:not-italic prose-blockquote:text-slate-700 dark:prose-blockquote:text-slate-300 prose-blockquote:my-8
+                prose-img:rounded-lg prose-img:shadow-lg prose-img:my-8 prose-img:w-full prose-img:h-auto
+                prose-figure:my-8 prose-figcaption:text-center prose-figcaption:text-sm prose-figcaption:text-muted-foreground prose-figcaption:mt-2 prose-figcaption:italic
                 prose-h1:text-2xl prose-h1:mb-8 prose-h1:mt-12
                 prose-h2:text-xl prose-h2:mb-6 prose-h2:mt-10 
                 prose-h3:text-lg prose-h3:mb-4 prose-h3:mt-8
