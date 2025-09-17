@@ -48,8 +48,9 @@ export default function MapScreen() {
     }
   }, [circles, activeCircleId]);
 
-  // Get user's current location on mount
+  // Get user's current location on mount (only once)
   useEffect(() => {
+    if (center !== null) return; // Already set
     let mounted = true;
     (async () => {
       try {
@@ -61,14 +62,14 @@ export default function MapScreen() {
       } catch (e) {
         console.warn('Unable to fetch current location initially:', e);
         // Fallback to presences center if available
-        if (presences.length > 0) {
+        if (mounted && presences.length > 0) {
           const sums = presences.reduce((acc, p) => ({ lat: acc.lat + p.lat, lng: acc.lng + p.lng }), { lat: 0, lng: 0 });
           setCenter({ lat: sums.lat / presences.length, lng: sums.lng / presences.length });
         }
       }
     })();
     return () => { mounted = false; };
-  }, [getCurrentLocationData, presences]);
+  }, [getCurrentLocationData, center, presences]);
 
   const handleUseMyLocation = async () => {
     const ok = await requestLocationPermission();

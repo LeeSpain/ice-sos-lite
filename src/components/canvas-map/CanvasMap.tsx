@@ -220,27 +220,27 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     if (isMapLoading !== prevIsLoadingRef.current) {
       prevIsLoadingRef.current = isMapLoading;
       setIsLoading(isMapLoading);
-      
-      // Detect tile loading failure and trigger provider rotation
-      if (isMapLoading && totalTiles > 0 && tilesLoaded === 0 && !failureDetected) {
-        setFailureDetected(true);
-        if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = window.setTimeout(() => {
-          if (retryCount < 3) {
-            console.log(`[CanvasMap] No tiles loaded, rotating provider (attempt ${retryCount + 1})`);
-            enhancedTileCache.rotateToNextProvider();
-            setCurrentProvider(enhancedTileCache.getCurrentProviderName());
-            setRetryCount(prev => prev + 1);
-            setFailureDetected(false);
-            scheduleDraw();
-          }
-        }, 3000);
-      } else if (!isMapLoading && failureDetected) {
-        setFailureDetected(false);
-        if (retryTimeoutRef.current) {
-          clearTimeout(retryTimeoutRef.current);
-          retryTimeoutRef.current = null;
+    }
+
+    // Detect tile loading failure and trigger provider rotation even if loading state hasn't changed
+    if (isMapLoading && totalTiles > 0 && tilesLoaded === 0 && !failureDetected) {
+      setFailureDetected(true);
+      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = window.setTimeout(() => {
+        if (retryCount < 3) {
+          console.log(`[CanvasMap] No tiles loaded, rotating provider (attempt ${retryCount + 1})`);
+          enhancedTileCache.rotateToNextProvider();
+          setCurrentProvider(enhancedTileCache.getCurrentProviderName());
+          setRetryCount(prev => prev + 1);
+          setFailureDetected(false);
+          scheduleDraw();
         }
+      }, 3000);
+    } else if (!isMapLoading && failureDetected) {
+      setFailureDetected(false);
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
       }
     }
 

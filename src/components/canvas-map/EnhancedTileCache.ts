@@ -145,6 +145,9 @@ class EnhancedTileCache {
     return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
+      // Help with providers that dislike referrers
+      // @ts-ignore
+      img.referrerPolicy = 'no-referrer';
       let settled = false;
       const timeoutMs = 3000;
       const timeoutId = window.setTimeout(() => {
