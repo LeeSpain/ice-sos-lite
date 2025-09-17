@@ -492,8 +492,8 @@ const SimplifiedRivenContent: React.FC = () => {
               </Badge>
             </div>
             
-            {/* Stage Progress */}
-            <div className="flex items-center gap-4">
+            {/* Stage Navigation */}
+            <div className="flex items-center gap-2">
               {[
                 { id: 'command', label: 'Command Centre', icon: Wand2 },
                 { id: 'process', label: 'AI Processing', icon: Activity },
@@ -502,20 +502,29 @@ const SimplifiedRivenContent: React.FC = () => {
               ].map((stage, index) => {
                 const StageIcon = stage.icon;
                 const isActive = currentStage === stage.id;
-                const isCompleted = ['command', 'process', 'approval'].indexOf(currentStage) > index;
+                const isCompleted = ['command', 'process', 'approval', 'success'].indexOf(currentStage) > index;
+                const isClickable = stage.id === 'command' || 
+                  (stage.id === 'approval' && generatedContent.length > 0) ||
+                  (stage.id === 'success' && generatedContent.some(c => c.status === 'published'));
                 
                 return (
                   <div key={stage.id} className="flex items-center">
-                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
-                      isActive 
-                        ? 'bg-primary text-primary-foreground' 
-                        : isCompleted 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}>
+                    <Button
+                      variant={isActive ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => isClickable && setCurrentStage(stage.id as WorkflowStage)}
+                      disabled={!isClickable}
+                      className={`flex items-center gap-2 transition-all ${
+                        isActive 
+                          ? 'bg-primary text-primary-foreground' 
+                          : isCompleted 
+                          ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                          : 'text-muted-foreground'
+                      } ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'}`}
+                    >
                       <StageIcon className="h-4 w-4" />
                       <span className="text-sm font-medium">{stage.label}</span>
-                    </div>
+                    </Button>
                     {index < 3 && (
                       <ArrowRight className="h-4 w-4 mx-2 text-muted-foreground" />
                     )}
