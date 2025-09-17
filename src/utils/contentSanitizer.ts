@@ -13,6 +13,23 @@ export const sanitizeHtmlContent = (html: string): string => {
     .replace(/<\/body>[\s\S]*?<\/html>\s*$/i, '') // Remove closing body and html
     .trim();
   
+  // If content doesn't have proper HTML structure, convert plain text to proper paragraphs
+  if (!cleanHtml.includes('<p>') && !cleanHtml.includes('<h') && !cleanHtml.includes('<div>')) {
+    // Split by double line breaks for paragraphs
+    const paragraphs = cleanHtml.split(/\n\s*\n/);
+    cleanHtml = paragraphs
+      .map(paragraph => {
+        const trimmed = paragraph.trim();
+        if (!trimmed) return '';
+        
+        // Convert single line breaks to <br> tags within paragraphs
+        const withBreaks = trimmed.replace(/\n/g, '<br>');
+        return `<p>${withBreaks}</p>`;
+      })
+      .filter(p => p)
+      .join('\n');
+  }
+  
   return cleanHtml;
 };
 

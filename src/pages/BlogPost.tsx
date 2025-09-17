@@ -338,7 +338,7 @@ const BlogPost = () => {
           <div className="container mx-auto px-6">
             <div className="max-w-4xl mx-auto">
               {/* Article Body */}
-              <div className="prose prose-xl max-w-none prose-slate dark:prose-invert 
+              <div className="prose prose-xl max-w-none prose-slate dark:prose-invert space-y-6
                 prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-headings:mb-8 prose-headings:mt-12
                 prose-h1:text-4xl prose-h1:mb-10 prose-h1:mt-16 prose-h1:leading-tight
                 prose-h2:text-3xl prose-h2:mb-8 prose-h2:mt-14 prose-h2:leading-tight prose-h2:border-b prose-h2:border-slate-200 dark:prose-h2:border-slate-700 prose-h2:pb-4
