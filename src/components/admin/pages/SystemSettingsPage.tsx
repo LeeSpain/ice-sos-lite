@@ -29,7 +29,8 @@ export default function SystemSettingsPage() {
   const { value: aiProvidersConfig, save: saveAiProvidersConfig, isLoading: aiConfigLoading } = useSiteContent('ai_providers_config', {
     providers: {
       openai: { enabled: true, model: 'gpt-5' },
-      xai: { enabled: false, model: 'grok-beta' }
+      xai: { enabled: false, model: 'grok-beta' },
+      openrouter: { enabled: false, model: 'meta-llama/llama-3.1-8b-instruct:free' }
     },
     stages: {
       overview: { provider: 'openai' },
@@ -72,8 +73,9 @@ export default function SystemSettingsPage() {
       // Show detailed status
       const openaiStatus = data?.providers?.openai ? '✅ Connected' : '❌ Missing Key';
       const xaiStatus = data?.providers?.xai ? '✅ Connected' : '❌ Missing Key';
+      const openrouterStatus = data?.providers?.openrouter ? '✅ Connected' : '❌ Missing Key';
       
-      toast.success(`Provider Status: OpenAI: ${openaiStatus}, xAI: ${xaiStatus}`);
+      toast.success(`Provider Status: OpenAI: ${openaiStatus}, xAI: ${xaiStatus}, OpenRouter: ${openrouterStatus}`);
     } catch (err) {
       console.error('Provider status error:', err);
       const errorMsg = err instanceof Error ? err.message : 'Unknown error';
@@ -251,7 +253,7 @@ export default function SystemSettingsPage() {
               </Button>
             </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* OpenAI */}
             <div className="p-4 border rounded-lg space-y-3">
               <div className="flex items-center justify-between">
@@ -359,6 +361,62 @@ export default function SystemSettingsPage() {
                 </Select>
               </div>
             </div>
+
+            {/* OpenRouter */}
+            <div className="p-4 border rounded-lg space-y-3">
+              <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">OpenRouter</span>
+                     {providerStatus.openrouter !== undefined && (
+                       <Badge 
+                         variant="outline" 
+                         className={`${providerStatus.openrouter ? 'border-green-500 text-green-600 bg-green-50' : 'border-red-500 text-red-600 bg-red-50'} transition-colors`}
+                       >
+                         {providerStatus.openrouter ? '✅ Connected' : '❌ Missing Key'}
+                       </Badge>
+                     )}
+                  </div>
+                <Switch
+                  checked={!!aiProvidersConfig?.providers?.openrouter?.enabled}
+                  onCheckedChange={async (val) => {
+                    const next = {
+                      ...aiProvidersConfig!,
+                      providers: {
+                        ...aiProvidersConfig!.providers,
+                        openrouter: { ...aiProvidersConfig!.providers.openrouter, enabled: val }
+                      }
+                    } as any;
+                    await saveAiProvidersConfig(next);
+                    toast.success(`OpenRouter ${val ? 'enabled' : 'disabled'}`);
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Model</Label>
+                <Select
+                  value={aiProvidersConfig?.providers?.openrouter?.model || 'meta-llama/llama-3.1-8b-instruct:free'}
+                  onValueChange={async (value) => {
+                    const next = {
+                      ...aiProvidersConfig!,
+                      providers: {
+                        ...aiProvidersConfig!.providers,
+                        openrouter: { ...aiProvidersConfig!.providers.openrouter, model: value }
+                      }
+                    } as any;
+                    await saveAiProvidersConfig(next);
+                    toast.success(`OpenRouter model set to ${value}`);
+                  }}
+                >
+                  <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (Free)</SelectItem>
+                    <SelectItem value="google/gemma-2-9b-it:free">Gemma 2 9B (Free)</SelectItem>
+                    <SelectItem value="microsoft/phi-3-mini-128k-instruct:free">Phi-3 Mini (Free)</SelectItem>
+                    <SelectItem value="qwen/qwen-2-7b-instruct:free">Qwen 2 7B (Free)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
 
 
@@ -382,6 +440,7 @@ export default function SystemSettingsPage() {
                   <SelectContent>
                     <SelectItem value="openai">OpenAI</SelectItem>
                     <SelectItem value="xai">xAI (Grok)</SelectItem>
+                    <SelectItem value="openrouter">OpenRouter</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
