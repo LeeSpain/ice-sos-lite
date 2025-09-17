@@ -15,6 +15,8 @@ interface TileProvider {
   attribution: string;
   hasLabels: boolean;
   maxZoom: number;
+  crossOrigin?: '' | 'anonymous';
+  referrerPolicy?: '' | 'no-referrer' | 'origin' | 'strict-origin-when-cross-origin';
 }
 
 class EnhancedTileCache {
@@ -33,42 +35,53 @@ class EnhancedTileCache {
       url: (x, y, z) => `https://tile.openstreetmap.org/${z}/${x}/${y}.png`,
       attribution: '© OpenStreetMap contributors',
       hasLabels: true,
-      maxZoom: 19
+      maxZoom: 19,
+      crossOrigin: 'anonymous',
+      referrerPolicy: 'no-referrer'
     },
     'osm-hot': {
       name: 'Humanitarian OSM',
       url: (x, y, z) => `https://tile-{s}.openstreetmap.fr/hot/${z}/${x}/${y}.png`.replace('{s}', ['a', 'b', 'c'][Math.floor(Math.random() * 3)]),
       attribution: '© OpenStreetMap contributors, Tiles style by Humanitarian OpenStreetMap Team',
       hasLabels: true,
-      maxZoom: 19
+      maxZoom: 19,
+      referrerPolicy: 'no-referrer'
     },
     'cartodb-light': {
       name: 'CartoDB Light',
       url: (x, y, z) => `https://{s}.basemaps.cartocdn.com/light_all/${z}/${x}/${y}.png`.replace('{s}', ['a', 'b', 'c', 'd'][Math.floor(Math.random() * 4)]),
       attribution: '© OpenStreetMap contributors, © CARTO',
       hasLabels: true,
-      maxZoom: 19
+      maxZoom: 19,
+      crossOrigin: 'anonymous',
+      referrerPolicy: 'no-referrer'
     },
     'cartodb-dark': {
       name: 'CartoDB Dark',
       url: (x, y, z) => `https://{s}.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png`.replace('{s}', ['a', 'b', 'c', 'd'][Math.floor(Math.random() * 4)]),
       attribution: '© OpenStreetMap contributors, © CARTO',
       hasLabels: true,
-      maxZoom: 19
+      maxZoom: 19,
+      crossOrigin: 'anonymous',
+      referrerPolicy: 'no-referrer'
     },
     'esri-satellite': {
       name: 'Esri Satellite',
       url: (x, y, z) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`,
       attribution: '© Esri, Maxar, Earthstar Geographics',
       hasLabels: false,
-      maxZoom: 18
+      maxZoom: 18,
+      crossOrigin: 'anonymous',
+      referrerPolicy: 'no-referrer'
     },
     'esri-labels': {
       name: 'Esri Labels',
       url: (x, y, z) => `https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/${z}/${y}/${x}`,
       attribution: '© Esri',
       hasLabels: true,
-      maxZoom: 18
+      maxZoom: 18,
+      crossOrigin: 'anonymous',
+      referrerPolicy: 'no-referrer'
     }
   };
 
@@ -145,13 +158,27 @@ class EnhancedTileCache {
 
   private createLoadingPromise(x: number, y: number, z: number, provider: string, key: string): Promise<HTMLImageElement | null> {
     return new Promise((resolve) => {
+      const tileProvider = this.providers[provider];
+      if (!tileProvider) {
+        resolve(null);
+        return;
+      }
+
       const img = new Image();
-      img.crossOrigin = 'anonymous';
-      // Help with providers that dislike referrers
-      // @ts-ignore
-      img.referrerPolicy = 'no-referrer';
+      // Provider-specific CORS and referrer handling
+      if (typeof tileProvider.crossOrigin !== 'undefined') {
+        // @ts-ignore
+        img.crossOrigin = tileProvider.crossOrigin;
+      }
+      try {
+        // @ts-ignore
+        img.decoding = 'async';
+        // @ts-ignore
+        if (tileProvider.referrerPolicy) img.referrerPolicy = tileProvider.referrerPolicy;
+      } catch {}
+
       let settled = false;
-      const timeoutMs = 3000;
+      const timeoutMs = 4000;
       const timeoutId = window.setTimeout(() => {
         if (settled) return;
         settled = true;
@@ -163,7 +190,7 @@ class EnhancedTileCache {
         });
         resolve(null);
       }, timeoutMs);
-      
+
       // Set loading state
       this.cache.set(key, {
         image: img,
@@ -196,16 +223,10 @@ class EnhancedTileCache {
           loading: false,
           error: true
         });
+        try { console.warn('[Map] Tile load error from', provider); } catch {}
         resolve(null);
       };
 
-      const tileProvider = this.providers[provider];
-      if (!tileProvider) {
-        window.clearTimeout(timeoutId);
-        settled = true;
-        resolve(null);
-        return;
-      }
       const url = tileProvider.url(x, y, z);
       if (!this.loggedProviders.has(provider)) {
         try { console.info('[Map] Tiles provider:', provider, '-', tileProvider.name, '| sample:', url); } catch {}

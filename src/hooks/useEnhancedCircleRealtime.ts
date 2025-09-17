@@ -47,6 +47,7 @@ interface RealtimeMetrics {
 export const useEnhancedCircleRealtime = (activeCircleId: string | null) => {
   const { user } = useOptimizedAuth();
   const realtime = useUnifiedRealtime();
+  const { subscribe, unsubscribe } = realtime;
   
   // Enhanced state management
   const [presences, setPresences] = useState<Presence[]>([]);
@@ -189,11 +190,11 @@ export const useEnhancedCircleRealtime = (activeCircleId: string | null) => {
 
     // Clean up existing subscriptions
     Object.values(subscriptionIds).forEach(id => {
-      if (id) realtime.unsubscribe(user.id, id);
+      if (id) unsubscribe(user.id, id);
     });
 
     // Subscribe to live presence updates
-    const presenceChannelId = realtime.subscribe(
+    const presenceChannelId = subscribe(
       `presence-${user.id}`,
       {
         channelName: `circle-presence-${activeCircleId}`,
@@ -250,7 +251,7 @@ export const useEnhancedCircleRealtime = (activeCircleId: string | null) => {
     );
 
     // Subscribe to place events
-    const eventsChannelId = realtime.subscribe(
+    const eventsChannelId = subscribe(
       `events-${user.id}`,
       {
         channelName: `circle-events-${activeCircleId}`,
@@ -284,10 +285,10 @@ export const useEnhancedCircleRealtime = (activeCircleId: string | null) => {
 
     return () => {
       // Cleanup subscriptions
-      if (presenceChannelId) realtime.unsubscribe(`presence-${user.id}`, presenceChannelId);
-      if (eventsChannelId) realtime.unsubscribe(`events-${user.id}`, eventsChannelId);
+      if (presenceChannelId) unsubscribe(`presence-${user.id}`, presenceChannelId);
+      if (eventsChannelId) unsubscribe(`events-${user.id}`, eventsChannelId);
     };
-  }, [activeCircleId, user, realtime]);
+  }, [activeCircleId, user?.id, subscribe, unsubscribe]);
 
   // Enhanced refresh with performance tracking
   const refresh = useCallback(async () => {

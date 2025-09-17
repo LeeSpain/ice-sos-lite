@@ -37,9 +37,6 @@ export default function MapScreen() {
   const { permission, isTracking, requestPermission } = useBackgroundLocation(locationEnabled);
   const { toast } = useToast();
 
-  useEffect(() => {
-    loadInitial();
-  }, [loadInitial]);
 
   useEffect(() => {
     // Auto-select first circle if available
