@@ -28,8 +28,9 @@ export const AICommandProcessor: React.FC<AICommandProcessorProps> = ({ onComman
   const [providerStatus, setProviderStatus] = useState<{
     xai: boolean;
     openai: boolean;
+    openrouter: boolean;
     fallbackUsed: boolean;
-  }>({ xai: false, openai: false, fallbackUsed: false });
+  }>({ xai: false, openai: false, openrouter: false, fallbackUsed: false });
 
   const checkProviderStatus = async () => {
     try {
@@ -43,7 +44,8 @@ export const AICommandProcessor: React.FC<AICommandProcessorProps> = ({ onComman
         setProviderStatus({
           xai: data.providers.xai,
           openai: data.providers.openai,
-          fallbackUsed: !data.providers.xai && !data.providers.openai
+          openrouter: data.providers.openrouter,
+          fallbackUsed: !data.providers.xai && !data.providers.openai && !data.providers.openrouter
         });
       }
     } catch (err) {
@@ -100,6 +102,8 @@ export const AICommandProcessor: React.FC<AICommandProcessorProps> = ({ onComman
       return <Badge className="bg-purple-100 text-purple-700 border-purple-200">xAI Active</Badge>;
     } else if (providerStatus.openai) {
       return <Badge className="bg-blue-100 text-blue-700 border-blue-200">OpenAI Active</Badge>;
+    } else if (providerStatus.openrouter) {
+      return <Badge className="bg-green-100 text-green-700 border-green-200">OpenRouter Active</Badge>;
     } else if (providerStatus.fallbackUsed) {
       return <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">Template Mode</Badge>;
     }
@@ -188,6 +192,7 @@ export const AICommandProcessor: React.FC<AICommandProcessorProps> = ({ onComman
             <ul className="list-disc list-inside mt-1 space-y-1">
               <li>xAI (Grok): {providerStatus.xai ? '✅ Connected' : '❌ Offline'}</li>
               <li>OpenAI: {providerStatus.openai ? '✅ Connected' : '❌ Offline'}</li>
+              <li>OpenRouter: {providerStatus.openrouter ? '✅ Connected' : '❌ Offline'}</li>
               <li>Fallback Templates: ✅ Always Available</li>
             </ul>
           </div>

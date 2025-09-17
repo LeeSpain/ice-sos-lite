@@ -5,12 +5,14 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 const xaiApiKey = Deno.env.get('XAI_API_KEY');
+const openRouterApiKey = Deno.env.get('OPENROUTER_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 
 console.log('🔧 Environment check:', {
   openAI: openAIApiKey ? '✅ configured' : '❌ missing',
-  xai: xaiApiKey ? '✅ configured' : '❌ missing', 
+  xai: xaiApiKey ? '✅ configured' : '❌ missing',
+  openrouter: openRouterApiKey ? '✅ configured' : '❌ missing',
   supabaseUrl: supabaseUrl ? '✅ configured' : '❌ missing',
   supabaseKey: supabaseServiceKey ? '✅ configured' : '❌ missing'
 });
@@ -55,6 +57,7 @@ serve(async (req) => {
       // Always read secrets per request to avoid warm instance stale values
       const openAIKey = Deno.env.get('OPENAI_API_KEY') || '';
       const xaiKey = Deno.env.get('XAI_API_KEY') || '';
+      const openRouterKey = Deno.env.get('OPENROUTER_API_KEY') || '';
 
       // Test OpenAI connection
       let openaiStatus = 'not_configured';
@@ -108,15 +111,51 @@ serve(async (req) => {
         }
       }
 
+      // Test OpenRouter connection
+      let openrouterStatus = 'not_configured';
+      let openrouterError: string | null = null;
+      if (openRouterKey) {
+        try {
+          console.log('Testing OpenRouter connection...');
+          const testResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${openRouterKey}`,
+              'Content-Type': 'application/json',
+              'HTTP-Referer': 'https://your-app.com',
+              'X-Title': 'ICE SOS Marketing'
+            },
+            body: JSON.stringify({
+              model: 'nousresearch/hermes-3-llama-3.1-405b:free',
+              messages: [{ role: 'user', content: 'ping' }],
+              max_tokens: 1
+            })
+          });
+          console.log('OpenRouter test response status:', testResponse.status);
+          if (testResponse.ok) {
+            openrouterStatus = 'connected';
+          } else {
+            openrouterStatus = 'error';
+            openrouterError = await testResponse.text();
+          }
+        } catch (error) {
+          console.error('OpenRouter connection test failed:', error);
+          openrouterStatus = 'error';
+          openrouterError = (error as Error).message;
+        }
+      }
+
       const status = {
         success: true,
         providers: {
           openai: openaiStatus === 'connected',
-          xai: xaiStatus === 'connected'
+          xai: xaiStatus === 'connected',
+          openrouter: openrouterStatus === 'connected'
         },
         details: {
           openai: { status: openaiStatus, models: openaiStatus === 'connected' ? ['gpt-4o-mini', 'gpt-4o'] : [], error: openaiError },
           xai: { status: xaiStatus, models: xaiStatus === 'connected' ? ['grok-2-mini', 'grok-2-latest'] : [], error: xaiError },
+          openrouter: { status: openrouterStatus, models: openrouterStatus === 'connected' ? ['nousresearch/hermes-3-llama-3.1-405b:free', 'mistralai/mistral-7b-instruct:free'] : [], error: openrouterError },
           supabase: { status: 'connected', url: supabaseUrl }
         }
       };
@@ -450,6 +489,62 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
       }
     } catch (error) {
       console.error('OpenAI analysis failed, using intelligent fallback:', error);
+    }
+  }
+  
+  // Try OpenRouter if configured
+  if (overviewProvider === 'openrouter' && openRouterApiKey) {
+    try {
+      console.log('Using OpenRouter for command analysis');
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openRouterApiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://your-app.com',
+          'X-Title': 'ICE SOS Marketing'
+        },
+        body: JSON.stringify({
+          model: (aiConfig?.providers?.openrouter?.model || 'nousresearch/hermes-3-llama-3.1-405b:free'),
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a marketing strategist for ICE SOS Lite, an emergency preparedness app. Analyze content creation commands and extract the actual topic and intent, not just repeat the command. Focus on what content should be created about.'
+            },
+            {
+              role: 'user',
+              content: `Analyze this content creation request: "${command}". 
+              
+              What topic should the content actually be about? What type of content is requested? 
+              Extract the real subject matter and content strategy.
+              
+              For context: ICE SOS Lite is an emergency preparedness app with features like emergency contacts, SOS alerts, location sharing, medical info storage, family circles, and offline functionality.`
+            }
+          ],
+          max_tokens: 500
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.choices[0].message.content;
+        console.log('OpenRouter analysis completed:', content);
+        
+        return {
+          strategy: `Content strategy for ${parsedCommand.topic}`,
+          target_audience: settings?.target_audience || getTargetAudienceForTopic(parsedCommand.topic),
+          tone: settings?.tone || 'Professional yet approachable',
+          content_type: parsedCommand.intent,
+          content_topic: parsedCommand.topic,
+          content_category: parsedCommand.category,
+          seo_keywords: generateKeywordsForTopic(parsedCommand.topic),
+          estimated_completion: '15 minutes',
+          ai_insights: content,
+          parsed_command: parsedCommand
+        };
+      }
+    } catch (error) {
+      console.error('OpenRouter analysis failed, using intelligent fallback:', error);
     }
   }
   
@@ -927,6 +1022,92 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
       }
     } catch (error) {
       console.error('OpenAI content creation failed, using intelligent fallback:', error);
+    }
+  }
+
+  // Try OpenRouter if configured
+  if (textProvider === 'openrouter' && openRouterApiKey) {
+    try {
+      console.log('Calling OpenRouter API for content generation...');
+      
+      const contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
+
+Context: This is for ICE SOS Lite, an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, and medical information storage.
+
+Command Intent: ${parsedCommand.intent} 
+Content Category: ${parsedCommand.category}
+Topic: ${parsedCommand.topic}
+
+Target audience: ${analysisResult.target_audience || 'Families and safety-conscious individuals'}
+Tone: ${analysisResult.tone || 'Professional yet approachable'}
+Word count: ${settings?.word_count || 800} words
+
+Please create:
+1. An engaging, SEO-optimized title
+2. Complete HTML body content with proper heading structure (use <h1>, <h2>, <h3>, <p>, <ul>, <li> tags)
+3. Focus on practical advice and how ICE SOS Lite features solve real problems
+4. Include specific use cases and examples
+5. Make it actionable and valuable for readers
+
+The content should be about the TOPIC (${parsedCommand.topic}), not about the command itself. Create actual informative content that helps readers understand and implement better emergency preparedness.`;
+
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openRouterApiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://your-app.com',
+          'X-Title': 'ICE SOS Marketing'
+        },
+        body: JSON.stringify({
+          model: (aiConfig?.providers?.openrouter?.model || 'nousresearch/hermes-3-llama-3.1-405b:free'),
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.'
+            },
+            {
+              role: 'user',
+              content: contentPrompt
+            }
+          ],
+          max_tokens: 3000
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const generatedContent = data.choices[0].message.content;
+        
+        console.log('OpenRouter content generated successfully');
+        
+        // Extract title from generated content or create one
+        const titleMatch = generatedContent.match(/<h1[^>]*>(.*?)<\/h1>/);
+        const extractedTitle = titleMatch ? titleMatch[1].replace(/<[^>]*>/g, '') : `${parsedCommand.topic.charAt(0).toUpperCase() + parsedCommand.topic.slice(1)} - Complete Safety Guide`;
+        
+        return {
+          title: extractedTitle,
+          body_text: generatedContent,
+          seo_title: `${extractedTitle} | ICE SOS Lite`,
+          meta_description: `Essential guide to ${parsedCommand.topic} and emergency preparedness. Learn practical strategies and how ICE SOS Lite can enhance your family's safety.`,
+          content_sections: [
+            { heading: "Introduction", summary: `Overview of ${parsedCommand.topic}` },
+            { heading: "Key Strategies", summary: "Practical implementation advice" },
+            { heading: "ICE SOS Features", summary: "How technology enhances safety" },
+            { heading: "Best Practices", summary: "Expert recommendations" },
+            { heading: "Conclusion", summary: "Key takeaways and next steps" }
+          ],
+          word_count: desiredWordCount,
+          keywords: [parsedCommand.topic, 'emergency preparedness', 'family safety', 'ICE SOS', 'safety planning'],
+          featured_image_alt: `Professional illustration showing ${parsedCommand.topic} and emergency preparedness`,
+          reading_time: Math.ceil(desiredWordCount / 200),
+          seo_score: 87
+        };
+      } else {
+        console.error(`OpenRouter API error: ${response.status}, using intelligent fallback`);
+      }
+    } catch (error) {
+      console.error('OpenRouter content creation failed, using intelligent fallback:', error);
     }
   }
 

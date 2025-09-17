@@ -79,8 +79,17 @@ export const AIProviderDiagnostics: React.FC = () => {
           details: providerData?.details?.xai
         });
 
-        // Test 5: Content Generation Test
-        if (openaiStatus || xaiStatus) {
+        // Test 5: OpenRouter Status
+        const openrouterStatus = providerData?.providers?.openrouter;
+        diagnostics.push({
+          component: 'OpenRouter Connection',
+          status: openrouterStatus ? 'success' : 'error',
+          message: openrouterStatus ? 'OpenRouter API connected successfully' : 'OpenRouter API connection failed',
+          details: providerData?.details?.openrouter
+        });
+
+        // Test 6: Content Generation Test
+        if (openaiStatus || xaiStatus || openrouterStatus) {
           try {
             const { data: testContent, error: testError } = await supabase.functions.invoke('riven-marketing-enhanced', {
               body: { 
