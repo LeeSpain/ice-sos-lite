@@ -69,7 +69,7 @@ serve(async (req) => {
       let xaiStatus = 'not_configured';
       if (xaiApiKey) {
         try {
-          console.log('Testing xAI connection...');
+          console.log('Testing xAI connection with updated API key...');
           const testResponse = await fetch('https://api.x.ai/v1/chat/completions', {
             method: 'POST',
             headers: { 
@@ -78,20 +78,20 @@ serve(async (req) => {
             },
             body: JSON.stringify({
               model: 'grok-beta',
-              messages: [{ role: 'user', content: 'test' }],
-              max_tokens: 1
+              messages: [{ role: 'user', content: 'Hello' }],
+              max_tokens: 5,
+              temperature: 0.7
             })
           });
           console.log('xAI test response status:', testResponse.status);
           
           if (testResponse.ok) {
+            const responseData = await testResponse.json();
+            console.log('xAI test successful:', responseData);
             xaiStatus = 'connected';
-          } else if (testResponse.status === 400) {
-            // 400 might indicate the test message was rejected, but API is accessible
-            const errorData = await testResponse.text();
-            console.log('xAI 400 response:', errorData);
-            xaiStatus = 'connected'; // API is responding, just didn't like our test
           } else {
+            const errorData = await testResponse.text();
+            console.log('xAI test failed:', testResponse.status, errorData);
             xaiStatus = 'error';
           }
         } catch (error) {
@@ -365,6 +365,7 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
             }
           ],
           max_tokens: 500,
+          temperature: 0.7
         }),
       });
 

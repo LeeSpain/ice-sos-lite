@@ -4,11 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send } from 'lucide-react';
+import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RealTimeWorkflowVisualizer } from './RealTimeWorkflowVisualizer';
+import { AICommandProcessor } from './AICommandProcessor';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -544,6 +546,16 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
     }
   };
 
+  const handleCommandSubmit = (submittedCommand: string) => {
+    setFormData(prev => ({
+      ...prev,
+      command: submittedCommand,
+      title: prev.title || `AI Generated: ${submittedCommand.substring(0, 50)}...`
+    }));
+    // The AICommandProcessor handles the actual submission, this is just for UI updates
+    setCurrentStage('process');
+  };
+
   const resetWorkflow = () => {
     setCurrentStage('command');
     setIsProcessing(false);
@@ -674,6 +686,22 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         <CardContent>
           {currentStage === 'command' && (
             <div className="space-y-6">
+              {/* Enhanced AI Command Processor */}
+              <AICommandProcessor onCommandSubmit={handleCommandSubmit} />
+              
+              {/* AI Provider Status Alert */}
+              {(!apiProviderStatus.openai && !apiProviderStatus.xai) && (
+                <Alert className="border-yellow-200 bg-yellow-50">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                  <AlertDescription className="text-yellow-700">
+                    <strong>AI Providers Offline:</strong> Content will be generated using intelligent templates. 
+                    For full AI generation, ensure API keys are properly configured.
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <Separator />
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
