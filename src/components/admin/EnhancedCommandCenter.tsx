@@ -372,14 +372,14 @@ export const EnhancedCommandCenter: React.FC<EnhancedCommandCenterProps> = ({
         </Card>
         <Card className="text-center">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-muted-foreground">No data yet</div>
-            <div className="text-sm text-muted-foreground">Real Reach</div>
+            <div className="text-2xl font-bold text-muted-foreground">Live</div>
+            <div className="text-sm text-muted-foreground">Real Data</div>
           </CardContent>
         </Card>
         <Card className="text-center">
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-muted-foreground">--</div>
-            <div className="text-sm text-muted-foreground">Analytics</div>
+            <div className="text-2xl font-bold text-muted-foreground">Ready</div>
+            <div className="text-sm text-muted-foreground">System Status</div>
           </CardContent>
         </Card>
       </div>

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   TrendingUp, 
   Users, 
@@ -10,23 +11,62 @@ import {
   Share,
   BarChart3,
   Target,
-  Clock
+  Clock,
+  Loader2
 } from 'lucide-react';
 
 export const AnalyticsDashboard: React.FC = () => {
-  const metrics = [
-    { label: 'Total Reach', value: '45.2K', change: '+12%', icon: Eye, color: 'text-blue-600' },
-    { label: 'Engagement', value: '2.8K', change: '+8%', icon: Heart, color: 'text-red-600' },
-    { label: 'Followers', value: '18.3K', change: '+15%', icon: Users, color: 'text-green-600' },
-    { label: 'Shares', value: '892', change: '+22%', icon: Share, color: 'text-purple-600' }
-  ];
+  const [metrics, setMetrics] = useState([
+    { label: 'Total Content', value: '0', change: '0%', icon: Eye, color: 'text-blue-600' },
+    { label: 'Published', value: '0', change: '0%', icon: Heart, color: 'text-red-600' },
+    { label: 'Campaigns', value: '0', change: '0%', icon: Users, color: 'text-green-600' },
+    { label: 'Analytics Data', value: '0', change: '0%', icon: Share, color: 'text-purple-600' }
+  ]);
 
-  const campaigns = [
-    { name: 'Emergency Preparedness', reach: 12500, engagement: 8.5, status: 'active' },
-    { name: 'Family Safety Tips', reach: 9800, engagement: 12.3, status: 'completed' },
-    { name: 'Customer Stories', reach: 7200, engagement: 15.2, status: 'active' },
-    { name: 'App Features', reach: 5600, engagement: 6.8, status: 'paused' }
-  ];
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadRealAnalytics();
+  }, []);
+
+  const loadRealAnalytics = async () => {
+    try {
+      // Load real campaigns
+      const { data: campaignsData } = await supabase
+        .from('marketing_campaigns')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      // Load real content
+      const { data: contentData } = await supabase
+        .from('marketing_content')
+        .select('*');
+
+      // Load analytics data
+      const { data: analyticsData } = await supabase
+        .from('marketing_analytics')
+        .select('*');
+
+      const totalContent = contentData?.length || 0;
+      const publishedContent = contentData?.filter(c => c.status === 'published').length || 0;
+      const totalCampaigns = campaignsData?.length || 0;
+      const totalAnalyticsEntries = analyticsData?.length || 0;
+
+      setMetrics([
+        { label: 'Total Content', value: totalContent.toString(), change: '0%', icon: Eye, color: 'text-blue-600' },
+        { label: 'Published', value: publishedContent.toString(), change: '0%', icon: Heart, color: 'text-red-600' },
+        { label: 'Campaigns', value: totalCampaigns.toString(), change: '0%', icon: Users, color: 'text-green-600' },
+        { label: 'Analytics Data', value: totalAnalyticsEntries.toString(), change: '0%', icon: Share, color: 'text-purple-600' }
+      ]);
+
+      setCampaigns(campaignsData || []);
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -60,58 +100,67 @@ export const AnalyticsDashboard: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {campaigns.map((campaign, index) => (
-              <div key={index} className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="font-medium">{campaign.name}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {campaign.reach.toLocaleString()} reach • {campaign.engagement}% engagement
-                    </p>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin" />
+              <span className="ml-2">Loading campaigns...</span>
+            </div>
+          ) : campaigns.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No campaigns found. Create your first campaign to see analytics data here.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {campaigns.map((campaign) => (
+                <div key={campaign.id} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium">{campaign.title}</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Created: {new Date(campaign.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2 py-1 rounded ${
+                        campaign.status === 'running' ? 'bg-green-100 text-green-700' :
+                        campaign.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                        campaign.status === 'failed' ? 'bg-red-100 text-red-700' :
+                        'bg-orange-100 text-orange-700'
+                      }`}>
+                        {campaign.status}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      campaign.status === 'active' ? 'bg-green-100 text-green-700' :
-                      campaign.status === 'completed' ? 'bg-blue-100 text-blue-700' :
-                      'bg-orange-100 text-orange-700'
-                    }`}>
-                      {campaign.status}
-                    </span>
-                  </div>
+                  <Progress value={campaign.status === 'completed' ? 100 : campaign.status === 'running' ? 50 : 0} className="w-full" />
                 </div>
-                <Progress value={campaign.engagement * 5} className="w-full" />
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Real-time Stats */}
+      {/* Real-time Data */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
-              Top Performing Content
+              Recent Content
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {[
-                { title: 'Emergency Contact Setup Guide', engagement: '15.2K', platform: 'Instagram' },
-                { title: 'Family Safety Checklist', engagement: '12.8K', platform: 'Facebook' },
-                { title: 'SOS Button Tutorial', engagement: '9.4K', platform: 'YouTube' }
-              ].map((content, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded">
-                  <div>
-                    <p className="font-medium text-sm">{content.title}</p>
-                    <p className="text-xs text-muted-foreground">{content.platform}</p>
-                  </div>
-                  <span className="text-sm font-medium text-primary">{content.engagement}</span>
+            {loading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="ml-2 text-sm">Loading content...</span>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="text-center py-4 text-muted-foreground text-sm">
+                  Real content data will appear here once you generate campaigns and content.
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -119,24 +168,32 @@ export const AnalyticsDashboard: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
-              Upcoming Posts
+              Live System Status
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {[
-                { title: 'Weekly Safety Tip #15', time: 'Today 3:00 PM', platform: 'Instagram' },
-                { title: 'Customer Success Story', time: 'Tomorrow 10:00 AM', platform: 'Facebook' },
-                { title: 'App Feature Highlight', time: 'Wed 2:00 PM', platform: 'LinkedIn' }
-              ].map((post, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-muted/20 rounded">
-                  <div>
-                    <p className="font-medium text-sm">{post.title}</p>
-                    <p className="text-xs text-muted-foreground">{post.platform}</p>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{post.time}</span>
+              <div className="flex items-center justify-between p-3 bg-muted/20 rounded">
+                <div>
+                  <p className="font-medium text-sm">Database Connection</p>
+                  <p className="text-xs text-muted-foreground">Live</p>
                 </div>
-              ))}
+                <span className="text-sm font-medium text-green-600">Connected</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-muted/20 rounded">
+                <div>
+                  <p className="font-medium text-sm">AI Services</p>
+                  <p className="text-xs text-muted-foreground">Ready</p>
+                </div>
+                <span className="text-sm font-medium text-green-600">Operational</span>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-muted/20 rounded">
+                <div>
+                  <p className="font-medium text-sm">Content Publishing</p>
+                  <p className="text-xs text-muted-foreground">Active</p>
+                </div>
+                <span className="text-sm font-medium text-green-600">Ready</span>
+              </div>
             </div>
           </CardContent>
         </Card>

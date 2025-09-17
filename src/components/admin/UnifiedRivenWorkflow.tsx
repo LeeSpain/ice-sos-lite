@@ -214,7 +214,6 @@ const WorkflowContent: React.FC = () => {
                       rivenResponse=""
                       campaignId={currentCampaignId}
                     />
-                    <WorkflowTester />
                   </div>
                 </TabsContent>
 
