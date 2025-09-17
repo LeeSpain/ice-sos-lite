@@ -597,6 +597,67 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                       onChange={(e) => setFormData({...formData, title: e.target.value})}
                     />
                   </div>
+
+                  {/* Quick Templates */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Quick Templates
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        {
+                          title: "Emergency Preparedness Blog",
+                          command: "Create a comprehensive 2500-word blog post about emergency preparedness for families, including emergency kits, evacuation plans, and safety protocols",
+                          tone: "informative",
+                          audience: "families"
+                        },
+                        {
+                          title: "Security Tips Article",
+                          command: "Write a detailed 2500-word article about home security best practices, including smart home technology, surveillance systems, and safety habits",
+                          tone: "professional",
+                          audience: "general"
+                        },
+                        {
+                          title: "Travel Safety Guide",
+                          command: "Create an engaging 2500-word travel safety guide covering international travel tips, document security, and emergency contacts",
+                          tone: "friendly",
+                          audience: "travelers"
+                        },
+                        {
+                          title: "Senior Safety Article",
+                          command: "Develop a comprehensive 2500-word article about safety considerations for senior citizens, including home modifications and health monitoring",
+                          tone: "informative",
+                          audience: "seniors"
+                        }
+                      ].map((template, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          size="sm"
+                          className="justify-start text-left h-auto p-3"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              command: template.command,
+                              title: template.title,
+                              settings: {
+                                ...formData.settings,
+                                tone: template.tone,
+                                target_audience: template.audience
+                              }
+                            });
+                          }}
+                        >
+                          <div>
+                            <div className="font-medium text-sm">{template.title}</div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {template.command.substring(0, 80)}...
+                            </div>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
