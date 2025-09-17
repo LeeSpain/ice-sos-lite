@@ -70,36 +70,34 @@ export const SocialMediaManager: React.FC = () => {
 
   const loadSocialAccounts = async () => {
     try {
-      // Mock data since table doesn't exist yet
-      const mockAccounts = [
-        { id: '1', platform: 'facebook', account_name: 'ICE SOS Emergency', followers_count: 12500, status: 'connected' as const, profile_url: '#' },
-        { id: '2', platform: 'instagram', account_name: '@icesosfamily', followers_count: 8200, status: 'connected' as const, profile_url: '#' },
-        { id: '3', platform: 'twitter', account_name: '@ICESafety', followers_count: 5800, status: 'disconnected' as const, profile_url: '#' },
-      ];
-      setAccounts(mockAccounts);
+      // Show empty state - no social accounts connected yet
+      // This will be populated when users connect real social media accounts
+      setAccounts([]);
     } catch (error) {
       console.error('Error loading social accounts:', error);
+      setAccounts([]);
     }
   };
 
   const loadPostingQueue = async () => {
     try {
+      // Use the existing social_media_posting_queue table
       const { data, error } = await supabase
-        .from('posting_queue')
-        .select(`
-          *,
-          marketing_content (
-            title,
-            body_text
-          )
-        `)
+        .from('social_media_posting_queue')
+        .select('*')
         .order('scheduled_time', { ascending: true })
         .limit(20);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading posting queue:', error);
+        setQueueItems([]);
+        return;
+      }
+
       setQueueItems(data || []);
     } catch (error) {
       console.error('Error loading posting queue:', error);
+      setQueueItems([]);
     } finally {
       setLoading(false);
     }
@@ -133,17 +131,13 @@ export const SocialMediaManager: React.FC = () => {
 
   const disconnectAccount = async (accountId: string) => {
     try {
-      // Mock update
-      setAccounts(prev => prev.map(acc => 
-        acc.id === accountId ? { ...acc, status: 'disconnected' as const } : acc
-      ));
+      // For now, just remove from state since no real connections exist yet
+      setAccounts(prev => prev.filter(acc => acc.id !== accountId));
 
       toast({
         title: "Account Disconnected",
         description: "Social media account has been disconnected",
       });
-
-      loadSocialAccounts();
     } catch (error) {
       console.error('Error disconnecting account:', error);
       toast({
@@ -157,11 +151,12 @@ export const SocialMediaManager: React.FC = () => {
   const retryPost = async (queueItemId: string) => {
     try {
       const { error } = await supabase
-        .from('posting_queue')
+        .from('social_media_posting_queue')
         .update({ 
-          status: 'pending',
+          status: 'scheduled',
           retry_count: 0,
-          error_message: null
+          error_message: null,
+          updated_at: new Date().toISOString()
         })
         .eq('id', queueItemId);
 
@@ -226,82 +221,24 @@ export const SocialMediaManager: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.keys(platformIcons).map((platform) => {
-              const account = accounts.find(acc => acc.platform === platform);
-              const IconComponent = platformIcons[platform as keyof typeof platformIcons];
-              const iconColor = platformColors[platform as keyof typeof platformColors];
-
-              return (
-                <Card key={platform} className="border">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <IconComponent className={`h-8 w-8 ${iconColor}`} />
-                        <div>
-                          <h4 className="font-medium capitalize">{platform}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {account?.account_name || 'Not connected'}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant={getStatusColor(account?.status || 'disconnected')}>
-                        {account?.status || 'disconnected'}
-                      </Badge>
-                    </div>
-                    
-                    {account?.followers_count && (
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm text-muted-foreground">Followers</span>
-                        <span className="font-medium">{account.followers_count.toLocaleString()}</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex gap-2">
-                      {account?.status === 'connected' ? (
-                        <>
-                          <Button variant="outline" size="sm" className="flex-1">
-                            <Settings className="h-3 w-3 mr-1" />
-                            Settings
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => disconnectAccount(account.id)}
-                            className="flex-1"
-                          >
-                            <XCircle className="h-3 w-3 mr-1" />
-                            Disconnect
-                          </Button>
-                        </>
-                      ) : (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => connectAccount(platform)}
-                          className="w-full"
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Connect
-                        </Button>
-                      )}
-                    </div>
-
-                    {account?.profile_url && (
-                      <div className="mt-2">
-                        <Button variant="ghost" size="sm" asChild className="w-full">
-                          <a href={account.profile_url} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            View Profile
-                          </a>
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="text-center py-8 text-muted-foreground">
+            <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <h3 className="text-lg font-medium mb-2">No Social Accounts Connected</h3>
+            <p className="mb-4">Connect your social media accounts to start publishing content automatically.</p>
+            <div className="flex justify-center gap-3">
+              {Object.keys(platformIcons).map((platform) => {
+                const IconComponent = platformIcons[platform as keyof typeof platformIcons];
+                const iconColor = platformColors[platform as keyof typeof platformColors];
+                return (
+                  <Button key={platform} variant="outline" onClick={() => connectAccount(platform)}>
+                    <IconComponent className={`h-4 w-4 mr-2 ${iconColor}`} />
+                    Connect {platform.charAt(0).toUpperCase() + platform.slice(1)}
+                  </Button>
+                );
+              })}
+            </div>
           </div>
+                    
         </CardContent>
       </Card>
 
