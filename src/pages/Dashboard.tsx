@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Routes, Route } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -42,6 +42,7 @@ const Dashboard = () => {
   const [subscription, setSubscription] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const initialLoadTimeoutRef = useRef<number | null>(null);
 
   // Auto-scroll to top when navigating
   useScrollToTop();
@@ -55,16 +56,19 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
+    console.log('[Dashboard] mount -> starting initial load');
     loadDashboardData();
     
     // Auto-refresh every 2 minutes
     const interval = setInterval(() => {
+      console.log('[Dashboard] auto-refresh tick');
       loadDashboardData();
     }, 120000);
 
     // Listen for page visibility changes
     const handleVisibilityChange = () => {
       if (!document.hidden) {
+        console.log('[Dashboard] tab visible -> refresh');
         loadDashboardData();
       }
     };
@@ -73,19 +77,31 @@ const Dashboard = () => {
     // Listen for storage events (when user completes payment in another tab)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'subscription-updated') {
+        console.log('[Dashboard] storage subscription-updated -> refresh');
         loadDashboardData();
       }
     };
     window.addEventListener('storage', handleStorageChange);
 
+    // Hard timeout guard to avoid being stuck on initial loading
+    initialLoadTimeoutRef.current = window.setTimeout(() => {
+      console.warn('[Dashboard] initial load timeout -> forcing setLoading(false)');
+      setLoading(false);
+    }, 8000);
+
     return () => {
       clearInterval(interval);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('storage', handleStorageChange);
+      if (initialLoadTimeoutRef.current) {
+        clearTimeout(initialLoadTimeoutRef.current);
+        initialLoadTimeoutRef.current = null;
+      }
     };
   }, []);
 
   const loadDashboardData = async () => {
+    console.log('[Dashboard] loadDashboardData: start');
     try {
       await Promise.all([
         checkSubscription(),
@@ -94,14 +110,17 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
+      console.log('[Dashboard] loadDashboardData: finished -> setLoading(false)');
       setLoading(false);
     }
   };
 
   const checkSubscription = async () => {
     try {
+      console.log('[Dashboard] checkSubscription: invoking function');
       const { data, error } = await supabase.functions.invoke('check-subscription');
       if (error) throw error;
+      console.log('[Dashboard] checkSubscription: success', data);
       setSubscription(data);
     } catch (error) {
       console.error('Error checking subscription:', error);
@@ -110,9 +129,14 @@ const Dashboard = () => {
 
   const loadProfile = async () => {
     try {
+      console.log('[Dashboard] loadProfile: getUser');
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        console.warn('[Dashboard] loadProfile: no user');
+        return;
+      }
 
+      console.log('[Dashboard] loadProfile: fetching profile for', user.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -123,6 +147,7 @@ const Dashboard = () => {
         throw error;
       }
 
+      console.log('[Dashboard] loadProfile: success');
       setProfile(data);
     } catch (error) {
       console.error('Error loading profile:', error);
