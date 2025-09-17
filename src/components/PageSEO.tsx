@@ -2,7 +2,7 @@ import React from 'react';
 import { SEO } from './SEO';
 
 interface PageSEOProps {
-  pageType: 'home' | 'register' | 'auth' | 'dashboard' | 'support' | 'contact' | 'privacy' | 'terms' | 'sos' | 'devices' | 'regional' | 'family' | 'admin' | 'videos';
+  pageType: 'home' | 'register' | 'auth' | 'dashboard' | 'support' | 'contact' | 'privacy' | 'terms' | 'sos' | 'devices' | 'regional' | 'family' | 'admin' | 'videos' | 'ai-register' | 'payment-success' | 'map-demo' | 'test-registration' | 'emergency-response-services' | 'ai-emergency-assistant' | 'family-safety-monitoring' | 'senior-emergency-protection';
   customTitle?: string;
   customDescription?: string;
   customKeywords?: string[];

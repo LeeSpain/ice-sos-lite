@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import Navigation from '@/components/Navigation';
 import EmbeddedPayment from '@/components/EmbeddedPayment';
 import { Badge } from '@/components/ui/badge';
-import SEO from '@/components/SEO';
+import { PageSEO } from '@/components/PageSEO';
 import { notifyPaymentSuccess } from '@/utils/paymentSuccess';
 
 interface TestPlan {
@@ -172,11 +172,7 @@ const TestRegistration = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <SEO 
-        title="Test Registration - ICE SOS Lite"
-        description="Test the complete registration and payment flow for ICE SOS Lite emergency protection service."
-        canonical="/test-registration"
-      />
+      <PageSEO pageType="test-registration" />
       <Navigation />
       
       <div className="pt-32 pb-8 px-4">

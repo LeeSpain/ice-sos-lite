@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Battery, MessageCircle, Phone, Navigation, AlertTriangle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import NavigationComponent from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import { PageSEO } from '@/components/PageSEO';
 
 interface Presence {
   user_id: string;
@@ -102,7 +105,10 @@ export default function MapDemo() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="min-h-screen bg-gradient-hero">
+      <PageSEO pageType="map-demo" />
+      <NavigationComponent />
+      <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Live Map Demo</h1>
         <p className="text-muted-foreground">
@@ -259,6 +265,8 @@ export default function MapDemo() {
           )}
         </div>
       </div>
+      <Footer />
+    </div>
     </div>
   );
 }

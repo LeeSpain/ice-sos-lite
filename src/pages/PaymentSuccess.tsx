@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Download, Shield, Smartphone, UserCircle } from 'lucide-react';
 import QRCode from 'qrcode';
-import SEO from '@/components/SEO';
+import { PageSEO } from '@/components/PageSEO';
 
 
 interface WelcomeData {
@@ -175,7 +175,7 @@ const PaymentSuccess = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <SEO title="Payment Success – ICE SOS Lite" description="Your account is active. Access your dashboard and download the mobile app." />
+      <PageSEO pageType="payment-success" />
       <Navigation />
       
       <div className="container mx-auto px-4 pt-page-top pb-section">

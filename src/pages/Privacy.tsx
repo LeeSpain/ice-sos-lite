@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import { PrivacyDialog } from "@/components/legal/PrivacyDialog";
 import { useTranslation } from "react-i18next";
+import { PageSEO } from "@/components/PageSEO";
 
 const Privacy: React.FC = () => {
   const { t } = useTranslation();
@@ -23,11 +23,7 @@ const Privacy: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <link rel="canonical" href={canonical} />
-      </Helmet>
+      <PageSEO pageType="privacy" />
       
       <PrivacyDialog 
         open={dialogOpen} 

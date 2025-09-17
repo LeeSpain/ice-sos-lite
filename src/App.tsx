@@ -41,6 +41,10 @@ import Terms from "./pages/Terms";
 import Contact from "./pages/Contact";
 import Videos from "./pages/Videos";
 import FamilyCarerAccessPage from "./pages/FamilyCarerAccess";
+import EmergencyResponseServices from "./pages/EmergencyResponseServices";
+import AIEmergencyAssistant from "./pages/AIEmergencyAssistant";
+import FamilySafetyMonitoring from "./pages/FamilySafetyMonitoring";
+import SeniorEmergencyProtection from "./pages/SeniorEmergencyProtection";
 
 // Interactive and Mobile Pages
 import FamilyAccessSetup from "./pages/FamilyAccessSetup";
@@ -152,6 +156,31 @@ function AppWithTracking() {
                 <Route path="/family-carer-access" element={
                   <OptimizedSuspense skeletonType="card">
                     <FamilyCarerAccessPage />
+                  </OptimizedSuspense>
+                } />
+
+                {/* New SEO Landing Pages */}
+                <Route path="/emergency-response-services" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <EmergencyResponseServices />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/ai-emergency-assistant" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <AIEmergencyAssistant />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/family-safety-monitoring" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <FamilySafetyMonitoring />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/senior-emergency-protection" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <SeniorEmergencyProtection />
                   </OptimizedSuspense>
                 } />
 

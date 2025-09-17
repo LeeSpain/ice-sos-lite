@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { usePreferences } from '@/contexts/PreferencesContext';
 import { notifyPaymentSuccess } from '@/utils/paymentSuccess';
 
-import SEO from '@/components/SEO';
+import { PageSEO } from '@/components/PageSEO';
 import { isValidEmail, isValidPhone, validatePasswordStrength } from '@/utils/security';
 
 
@@ -492,12 +492,7 @@ const AIRegister = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
-      <SEO 
-        title="Join ICE SOS Lite – Emergency Protection Registration"
-        description="Register for ICE SOS Lite emergency protection service. Quick setup with AI assistance and instant access to life-saving features for you and your family."
-        canonical="/ai-register"
-        structuredData={structuredData}
-      />
+      <PageSEO pageType="ai-register" />
       <Navigation />
       
       

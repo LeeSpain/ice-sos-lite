@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
 import { TermsDialog } from "@/components/legal/TermsDialog";
 import { useTranslation } from "react-i18next";
+import { PageSEO } from "@/components/PageSEO";
 
 const Terms: React.FC = () => {
   const { t } = useTranslation();
@@ -23,11 +23,7 @@ const Terms: React.FC = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <link rel="canonical" href={canonical} />
-      </Helmet>
+      <PageSEO pageType="terms" />
       
       <TermsDialog 
         open={dialogOpen} 
