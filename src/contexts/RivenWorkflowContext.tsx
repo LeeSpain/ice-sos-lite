@@ -125,19 +125,23 @@ function workflowReducer(state: WorkflowState, action: WorkflowAction): Workflow
         }
       };
     
-    case 'UPDATE_WORKFLOW_STAGE':
+    case 'UPDATE_WORKFLOW_STAGE': {
       const campaignId = action.payload.campaign_id;
       const currentStages = state.activeWorkflows[campaignId] || [];
+      const idx = currentStages.findIndex(stage => stage.stage_name === action.payload.stage_name);
+      const nextStages = idx >= 0
+        ? currentStages.map(stage =>
+            stage.stage_name === action.payload.stage_name ? action.payload : stage
+          )
+        : [...currentStages, action.payload];
       return {
         ...state,
         activeWorkflows: {
           ...state.activeWorkflows,
-          [campaignId]: currentStages.map(stage =>
-            stage.stage_name === action.payload.stage_name ? action.payload : stage
-          )
+          [campaignId]: nextStages
         }
       };
-    
+    }
     case 'SET_CONTENT_ITEMS':
       return { ...state, contentItems: action.payload };
     
@@ -300,7 +304,9 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           settings: {
             word_count: config?.word_count || 900,
             content_depth: config?.content_depth || 'high',
-            seo_difficulty: config?.seo_difficulty || 'medium'
+            seo_difficulty: config?.seo_difficulty || 'medium',
+            image_generation: !!config?.image_generation,
+            image_prompt: config?.image_prompt || ''
           },
           scheduling_options: {
             mode: config?.scheduling_mode || 'spread',
@@ -322,7 +328,7 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         throw error;
       }
 
-      const campaignId = data?.campaignId;
+      const campaignId = data?.campaignId || data?.campaign_id;
       if (campaignId) {
         dispatch({ type: 'SET_CURRENT_CAMPAIGN', payload: campaignId });
         
@@ -337,14 +343,26 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           description: "Riven is now processing your command",
         });
 
-        // Set up polling for workflow updates
+        // Set up resilient polling (fetch fresh data, avoid stale closures)
         const pollInterval = setInterval(async () => {
-          await loadWorkflowStages(campaignId);
-          const workflow = state.activeWorkflows[campaignId];
-          if (workflow && workflow.every(stage => stage.status === 'completed' || stage.status === 'failed')) {
-            clearInterval(pollInterval);
-            await loadContentItems();
-            dispatch({ type: 'SET_PROCESSING_STAGE', payload: undefined });
+          const { data: freshStages, error: wfErr } = await supabase
+            .from('workflow_stages')
+            .select('*')
+            .eq('campaign_id', campaignId)
+            .order('created_at', { ascending: true });
+
+          if (!wfErr && freshStages) {
+            dispatch({ 
+              type: 'SET_WORKFLOW_STAGES', 
+              payload: { campaignId, stages: freshStages }
+            });
+
+            const isDone = freshStages.every(s => s.status === 'completed' || s.status === 'failed');
+            if (isDone) {
+              clearInterval(pollInterval);
+              await loadContentItems();
+              dispatch({ type: 'SET_PROCESSING_STAGE', payload: undefined });
+            }
           }
         }, 2000);
 

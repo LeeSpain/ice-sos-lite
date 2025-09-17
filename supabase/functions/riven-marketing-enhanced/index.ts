@@ -129,7 +129,8 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       message: 'Marketing workflow completed successfully',
-      campaign_id: campaignId
+      campaign_id: campaignId,
+      campaignId: campaignId
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
