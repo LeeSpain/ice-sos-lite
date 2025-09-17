@@ -17,6 +17,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { PageSEO } from '@/components/PageSEO';
+import SEOBreadcrumbs from '@/components/SEOBreadcrumbs';
 import SEO from '@/components/SEO';
 
 interface BlogPost {
@@ -163,13 +165,9 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <SEO 
-        title="Blog | Safety & Emergency Response Insights"
-        description="Stay informed with the latest safety tips, emergency response guidance, and family protection insights from our safety experts."
-        keywords={['safety blog', 'emergency response', 'family safety', 'protection tips', 'safety technology']}
-      />
-      
+      <PageSEO pageType="videos" />
       <Navigation />
+      <SEOBreadcrumbs />
       
       {/* Hero Section with Background */}
       <section className="relative bg-gradient-to-br from-primary/10 via-secondary/5 to-background pt-page-top pb-section">

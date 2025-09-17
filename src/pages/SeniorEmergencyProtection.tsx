@@ -23,12 +23,43 @@ import {
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { PageSEO } from '@/components/PageSEO';
+import SEOBreadcrumbs from '@/components/SEOBreadcrumbs';
+import SEOFAQSection from '@/components/SEOFAQSection';
+import StructuredData from '@/components/StructuredData';
 
 const SeniorEmergencyProtection = () => {
+  const seniorFAQs = [
+    {
+      question: "What makes this service different for seniors?",
+      answer: "Our senior emergency protection includes specialized medical alert integration, fall detection, medication reminders, and monitoring staff trained in senior care. We understand the unique health and safety needs of elderly individuals."
+    },
+    {
+      question: "How does fall detection work?",
+      answer: "Our advanced fall detection uses AI algorithms that analyze movement patterns from wearable devices. It can distinguish between normal activities and actual falls, reducing false alarms while ensuring rapid response to real emergencies."
+    },
+    {
+      question: "Can the system work with existing medical devices?",
+      answer: "Yes, our platform integrates with most common medical alert devices, health monitors, and smart home systems. We can coordinate with your existing healthcare providers and medical equipment."
+    },
+    {
+      question: "What if my loved one has dementia or Alzheimer's?",
+      answer: "We offer specialized monitoring for cognitive conditions including wandering prevention, safe zone alerts, memory assistance, and enhanced caregiver coordination. Our team is trained to handle situations involving memory-related challenges."
+    },
+    {
+      question: "How do family members stay informed?",
+      answer: "Family members receive customizable updates about their loved one's safety, daily activities, medication adherence, and any concerning incidents. Our family dashboard provides peace of mind without overwhelming information."
+    },
+    {
+      question: "Is the service suitable for seniors living independently?",
+      answer: "Absolutely. Our service is designed to help seniors maintain their independence while ensuring their safety. We provide discrete monitoring that supports independent living while giving families confidence their loved ones are protected."
+    }
+  ];
   return (
     <div className="min-h-screen bg-gradient-hero">
       <PageSEO pageType="senior-emergency-protection" />
+      <StructuredData type="Service" data={{ serviceType: 'senior-protection' }} />
       <Navigation />
+      <SEOBreadcrumbs />
       
       <main className="container mx-auto px-4 py-section pt-page-top">
         {/* Hero Section */}
@@ -354,6 +385,13 @@ const SeniorEmergencyProtection = () => {
             </Card>
           </div>
         </section>
+
+        {/* FAQ Section */}
+        <SEOFAQSection 
+          title="Senior Emergency Protection FAQ"
+          faqs={seniorFAQs}
+          className="bg-background/50"
+        />
 
         {/* CTA Section */}
         <section className="text-center">

@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 import { sanitizeInput, isValidEmail, checkRateLimit, logSecurityEvent } from "@/utils/security";
 import { PageSEO } from "@/components/PageSEO";
+import SEOBreadcrumbs from '@/components/SEOBreadcrumbs';
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -122,8 +123,8 @@ const Contact: React.FC = () => {
   return (
     <div className="min-h-screen">
       <PageSEO pageType="contact" />
-
       <Navigation />
+      <SEOBreadcrumbs />
 
       <main className="container mx-auto px-4 py-section pt-page-top">
         <header className="text-center mb-12">

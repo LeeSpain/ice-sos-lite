@@ -22,12 +22,43 @@ import {
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { PageSEO } from '@/components/PageSEO';
+import SEOBreadcrumbs from '@/components/SEOBreadcrumbs';
+import SEOFAQSection from '@/components/SEOFAQSection';
+import StructuredData from '@/components/StructuredData';
 
 const FamilySafetyMonitoring = () => {
+  const familyFAQs = [
+    {
+      question: "How does family safety monitoring work?",
+      answer: "Our system provides real-time location tracking for all family members with smart alerts, safe zone notifications, and coordinated emergency response. Each family member gets a personalized safety profile with age-appropriate monitoring."
+    },
+    {
+      question: "Can I monitor family members without invading their privacy?",
+      answer: "Yes, our system includes privacy controls and age-appropriate settings. Teen and adult family members can control their privacy levels while maintaining safety features. Location sharing can be customized based on individual preferences."
+    },
+    {
+      question: "What age groups does family monitoring support?",
+      answer: "We provide tailored monitoring for all ages: children with school tracking, teens with friend activity monitoring, adults with commute safety, and seniors with health monitoring. Each age group has specialized features."
+    },
+    {
+      question: "How do family emergency alerts work?",
+      answer: "When an emergency is detected for any family member, our system immediately notifies all designated family contacts with location details and situation information. Emergency services are contacted automatically based on your preferences."
+    },
+    {
+      question: "Can family members see each other's locations?",
+      answer: "Location sharing within families is customizable. Parents can monitor children, and family members can opt-in to share their locations with others. All sharing respects individual privacy settings and legal requirements."
+    },
+    {
+      question: "Is there a family dashboard to see everyone's status?",
+      answer: "Yes, our centralized family dashboard shows the real-time status and location of all family members, recent activities, safe zone arrivals/departures, and emergency contacts. It's designed for easy monitoring without information overload."
+    }
+  ];
   return (
     <div className="min-h-screen bg-gradient-hero">
       <PageSEO pageType="family-safety-monitoring" />
+      <StructuredData type="Service" data={{ serviceType: 'family-monitoring' }} />
       <Navigation />
+      <SEOBreadcrumbs />
       
       <main className="container mx-auto px-4 py-section pt-page-top">
         {/* Hero Section */}
@@ -324,6 +355,13 @@ const FamilySafetyMonitoring = () => {
             </Card>
           </div>
         </section>
+
+        {/* FAQ Section */}
+        <SEOFAQSection 
+          title="Family Safety Monitoring FAQ"
+          faqs={familyFAQs}
+          className="bg-background/50"
+        />
 
         {/* CTA Section */}
         <section className="text-center">

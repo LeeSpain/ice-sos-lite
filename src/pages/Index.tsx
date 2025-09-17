@@ -16,6 +16,7 @@ import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
 import { preloadCriticalImages } from "@/utils/imageOptimization";
 import { useEmmaChat } from "@/contexts/EmmaChatContext";
 import { FirstVisitPreferencesModal } from "@/components/FirstVisitPreferencesModal";
+import StructuredData from '@/components/StructuredData';
 
 
 const Index = () => {
@@ -32,6 +33,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <PageSEO pageType="home" />
+      <StructuredData type="Organization" />
       <FirstVisitPreferencesModal />
       <Navigation />
 

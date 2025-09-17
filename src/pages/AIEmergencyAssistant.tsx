@@ -19,12 +19,43 @@ import {
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { PageSEO } from '@/components/PageSEO';
+import SEOBreadcrumbs from '@/components/SEOBreadcrumbs';
+import SEOFAQSection from '@/components/SEOFAQSection';
+import StructuredData from '@/components/StructuredData';
 
 const AIEmergencyAssistant = () => {
+  const aiFAQs = [
+    {
+      question: "How does the AI emergency assistant work?",
+      answer: "Our AI assistant uses advanced machine learning algorithms to continuously monitor your behavior patterns, device sensors, and location data. It learns your normal routines and can detect anomalies that may indicate an emergency situation, providing proactive protection."
+    },
+    {
+      question: "Is my personal data safe with AI monitoring?",
+      answer: "Yes, we use privacy-first AI architecture with edge computing. Your personal data is processed locally on your device and encrypted before any transmission. We follow strict GDPR compliance and zero-knowledge data principles."
+    },
+    {
+      question: "Can the AI assistant learn my specific needs?",
+      answer: "Absolutely. The AI continuously adapts to your lifestyle, health conditions, and emergency preferences. Over time, it becomes more accurate at detecting situations specific to your circumstances while maintaining your privacy."
+    },
+    {
+      question: "What happens if the AI detects a false emergency?",
+      answer: "The AI includes multiple verification layers to minimize false alarms. If it detects a potential emergency, it first attempts intelligent communication with you. Only after verification protocols fail does it escalate to emergency services."
+    },
+    {
+      question: "Does the AI work offline?",
+      answer: "Yes, our edge AI technology works even when internet connectivity is limited. Core emergency detection functions operate locally on your device, though full features work best with an internet connection."
+    },
+    {
+      question: "How accurate is the AI emergency detection?",
+      answer: "Our AI achieves over 95% accuracy in emergency detection through continuous learning and multi-sensor data fusion. The system improves accuracy over time as it learns your specific patterns and preferences."
+    }
+  ];
   return (
     <div className="min-h-screen bg-gradient-hero">
       <PageSEO pageType="ai-emergency-assistant" />
+      <StructuredData type="Service" data={{ serviceType: 'ai-assistant' }} />
       <Navigation />
+      <SEOBreadcrumbs />
       
       <main className="container mx-auto px-4 py-section pt-page-top">
         {/* Hero Section */}
@@ -269,6 +300,13 @@ const AIEmergencyAssistant = () => {
             </Card>
           </div>
         </section>
+
+        {/* FAQ Section */}
+        <SEOFAQSection 
+          title="AI Emergency Assistant FAQ"
+          faqs={aiFAQs}
+          className="bg-background/50"
+        />
 
         {/* CTA Section */}
         <section className="text-center">

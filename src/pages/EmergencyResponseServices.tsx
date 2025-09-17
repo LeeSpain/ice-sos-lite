@@ -17,12 +17,43 @@ import {
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import { PageSEO } from '@/components/PageSEO';
+import SEOBreadcrumbs from '@/components/SEOBreadcrumbs';
+import SEOFAQSection from '@/components/SEOFAQSection';
+import StructuredData from '@/components/StructuredData';
 
 const EmergencyResponseServices = () => {
+  const emergencyFAQs = [
+    {
+      question: "How fast is your emergency response time?",
+      answer: "Our professional monitoring team responds to emergencies within 30 seconds of detection. Emergency services are contacted immediately, and family members are notified within 1 minute."
+    },
+    {
+      question: "What types of emergencies do you monitor?",
+      answer: "We monitor all types of emergencies including medical crises (heart attacks, strokes, falls), personal safety threats, home security incidents, and location-based emergencies like being lost or stranded."
+    },
+    {
+      question: "Is the service available 24/7?",
+      answer: "Yes, our emergency monitoring service operates 24 hours a day, 7 days a week, 365 days a year. Our professional response team is always ready to assist you."
+    },
+    {
+      question: "How does the AI detection work?",
+      answer: "Our AI continuously analyzes patterns from your device sensors, location data, and behavior patterns to detect anomalies that may indicate an emergency situation. The AI learns your normal routines to better identify when something is wrong."
+    },
+    {
+      question: "What happens during a false alarm?",
+      answer: "If our system detects a potential emergency, we first attempt to contact you directly. If you don't respond or confirm you're safe within the grace period, we proceed with emergency protocols. False alarms are handled professionally and help us improve our detection accuracy."
+    },
+    {
+      question: "Can I customize my emergency contacts?",
+      answer: "Yes, you can set up multiple emergency contacts including family members, friends, and healthcare providers. You can specify different contacts for different types of emergencies and set the order in which they should be contacted."
+    }
+  ];
   return (
     <div className="min-h-screen bg-gradient-hero">
       <PageSEO pageType="emergency-response-services" />
+      <StructuredData type="Service" data={{ serviceType: 'emergency-response' }} />
       <Navigation />
+      <SEOBreadcrumbs />
       
       <main className="container mx-auto px-4 py-section pt-page-top">
         {/* Hero Section */}
@@ -211,6 +242,13 @@ const EmergencyResponseServices = () => {
             </Card>
           </div>
         </section>
+
+        {/* FAQ Section */}
+        <SEOFAQSection 
+          title="Emergency Response FAQ"
+          faqs={emergencyFAQs}
+          className="bg-background/50"
+        />
 
         {/* CTA Section */}
         <section className="text-center">
