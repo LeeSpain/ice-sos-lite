@@ -65,7 +65,7 @@ serve(async (req) => {
         }
       }
 
-      // Test xAI connection
+      // Test xAI connection with better error handling
       let xaiStatus = 'not_configured';
       if (xaiApiKey) {
         try {
@@ -83,7 +83,17 @@ serve(async (req) => {
             })
           });
           console.log('xAI test response status:', testResponse.status);
-          xaiStatus = testResponse.ok || testResponse.status === 400 ? 'connected' : 'error';
+          
+          if (testResponse.ok) {
+            xaiStatus = 'connected';
+          } else if (testResponse.status === 400) {
+            // 400 might indicate the test message was rejected, but API is accessible
+            const errorData = await testResponse.text();
+            console.log('xAI 400 response:', errorData);
+            xaiStatus = 'connected'; // API is responding, just didn't like our test
+          } else {
+            xaiStatus = 'error';
+          }
         } catch (error) {
           console.error('xAI connection test failed:', error);
           xaiStatus = 'error';
@@ -217,6 +227,9 @@ async function executeWorkflowStages(supabase: any, campaignId: string, command:
   for (const stageName of stages) {
     console.log(`Executing stage: ${stageName}`);
     
+    // Set stage to in_progress before starting
+    await updateStageStatus(supabase, campaignId, stageName, 'in_progress');
+    
     // Set stage timeout (5 minutes per stage)
     const stageTimeout = setTimeout(async () => {
       console.error(`Stage ${stageName} timed out after 5 minutes`);
@@ -297,6 +310,7 @@ async function updateStageStatus(supabase: any, campaignId: string, stageName: s
     updateData.completed_at = new Date().toISOString();
     if (outputData) {
       updateData.error_message = outputData.error || 'Unknown error';
+      updateData.output_data = outputData;
     }
   }
 

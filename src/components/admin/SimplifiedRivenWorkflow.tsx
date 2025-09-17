@@ -1,148 +1,213 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { WorkflowProvider, useWorkflow } from '@/contexts/RivenWorkflowContext';
+import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Progress } from '@/components/ui/progress';
+import { RealTimeWorkflowVisualizer } from './RealTimeWorkflowVisualizer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { MarketingTemplates } from './MarketingTemplates';
-import { AIProviderStatus } from './AIProviderStatus';
-import { ImageGenerationToggle } from './ImageGenerationToggle';
-import BlogPreviewModal from './BlogPreviewModal';
-import BlogEditModal from './BlogEditModal';
-import { 
-  Wand2, 
-  Brain, 
-  CheckCircle2,
-  XCircle,
-  Share2,
-  Clock,
-  Activity,
-  Zap,
-  FileText,
-  Mail,
-  Video,
-  Image,
-  Eye,
-  Edit3,
-  Trash2,
-  ArrowRight,
-  CheckCircle,
-  Loader2,
-  TrendingUp,
-  Sparkles,
-  Settings,
-  Layers,
-  Star,
-  Tag
-} from 'lucide-react';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 
-interface ContentItem {
+interface WorkflowStageData {
   id: string;
-  title?: string;
-  body_text?: string;
+  campaign_id: string;
+  stage_name: string;
+  stage_order: number;
   status: string;
-  platform: string;
-  content_type: string;
-  image_url?: string;
-  hashtags?: string[];
-  seo_score?: number;
-  seo_title?: string;
-  meta_description?: string;
-  keywords?: string[];
-  reading_time?: number;
-  slug?: string;
-  featured_image_alt?: string;
-  content_sections?: any;
+  started_at?: string;
+  completed_at?: string;
+  error_message?: string;
+  output_data?: any;
+  metadata?: any;
   created_at: string;
+  updated_at: string;
 }
 
-interface Template {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  icon: React.ComponentType<any>;
-  prompt: string;
-  imagePrompt?: string;
-  contentType: string;
-  estimatedTime: string;
-  tags: string[];
-}
-
-const SimplifiedRivenContent: React.FC = () => {
-  const { sendCommand, activeWorkflows, currentCampaignId, contentItems, loadContentItems } = useWorkflow();
-  const { toast } = useToast();
-  
-  const [currentStage, setCurrentStage] = useState<WorkflowStage>('command');
-  const [command, setCommand] = useState('');
-  const [contentType, setContentType] = useState('blog');
+export const SimplifiedRivenWorkflow: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<ContentItem[]>([]);
-  const [processingSteps, setProcessingSteps] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
-  
-  // Enhanced state for new features
-  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-  const [imageGenerationEnabled, setImageGenerationEnabled] = useState(false);
-  const [customImagePrompt, setCustomImagePrompt] = useState('');
-  const [aiProviderStatus, setAiProviderStatus] = useState({ openai: false, xai: false });
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [workflowStages, setWorkflowStages] = useState<WorkflowStageData[]>([]);
+  const [currentCampaignId, setCurrentCampaignId] = useState<string | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<ContentItem[]>([]);
+  const [currentStage, setCurrentStage] = useState<WorkflowStage>('command');
+  const [realTimeStages, setRealTimeStages] = useState<any[]>([]);
+  const [apiProviderStatus, setApiProviderStatus] = useState<{ openai: boolean; xai: boolean }>({ openai: false, xai: false });
+
+  // Form data state
+  const [formData, setFormData] = useState({
+    command: '',
+    title: '',
+    settings: {
+      tone: 'professional',
+      target_audience: 'families',
+      content_type: 'blog_post',
+      length: 'medium'
+    },
+    schedulingOptions: {
+      publish_immediately: true,
+      scheduled_time: null
+    },
+    publishingControls: {
+      auto_publish: false,
+      require_approval: true
+    }
+  });
 
   // Modal states
+  const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
 
-  // Auto-navigate through workflow stages and load real content
+  interface ContentItem {
+    id: string;
+    campaign_id: string;
+    platform: string;
+    content_type: string;
+    title?: string;
+    body_text?: string;
+    seo_title?: string;
+    meta_description?: string;
+    image_url?: string;
+    featured_image_alt?: string;
+    hashtags?: string[];
+    status: string;
+    created_at: string;
+    updated_at: string;
+    keywords?: string[];
+    seo_score?: number;
+    reading_time?: number;
+    content_sections?: any;
+    posted_at?: string;
+  }
+
+  const { toast } = useToast();
+
+  // Check API provider status on mount
   useEffect(() => {
-    if (currentCampaignId && currentStage === 'process') {
-      const workflow = activeWorkflows[currentCampaignId];
-      if (workflow) {
-        const completedSteps = workflow.filter(step => step.status === 'completed');
-        setCurrentStep(completedSteps.length);
+    const checkProviderStatus = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
+          body: { action: 'provider_status' }
+        });
         
-        // Auto-advance to approval when content is generated
-        if (completedSteps.length === workflow.length) {
-          setTimeout(async () => {
-            setCurrentStage('approval');
-            // Load real content from the database
-            await loadContentItems();
-            // Filter content for current campaign
-            const campaignContent = contentItems.filter(item => 
-              item.status === 'draft' || item.status === 'pending_review'
-            ).map(item => ({
-              ...item,
-              title: item.title || 'Untitled Content',
-              body_text: item.body_text || ''
-            }));
-            setGeneratedContent(campaignContent);
-          }, 1000);
+        if (data?.providers) {
+          setApiProviderStatus(data.providers);
+          
+          if (!data.providers.openai && !data.providers.xai) {
+            toast({
+              title: "API Provider Warning",
+              description: "No AI providers are configured. Content generation may use fallback templates.",
+              variant: "destructive"
+            });
+          }
         }
+      } catch (error) {
+        console.error('Failed to check provider status:', error);
       }
-    }
-  }, [currentCampaignId, activeWorkflows, currentStage, contentType, contentItems, loadContentItems]);
+    };
+    
+    checkProviderStatus();
+  }, []);
 
-  const handleTemplateSelect = (template: Template) => {
-    setSelectedTemplate(template);
-    setCommand(template.prompt);
-    setContentType(template.contentType);
-    setCustomImagePrompt(template.imagePrompt || '');
-    setImageGenerationEnabled(!!template.imagePrompt);
+  // Real-time subscription for workflow stages
+  useEffect(() => {
+    if (!currentCampaignId) return;
+
+    const channel = supabase
+      .channel(`workflow-stages-${currentCampaignId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'workflow_stages',
+          filter: `campaign_id=eq.${currentCampaignId}`
+        },
+        (payload) => {
+          console.log('Real-time workflow stage update:', payload);
+          
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            setRealTimeStages(prev => {
+              const updated = [...prev];
+              const index = updated.findIndex(stage => stage.stage_name === payload.new.stage_name);
+              
+              if (index >= 0) {
+                updated[index] = payload.new;
+              } else {
+                updated.push(payload.new);
+              }
+              
+              // Sort by stage order
+              return updated.sort((a, b) => a.stage_order - b.stage_order);
+            });
+            
+            // Update processing status based on stages
+            const allStagesCompleted = payload.new.status === 'completed' && 
+              realTimeStages.filter(s => s.status === 'completed').length >= 4;
+            
+            if (allStagesCompleted) {
+              setIsProcessing(false);
+              setCurrentStage('approval');
+              loadContentItems();
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [currentCampaignId, realTimeStages]);
+
+  // Load content items from database
+  const loadContentItems = async () => {
+    if (!currentCampaignId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('marketing_content')
+        .select('*')
+        .eq('campaign_id', currentCampaignId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      setGeneratedContent(data || []);
+      
+      // Auto-move to approval stage if content exists
+      if (data && data.length > 0 && currentStage === 'process') {
+        setCurrentStage('approval');
+        setIsProcessing(false);
+      }
+    } catch (error) {
+      console.error('Error loading content items:', error);
+      toast({
+        title: "Loading Error",
+        description: "Failed to load content items",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleCreateContent = async () => {
-    if (!command.trim()) {
+  // Load content items when campaign ID changes
+  useEffect(() => {
+    if (currentCampaignId) {
+      loadContentItems();
+    }
+  }, [currentCampaignId]);
+
+  const handleSubmit = async () => {
+    if (!formData.command.trim()) {
       toast({
         title: "Command Required",
-        description: "Please enter a content creation command or select a template",
+        description: "Please enter a marketing command to proceed.",
         variant: "destructive"
       });
       return;
@@ -150,100 +215,59 @@ const SimplifiedRivenContent: React.FC = () => {
 
     setIsProcessing(true);
     setCurrentStage('process');
-    
-    // Enhanced processing steps based on enabled features
-    const steps = [
-      'Analyzing command and requirements...',
-      'Generating content structure...',
-      imageGenerationEnabled ? 'Creating AI-generated image...' : null,
-      'Writing engaging copy...',
-      'Optimizing for SEO and readability...',
-      'Finalizing content package...'
-    ].filter(Boolean) as string[];
-    
-    setProcessingSteps(steps);
     setCurrentStep(0);
+    setRealTimeStages([]);
 
     try {
-      console.log('Starting content creation with config:', {
-        title: selectedTemplate ? selectedTemplate.title : `${contentType.charAt(0).toUpperCase() + contentType.slice(1)} Content`,
-        platform: contentType,
-        content_type: selectedTemplate?.category || 'marketing_content',
-        image_generation: imageGenerationEnabled,
-        image_prompt: customImagePrompt,
-        template_id: selectedTemplate?.id,
-        word_count: 800,
-        seo_optimization: true
+      const { data: campaignData, error: campaignError } = await supabase.functions.invoke('riven-marketing-enhanced', {
+        body: {
+          command: formData.command,
+          title: formData.title,
+          settings: formData.settings,
+          scheduling_options: formData.schedulingOptions,
+          publishing_controls: formData.publishingControls
+        }
       });
 
-      const campaignId = await sendCommand(command, {
-        title: selectedTemplate ? selectedTemplate.title : `${contentType.charAt(0).toUpperCase() + contentType.slice(1)} Content`,
-        platform: contentType,
-        content_type: selectedTemplate?.category || 'marketing_content',
-        image_generation: imageGenerationEnabled,
-        image_prompt: customImagePrompt,
-        template_id: selectedTemplate?.id,
-        word_count: 800,
-        seo_optimization: true
-      });
-
-      if (campaignId) {
-        console.log('Campaign created successfully:', campaignId);
-        // Start monitoring progress
-        const progressInterval = setInterval(() => {
-          const workflow = activeWorkflows[campaignId];
-          if (workflow) {
-            const completedSteps = workflow.filter(step => step.status === 'completed').length;
-            const inProgressStep = workflow.find(step => step.status === 'in_progress');
-            
-            if (inProgressStep) {
-              console.log('Current step:', inProgressStep.stage_name);
-              setCurrentStep(Math.min(completedSteps + 1, steps.length - 1));
-            } else if (completedSteps === workflow.length) {
-              clearInterval(progressInterval);
-              setCurrentStep(steps.length);
-              setTimeout(() => {
-                setCurrentStage('approval');
-                setGeneratedContent([
-                  {
-                    id: '1',
-                    title: 'Generated Content Ready',
-                    body_text: 'Your content has been generated and is ready for review...',
-                    status: 'pending',
-                    platform: contentType,
-                    content_type: selectedTemplate?.category || 'marketing_content',
-                    seo_score: 85,
-                    created_at: new Date().toISOString()
-                  }
-                ]);
-              }, 1000);
-            }
-          }
-        }, 1000);
-
-        // Cleanup after 5 minutes
-        setTimeout(() => {
-          clearInterval(progressInterval);
-        }, 300000);
+      if (campaignError) {
+        throw new Error(campaignError.message || 'Failed to start campaign');
       }
-    } catch (error) {
-      console.error('Content creation failed:', error);
+
+      if (campaignData?.campaignId) {
+        setCurrentCampaignId(campaignData.campaignId);
+        setRealTimeStages([]); // Reset stages for new campaign
+        // Start monitoring real-time stages immediately
+        monitorWorkflowProgress(campaignData.campaignId);
+      }
+
       toast({
-        title: "Creation Failed",
-        description: error?.message || "Failed to create content. Please try again.",
+        title: "Campaign Started",
+        description: "Your AI marketing campaign is now processing...",
+      });
+
+    } catch (error) {
+      console.error('Error starting campaign:', error);
+      setIsProcessing(false);
+      setCurrentStage('command');
+      
+      toast({
+        title: "Campaign Failed",
+        description: error instanceof Error ? error.message : 'Failed to start campaign',
         variant: "destructive"
       });
-      setCurrentStage('command');
-      setIsProcessing(false);
     }
   };
 
-  const handleApproveContent = async (contentId: string) => {
+  const monitorWorkflowProgress = async (campaignId: string) => {
+    // This function can be used for additional monitoring if needed
+    console.log('Monitoring workflow progress for campaign:', campaignId);
+  };
+
+  const handleApproval = async (contentId: string) => {
     try {
-      // Update database first
       const { error } = await supabase
         .from('marketing_content')
-        .update({ status: 'published' })
+        .update({ status: 'approved' })
         .eq('id', contentId);
 
       if (error) throw error;
@@ -251,23 +275,17 @@ const SimplifiedRivenContent: React.FC = () => {
       // Update local state
       setGeneratedContent(prev => 
         prev.map(item => 
-          item.id === contentId 
-            ? { ...item, status: 'published' }
-            : item
+          item.id === contentId ? { ...item, status: 'approved' } : item
         )
       );
-
+      
       // Reload content to sync
       await loadContentItems();
       
-      // Show success and transition
-      setTimeout(() => {
-        setCurrentStage('success');
-        toast({
-          title: "Content Published",
-          description: "Your content has been successfully published!",
-        });
-      }, 1000);
+      toast({
+        title: "Content Approved",
+        description: "Content has been approved and is ready for publishing.",
+      });
     } catch (error) {
       console.error('Error approving content:', error);
       toast({
@@ -278,9 +296,47 @@ const SimplifiedRivenContent: React.FC = () => {
     }
   };
 
-  const handleRejectContent = async (contentId: string) => {
+  const handlePublish = async (contentId: string) => {
     try {
-      // Update database first
+      const { error } = await supabase
+        .from('marketing_content')
+        .update({ 
+          status: 'published',
+          posted_at: new Date().toISOString()
+        })
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      // Update local state
+      setGeneratedContent(prev => 
+        prev.map(item => 
+          item.id === contentId ? { ...item, status: 'published', posted_at: new Date().toISOString() } : item
+        )
+      );
+      
+      // Move to success stage if any content is published
+      setCurrentStage('success');
+      
+      // Reload content to sync
+      await loadContentItems();
+      
+      toast({
+        title: "Content Published",
+        description: "Content has been successfully published!",
+      });
+    } catch (error) {
+      console.error('Error publishing content:', error);
+      toast({
+        title: "Publishing Failed",
+        description: "Failed to publish content. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleReject = async (contentId: string) => {
+    try {
       const { error } = await supabase
         .from('marketing_content')
         .update({ status: 'rejected' })
@@ -291,12 +347,10 @@ const SimplifiedRivenContent: React.FC = () => {
       // Update local state
       setGeneratedContent(prev => 
         prev.map(item => 
-          item.id === contentId 
-            ? { ...item, status: 'rejected' }
-            : item
+          item.id === contentId ? { ...item, status: 'rejected' } : item
         )
       );
-
+      
       // Reload content to sync
       await loadContentItems();
       
@@ -399,9 +453,11 @@ const SimplifiedRivenContent: React.FC = () => {
       // Trigger regeneration by calling the edge function again
       const { error: regenError } = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: {
-          command: command || 'Generate improved content',
-          campaign_id: currentCampaignId,
-          regenerate: true
+          command: formData.command,
+          title: formData.title,
+          settings: formData.settings,
+          scheduling_options: formData.schedulingOptions,
+          publishing_controls: formData.publishingControls
         }
       });
 
@@ -409,86 +465,64 @@ const SimplifiedRivenContent: React.FC = () => {
 
     } catch (error) {
       console.error('Error regenerating content:', error);
+      setIsProcessing(false);
+      setCurrentStage('approval');
+      
       toast({
         title: "Regeneration Failed",
         description: "Failed to regenerate content. Please try again.",
         variant: "destructive"
       });
-      setCurrentStage('approval');
-      setIsProcessing(false);
     }
   };
 
-  const handleDeleteContent = async (contentId: string) => {
-    try {
-      // Delete from database
-      const { error } = await supabase
-        .from('marketing_content')
-        .delete()
-        .eq('id', contentId);
-
-      if (error) throw error;
-
-      // Update local state
-      setGeneratedContent(prev => 
-        prev.filter(item => item.id !== contentId)
-      );
-
-      // Reload content to sync
-      await loadContentItems();
-      
-      toast({
-        title: "Content Deleted",
-        description: "Content has been permanently removed.",
-      });
-    } catch (error) {
-      console.error('Error deleting content:', error);
-      toast({
-        title: "Delete Failed",
-        description: "Failed to delete content. Please try again.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleStartOver = () => {
+  const resetWorkflow = () => {
     setCurrentStage('command');
-    setCommand('');
-    setGeneratedContent([]);
-    setProcessingSteps([]);
+    setIsProcessing(false);
     setCurrentStep(0);
-    setSelectedTemplate(null);
-    setImageGenerationEnabled(false);
-    setCustomImagePrompt('');
-    setShowPreviewModal(false);
-    setShowEditModal(false);
-    setSelectedContent(null);
-  };
-
-  const getContentTypeIcon = (type: string) => {
-    const icons = {
-      blog: FileText,
-      email: Mail,
-      social: Share2,
-      video: Video,
-      image: Image
-    };
-    return icons[type] || FileText;
+    setCurrentCampaignId(null);
+    setGeneratedContent([]);
+    setRealTimeStages([]);
+    setFormData({
+      command: '',
+      title: '',
+      settings: {
+        tone: 'professional',
+        target_audience: 'families',
+        content_type: 'blog_post',
+        length: 'medium'
+      },
+      schedulingOptions: {
+        publish_immediately: true,
+        scheduled_time: null
+      },
+      publishingControls: {
+        auto_publish: false,
+        require_approval: true
+      }
+    });
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 space-y-6">
-        {/* Progress Header */}
-        <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Brain className="h-7 w-7 text-primary" />
-                Riven AI Marketing System
-              </h1>
-              <Badge variant="outline" className="text-sm">
-                Professional Edition
+    <div className="container mx-auto p-6 max-w-6xl">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold mb-2">Riven AI Marketing System</h1>
+        <p className="text-muted-foreground text-lg">
+          Advanced AI-powered content creation and marketing automation
+        </p>
+      </div>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Wand2 className="h-5 w-5 text-primary" />
+              Marketing Workflow Control
+            </CardTitle>
+            
+            <div className="flex items-center gap-2">
+              <Badge variant={isProcessing ? "secondary" : "outline"}>
+                {isProcessing ? "Processing" : "Ready"}
               </Badge>
             </div>
             
@@ -497,8 +531,8 @@ const SimplifiedRivenContent: React.FC = () => {
               {[
                 { id: 'command', label: 'Command Centre', icon: Wand2 },
                 { id: 'process', label: 'AI Processing', icon: Activity },
-                { id: 'approval', label: 'Review & Approve', icon: CheckCircle2 },
-                { id: 'success', label: 'Published', icon: TrendingUp }
+                { id: 'approval', label: 'Review & Approve', icon: Eye },
+                { id: 'success', label: 'Published', icon: CheckCircle }
               ].map((stage, index) => {
                 const StageIcon = stage.icon;
                 const isActive = currentStage === stage.id;
@@ -532,444 +566,420 @@ const SimplifiedRivenContent: React.FC = () => {
                 );
               })}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardHeader>
 
-        {/* Stage Content */}
-        {currentStage === 'command' && (
-          <div className="space-y-6">
-            {/* AI Provider Status */}
-            <AIProviderStatus onStatusUpdate={setAiProviderStatus} />
-            
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
+        <CardContent>
+          {currentStage === 'command' && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
                   <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Wand2 className="h-5 w-5 text-primary" />
-                      Command Centre
-                    </CardTitle>
-                    <p className="text-muted-foreground">
-                      Create professional marketing content with AI-powered templates and image generation
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    {showAdvancedOptions ? 'Hide' : 'Show'} Options
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Content Type Selection */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  {[
-                    { id: 'blog', label: 'Blog Post', icon: FileText, desc: 'SEO-optimized articles' },
-                    { id: 'social', label: 'Social Media', icon: Share2, desc: 'Engaging social posts' },
-                    { id: 'email', label: 'Email Campaign', icon: Mail, desc: 'Newsletter content' },
-                    { id: 'video', label: 'Video Script', icon: Video, desc: 'Script for videos' }
-                  ].map((type) => {
-                    const TypeIcon = type.icon;
-                    return (
-                      <Button
-                        key={type.id}
-                        variant={contentType === type.id ? 'default' : 'outline'}
-                        onClick={() => {
-                          setContentType(type.id);
-                          setSelectedTemplate(null); // Clear template when manually changing type
-                        }}
-                        className="h-auto p-4 flex flex-col items-center gap-2"
-                      >
-                        <TypeIcon className="h-6 w-6" />
-                        <div className="text-center">
-                          <div className="font-medium">{type.label}</div>
-                          <div className="text-xs text-muted-foreground">{type.desc}</div>
-                        </div>
-                      </Button>
-                    );
-                  })}
-                </div>
-
-                {/* Marketing Templates */}
-                <MarketingTemplates 
-                  onSelectTemplate={handleTemplateSelect}
-                  selectedTemplate={selectedTemplate}
-                  contentType={contentType}
-                />
-
-                {/* Command Input */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium">Content Description</span>
-                    {selectedTemplate && (
-                      <Badge variant="outline" className="text-xs">
-                        Using template: {selectedTemplate.title}
-                      </Badge>
-                    )}
-                  </div>
-                  <Textarea
-                    placeholder={selectedTemplate 
-                      ? "Template loaded! You can customize the prompt above or add specific requirements..."
-                      : "e.g., Create a comprehensive family emergency preparedness guide that covers SOS device setup, emergency contacts, and safety protocols..."
-                    }
-                    value={command}
-                    onChange={(e) => setCommand(e.target.value)}
-                    className="min-h-[120px] text-base"
-                  />
-                </div>
-
-                {/* Advanced Options */}
-                {showAdvancedOptions && (
-                  <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Layers className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">Advanced Options</span>
-                    </div>
-                    
-                    {/* Image Generation Toggle */}
-                    <ImageGenerationToggle
-                      enabled={imageGenerationEnabled}
-                      onToggle={setImageGenerationEnabled}
-                      customPrompt={customImagePrompt}
-                      onPromptChange={setCustomImagePrompt}
-                      templateImagePrompt={selectedTemplate?.imagePrompt}
+                    <label className="block text-sm font-medium mb-2">
+                      Marketing Command *
+                    </label>
+                    <Textarea
+                      placeholder="Enter your marketing command (e.g., 'Create a comprehensive blog post about emergency preparedness for families')"
+                      value={formData.command}
+                      onChange={(e) => setFormData({...formData, command: e.target.value})}
+                      className="min-h-[120px]"
                     />
                   </div>
-                )}
-
-                {/* Action Section */}
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <div className="space-y-1">
-                    <p className="text-sm text-muted-foreground">
-                      {selectedTemplate ? 'Template ready' : 'Be specific about your target audience and content goals'}
-                    </p>
-                    {imageGenerationEnabled && (
-                      <p className="text-xs text-blue-600 flex items-center gap-1">
-                        <Image className="h-3 w-3" />
-                        AI image generation enabled
-                      </p>
-                    )}
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Campaign Title
+                    </label>
+                    <Input
+                      placeholder="Optional: Custom title for this campaign"
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                    />
                   </div>
-                  <Button 
-                    onClick={handleCreateContent}
-                    disabled={!command.trim() || isProcessing}
-                    className="px-8"
-                    size="lg"
-                  >
-                    <Zap className="h-4 w-4 mr-2" />
-                    Create with Riven
-                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
 
-        {currentStage === 'process' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="h-5 w-5 text-primary animate-pulse" />
-                AI Processing
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Riven is creating your content using advanced AI technology
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                {processingSteps.map((step, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    {index < currentStep ? (
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    ) : index === currentStep ? (
-                      <Loader2 className="h-5 w-5 text-primary animate-spin" />
-                    ) : (
-                      <Clock className="h-5 w-5 text-muted-foreground" />
-                    )}
-                    <span className={`${
-                      index <= currentStep ? 'text-foreground' : 'text-muted-foreground'
-                    }`}>
-                      {step}
-                    </span>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Content Tone
+                    </label>
+                    <Select 
+                      value={formData.settings.tone} 
+                      onValueChange={(value) => setFormData({
+                        ...formData, 
+                        settings: {...formData.settings, tone: value}
+                      })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="professional">Professional</SelectItem>
+                        <SelectItem value="friendly">Friendly</SelectItem>
+                        <SelectItem value="informative">Informative</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                        <SelectItem value="casual">Casual</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                ))}
-              </div>
-              
-              <Progress value={(currentStep / processingSteps.length) * 100} className="w-full" />
-              
-              <div className="text-center text-sm text-muted-foreground">
-                Estimated time remaining: {Math.max(0, (processingSteps.length - currentStep) * 2)} seconds
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
-        {currentStage === 'approval' && (
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  Review & Approve
-                </CardTitle>
-                <p className="text-muted-foreground">
-                  Review your AI-generated content with full preview and editing capabilities
-                </p>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Target Audience
+                    </label>
+                    <Select 
+                      value={formData.settings.target_audience} 
+                      onValueChange={(value) => setFormData({
+                        ...formData, 
+                        settings: {...formData.settings, target_audience: value}
+                      })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="families">Families</SelectItem>
+                        <SelectItem value="seniors">Senior Citizens</SelectItem>
+                        <SelectItem value="professionals">Working Professionals</SelectItem>
+                        <SelectItem value="travelers">Frequent Travelers</SelectItem>
+                        <SelectItem value="general">General Public</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Content Type
+                    </label>
+                    <Select 
+                      value={formData.settings.content_type} 
+                      onValueChange={(value) => setFormData({
+                        ...formData, 
+                        settings: {...formData.settings, content_type: value}
+                      })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="blog_post">Blog Post</SelectItem>
+                        <SelectItem value="social_post">Social Media Post</SelectItem>
+                        <SelectItem value="email_campaign">Email Campaign</SelectItem>
+                        <SelectItem value="video_script">Video Script</SelectItem>
+                        <SelectItem value="press_release">Press Release</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
-              {generatedContent.length > 0 && (
+
+              <Separator />
+
+              <div className="flex justify-between items-center">
+                <div className="text-sm text-muted-foreground">
+                  Ready to create AI-powered marketing content
+                </div>
                 <Button 
-                  variant="outline" 
-                  onClick={async () => {
-                    try {
-                      // Delete all content
-                      for (const content of generatedContent) {
-                        await supabase
-                          .from('marketing_content')
-                          .delete()
-                          .eq('id', content.id);
-                      }
-                      setGeneratedContent([]);
-                      await loadContentItems();
-                      toast({
-                        title: "All Content Cleared",
-                        description: "All generated content has been removed.",
-                      });
-                    } catch (error) {
-                      console.error('Error clearing content:', error);
-                      toast({
-                        title: "Clear Failed",
-                        description: "Failed to clear all content.",
-                        variant: "destructive"
-                      });
-                    }
-                  }}
-                  className="text-red-600 border-red-200 hover:bg-red-50"
+                  onClick={handleSubmit} 
+                  disabled={!formData.command.trim() || isProcessing}
+                  className="flex items-center gap-2"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Clear All
+                  {isProcessing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-4 w-4" />
+                      Launch AI Campaign
+                    </>
+                  )}
                 </Button>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {generatedContent.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileText className="h-8 w-8 text-muted-foreground" />
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2">No Content Generated Yet</h3>
-                  <p className="text-muted-foreground">
-                    Content is still being processed or hasn't been generated yet.
-                  </p>
-                </div>
-              ) : (
-                generatedContent.map((content) => (
-                  <Card key={content.id} className="border-l-4 border-l-primary hover:shadow-md transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="space-y-3 flex-1">
-                          <div>
-                            <h3 className="text-lg font-semibold mb-1">{content.title || 'Untitled Content'}</h3>
-                            {content.meta_description && (
-                              <p className="text-sm text-muted-foreground line-clamp-2">
-                                {content.meta_description}
-                              </p>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="outline">{content.platform}</Badge>
-                            <Badge variant="outline">{content.content_type}</Badge>
-                            {content.seo_score && (
-                              <Badge 
-                                variant="secondary" 
-                                className={content.seo_score >= 80 ? 'bg-green-100 text-green-700 border-green-200' : content.seo_score >= 60 ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 'bg-red-100 text-red-700 border-red-200'}
-                              >
-                                <Star className="h-3 w-3 mr-1" />
-                                SEO: {content.seo_score}%
-                              </Badge>
-                            )}
-                            {content.reading_time && (
-                              <Badge variant="outline">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {content.reading_time} min read
-                              </Badge>
-                            )}
-                            {content.keywords && content.keywords.length > 0 && (
-                              <Badge variant="outline">
-                                <Tag className="h-3 w-3 mr-1" />
-                                {content.keywords.length} keywords
-                              </Badge>
-                            )}
-                          </div>
+              </div>
+            </div>
+          )}
 
-                          {content.image_url && (
-                            <div className="w-full h-24 bg-muted rounded overflow-hidden">
-                              <img 
-                                src={content.image_url} 
-                                alt={content.featured_image_alt || content.title || 'Content image'}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
+          {currentStage === 'process' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <Activity className="h-6 w-6 text-primary animate-pulse" />
+                  <h3 className="text-xl font-semibold">AI Processing Your Content</h3>
+                </div>
+                <p className="text-muted-foreground mb-6">
+                  Our AI is analyzing your command and generating high-quality content...
+                </p>
+                
+                {/* API Provider Status */}
+                <div className="flex justify-center gap-4 mb-6">
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
+                    apiProviderStatus.openai ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full ${apiProviderStatus.openai ? 'bg-green-500' : 'bg-red-500'}`} />
+                    OpenAI {apiProviderStatus.openai ? 'Connected' : 'Unavailable'}
+                  </div>
+                  <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm ${
+                    apiProviderStatus.xai ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  }`}>
+                    <div className={`w-2 h-2 rounded-full ${apiProviderStatus.xai ? 'bg-green-500' : 'bg-red-500'}`} />
+                    xAI {apiProviderStatus.xai ? 'Connected' : 'Unavailable'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Enhanced Real-Time Progress */}
+              <div className="space-y-4">
+                {realTimeStages.length > 0 ? (
+                  realTimeStages.map((stage, index) => (
+                    <div key={stage.stage_name} className="bg-card rounded-lg p-4 border">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          {stage.status === 'completed' ? (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          ) : stage.status === 'failed' ? (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          ) : stage.status === 'in_progress' ? (
+                            <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
+                          ) : (
+                            <Clock className="h-5 w-5 text-muted-foreground" />
                           )}
+                          <span className="font-medium capitalize">
+                            {stage.stage_name.replace('_', ' ')}
+                          </span>
                         </div>
-                        
-                        <div className="flex items-center gap-2 ml-4">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handlePreviewContent(content)}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            Preview
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleEditContent(content)}
-                          >
-                            <Edit3 className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
-                        </div>
+                        <Badge variant={
+                          stage.status === 'completed' ? 'default' :
+                          stage.status === 'failed' ? 'destructive' :
+                          stage.status === 'in_progress' ? 'secondary' : 'outline'
+                        }>
+                          {stage.status}
+                        </Badge>
                       </div>
                       
-                      {/* Content Preview */}
-                      <div className="bg-muted/30 p-4 rounded-lg mb-4">
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Content Preview</h4>
-                        <div className="text-sm text-foreground line-clamp-3">
-                          {content.body_text ? (
-                            content.body_text.replace(/<[^>]*>/g, '').substring(0, 300) + (content.body_text.length > 300 ? '...' : '')
-                          ) : (
-                            'No content available'
+                      {stage.started_at && (
+                        <div className="text-xs text-muted-foreground">
+                          Started: {new Date(stage.started_at).toLocaleTimeString()}
+                          {stage.completed_at && (
+                            <span className="ml-4">
+                              Completed: {new Date(stage.completed_at).toLocaleTimeString()}
+                            </span>
                           )}
-                        </div>
-                      </div>
-
-                      {/* Content Sections Preview */}
-                      {content.content_sections && Array.isArray(content.content_sections) && content.content_sections.length > 0 && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-medium text-muted-foreground mb-2">Content Structure</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {content.content_sections.map((section: any, index: number) => (
-                              <Badge key={index} variant="outline" className="text-xs">
-                                {section.heading || `Section ${index + 1}`}
-                              </Badge>
-                            ))}
-                          </div>
                         </div>
                       )}
                       
+                      {stage.error_message && (
+                        <div className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded">
+                          Error: {stage.error_message}
+                        </div>
+                      )}
+                      
+                      {stage.output_data && Object.keys(stage.output_data).length > 0 && (
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          <details className="cursor-pointer">
+                            <summary>Stage Output</summary>
+                            <pre className="mt-1 p-2 bg-muted rounded text-xs overflow-auto max-h-32">
+                              {JSON.stringify(stage.output_data, null, 2)}
+                            </pre>
+                          </details>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <RealTimeWorkflowVisualizer 
+                    campaignId={currentCampaignId || ''}
+                  />
+                )}
+              </div>
+              
+              {isProcessing && (
+                <div className="text-center">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-lg">
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    <span className="text-sm font-medium">
+                      Processing {realTimeStages.find(s => s.status === 'in_progress')?.stage_name?.replace('_', ' ') || 'workflow'}...
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentStage === 'approval' && (
+            <div className="space-y-6">
+              <div className="text-center mb-6">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <Eye className="h-6 w-6 text-primary" />
+                  <h3 className="text-xl font-semibold">Review & Approve Content</h3>
+                </div>
+                <p className="text-muted-foreground">
+                  Review the AI-generated content and approve it for publishing
+                </p>
+              </div>
+
+              <div className="grid gap-6">
+                {generatedContent.length > 0 ? (
+                  generatedContent.map((content) => (
+                    <Card key={content.id} className="border">
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">{content.title || 'Untitled Content'}</CardTitle>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={content.status === 'approved' ? 'default' : 'secondary'}>
+                              {content.status}
+                            </Badge>
+                            <Badge variant="outline">
+                              {content.content_type}
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          {content.meta_description && (
+                            <p className="text-sm text-muted-foreground">
+                              {content.meta_description}
+                            </p>
+                          )}
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            {content.reading_time && (
+                              <div>
+                                <span className="font-medium">Reading Time:</span>
+                                <div>{content.reading_time} min</div>
+                              </div>
+                            )}
+                            {content.seo_score && (
+                              <div>
+                                <span className="font-medium">SEO Score:</span>
+                                <div>{content.seo_score}/100</div>
+                              </div>
+                            )}
+                            <div>
+                              <span className="font-medium">Platform:</span>
+                              <div className="capitalize">{content.platform}</div>
+                            </div>
+                            <div>
+                              <span className="font-medium">Created:</span>
+                              <div>{new Date(content.created_at).toLocaleDateString()}</div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePreviewContent(content)}
+                            >
+                              <Eye className="h-4 w-4 mr-2" />
+                              Preview
+                            </Button>
+                            
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditContent(content)}
+                            >
+                              Edit
+                            </Button>
+
+                            {content.status !== 'approved' && (
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handleApproval(content.id)}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Approve
+                              </Button>
+                            )}
+
+                            {content.status === 'approved' && (
+                              <Button
+                                variant="default"
+                                size="sm"
+                                onClick={() => handlePublish(content.id)}
+                              >
+                                Publish
+                              </Button>
+                            )}
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleReject(content.id)}
+                            >
+                              Reject
+                            </Button>
+
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleRegenerateContent(content.id)}
+                            >
+                              Regenerate
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-muted-foreground mb-4">
+                      No content generated yet. Try running the AI processing again.
+                    </div>
+                    <Button variant="outline" onClick={() => setCurrentStage('command')}>
+                      Return to Command Centre
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {currentStage === 'success' && (
+            <div className="text-center space-y-6">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <CheckCircle className="h-8 w-8 text-green-500" />
+                <h3 className="text-2xl font-semibold text-green-700">Campaign Published Successfully!</h3>
+              </div>
+              
+              <p className="text-muted-foreground text-lg mb-6">
+                Your AI-generated content has been published and is now live.
+              </p>
+
+              <div className="grid gap-4">
+                {generatedContent.filter(c => c.status === 'published').map((content) => (
+                  <Card key={content.id} className="border-green-200">
+                    <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
-                        <div className="text-sm text-muted-foreground">
-                          Ready for review • Generated {new Date(content.created_at).toLocaleString()}
+                        <div>
+                          <h4 className="font-semibold">{content.title}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Published on {content.platform} • {new Date(content.posted_at || content.updated_at).toLocaleString()}
+                          </p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Button 
-                            variant="outline" 
-                            onClick={() => handleRegenerateContent(content.id)}
-                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                          >
-                            <Wand2 className="h-4 w-4 mr-2" />
-                            Regenerate
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            onClick={() => handleDeleteContent(content.id)}
-                            className="text-red-600 border-red-200 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            onClick={() => handleRejectContent(content.id)}
-                          >
-                            <XCircle className="h-4 w-4 mr-2" />
-                            Reject
-                          </Button>
-                          <Button 
-                            onClick={() => handleApproveContent(content.id)}
-                            className="bg-green-600 hover:bg-green-700 text-white"
-                          >
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Approve & Publish
-                          </Button>
-                        </div>
+                        <Badge className="bg-green-100 text-green-700">Published</Badge>
                       </div>
                     </CardContent>
                   </Card>
-                ))
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {currentStage === 'success' && (
-          <Card className="border-green-200 bg-green-50">
-            <CardContent className="text-center py-12">
-              <div className="h-16 w-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+                ))}
               </div>
-              <h2 className="text-2xl font-bold text-green-900 mb-3">
-                Content Published Successfully!
-              </h2>
-              <p className="text-green-700 mb-6 max-w-md mx-auto">
-                Your content has been automatically published and is now live. 
-                Analytics and engagement data will be available shortly.
-              </p>
-              <div className="flex items-center justify-center gap-4">
-                <Button variant="outline" onClick={handleStartOver}>
-                  <Wand2 className="h-4 w-4 mr-2" />
-                  Create More Content
+
+              <div className="flex justify-center gap-4 pt-6">
+                <Button onClick={resetWorkflow}>
+                  Create New Campaign
                 </Button>
-                <Button>
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  View Analytics
+                <Button variant="outline" onClick={() => setCurrentStage('approval')}>
+                  Back to Review
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {/* Enhanced Modals */}
-      {selectedContent && (
-        <>
-          <BlogPreviewModal
-            content={selectedContent}
-            isOpen={showPreviewModal}
-            onClose={() => {
-              setShowPreviewModal(false);
-              setSelectedContent(null);
-            }}
-            onEdit={(contentId) => {
-              setShowPreviewModal(false);
-              setShowEditModal(true);
-            }}
-            onPublish={(contentId) => handleApproveContent(contentId)}
-          />
-          
-          <BlogEditModal
-            content={selectedContent}
-            isOpen={showEditModal}
-            onClose={handleCancelEdit}
-            onSave={handleSaveEdit}
-          />
-        </>
-      )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
-  );
-};
-
-export const SimplifiedRivenWorkflow: React.FC = () => {
-  return (
-    <WorkflowProvider>
-      <SimplifiedRivenContent />
-    </WorkflowProvider>
   );
 };
