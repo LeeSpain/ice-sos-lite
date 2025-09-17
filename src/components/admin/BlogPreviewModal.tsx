@@ -17,8 +17,8 @@ interface BlogPreviewModalProps {
     id: string;
     platform: string;
     content_type: string;
-    title: string;
-    body_text: string;
+    title?: string;
+    body_text?: string;
     status: string;
     created_at: string;
     seo_title?: string;
@@ -28,6 +28,7 @@ interface BlogPreviewModalProps {
     seo_score?: number;
     slug?: string;
     image_url?: string;
+    featured_image_alt?: string;
   };
   isOpen: boolean;
   onClose: () => void;
