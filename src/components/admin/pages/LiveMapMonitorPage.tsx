@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useUnifiedMap } from '@/hooks/useUnifiedMap';
+import { useCanvasMap } from '@/hooks/useCanvasMap';
 import { Map, Users, MapPin, Activity, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,7 +28,7 @@ export default function LiveMapMonitorPage() {
   const [locationPings, setLocationPings] = useState<any[]>([]);
   const [placeEvents, setPlaceEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { MapView, currentBackend, hasMapboxToken, switchToCanvas, switchToMapbox } = useUnifiedMap();
+  const { MapView } = useCanvasMap();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -302,23 +302,13 @@ export default function LiveMapMonitorPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {import.meta.env.DEV && (
-            <div className="flex justify-end mb-2 gap-2">
-              <Badge variant="outline">Map: {currentBackend}</Badge>
-              {hasMapboxToken ? (
-                <Button size="sm" variant="outline" onClick={() => { switchToMapbox(); }}>Use Mapbox</Button>
-              ) : (
-                <Badge variant="secondary">No Mapbox token</Badge>
-              )}
-              <Button size="sm" variant="outline" onClick={() => { switchToCanvas(); }}>Use Canvas</Button>
-            </div>
-          )}
           <div className="h-96 rounded-lg overflow-hidden border">
             <MapView
               markers={markers}
               className="w-full h-full"
               center={mapCenter}
-              preferCanvas={true}
+              showControls={true}
+              interactive={true}
             />
           </div>
         </CardContent>

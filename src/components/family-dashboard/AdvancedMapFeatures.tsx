@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useUnifiedMap } from '@/hooks/useUnifiedMap';
+import { useCanvasMap } from '@/hooks/useCanvasMap';
 import { useEnhancedConnectionDisplay } from '@/hooks/useEnhancedConnectionDisplay';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -310,7 +310,7 @@ const HeatMapLayer: React.FC<{
 
 export const AdvancedMapFeatures: React.FC = () => {
   const { data: familyRole } = useFamilyRole();
-  const { MapView } = useUnifiedMap();
+  const { MapView } = useCanvasMap();
   const {
     familyMembers,
     connectionMetrics,

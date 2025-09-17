@@ -1,6 +1,4 @@
-import { useMemo, useCallback, useState, useEffect } from 'react';
-import { getMapboxToken, hasCachedMapboxToken, validateMapboxAccess } from '@/hooks/mapboxToken';
-import { useMapProvider } from './useMapProvider';
+import { useMemo } from 'react';
 import { useCanvasMap } from './useCanvasMap';
 
 interface MapMarker {
@@ -18,143 +16,37 @@ interface UnifiedMapViewProps {
   onMapReady?: () => void;
   showControls?: boolean;
   interactive?: boolean;
-  preferCanvas?: boolean;
+  preferCanvas?: boolean; // Kept for compatibility but always uses Canvas
 }
 
 export const useUnifiedMap = () => {
-  const mapboxProvider = useMapProvider();
-  const canvasProvider = useCanvasMap();
-  const [mapbackend, setMapBackend] = useState<'canvas' | 'mapbox'>('canvas'); // Default to canvas for stability
-  const [mapboxReady, setMapboxReady] = useState(false);
-  const [decided] = useState(true);
+  const { MapView: CanvasMapView, isLoading, error } = useCanvasMap();
 
-  // Check for Mapbox token only when explicitly requested
-  const checkMapboxAvailability = useCallback(async () => {
-    try {
-      // If we already have a token, validate actual access (catches URL whitelist issues)
-      if (hasCachedMapboxToken()) {
-        const valid = await validateMapboxAccess();
-        setMapboxReady(valid);
-        return valid;
-      }
-      // Otherwise fetch token, then validate
-      const token = await getMapboxToken();
-      if (!token) {
-        setMapboxReady(false);
-        return false;
-      }
-      const valid = await validateMapboxAccess(token);
-      setMapboxReady(valid);
-      return valid;
-    } catch (error) {
-      console.log('Mapbox token not available, using Canvas');
-      setMapboxReady(false);
-      return false;
-    }
-  }, []);
-
-
-  // Try enabling Mapbox in the background; start with Canvas immediately
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      const available = await checkMapboxAvailability();
-      if (!mounted) return;
-      if (available) {
-        setMapBackend('mapbox');
-      }
-    })();
-    return () => { mounted = false; };
-  }, [checkMapboxAvailability]);
-
-  // Unified MapView component - choose backend deterministically
-  const MapView = useCallback(({ 
-    className, 
-    markers = [], 
-    center, 
-    zoom = 13, 
-    onMapReady, 
-    showControls = true, 
-    interactive = true,
-    preferCanvas = false
-  }: UnifiedMapViewProps) => {
-    const CanvasComponent = canvasProvider.MapView;
-    const MapboxComponent = mapboxProvider.MapView;
-
-    // While deciding, show a stable placeholder to avoid flicker
-    if (!decided) {
+  // Memoize the MapView component to prevent unnecessary re-renders
+  const MapView = useMemo(() => {
+    return ({ className, markers = [], center, zoom = 13, onMapReady, showControls = true, interactive = true }: UnifiedMapViewProps) => {
       return (
-        <div className={className || ''}>
-          <div className="h-full w-full min-h-[300px] bg-muted/20 animate-pulse" />
-        </div>
+        <CanvasMapView
+          className={className}
+          markers={markers}
+          center={center}
+          zoom={zoom}
+          onMapReady={onMapReady}
+          showControls={showControls}
+          interactive={interactive}
+        />
       );
-    }
+    };
+  }, [CanvasMapView]);
 
-    // Lock backend: preferCanvas overrides, otherwise use decided backend
-    const backend = preferCanvas ? 'canvas' : mapbackend;
-
-    if (backend === 'mapbox') {
-      try {
-        return (
-          <MapboxComponent
-            className={className}
-            markers={markers}
-            center={center}
-            zoom={zoom}
-          />
-        );
-      } catch (e) {
-        console.error('Mapbox render failed, falling back to Canvas:', e);
-        return (
-          <CanvasComponent
-            className={className}
-            markers={markers}
-            center={center}
-            zoom={zoom}
-            onMapReady={onMapReady}
-            showControls={showControls}
-            interactive={interactive}
-          />
-        );
-      }
-    }
-
-    return (
-      <CanvasComponent
-        className={className}
-        markers={markers}
-        center={center}
-        zoom={zoom}
-        onMapReady={onMapReady}
-        showControls={showControls}
-        interactive={interactive}
-      />
-    );
-  }, [canvasProvider, mapboxProvider, mapbackend, decided]);
-
-  const switchToCanvas = useCallback(() => {
-    setMapBackend('canvas');
-    return canvasProvider.MapView;
-  }, [canvasProvider]);
-
-  const switchToMapbox = useCallback(() => {
-    if (mapboxReady) {
-      setMapBackend('mapbox');
-      return mapboxProvider.MapView;
-    }
-    return null;
-  }, [mapboxProvider, mapboxReady]);
-
+  // Return a simplified interface that always uses Canvas
   return {
     MapView,
-    isLoading: !decided,
-    error: null,
-    hasMapboxToken: mapboxReady,
-    currentBackend: mapbackend,
-    switchToCanvas,
-    switchToMapbox,
-    checkMapboxAvailability,
-    mapboxProvider,
-    canvasProvider
+    isLoading,
+    error,
+    hasMapboxToken: false, // Always false since we removed Mapbox
+    currentBackend: 'canvas' as const,
+    switchToCanvas: () => CanvasMapView, // No-op, already using Canvas
+    switchToMapbox: () => CanvasMapView, // No-op, fallback to Canvas
   };
 };

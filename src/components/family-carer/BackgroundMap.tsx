@@ -1,80 +1,41 @@
-import React, { useEffect, useRef } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-import { supabase } from '@/integrations/supabase/client';
+import React from 'react';
 
 interface BackgroundMapProps {
   className?: string;
 }
 
 export const BackgroundMap: React.FC<BackgroundMapProps> = ({ className }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-
-  useEffect(() => {
-    const initializeMap = async () => {
-      if (!mapContainer.current) return;
-
-      try {
-        // Fetch Mapbox token
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
-        if (error) throw error;
-        
-        if (data?.token) {
-          mapboxgl.accessToken = data.token;
-        } else {
-          // Fallback for development
-          mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZSIsImEiOiJjbTJ1NGRvN3UwM3d6MnNxcGhoOWJhd2ZwIn0.XSoLIv1rDp_bRgVS3KJ5-g';
-        }
-
-        // Initialize map
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/light-v11',
-          center: [-0.09, 51.505], // London coordinates
-          zoom: 11,
-          interactive: false, // Make it non-interactive
-          attributionControl: false,
-          logoPosition: 'bottom-left'
-        });
-
-        console.log('Background map initialized');
-
-        // Disable all interactions
-        map.current.dragPan.disable();
-        map.current.scrollZoom.disable();
-        map.current.boxZoom.disable();
-        map.current.dragRotate.disable();
-        map.current.keyboard.disable();
-        map.current.doubleClickZoom.disable();
-        map.current.touchZoomRotate.disable();
-
-        // Add load event listener
-        map.current.on('load', () => {
-          console.log('Background map loaded successfully');
-        });
-
-      } catch (error) {
-        console.error('Failed to initialize background map:', error);
-      }
-    };
-
-    initializeMap();
-
-    return () => {
-      map.current?.remove();
-    };
-  }, []);
-
   return (
     <div 
-      className={`absolute inset-0 opacity-80 pointer-events-none ${className || ''}`}
+      className={`absolute inset-0 opacity-60 pointer-events-none ${className || ''}`}
       style={{ filter: 'blur(0.5px)' }}
     >
-      <div 
-        ref={mapContainer} 
-        className="w-full h-full"
-      />
+      {/* Simple CSS-based map background */}
+      <div className="w-full h-full bg-gradient-to-br from-blue-100 via-green-100 to-emerald-100">
+        {/* Map-like grid pattern */}
+        <div className="absolute inset-0" style={{
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px'
+        }} />
+        
+        {/* Simulated streets */}
+        <div className="absolute top-1/3 left-0 right-0 h-0.5 bg-white opacity-40"></div>
+        <div className="absolute top-2/3 left-0 right-0 h-0.5 bg-white opacity-30"></div>
+        <div className="absolute top-0 bottom-0 left-1/3 w-0.5 bg-white opacity-40"></div>
+        <div className="absolute top-0 bottom-0 left-2/3 w-0.5 bg-white opacity-30"></div>
+        
+        {/* Green spaces */}
+        <div className="absolute top-8 right-8 w-16 h-12 bg-green-200 rounded-lg opacity-60"></div>
+        <div className="absolute bottom-12 left-12 w-12 h-12 bg-green-200 rounded-full opacity-60"></div>
+        
+        {/* Buildings */}
+        <div className="absolute top-16 left-16 w-6 h-8 bg-gray-300 opacity-50"></div>
+        <div className="absolute top-20 right-20 w-8 h-6 bg-gray-300 opacity-50"></div>
+      </div>
+      
       {/* Overlay gradient to blend with background */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-white/20" />
     </div>

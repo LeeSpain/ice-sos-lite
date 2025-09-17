@@ -3,7 +3,7 @@ import { Users, Heart, MapPin, Phone, Shield, Clock, Play } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { Link } from "react-router-dom";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
-import { useMapProvider } from "@/hooks/useMapProvider";
+import { useCanvasMap } from "@/hooks/useCanvasMap";
 import FamilyMarker from "@/components/map/FamilyMarker";
 import emmaAvatar from "/emma-avatar.png";
 import grandmaAvatar from "/grandma-avatar.png";
@@ -12,7 +12,7 @@ import momAvatar from "/mom-avatar.png";
 
 const Features = () => {
   const { t } = useTranslation();
-  const { MapView } = useMapProvider();
+  const { MapView } = useCanvasMap();
 
   // Family member data for the map
   const familyMembers = [

@@ -2,13 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { CircleSwitcher } from "@/components/map/CircleSwitcher";
 import { MemberPin } from "@/components/map/MemberPin";
 import { MemberSheet } from "@/components/map/MemberSheet";
-import { useUnifiedMap } from "@/hooks/useUnifiedMap";
+import { useCanvasMap } from "@/hooks/useCanvasMap";
+import { useLocationServices } from "@/hooks/useLocationServices";
 import { useEnhancedCircleRealtime } from "@/hooks/useEnhancedCircleRealtime";
 import { useBackgroundLocation } from "@/hooks/useBackgroundLocation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, MapPin, Pause, Play, Settings } from "lucide-react";
+import { AlertTriangle, MapPin, Pause, Play, Settings, Target } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -27,8 +28,11 @@ export default function MapScreen() {
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [sosHoldTimer, setSosHoldTimer] = useState<number | null>(null);
   const [sosProgress, setSosProgress] = useState(0);
+  const [center, setCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [zoom, setZoom] = useState(15);
   
-  const { MapView, currentBackend, hasMapboxToken, switchToCanvas, switchToMapbox } = useUnifiedMap();
+  const { MapView } = useCanvasMap();
+  const { getCurrentLocationData, requestLocationPermission, permissionState, isGettingLocation } = useLocationServices();
   const { presences, circles, recentEvents, loadInitial, refresh, metrics, connectionHealth } = useEnhancedCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(locationEnabled);
   const { toast } = useToast();
@@ -44,11 +48,37 @@ export default function MapScreen() {
     }
   }, [circles, activeCircleId]);
 
-  const mapCenter = useMemo(() => {
-    if (presences.length === 0) return { lat: 37.7749, lng: -122.4194 };
-    const sums = presences.reduce((acc, p) => ({ lat: acc.lat + p.lat, lng: acc.lng + p.lng }), { lat: 0, lng: 0 });
-    return { lat: sums.lat / presences.length, lng: sums.lng / presences.length };
-  }, [presences]);
+  // Get user's current location on mount
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const loc = await getCurrentLocationData();
+        if (mounted && loc) {
+          setCenter({ lat: loc.latitude, lng: loc.longitude });
+          setZoom(16);
+        }
+      } catch (e) {
+        console.warn('Unable to fetch current location initially:', e);
+        // Fallback to presences center if available
+        if (presences.length > 0) {
+          const sums = presences.reduce((acc, p) => ({ lat: acc.lat + p.lat, lng: acc.lng + p.lng }), { lat: 0, lng: 0 });
+          setCenter({ lat: sums.lat / presences.length, lng: sums.lng / presences.length });
+        }
+      }
+    })();
+    return () => { mounted = false; };
+  }, [getCurrentLocationData, presences]);
+
+  const handleUseMyLocation = async () => {
+    const ok = await requestLocationPermission();
+    if (!ok) return;
+    const loc = await getCurrentLocationData();
+    if (loc) {
+      setCenter({ lat: loc.latitude, lng: loc.longitude });
+      setZoom(16);
+    }
+  };
 
   const handleLocationToggle = async () => {
     if (!locationEnabled && permission !== 'granted') {
@@ -156,39 +186,50 @@ export default function MapScreen() {
               <Button size="sm" variant="outline" onClick={refresh}>
                 <Settings className="w-3 h-3" />
               </Button>
+              
+              <Button size="sm" variant="outline" onClick={handleUseMyLocation}>
+                <Target className="w-3 h-3" />
+              </Button>
             </div>
           </div>
         </Card>
       </div>
 
       {/* Map */}
-      {import.meta.env.DEV && (
-        <div className="absolute top-4 right-4 z-30 flex items-center gap-2">
-          <Badge variant="outline">Map: {currentBackend}</Badge>
-          {hasMapboxToken ? (
-            <Button size="sm" variant="outline" onClick={() => { switchToMapbox(); }}>Use Mapbox</Button>
-          ) : (
-            <Badge variant="secondary">No Mapbox token</Badge>
-          )}
-          <Button size="sm" variant="outline" onClick={() => { switchToCanvas(); }}>Use Canvas</Button>
+      {!center && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-background/80 backdrop-blur-sm">
+          <p className="text-sm opacity-80">Waiting for your location…</p>
+          <Button
+            onClick={handleUseMyLocation}
+            disabled={isGettingLocation}
+            className="inline-flex items-center gap-2"
+          >
+            <Target className="w-4 h-4" />
+            {permissionState.granted ? 'Recenter to my location' : 'Use my location'}
+          </Button>
         </div>
       )}
-      <MapView
-        className="h-full min-h-[500px] w-full"
-        markers={presences.map(p => ({
-          id: p.user_id,
-          lat: p.lat,
-          lng: p.lng,
-          render: () => (
-            <MemberPin
-              presence={p}
-              onClick={() => setSelectedMember(p)}
-            />
-          )
-        }))}
-        center={mapCenter}
-        preferCanvas={true}
-      />
+
+      {center && (
+        <MapView
+          className="h-full min-h-[600px] w-full"
+          markers={presences.map(p => ({
+            id: p.user_id,
+            lat: p.lat,
+            lng: p.lng,
+            render: () => (
+              <MemberPin
+                presence={p}
+                onClick={() => setSelectedMember(p)}
+              />
+            )
+          }))}
+          center={center}
+          zoom={zoom}
+          showControls={true}
+          interactive={true}
+        />
+      )}
 
       {/* SOS Button */}
       <div className="absolute bottom-6 right-6 z-20">
