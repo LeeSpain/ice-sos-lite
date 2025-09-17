@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useCanvasMap } from './useCanvasMap';
+import { PLATFORM_MAP_CONFIG } from '@/config/mapConfig';
 
 interface MapMarker {
   id: string;
@@ -24,12 +25,12 @@ export const useUnifiedMap = () => {
 
   // Memoize the MapView component to prevent unnecessary re-renders
   const MapView = useMemo(() => {
-    return ({ className, markers = [], center, zoom = 13, onMapReady, showControls = true, interactive = true }: UnifiedMapViewProps) => {
+    return ({ className, markers = [], center, zoom = PLATFORM_MAP_CONFIG.defaultZoom, onMapReady, showControls = true, interactive = true }: UnifiedMapViewProps) => {
       return (
         <CanvasMapView
           className={className}
           markers={markers}
-          center={center}
+          center={center || PLATFORM_MAP_CONFIG.defaultCenter}
           zoom={zoom}
           onMapReady={onMapReady}
           showControls={showControls}

@@ -6,6 +6,7 @@ import { enhancedTileCache } from './EnhancedTileCache';
 import { MapSearch } from './MapSearch';
 import { MapDirections } from './MapDirections';
 import { MarkerRenderer } from './MarkerRenderer';
+import { PLATFORM_MAP_CONFIG, MAP_CONTROLS, MAP_ANIMATIONS } from '@/config/mapConfig';
 
 interface CanvasMapProps {
   className?: string;
@@ -590,21 +591,42 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className={cn("relative w-full h-full overflow-hidden rounded-lg border", className)}
+    <div 
+      ref={containerRef} 
+      className={cn(
+        "relative w-full h-full overflow-hidden",
+        "bg-map-background border border-map-border",
+        "shadow-map transition-map",
+        PLATFORM_MAP_CONFIG.appearance.borderRadius === '0.75rem' && "rounded-xl",
+        className
+      )}
+      style={{
+        borderRadius: PLATFORM_MAP_CONFIG.appearance.borderRadius
+      }}
     >
       <canvas
         ref={canvasRef}
+        className="absolute inset-0 w-full h-full"
+        style={{
+          borderRadius: PLATFORM_MAP_CONFIG.appearance.borderRadius
+        }}
+      />
+      
+      {/* Transparent overlay for interaction */}
+      <div
         className={cn(
           "absolute inset-0",
-          interactive ? "cursor-move" : "cursor-default"
+          interactive ? "cursor-move" : "cursor-default",
+          MAP_ANIMATIONS.pan
         )}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onWheel={handleWheel}
+        style={{
+          borderRadius: PLATFORM_MAP_CONFIG.appearance.borderRadius
+        }}
       />
 
       {useEmbedFallback && (
@@ -628,8 +650,12 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       
       {/* Loading indicator with progress */}
       {isLoading && !useEmbedFallback && (
-        <div className="absolute top-4 left-4 flex items-center gap-2 bg-background/90 backdrop-blur-sm border rounded-lg px-3 py-2 text-sm">
-          <Loader2 className="h-4 w-4 animate-spin" />
+        <div className={cn(
+          "absolute top-4 left-4 flex items-center gap-2 px-3 py-2 text-sm rounded-lg shadow-map border border-map-border",
+          MAP_CONTROLS.professional.background,
+          "text-map-control-foreground"
+        )}>
+          <Loader2 className="h-4 w-4 animate-spin text-primary" />
           <span>Loading tiles... ({renderStats.tilesLoaded}/{renderStats.totalTiles})</span>
         </div>
       )}
@@ -637,13 +663,27 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       {/* Prolonged-loading hint */}
       {loadingTooLong && !useEmbedFallback && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20">
-          <div className="bg-background/95 backdrop-blur-sm border rounded-md px-3 py-2 text-xs flex items-center gap-2">
+          <div className={cn(
+            "px-3 py-2 text-xs flex items-center gap-2 rounded-lg shadow-map border border-map-border",
+            MAP_CONTROLS.professional.background,
+            "text-map-control-foreground"
+          )}>
             <span>Tiles are taking longer than usual to load.</span>
             <span className="text-muted-foreground">Provider: {currentProvider}</span>
-            <Button variant="secondary" size="sm" onClick={tryAlternateProvider} className="h-7 px-2">
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={tryAlternateProvider} 
+              className="h-7 px-2 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
               Try alternate
             </Button>
-            <Button variant="secondary" size="sm" onClick={() => setUseEmbedFallback(true)} className="h-7 px-2">
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              onClick={() => setUseEmbedFallback(true)} 
+              className="h-7 px-2 bg-primary text-primary-foreground hover:bg-primary/90"
+            >
               Use fallback
             </Button>
           </div>
@@ -654,12 +694,18 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       {showControls && (
         <>
           {/* Zoom controls */}
-          <div className="absolute top-4 right-4 flex flex-col gap-2">
+          <div className="absolute top-4 right-4 flex flex-col gap-1.5">
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setViewport(prev => ({ ...prev, zoom: Math.min(18, prev.zoom + 1) }))}
-              className="w-8 h-8 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
+              onClick={() => setViewport(prev => ({ ...prev, zoom: Math.min(PLATFORM_MAP_CONFIG.maxZoom, prev.zoom + 1) }))}
+              className={cn(
+                "w-10 h-10 p-0 shadow-map border-map-border transition-map",
+                MAP_CONTROLS.professional.background,
+                MAP_CONTROLS.professional.foreground,
+                MAP_CONTROLS.professional.hover,
+                MAP_CONTROLS.professional.rounded
+              )}
               disabled={!interactive}
             >
               <ZoomIn className="h-4 w-4" />
@@ -667,8 +713,14 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setViewport(prev => ({ ...prev, zoom: Math.max(3, prev.zoom - 1) }))}
-              className="w-8 h-8 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
+              onClick={() => setViewport(prev => ({ ...prev, zoom: Math.max(PLATFORM_MAP_CONFIG.minZoom, prev.zoom - 1) }))}
+              className={cn(
+                "w-10 h-10 p-0 shadow-map border-map-border transition-map",
+                MAP_CONTROLS.professional.background,
+                MAP_CONTROLS.professional.foreground,
+                MAP_CONTROLS.professional.hover,
+                MAP_CONTROLS.professional.rounded
+              )}
               disabled={!interactive}
             >
               <ZoomOut className="h-4 w-4" />
@@ -677,7 +729,13 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
               variant="secondary"
               size="sm"
               onClick={resetToCenter}
-              className="w-8 h-8 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
+              className={cn(
+                "w-10 h-10 p-0 shadow-map border-map-border transition-map",
+                MAP_CONTROLS.professional.background,
+                MAP_CONTROLS.professional.foreground,
+                MAP_CONTROLS.professional.hover,
+                MAP_CONTROLS.professional.rounded
+              )}
               disabled={!interactive}
             >
               <RotateCcw className="h-4 w-4" />
@@ -686,7 +744,14 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
               variant="secondary"
               size="sm"
               onClick={() => setShowAccuracy(!showAccuracy)}
-              className="w-8 h-8 p-0 bg-background/90 backdrop-blur-sm hover:bg-background"
+              className={cn(
+                "w-10 h-10 p-0 shadow-map border-map-border transition-map",
+                MAP_CONTROLS.professional.background,
+                MAP_CONTROLS.professional.foreground,
+                MAP_CONTROLS.professional.hover,
+                MAP_CONTROLS.professional.rounded,
+                showAccuracy && "bg-primary text-primary-foreground"
+              )}
               disabled={!interactive}
               title="Toggle accuracy circles"
             >
@@ -697,30 +762,45 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
           {/* Enhanced controls */}
           <div className="absolute top-4 left-4 space-y-2">
             {/* Map mode toggle */}
-            <div className="flex gap-1">
+            <div className="flex gap-1 p-1 rounded-lg bg-map-control shadow-map border border-map-border">
               <Button
-                variant={mapMode === 'standard' ? 'default' : 'secondary'}
+                variant={mapMode === 'standard' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setMapMode('standard')}
-                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                className={cn(
+                  "text-xs h-7 px-3 transition-map",
+                  mapMode === 'standard' 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "text-map-control-foreground hover:bg-map-control-hover"
+                )}
                 disabled={!interactive}
               >
                 Map
               </Button>
               <Button
-                variant={mapMode === 'satellite' ? 'default' : 'secondary'}
+                variant={mapMode === 'satellite' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setMapMode('satellite')}
-                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                className={cn(
+                  "text-xs h-7 px-3 transition-map",
+                  mapMode === 'satellite' 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "text-map-control-foreground hover:bg-map-control-hover"
+                )}
                 disabled={!interactive}
               >
                 Satellite
               </Button>
               <Button
-                variant={mapMode === 'dark' ? 'default' : 'secondary'}
+                variant={mapMode === 'dark' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setMapMode('dark')}
-                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                className={cn(
+                  "text-xs h-7 px-3 transition-map",
+                  mapMode === 'dark' 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "text-map-control-foreground hover:bg-map-control-hover"
+                )}
                 disabled={!interactive}
               >
                 Dark
@@ -728,21 +808,31 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
             </div>
 
             {/* Search and Directions toggles */}
-            <div className="flex gap-1">
+            <div className="flex gap-1 p-1 rounded-lg bg-map-control shadow-map border border-map-border">
               <Button
-                variant={showSearch ? 'default' : 'secondary'}
+                variant={showSearch ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setShowSearch(!showSearch)}
-                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                className={cn(
+                  "text-xs h-7 px-3 transition-map",
+                  showSearch 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "text-map-control-foreground hover:bg-map-control-hover"
+                )}
                 disabled={!interactive}
               >
                 Search
               </Button>
               <Button
-                variant={showDirections ? 'default' : 'secondary'}
+                variant={showDirections ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setShowDirections(!showDirections)}
-                className="text-xs h-7 px-2 bg-background/90 backdrop-blur-sm"
+                className={cn(
+                  "text-xs h-7 px-3 transition-map",
+                  showDirections 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
+                    : "text-map-control-foreground hover:bg-map-control-hover"
+                )}
                 disabled={!interactive}
               >
                 Routes
@@ -751,8 +841,12 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
           </div>
 
           {/* Map info and cache stats */}
-          {!useEmbedFallback && (
-            <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm border rounded-lg px-3 py-2 text-xs text-muted-foreground">
+          {!useEmbedFallback && PLATFORM_MAP_CONFIG.appearance.showCoordinates && (
+            <div className={cn(
+              "absolute bottom-4 left-4 rounded-lg px-3 py-2 text-xs shadow-map border border-map-border",
+              MAP_CONTROLS.professional.background,
+              "text-map-control-foreground"
+            )}>
               <div className="flex items-center gap-2 mb-1">
                 <MapPin className="h-3 w-3" />
                 <span>

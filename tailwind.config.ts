@@ -100,6 +100,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				map: {
+					background: 'hsl(var(--map-background))',
+					border: 'hsl(var(--map-border))',
+					control: 'hsl(var(--map-control))',
+					'control-foreground': 'hsl(var(--map-control-foreground))',
+					'control-hover': 'hsl(var(--map-control-hover))',
+					overlay: 'hsl(var(--map-overlay))',
+					info: 'hsl(var(--map-info))'
 				}
 			},
 			backgroundImage: {
@@ -115,11 +124,14 @@ export default {
 				'guardian': 'var(--shadow-guardian)',
 				'wellness': 'var(--shadow-wellness)',
 				'glow': 'var(--shadow-glow)',
-				'wellness-glow': 'var(--shadow-wellness-glow)'
+				'wellness-glow': 'var(--shadow-wellness-glow)',
+				'map': 'var(--map-shadow)',
+				'map-glow': 'var(--map-glow)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'var(--transition-smooth)',
-				'emergency': 'var(--transition-emergency)'
+				'emergency': 'var(--transition-emergency)',
+				'map': 'var(--transition-map)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
