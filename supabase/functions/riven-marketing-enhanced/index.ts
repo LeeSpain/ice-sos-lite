@@ -716,50 +716,6 @@ function generateIntelligentContent(parsedCommand: any, settings: any): any {
     seo_score: 87
   };
 }
-    bodyContent += `<p>In today's world, ${topic} has become increasingly important for families and individuals. Modern technology, like ICE SOS Lite, offers innovative solutions to traditional safety challenges.</p>\n\n`;
-    
-    bodyContent += `<h2>Modern Solutions</h2>\n`;
-    bodyContent += `<p>ICE SOS Lite represents the next generation of emergency preparedness tools, combining traditional safety principles with cutting-edge technology to provide comprehensive protection.</p>\n\n`;
-  }
-  
-  // Add ICE SOS specific content
-  bodyContent += `<h2>ICE SOS Lite Integration</h2>\n`;
-  bodyContent += `<p>ICE SOS Lite's comprehensive approach to emergency preparedness includes features specifically designed to address ${topic}. The app's intuitive interface makes it easy for users of all ages to access critical safety features when needed most.</p>\n\n`;
-  
-  bodyContent += `<h2>Getting Started</h2>\n`;
-  bodyContent += `<p>Taking the first step towards better emergency preparedness is simple with ICE SOS Lite. Download the app, set up your emergency contacts, and customize the features that matter most to your family's safety needs.</p>\n\n`;
-  
-  bodyContent += `<h2>Conclusion</h2>\n`;
-  bodyContent += `<p>Effective ${topic} requires the right combination of preparation, technology, and peace of mind. ICE SOS Lite provides all three, ensuring that you and your family are prepared for whatever challenges may arise.</p>`;
-  
-  // Generate metadata
-  const keywords = [
-    topic,
-    'emergency preparedness',
-    'family safety',
-    'ICE SOS',
-    'emergency contacts',
-    'safety planning',
-    'emergency app',
-    'crisis management'
-  ];
-  
-  return {
-    title,
-    body_text: bodyContent,
-    seo_title: `${title} | ICE SOS Lite`,
-    meta_description: `Complete guide to ${topic} and emergency preparedness. Learn how ICE SOS Lite can enhance your family's safety with modern emergency response technology.`,
-    content_sections: template.sections.map(section => ({
-      heading: section,
-      summary: `Detailed information about ${section.toLowerCase()} related to ${topic}`
-    })),
-    word_count: Math.max(settings?.word_count || 800, 600),
-    keywords,
-    featured_image_alt: `Professional illustration showing ${topic} and emergency preparedness concept`,
-    reading_time: Math.ceil((settings?.word_count || 800) / 200),
-    seo_score: 88
-  };
-}
 
 async function executeContentCreation(supabase: any, campaignId: string, originalCommand: string, settings: any, aiConfig: any) {
   console.log('Executing content creation stage');
