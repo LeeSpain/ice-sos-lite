@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Edit
 } from 'lucide-react';
+import ImageFallback from './ImageFallback';
 
 interface BlogPreviewModalProps {
   content: {
@@ -49,6 +50,18 @@ const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const sanitizeHtmlContent = (html: string) => {
+    // Remove code fences and extract clean HTML
+    let cleanHtml = html
+      .replace(/```html\s*\n?/gi, '') // Remove opening code fence
+      .replace(/```\s*$/gi, '') // Remove closing code fence
+      .replace(/^<!DOCTYPE html>[\s\S]*?<body[^>]*>/i, '') // Remove DOCTYPE and head
+      .replace(/<\/body>[\s\S]*?<\/html>\s*$/i, '') // Remove closing body and html
+      .trim();
+    
+    return cleanHtml;
   };
 
   const handleViewLive = () => {
@@ -132,15 +145,15 @@ const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
           {/* Blog Preview */}
           <div className="border rounded-lg overflow-hidden">
             {/* Featured Image */}
-            {content.image_url && (
-              <div className="relative h-64 bg-muted">
-                <img 
-                  src={content.image_url} 
-                  alt={content.title || 'Blog post image'}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
+            <div className="relative h-64 bg-muted">
+              <ImageFallback
+                src={content.image_url}
+                alt={content.featured_image_alt}
+                title={content.title}
+                className="w-full h-full object-cover"
+                fallbackType="gradient"
+              />
+            </div>
             
             {/* Blog Header */}
             <div className="p-6 border-b">
@@ -189,7 +202,7 @@ const BlogPreviewModal: React.FC<BlogPreviewModalProps> = ({
               <div className="prose prose-lg max-w-none">
                 {content.body_text ? (
                   <div 
-                    dangerouslySetInnerHTML={{ __html: content.body_text }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtmlContent(content.body_text) }}
                     className="text-foreground leading-relaxed"
                   />
                 ) : (

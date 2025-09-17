@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import ImageFallback from '@/components/admin/ImageFallback';
 
 interface BlogPost {
   id: string;
@@ -44,6 +45,18 @@ const BlogPost = () => {
   const [notFound, setNotFound] = useState(false);
   const { toast } = useToast();
 
+  const sanitizeHtmlContent = (html: string) => {
+    // Remove code fences and extract clean HTML
+    let cleanHtml = html
+      .replace(/```html\s*\n?/gi, '') // Remove opening code fence
+      .replace(/```\s*$/gi, '') // Remove closing code fence
+      .replace(/^<!DOCTYPE html>[\s\S]*?<body[^>]*>/i, '') // Remove DOCTYPE and head
+      .replace(/<\/body>[\s\S]*?<\/html>\s*$/i, '') // Remove closing body and html
+      .trim();
+    
+    return cleanHtml;
+  };
+
   useEffect(() => {
     if (slug) {
       loadBlogPost();
@@ -59,7 +72,8 @@ const BlogPost = () => {
         .select('*')
         .eq('platform', 'blog')
         .eq('status', 'published')
-        .or(`slug.eq.${slug},title.ilike.%${titlePattern}%`);
+        .or(`slug.eq.${slug},title.ilike.%${titlePattern}%`)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -308,26 +322,26 @@ const BlogPost = () => {
         </header>
 
         {/* Featured Image Section */}
-        {blogPost.image_url && (
-          <section className="py-6 bg-slate-50 dark:bg-slate-900/50">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <figure>
-                  <img 
-                    src={blogPost.image_url} 
-                    alt={blogPost.featured_image_alt || blogPost.title || 'Article featured image'}
-                    className="w-full h-auto rounded-lg shadow-lg"
-                  />
-                  {blogPost.featured_image_alt && (
-                    <figcaption className="text-center text-xs text-muted-foreground mt-3 italic">
-                      {blogPost.featured_image_alt}
-                    </figcaption>
-                  )}
-                </figure>
-              </div>
+        <section className="py-6 bg-slate-50 dark:bg-slate-900/50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <figure>
+                <ImageFallback
+                  src={blogPost.image_url}
+                  alt={blogPost.featured_image_alt}
+                  title={blogPost.title}
+                  className="w-full h-auto rounded-lg shadow-lg"
+                  fallbackType="placeholder"
+                />
+                {blogPost.featured_image_alt && (
+                  <figcaption className="text-center text-xs text-muted-foreground mt-3 italic">
+                    {blogPost.featured_image_alt}
+                  </figcaption>
+                )}
+              </figure>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
 
         {/* Article Content */}
         <article className="py-12">
@@ -351,7 +365,7 @@ const BlogPost = () => {
                 [&>*]:mb-6 [&>h1]:mb-8 [&>h2]:mb-6 [&>h3]:mb-4">
                 {blogPost.body_text ? (
                   <div 
-                    dangerouslySetInnerHTML={{ __html: blogPost.body_text }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtmlContent(blogPost.body_text) }}
                   />
                 ) : (
                   <div className="text-center py-12">

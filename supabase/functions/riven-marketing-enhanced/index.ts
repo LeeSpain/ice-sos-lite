@@ -1396,21 +1396,40 @@ async function createFinalContent(supabase: any, campaignId: string) {
   
   console.log('Assembled content:', JSON.stringify(assembledContent, null, 2));
   
+  // Generate slug from title
+  const title = assembledContent.title || 'Untitled Blog Post';
+  let slug = generateSlugFromTitle(title);
+  
+  // Ensure slug uniqueness
+  const { data: existingContent } = await supabase
+    .from('marketing_content')
+    .select('slug')
+    .like('slug', `${slug}%`);
+    
+  if (existingContent && existingContent.length > 0) {
+    slug = `${slug}-${Date.now()}`;
+  }
+  
+  // Clean body text and ensure proper image handling
+  const bodyText = sanitizeContentBeforePublish(assembledContent.body_text || '');
+  const imageUrl = assembledContent.featured_image_url || assembledContent.image_url;
+  
   // Create the final content record with correct schema mapping
   const contentPayload = {
     campaign_id: campaignId,
     platform: 'blog',  // Required field
     content_type: 'blog_post',  // Required field
-    title: assembledContent.title || 'Untitled Blog Post',
-    body_text: assembledContent.body_text || '',
-    seo_title: assembledContent.seo_title || assembledContent.title,
+    title: title,
+    body_text: bodyText,
+    seo_title: assembledContent.seo_title || title,
     meta_description: assembledContent.meta_description || '',
-    image_url: assembledContent.featured_image_url,  // Map to image_url column
-    featured_image_alt: assembledContent.featured_image_alt || '',
+    image_url: imageUrl,  // Map to image_url column
+    featured_image_alt: assembledContent.featured_image_alt || `Professional image representing ${title}`,
     content_sections: assembledContent.content_sections || {},
     reading_time: assembledContent.reading_time || 0,
     seo_score: assembledContent.seo_score || 0,
     keywords: assembledContent.keywords || [],
+    slug: slug,  // Add the generated slug
     status: 'draft'  // Use correct enum value
   };
   
@@ -1438,4 +1457,31 @@ async function createFinalContent(supabase: any, campaignId: string) {
 
   console.log('Final content created successfully with ID:', data.id);
   return { content_id: data.id, status: 'completed' };
+}
+
+// Utility functions
+function sanitizeContentBeforePublish(html: string): string {
+  if (!html) return '';
+  
+  // Remove code fences and extract clean HTML
+  let cleanHtml = html
+    .replace(/```html\s*\n?/gi, '') // Remove opening code fence
+    .replace(/```\s*$/gi, '') // Remove closing code fence
+    .replace(/^<!DOCTYPE html>[\s\S]*?<body[^>]*>/i, '') // Remove DOCTYPE and head
+    .replace(/<\/body>[\s\S]*?<\/html>\s*$/i, '') // Remove closing body and html
+    .trim();
+  
+  return cleanHtml;
+}
+
+function generateSlugFromTitle(title: string): string {
+  if (!title) return 'untitled-post';
+  
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+    .substring(0, 50); // Limit length
 }

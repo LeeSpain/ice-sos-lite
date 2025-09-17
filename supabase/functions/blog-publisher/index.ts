@@ -59,6 +59,9 @@ async function publishBlog(contentId: string, supabase: any) {
 
   if (fetchError) throw fetchError;
 
+  // Clean the content before publishing
+  const cleanedBodyText = sanitizeContentBeforePublish(content.body_text || '');
+
   // Generate SEO-friendly slug
   let slug = content.slug;
   if (!slug) {
@@ -80,14 +83,14 @@ async function publishBlog(contentId: string, supabase: any) {
     content_id: contentId,
     title: content.title || content.seo_title,
     slug,
-    content: generateBlogHTML(content),
-    excerpt: content.meta_description || content.body_text?.substring(0, 200),
+    content: cleanedBodyText,
+    excerpt: content.meta_description || cleanedBodyText.substring(0, 200),
     featured_image: content.image_url,
     featured_image_alt: content.featured_image_alt || content.title,
     seo_title: content.seo_title || content.title,
     meta_description: content.meta_description,
     keywords: content.keywords || [],
-    reading_time: content.reading_time || estimateReadingTime(content.body_text || ''),
+    reading_time: content.reading_time || estimateReadingTime(cleanedBodyText),
     published_at: new Date().toISOString(),
     status: 'published'
   };
@@ -100,13 +103,14 @@ async function publishBlog(contentId: string, supabase: any) {
 
   if (insertError) throw insertError;
 
-  // Update content status
+  // Update content status and clean body_text
   await supabase
     .from('marketing_content')
     .update({
       status: 'published',
       posted_at: new Date().toISOString(),
-      slug: slug
+      slug: slug,
+      body_text: cleanedBodyText // Store cleaned content
     })
     .eq('id', contentId);
 
@@ -119,12 +123,30 @@ async function publishBlog(contentId: string, supabase: any) {
   });
 }
 
+function sanitizeContentBeforePublish(html: string): string {
+  if (!html) return '';
+  
+  // Remove code fences and extract clean HTML
+  let cleanHtml = html
+    .replace(/```html\s*\n?/gi, '') // Remove opening code fence
+    .replace(/```\s*$/gi, '') // Remove closing code fence
+    .replace(/^<!DOCTYPE html>[\s\S]*?<body[^>]*>/i, '') // Remove DOCTYPE and head
+    .replace(/<\/body>[\s\S]*?<\/html>\s*$/i, '') // Remove closing body and html
+    .trim();
+  
+  return cleanHtml;
+}
+
 function generateSlugFromTitle(title: string): string {
+  if (!title) return 'untitled-post';
+  
   return title
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .substring(0, 50);
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+    .substring(0, 50); // Limit length
 }
 
 function generateBlogHTML(content: any): string {
