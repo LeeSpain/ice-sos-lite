@@ -80,16 +80,36 @@ export const AIProviderDiagnostics: React.FC = () => {
         });
 
         // Test 5: OpenRouter Status
-        const openrouterStatus = providerData?.providers?.openrouter;
+        const openrouterConnected = providerData?.providers?.openrouter;
+        const openrouterDetails = providerData?.details?.openrouter;
+        let openrouterDiagStatus: 'success' | 'warning' | 'error' = openrouterConnected ? 'success' : 'error';
+        let openrouterMessage = openrouterConnected
+          ? 'OpenRouter API connected successfully'
+          : 'OpenRouter API connection failed';
+
+        if (!openrouterConnected && openrouterDetails?.status === 'warning') {
+          openrouterDiagStatus = 'warning';
+          // Try to extract a friendly message from the error payload
+          let friendly = 'OpenRouter rate limited; please retry after reset.';
+          try {
+            const parsed = typeof openrouterDetails.error === 'string' 
+              ? JSON.parse(openrouterDetails.error) 
+              : openrouterDetails.error;
+            if (parsed?.message) friendly = parsed.message;
+            if (parsed?.resetAt) friendly += ` (resets at ${new Date(parsed.resetAt).toLocaleString()})`;
+          } catch {}
+          openrouterMessage = friendly;
+        }
+
         diagnostics.push({
           component: 'OpenRouter Connection',
-          status: openrouterStatus ? 'success' : 'error',
-          message: openrouterStatus ? 'OpenRouter API connected successfully' : 'OpenRouter API connection failed',
-          details: providerData?.details?.openrouter
+          status: openrouterDiagStatus,
+          message: openrouterMessage,
+          details: openrouterDetails
         });
 
         // Test 6: Content Generation Test
-        if (openaiStatus || xaiStatus || openrouterStatus) {
+        if (openaiStatus || xaiStatus || openrouterConnected) {
           try {
             const { data: testContent, error: testError } = await supabase.functions.invoke('riven-marketing-enhanced', {
               body: { 
