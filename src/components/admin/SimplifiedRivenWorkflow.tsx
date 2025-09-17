@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock } from 'lucide-react';
+import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
@@ -965,9 +965,24 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                   <Eye className="h-6 w-6 text-primary" />
                   <h3 className="text-xl font-semibold">Review & Approve Content</h3>
                 </div>
-                <p className="text-muted-foreground">
+                <p className="text-muted-foreground mb-4">
                   Review the AI-generated content and approve it for publishing
                 </p>
+                
+                {/* Workflow Guide */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-2xl mx-auto">
+                  <h4 className="font-semibold text-blue-800 mb-2">Publishing Workflow:</h4>
+                  <div className="flex items-center gap-2 text-sm text-blue-700">
+                    <span className="bg-white px-2 py-1 rounded font-medium">1. Review</span>
+                    <ArrowRight className="h-4 w-4" />
+                    <span className="bg-white px-2 py-1 rounded font-medium">2. Approve</span>
+                    <ArrowRight className="h-4 w-4" />
+                    <span className="bg-white px-2 py-1 rounded font-medium">3. Publish Live</span>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-2">
+                    After approval, click "Publish to Live" to make content visible on your blog.
+                  </p>
+                </div>
               </div>
 
               <div className="grid gap-6">
@@ -1036,14 +1051,15 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                               Edit
                             </Button>
 
-                            {content.status !== 'approved' && (
+                            {content.status === 'draft' && (
                               <Button
                                 variant="default"
                                 size="sm"
+                                className="bg-blue-600 hover:bg-blue-700 text-white"
                                 onClick={() => handleApproval(content.id)}
                               >
                                 <CheckCircle className="h-4 w-4 mr-2" />
-                                Approve
+                                Approve for Publishing
                               </Button>
                             )}
 
@@ -1051,9 +1067,11 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                               <Button
                                 variant="default"
                                 size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white"
                                 onClick={() => handlePublish(content.id)}
                               >
-                                Publish
+                                <Send className="h-4 w-4 mr-2" />
+                                Publish to Live
                               </Button>
                             )}
 
@@ -1245,6 +1263,20 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                 <div className="flex flex-wrap items-center gap-3 mb-3">
                                   <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 font-medium">
                                     {content.platform}
+                                  </Badge>
+                                  <Badge 
+                                    variant={content.status === 'published' ? 'default' : 'secondary'}
+                                    className={
+                                      content.status === 'published' 
+                                        ? "bg-green-100 text-green-800 border-green-200 font-medium" 
+                                        : content.status === 'approved'
+                                        ? "bg-blue-100 text-blue-800 border-blue-200 font-medium"
+                                        : "bg-yellow-100 text-yellow-800 border-yellow-200 font-medium"
+                                    }
+                                  >
+                                    {content.status === 'published' ? 'Published' : 
+                                     content.status === 'approved' ? 'Ready to Publish' : 
+                                     'Draft'}
                                   </Badge>
                                   <Badge variant="secondary" className="bg-accent/20 text-accent-foreground font-medium">
                                     {content.content_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
