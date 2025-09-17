@@ -150,7 +150,7 @@ const SimplifiedRivenContent: React.FC = () => {
     setCurrentStep(0);
 
     try {
-      await sendCommand(command, {
+      console.log('Starting content creation with config:', {
         title: selectedTemplate ? selectedTemplate.title : `${contentType.charAt(0).toUpperCase() + contentType.slice(1)} Content`,
         platform: contentType,
         content_type: selectedTemplate?.category || 'marketing_content',
@@ -160,15 +160,65 @@ const SimplifiedRivenContent: React.FC = () => {
         word_count: 800,
         seo_optimization: true
       });
+
+      const campaignId = await sendCommand(command, {
+        title: selectedTemplate ? selectedTemplate.title : `${contentType.charAt(0).toUpperCase() + contentType.slice(1)} Content`,
+        platform: contentType,
+        content_type: selectedTemplate?.category || 'marketing_content',
+        image_generation: imageGenerationEnabled,
+        image_prompt: customImagePrompt,
+        template_id: selectedTemplate?.id,
+        word_count: 800,
+        seo_optimization: true
+      });
+
+      if (campaignId) {
+        console.log('Campaign created successfully:', campaignId);
+        // Start monitoring progress
+        const progressInterval = setInterval(() => {
+          const workflow = activeWorkflows[campaignId];
+          if (workflow) {
+            const completedSteps = workflow.filter(step => step.status === 'completed').length;
+            const inProgressStep = workflow.find(step => step.status === 'in_progress');
+            
+            if (inProgressStep) {
+              console.log('Current step:', inProgressStep.stage_name);
+              setCurrentStep(Math.min(completedSteps + 1, steps.length - 1));
+            } else if (completedSteps === workflow.length) {
+              clearInterval(progressInterval);
+              setCurrentStep(steps.length);
+              setTimeout(() => {
+                setCurrentStage('approval');
+                setGeneratedContent([
+                  {
+                    id: '1',
+                    title: 'Generated Content Ready',
+                    body_text: 'Your content has been generated and is ready for review...',
+                    status: 'pending',
+                    platform: contentType,
+                    content_type: selectedTemplate?.category || 'marketing_content',
+                    seo_score: 85,
+                    created_at: new Date().toISOString()
+                  }
+                ]);
+              }, 1000);
+            }
+          }
+        }, 1000);
+
+        // Cleanup after 5 minutes
+        setTimeout(() => {
+          clearInterval(progressInterval);
+        }, 300000);
+      }
     } catch (error) {
       console.error('Content creation failed:', error);
       toast({
         title: "Creation Failed",
-        description: "Failed to create content. Please try again.",
+        description: error?.message || "Failed to create content. Please try again.",
         variant: "destructive"
       });
       setCurrentStage('command');
-    } finally {
       setIsProcessing(false);
     }
   };

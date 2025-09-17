@@ -284,10 +284,19 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     try {
       dispatch({ type: 'SET_PROCESSING_STAGE', payload: 'initializing' });
       
+      console.log('Sending command to Riven:', { command, config });
+      
       const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: { 
           command, 
           title: config?.title || `Campaign: ${command.substring(0, 50)}...`,
+          platform: config?.platform || 'blog',
+          content_type: config?.content_type || 'blog_post',
+          image_generation: config?.image_generation || false,
+          image_prompt: config?.image_prompt || '',
+          template_id: config?.template_id,
+          word_count: config?.word_count || 800,
+          seo_optimization: config?.seo_optimization !== false,
           settings: {
             word_count: config?.word_count || 900,
             content_depth: config?.content_depth || 'high',
@@ -306,13 +315,18 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       });
 
-      if (error) throw error;
+      console.log('Riven response:', { data, error });
+
+      if (error) {
+        console.error('Riven function error:', error);
+        throw error;
+      }
 
       const campaignId = data?.campaignId;
       if (campaignId) {
         dispatch({ type: 'SET_CURRENT_CAMPAIGN', payload: campaignId });
         
-        // Load campaign and workflow data
+        // Load campaign and workflow data immediately
         await Promise.all([
           loadCampaigns(),
           loadWorkflowStages(campaignId)
@@ -323,10 +337,22 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           description: "Riven is now processing your command",
         });
 
-        // Auto-refresh content when workflow completes
+        // Set up polling for workflow updates
+        const pollInterval = setInterval(async () => {
+          await loadWorkflowStages(campaignId);
+          const workflow = state.activeWorkflows[campaignId];
+          if (workflow && workflow.every(stage => stage.status === 'completed' || stage.status === 'failed')) {
+            clearInterval(pollInterval);
+            await loadContentItems();
+            dispatch({ type: 'SET_PROCESSING_STAGE', payload: undefined });
+          }
+        }, 2000);
+
+        // Clear polling after 5 minutes as failsafe
         setTimeout(() => {
-          loadContentItems();
-        }, 5000);
+          clearInterval(pollInterval);
+          dispatch({ type: 'SET_PROCESSING_STAGE', payload: undefined });
+        }, 300000);
       }
 
       return campaignId;
@@ -335,9 +361,10 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       dispatch({ type: 'SET_PROCESSING_STAGE', payload: undefined });
       toast({
         title: "Command Failed",
-        description: "Failed to send command to Riven",
+        description: error?.message || "Failed to send command to Riven",
         variant: "destructive"
       });
+      throw error;
     }
   };
 
