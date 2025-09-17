@@ -553,6 +553,11 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     }
   }, [onMapReady]);
 
+  // Initialize current provider label
+  useEffect(() => {
+    setCurrentProvider(enhancedTileCache.getCurrentProviderName());
+  }, []);
+
   return (
     <div
       ref={containerRef}
@@ -591,8 +596,12 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       {/* Prolonged-loading hint */}
       {loadingTooLong && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20">
-          <div className="bg-background/95 backdrop-blur-sm border rounded-md px-3 py-2 text-xs">
-            Tiles are taking longer than usual to load. Try zooming or refreshing.
+          <div className="bg-background/95 backdrop-blur-sm border rounded-md px-3 py-2 text-xs flex items-center gap-2">
+            <span>Tiles are taking longer than usual to load.</span>
+            <span className="text-muted-foreground">Provider: {currentProvider}</span>
+            <Button variant="secondary" size="sm" onClick={tryAlternateProvider} className="h-7 px-2">
+              Try alternate
+            </Button>
           </div>
         </div>
       )}

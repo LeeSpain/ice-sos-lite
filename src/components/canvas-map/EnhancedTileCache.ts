@@ -145,6 +145,19 @@ class EnhancedTileCache {
     return new Promise((resolve) => {
       const img = new Image();
       img.crossOrigin = 'anonymous';
+      let settled = false;
+      const timeoutMs = 3000;
+      const timeoutId = window.setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        this.cache.set(key, {
+          image: img,
+          timestamp: Date.now(),
+          loading: false,
+          error: true
+        });
+        resolve(null);
+      }, timeoutMs);
       
       // Set loading state
       this.cache.set(key, {
@@ -155,6 +168,9 @@ class EnhancedTileCache {
       });
 
       img.onload = () => {
+        if (settled) return; // Ignore late loads after timeout
+        settled = true;
+        window.clearTimeout(timeoutId);
         this.cache.set(key, {
           image: img,
           timestamp: Date.now(),
@@ -166,13 +182,9 @@ class EnhancedTileCache {
       };
 
       img.onerror = () => {
-        // Try fallback provider for failed tiles
-        if (provider !== 'osm-standard') {
-          const fallbackUrl = this.providers['osm-standard'].url(x, y, z);
-          img.src = fallbackUrl;
-          return; // Let the existing handlers work
-        }
-        
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timeoutId);
         this.cache.set(key, {
           image: img,
           timestamp: Date.now(),
@@ -184,6 +196,8 @@ class EnhancedTileCache {
 
       const tileProvider = this.providers[provider];
       if (!tileProvider) {
+        window.clearTimeout(timeoutId);
+        settled = true;
         resolve(null);
         return;
       }
