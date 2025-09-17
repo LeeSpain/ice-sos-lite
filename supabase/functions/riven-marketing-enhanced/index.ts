@@ -69,11 +69,23 @@ serve(async (req) => {
       let xaiStatus = 'not_configured';
       if (xaiApiKey) {
         try {
-          const testResponse = await fetch('https://api.x.ai/v1/models', {
-            headers: { 'Authorization': `Bearer ${xaiApiKey}` }
+          console.log('Testing xAI connection...');
+          const testResponse = await fetch('https://api.x.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: { 
+              'Authorization': `Bearer ${xaiApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              model: 'grok-beta',
+              messages: [{ role: 'user', content: 'test' }],
+              max_tokens: 1
+            })
           });
-          xaiStatus = testResponse.ok ? 'connected' : 'error';
-        } catch {
+          console.log('xAI test response status:', testResponse.status);
+          xaiStatus = testResponse.ok || testResponse.status === 400 ? 'connected' : 'error';
+        } catch (error) {
+          console.error('xAI connection test failed:', error);
           xaiStatus = 'error';
         }
       }

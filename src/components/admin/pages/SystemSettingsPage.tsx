@@ -10,6 +10,7 @@ import { Settings, Database, Shield, Mail, Zap, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useAuth } from '@/contexts/AuthContext';
+import { AIProviderDiagnostics } from '@/components/admin/AIProviderDiagnostics';
 
 interface HealthCheck {
   component: string;
@@ -311,14 +312,14 @@ export default function SystemSettingsPage() {
               <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-medium">xAI (Grok)</span>
-                    {providerStatus.xai !== undefined && (
-                      <Badge 
-                        variant="outline" 
-                        className={`${providerStatus.xai ? 'border-green-500 text-green-600 bg-green-50' : 'border-yellow-500 text-yellow-600 bg-yellow-50'} transition-colors`}
-                      >
-                        {providerStatus.xai ? '✅ Connected' : '⚠️ Add Key Later'}
-                      </Badge>
-                    )}
+                     {providerStatus.xai !== undefined && (
+                       <Badge 
+                         variant="outline" 
+                         className={`${providerStatus.xai ? 'border-green-500 text-green-600 bg-green-50' : 'border-red-500 text-red-600 bg-red-50'} transition-colors`}
+                       >
+                         {providerStatus.xai ? '✅ Connected' : '❌ Connection Failed'}
+                       </Badge>
+                     )}
                   </div>
                 <Switch
                   checked={!!aiProvidersConfig?.providers?.xai?.enabled}
@@ -406,6 +407,9 @@ export default function SystemSettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* AI Provider Diagnostics */}
+      <AIProviderDiagnostics />
 
     </div>
   );
