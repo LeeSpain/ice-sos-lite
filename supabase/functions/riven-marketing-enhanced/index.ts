@@ -595,6 +595,18 @@ Focus on family safety, emergency preparedness, and practical advice that relate
 async function executeImageGeneration(command: string, settings: any, aiConfig: any) {
   console.log('Executing image generation stage');
   
+  // Check if image generation is requested
+  if (!settings?.image_generation) {
+    console.log('Image generation not requested, skipping...');
+    return {
+      image_url: null,
+      alt_text: null,
+      generation_prompt: null,
+      style: 'none',
+      note: 'Image generation not requested'
+    };
+  }
+  
   const imageProvider = aiConfig?.stages?.image?.provider || 'openai';
   console.log(`Using ${imageProvider} for image generation`);
   
@@ -612,11 +624,15 @@ async function executeImageGeneration(command: string, settings: any, aiConfig: 
   try {
     console.log('Calling OpenAI DALL-E for image generation...');
     
-    const imagePrompt = `Create a professional, high-quality image representing "${command}". 
+    // Use custom image prompt if provided, otherwise use default
+    const customPrompt = settings?.image_prompt;
+    const imagePrompt = customPrompt || `Create a professional, high-quality image representing "${command}". 
     Style: Clean, modern, professional
     Theme: Family safety and emergency preparedness
     Colors: Calming blues and whites
     No text in the image.`;
+    
+    console.log('Using image prompt:', imagePrompt);
 
     // Set timeout for image generation (2 minutes)
     const controller = new AbortController();

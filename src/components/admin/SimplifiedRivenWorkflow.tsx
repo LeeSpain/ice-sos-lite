@@ -5,8 +5,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { WorkflowProvider, useWorkflow } from '@/contexts/RivenWorkflowContext';
 import { useToast } from '@/hooks/use-toast';
+import { MarketingTemplates } from './MarketingTemplates';
+import { AIProviderStatus } from './AIProviderStatus';
+import { ImageGenerationToggle } from './ImageGenerationToggle';
 import { 
   Wand2, 
   Brain, 
@@ -26,7 +31,10 @@ import {
   ArrowRight,
   CheckCircle,
   Loader2,
-  TrendingUp
+  TrendingUp,
+  Sparkles,
+  Settings,
+  Layers
 } from 'lucide-react';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
@@ -44,6 +52,19 @@ interface ContentItem {
   created_at: string;
 }
 
+interface Template {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  icon: React.ComponentType<any>;
+  prompt: string;
+  imagePrompt?: string;
+  contentType: string;
+  estimatedTime: string;
+  tags: string[];
+}
+
 const SimplifiedRivenContent: React.FC = () => {
   const { sendCommand, activeWorkflows, currentCampaignId } = useWorkflow();
   const { toast } = useToast();
@@ -55,6 +76,13 @@ const SimplifiedRivenContent: React.FC = () => {
   const [generatedContent, setGeneratedContent] = useState<ContentItem[]>([]);
   const [processingSteps, setProcessingSteps] = useState<string[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
+  
+  // Enhanced state for new features
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [imageGenerationEnabled, setImageGenerationEnabled] = useState(false);
+  const [customImagePrompt, setCustomImagePrompt] = useState('');
+  const [aiProviderStatus, setAiProviderStatus] = useState({ openai: false, xai: false });
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
 
   // Auto-navigate through workflow stages
   useEffect(() => {
@@ -87,11 +115,19 @@ const SimplifiedRivenContent: React.FC = () => {
     }
   }, [currentCampaignId, activeWorkflows, currentStage, contentType]);
 
+  const handleTemplateSelect = (template: Template) => {
+    setSelectedTemplate(template);
+    setCommand(template.prompt);
+    setContentType(template.contentType);
+    setCustomImagePrompt(template.imagePrompt || '');
+    setImageGenerationEnabled(!!template.imagePrompt);
+  };
+
   const handleCreateContent = async () => {
     if (!command.trim()) {
       toast({
         title: "Command Required",
-        description: "Please enter a content creation command",
+        description: "Please enter a content creation command or select a template",
         variant: "destructive"
       });
       return;
@@ -100,22 +136,29 @@ const SimplifiedRivenContent: React.FC = () => {
     setIsProcessing(true);
     setCurrentStage('process');
     
-    // Set processing steps
+    // Enhanced processing steps based on enabled features
     const steps = [
-      'Analyzing command...',
+      'Analyzing command and requirements...',
       'Generating content structure...',
+      imageGenerationEnabled ? 'Creating AI-generated image...' : null,
       'Writing engaging copy...',
-      'Optimizing for SEO...',
-      'Finalizing content...'
-    ];
+      'Optimizing for SEO and readability...',
+      'Finalizing content package...'
+    ].filter(Boolean) as string[];
+    
     setProcessingSteps(steps);
     setCurrentStep(0);
 
     try {
       await sendCommand(command, {
-        title: `${contentType.charAt(0).toUpperCase() + contentType.slice(1)} Content`,
+        title: selectedTemplate ? selectedTemplate.title : `${contentType.charAt(0).toUpperCase() + contentType.slice(1)} Content`,
         platform: contentType,
-        content_type: 'safety_guide'
+        content_type: selectedTemplate?.category || 'marketing_content',
+        image_generation: imageGenerationEnabled,
+        image_prompt: customImagePrompt,
+        template_id: selectedTemplate?.id,
+        word_count: 800,
+        seo_optimization: true
       });
     } catch (error) {
       console.error('Content creation failed:', error);
@@ -165,6 +208,9 @@ const SimplifiedRivenContent: React.FC = () => {
     setGeneratedContent([]);
     setProcessingSteps([]);
     setCurrentStep(0);
+    setSelectedTemplate(null);
+    setImageGenerationEnabled(false);
+    setCustomImagePrompt('');
   };
 
   const getContentTypeIcon = (type: string) => {
@@ -230,64 +276,135 @@ const SimplifiedRivenContent: React.FC = () => {
 
         {/* Stage Content */}
         {currentStage === 'command' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wand2 className="h-5 w-5 text-primary" />
-                Command Centre
-              </CardTitle>
-              <p className="text-muted-foreground">
-                Tell Riven what content you want to create and watch the AI work its magic
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {[
-                  { id: 'blog', label: 'Blog Post', icon: FileText, desc: 'SEO-optimized articles' },
-                  { id: 'social', label: 'Social Media', icon: Share2, desc: 'Engaging social posts' },
-                  { id: 'email', label: 'Email Campaign', icon: Mail, desc: 'Newsletter content' },
-                  { id: 'video', label: 'Video Script', icon: Video, desc: 'Script for videos' }
-                ].map((type) => {
-                  const TypeIcon = type.icon;
-                  return (
-                    <Button
-                      key={type.id}
-                      variant={contentType === type.id ? 'default' : 'outline'}
-                      onClick={() => setContentType(type.id)}
-                      className="h-auto p-4 flex flex-col items-center gap-2"
-                    >
-                      <TypeIcon className="h-6 w-6" />
-                      <div className="text-center">
-                        <div className="font-medium">{type.label}</div>
-                        <div className="text-xs text-muted-foreground">{type.desc}</div>
-                      </div>
-                    </Button>
-                  );
-                })}
-              </div>
+          <div className="space-y-6">
+            {/* AI Provider Status */}
+            <AIProviderStatus onStatusUpdate={setAiProviderStatus} />
+            
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Wand2 className="h-5 w-5 text-primary" />
+                      Command Centre
+                    </CardTitle>
+                    <p className="text-muted-foreground">
+                      Create professional marketing content with AI-powered templates and image generation
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAdvancedOptions(!showAdvancedOptions)}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    {showAdvancedOptions ? 'Hide' : 'Show'} Options
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Content Type Selection */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {[
+                    { id: 'blog', label: 'Blog Post', icon: FileText, desc: 'SEO-optimized articles' },
+                    { id: 'social', label: 'Social Media', icon: Share2, desc: 'Engaging social posts' },
+                    { id: 'email', label: 'Email Campaign', icon: Mail, desc: 'Newsletter content' },
+                    { id: 'video', label: 'Video Script', icon: Video, desc: 'Script for videos' }
+                  ].map((type) => {
+                    const TypeIcon = type.icon;
+                    return (
+                      <Button
+                        key={type.id}
+                        variant={contentType === type.id ? 'default' : 'outline'}
+                        onClick={() => {
+                          setContentType(type.id);
+                          setSelectedTemplate(null); // Clear template when manually changing type
+                        }}
+                        className="h-auto p-4 flex flex-col items-center gap-2"
+                      >
+                        <TypeIcon className="h-6 w-6" />
+                        <div className="text-center">
+                          <div className="font-medium">{type.label}</div>
+                          <div className="text-xs text-muted-foreground">{type.desc}</div>
+                        </div>
+                      </Button>
+                    );
+                  })}
+                </div>
 
-              <Textarea
-                placeholder="e.g., Create a comprehensive family emergency preparedness guide that covers SOS device setup, emergency contacts, and safety protocols..."
-                value={command}
-                onChange={(e) => setCommand(e.target.value)}
-                className="min-h-[120px] text-base"
-              />
+                {/* Marketing Templates */}
+                <MarketingTemplates 
+                  onSelectTemplate={handleTemplateSelect}
+                  selectedTemplate={selectedTemplate}
+                />
 
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">
-                  Be specific about your target audience and content goals
-                </p>
-                <Button 
-                  onClick={handleCreateContent}
-                  disabled={!command.trim() || isProcessing}
-                  className="px-8"
-                >
-                  <Zap className="h-4 w-4 mr-2" />
-                  Create with Riven
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                {/* Command Input */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium">Content Description</span>
+                    {selectedTemplate && (
+                      <Badge variant="outline" className="text-xs">
+                        Using template: {selectedTemplate.title}
+                      </Badge>
+                    )}
+                  </div>
+                  <Textarea
+                    placeholder={selectedTemplate 
+                      ? "Template loaded! You can customize the prompt above or add specific requirements..."
+                      : "e.g., Create a comprehensive family emergency preparedness guide that covers SOS device setup, emergency contacts, and safety protocols..."
+                    }
+                    value={command}
+                    onChange={(e) => setCommand(e.target.value)}
+                    className="min-h-[120px] text-base"
+                  />
+                </div>
+
+                {/* Advanced Options */}
+                {showAdvancedOptions && (
+                  <div className="space-y-4 p-4 rounded-lg border bg-muted/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Layers className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">Advanced Options</span>
+                    </div>
+                    
+                    {/* Image Generation Toggle */}
+                    <ImageGenerationToggle
+                      enabled={imageGenerationEnabled}
+                      onToggle={setImageGenerationEnabled}
+                      customPrompt={customImagePrompt}
+                      onPromptChange={setCustomImagePrompt}
+                      templateImagePrompt={selectedTemplate?.imagePrompt}
+                    />
+                  </div>
+                )}
+
+                {/* Action Section */}
+                <div className="flex items-center justify-between pt-4 border-t">
+                  <div className="space-y-1">
+                    <p className="text-sm text-muted-foreground">
+                      {selectedTemplate ? 'Template ready' : 'Be specific about your target audience and content goals'}
+                    </p>
+                    {imageGenerationEnabled && (
+                      <p className="text-xs text-blue-600 flex items-center gap-1">
+                        <Image className="h-3 w-3" />
+                        AI image generation enabled
+                      </p>
+                    )}
+                  </div>
+                  <Button 
+                    onClick={handleCreateContent}
+                    disabled={!command.trim() || isProcessing}
+                    className="px-8"
+                    size="lg"
+                  >
+                    <Zap className="h-4 w-4 mr-2" />
+                    Create with Riven
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
         {currentStage === 'process' && (
