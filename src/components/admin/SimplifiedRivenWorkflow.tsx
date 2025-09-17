@@ -4,13 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle } from 'lucide-react';
+import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle, RefreshCw, Play } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RealTimeWorkflowVisualizer } from './RealTimeWorkflowVisualizer';
-import { AICommandProcessor } from './AICommandProcessor';
 import { ImageGenerationToggle } from './ImageGenerationToggle';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -42,7 +41,12 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const [allPublishedContent, setAllPublishedContent] = useState<ContentItem[]>([]);
   const [currentStage, setCurrentStage] = useState<WorkflowStage>('command');
   const [realTimeStages, setRealTimeStages] = useState<any[]>([]);
-  const [apiProviderStatus, setApiProviderStatus] = useState<{ openai: boolean; xai: boolean }>({ openai: false, xai: false });
+  const [apiProviderStatus, setApiProviderStatus] = useState<{ 
+    openai: boolean; 
+    xai: boolean; 
+    openrouter: boolean; 
+    fallbackUsed: boolean 
+  }>({ openai: false, xai: false, openrouter: false, fallbackUsed: false });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [showRegenerateDialog, setShowRegenerateDialog] = useState<string | null>(null);
   const [regenerateInstructions, setRegenerateInstructions] = useState('');
@@ -110,12 +114,17 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         });
         
         if (data?.providers) {
-          setApiProviderStatus(data.providers);
+          setApiProviderStatus({
+            openai: data.providers.openai,
+            xai: data.providers.xai,
+            openrouter: data.providers.openrouter,
+            fallbackUsed: !data.providers.openai && !data.providers.xai && !data.providers.openrouter
+          });
           
-          if (!data.providers.openai && !data.providers.xai) {
+          if (!data.providers.openai && !data.providers.xai && !data.providers.openrouter) {
             toast({
               title: "API Provider Warning",
-              description: "No AI providers are configured. Content generation may use fallback templates.",
+              description: "No AI providers are configured. Content generation will use fallback templates.",
               variant: "destructive"
             });
           }
@@ -558,15 +567,6 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
     }
   };
 
-  const handleCommandSubmit = (submittedCommand: string) => {
-    setFormData(prev => ({
-      ...prev,
-      command: submittedCommand,
-      title: prev.title || `AI Generated: ${submittedCommand.substring(0, 50)}...`
-    }));
-    // The AICommandProcessor handles the actual submission, this is just for UI updates
-    setCurrentStage('process');
-  };
 
   const resetWorkflow = () => {
     setCurrentStage('command');
@@ -703,35 +703,86 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         <CardContent>
           {currentStage === 'command' && (
             <div className="space-y-6">
-              {/* Enhanced AI Command Processor */}
-              <AICommandProcessor onCommandSubmit={handleCommandSubmit} />
-              
-              {/* AI Provider Status Alert */}
-              {(!apiProviderStatus.openai && !apiProviderStatus.xai) && (
-                <Alert className="border-yellow-200 bg-yellow-50">
-                  <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                  <AlertDescription className="text-yellow-700">
-                    <strong>AI Providers Offline:</strong> Content will be generated using intelligent templates. 
-                    For full AI generation, ensure API keys are properly configured.
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              <Separator />
+              {/* AI Provider Status */}
+              <Card className="border-l-4 border-l-primary">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Brain className="h-5 w-5 text-primary" />
+                      AI Marketing Command
+                    </CardTitle>
+                    <div className="flex items-center gap-2">
+                      {apiProviderStatus.openai && (
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-200">OpenAI Active</Badge>
+                      )}
+                      {apiProviderStatus.xai && (
+                        <Badge className="bg-purple-100 text-purple-700 border-purple-200">xAI Active</Badge>
+                      )}
+                      {apiProviderStatus.openrouter && (
+                        <Badge className="bg-green-100 text-green-700 border-green-200">OpenRouter Active</Badge>
+                      )}
+                      {apiProviderStatus.fallbackUsed && (
+                        <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">Template Mode</Badge>
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const checkProviderStatus = async () => {
+                            try {
+                              const { data } = await supabase.functions.invoke('riven-marketing-enhanced', {
+                                body: { action: 'provider_status' }
+                              });
+                              if (data?.providers) {
+                                setApiProviderStatus({
+                                  openai: data.providers.openai,
+                                  xai: data.providers.xai,
+                                  openrouter: data.providers.openrouter,
+                                  fallbackUsed: !data.providers.openai && !data.providers.xai && !data.providers.openrouter
+                                });
+                              }
+                            } catch (error) {
+                              console.error('Failed to check provider status:', error);
+                            }
+                          };
+                          checkProviderStatus();
+                        }}
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {apiProviderStatus.fallbackUsed && (
+                    <Alert className="border-yellow-200 bg-yellow-50">
+                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                      <AlertDescription className="text-yellow-700">
+                        AI providers are offline. Content will be generated using template fallbacks.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Marketing Command
+                    </label>
+                    <Textarea
+                      placeholder="Create a comprehensive blog post about emergency preparedness for families..."
+                      value={formData.command}
+                      onChange={(e) => setFormData({...formData, command: e.target.value})}
+                      className="min-h-[100px]"
+                      disabled={isProcessing}
+                    />
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Describe what content you want to create. Be specific about topic, audience, and format.
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Marketing Command *
-                    </label>
-                    <Textarea
-                      placeholder="Enter your marketing command (e.g., 'Create a comprehensive blog post about emergency preparedness for families')"
-                      value={formData.command}
-                      onChange={(e) => setFormData({...formData, command: e.target.value})}
-                      className="min-h-[120px]"
-                    />
-                  </div>
                   
                   <div>
                     <label className="block text-sm font-medium mb-2">

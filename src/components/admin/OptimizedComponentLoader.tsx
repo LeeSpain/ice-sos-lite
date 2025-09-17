@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { WorkflowProvider } from '@/contexts/RivenWorkflowContext';
-import { EnhancedCommandCenter } from './EnhancedCommandCenter';
+import { SimplifiedRivenWorkflow } from './SimplifiedRivenWorkflow';
 import { ContentApprovalDashboard } from './ContentApprovalDashboard';
 import { RealContentApproval } from './RealContentApproval';
 import { SocialHub } from './SocialHub';
@@ -39,7 +39,7 @@ export default function OptimizedComponentLoader({ type, props, enhanced = true 
       case 'command-center':
         return (
           <WorkflowProvider>
-            <EnhancedCommandCenter {...props} />
+            <SimplifiedRivenWorkflow />
           </WorkflowProvider>
         );
       case 'workflow-pipeline':
