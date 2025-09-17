@@ -1046,11 +1046,11 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
 
       {/* Enhanced Professional Preview Modal */}
       <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden">
-          <DialogHeader className="border-b pb-4">
+        <DialogContent className="max-w-6xl max-h-[95vh] flex flex-col">
+          <DialogHeader className="border-b pb-4 flex-shrink-0">
             <div className="flex items-start justify-between">
               <div className="space-y-2">
-                <DialogTitle className="text-2xl font-bold text-foreground">
+                <DialogTitle className="text-3xl font-bold text-foreground">
                   {selectedContent?.title || 'Content Preview'}
                 </DialogTitle>
                 <DialogDescription className="text-base text-muted-foreground">
@@ -1067,10 +1067,15 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                       </Badge>
                     </div>
                     {selectedContent.reading_time && (
-                      <span>🕒 {selectedContent.reading_time} min read</span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {selectedContent.reading_time} min read
+                      </span>
                     )}
                     {selectedContent.seo_score && (
-                      <span>📈 SEO Score: {selectedContent.seo_score}/100</span>
+                      <span className="flex items-center gap-1">
+                        📈 SEO Score: {selectedContent.seo_score}/100
+                      </span>
                     )}
                   </div>
                 )}
@@ -1078,25 +1083,48 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
             </div>
           </DialogHeader>
           
-          <div className="flex-1 overflow-y-auto">
-            <div className="py-6">
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto min-h-0">
+            <div className="p-6">
               {selectedContent?.body_text ? (
                 <article className="max-w-none">
+                  {/* Featured Image */}
+                  {selectedContent.image_url && (
+                    <div className="mb-8">
+                      <img 
+                        src={selectedContent.image_url} 
+                        alt={selectedContent.featured_image_alt || selectedContent.title || 'Featured image'} 
+                        className="w-full h-64 object-cover rounded-lg border shadow-lg"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      {selectedContent.featured_image_alt && (
+                        <p className="text-xs text-muted-foreground mt-2 italic text-center">
+                          {selectedContent.featured_image_alt}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Professional article styling */}
                   <div className="prose prose-lg max-w-none prose-headings:text-foreground prose-headings:font-bold prose-p:text-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground">
                     <div 
-                      className="formatted-content space-y-4"
+                      className="formatted-content space-y-6"
                       dangerouslySetInnerHTML={{ __html: selectedContent.body_text }} 
                     />
                   </div>
                   
                   {/* Content metadata */}
                   {(selectedContent.keywords || selectedContent.hashtags) && (
-                    <div className="mt-8 pt-6 border-t border-border">
+                    <div className="mt-12 pt-8 border-t border-border">
+                      <h4 className="text-lg font-semibold text-foreground mb-4">Content Tags</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {selectedContent.keywords && selectedContent.keywords.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold text-foreground mb-2">Keywords</h4>
+                          <div className="space-y-3">
+                            <h5 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                              🔍 Keywords
+                            </h5>
                             <div className="flex flex-wrap gap-2">
                               {selectedContent.keywords.map((keyword, index) => (
                                 <Badge key={index} variant="outline" className="text-xs">
@@ -1108,8 +1136,10 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                         )}
                         
                         {selectedContent.hashtags && selectedContent.hashtags.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold text-foreground mb-2">Hashtags</h4>
+                          <div className="space-y-3">
+                            <h5 className="text-sm font-semibold text-foreground flex items-center gap-2">
+                              # Hashtags
+                            </h5>
                             <div className="flex flex-wrap gap-2">
                               {selectedContent.hashtags.map((hashtag, index) => (
                                 <Badge key={index} variant="secondary" className="text-xs">
@@ -1125,50 +1155,86 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                   
                   {/* SEO Information */}
                   {(selectedContent.seo_title || selectedContent.meta_description) && (
-                    <div className="mt-6 pt-6 border-t border-border">
-                      <h4 className="text-sm font-semibold text-foreground mb-3">SEO Information</h4>
-                      <div className="space-y-3">
+                    <div className="mt-8 pt-8 border-t border-border">
+                      <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                        🎯 SEO Optimization
+                      </h4>
+                      <div className="space-y-4">
                         {selectedContent.seo_title && (
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground">SEO Title</label>
-                            <p className="text-sm text-foreground mt-1 p-2 bg-muted rounded">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-muted-foreground">SEO Title</label>
+                            <div className="text-sm text-foreground p-3 bg-muted rounded-lg border">
                               {selectedContent.seo_title}
-                            </p>
+                            </div>
                           </div>
                         )}
                         {selectedContent.meta_description && (
-                          <div>
-                            <label className="text-xs font-medium text-muted-foreground">Meta Description</label>
-                            <p className="text-sm text-foreground mt-1 p-2 bg-muted rounded">
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium text-muted-foreground">Meta Description</label>
+                            <div className="text-sm text-foreground p-3 bg-muted rounded-lg border">
                               {selectedContent.meta_description}
-                            </p>
+                            </div>
                           </div>
                         )}
                       </div>
                     </div>
                   )}
+
+                  {/* Content Statistics */}
+                  <div className="mt-8 pt-8 border-t border-border">
+                    <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                      📊 Content Statistics
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {selectedContent.reading_time && (
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-semibold text-foreground">{selectedContent.reading_time}</div>
+                          <div className="text-xs text-muted-foreground">Minutes</div>
+                        </div>
+                      )}
+                      {selectedContent.seo_score && (
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-semibold text-foreground">{selectedContent.seo_score}/100</div>
+                          <div className="text-xs text-muted-foreground">SEO Score</div>
+                        </div>
+                      )}
+                      {selectedContent.keywords && (
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-semibold text-foreground">{selectedContent.keywords.length}</div>
+                          <div className="text-xs text-muted-foreground">Keywords</div>
+                        </div>
+                      )}
+                      {selectedContent.hashtags && (
+                        <div className="text-center p-3 bg-muted rounded-lg">
+                          <div className="text-lg font-semibold text-foreground">{selectedContent.hashtags.length}</div>
+                          <div className="text-xs text-muted-foreground">Hashtags</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </article>
               ) : (
                 <div className="text-center py-12">
-                  <div className="text-muted-foreground">No content body available for preview.</div>
+                  <div className="text-muted-foreground text-lg">No content body available for preview.</div>
                 </div>
               )}
             </div>
           </div>
           
-          <DialogFooter className="border-t pt-4">
+          <DialogFooter className="border-t pt-4 flex-shrink-0">
             <div className="flex items-center justify-between w-full">
               <div className="text-xs text-muted-foreground">
                 {selectedContent && (
                   <>Created: {new Date(selectedContent.created_at).toLocaleString()}</>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setShowPreviewModal(false)}>
-                  Close
+                  Close Preview
                 </Button>
                 {selectedContent && (
                   <Button onClick={() => { setShowPreviewModal(false); setShowEditModal(true); }}>
+                    <Eye className="h-4 w-4 mr-2" />
                     Edit Content
                   </Button>
                 )}
