@@ -384,11 +384,7 @@ function isNewerModel(model: string): boolean {
   return newerModels.some(prefix => model.startsWith(prefix));
 }
 
-// Helper function to determine if model uses newer API parameters
-function isNewerModel(model: string): boolean {
-  const newerModels = ['gpt-5', 'gpt-4.1', 'o3', 'o4'];
-  return newerModels.some(prefix => model.startsWith(prefix));
-}
+// duplicate isNewerModel removed
 
 async function executeContentCreation(supabase: any, campaignId: string, originalCommand: string, settings: any, aiConfig: any) {
   console.log('Executing content creation stage');
