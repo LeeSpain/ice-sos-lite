@@ -23,7 +23,7 @@ class EnhancedTileCache {
   private readonly maxAge: number;
   private loadingPromises = new Map<string, Promise<HTMLImageElement | null>>();
   private loggedProviders = new Set<string>();
-  private fallbackOrder = ['cartodb-light', 'osm-standard', 'osm-hot', 'cartodb-dark'];
+  private fallbackOrder = ['esri-streets', 'cartodb-light', 'osm-standard', 'osm-hot', 'cartodb-dark'];
   private currentProviderIndex = 0;
 
   // Enhanced tile providers with better labeling
@@ -55,6 +55,13 @@ class EnhancedTileCache {
       attribution: '© OpenStreetMap contributors, © CARTO',
       hasLabels: true,
       maxZoom: 19
+    },
+    'esri-streets': {
+      name: 'Esri Streets',
+      url: (x, y, z) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/${z}/${y}/${x}`,
+      attribution: '© Esri, HERE, Garmin, USGS, Intermap, INCREMENT P, NRCan, Esri Japan, METI, Esri China (Hong Kong), OpenStreetMap contributors, and the GIS User Community',
+      hasLabels: true,
+      maxZoom: 18
     },
     'esri-satellite': {
       name: 'Esri Satellite',
