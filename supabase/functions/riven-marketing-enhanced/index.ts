@@ -316,6 +316,11 @@ async function updateStageStatus(supabase: any, campaignId: string, stageName: s
 
 async function executeCommandAnalysis(command: string, settings: any, aiConfig: any) {
   console.log('Executing command analysis stage');
+  console.log('Analyzing command:', command);
+  
+  // Parse the command to understand intent
+  const parsedCommand = parseCommand(command);
+  console.log('Command parsed as:', parsedCommand);
   
   const overviewProvider = aiConfig?.stages?.overview?.provider || 'openai';
   console.log(`Using ${overviewProvider} for command analysis`);
@@ -333,11 +338,16 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
           messages: [
             {
               role: 'system',
-              content: 'You are a marketing strategist. Analyze the given command and provide strategic insights in JSON format.'
+              content: 'You are a marketing strategist for ICE SOS Lite, an emergency preparedness app. Analyze content creation commands and extract the actual topic and intent, not just repeat the command. Focus on what content should be created about.'
             },
             {
               role: 'user',
-              content: `Analyze this marketing command: "${command}". Provide strategy, target audience, tone, and SEO keywords.`
+              content: `Analyze this content creation request: "${command}". 
+              
+              What topic should the content actually be about? What type of content is requested? 
+              Extract the real subject matter and content strategy.
+              
+              For context: ICE SOS Lite is an emergency preparedness app with features like emergency contacts, SOS alerts, location sharing, medical info storage, family circles, and offline functionality.`
             }
           ],
           max_tokens: 500,
@@ -349,46 +359,136 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
         const content = data.choices[0].message.content;
         console.log('xAI analysis completed:', content);
         
-        // Parse or create structured response
         return {
-          strategy: `AI-enhanced ${command} strategy`,
-          target_audience: settings?.target_audience || 'Families and emergency preparedness enthusiasts',
+          strategy: `Content strategy for ${parsedCommand.topic}`,
+          target_audience: settings?.target_audience || getTargetAudienceForTopic(parsedCommand.topic),
           tone: settings?.tone || 'Professional yet approachable',
-          content_type: 'blog_post',
-          seo_keywords: [
-            'emergency preparedness',
-            'family safety',
-            'ICE SOS',
-            'emergency contacts',
-            'safety planning'
-          ],
+          content_type: parsedCommand.intent,
+          content_topic: parsedCommand.topic,
+          content_category: parsedCommand.category,
+          seo_keywords: generateKeywordsForTopic(parsedCommand.topic),
           estimated_completion: '15 minutes',
-          ai_insights: content
+          ai_insights: content,
+          parsed_command: parsedCommand
         };
       }
     } catch (error) {
-      console.error('xAI analysis failed, using fallback:', error);
+      console.error('xAI analysis failed, using intelligent fallback:', error);
     }
   }
   
-  // Fallback analysis
+  // Try OpenAI if configured
+  if (overviewProvider === 'openai' && openAIApiKey) {
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a marketing strategist for ICE SOS Lite, an emergency preparedness app. Analyze content creation commands and extract the actual topic and intent, not just repeat the command. Focus on what content should be created about.'
+            },
+            {
+              role: 'user',
+              content: `Analyze this content creation request: "${command}". 
+              
+              What topic should the content actually be about? What type of content is requested? 
+              Extract the real subject matter and content strategy.
+              
+              For context: ICE SOS Lite is an emergency preparedness app with features like emergency contacts, SOS alerts, location sharing, medical info storage, family circles, and offline functionality.`
+            }
+          ],
+          max_tokens: 500,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const content = data.choices[0].message.content;
+        console.log('OpenAI analysis completed:', content);
+        
+        return {
+          strategy: `Content strategy for ${parsedCommand.topic}`,
+          target_audience: settings?.target_audience || getTargetAudienceForTopic(parsedCommand.topic),
+          tone: settings?.tone || 'Professional yet approachable',
+          content_type: parsedCommand.intent,
+          content_topic: parsedCommand.topic,
+          content_category: parsedCommand.category,
+          seo_keywords: generateKeywordsForTopic(parsedCommand.topic),
+          estimated_completion: '15 minutes',
+          ai_insights: content,
+          parsed_command: parsedCommand
+        };
+      }
+    } catch (error) {
+      console.error('OpenAI analysis failed, using intelligent fallback:', error);
+    }
+  }
+  
+  // Intelligent fallback analysis
   const analysisResult = {
-    strategy: `Comprehensive ${command} strategy`,
-    target_audience: settings?.target_audience || 'General audience interested in family safety and emergency preparedness',
+    strategy: `Comprehensive content strategy for ${parsedCommand.topic}`,
+    target_audience: settings?.target_audience || getTargetAudienceForTopic(parsedCommand.topic),
     tone: settings?.tone || 'Professional yet approachable',
-    content_type: 'blog_post',
-    seo_keywords: [
-      'emergency preparedness',
-      'family safety',
-      'ICE SOS',
-      'emergency contacts',
-      'safety planning'
-    ],
-    estimated_completion: '15 minutes'
+    content_type: parsedCommand.intent,
+    content_topic: parsedCommand.topic,
+    content_category: parsedCommand.category,
+    seo_keywords: generateKeywordsForTopic(parsedCommand.topic),
+    estimated_completion: '15 minutes',
+    parsed_command: parsedCommand
   };
   
   console.log('Command analysis completed:', analysisResult);
   return analysisResult;
+}
+
+// Helper functions for intelligent analysis
+function getTargetAudienceForTopic(topic: string): string {
+  if (topic.includes('senior') || topic.includes('elderly')) {
+    return 'Senior citizens and their families';
+  }
+  if (topic.includes('family') || topic.includes('children')) {
+    return 'Families with children';
+  }
+  if (topic.includes('travel') || topic.includes('vacation')) {
+    return 'Frequent travelers and vacation planners';
+  }
+  if (topic.includes('medical') || topic.includes('health')) {
+    return 'Healthcare-conscious individuals and families';
+  }
+  if (topic.includes('workplace') || topic.includes('corporate')) {
+    return 'Corporate safety managers and HR professionals';
+  }
+  return 'Families and safety-conscious individuals';
+}
+
+function generateKeywordsForTopic(topic: string): string[] {
+  const baseKeywords = ['emergency preparedness', 'family safety', 'ICE SOS', 'emergency contacts', 'safety planning'];
+  const topicKeywords = [topic];
+  
+  // Add relevant keywords based on topic
+  if (topic.includes('medical')) {
+    topicKeywords.push('medical emergency', 'health crisis', 'medical information');
+  }
+  if (topic.includes('family')) {
+    topicKeywords.push('family emergency plan', 'child safety', 'family communication');
+  }
+  if (topic.includes('senior')) {
+    topicKeywords.push('senior safety', 'elderly care', 'aging parents');
+  }
+  if (topic.includes('travel')) {
+    topicKeywords.push('travel safety', 'vacation emergency', 'travel preparedness');
+  }
+  if (topic.includes('contact')) {
+    topicKeywords.push('emergency contact list', 'emergency phone numbers', 'crisis communication');
+  }
+  
+  return [...baseKeywords, ...topicKeywords];
 }
 
 // Helper function to determine if model uses newer API parameters
@@ -399,8 +499,237 @@ function isNewerModel(model: string): boolean {
 
 // duplicate isNewerModel removed
 
+// ICE SOS Lite Knowledge Base
+const ICE_SOS_KNOWLEDGE = {
+  features: {
+    emergency_contacts: "Store and manage emergency contacts with priority levels, including family, friends, and professional services",
+    sos_alerts: "One-touch SOS activation that notifies all emergency contacts via multiple channels",
+    location_sharing: "Real-time GPS location sharing with family and emergency contacts",
+    medical_info: "Store critical medical information, allergies, and emergency medical details",
+    family_circles: "Create family groups for shared emergency planning and communication",
+    offline_mode: "Critical functions work even without internet connectivity",
+    voice_activation: "Hands-free emergency activation through voice commands",
+    automated_calling: "Automatic emergency calling sequence to contacts in priority order"
+  },
+  benefits: {
+    peace_of_mind: "24/7 safety assurance for families and individuals",
+    quick_response: "Fastest emergency response through automated systems",
+    family_coordination: "Keep families connected and informed during emergencies",
+    medical_safety: "Instant access to critical medical information for first responders",
+    location_safety: "Real-time location tracking for family safety",
+    senior_safety: "Specialized features for elderly family members",
+    travel_safety: "Enhanced safety features for travel and unfamiliar locations"
+  },
+  use_cases: [
+    "Medical emergencies and health crises",
+    "Car accidents and roadside emergencies", 
+    "Personal safety and security threats",
+    "Natural disasters and weather emergencies",
+    "Senior citizen safety monitoring",
+    "Teen and young adult safety",
+    "Travel and vacation safety",
+    "Workplace emergency preparedness",
+    "Sports and outdoor activity safety",
+    "Home security and break-ins"
+  ],
+  target_audiences: [
+    "Families with children",
+    "Senior citizens and their families", 
+    "Frequent travelers",
+    "Outdoor enthusiasts",
+    "Healthcare providers",
+    "Security-conscious individuals",
+    "Corporate safety managers",
+    "Emergency responders",
+    "College students and parents"
+  ]
+};
+
+// Content Templates for Different Topics
+const CONTENT_TEMPLATES = {
+  features: {
+    title_template: "ICE SOS Lite Features: {feature} - Complete Guide",
+    intro_template: "Discover how ICE SOS Lite's {feature} can enhance your family's safety and emergency preparedness...",
+    sections: ["Overview", "How It Works", "Benefits", "Setup Guide", "Best Practices", "Real-World Examples"]
+  },
+  benefits: {
+    title_template: "{benefit} with ICE SOS Lite - Essential Safety Guide", 
+    intro_template: "Learn how ICE SOS Lite delivers {benefit} through advanced emergency preparedness technology...",
+    sections: ["Why It Matters", "Key Features", "Implementation", "Success Stories", "Expert Tips"]
+  },
+  use_cases: {
+    title_template: "Emergency Preparedness for {use_case} - ICE SOS Guide",
+    intro_template: "Essential emergency preparedness strategies for {use_case} using ICE SOS Lite's comprehensive safety features...",
+    sections: ["Common Scenarios", "Prevention Strategies", "Emergency Response", "ICE SOS Features", "Action Plans"]
+  },
+  general: {
+    title_template: "Emergency Preparedness: {topic} - Complete Safety Guide",
+    intro_template: "Comprehensive guide to {topic} and how modern emergency apps like ICE SOS Lite can enhance your safety preparedness...",
+    sections: ["Understanding the Basics", "Modern Solutions", "Implementation Guide", "Best Practices", "Advanced Tips"]
+  }
+};
+
+// Intelligent Command Parser
+function parseCommand(command: string): { topic: string, category: string, intent: string } {
+  const lowerCommand = command.toLowerCase();
+  
+  // Extract intent (what type of content they want)
+  let intent = 'guide';
+  if (lowerCommand.includes('review') || lowerCommand.includes('comparison')) intent = 'review';
+  if (lowerCommand.includes('tutorial') || lowerCommand.includes('how to')) intent = 'tutorial';
+  if (lowerCommand.includes('benefits') || lowerCommand.includes('advantages')) intent = 'benefits';
+  if (lowerCommand.includes('features') || lowerCommand.includes('capabilities')) intent = 'features';
+  
+  // Identify what they're asking about
+  let topic = 'emergency preparedness';
+  let category = 'general';
+  
+  // Check for specific ICE SOS features
+  for (const [key, description] of Object.entries(ICE_SOS_KNOWLEDGE.features)) {
+    if (lowerCommand.includes(key.replace('_', ' ')) || lowerCommand.includes(description.toLowerCase().substring(0, 20))) {
+      topic = key.replace('_', ' ');
+      category = 'features';
+      break;
+    }
+  }
+  
+  // Check for specific benefits
+  for (const [key, description] of Object.entries(ICE_SOS_KNOWLEDGE.benefits)) {
+    if (lowerCommand.includes(key.replace('_', ' ')) || lowerCommand.includes(description.toLowerCase().substring(0, 20))) {
+      topic = key.replace('_', ' ');
+      category = 'benefits';
+      break;
+    }
+  }
+  
+  // Check for use cases
+  for (const useCase of ICE_SOS_KNOWLEDGE.use_cases) {
+    if (lowerCommand.includes(useCase.toLowerCase().substring(0, 15))) {
+      topic = useCase;
+      category = 'use_cases';
+      break;
+    }
+  }
+  
+  // Extract general topics
+  if (category === 'general') {
+    if (lowerCommand.includes('family safety')) topic = 'family safety';
+    if (lowerCommand.includes('emergency contact')) topic = 'emergency contacts';
+    if (lowerCommand.includes('medical emergency')) topic = 'medical emergencies';
+    if (lowerCommand.includes('sos')) topic = 'SOS systems';
+    if (lowerCommand.includes('location sharing')) topic = 'location sharing';
+  }
+  
+  return { topic, category, intent };
+}
+
+// Intelligent Content Generator
+function generateIntelligentContent(parsedCommand: any, settings: any): any {
+  const { topic, category, intent } = parsedCommand;
+  const template = CONTENT_TEMPLATES[category] || CONTENT_TEMPLATES.general;
+  
+  // Generate title
+  const title = template.title_template.replace('{topic}', topic)
+    .replace('{feature}', topic)
+    .replace('{benefit}', topic)
+    .replace('{use_case}', topic);
+  
+  // Generate introduction
+  const intro = template.intro_template.replace('{topic}', topic)
+    .replace('{feature}', topic)
+    .replace('{benefit}', topic)
+    .replace('{use_case}', topic);
+  
+  // Generate body content based on category
+  let bodyContent = `<h1>${title}</h1>\n\n<p>${intro}</p>\n\n`;
+  
+  if (category === 'features') {
+    const featureData = ICE_SOS_KNOWLEDGE.features[topic.replace(' ', '_')];
+    bodyContent += `<h2>What is ${topic.charAt(0).toUpperCase() + topic.slice(1)}?</h2>\n`;
+    bodyContent += `<p>${featureData || `The ${topic} feature in ICE SOS Lite provides essential emergency preparedness capabilities for modern families.`}</p>\n\n`;
+    
+    bodyContent += `<h2>Key Benefits</h2>\n<ul>\n`;
+    bodyContent += `<li>Enhanced family safety and emergency response</li>\n`;
+    bodyContent += `<li>Instant access during critical situations</li>\n`;
+    bodyContent += `<li>Peace of mind for family members</li>\n`;
+    bodyContent += `<li>Integration with professional emergency services</li>\n</ul>\n\n`;
+    
+    bodyContent += `<h2>How to Use This Feature</h2>\n`;
+    bodyContent += `<p>Setting up ${topic} in ICE SOS Lite is straightforward and can be completed in just a few minutes. The intuitive interface guides you through each step of the configuration process.</p>\n\n`;
+    
+  } else if (category === 'benefits') {
+    const benefitData = ICE_SOS_KNOWLEDGE.benefits[topic.replace(' ', '_')];
+    bodyContent += `<h2>Understanding ${topic.charAt(0).toUpperCase() + topic.slice(1)}</h2>\n`;
+    bodyContent += `<p>${benefitData || `${topic.charAt(0).toUpperCase() + topic.slice(1)} is a crucial aspect of modern emergency preparedness that ICE SOS Lite addresses comprehensively.`}</p>\n\n`;
+    
+    bodyContent += `<h2>How ICE SOS Lite Delivers</h2>\n`;
+    bodyContent += `<p>Through advanced technology and user-centric design, ICE SOS Lite ensures that ${topic} is not just a promise, but a reliable reality for users and their families.</p>\n\n`;
+    
+  } else if (category === 'use_cases') {
+    bodyContent += `<h2>Understanding ${topic} Scenarios</h2>\n`;
+    bodyContent += `<p>When it comes to ${topic}, preparation and the right tools can make all the difference. ICE SOS Lite provides specialized features designed specifically for these situations.</p>\n\n`;
+    
+    bodyContent += `<h2>Essential Preparation Steps</h2>\n<ol>\n`;
+    bodyContent += `<li>Set up emergency contacts with priority levels</li>\n`;
+    bodyContent += `<li>Configure location sharing preferences</li>\n`;
+    bodyContent += `<li>Test the system regularly with family members</li>\n`;
+    bodyContent += `<li>Review and update information quarterly</li>\n</ol>\n\n`;
+    
+  } else {
+    // General content
+    bodyContent += `<h2>The Importance of ${topic.charAt(0).toUpperCase() + topic.slice(1)}</h2>\n`;
+    bodyContent += `<p>In today's world, ${topic} has become increasingly important for families and individuals. Modern technology, like ICE SOS Lite, offers innovative solutions to traditional safety challenges.</p>\n\n`;
+    
+    bodyContent += `<h2>Modern Solutions</h2>\n`;
+    bodyContent += `<p>ICE SOS Lite represents the next generation of emergency preparedness tools, combining traditional safety principles with cutting-edge technology to provide comprehensive protection.</p>\n\n`;
+  }
+  
+  // Add ICE SOS specific content
+  bodyContent += `<h2>ICE SOS Lite Integration</h2>\n`;
+  bodyContent += `<p>ICE SOS Lite's comprehensive approach to emergency preparedness includes features specifically designed to address ${topic}. The app's intuitive interface makes it easy for users of all ages to access critical safety features when needed most.</p>\n\n`;
+  
+  bodyContent += `<h2>Getting Started</h2>\n`;
+  bodyContent += `<p>Taking the first step towards better emergency preparedness is simple with ICE SOS Lite. Download the app, set up your emergency contacts, and customize the features that matter most to your family's safety needs.</p>\n\n`;
+  
+  bodyContent += `<h2>Conclusion</h2>\n`;
+  bodyContent += `<p>Effective ${topic} requires the right combination of preparation, technology, and peace of mind. ICE SOS Lite provides all three, ensuring that you and your family are prepared for whatever challenges may arise.</p>`;
+  
+  // Generate metadata
+  const keywords = [
+    topic,
+    'emergency preparedness',
+    'family safety',
+    'ICE SOS',
+    'emergency contacts',
+    'safety planning',
+    'emergency app',
+    'crisis management'
+  ];
+  
+  return {
+    title,
+    body_text: bodyContent,
+    seo_title: `${title} | ICE SOS Lite`,
+    meta_description: `Complete guide to ${topic} and emergency preparedness. Learn how ICE SOS Lite can enhance your family's safety with modern emergency response technology.`,
+    content_sections: template.sections.map(section => ({
+      heading: section,
+      summary: `Detailed information about ${section.toLowerCase()} related to ${topic}`
+    })),
+    word_count: Math.max(settings?.word_count || 800, 600),
+    keywords,
+    featured_image_alt: `Professional illustration showing ${topic} and emergency preparedness concept`,
+    reading_time: Math.ceil((settings?.word_count || 800) / 200),
+    seo_score: 88
+  };
+}
+
 async function executeContentCreation(supabase: any, campaignId: string, originalCommand: string, settings: any, aiConfig: any) {
   console.log('Executing content creation stage');
+  console.log('Original command:', originalCommand);
+  
+  // Parse the command to understand what content to create
+  const parsedCommand = parseCommand(originalCommand);
+  console.log('Parsed command:', parsedCommand);
   
   // Get the analysis result from the previous stage
   const { data: analysisStage } = await supabase
@@ -420,20 +749,26 @@ async function executeContentCreation(supabase: any, campaignId: string, origina
     try {
       console.log('Calling xAI API for content generation...');
       
-      const prompt = `Create a comprehensive blog post about "${originalCommand}".
-      
-Target audience: ${analysisResult.target_audience || 'General audience'}
-Tone: ${analysisResult.tone || 'Professional'}
+      const contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
+
+Context: This is for ICE SOS Lite, an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, and medical information storage.
+
+Command Intent: ${parsedCommand.intent} 
+Content Category: ${parsedCommand.category}
+Topic: ${parsedCommand.topic}
+
+Target audience: ${analysisResult.target_audience || 'Families and safety-conscious individuals'}
+Tone: ${analysisResult.tone || 'Professional yet approachable'}
 Word count: ${settings?.word_count || 800} words
-SEO focus: Include keywords like ${analysisResult.seo_keywords?.join(', ') || 'emergency, safety, preparedness'}
 
 Please create:
-1. An engaging title
+1. An engaging, SEO-optimized title
 2. Complete HTML body content with proper heading structure (use <h1>, <h2>, <h3>, <p>, <ul>, <li> tags)
-3. SEO-optimized title and meta description
-4. Relevant keywords
+3. Focus on practical advice and how ICE SOS Lite features solve real problems
+4. Include specific use cases and examples
+5. Make it actionable and valuable for readers
 
-Focus on family safety, emergency preparedness, and practical advice that relates to ICE SOS Lite app features.`;
+The content should be about the TOPIC (${parsedCommand.topic}), not about the command itself. Create actual informative content that helps readers understand and implement better emergency preparedness.`;
 
       const response = await fetch('https://api.x.ai/v1/chat/completions', {
         method: 'POST',
@@ -446,11 +781,11 @@ Focus on family safety, emergency preparedness, and practical advice that relate
           messages: [
             {
               role: 'system',
-              content: 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format.'
+              content: 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.'
             },
             {
               role: 'user',
-              content: prompt
+              content: contentPrompt
             }
           ],
           max_tokens: 3000,
@@ -463,35 +798,125 @@ Focus on family safety, emergency preparedness, and practical advice that relate
         
         console.log('xAI content generated successfully');
         
+        // Extract title from generated content or create one
+        const titleMatch = generatedContent.match(/<h1[^>]*>(.*?)<\/h1>/);
+        const extractedTitle = titleMatch ? titleMatch[1].replace(/<[^>]*>/g, '') : `${parsedCommand.topic.charAt(0).toUpperCase() + parsedCommand.topic.slice(1)} - Complete Safety Guide`;
+        
         return {
-          title: `${originalCommand} - Complete Guide`,
+          title: extractedTitle,
           body_text: generatedContent,
-          seo_title: `${originalCommand} - Essential Guide 2025`,
-          meta_description: `Comprehensive guide about ${originalCommand}. Get expert insights and practical advice for better planning.`,
+          seo_title: `${extractedTitle} | ICE SOS Lite`,
+          meta_description: `Essential guide to ${parsedCommand.topic} and emergency preparedness. Learn practical strategies and how ICE SOS Lite can enhance your family's safety.`,
           content_sections: [
-            { heading: "Introduction", summary: "Overview of the topic" },
-            { heading: "Main Content", summary: "Detailed information and insights" },
+            { heading: "Introduction", summary: `Overview of ${parsedCommand.topic}` },
+            { heading: "Key Strategies", summary: "Practical implementation advice" },
+            { heading: "ICE SOS Features", summary: "How technology enhances safety" },
+            { heading: "Best Practices", summary: "Expert recommendations" },
             { heading: "Conclusion", summary: "Key takeaways and next steps" }
           ],
           word_count: Number(settings?.word_count) || 800,
-          keywords: analysisResult.seo_keywords || ['guide', 'planning', 'strategy'],
-          featured_image_alt: `Professional illustration for ${originalCommand}`,
+          keywords: [parsedCommand.topic, 'emergency preparedness', 'family safety', 'ICE SOS', 'safety planning'],
+          featured_image_alt: `Professional illustration showing ${parsedCommand.topic} and emergency preparedness`,
           reading_time: Math.ceil((Number(settings?.word_count) || 800) / 200),
-          seo_score: 85
+          seo_score: 87
         };
       } else {
-        console.error(`xAI API error: ${response.status}, falling back to OpenAI`);
+        console.error(`xAI API error: ${response.status}, falling back to intelligent content generation`);
       }
     } catch (error) {
-      console.error('xAI content creation failed, falling back to OpenAI:', error);
+      console.error('xAI content creation failed, falling back to intelligent generation:', error);
     }
   }
 
-  // OpenAI fallback or primary choice
-  if (!openAIApiKey) {
-    console.log('No API key available, using static fallback content generation');
-    return {
-      title: `Complete Guide: ${originalCommand}`,
+  // Try OpenAI if configured
+  if (textProvider === 'openai' && openAIApiKey) {
+    try {
+      console.log('Calling OpenAI API for content generation...');
+      
+      const contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
+
+Context: This is for ICE SOS Lite, an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, and medical information storage.
+
+Command Intent: ${parsedCommand.intent} 
+Content Category: ${parsedCommand.category}
+Topic: ${parsedCommand.topic}
+
+Target audience: ${analysisResult.target_audience || 'Families and safety-conscious individuals'}
+Tone: ${analysisResult.tone || 'Professional yet approachable'}
+Word count: ${settings?.word_count || 800} words
+
+Please create:
+1. An engaging, SEO-optimized title
+2. Complete HTML body content with proper heading structure (use <h1>, <h2>, <h3>, <p>, <ul>, <li> tags)
+3. Focus on practical advice and how ICE SOS Lite features solve real problems
+4. Include specific use cases and examples
+5. Make it actionable and valuable for readers
+
+The content should be about the TOPIC (${parsedCommand.topic}), not about the command itself. Create actual informative content that helps readers understand and implement better emergency preparedness.`;
+
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.'
+            },
+            {
+              role: 'user',
+              content: contentPrompt
+            }
+          ],
+          max_tokens: 3000,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const generatedContent = data.choices[0].message.content;
+        
+        console.log('OpenAI content generated successfully');
+        
+        // Extract title from generated content or create one
+        const titleMatch = generatedContent.match(/<h1[^>]*>(.*?)<\/h1>/);
+        const extractedTitle = titleMatch ? titleMatch[1].replace(/<[^>]*>/g, '') : `${parsedCommand.topic.charAt(0).toUpperCase() + parsedCommand.topic.slice(1)} - Complete Safety Guide`;
+        
+        return {
+          title: extractedTitle,
+          body_text: generatedContent,
+          seo_title: `${extractedTitle} | ICE SOS Lite`,
+          meta_description: `Essential guide to ${parsedCommand.topic} and emergency preparedness. Learn practical strategies and how ICE SOS Lite can enhance your family's safety.`,
+          content_sections: [
+            { heading: "Introduction", summary: `Overview of ${parsedCommand.topic}` },
+            { heading: "Key Strategies", summary: "Practical implementation advice" },
+            { heading: "ICE SOS Features", summary: "How technology enhances safety" },
+            { heading: "Best Practices", summary: "Expert recommendations" },
+            { heading: "Conclusion", summary: "Key takeaways and next steps" }
+          ],
+          word_count: Number(settings?.word_count) || 800,
+          keywords: [parsedCommand.topic, 'emergency preparedness', 'family safety', 'ICE SOS', 'safety planning'],
+          featured_image_alt: `Professional illustration showing ${parsedCommand.topic} and emergency preparedness`,
+          reading_time: Math.ceil((Number(settings?.word_count) || 800) / 200),
+          seo_score: 87
+        };
+      } else {
+        console.error(`OpenAI API error: ${response.status}, using intelligent fallback`);
+      }
+    } catch (error) {
+      console.error('OpenAI content creation failed, using intelligent fallback:', error);
+    }
+  }
+
+  // Intelligent fallback content generation (no external APIs needed)
+  console.log('Using intelligent fallback content generation');
+  const intelligentContent = generateIntelligentContent(parsedCommand, settings);
+  console.log('Intelligent content generated:', intelligentContent.title);
+  return intelligentContent;
       body_text: `<h1>${originalCommand}</h1>\n\n<h2>Introduction</h2>\n<p>This comprehensive guide provides essential information about ${originalCommand}.</p>\n\n<h2>Key Points</h2>\n<ul><li>Important consideration 1</li><li>Important consideration 2</li><li>Important consideration 3</li></ul>\n\n<h2>Conclusion</h2>\n<p>Understanding ${originalCommand} is crucial for effective planning and execution.</p>`,
       seo_title: `${originalCommand} - Essential Guide`,
       meta_description: `Learn everything about ${originalCommand} with our comprehensive guide.`,
