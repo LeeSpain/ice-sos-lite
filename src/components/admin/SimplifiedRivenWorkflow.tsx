@@ -789,6 +789,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                 ) : (
                   <RealTimeWorkflowVisualizer 
                     campaignId={currentCampaignId || ''}
+                    workflow={workflowStages}
                   />
                 )}
               </div>
