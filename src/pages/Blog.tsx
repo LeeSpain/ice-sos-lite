@@ -14,10 +14,10 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
-import { BlogPostModal } from '@/components/blog/BlogPostModal';
 
 interface BlogPost {
   id: string;
@@ -45,9 +45,8 @@ const Blog = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadBlogPosts();
@@ -144,13 +143,8 @@ const Blog = () => {
   };
 
   const handleReadMore = (post: BlogPost) => {
-    setSelectedPost(post);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPost(null);
+    const slug = post.slug || (post.title ? post.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : post.id);
+    navigate(`/blog/${slug}`);
   };
 
   if (isLoading) {
@@ -452,15 +446,6 @@ const Blog = () => {
           </Card>
         </section>
       </main>
-      
-      {/* Blog Post Modal */}
-      {selectedPost && (
-        <BlogPostModal
-          post={selectedPost}
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-        />
-      )}
       
       <Footer />
     </div>
