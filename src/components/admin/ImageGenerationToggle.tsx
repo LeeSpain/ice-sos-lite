@@ -208,15 +208,19 @@ export const ImageGenerationToggle: React.FC<ImageGenerationToggleProps> = ({
             <div className="border rounded-lg p-3 bg-muted/30">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium">Generated Preview</span>
-                <Button variant="ghost" size="sm">
-                  <Download className="h-4 w-4" />
+                <Button variant="ghost" size="sm" asChild>
+                  <a href={previewImage} download="generated-image.png" aria-label="Download generated image">
+                    <Download className="h-4 w-4" />
+                  </a>
                 </Button>
               </div>
-              <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <Image className="h-8 w-8 mx-auto mb-2" />
-                  <div className="text-sm">Generated Image Preview</div>
-                </div>
+              <div className="relative w-full overflow-hidden rounded-lg">
+                <img
+                  src={previewImage}
+                  alt="AI generated image preview for content"
+                  className="w-full h-auto object-contain"
+                  loading="lazy"
+                />
               </div>
             </div>
           )}
