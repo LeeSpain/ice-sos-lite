@@ -301,58 +301,74 @@ const Blog = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPosts.slice(featuredPost ? 1 : 0).map((post) => (
-                <Card key={post.id} className="group hover:shadow-xl transition-all duration-500 border-0 shadow-lg hover:-translate-y-1">
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between mb-3">
+                <Card key={post.id} className="group hover:shadow-2xl transition-all duration-500 border-0 shadow-lg hover:-translate-y-2 bg-gradient-to-br from-white to-primary/[0.02] overflow-hidden">
+                  {/* Top gradient accent */}
+                  <div className="h-1 bg-gradient-to-r from-primary via-secondary to-primary"></div>
+                  
+                  <CardHeader className="pb-6 pt-6">
+                    {/* Meta badges */}
+                    <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="border-primary/20 text-primary">
+                        <Badge className="bg-primary/10 text-primary border-primary/20 font-medium text-xs px-3 py-1">
                           {post.platform}
                         </Badge>
                         {post.seo_score && post.seo_score >= 80 && (
-                          <Badge className="bg-green-500/10 text-green-700 border-green-200">
+                          <Badge className="bg-green-50 text-green-700 border-green-200 font-medium text-xs px-3 py-1">
+                            <Star className="h-3 w-3 mr-1" />
                             SEO Optimized
                           </Badge>
                         )}
                       </div>
                       {post.reading_time && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full">
-                          <Clock className="h-3 w-3" />
-                          {post.reading_time}m
+                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground bg-muted/60 px-3 py-1.5 rounded-full">
+                          <Clock className="h-3.5 w-3.5" />
+                          <span className="font-medium">{post.reading_time}m</span>
                         </div>
                       )}
                     </div>
-                    <CardTitle className="group-hover:text-primary transition-colors text-lg leading-tight">
+                    
+                    {/* Title */}
+                    <CardTitle className="group-hover:text-primary transition-colors duration-300 text-xl font-bold leading-tight line-clamp-2 mb-3 min-h-[3.5rem] flex items-start">
                       {post.seo_title || post.title || 'Untitled Post'}
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-6 line-clamp-3 leading-relaxed">
-                      {post.meta_description || getExcerpt(post.body_text || '')}
+                  
+                  <CardContent className="pt-0">
+                    {/* Description */}
+                    <p className="text-muted-foreground text-base leading-relaxed line-clamp-3 mb-6 min-h-[4.5rem]">
+                      {post.meta_description || getExcerpt(post.body_text || '', 120)}
                     </p>
                     
+                    {/* Keywords */}
                     {post.keywords && post.keywords.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-6">
+                      <div className="flex flex-wrap gap-2 mb-6 min-h-[2rem]">
                         {post.keywords.slice(0, 3).map((keyword, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs bg-secondary/50">
+                          <Badge key={index} variant="secondary" className="text-xs bg-secondary/30 hover:bg-secondary/50 transition-colors font-normal px-2.5 py-1">
                             {keyword}
                           </Badge>
                         ))}
+                        {post.keywords.length > 3 && (
+                          <Badge variant="outline" className="text-xs text-muted-foreground px-2.5 py-1">
+                            +{post.keywords.length - 3} more
+                          </Badge>
+                        )}
                       </div>
                     )}
                     
-                    <div className="flex items-center justify-between pt-4 border-t border-border">
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Calendar className="h-3 w-3" />
-                        {formatDate(post.posted_at || post.created_at)}
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4" />
+                        <span className="font-medium">{formatDate(post.posted_at || post.created_at)}</span>
                       </div>
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="group-hover:text-primary text-xs px-0"
+                        className="group/btn hover:bg-primary/10 hover:text-primary text-sm font-medium px-4 py-2 h-auto"
                         onClick={() => handleReadMore(post)}
                       >
-                        Read More
-                        <ArrowRight className="h-3 w-3 ml-1 group-hover:translate-x-1 transition-transform" />
+                        Read Article
+                        <ArrowRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform duration-300" />
                       </Button>
                     </div>
                   </CardContent>
