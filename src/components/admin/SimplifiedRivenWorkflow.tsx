@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { RealTimeWorkflowVisualizer } from './RealTimeWorkflowVisualizer';
 import { AICommandProcessor } from './AICommandProcessor';
+import { ImageGenerationToggle } from './ImageGenerationToggle';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -63,6 +64,11 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
     publishingControls: {
       auto_publish: false,
       require_approval: true
+    },
+    imageGeneration: {
+      enabled: false,
+      customPrompt: '',
+      style: 'professional'
     }
   });
 
@@ -249,7 +255,10 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           title: formData.title,
           settings: formData.settings,
           scheduling_options: formData.schedulingOptions,
-          publishing_controls: formData.publishingControls
+          publishing_controls: formData.publishingControls,
+          image_generation: formData.imageGeneration.enabled,
+          image_prompt: formData.imageGeneration.customPrompt,
+          image_style: formData.imageGeneration.style
         }
       });
 
@@ -511,7 +520,10 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           title: formData.title,
           settings: formData.settings,
           scheduling_options: formData.schedulingOptions,
-          publishing_controls: formData.publishingControls
+          publishing_controls: formData.publishingControls,
+          image_generation: formData.imageGeneration.enabled,
+          image_prompt: formData.imageGeneration.customPrompt,
+          image_style: formData.imageGeneration.style
         }
       });
 
@@ -579,6 +591,11 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
       publishingControls: {
         auto_publish: false,
         require_approval: true
+      },
+      imageGeneration: {
+        enabled: false,
+        customPrompt: '',
+        style: 'professional'
       }
     });
   };
@@ -866,6 +883,29 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
 
               <Separator />
 
+              {/* Image Generation Section */}
+              <div className="space-y-4">
+                <ImageGenerationToggle
+                  enabled={formData.imageGeneration.enabled}
+                  onToggle={(enabled) => setFormData({
+                    ...formData,
+                    imageGeneration: { ...formData.imageGeneration, enabled }
+                  })}
+                  customPrompt={formData.imageGeneration.customPrompt}
+                  onPromptChange={(prompt) => setFormData({
+                    ...formData,
+                    imageGeneration: { ...formData.imageGeneration, customPrompt: prompt }
+                  })}
+                  templateImagePrompt={
+                    formData.settings.content_type === 'blog_post' 
+                      ? `A professional illustration related to ${formData.settings.target_audience} safety and security`
+                      : `A high-quality ${formData.settings.content_type} image for ${formData.settings.target_audience}`
+                  }
+                />
+              </div>
+
+              <Separator />
+
               <div className="flex justify-between items-center">
                 <div className="text-sm text-muted-foreground">
                   Ready to create AI-powered marketing content
@@ -899,8 +939,21 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                   <h3 className="text-xl font-semibold">AI Processing Your Content</h3>
                 </div>
                 <p className="text-muted-foreground mb-6">
-                  Our AI is analyzing your command and generating high-quality content...
+                  Our AI is analyzing your command and generating high-quality content{formData.imageGeneration.enabled ? ' with custom images' : ''}...
                 </p>
+                
+                {/* Image Generation Status */}
+                {formData.imageGeneration.enabled && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto mb-6">
+                    <div className="flex items-center gap-2 text-blue-800 mb-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                      <span className="text-sm font-medium">AI Image Generation Active</span>
+                    </div>
+                    <p className="text-xs text-blue-600">
+                      Creating custom image: "{formData.imageGeneration.customPrompt?.substring(0, 60)}..."
+                    </p>
+                  </div>
+                )}
                 
                 {/* API Provider Status */}
                 <div className="flex justify-center gap-4 mb-6">
@@ -1048,6 +1101,47 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                             <p className="text-sm text-muted-foreground">
                               {content.meta_description}
                             </p>
+                          )}
+
+                          {/* Generated Image Display */}
+                          {content.image_url && (
+                            <div className="rounded-lg border bg-muted/30 p-4">
+                              <div className="flex items-center gap-4">
+                                <div className="aspect-video w-32 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center text-xs text-muted-foreground overflow-hidden">
+                                  <img 
+                                    src={content.image_url} 
+                                    alt={content.featured_image_alt || "Generated content image"}
+                                    className="w-full h-full object-cover rounded-lg"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                      (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
+                                    }}
+                                  />
+                                  <div className="hidden flex-col items-center justify-center w-full h-full">
+                                    📸 Generated Image
+                                  </div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="text-sm font-medium flex items-center gap-2">
+                                    🎨 AI Generated Image
+                                    <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                      Ready
+                                    </Badge>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {content.featured_image_alt || "Custom generated image for this content"}
+                                  </div>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    className="mt-2 h-6 px-2 text-xs"
+                                    onClick={() => window.open(content.image_url, '_blank')}
+                                  >
+                                    View Full Size
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
                           )}
                           
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -1300,10 +1394,15 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                   {content.title}
                                 </h5>
                                 
-                                <div className="flex flex-wrap items-center gap-3 mb-3">
-                                  <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 font-medium">
-                                    {content.platform}
-                                  </Badge>
+                                 <div className="flex flex-wrap items-center gap-3 mb-3">
+                                   <Badge variant="default" className="bg-primary/10 text-primary border-primary/20 font-medium">
+                                     {content.platform}
+                                   </Badge>
+                                   {content.image_url && (
+                                     <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">
+                                       🎨 AI Image
+                                     </Badge>
+                                   )}
                                   <Badge 
                                     variant={content.status === 'published' ? 'default' : 'secondary'}
                                     className={

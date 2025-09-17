@@ -191,7 +191,16 @@ serve(async (req) => {
       });
     }
 
-    const { command, title, settings, scheduling_options, publishing_controls } = body;
+    const { 
+      command, 
+      title, 
+      settings, 
+      scheduling_options, 
+      publishing_controls,
+      image_generation,
+      image_prompt,
+      image_style 
+    } = body;
 
     // Create Supabase client via dynamic import (faster, avoids cold-boot import on preflight)
     const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.57.0');
@@ -206,7 +215,12 @@ serve(async (req) => {
     await initializeWorkflowStages(supabase, campaignId);
 
     // Execute workflow stages
-    await executeWorkflowStages(supabase, campaignId, command, settings);
+    await executeWorkflowStages(supabase, campaignId, command, {
+      ...settings,
+      image_generation: image_generation || false,
+      image_prompt: image_prompt || '',
+      image_style: image_style || 'professional'
+    });
 
     return new Response(JSON.stringify({
       success: true,
