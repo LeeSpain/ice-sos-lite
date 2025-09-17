@@ -1044,22 +1044,136 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Preview Modal */}
+      {/* Enhanced Professional Preview Modal */}
       <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>{selectedContent?.title || 'Preview'}</DialogTitle>
-            <DialogDescription>Preview the generated content before approving.</DialogDescription>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden">
+          <DialogHeader className="border-b pb-4">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2">
+                <DialogTitle className="text-2xl font-bold text-foreground">
+                  {selectedContent?.title || 'Content Preview'}
+                </DialogTitle>
+                <DialogDescription className="text-base text-muted-foreground">
+                  Preview the generated content before approving for publication.
+                </DialogDescription>
+                {selectedContent && (
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="capitalize">
+                        {selectedContent.platform}
+                      </Badge>
+                      <Badge variant="secondary" className="capitalize">
+                        {selectedContent.content_type.replace('_', ' ')}
+                      </Badge>
+                    </div>
+                    {selectedContent.reading_time && (
+                      <span>🕒 {selectedContent.reading_time} min read</span>
+                    )}
+                    {selectedContent.seo_score && (
+                      <span>📈 SEO Score: {selectedContent.seo_score}/100</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </DialogHeader>
-          <div className="prose max-w-none text-left">
-            {selectedContent?.body_text ? (
-              <div dangerouslySetInnerHTML={{ __html: selectedContent.body_text }} />
-            ) : (
-              <p>No content body available.</p>
-            )}
+          
+          <div className="flex-1 overflow-y-auto">
+            <div className="py-6">
+              {selectedContent?.body_text ? (
+                <article className="max-w-none">
+                  {/* Professional article styling */}
+                  <div className="prose prose-lg max-w-none prose-headings:text-foreground prose-headings:font-bold prose-p:text-foreground prose-p:leading-relaxed prose-strong:text-foreground prose-ul:text-foreground prose-ol:text-foreground prose-li:text-foreground">
+                    <div 
+                      className="formatted-content space-y-4"
+                      dangerouslySetInnerHTML={{ __html: selectedContent.body_text }} 
+                    />
+                  </div>
+                  
+                  {/* Content metadata */}
+                  {(selectedContent.keywords || selectedContent.hashtags) && (
+                    <div className="mt-8 pt-6 border-t border-border">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {selectedContent.keywords && selectedContent.keywords.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold text-foreground mb-2">Keywords</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedContent.keywords.map((keyword, index) => (
+                                <Badge key={index} variant="outline" className="text-xs">
+                                  {keyword}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedContent.hashtags && selectedContent.hashtags.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold text-foreground mb-2">Hashtags</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedContent.hashtags.map((hashtag, index) => (
+                                <Badge key={index} variant="secondary" className="text-xs">
+                                  #{hashtag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* SEO Information */}
+                  {(selectedContent.seo_title || selectedContent.meta_description) && (
+                    <div className="mt-6 pt-6 border-t border-border">
+                      <h4 className="text-sm font-semibold text-foreground mb-3">SEO Information</h4>
+                      <div className="space-y-3">
+                        {selectedContent.seo_title && (
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground">SEO Title</label>
+                            <p className="text-sm text-foreground mt-1 p-2 bg-muted rounded">
+                              {selectedContent.seo_title}
+                            </p>
+                          </div>
+                        )}
+                        {selectedContent.meta_description && (
+                          <div>
+                            <label className="text-xs font-medium text-muted-foreground">Meta Description</label>
+                            <p className="text-sm text-foreground mt-1 p-2 bg-muted rounded">
+                              {selectedContent.meta_description}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </article>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="text-muted-foreground">No content body available for preview.</div>
+                </div>
+              )}
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowPreviewModal(false)}>Close</Button>
+          
+          <DialogFooter className="border-t pt-4">
+            <div className="flex items-center justify-between w-full">
+              <div className="text-xs text-muted-foreground">
+                {selectedContent && (
+                  <>Created: {new Date(selectedContent.created_at).toLocaleString()}</>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowPreviewModal(false)}>
+                  Close
+                </Button>
+                {selectedContent && (
+                  <Button onClick={() => { setShowPreviewModal(false); setShowEditModal(true); }}>
+                    Edit Content
+                  </Button>
+                )}
+              </div>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -243,3 +243,72 @@
   outline: 3px solid hsl(var(--ring));
   outline-offset: 2px;
 }
+
+/* Professional Content Preview Styles */
+.formatted-content h1 {
+  @apply text-3xl font-bold mb-6 text-foreground border-b border-border pb-3;
+}
+
+.formatted-content h2 {
+  @apply text-2xl font-semibold mb-4 mt-8 text-foreground;
+}
+
+.formatted-content h3 {
+  @apply text-xl font-semibold mb-3 mt-6 text-foreground;
+}
+
+.formatted-content h4 {
+  @apply text-lg font-medium mb-2 mt-4 text-foreground;
+}
+
+.formatted-content p {
+  @apply mb-4 leading-relaxed text-foreground;
+}
+
+.formatted-content ul, .formatted-content ol {
+  @apply mb-4 ml-6 text-foreground;
+}
+
+.formatted-content li {
+  @apply mb-2 text-foreground;
+}
+
+.formatted-content strong, .formatted-content b {
+  @apply font-semibold text-foreground;
+}
+
+.formatted-content em, .formatted-content i {
+  @apply italic text-foreground;
+}
+
+.formatted-content blockquote {
+  @apply border-l-4 border-primary pl-4 ml-4 italic text-muted-foreground bg-muted/50 py-2 rounded-r;
+}
+
+.formatted-content code {
+  @apply bg-muted px-2 py-1 rounded text-sm font-mono text-foreground;
+}
+
+.formatted-content pre {
+  @apply bg-muted p-4 rounded overflow-x-auto text-sm font-mono text-foreground;
+}
+
+.formatted-content a {
+  @apply text-primary hover:text-primary/80 underline;
+}
+
+.formatted-content table {
+  @apply w-full border-collapse border border-border mb-4;
+}
+
+.formatted-content th, .formatted-content td {
+  @apply border border-border px-3 py-2 text-left;
+}
+
+.formatted-content th {
+  @apply bg-muted font-semibold text-foreground;
+}
+
+.formatted-content td {
+  @apply text-foreground;
+}
