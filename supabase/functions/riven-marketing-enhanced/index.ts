@@ -125,8 +125,8 @@ serve(async (req) => {
               'HTTP-Referer': 'https://your-app.com',
               'X-Title': 'ICE SOS Marketing'
             },
-      body: JSON.stringify({
-        model: 'google/gemma-2-9b-it:free',
+            body: JSON.stringify({
+              model: 'google/gemma-2-9b-it:free',
               messages: [{ role: 'user', content: 'ping' }],
               max_tokens: 1
             })
@@ -135,8 +135,33 @@ serve(async (req) => {
           if (testResponse.ok) {
             openrouterStatus = 'connected';
           } else {
-            openrouterStatus = 'error';
-            openrouterError = await testResponse.text();
+            // Handle OpenRouter rate limiting as a warning instead of hard error
+            if (testResponse.status === 429) {
+              const limit = testResponse.headers.get('X-RateLimit-Limit');
+              const remaining = testResponse.headers.get('X-RateLimit-Remaining');
+              const resetHeader = testResponse.headers.get('X-RateLimit-Reset');
+              let resetAt: string | null = null;
+              let waitSeconds: number | null = null;
+              if (resetHeader) {
+                const resetNum = Number(resetHeader);
+                const isMs = resetNum > 10_000_000_000; // crude ms vs s detection
+                const resetMs = isMs ? resetNum : resetNum * 1000;
+                resetAt = new Date(resetMs).toISOString();
+                waitSeconds = Math.max(0, Math.round((resetMs - Date.now()) / 1000));
+              }
+              openrouterStatus = 'warning';
+              openrouterError = JSON.stringify({
+                message: 'Rate limited on OpenRouter free tier. Please retry after reset.',
+                code: 429,
+                limit,
+                remaining,
+                resetAt,
+                waitSeconds,
+              });
+            } else {
+              openrouterStatus = 'error';
+              openrouterError = await testResponse.text();
+            }
           }
         } catch (error) {
           console.error('OpenRouter connection test failed:', error);
