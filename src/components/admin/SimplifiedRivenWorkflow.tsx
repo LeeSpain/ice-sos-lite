@@ -41,6 +41,8 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const [realTimeStages, setRealTimeStages] = useState<any[]>([]);
   const [apiProviderStatus, setApiProviderStatus] = useState<{ openai: boolean; xai: boolean }>({ openai: false, xai: false });
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [showRegenerateDialog, setShowRegenerateDialog] = useState<string | null>(null);
+  const [regenerateInstructions, setRegenerateInstructions] = useState('');
 
   // Form data state
   const [formData, setFormData] = useState({
@@ -358,32 +360,26 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
 
   const handleReject = async (contentId: string) => {
     try {
+      // Delete the rejected content entirely
       const { error } = await supabase
         .from('marketing_content')
-        .update({ status: 'rejected' })
+        .delete()
         .eq('id', contentId);
 
       if (error) throw error;
 
-      // Update local state
-      setGeneratedContent(prev => 
-        prev.map(item => 
-          item.id === contentId ? { ...item, status: 'rejected' } : item
-        )
-      );
-      
-      // Reload content to sync
-      await loadContentItems();
+      // Update local state by removing the content
+      setGeneratedContent(prev => prev.filter(item => item.id !== contentId));
       
       toast({
-        title: "Content Rejected",
-        description: "Content has been rejected and marked for revision.",
+        title: "Content Deleted",
+        description: "Rejected content has been permanently deleted.",
       });
     } catch (error) {
-      console.error('Error rejecting content:', error);
+      console.error('Error deleting rejected content:', error);
       toast({
-        title: "Rejection Failed",
-        description: "Failed to reject content. Please try again.",
+        title: "Deletion Failed",
+        description: "Failed to delete content. Please try again.",
         variant: "destructive"
       });
     }
@@ -496,20 +492,20 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
 
       if (deleteError) throw deleteError;
 
-      // Start a new generation with the same campaign
-      setCurrentStage('process');
-      setCurrentStep(0);
+      // Update local state by removing the content
+      setGeneratedContent(prev => prev.filter(item => item.id !== contentId));
+
+      // Generate new content with custom instructions
       setIsProcessing(true);
+      setCurrentStage('process');
 
-      toast({
-        title: "Regenerating Content",
-        description: "Creating new content with improved quality...",
-      });
+      const customCommand = regenerateInstructions.trim() 
+        ? `${formData.command}\n\nAdditional instructions: ${regenerateInstructions}`
+        : formData.command;
 
-      // Trigger regeneration by calling the edge function again
-      const { error: regenError } = await supabase.functions.invoke('riven-marketing-enhanced', {
+      const { data: campaignData, error: campaignError } = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: {
-          command: formData.command,
+          command: customCommand,
           title: formData.title,
           settings: formData.settings,
           scheduling_options: formData.schedulingOptions,
@@ -517,13 +513,29 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         }
       });
 
-      if (regenError) throw regenError;
+      if (campaignError) {
+        throw new Error(campaignError.message || 'Failed to regenerate content');
+      }
+
+      if (campaignData?.campaignId) {
+        setCurrentCampaignId(campaignData.campaignId);
+        setRealTimeStages([]);
+        monitorWorkflowProgress(campaignData.campaignId);
+      }
+
+      // Reset dialog state
+      setShowRegenerateDialog(null);
+      setRegenerateInstructions('');
+      
+      toast({
+        title: "Content Regenerating",
+        description: "New content is being generated with your instructions...",
+      });
 
     } catch (error) {
       console.error('Error regenerating content:', error);
       setIsProcessing(false);
       setCurrentStage('approval');
-      
       toast({
         title: "Regeneration Failed",
         description: "Failed to regenerate content. Please try again.",
@@ -1086,7 +1098,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleRegenerateContent(content.id)}
+                              onClick={() => setShowRegenerateDialog(content.id)}
                             >
                               Regenerate
                             </Button>
@@ -1639,6 +1651,37 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
               onClick={() => showDeleteConfirm && handleDeleteContent(showDeleteConfirm)}
             >
               Delete Permanently
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Regenerate Dialog */}
+      <Dialog open={!!showRegenerateDialog} onOpenChange={() => setShowRegenerateDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Regenerate Content</DialogTitle>
+            <DialogDescription>
+              Provide specific instructions for what you'd like changed in the regenerated content.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              placeholder="e.g., Make it more technical, add more examples, change the tone to be more casual..."
+              value={regenerateInstructions}
+              onChange={(e) => setRegenerateInstructions(e.target.value)}
+              className="min-h-[120px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRegenerateDialog(null)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={() => showRegenerateDialog && handleRegenerateContent(showRegenerateDialog)}
+            >
+              <Wand2 className="h-4 w-4 mr-2" />
+              Regenerate Content
             </Button>
           </DialogFooter>
         </DialogContent>
