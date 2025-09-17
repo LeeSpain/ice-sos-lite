@@ -52,28 +52,50 @@ const BlogPost = () => {
 
   const loadBlogPost = async () => {
     try {
+      // First attempt: direct match on slug or fuzzy match on title (hyphens -> spaces)
+      const titlePattern = slug?.replace(/-/g, ' ');
       const { data: posts, error } = await supabase
         .from('marketing_content')
         .select('*')
         .eq('platform', 'blog')
         .eq('status', 'published')
-        .or(`slug.eq.${slug},title.ilike.%${slug?.replace(/-/g, ' ')}%`);
+        .or(`slug.eq.${slug},title.ilike.%${titlePattern}%`);
 
       if (error) throw error;
 
-      if (!posts || posts.length === 0) {
+      let post = posts && posts.length > 0
+        ? posts.find((p: any) => p.slug === slug) || posts[0]
+        : null;
+
+      // Fallback: no direct DB slug and the title match failed due to punctuation
+      if (!post) {
+        const { data: allPosts, error: allErr } = await supabase
+          .from('marketing_content')
+          .select('*')
+          .eq('platform', 'blog')
+          .eq('status', 'published');
+        if (allErr) throw allErr;
+
+        // Normalize titles the same way we build URLs in Blog.tsx
+        post = (allPosts || []).find((p: any) => {
+          const derived = (p.title || '')
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '');
+          return derived === slug;
+        }) || null;
+      }
+
+      if (!post) {
         setNotFound(true);
         return;
       }
 
-      // Find exact slug match first, then fallback to title match
-      const post = posts.find(p => p.slug === slug) || posts[0];
-
-      const blogPost: BlogPost = {
+      const mapped: BlogPost = {
         id: post.id,
         title: post.title,
         body_text: post.body_text,
-        slug: post.slug || (post.title ? post.title.toLowerCase().replace(/\s+/g, '-') : ''),
+        slug: post.slug || (post.title ? post.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : ''),
         seo_title: post.seo_title,
         meta_description: post.meta_description,
         keywords: post.keywords,
@@ -86,7 +108,8 @@ const BlogPost = () => {
         image_url: post.image_url
       };
 
-      setBlogPost(blogPost);
+      setBlogPost(mapped);
+      setNotFound(false);
     } catch (error) {
       console.error('Error loading blog post:', error);
       toast({
