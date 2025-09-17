@@ -61,36 +61,6 @@ const Navigation = ({ onJoinNowClick }: NavigationProps = {}) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
-            {/* Services Dropdown */}
-            <div className="relative group">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="font-medium text-foreground hover:text-primary transition-all duration-200 hover:bg-primary/5"
-              >
-                Services
-                <svg className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </Button>
-              <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <div className="p-2">
-                  <Link to="/emergency-response-services" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-md transition-colors">
-                    Emergency Response Services
-                  </Link>
-                  <Link to="/ai-emergency-assistant" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-md transition-colors">
-                    AI Emergency Assistant
-                  </Link>
-                  <Link to="/family-safety-monitoring" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-md transition-colors">
-                    Family Safety Monitoring
-                  </Link>
-                  <Link to="/senior-emergency-protection" className="block px-3 py-2 text-sm text-foreground hover:bg-primary/5 rounded-md transition-colors">
-                    Senior Emergency Protection
-                  </Link>
-                </div>
-              </div>
-            </div>
-            
             <Button asChild size="sm" className="bg-wellness hover:bg-wellness/90 text-black font-medium shadow-sm" onClick={handleContactClick}>
               <Link to="/contact">
                 {t('nav.contact', 'Contact Us')}
