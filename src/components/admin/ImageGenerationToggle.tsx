@@ -15,6 +15,7 @@ import {
   Download,
   RefreshCw
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ImageGenerationToggleProps {
   enabled: boolean;
@@ -73,13 +74,24 @@ export const ImageGenerationToggle: React.FC<ImageGenerationToggleProps> = ({
 
   const generatePreview = async () => {
     if (!customPrompt.trim()) return;
-    
     setIsGenerating(true);
-    // Simulate image generation for demo
-    setTimeout(() => {
-      setPreviewImage('/placeholder.svg'); // This would be actual generated image
+    try {
+      const { data, error } = await supabase.functions.invoke('image-generator', {
+        body: {
+          prompt: customPrompt,
+          platform: 'blog',
+          style: selectedStyle,
+          size: '1024x1024'
+        }
+      });
+      if (error) throw new Error(error.message || 'Preview generation failed');
+      const img = data?.image || data?.imageUrl;
+      if (img) setPreviewImage(img);
+    } catch (e) {
+      console.error('Preview generation error:', e);
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   return (

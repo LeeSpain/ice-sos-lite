@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 interface ImageGenerationRequest {
-  contentId: string;
+  contentId?: string;
   prompt: string;
   platform: string;
   style?: string;
@@ -28,47 +28,50 @@ serve(async (req) => {
 
     const { contentId, prompt, platform, style = 'vivid', size = '1024x1024' }: ImageGenerationRequest = await req.json();
 
-    console.log(`Generating image for content ${contentId}`, { prompt, platform, style, size });
+    console.log(`Generating image for content ${contentId ?? 'preview'}`, { prompt, platform, style, size });
 
-    // Generate image using OpenAI DALL-E
-    const imageUrl = await generateImage(prompt, style, size, platform);
+    // Generate image with OpenAI first, then fallback to Hugging Face if needed
+    const image = await generateImage(prompt, style, size, platform);
 
-    // Update content with generated image
-    const { error: updateError } = await supabaseClient
-      .from('marketing_content')
-      .update({ 
-        image_url: imageUrl,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', contentId);
+    if (contentId) {
+      // Update content with generated image
+      const { error: updateError } = await supabaseClient
+        .from('marketing_content')
+        .update({ 
+          image_url: image,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', contentId);
 
-    if (updateError) {
-      console.error('Failed to update content with image:', updateError);
-      throw new Error('Failed to save generated image');
+      if (updateError) {
+        console.error('Failed to update content with image:', updateError);
+        throw new Error('Failed to save generated image');
+      }
+
+      // Log generation request
+      await supabaseClient
+        .from('content_generation_requests')
+        .insert({
+          campaign_id: null,
+          content_type: 'image',
+          platform,
+          prompt,
+          generated_image_url: image,
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          generation_metadata: {
+            style,
+            size,
+            model: 'gpt-image-1_or_hf'
+          }
+        });
     }
-
-    // Log generation request
-    await supabaseClient
-      .from('content_generation_requests')
-      .insert({
-        campaign_id: null,
-        content_type: 'image',
-        platform,
-        prompt,
-        generated_image_url: imageUrl,
-        status: 'completed',
-        completed_at: new Date().toISOString(),
-        generation_metadata: {
-          style,
-          size,
-          model: 'gpt-image-1'
-        }
-      });
 
     return new Response(JSON.stringify({ 
       success: true,
-      imageUrl,
-      contentId 
+      image,
+      imageUrl: image,
+      contentId: contentId ?? null
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
@@ -84,45 +87,46 @@ serve(async (req) => {
 
 async function generateImage(prompt: string, style: string, size: string, platform: string): Promise<string> {
   const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-  if (!openAIApiKey) {
-    throw new Error('OpenAI API key not configured');
-  }
-
   // Enhance prompt based on platform and requirements
   const enhancedPrompt = enhancePromptForPlatform(prompt, platform);
-
   console.log('Generating image with enhanced prompt:', enhancedPrompt);
 
-  const response = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${openAIApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'gpt-image-1',
-      prompt: enhancedPrompt,
-      n: 1,
-      size: size,
-      style: style,
-      quality: 'hd',
-      response_format: 'url'
-    }),
-  });
+  if (openAIApiKey) {
+    try {
+      const response = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openAIApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'gpt-image-1',
+          prompt: enhancedPrompt,
+          n: 1,
+          size,
+          quality: 'high'
+        }),
+      });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error('OpenAI API error:', errorData);
-    throw new Error(`Image generation failed: ${errorData.error?.message || 'Unknown error'}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data && data.data.length > 0 && data.data[0].b64_json) {
+          return `data:image/png;base64,${data.data[0].b64_json}`;
+        }
+        console.warn('OpenAI returned no b64_json, falling back to Hugging Face');
+      } else {
+        const errText = await response.text();
+        console.error('OpenAI API error:', errText);
+      }
+    } catch (err) {
+      console.error('OpenAI image generation failed, falling back to Hugging Face:', err);
+    }
+  } else {
+    console.warn('OpenAI API key not configured, using Hugging Face');
   }
 
-  const data = await response.json();
-  
-  if (!data.data || data.data.length === 0) {
-    throw new Error('No image generated');
-  }
-
-  return data.data[0].url;
+  // Fallback to Hugging Face
+  return await generateImageWithHuggingFace(enhancedPrompt, platform);
 }
 
 function enhancePromptForPlatform(prompt: string, platform: string): string {

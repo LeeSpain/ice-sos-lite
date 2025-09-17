@@ -1176,9 +1176,34 @@ async function executeImageGeneration(command: string, settings: any, aiConfig: 
   const imageProvider = aiConfig?.stages?.image?.provider || 'openai';
   console.log(`Using ${imageProvider} for image generation`);
   
-  // Always use OpenAI for image generation as it's the configured provider
+  // Prefer OpenAI, but fallback to Hugging Face if unavailable
   if (!openAIApiKey) {
-    console.log('OpenAI API key not found, using placeholder image');
+    console.log('OpenAI API key not found, attempting Hugging Face fallback');
+    const hfToken = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
+    if (hfToken) {
+      try {
+        const enhancedPrompt = (settings?.image_prompt || `Create a professional, high-quality image representing "${command}". Style: Clean, modern, professional`).toString();
+        const hfResp = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${hfToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inputs: enhancedPrompt, parameters: { width: 1024, height: 1024, num_inference_steps: 20 } })
+        });
+        if (hfResp.ok) {
+          const blob = await hfResp.blob();
+          const arr = new Uint8Array(await blob.arrayBuffer());
+          const b64 = btoa(String.fromCharCode(...arr));
+          return {
+            image_url: `data:image/png;base64,${b64}`,
+            alt_text: `Professional image representing ${command}`,
+            generation_prompt: enhancedPrompt,
+            style: 'professional'
+          };
+        }
+      } catch (e) {
+        console.error('Hugging Face fallback failed:', e);
+      }
+    }
+    console.log('Hugging Face not available or failed, using placeholder image');
     return {
       image_url: 'https://via.placeholder.com/800x600/4a90e2/ffffff?text=Generated+Image',
       alt_text: `Professional image representing ${command}`,
@@ -1226,8 +1251,32 @@ async function executeImageGeneration(command: string, settings: any, aiConfig: 
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`OpenAI Image API error: ${response.status} ${response.statusText} - ${errorText}`);
-      
-      // Handle rate limiting with fallback
+      // Try Hugging Face fallback
+      const hfToken = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
+      if (hfToken) {
+        try {
+          const hfResp = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${hfToken}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inputs: imagePrompt, parameters: { width: 1024, height: 1024, num_inference_steps: 20 } })
+          });
+          if (hfResp.ok) {
+            const blob = await hfResp.blob();
+            const arr = new Uint8Array(await blob.arrayBuffer());
+            const b64 = btoa(String.fromCharCode(...arr));
+            return {
+              image_url: `data:image/png;base64,${b64}`,
+              alt_text: `Professional image representing ${command}`,
+              generation_prompt: imagePrompt,
+              style: 'professional',
+              note: 'Generated via Hugging Face fallback'
+            };
+          }
+        } catch (e) {
+          console.error('Hugging Face fallback failed:', e);
+        }
+      }
+      // Handle rate limiting with placeholder only if no HF
       if (response.status === 429) {
         console.log('Image generation rate limit hit, using placeholder');
         return {
@@ -1238,17 +1287,44 @@ async function executeImageGeneration(command: string, settings: any, aiConfig: 
           note: 'Placeholder due to rate limiting'
         };
       }
-      
       throw new Error(`OpenAI Image API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    const imageUrl = data.data[0].url;
+    const imageUrl = data.data?.[0]?.url;
     
+    if (!imageUrl) {
+      console.warn('OpenAI did not return image URL, attempting Hugging Face');
+      const hfToken2 = Deno.env.get('HUGGING_FACE_ACCESS_TOKEN');
+      if (hfToken2) {
+        try {
+          const hfResp2 = await fetch('https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${hfToken2}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ inputs: imagePrompt, parameters: { width: 1024, height: 1024, num_inference_steps: 20 } })
+          });
+          if (hfResp2.ok) {
+            const blob2 = await hfResp2.blob();
+            const arr2 = new Uint8Array(await blob2.arrayBuffer());
+            const b642 = btoa(String.fromCharCode(...arr2));
+            return {
+              image_url: `data:image/png;base64,${b642}`,
+              alt_text: `Professional image representing ${command}`,
+              generation_prompt: imagePrompt,
+              style: 'professional',
+              note: 'Generated via Hugging Face fallback'
+            };
+          }
+        } catch (e2) {
+          console.error('Hugging Face secondary fallback failed:', e2);
+        }
+      }
+    }
+
     console.log('Image generated successfully');
     
     return {
-      image_url: imageUrl,
+      image_url: imageUrl as string,
       alt_text: `Professional image representing ${command}`,
       generation_prompt: imagePrompt,
       style: 'professional',
@@ -1257,14 +1333,13 @@ async function executeImageGeneration(command: string, settings: any, aiConfig: 
     
   } catch (error) {
     console.error('Image generation failed:', error);
-    
-    // Fallback to placeholder
+    // Final fallback to placeholder
     return {
       image_url: 'https://via.placeholder.com/800x600/4a90e2/ffffff?text=Generated+Image',
       alt_text: `Professional image representing ${command}`,
       generation_prompt: `Create a professional image representing ${command}`,
       style: 'professional',
-      error: error.message
+      error: (error as Error).message
     };
   }
 }
