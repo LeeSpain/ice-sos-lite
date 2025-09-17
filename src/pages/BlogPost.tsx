@@ -247,18 +247,18 @@ const BlogPost = () => {
               </nav>
 
               {/* Article Category & Metadata */}
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <Badge className="bg-primary text-primary-foreground font-semibold tracking-wide">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <Badge className="bg-red-600 text-white font-medium text-xs tracking-wider px-2 py-1">
                   EMERGENCY SAFETY
                 </Badge>
                 {blogPost.reading_time && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <span className="font-medium">{blogPost.reading_time} MIN READ</span>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground uppercase tracking-wide">
+                    <Clock className="h-3 w-3" />
+                    <span>{blogPost.reading_time} MIN READ</span>
                   </div>
                 )}
                 {blogPost.seo_score && blogPost.seo_score >= 80 && (
-                  <Badge variant="secondary" className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300">
+                  <Badge variant="secondary" className="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 text-xs">
                     <Star className="h-3 w-3 mr-1" />
                     VERIFIED
                   </Badge>
@@ -266,41 +266,41 @@ const BlogPost = () => {
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-none mb-8 text-slate-900 dark:text-slate-100">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 text-slate-900 dark:text-slate-100 tracking-tight">
                 {blogPost.seo_title || blogPost.title || 'Untitled Article'}
               </h1>
 
               {/* Subheadline */}
               {blogPost.meta_description && (
-                <p className="text-xl md:text-2xl leading-relaxed text-slate-600 dark:text-slate-300 mb-8 font-light">
+                <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-6 font-normal">
                   {blogPost.meta_description}
                 </p>
               )}
 
               {/* Byline & Publication Info */}
-              <div className="flex flex-wrap items-center justify-between gap-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
-                      <User className="h-5 w-5 text-white" />
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
                     </div>
                     <div>
-                      <div className="font-semibold text-foreground">Riven AI</div>
-                      <div className="text-sm text-muted-foreground">Senior Safety Analyst</div>
+                      <div className="font-medium text-foreground text-sm">Riven AI</div>
+                      <div className="text-xs text-muted-foreground">Senior Safety Analyst</div>
                     </div>
                   </div>
-                  <div className="h-8 w-px bg-slate-300 dark:bg-slate-600"></div>
-                  <div className="text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Calendar className="h-4 w-4" />
-                      <span className="font-medium">{formatDate(blogPost.created_at)}</span>
+                  <div className="h-6 w-px bg-slate-300 dark:bg-slate-600"></div>
+                  <div className="text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1 mb-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>{formatDate(blogPost.created_at)}</span>
                     </div>
                     <div className="text-xs opacity-75">ICE Emergency Solutions</div>
                   </div>
                 </div>
-                <Button variant="outline" onClick={handleShare} className="bg-white dark:bg-background">
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Share Article
+                <Button variant="outline" size="sm" onClick={handleShare} className="bg-white dark:bg-background text-xs">
+                  <Share2 className="h-3 w-3 mr-1" />
+                  Share
                 </Button>
               </div>
             </div>
@@ -309,17 +309,17 @@ const BlogPost = () => {
 
         {/* Featured Image Section */}
         {blogPost.image_url && (
-          <section className="py-8 bg-slate-50 dark:bg-slate-900/50">
+          <section className="py-6 bg-slate-50 dark:bg-slate-900/50">
             <div className="container mx-auto px-4">
-              <div className="max-w-5xl mx-auto">
+              <div className="max-w-4xl mx-auto">
                 <figure>
                   <img 
                     src={blogPost.image_url} 
                     alt={blogPost.featured_image_alt || blogPost.title || 'Article featured image'}
-                    className="w-full h-auto rounded-xl shadow-2xl"
+                    className="w-full h-auto rounded-lg shadow-lg"
                   />
                   {blogPost.featured_image_alt && (
-                    <figcaption className="text-center text-sm text-muted-foreground mt-4 italic">
+                    <figcaption className="text-center text-xs text-muted-foreground mt-3 italic">
                       {blogPost.featured_image_alt}
                     </figcaption>
                   )}
@@ -330,35 +330,35 @@ const BlogPost = () => {
         )}
 
         {/* Article Content */}
-        <article className="py-16">
+        <article className="py-12">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-3xl mx-auto">
               {/* Article Body */}
-              <div className="prose prose-xl max-w-none prose-slate dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-p:leading-relaxed prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-blockquote:border-l-primary prose-blockquote:bg-slate-50 dark:prose-blockquote:bg-slate-900/50 prose-blockquote:py-1 prose-blockquote:px-6 prose-blockquote:not-italic prose-blockquote:text-slate-700 dark:prose-blockquote:text-slate-300">
+              <div className="prose prose-lg max-w-none prose-slate dark:prose-invert prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-slate-900 dark:prose-headings:text-slate-100 prose-p:leading-relaxed prose-p:text-slate-700 dark:prose-p:text-slate-300 prose-p:text-base prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-900 dark:prose-strong:text-slate-100 prose-blockquote:border-l-primary prose-blockquote:bg-slate-50 dark:prose-blockquote:bg-slate-900/50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:not-italic prose-blockquote:text-slate-700 dark:prose-blockquote:text-slate-300 prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-li:text-base">
                 {blogPost.body_text ? (
                   <div 
                     dangerouslySetInnerHTML={{ __html: blogPost.body_text }}
                   />
                 ) : (
-                  <div className="text-center py-16">
-                    <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground italic text-lg">Article content is currently being prepared...</p>
+                  <div className="text-center py-12">
+                    <BookOpen className="h-12 w-12 mx-auto mb-3 text-muted-foreground" />
+                    <p className="text-muted-foreground italic">Article content is currently being prepared...</p>
                   </div>
                 )}
               </div>
 
               {/* Article Tags */}
               {blogPost.keywords && blogPost.keywords.length > 0 && (
-                <footer className="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700">
-                  <h3 className="text-lg font-bold mb-4 text-slate-900 dark:text-slate-100">Related Topics</h3>
-                  <div className="flex flex-wrap gap-3">
+                <footer className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-700">
+                  <h3 className="text-sm font-semibold mb-3 text-slate-900 dark:text-slate-100 uppercase tracking-wide">Related Topics</h3>
+                  <div className="flex flex-wrap gap-2">
                     {blogPost.keywords.map((keyword, index) => (
                       <Badge 
                         key={index} 
                         variant="secondary" 
-                        className="text-sm px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                        className="text-xs px-3 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                       >
-                        <Tag className="h-3 w-3 mr-2" />
+                        <Tag className="h-3 w-3 mr-1" />
                         {keyword}
                       </Badge>
                     ))}
@@ -367,22 +367,22 @@ const BlogPost = () => {
               )}
 
               {/* AI Attribution */}
-              <div className="mt-16">
-                <Card className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/50 dark:via-indigo-950/50 dark:to-purple-950/50 border border-blue-200 dark:border-blue-800 shadow-lg">
-                  <CardContent className="p-8">
-                    <div className="flex items-start gap-4">
-                      <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
-                        <Star className="h-7 w-7 text-white" />
+              <div className="mt-10">
+                <Card className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/50 dark:via-indigo-950/50 dark:to-purple-950/50 border border-blue-200 dark:border-blue-800">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Star className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-slate-100">AI-Generated Content</h3>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                          This comprehensive article was authored by <strong>Riven AI</strong>, our advanced artificial intelligence 
-                          system specialized in emergency response protocols, family safety strategies, and cutting-edge protection 
-                          technology. Every insight is backed by the latest research and industry best practices.
+                        <h3 className="text-sm font-semibold mb-2 text-slate-900 dark:text-slate-100">AI-Generated Content</h3>
+                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+                          This article was authored by <strong>Riven AI</strong>, our specialized artificial intelligence 
+                          system for emergency response protocols and family safety strategies. Content is backed by 
+                          current research and industry best practices.
                         </p>
-                        <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
-                          <div className="text-sm text-slate-500 dark:text-slate-400">
+                        <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-700">
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
                             <strong>Reviewed by:</strong> ICE Emergency Solutions Editorial Team
                           </div>
                         </div>
@@ -393,23 +393,25 @@ const BlogPost = () => {
               </div>
 
               {/* Article Navigation */}
-              <nav className="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <nav className="mt-12 pt-6 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
                   <Button 
                     variant="outline" 
                     onClick={() => navigate('/blog')}
+                    size="sm"
                     className="w-full sm:w-auto bg-white dark:bg-background hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    <ArrowLeft className="h-3 w-3 mr-2" />
                     Browse All Articles
                   </Button>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <Button 
                       variant="default" 
                       onClick={handleShare}
+                      size="sm"
                       className="bg-primary hover:bg-primary/90"
                     >
-                      <Share2 className="h-4 w-4 mr-2" />
+                      <Share2 className="h-3 w-3 mr-2" />
                       Share Article
                     </Button>
                   </div>
