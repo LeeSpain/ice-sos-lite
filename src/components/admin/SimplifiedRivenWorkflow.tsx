@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { WorkflowProvider, useWorkflow } from '@/contexts/RivenWorkflowContext';
+import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { MarketingTemplates } from './MarketingTemplates';
 import { AIProviderStatus } from './AIProviderStatus';
@@ -237,33 +238,80 @@ const SimplifiedRivenContent: React.FC = () => {
     }
   };
 
-  const handleApproveContent = (contentId: string) => {
-    setGeneratedContent(prev => 
-      prev.map(item => 
-        item.id === contentId 
-          ? { ...item, status: 'approved' }
-          : item
-      )
-    );
-    
-    // Auto-publish and show success
-    setTimeout(() => {
-      setCurrentStage('success');
+  const handleApproveContent = async (contentId: string) => {
+    try {
+      // Update database first
+      const { error } = await supabase
+        .from('marketing_content')
+        .update({ status: 'published' })
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      // Update local state
+      setGeneratedContent(prev => 
+        prev.map(item => 
+          item.id === contentId 
+            ? { ...item, status: 'published' }
+            : item
+        )
+      );
+
+      // Reload content to sync
+      await loadContentItems();
+      
+      // Show success and transition
+      setTimeout(() => {
+        setCurrentStage('success');
+        toast({
+          title: "Content Published",
+          description: "Your content has been successfully published!",
+        });
+      }, 1000);
+    } catch (error) {
+      console.error('Error approving content:', error);
       toast({
-        title: "Content Published",
-        description: "Your content has been successfully published!",
+        title: "Approval Failed",
+        description: "Failed to approve content. Please try again.",
+        variant: "destructive"
       });
-    }, 1000);
+    }
   };
 
-  const handleRejectContent = (contentId: string) => {
-    setGeneratedContent(prev => 
-      prev.map(item => 
-        item.id === contentId 
-          ? { ...item, status: 'rejected' }
-          : item
-      )
-    );
+  const handleRejectContent = async (contentId: string) => {
+    try {
+      // Update database first
+      const { error } = await supabase
+        .from('marketing_content')
+        .update({ status: 'rejected' })
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      // Update local state
+      setGeneratedContent(prev => 
+        prev.map(item => 
+          item.id === contentId 
+            ? { ...item, status: 'rejected' }
+            : item
+        )
+      );
+
+      // Reload content to sync
+      await loadContentItems();
+      
+      toast({
+        title: "Content Rejected",
+        description: "Content has been rejected and marked for revision.",
+      });
+    } catch (error) {
+      console.error('Error rejecting content:', error);
+      toast({
+        title: "Rejection Failed",
+        description: "Failed to reject content. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Modal handlers
@@ -278,25 +326,97 @@ const SimplifiedRivenContent: React.FC = () => {
   };
 
   const handleSaveEdit = async (updatedContent: ContentItem) => {
-    // Update the local state
-    setGeneratedContent(prev => 
-      prev.map(item => 
-        item.id === updatedContent.id ? updatedContent : item
-      )
-    );
-    
-    // Reload content from database to sync
-    await loadContentItems();
-    
-    toast({
-      title: "Content Updated",
-      description: "Your changes have been saved successfully.",
-    });
+    try {
+      // Update database first
+      const { error } = await supabase
+        .from('marketing_content')
+        .update({
+          title: updatedContent.title,
+          body_text: updatedContent.body_text,
+          seo_title: updatedContent.seo_title,
+          meta_description: updatedContent.meta_description,
+          keywords: updatedContent.keywords,
+          image_url: updatedContent.image_url,
+          featured_image_alt: updatedContent.featured_image_alt,
+          seo_score: updatedContent.seo_score
+        })
+        .eq('id', updatedContent.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setGeneratedContent(prev => 
+        prev.map(item => 
+          item.id === updatedContent.id ? updatedContent : item
+        )
+      );
+      
+      // Reload content from database to sync
+      await loadContentItems();
+      
+      toast({
+        title: "Content Updated",
+        description: "Your changes have been saved successfully.",
+      });
+    } catch (error) {
+      console.error('Error updating content:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to save changes. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCancelEdit = () => {
     setSelectedContent(null);
     setShowEditModal(false);
+  };
+
+  const handleRegenerateContent = async (contentId: string) => {
+    try {
+      const content = generatedContent.find(item => item.id === contentId);
+      if (!content) return;
+
+      // Delete the current content
+      const { error: deleteError } = await supabase
+        .from('marketing_content')
+        .delete()
+        .eq('id', contentId);
+
+      if (deleteError) throw deleteError;
+
+      // Start a new generation with the same campaign
+      setCurrentStage('process');
+      setCurrentStep(0);
+      setIsProcessing(true);
+
+      toast({
+        title: "Regenerating Content",
+        description: "Creating new content with improved quality...",
+      });
+
+      // Trigger regeneration by calling the edge function again
+      const { error: regenError } = await supabase.functions.invoke('riven-marketing-enhanced', {
+        body: {
+          command: command || 'Generate improved content',
+          campaign_id: currentCampaignId,
+          regenerate: true
+        }
+      });
+
+      if (regenError) throw regenError;
+
+    } catch (error) {
+      console.error('Error regenerating content:', error);
+      toast({
+        title: "Regeneration Failed",
+        description: "Failed to regenerate content. Please try again.",
+        variant: "destructive"
+      });
+      setCurrentStage('approval');
+      setIsProcessing(false);
+    }
   };
 
   const handleStartOver = () => {
@@ -673,6 +793,14 @@ const SimplifiedRivenContent: React.FC = () => {
                           Ready for review • Generated {new Date(content.created_at).toLocaleString()}
                         </div>
                         <div className="flex items-center gap-2">
+                          <Button 
+                            variant="outline" 
+                            onClick={() => handleRegenerateContent(content.id)}
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                          >
+                            <Wand2 className="h-4 w-4 mr-2" />
+                            Regenerate
+                          </Button>
                           <Button 
                             variant="outline" 
                             onClick={() => handleRejectContent(content.id)}
