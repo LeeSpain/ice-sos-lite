@@ -758,7 +758,7 @@ async function createFinalContent(supabase: any, campaignId: string) {
     reading_time: assembledContent.reading_time || 0,
     seo_score: assembledContent.seo_score || 0,
     keywords: assembledContent.keywords || [],
-    status: 'pending_review'  // Use status that exists in enum
+    status: 'draft'  // Use correct enum value
   };
   
   console.log('Content payload for insert:', JSON.stringify(contentPayload, null, 2));

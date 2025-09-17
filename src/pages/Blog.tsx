@@ -68,7 +68,7 @@ const Blog = () => {
       const { data: posts, error } = await supabase
         .from('marketing_content')
         .select('*')
-        .eq('platform', 'Blog')
+        .eq('platform', 'blog')
         .eq('status', 'published')
         .order('created_at', { ascending: false });
 

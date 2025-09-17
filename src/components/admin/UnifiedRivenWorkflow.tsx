@@ -27,8 +27,10 @@ import {
   Users,
   Settings,
   Database,
-  Monitor
+  Monitor,
+  BookOpen
 } from 'lucide-react';
+import { RivenBlogWorkflow } from './RivenBlogWorkflow';
 
 const WorkflowContent: React.FC = () => {
   const { 
@@ -86,6 +88,7 @@ const WorkflowContent: React.FC = () => {
 
   const tabs = [
     { id: 'command-center', label: 'Command Center', icon: Wand2, description: 'AI Marketing Commands' },
+    { id: 'blog-workflow', label: 'Blog Workflow', icon: BookOpen, description: 'Complete Blog Pipeline' },
     { id: 'creation-pipeline', label: 'Creation Pipeline', icon: Cog, description: 'Content Generation' },
     { id: 'content-approval', label: 'Content Approval', icon: CheckCircle, description: 'Review & Publish' },
     { id: 'social-hub', label: 'Social Hub', icon: Users, description: 'Social Accounts' },
@@ -213,6 +216,10 @@ const WorkflowContent: React.FC = () => {
                     />
                     <WorkflowTester />
                   </div>
+                </TabsContent>
+
+                <TabsContent value="blog-workflow" className="mt-0">
+                  <RivenBlogWorkflow />
                 </TabsContent>
 
                 <TabsContent value="creation-pipeline" className="mt-0">
