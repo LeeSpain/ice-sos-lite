@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { RealTimeWorkflowVisualizer } from './RealTimeWorkflowVisualizer';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 
@@ -981,6 +982,57 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Preview Modal */}
+      <Dialog open={showPreviewModal} onOpenChange={setShowPreviewModal}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{selectedContent?.title || 'Preview'}</DialogTitle>
+            <DialogDescription>Preview the generated content before approving.</DialogDescription>
+          </DialogHeader>
+          <div className="prose max-w-none text-left">
+            {selectedContent?.body_text ? (
+              <div dangerouslySetInnerHTML={{ __html: selectedContent.body_text }} />
+            ) : (
+              <p>No content body available.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPreviewModal(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Modal */}
+      <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Edit Content</DialogTitle>
+            <DialogDescription>Make quick edits and save your changes.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Input
+              value={selectedContent?.title || ''}
+              onChange={(e) => setSelectedContent(prev => prev ? { ...prev, title: e.target.value } : prev)}
+              placeholder="Title"
+            />
+            <Textarea
+              className="min-h-[300px]"
+              value={selectedContent?.body_text || ''}
+              onChange={(e) => setSelectedContent(prev => prev ? { ...prev, body_text: e.target.value } : prev)}
+              placeholder="Body (HTML supported)"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditModal(false)}>Cancel</Button>
+            {selectedContent && (
+              <Button onClick={() => { handleSaveEdit(selectedContent); setShowEditModal(false); }}>
+                Save Changes
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -723,10 +723,10 @@ function generateIntelligentContent(parsedCommand: any, settings: any): any {
       { heading: "Best Practices", summary: "Expert recommendations" },
       { heading: "Conclusion", summary: "Key takeaways and next steps" }
     ],
-    word_count: Number(settings?.word_count) || 800,
+    word_count: Number(settings?.word_count) || 2500,
     keywords: [topic, 'emergency preparedness', 'family safety', 'ICE SOS', 'safety planning'],
     featured_image_alt: `Professional illustration showing ${topic} and emergency preparedness`,
-    reading_time: Math.ceil((Number(settings?.word_count) || 800) / 200),
+    reading_time: Math.ceil(((Number(settings?.word_count) || 2500)) / 200),
     seo_score: 87
   };
 }
@@ -749,6 +749,7 @@ async function executeContentCreation(supabase: any, campaignId: string, origina
   
   const analysisResult = analysisStage?.output_data || {};
   const textProvider = aiConfig?.stages?.text?.provider || 'openai';
+  const desiredWordCount = Number(settings?.word_count) || 2500;
   
   console.log(`Using ${textProvider} for content creation`);
   
@@ -822,10 +823,10 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
             { heading: "Best Practices", summary: "Expert recommendations" },
             { heading: "Conclusion", summary: "Key takeaways and next steps" }
           ],
-          word_count: Number(settings?.word_count) || 800,
+          word_count: desiredWordCount,
           keywords: [parsedCommand.topic, 'emergency preparedness', 'family safety', 'ICE SOS', 'safety planning'],
           featured_image_alt: `Professional illustration showing ${parsedCommand.topic} and emergency preparedness`,
-          reading_time: Math.ceil((Number(settings?.word_count) || 800) / 200),
+          reading_time: Math.ceil(desiredWordCount / 200),
           seo_score: 87
         };
       } else {
@@ -906,10 +907,10 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
             { heading: "Best Practices", summary: "Expert recommendations" },
             { heading: "Conclusion", summary: "Key takeaways and next steps" }
           ],
-          word_count: Number(settings?.word_count) || 800,
+          word_count: desiredWordCount,
           keywords: [parsedCommand.topic, 'emergency preparedness', 'family safety', 'ICE SOS', 'safety planning'],
           featured_image_alt: `Professional illustration showing ${parsedCommand.topic} and emergency preparedness`,
-          reading_time: Math.ceil((Number(settings?.word_count) || 800) / 200),
+          reading_time: Math.ceil(desiredWordCount / 200),
           seo_score: 87
         };
       } else {
