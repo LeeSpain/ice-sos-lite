@@ -96,6 +96,13 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   const retryTimeoutRef = useRef<number | null>(null);
   const [useEmbedFallback, setUseEmbedFallback] = useState(false);
 
+  // Reset fallback when tiles start loading successfully
+  useEffect(() => {
+    if (renderStats.tilesLoaded > 0 && useEmbedFallback) {
+      setUseEmbedFallback(false);
+    }
+  }, [renderStats.tilesLoaded, useEmbedFallback]);
+
   // Convert lat/lng to pixel coordinates
   const latLngToPixel = useCallback((lat: number, lng: number): { x: number; y: number } => {
     const scale = Math.pow(2, viewport.zoom);
@@ -629,13 +636,17 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
         }}
       />
 
-      {useEmbedFallback && (
+      {/* Fallback iframe map - only show when primary map completely fails */}
+      {useEmbedFallback && renderStats.tilesLoaded === 0 && (
         <iframe
           title="Map fallback"
           src={getOsmEmbedUrl()}
-          className="absolute inset-0 w-full h-full border-0 z-10"
+          className="absolute inset-0 w-full h-full border-0 z-10 rounded-xl"
           loading="lazy"
           referrerPolicy="no-referrer"
+          style={{
+            borderRadius: PLATFORM_MAP_CONFIG.appearance.borderRadius
+          }}
         />
       )}
 
@@ -678,14 +689,16 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
             >
               Try alternate
             </Button>
-            <Button 
-              variant="secondary" 
-              size="sm" 
-              onClick={() => setUseEmbedFallback(true)} 
-              className="h-7 px-2 bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              Use fallback
-            </Button>
+            {renderStats.tilesLoaded === 0 && (
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                onClick={() => setUseEmbedFallback(true)} 
+                className="h-7 px-2 bg-emergency text-emergency-foreground hover:bg-emergency/90"
+              >
+                Use fallback
+              </Button>
+            )}
           </div>
         </div>
       )}
