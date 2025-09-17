@@ -93,6 +93,7 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
   const [retryCount, setRetryCount] = useState(0);
   const [failureDetected, setFailureDetected] = useState(false);
   const retryTimeoutRef = useRef<number | null>(null);
+  const [useEmbedFallback, setUseEmbedFallback] = useState(false);
 
   // Convert lat/lng to pixel coordinates
   const latLngToPixel = useCallback((lat: number, lng: number): { x: number; y: number } => {
@@ -222,27 +223,36 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
       setIsLoading(isMapLoading);
     }
 
-    // Detect tile loading failure and trigger provider rotation even if loading state hasn't changed
-    if (isMapLoading && totalTiles > 0 && tilesLoaded === 0 && !failureDetected) {
-      setFailureDetected(true);
-      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
-      retryTimeoutRef.current = window.setTimeout(() => {
-        if (retryCount < 3) {
-          console.log(`[CanvasMap] No tiles loaded, rotating provider (attempt ${retryCount + 1})`);
-          enhancedTileCache.rotateToNextProvider();
-          enhancedTileCache.clear();
-          setCurrentProvider(enhancedTileCache.getCurrentProviderName());
-          setRetryCount(prev => prev + 1);
-          setFailureDetected(false);
-          scheduleDraw();
-        }
-      }, 3000);
-    } else if (!isMapLoading && failureDetected) {
-      setFailureDetected(false);
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-        retryTimeoutRef.current = null;
+    // Detect tile loading failure; rotate providers and eventually fall back to OSM embed
+    if (isMapLoading && totalTiles > 0 && tilesLoaded === 0) {
+      if (!failureDetected) {
+        setFailureDetected(true);
+        if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = window.setTimeout(() => {
+          if (retryCount < 3) {
+            console.log(`[CanvasMap] No tiles loaded, rotating provider (attempt ${retryCount + 1})`);
+            enhancedTileCache.rotateToNextProvider();
+            enhancedTileCache.clear();
+            setCurrentProvider(enhancedTileCache.getCurrentProviderName());
+            setRetryCount(prev => prev + 1);
+            setFailureDetected(false);
+            scheduleDraw();
+          }
+        }, 2000);
       }
+      if (retryCount >= 2) {
+        setUseEmbedFallback(true);
+      }
+    } else {
+      // We have tiles; disable failure state and fallback
+      if (failureDetected) {
+        setFailureDetected(false);
+        if (retryTimeoutRef.current) {
+          clearTimeout(retryTimeoutRef.current);
+          retryTimeoutRef.current = null;
+        }
+      }
+      if (tilesLoaded > 0) setUseEmbedFallback(false);
     }
 
     const cacheStats = enhancedTileCache.getStats();
@@ -446,6 +456,23 @@ const CanvasMap: React.FC<CanvasMapProps> = ({
     setRouteData(route);
   }, []);
 
+  // Build a resilient OSM embed URL as a last-resort fallback
+  const getOsmEmbedUrl = useCallback(() => {
+    const lat = viewport.centerLat;
+    const lng = viewport.centerLng;
+    const z = Math.floor(viewport.zoom);
+    const scale = Math.pow(2, z);
+    const degPerPixel = 360 / (256 * scale);
+    const widthDeg = degPerPixel * Math.max(256, viewport.width);
+    const heightDeg = degPerPixel * Math.max(256, viewport.height);
+    const minLng = lng - widthDeg / 2;
+    const maxLng = lng + widthDeg / 2;
+    const latFactor = Math.cos((lat * Math.PI) / 180) || 0.0001;
+    const minLat = lat - (heightDeg / 2) * latFactor;
+    const maxLat = lat + (heightDeg / 2) * latFactor;
+    const bbox = `${minLng.toFixed(6)},${minLat.toFixed(6)},${maxLng.toFixed(6)},${maxLat.toFixed(6)}`;
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat.toFixed(6)},${lng.toFixed(6)}`;
+  }, [viewport.centerLat, viewport.centerLng, viewport.zoom, viewport.width, viewport.height]);
   // Update center when prop changes (only if not being dragged and significantly different)
   useEffect(() => {
     if (isDragging) return; // Don't update center while user is interacting
