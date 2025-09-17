@@ -52,51 +52,59 @@ serve(async (req) => {
     if (body.action === 'provider_status') {
       console.log('Checking provider status...');
       
+      // Always read secrets per request to avoid warm instance stale values
+      const openAIKey = Deno.env.get('OPENAI_API_KEY') || '';
+      const xaiKey = Deno.env.get('XAI_API_KEY') || '';
+
       // Test OpenAI connection
       let openaiStatus = 'not_configured';
-      if (openAIApiKey) {
+      let openaiError: string | null = null;
+      if (openAIKey) {
         try {
           const testResponse = await fetch('https://api.openai.com/v1/models', {
-            headers: { 'Authorization': `Bearer ${openAIApiKey}` }
+            headers: { 'Authorization': `Bearer ${openAIKey}` }
           });
-          openaiStatus = testResponse.ok ? 'connected' : 'error';
-        } catch {
+          if (testResponse.ok) {
+            openaiStatus = 'connected';
+          } else {
+            openaiStatus = 'error';
+            openaiError = await testResponse.text();
+          }
+        } catch (err) {
           openaiStatus = 'error';
+          openaiError = (err as Error).message;
         }
       }
 
       // Test xAI connection with better error handling
       let xaiStatus = 'not_configured';
-      if (xaiApiKey) {
+      let xaiError: string | null = null;
+      if (xaiKey) {
         try {
-          console.log('Testing xAI connection with updated API key...');
+          console.log('Testing xAI connection with current API key...');
           const testResponse = await fetch('https://api.x.ai/v1/chat/completions', {
             method: 'POST',
-            headers: { 
-              'Authorization': `Bearer ${xaiApiKey}`,
+            headers: {
+              'Authorization': `Bearer ${xaiKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              model: 'grok-beta',
-              messages: [{ role: 'user', content: 'Hello' }],
-              max_tokens: 5,
-              temperature: 0.7
+              model: 'grok-2-mini',
+              messages: [{ role: 'user', content: 'ping' }],
+              max_tokens: 1
             })
           });
           console.log('xAI test response status:', testResponse.status);
-          
           if (testResponse.ok) {
-            const responseData = await testResponse.json();
-            console.log('xAI test successful:', responseData);
             xaiStatus = 'connected';
           } else {
-            const errorData = await testResponse.text();
-            console.log('xAI test failed:', testResponse.status, errorData);
             xaiStatus = 'error';
+            xaiError = await testResponse.text();
           }
         } catch (error) {
           console.error('xAI connection test failed:', error);
           xaiStatus = 'error';
+          xaiError = (error as Error).message;
         }
       }
 
@@ -107,8 +115,8 @@ serve(async (req) => {
           xai: xaiStatus === 'connected'
         },
         details: {
-          openai: { status: openaiStatus, models: openaiStatus === 'connected' ? ['gpt-4o-mini', 'gpt-4o', 'dall-e-3'] : [] },
-          xai: { status: xaiStatus, models: xaiStatus === 'connected' ? ['grok-beta', 'grok-vision-beta'] : [] },
+          openai: { status: openaiStatus, models: openaiStatus === 'connected' ? ['gpt-4o-mini', 'gpt-4o'] : [], error: openaiError },
+          xai: { status: xaiStatus, models: xaiStatus === 'connected' ? ['grok-2-mini', 'grok-2-latest'] : [], error: xaiError },
           supabase: { status: 'connected', url: supabaseUrl }
         }
       };
@@ -348,7 +356,7 @@ async function executeCommandAnalysis(command: string, settings: any, aiConfig: 
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: (aiConfig?.providers?.xai?.model || 'grok-beta'),
+          model: (aiConfig?.providers?.xai?.model || 'grok-2-latest'),
           messages: [
             {
               role: 'system',
@@ -787,7 +795,7 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'grok-beta',
+          model: 'grok-2-latest',
           messages: [
             {
               role: 'system',
