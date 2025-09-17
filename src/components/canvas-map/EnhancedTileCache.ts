@@ -130,6 +130,17 @@ class EnhancedTileCache {
     return newProvider;
   }
 
+  // Manual provider rotation (for button)
+  public rotateProvider(): void {
+    this.rotateToNextProvider();
+  }
+
+  // Get current provider name for diagnostics
+  public getCurrentProviderName(): string {
+    const provider = this.getProviderForMode('standard');
+    return this.providers[provider]?.name || 'Unknown';
+  }
+
   private createLoadingPromise(x: number, y: number, z: number, provider: string, key: string): Promise<HTMLImageElement | null> {
     return new Promise((resolve) => {
       const img = new Image();
@@ -262,10 +273,13 @@ class EnhancedTileCache {
   }
 
   getStats(): { size: number; maxSize: number; hitRate: number } {
+    const totalEntries = this.cache.size;
+    const successfulEntries = Array.from(this.cache.values()).filter(tile => !tile.loading && !tile.error && tile.image).length;
+    
     return {
       size: this.cache.size,
       maxSize: this.maxSize,
-      hitRate: this.cache.size > 0 ? Array.from(this.cache.values()).filter(t => !t.error).length / this.cache.size : 0
+      hitRate: totalEntries > 0 ? successfulEntries / totalEntries : 0
     };
   }
 
