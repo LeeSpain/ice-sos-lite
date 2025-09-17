@@ -917,14 +917,7 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
   const intelligentContent = generateIntelligentContent(parsedCommand, settings);
   console.log('Intelligent content generated:', intelligentContent.title);
   return intelligentContent;
-      body_text: `<h1>${originalCommand}</h1>\n\n<h2>Introduction</h2>\n<p>This comprehensive guide provides essential information about ${originalCommand}.</p>\n\n<h2>Key Points</h2>\n<ul><li>Important consideration 1</li><li>Important consideration 2</li><li>Important consideration 3</li></ul>\n\n<h2>Conclusion</h2>\n<p>Understanding ${originalCommand} is crucial for effective planning and execution.</p>`,
-      seo_title: `${originalCommand} - Essential Guide`,
-      meta_description: `Learn everything about ${originalCommand} with our comprehensive guide.`,
-      word_count: Number(settings?.word_count) || 800,
-      keywords: ['guide', 'essential', 'planning'],
-      reading_time: 4
-    };
-  }
+}
 
   try {
     console.log('Calling OpenAI API for content generation...');
