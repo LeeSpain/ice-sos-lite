@@ -67,18 +67,50 @@ class ErrorReporter {
 
   private async sendToErrorService(report: ErrorReport) {
     try {
-      // Replace with your error tracking service
-      // Example: Sentry, LogRocket, or custom endpoint
-      console.log('Would send to error service:', report);
-      
-      // Example implementation:
-      // await fetch('/api/errors', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(report),
-      // });
+      // Send to internal production monitoring edge function
+      const response = await fetch('/api/v1/production-monitoring', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'track_error',
+          data: {
+            message: report.message,
+            stack: report.stack,
+            url: report.url,
+            timestamp: report.timestamp,
+            user_agent: report.userAgent,
+            user_id: report.userId,
+            session_id: report.sessionId,
+            metadata: report.metadata,
+            severity: report.metadata?.critical ? 'critical' : 'error'
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error tracking failed: ${response.status}`);
+      }
     } catch (e) {
-      console.error('Failed to send error report:', e);
+      console.error('Failed to send error report to internal system:', e);
+      // Fallback to local storage for offline scenarios
+      this.storeErrorLocally(report);
+    }
+  }
+
+  private storeErrorLocally(report: ErrorReport) {
+    try {
+      const stored = localStorage.getItem('pending_errors');
+      const pendingErrors = stored ? JSON.parse(stored) : [];
+      pendingErrors.push(report);
+      
+      // Keep only last 20 errors in local storage
+      if (pendingErrors.length > 20) {
+        pendingErrors.splice(0, pendingErrors.length - 20);
+      }
+      
+      localStorage.setItem('pending_errors', JSON.stringify(pendingErrors));
+    } catch (e) {
+      console.error('Failed to store error locally:', e);
     }
   }
 

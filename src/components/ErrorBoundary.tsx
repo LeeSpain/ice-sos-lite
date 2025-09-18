@@ -1,4 +1,5 @@
 import React from 'react';
+import { errorReporter } from '@/utils/errorReporting';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -22,6 +23,14 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('🚨 ErrorBoundary caught an error:', error, errorInfo);
+    
+    // Report error to internal monitoring system
+    errorReporter.reportError(error, {
+      category: 'react_error_boundary',
+      componentStack: errorInfo.componentStack,
+      errorBoundary: true,
+      critical: true
+    });
   }
 
   reset = () => {
