@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle, RefreshCw, Play, Users } from 'lucide-react';
+import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle, RefreshCw, Play, Users, TrendingUp, Settings } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
@@ -16,6 +16,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { BulkEmailCRM } from './BulkEmailCRM';
 import { EmailCampaignControls } from './EmailCampaignControls';
+import { EmailTemplateEditor } from './EmailTemplateEditor';
+import { EmailAnalyticsDashboard } from './EmailAnalyticsDashboard';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 
@@ -43,7 +45,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const [allPublishedContent, setAllPublishedContent] = useState<ContentItem[]>([]);
   const [publishedBlogs, setPublishedBlogs] = useState<ContentItem[]>([]);
   const [publishedEmails, setPublishedEmails] = useState<ContentItem[]>([]);
-  const [currentContentView, setCurrentContentView] = useState<'blogs' | 'emails' | 'bulk-crm'>('blogs');
+  const [currentContentView, setCurrentContentView] = useState<'blogs' | 'emails' | 'bulk-crm' | 'analytics'>('blogs');
   const [currentStage, setCurrentStage] = useState<WorkflowStage>('command');
   const [realTimeStages, setRealTimeStages] = useState<any[]>([]);
   const [apiProviderStatus, setApiProviderStatus] = useState<{ 
@@ -85,6 +87,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showTemplateEditor, setShowTemplateEditor] = useState(false);
 
   interface ContentItem {
     id: string;
@@ -743,6 +746,18 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
             Bulk Email CRM
           </Button>
           
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setCurrentStage('success');
+              setCurrentContentView('analytics');
+            }}
+            className="flex items-center gap-2"
+          >
+            <TrendingUp className="h-4 w-4" />
+            Email Analytics
+          </Button>
+          
           <Button
             variant="outline" 
             onClick={() => setCurrentStage('command')}
@@ -1357,11 +1372,106 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
 
           {currentStage === 'success' && (
             <div className="space-y-6">
-              {currentContentView === 'bulk-crm' ? (
-                <BulkEmailCRM />
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  Published content will appear here.
+              {/* Content View Tabs */}
+              <div className="flex gap-2 border-b">
+                <Button 
+                  variant={currentContentView === 'blogs' ? 'default' : 'ghost'}
+                  onClick={() => { setCurrentContentView('blogs'); loadPublishedBlogs(); }}
+                  className="rounded-none border-b-2 border-transparent hover:border-primary"
+                >
+                  Blog Posts
+                </Button>
+                <Button 
+                  variant={currentContentView === 'emails' ? 'default' : 'ghost'}
+                  onClick={() => { setCurrentContentView('emails'); loadPublishedEmails(); }}
+                  className="rounded-none border-b-2 border-transparent hover:border-primary"
+                >
+                  Email Campaigns
+                </Button>
+                <Button 
+                  variant={currentContentView === 'bulk-crm' ? 'default' : 'ghost'}
+                  onClick={() => setCurrentContentView('bulk-crm')}
+                  className="rounded-none border-b-2 border-transparent hover:border-primary"
+                >
+                  Bulk CRM
+                </Button>
+                <Button 
+                  variant={currentContentView === 'analytics' ? 'default' : 'ghost'}
+                  onClick={() => setCurrentContentView('analytics')}
+                  className="rounded-none border-b-2 border-transparent hover:border-primary"
+                >
+                  Analytics
+                </Button>
+              </div>
+
+              {/* Content Area */}
+              {currentContentView === 'bulk-crm' && <BulkEmailCRM />}
+              {currentContentView === 'analytics' && <EmailAnalyticsDashboard />}
+              {(currentContentView === 'blogs' || currentContentView === 'emails') && (
+                <div className="space-y-4">
+                  {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0 ? (
+                    <div className="grid gap-4">
+                      {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).map((item) => (
+                        <Card key={item.id} className="p-4">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <h3 className="font-semibold">{item.title}</h3>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {item.content_type === 'email_campaign' ? 'Email Campaign' : 'Blog Post'} • 
+                                Published {new Date(item.posted_at || item.created_at).toLocaleDateString()}
+                              </p>
+                              {item.email_metrics && (
+                                <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+                                  <span>Sent: {item.email_metrics.total_sent}</span>
+                                  <span>Opens: {item.email_metrics.total_opened} ({item.email_metrics.open_rate}%)</span>
+                                  <span>Clicks: {item.email_metrics.total_clicked} ({item.email_metrics.click_rate}%)</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => { setSelectedContent(item); setShowPreviewModal(true); }}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              {item.content_type === 'email_campaign' && (
+                                <>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => { setSelectedContent(item); setShowTemplateEditor(true); }}
+                                  >
+                                    <Settings className="h-4 w-4" />
+                                  </Button>
+                                  <EmailCampaignControls 
+                                    contentItem={item}
+                                    onCampaignCreated={(campaignId) => {
+                                      toast({
+                                        title: "Campaign Created",
+                                        description: `Campaign ${campaignId} has been created.`
+                                      });
+                                    }}
+                                    onEmailsQueued={(count) => {
+                                      toast({
+                                        title: "Emails Queued",
+                                        description: `${count} emails have been queued for sending.`
+                                      });
+                                    }}
+                                  />
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      No {currentContentView === 'blogs' ? 'published blog posts' : 'email campaigns'} found.
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -1651,6 +1761,22 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
               Regenerate Content
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Template Editor Dialog */}
+      <Dialog open={showTemplateEditor} onOpenChange={setShowTemplateEditor}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Email Template Editor</DialogTitle>
+          </DialogHeader>
+          {selectedContent && (
+            <EmailTemplateEditor
+              content={selectedContent}
+              onSave={() => setShowTemplateEditor(false)}
+              onSend={() => setShowTemplateEditor(false)}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
