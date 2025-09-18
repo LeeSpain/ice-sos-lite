@@ -21,7 +21,7 @@ export function useRealTimeCustomerData() {
       
       try {
         // Fetch data directly from Supabase tables for more reliable metrics
-        const [profilesResult, subscribersResult] = await Promise.all([
+        const [profilesResult, subscribersResult, subscriptionPlansResult] = await Promise.all([
           supabase
             .from('profiles')
             .select('created_at, user_id, role')
@@ -29,7 +29,12 @@ export function useRealTimeCustomerData() {
           
           supabase
             .from('subscribers')
-            .select('user_id, subscribed, subscription_tier, email')
+            .select('user_id, subscribed, subscription_tier, email'),
+          
+          supabase
+            .from('subscription_plans')
+            .select('name, price, is_active')
+            .eq('is_active', true)
         ]);
 
         if (profilesResult.error) {
@@ -42,8 +47,14 @@ export function useRealTimeCustomerData() {
           throw subscribersResult.error;
         }
 
+        if (subscriptionPlansResult.error) {
+          console.error('❌ Error fetching subscription plans:', subscriptionPlansResult.error);
+          throw subscriptionPlansResult.error;
+        }
+
         const profiles = profilesResult.data || [];
         const subscribers = subscribersResult.data || [];
+        const subscriptionPlans = subscriptionPlansResult.data || [];
 
         console.log('✅ Fetched profiles:', profiles.length, 'subscribers:', subscribers.length);
 
@@ -60,15 +71,22 @@ export function useRealTimeCustomerData() {
           new Date(profile.created_at) >= monthStart
         ).length;
 
-        // Calculate subscription tiers (fixed logic)
+        // Get plan pricing from subscription plans
+        const premiumPlan = subscriptionPlans.find(plan => 
+          plan.name.toLowerCase().includes('premium') || 
+          plan.name.toLowerCase().includes('protection')
+        );
+        const familyPlan = subscriptionPlans.find(plan => 
+          plan.name.toLowerCase().includes('family') || 
+          plan.name.toLowerCase().includes('connection')
+        );
+        
+        // Calculate subscription tiers using actual plan names
         const premiumSubscriptions = subscribers.filter(sub => 
-          sub.subscribed && (
-            sub.subscription_tier?.toLowerCase().includes('premium') ||
-            sub.subscription_tier?.toLowerCase().includes('protection')
-          )
+          sub.subscribed && premiumPlan && sub.subscription_tier === premiumPlan.name
         ).length;
         
-        // Regional/Call Centre subscriptions - €24.99/month tier
+        // Regional/Call Centre subscriptions - for profiles with subscription_regional = true
         const callCentreSubscriptions = subscribers.filter(sub => 
           sub.subscribed && (
             sub.subscription_tier?.toLowerCase().includes('regional') ||
@@ -78,10 +96,19 @@ export function useRealTimeCustomerData() {
           )
         ).length;
 
-        // Revenue calculation (simplified - based on subscription tiers)
-        const premiumPrice = 0.99; // €0.99/month
-        const regionalPrice = 24.99; // €24.99/month (corrected price)
-        const totalRevenue = (premiumSubscriptions * premiumPrice) + (callCentreSubscriptions * regionalPrice);
+        // Revenue calculation using actual plan prices
+        const premiumPrice = premiumPlan?.price || 9.99;
+        const regionalPrice = 24.99; // Regional pricing for call centre services
+        const familyPrice = familyPlan?.price || 2.99;
+        
+        // Calculate family plan subscriptions
+        const familySubscriptions = subscribers.filter(sub => 
+          sub.subscribed && familyPlan && sub.subscription_tier === familyPlan.name
+        ).length;
+        
+        const totalRevenue = (premiumSubscriptions * premiumPrice) + 
+                           (callCentreSubscriptions * regionalPrice) + 
+                           (familySubscriptions * familyPrice);
 
         // Calculate derived metrics
         const averageRevenuePerCustomer = totalCustomers > 0 ? totalRevenue / totalCustomers : 0;
