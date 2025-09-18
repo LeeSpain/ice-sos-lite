@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, CreditCard, DollarSign, Users, TrendingUp, Calendar } from 'lucide-react';
+import { Search, CreditCard, DollarSign, Users, TrendingUp, Calendar, RefreshCw, Loader2, Euro } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Subscription {
   id: string;
@@ -28,33 +29,76 @@ export default function SubscriptionsPage() {
   const [tierFilter, setTierFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [reconciling, setReconciling] = useState(false);
+  const [revenueData, setRevenueData] = useState<any>(null);
 
   useEffect(() => {
-    loadSubscriptions();
+    loadRevenueData();
   }, []);
 
   useEffect(() => {
     filterSubscriptions();
   }, [searchTerm, tierFilter, statusFilter, subscriptions]);
 
-  const loadSubscriptions = async () => {
+  const loadRevenueData = async () => {
     try {
       setLoading(true);
-      const { data: subscriptionsData, error } = await supabase
-        .from('subscribers')
-        .select('*')
-        .order('created_at', { ascending: false });
+      
+      // Use the new admin revenue function to get comprehensive data
+      const { data, error } = await supabase.functions.invoke('get-admin-revenue');
 
       if (error) {
-        console.error('Error loading subscriptions:', error);
+        console.error('Error loading revenue data:', error);
+        toast.error('Failed to load revenue data');
         return;
       }
 
-      setSubscriptions(subscriptionsData || []);
+      console.log('Revenue data loaded:', data);
+      setRevenueData(data);
+      
+      // Transform data to match Subscription interface
+      const transformedData: Subscription[] = (data.subscribers || []).map((sub: any) => ({
+        id: sub.id || sub.user_id || '',
+        user_id: sub.user_id || '',
+        email: sub.email || 'No email',
+        stripe_customer_id: sub.stripe_customer_id,
+        subscribed: sub.subscribed,
+        subscription_tier: sub.subscription_tier || 'basic',
+        subscription_end: sub.subscription_end,
+        created_at: sub.created_at,
+        updated_at: sub.updated_at
+      }));
+
+      setSubscriptions(transformedData);
     } catch (error) {
-      console.error('Error loading subscriptions:', error);
+      console.error('Error:', error);
+      toast.error('Failed to load revenue data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleReconcileStripe = async () => {
+    try {
+      setReconciling(true);
+      toast.info('Reconciling Stripe data...');
+      
+      const { data, error } = await supabase.functions.invoke('reconcile-stripe-data');
+      
+      if (error) {
+        console.error('Reconciliation error:', error);
+        toast.error('Failed to reconcile Stripe data');
+        return;
+      }
+      
+      toast.success('Stripe data reconciled successfully');
+      // Reload data after reconciliation
+      await loadRevenueData();
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Reconciliation failed');
+    } finally {
+      setReconciling(false);
     }
   };
 
@@ -97,12 +141,12 @@ export default function SubscriptionsPage() {
     }
     
     switch (tier) {
-      case 'Basic':
+      case 'basic':
         return <Badge variant="secondary">Basic</Badge>;
-      case 'Premium':
+      case 'premium':
         return <Badge variant="default">Premium</Badge>;
-      case 'Enterprise':
-        return <Badge variant="destructive">Enterprise</Badge>;
+      case 'call_centre':
+        return <Badge variant="destructive">Call Centre</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -129,19 +173,25 @@ export default function SubscriptionsPage() {
 
   const calculateRevenue = (tier?: string) => {
     switch (tier) {
-      case 'Basic': return 7.99;
-      case 'Premium': return 19.99;
-      case 'Enterprise': return 49.99;
+      case 'basic': return 0;
+      case 'premium': return 0.99;
+      case 'call_centre': return 4.99;
       default: return 0;
     }
   };
 
+  // Use actual revenue data from the backend
+  const totalRevenue = revenueData?.metrics?.totalRevenue || 0;
+  const totalOrders = revenueData?.metrics?.totalOrders || 0;
+  const totalCustomers = revenueData?.metrics?.totalCustomers || 0;
+  const activeSubscriptions = revenueData?.metrics?.activeSubscriptions || 0;
+
   const stats = {
     total: subscriptions.length,
     active: subscriptions.filter(s => s.subscribed).length,
-    basic: subscriptions.filter(s => s.subscription_tier === 'Basic' && s.subscribed).length,
-    premium: subscriptions.filter(s => s.subscription_tier === 'Premium' && s.subscribed).length,
-    enterprise: subscriptions.filter(s => s.subscription_tier === 'Enterprise' && s.subscribed).length,
+    basic: subscriptions.filter(s => s.subscription_tier === 'basic' && s.subscribed).length,
+    premium: subscriptions.filter(s => s.subscription_tier === 'premium' && s.subscribed).length,
+    call_centre: subscriptions.filter(s => s.subscription_tier === 'call_centre' && s.subscribed).length,
     monthlyRevenue: subscriptions
       .filter(s => s.subscribed)
       .reduce((sum, s) => sum + calculateRevenue(s.subscription_tier), 0)
@@ -151,8 +201,11 @@ export default function SubscriptionsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">Subscription Management</h1>
-          <p className="text-muted-foreground">Loading subscriptions...</p>
+          <h1 className="text-3xl font-bold">Revenue Analytics</h1>
+          <p className="text-muted-foreground">Loading revenue data...</p>
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       </div>
     );
@@ -162,85 +215,102 @@ export default function SubscriptionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Subscription Management</h1>
-          <p className="text-muted-foreground">Monitor and manage all subscriptions</p>
+          <h1 className="text-3xl font-bold">Revenue Analytics</h1>
+          <p className="text-muted-foreground">Real Stripe payment data and subscription metrics</p>
         </div>
+        <Button 
+          onClick={handleReconcileStripe}
+          disabled={reconciling}
+          variant="outline"
+        >
+          {reconciling ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="mr-2 h-4 w-4" />
+          )}
+          Sync Stripe Data
+        </Button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      {/* Revenue Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Users className="h-6 w-6 text-blue-500" />
-              <div>
-                <p className="text-xl font-bold">{stats.total}</p>
-                <p className="text-sm text-muted-foreground">Total Users</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <Euro className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">€{totalRevenue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">
+              All-time revenue from Stripe
+            </p>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="h-6 w-6 text-green-500" />
-              <div>
-                <p className="text-xl font-bold">{stats.active}</p>
-                <p className="text-sm text-muted-foreground">Active Subs</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalOrders}</div>
+            <p className="text-xs text-muted-foreground">
+              Completed payments
+            </p>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <CreditCard className="h-6 w-6 text-purple-500" />
-              <div>
-                <p className="text-xl font-bold">{stats.basic}</p>
-                <p className="text-sm text-muted-foreground">Basic</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{activeSubscriptions}</div>
+            <p className="text-xs text-muted-foreground">
+              Premium: {stats.premium}, Call Centre: {stats.call_centre}
+            </p>
           </CardContent>
         </Card>
-
+        
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <CreditCard className="h-6 w-6 text-blue-500" />
-              <div>
-                <p className="text-xl font-bold">{stats.premium}</p>
-                <p className="text-sm text-muted-foreground">Premium</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <CreditCard className="h-6 w-6 text-orange-500" />
-              <div>
-                <p className="text-xl font-bold">{stats.enterprise}</p>
-                <p className="text-sm text-muted-foreground">Enterprise</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <DollarSign className="h-6 w-6 text-green-500" />
-              <div>
-                <p className="text-xl font-bold">€{stats.monthlyRevenue.toFixed(0)}</p>
-                <p className="text-sm text-muted-foreground">Monthly Revenue (EUR)</p>
-              </div>
-            </div>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalCustomers}</div>
+            <p className="text-xs text-muted-foreground">
+              Unique paying customers
+            </p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Debug Info */}
+      {revenueData?.rawData && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Database Status</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <strong>Orders in DB:</strong> {revenueData.rawData.allOrders?.length || 0}
+              </div>
+              <div>
+                <strong>Subscribers in DB:</strong> {revenueData.rawData.allSubscribers?.length || 0}
+              </div>
+              <div>
+                <strong>Completed Orders:</strong> {revenueData.orders?.length || 0}
+              </div>
+              <div>
+                <strong>Active Subs:</strong> {revenueData.subscribers?.length || 0}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filters */}
       <Card>
@@ -261,9 +331,9 @@ export default function SubscriptionsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Tiers</SelectItem>
-                <SelectItem value="Basic">Basic</SelectItem>
-                <SelectItem value="Premium">Premium</SelectItem>
-                <SelectItem value="Enterprise">Enterprise</SelectItem>
+                <SelectItem value="basic">Basic</SelectItem>
+                <SelectItem value="premium">Premium</SelectItem>
+                <SelectItem value="call_centre">Call Centre</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -277,7 +347,6 @@ export default function SubscriptionsPage() {
                 <SelectItem value="expired">Expired</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline">Export</Button>
           </div>
         </CardContent>
       </Card>
