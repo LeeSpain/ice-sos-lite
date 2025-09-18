@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.53.0";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -26,7 +26,7 @@ async function applyRoutingRules(request: RoutingRequest) {
 
   // Get all active routing rules ordered by priority
   const { data: rules, error: rulesError } = await supabase
-    .from('routing_rules')
+    .from('conversation_routing_rules')
     .select('*')
     .eq('is_active', true)
     .order('priority');
@@ -200,7 +200,7 @@ async function assignCategory(conversationId: string, actionConfig: any, categor
 
   // Update conversation metadata
   const { error: updateError } = await supabase
-    .from('conversations')
+    .from('unified_conversations')
     .update({
       metadata: {
         category_id: category.id,
@@ -220,7 +220,7 @@ async function assignUser(conversationId: string, actionConfig: any) {
   const userId = actionConfig.user_id;
 
   const { error } = await supabase
-    .from('conversations')
+    .from('unified_conversations')
     .update({
       metadata: {
         assigned_to: userId,
@@ -276,7 +276,7 @@ async function escalateConversation(conversationId: string, actionConfig: any) {
   const escalateTo = actionConfig.escalate_to;
 
   const { error } = await supabase
-    .from('conversations')
+    .from('unified_conversations')
     .update({
       metadata: {
         escalated: true,
@@ -296,7 +296,7 @@ async function addConversationTag(conversationId: string, actionConfig: any) {
   const tags = actionConfig.tags || [];
 
   const { data: conversation, error: fetchError } = await supabase
-    .from('conversations')
+    .from('unified_conversations')
     .select('metadata')
     .eq('id', conversationId)
     .single();
@@ -310,7 +310,7 @@ async function addConversationTag(conversationId: string, actionConfig: any) {
   const newTags = [...new Set([...currentTags, ...tags])];
 
   const { error: updateError } = await supabase
-    .from('conversations')
+    .from('unified_conversations')
     .update({
       metadata: {
         ...currentMetadata,
@@ -328,7 +328,7 @@ async function setPriority(conversationId: string, actionConfig: any) {
   const priority = actionConfig.priority || 3;
 
   const { error } = await supabase
-    .from('conversations')
+    .from('unified_conversations')
     .update({
       metadata: {
         priority: priority,
