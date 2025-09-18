@@ -79,13 +79,45 @@ serve(async (req) => {
       console.error('Error fetching subscribers:', subsError);
     }
 
-    // Calculate revenue metrics
+    // Calculate actual received revenue from orders
     const completedOrders = (orders || []).filter(o => ['completed', 'paid'].includes(o.status));
-    const totalRevenue = completedOrders.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0);
+    const productRevenue = completedOrders.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0);
     
     const activeSubscribers = (subscribers || []).filter(s => s.subscribed);
-    const subscriptionRevenue = activeSubscribers.length * 0.99; // Assuming 0.99 EUR per subscription
+    
+    // Fetch subscription plans to get actual pricing
+    const { data: subscriptionPlans, error: plansError } = await supabase
+      .from('subscription_plans')
+      .select('*')
+      .eq('is_active', true);
 
+    if (plansError) {
+      console.error('Error fetching subscription plans:', plansError);
+    }
+
+    // Calculate actual subscription revenue based on subscriber tiers and plan pricing
+    let subscriptionRevenue = 0;
+    const planBreakdown: { [key: string]: { count: number; revenue: number; price: number } } = {};
+    
+    if (subscriptionPlans) {
+      const planMap = new Map(subscriptionPlans.map(plan => [plan.name, plan]));
+      
+      activeSubscribers.forEach(subscriber => {
+        const tierName = subscriber.subscription_tier || 'Premium Protection';
+        const plan = planMap.get(tierName);
+        const planPrice = plan ? Number(plan.price) : 9.99; // Default to €9.99 if plan not found
+        
+        subscriptionRevenue += planPrice;
+        
+        if (!planBreakdown[tierName]) {
+          planBreakdown[tierName] = { count: 0, revenue: 0, price: planPrice };
+        }
+        planBreakdown[tierName].count += 1;
+        planBreakdown[tierName].revenue += planPrice;
+      });
+    }
+
+    const totalRevenue = productRevenue + subscriptionRevenue;
     const totalCustomers = new Set([
       ...completedOrders.map(o => o.user_id).filter(Boolean),
       ...activeSubscribers.map(s => s.user_id).filter(Boolean)
@@ -94,16 +126,20 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       success: true,
       metrics: {
-        totalRevenue: totalRevenue + subscriptionRevenue,
+        totalRevenue,
+        productRevenue,
+        subscriptionRevenue,
         totalOrders: completedOrders.length,
         totalCustomers,
         activeSubscriptions: activeSubscribers.length
       },
       orders: completedOrders,
       subscribers: activeSubscribers,
+      planBreakdown,
       rawData: {
         allOrders: orders || [],
-        allSubscribers: subscribers || []
+        allSubscribers: subscribers || [],
+        subscriptionPlans: subscriptionPlans || []
       }
     }), {
       headers: { ...corsHeaders, 'content-type': 'application/json' }

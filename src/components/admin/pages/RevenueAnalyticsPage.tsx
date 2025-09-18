@@ -80,31 +80,22 @@ const RevenueAnalyticsPage = () => {
   const revenueData = useMemo(() => {
     if (loading || !adminData?.metrics) return null;
 
+    const metrics = adminData.metrics;
     const orders = adminData.orders || [];
     const subscribers = adminData.subscribers || [];
 
-    const productRevenue = orders.reduce((total: number, order: any) => total + (Number(order.total_price) || 0), 0);
-    const activeCount = subscribers.filter((s: any) => s.subscribed).length;
-    const subscriptionRevenue = activeCount * 0.99; // Align with edge function assumption
-    const totalRevenue = typeof adminData.metrics.totalRevenue === 'number'
-      ? adminData.metrics.totalRevenue
-      : subscriptionRevenue + productRevenue;
-    const subscriberCount = activeCount;
+    // Use actual calculated revenue from edge function
+    const productRevenue = metrics.productRevenue || 0;
+    const subscriptionRevenue = metrics.subscriptionRevenue || 0;
+    const totalRevenue = metrics.totalRevenue || 0;
+    const subscriberCount = metrics.activeSubscriptions || 0;
     const averageRevenuePerUser = subscriberCount > 0 ? totalRevenue / subscriberCount : 0;
 
-    const planBreakdown: { [key: string]: { count: number; revenue: number; price: number } } = {};
-    subscribers.forEach((subscriber: any) => {
-      if (subscriber.subscribed) {
-        const tier = (subscriber.subscription_tier || 'Premium').toString();
-        if (!planBreakdown[tier]) {
-          planBreakdown[tier] = { count: 0, revenue: 0, price: 0.99 };
-        }
-        planBreakdown[tier].count += 1;
-        planBreakdown[tier].revenue += 0.99;
-      }
-    });
+    // Use plan breakdown from edge function (with actual pricing)
+    const planBreakdown = adminData.planBreakdown || {};
 
-    const pendantSales = 0; // Not available from admin function
+    // Calculate pendant/product sales count from orders
+    const pendantSales = orders.length;
 
     return {
       subscriptionRevenue,
@@ -211,7 +202,7 @@ const RevenueAnalyticsPage = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-green-600">Total Revenue</p>
+                <p className="text-sm font-medium text-green-600">Total Received Revenue</p>
                 <p className="text-3xl font-bold text-green-900">€{revenueData.totalRevenue.toFixed(2)}</p>
                 <p className="text-xs text-green-600 mt-1">Subscription + Product Sales</p>
               </div>
@@ -226,7 +217,7 @@ const RevenueAnalyticsPage = () => {
               <div>
                 <p className="text-sm font-medium text-blue-600">Subscription Revenue</p>
                 <p className="text-3xl font-bold text-blue-900">€{revenueData.subscriptionRevenue.toFixed(2)}</p>
-                <p className="text-xs text-blue-600 mt-1">Monthly recurring</p>
+                <p className="text-xs text-blue-600 mt-1">From active subscriptions</p>
               </div>
               <TrendingUp className="h-12 w-12 text-blue-600 opacity-20" />
             </div>
