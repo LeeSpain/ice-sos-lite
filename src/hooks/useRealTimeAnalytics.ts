@@ -57,10 +57,11 @@ export function useRealTimeAnalytics() {
     queryFn: async (): Promise<RealTimeMetrics> => {
       try {
         // Get real data from database with error handling
-        const [ordersResult, profilesResult, subscribersResult] = await Promise.allSettled([
-          supabase.from('orders').select('total_price').eq('status', 'completed').throwOnError(),
-          supabase.from('profiles').select('count', { count: 'exact', head: true }).throwOnError(),
-          supabase.from('subscribers').select('subscription_tier, subscribed, created_at').eq('subscribed', true).throwOnError()
+        const [ordersResult, profilesResult, subscribersResult, subscriptionPlansResult] = await Promise.allSettled([
+          supabase.from('orders').select('total_price').eq('status', 'completed'),
+          supabase.from('profiles').select('count', { count: 'exact', head: true }),
+          supabase.from('subscribers').select('subscription_tier, subscribed, created_at').eq('subscribed', true),
+          supabase.from('subscription_plans').select('name, price, billing_interval').eq('is_active', true)
         ]);
 
         // Get actual user count from profiles
@@ -88,25 +89,38 @@ export function useRealTimeAnalytics() {
         // Get registration count from profiles table
         const totalRegistrations = totalUsers; // All profiles represent registrations
 
-        // Process subscription data
+        // Process subscription data with real pricing
         const subscribers = subscribersResult.status === 'fulfilled' ? (subscribersResult.value.data || []) : [];
+        const subscriptionPlans = subscriptionPlansResult.status === 'fulfilled' ? (subscriptionPlansResult.value.data || []) : [];
         
-        // Use standard pricing for subscription tiers
-        const standardPricing = {
-          'premium': 9.99,
-          'call_centre': 19.99,
-          'basic': 4.99
-        };
+        // Create pricing map from actual subscription plans
+        const planPriceMap = new Map();
+        subscriptionPlans.forEach(plan => {
+          planPriceMap.set(plan.name, {
+            price: parseFloat(plan.price?.toString() || '0'),
+            interval: plan.billing_interval
+          });
+        });
 
-        // Calculate subscription metrics
+        console.info('Active subscribers:', subscribers);
+        console.info('Plan price map:', planPriceMap);
+
+        // Calculate subscription metrics using real pricing
         const totalSubscriptions = subscribers.length;
-        const monthlyRecurringRevenue = subscribers.reduce((sum, subscriber) => {
-          const tierPrice = standardPricing[subscriber.subscription_tier as keyof typeof standardPricing] || 0;
-          return sum + tierPrice;
-        }, 0);
+        let monthlyRecurringRevenue = 0;
+        
+        subscribers.forEach(subscriber => {
+          const plan = planPriceMap.get(subscriber.subscription_tier);
+          if (plan) {
+            console.info(`Processing subscriber with tier ${subscriber.subscription_tier}, plan:`, plan);
+            console.info(`Adding ${plan.price} to MRR`);
+            monthlyRecurringRevenue += plan.price;
+          }
+        });
+        
+        console.info('Calculated MRR:', monthlyRecurringRevenue);
         
         // For total subscription revenue, we'll use MRR as baseline
-        // (In a real scenario, you'd calculate based on actual subscription duration)
         const subscriptionRevenue = monthlyRecurringRevenue;
         
         // Total revenue combines orders and subscriptions
