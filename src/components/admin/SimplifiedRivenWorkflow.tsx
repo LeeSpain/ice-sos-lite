@@ -193,15 +193,46 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   // Load published emails only
   const loadPublishedEmails = async () => {
     try {
-      const { data, error } = await supabase
+      // Load email campaigns and their queue data
+      const { data: emailCampaigns, error: campaignError } = await supabase
         .from('marketing_content')
-        .select('*')
-        .eq('status', 'published')
+        .select(`
+          *,
+          email_queue!inner(
+            id,
+            recipient_email,
+            status,
+            sent_at,
+            created_at
+          )
+        `)
         .eq('content_type', 'email_campaign')
-        .order('posted_at', { ascending: false });
+        .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPublishedEmails(data || []);
+      if (campaignError) throw campaignError;
+
+      // Also get email queue statistics for metrics
+      const { data: queueStats, error: statsError } = await supabase
+        .from('email_queue')
+        .select('status, sent_at, created_at')
+        .order('created_at', { ascending: false });
+
+      if (statsError) throw statsError;
+
+      setPublishedEmails(emailCampaigns || []);
+      
+      // Store email statistics for metrics display
+      if (queueStats) {
+        const emailMetrics = {
+          totalEmails: queueStats.length,
+          sentEmails: queueStats.filter(email => email.status === 'sent').length,
+          pendingEmails: queueStats.filter(email => email.status === 'pending').length,
+          failedEmails: queueStats.filter(email => email.status === 'failed').length
+        };
+        
+        // You can use these metrics in the UI
+        console.log('Email metrics:', emailMetrics);
+      }
     } catch (error) {
       console.error('Error loading published emails:', error);
     }

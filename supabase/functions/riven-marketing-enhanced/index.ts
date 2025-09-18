@@ -908,12 +908,43 @@ async function executeContentCreation(supabase: any, campaignId: string, origina
   
   console.log(`Using ${textProvider} for content creation`);
   
+  // Create different prompts based on content type
+  const isEmailContent = parsedCommand.content_type === 'email_campaign';
+  
   // Try xAI first if configured
   if (textProvider === 'xai' && xaiApiKey) {
     try {
       console.log('Calling xAI API for content generation...');
       
-      const contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
+      let contentPrompt = '';
+      
+      if (isEmailContent) {
+        contentPrompt = `Create a compelling sales email to introduce ICE SOS Lite services to potential clients.
+
+Context: ICE SOS Lite is an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, medical information storage, family circles, and offline functionality.
+
+Command Intent: ${parsedCommand.intent} 
+Content Category: ${parsedCommand.category}
+Topic: ${parsedCommand.topic}
+
+Target audience: ${analysisResult.target_audience || 'Potential clients and families looking for safety solutions'}
+Tone: ${analysisResult.tone || 'Professional, persuasive, and trustworthy'}
+Word count: ${settings?.word_count || 3000} words
+
+Please create a complete email including:
+1. Compelling subject line
+2. Professional greeting
+3. Strong opening that grabs attention
+4. Clear value proposition highlighting ICE SOS Lite benefits
+5. Detailed feature explanations with real-world scenarios
+6. Social proof and testimonials if appropriate
+7. Clear call-to-action (download app, schedule demo, etc.)
+8. Professional closing
+9. Unsubscribe link and company info
+
+Format as HTML with proper email structure. Focus on persuasive copywriting that converts prospects into customers by emphasizing family safety, peace of mind, and ease of use.`;
+      } else {
+        contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
 
 Context: This is for ICE SOS Lite, an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, and medical information storage.
 
@@ -933,7 +964,12 @@ Please create:
 5. Make it actionable and valuable for readers
 
 The content should be about the TOPIC (${parsedCommand.topic}), not about the command itself. Create actual informative content that helps readers understand and implement better emergency preparedness.`;
+      }
 
+      const systemPrompt = isEmailContent 
+        ? 'You are an expert email marketing copywriter specializing in emergency preparedness and family safety solutions. Create compelling, persuasive email content that converts prospects into customers. Focus on benefits, real-world scenarios, and clear calls-to-action.'
+        : 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.';
+      
       const response = await fetch('https://api.x.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -945,7 +981,7 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
           messages: [
             {
               role: 'system',
-              content: 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.'
+              content: systemPrompt
             },
             {
               role: 'user',
@@ -997,7 +1033,35 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
     try {
       console.log('Calling OpenAI API for content generation...');
       
-      const contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
+      let contentPrompt = '';
+      
+      if (isEmailContent) {
+        contentPrompt = `Create a compelling sales email to introduce ICE SOS Lite services to potential clients.
+
+Context: ICE SOS Lite is an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, medical information storage, family circles, and offline functionality.
+
+Command Intent: ${parsedCommand.intent} 
+Content Category: ${parsedCommand.category}
+Topic: ${parsedCommand.topic}
+
+Target audience: ${analysisResult.target_audience || 'Potential clients and families looking for safety solutions'}
+Tone: ${analysisResult.tone || 'Professional, persuasive, and trustworthy'}
+Word count: ${settings?.word_count || 3000} words
+
+Please create a complete email including:
+1. Compelling subject line
+2. Professional greeting
+3. Strong opening that grabs attention
+4. Clear value proposition highlighting ICE SOS Lite benefits
+5. Detailed feature explanations with real-world scenarios
+6. Social proof and testimonials if appropriate
+7. Clear call-to-action (download app, schedule demo, etc.)
+8. Professional closing
+9. Unsubscribe link and company info
+
+Format as HTML with proper email structure. Focus on persuasive copywriting that converts prospects into customers by emphasizing family safety, peace of mind, and ease of use.`;
+      } else {
+        contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
 
 Context: This is for ICE SOS Lite, an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, and medical information storage.
 
@@ -1017,7 +1081,12 @@ Please create:
 5. Make it actionable and valuable for readers
 
 The content should be about the TOPIC (${parsedCommand.topic}), not about the command itself. Create actual informative content that helps readers understand and implement better emergency preparedness.`;
+      }
 
+      const systemPrompt = isEmailContent 
+        ? 'You are an expert email marketing copywriter specializing in emergency preparedness and family safety solutions. Create compelling, persuasive email content that converts prospects into customers. Focus on benefits, real-world scenarios, and clear calls-to-action.'
+        : 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.';
+      
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -1029,7 +1098,7 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
           messages: [
             {
               role: 'system',
-              content: 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.'
+              content: systemPrompt
             },
             {
               role: 'user',
@@ -1081,7 +1150,35 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
     try {
       console.log('Calling OpenRouter API for content generation...');
       
-      const contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
+      let contentPrompt = '';
+      
+      if (isEmailContent) {
+        contentPrompt = `Create a compelling sales email to introduce ICE SOS Lite services to potential clients.
+
+Context: ICE SOS Lite is an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, medical information storage, family circles, and offline functionality.
+
+Command Intent: ${parsedCommand.intent} 
+Content Category: ${parsedCommand.category}
+Topic: ${parsedCommand.topic}
+
+Target audience: ${analysisResult.target_audience || 'Potential clients and families looking for safety solutions'}
+Tone: ${analysisResult.tone || 'Professional, persuasive, and trustworthy'}
+Word count: ${settings?.word_count || 3000} words
+
+Please create a complete email including:
+1. Compelling subject line
+2. Professional greeting
+3. Strong opening that grabs attention
+4. Clear value proposition highlighting ICE SOS Lite benefits
+5. Detailed feature explanations with real-world scenarios
+6. Social proof and testimonials if appropriate
+7. Clear call-to-action (download app, schedule demo, etc.)
+8. Professional closing
+9. Unsubscribe link and company info
+
+Format as HTML with proper email structure. Focus on persuasive copywriting that converts prospects into customers by emphasizing family safety, peace of mind, and ease of use.`;
+      } else {
+        contentPrompt = `Create a comprehensive blog post about "${parsedCommand.topic}".
 
 Context: This is for ICE SOS Lite, an emergency preparedness app that helps families stay safe through features like emergency contacts, SOS alerts, location sharing, and medical information storage.
 
@@ -1101,7 +1198,12 @@ Please create:
 5. Make it actionable and valuable for readers
 
 The content should be about the TOPIC (${parsedCommand.topic}), not about the command itself. Create actual informative content that helps readers understand and implement better emergency preparedness.`;
+      }
 
+      const systemPrompt = isEmailContent 
+        ? 'You are an expert email marketing copywriter specializing in emergency preparedness and family safety solutions. Create compelling, persuasive email content that converts prospects into customers. Focus on benefits, real-world scenarios, and clear calls-to-action.'
+        : 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.';
+      
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -1115,7 +1217,7 @@ The content should be about the TOPIC (${parsedCommand.topic}), not about the co
           messages: [
             {
               role: 'system',
-              content: 'You are an expert content writer specializing in family safety and emergency preparedness. Create engaging, SEO-optimized blog content in HTML format. Focus on providing value and practical advice, not just describing the command given to you.'
+              content: systemPrompt
             },
             {
               role: 'user',
