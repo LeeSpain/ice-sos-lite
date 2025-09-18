@@ -217,3 +217,9 @@ verify_jwt = false
 
 [functions.email-campaign-creator]
 verify_jwt = true
+
+[functions.email-processor]
+verify_jwt = false
+
+[functions.email-publisher]
+verify_jwt = false

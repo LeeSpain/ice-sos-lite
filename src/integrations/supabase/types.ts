@@ -1124,53 +1124,154 @@ export type Database = {
       email_campaigns: {
         Row: {
           click_count: number | null
+          content: string | null
+          content_id: string | null
           created_at: string
           created_by: string | null
           id: string
+          metadata: Json | null
           name: string
           open_count: number | null
           recipient_count: number | null
           scheduled_at: string | null
+          sender_email: string | null
+          sender_name: string | null
           sent_at: string | null
           sent_count: number | null
           status: string
           subject: string
+          template_id: string | null
           template_name: string
+          text_content: string | null
+          tracking_enabled: boolean | null
           updated_at: string
         }
         Insert: {
           click_count?: number | null
+          content?: string | null
+          content_id?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
+          metadata?: Json | null
           name: string
           open_count?: number | null
           recipient_count?: number | null
           scheduled_at?: string | null
+          sender_email?: string | null
+          sender_name?: string | null
           sent_at?: string | null
           sent_count?: number | null
           status?: string
           subject: string
+          template_id?: string | null
           template_name: string
+          text_content?: string | null
+          tracking_enabled?: boolean | null
           updated_at?: string
         }
         Update: {
           click_count?: number | null
+          content?: string | null
+          content_id?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
+          metadata?: Json | null
           name?: string
           open_count?: number | null
           recipient_count?: number | null
           scheduled_at?: string | null
+          sender_email?: string | null
+          sender_name?: string | null
           sent_at?: string | null
           sent_count?: number | null
           status?: string
           subject?: string
+          template_id?: string | null
           template_name?: string
+          text_content?: string | null
+          tracking_enabled?: boolean | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "email_campaigns_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_delivery_log: {
+        Row: {
+          bounce_reason: string | null
+          bounced_at: string | null
+          campaign_id: string | null
+          clicked_at: string | null
+          created_at: string | null
+          delivered_at: string | null
+          delivery_status: string
+          email_queue_id: string | null
+          id: string
+          opened_at: string | null
+          provider_message_id: string | null
+          provider_response: Json | null
+          recipient_email: string
+          retry_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          bounce_reason?: string | null
+          bounced_at?: string | null
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_status?: string
+          email_queue_id?: string | null
+          id?: string
+          opened_at?: string | null
+          provider_message_id?: string | null
+          provider_response?: Json | null
+          recipient_email: string
+          retry_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          bounce_reason?: string | null
+          bounced_at?: string | null
+          campaign_id?: string | null
+          clicked_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_status?: string
+          email_queue_id?: string | null
+          id?: string
+          opened_at?: string | null
+          provider_message_id?: string | null
+          provider_response?: Json | null
+          recipient_email?: string
+          retry_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_delivery_log_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "email_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_delivery_log_email_queue_id_fkey"
+            columns: ["email_queue_id"]
+            isOneToOne: false
+            referencedRelation: "email_queue"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_logs: {
         Row: {
