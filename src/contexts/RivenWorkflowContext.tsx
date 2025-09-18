@@ -290,18 +290,44 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       console.log('Sending command to Riven:', { command, config });
       
-      // Auto-detect if this is an email command
+      // Enhanced email command detection
       const lowerCommand = command.toLowerCase();
-      const isEmailCommand = lowerCommand.includes('email') || lowerCommand.includes('newsletter') || 
-                            lowerCommand.includes('campaign') || lowerCommand.includes('send') || 
-                            lowerCommand.includes('notify') || lowerCommand.includes('message to');
+      const emailKeywords = ['email', 'newsletter', 'mailing', 'send', 'notify', 'subscribers', 
+                           'announcement', 'update', 'alert', 'invitation'];
+      const blogKeywords = ['blog', 'article', 'post', 'write', 'content', 'seo', 'publish'];
+      
+      const isEmailCommand = emailKeywords.some(keyword => lowerCommand.includes(keyword)) ||
+                            lowerCommand.includes('message to') || lowerCommand.includes('email to');
+      const isBlogCommand = blogKeywords.some(keyword => lowerCommand.includes(keyword));
+      
+      // Prioritize explicit content type, then command analysis
+      let contentType = config?.content_type;
+      let platform = config?.platform;
+      
+      if (!contentType) {
+        if (isEmailCommand && !isBlogCommand) {
+          contentType = 'email_campaign';
+          platform = 'email';
+        } else {
+          contentType = 'blog_post';
+          platform = 'blog';
+        }
+      }
+      
+      console.log('Command analysis:', { 
+        command: command.substring(0, 100), 
+        isEmailCommand, 
+        isBlogCommand, 
+        finalContentType: contentType,
+        finalPlatform: platform 
+      });
       
       const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: { 
           command, 
           title: config?.title || `Campaign: ${command.substring(0, 50)}...`,
-          platform: config?.platform || (isEmailCommand ? 'email' : 'blog'),
-          content_type: config?.content_type || (isEmailCommand ? 'email_campaign' : 'blog_post'),
+          platform: platform,
+          content_type: contentType,
           image_generation: config?.image_generation || false,
           image_prompt: config?.image_prompt || '',
           template_id: config?.template_id,
@@ -321,7 +347,7 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             total_posts: config?.total_posts || 3
           },
           publishing_controls: {
-            platforms: config?.platforms || (isEmailCommand ? ['email'] : ['blog']),
+            platforms: config?.platforms || [platform],
             approval_required: config?.approval_required !== false
           }
         }

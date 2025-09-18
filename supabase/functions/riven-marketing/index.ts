@@ -758,11 +758,34 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
       throw new Error('Campaign not found');
     }
 
-    // Generate content for different platforms
-    const platforms = campaign.target_audience?.platforms || ['Facebook', 'Instagram'];
-    const contentTypes = ['blog_post']; // Keep it simple and reliable first
+    // Determine platforms and content types from campaign command
+    let platforms = campaign.target_audience?.platforms || [];
+    let contentTypes = [];
+    
+    // Auto-detect content type from command if not explicitly set
+    const command = campaign.command_input?.toLowerCase() || '';
+    const isEmailCommand = ['email', 'newsletter', 'mailing', 'send', 'notify', 'subscribers'].some(k => command.includes(k));
+    const isBlogCommand = ['blog', 'article', 'post', 'write', 'content', 'seo'].some(k => command.includes(k));
+    
+    if (isEmailCommand) {
+      platforms = ['email'];
+      contentTypes = ['email_campaign'];
+    } else if (isBlogCommand || (!isEmailCommand && platforms.includes('blog'))) {
+      platforms = ['blog'];
+      contentTypes = ['blog_post'];
+    } else {
+      // Default fallback
+      platforms = platforms.length > 0 ? platforms : ['blog'];
+      contentTypes = ['blog_post'];
+    }
 
-    console.log(`🎯 Generating content for platforms: ${platforms.join(', ')}`);
+    console.log(`🎯 Auto-detected content generation:`, { 
+      command: command.substring(0, 100), 
+      isEmailCommand, 
+      isBlogCommand, 
+      platforms, 
+      contentTypes 
+    });
 
     let createdCount = 0;
 
@@ -772,12 +795,13 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
           console.log(`📝 Generating ${contentType} for ${platform}...`);
           const content = await generatePlatformContent(campaign, platform, contentType, supabase, aiConfig);
 
-          // Generate featured image for blog posts
+          // Generate featured image for content that needs it
           let imageUrl = null;
-          if (contentType === 'blog_post' && openaiApiKey) {
+          if ((contentType === 'blog_post' || contentType === 'email_campaign') && openaiApiKey) {
             try {
               console.log('🎨 Generating DALL-E featured image...');
-              const imagePrompt = `Professional featured image for blog post: "${content?.title || campaign.title}". Modern, clean design with ICE SOS branding. Family safety and emergency preparedness theme.`;
+              const imageType = contentType === 'email_campaign' ? 'email header' : 'blog post';
+              const imagePrompt = `Professional featured image for ${imageType}: "${content?.title || campaign.title}". Modern, clean design with ICE SOS branding. Family safety and emergency preparedness theme.`;
               
               const imgRes = await fetch('https://api.openai.com/v1/images/generations', {
                 method: 'POST',
@@ -814,7 +838,7 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
             status: 'draft'
           };
 
-          // Blog-specific fields (when provided)
+          // Add platform-specific fields
           if (platform === 'blog' && content?.blogData) {
             insertData.seo_title = content.blogData.seo_title;
             insertData.meta_description = content.blogData.meta_description;
@@ -824,6 +848,13 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
             insertData.content_sections = content.blogData.content_sections;
             insertData.reading_time = content.blogData.reading_time;
             insertData.seo_score = content.blogData.seo_score;
+          } else if (platform === 'email' && content?.emailData) {
+            insertData.content_sections = {
+              email_subject: content.emailData.email_subject,
+              preheader_text: content.emailData.preheader_text,
+              call_to_action: content.emailData.call_to_action,
+              email_type: 'marketing'
+            };
           }
 
           const { data: ins, error: genInsertError } = await supabase
@@ -881,7 +912,32 @@ async function generateMarketingContent(campaignId: string, supabase: any, setti
 async function generatePlatformContent(campaign: any, platform: string, contentType: string, supabase: any, aiConfig: any) {
   let prompt = '';
   
-  if (platform === 'blog') {
+  if (platform === 'email' && contentType === 'email_campaign') {
+    prompt = `Create a professional email marketing campaign for ICE SOS emergency safety services.
+
+Campaign: ${campaign.title}
+Description: ${campaign.description}
+Content Type: ${contentType}
+
+Requirements:
+- Write a compelling email that promotes family safety and emergency preparedness
+- Include personalization placeholders: {{name}}, {{email}}
+- Use email-friendly HTML structure with tables for layout
+- Focus on building trust and providing value
+- Include a clear call-to-action
+- Maintain professional but warm tone
+- Subject line should be compelling and under 50 characters
+
+Return ONLY a JSON object with this exact structure:
+{
+  "title": "Email subject line (under 50 characters)",
+  "email_subject": "Email subject line (under 50 characters)",
+  "preheader_text": "Preview text that appears after subject (under 90 characters)",
+  "content": "Full email HTML content with tables and inline CSS, including {{name}} and {{email}} placeholders",
+  "call_to_action": "Button text for main CTA",
+  "hashtags": []
+}`;
+  } else if (platform === 'blog') {
     const wordCount = campaign.target_audience?.wordCount || 1000;
     const seoDifficulty = campaign.target_audience?.seoDifficulty || 'intermediate';
     const contentDepth = campaign.target_audience?.contentDepth || 'detailed';
@@ -946,7 +1002,33 @@ Make it compelling, action-oriented, and suitable for ICE SOS emergency safety p
       throw new Error('LLM returned empty content');
     }
 
-    if (platform === 'blog') {
+    if (platform === 'email' && contentType === 'email_campaign') {
+      try {
+        // Parse email campaign JSON
+        const emailData = JSON.parse(contentStr);
+        return {
+          title: emailData.email_subject || emailData.title,
+          content: emailData.content,
+          body: emailData.content,
+          hashtags: [],
+          emailData: emailData
+        };
+      } catch (e) {
+        console.error('Failed to parse email JSON, using fallback:', e);
+        // Fallback for non-JSON response
+        return {
+          title: `Important Family Safety Update`,
+          content: contentStr,
+          body: contentStr,
+          hashtags: [],
+          emailData: {
+            email_subject: "Important Family Safety Update",
+            preheader_text: "Keep your family safe with these essential tips",
+            call_to_action: "Learn More"
+          }
+        };
+      }
+    } else if (platform === 'blog') {
       try {
         // Try to parse as JSON for blog content
         const blogData = JSON.parse(contentStr);

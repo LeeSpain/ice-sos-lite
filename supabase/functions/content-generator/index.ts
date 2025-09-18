@@ -113,21 +113,28 @@ ${request.includeImage ? '7. Hero image description for generation' : ''}
 
 Additional instructions: ${request.additionalInstructions || 'Focus on practical, actionable advice'}`,
 
-    'email_campaign': `Create a compelling email campaign about family safety solutions.
+    'email_campaign': `Create a personalized email campaign about family safety solutions.
 Target Audience: ${request.targetAudience}
 Tone: ${request.tone}
 Purpose: Educational and promotional
+Word Count: ${request.wordCount || 400} words
 
-Include:
-- Subject line (compelling, 50 chars max)
-- Preheader text
-- Personal greeting
-- Value-driven content about emergency preparedness
-- Clear call-to-action
-- Professional sign-off
-${request.includeImage ? '- Header image description' : ''}
+Structure your response as:
+1. Subject Line (compelling, 50 chars max, no quotation marks)
+2. Preheader Text (preview text, 90 chars max)
+3. Email Body (HTML-friendly, use tables for layout)
+4. Call-to-Action (clear button text)
+5. Personalization tags: {{name}}, {{email}}
 
-Additional instructions: ${request.additionalInstructions || 'Focus on benefits and peace of mind'}`,
+Format:
+- Use email-friendly HTML (tables, inline CSS)
+- Include personalization placeholders
+- Focus on value and benefits
+- Professional but warm tone
+- Clear hierarchy with headers
+${request.includeImage ? '- Header image description for email hero image' : ''}
+
+Additional instructions: ${request.additionalInstructions || 'Focus on trust-building and peace of mind'}`,
 
     'video_script': `Write a video script about family emergency preparedness.
 Duration: 60-90 seconds
@@ -160,14 +167,27 @@ Additional instructions: ${request.additionalInstructions || 'Keep engaging and 
           role: 'system',
           content: `You are a professional content creator specializing in family safety and emergency preparedness. Create engaging, informative content that builds trust and provides real value. Always prioritize safety and accurate information.
 
-Response format:
+IMPORTANT: Adjust your response format based on content type:
+
+For EMAIL CAMPAIGNS:
 {
-  "title": "Main title/headline",
-  "body": "Main content body",
-  "hashtags": ["hashtag1", "hashtag2", "hashtag3"],
-  "imagePrompt": "Detailed description for image generation (if needed)",
-  "seoTitle": "SEO title (for blog posts)",
-  "metaDescription": "Meta description (for blog posts)"
+  "title": "Subject line (50 chars max)",
+  "body": "Email HTML body with personalization tags {{name}}, {{email}}",
+  "hashtags": [],
+  "imagePrompt": "Email hero image description (if requested)",
+  "emailSubject": "Subject line",
+  "preheaderText": "Preview text for email",
+  "callToAction": "Button text"
+}
+
+For BLOG POSTS:
+{
+  "title": "Blog post title",
+  "body": "Full blog content with sections",
+  "hashtags": ["#hashtag1", "#hashtag2"],
+  "imagePrompt": "Blog hero image description (if requested)",
+  "seoTitle": "SEO-optimized title (60 chars max)",
+  "metaDescription": "Meta description (160 chars max)"
 }`
         },
         {
@@ -188,9 +208,36 @@ Response format:
   const contentText = data.choices[0].message.content;
   
   try {
-    return JSON.parse(contentText);
+    const parsed = JSON.parse(contentText);
+    
+    // Ensure email content has proper structure
+    if (request.contentType === 'email_campaign') {
+      return {
+        title: parsed.emailSubject || parsed.title,
+        body: parsed.body,
+        hashtags: [],
+        imagePrompt: parsed.imagePrompt,
+        emailSubject: parsed.emailSubject || parsed.title,
+        preheaderText: parsed.preheaderText || "",
+        callToAction: parsed.callToAction || "Learn More"
+      };
+    }
+    
+    return parsed;
   } catch {
     // Fallback if JSON parsing fails
+    if (request.contentType === 'email_campaign') {
+      return {
+        title: "Important Family Safety Update",
+        body: contentText,
+        hashtags: [],
+        imagePrompt: request.includeImage ? "Professional email header showing family safety and security" : undefined,
+        emailSubject: "Important Family Safety Update",
+        preheaderText: "Keep your family safe with these essential tips",
+        callToAction: "Learn More"
+      };
+    }
+    
     return {
       title: "Generated Content",
       body: contentText,
@@ -247,7 +294,34 @@ async function storeGeneratedContent(request: ContentRequest, content: Generated
     throw new Error('Supabase configuration missing');
   }
 
-  // Store in marketing_content table
+  // Store in marketing_content table with proper email/blog differentiation
+  const contentData = {
+    campaign_id: request.campaignId,
+    platform: request.platform,
+    content_type: request.contentType,
+    title: content.title,
+    body_text: content.body,
+    hashtags: content.hashtags || [],
+    image_url: content.imageUrl,
+    scheduled_time: content.scheduledTime,
+    status: request.scheduledTime ? 'scheduled' : 'draft',
+    engagement_metrics: {}
+  };
+
+  // Add email-specific fields
+  if (request.contentType === 'email_campaign') {
+    contentData.content_sections = {
+      email_subject: content.emailSubject || content.title,
+      preheader_text: content.preheaderText || "",
+      call_to_action: content.callToAction || "Learn More",
+      email_type: "marketing"
+    };
+  } else {
+    // Add blog-specific fields
+    contentData.seo_title = content.seoTitle;
+    contentData.meta_description = content.metaDescription;
+  }
+
   const response = await fetch(`${supabaseUrl}/rest/v1/marketing_content`, {
     method: 'POST',
     headers: {
@@ -255,20 +329,7 @@ async function storeGeneratedContent(request: ContentRequest, content: Generated
       'Content-Type': 'application/json',
       'apikey': supabaseKey,
     },
-    body: JSON.stringify({
-      campaign_id: request.campaignId,
-      platform: request.platform,
-      content_type: request.contentType,
-      title: content.title,
-      body_text: content.body,
-      hashtags: content.hashtags,
-      image_url: content.imageUrl,
-      seo_title: content.seoTitle,
-      meta_description: content.metaDescription,
-      scheduled_time: content.scheduledTime,
-      status: request.scheduledTime ? 'scheduled' : 'draft',
-      engagement_metrics: {}
-    }),
+    body: JSON.stringify(contentData),
   });
 
   if (!response.ok) {
@@ -287,22 +348,28 @@ async function scheduleContent(contentId: string, scheduledTime: string, platfor
     throw new Error('Supabase configuration missing');
   }
 
-  // Add to posting queue
-  await fetch(`${supabaseUrl}/rest/v1/social_media_posting_queue`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${supabaseKey}`,
-      'Content-Type': 'application/json',
-      'apikey': supabaseKey,
-    },
-    body: JSON.stringify({
-      content_id: contentId,
-      platform,
-      scheduled_time: scheduledTime,
-      status: 'scheduled',
-      retry_count: 0
-    }),
-  });
+  // Route to appropriate queue based on platform
+  if (platform === 'email') {
+    // Add to email queue (handled by email-campaign-creator)
+    console.log('Email content will be handled by email-campaign-creator function');
+  } else {
+    // Add to social media posting queue for other platforms
+    await fetch(`${supabaseUrl}/rest/v1/social_media_posting_queue`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        'apikey': supabaseKey,
+      },
+      body: JSON.stringify({
+        content_id: contentId,
+        platform,
+        scheduled_time: scheduledTime,
+        status: 'scheduled',
+        retry_count: 0
+      }),
+    });
+  }
 }
 
 serve(handler);

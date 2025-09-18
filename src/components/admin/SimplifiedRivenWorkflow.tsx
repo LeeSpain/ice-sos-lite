@@ -185,11 +185,21 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         .from('marketing_content')
         .select('*')
         .eq('status', 'published')
-        .eq('content_type', 'blog_post')
+        .neq('content_type', 'email_campaign')
+        .neq('platform', 'email')
         .order('posted_at', { ascending: false });
 
       if (error) throw error;
-      setPublishedBlogs(data || []);
+      
+      // Filter to ensure only blog content
+      const blogContent = (data || []).filter(item => 
+        item.content_type === 'blog_post' || 
+        item.platform === 'blog' || 
+        (!item.content_type && item.platform !== 'email') // Default fallback for old content
+      );
+      
+      console.log('Loaded published blogs:', blogContent.length);
+      setPublishedBlogs(blogContent);
     } catch (error) {
       console.error('Error loading published blogs:', error);
     }
