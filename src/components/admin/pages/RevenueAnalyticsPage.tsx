@@ -6,7 +6,8 @@ import { TrendingUp, DollarSign, Users, ShoppingCart, Calendar, Euro } from 'luc
 import { useToast } from '@/components/ui/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useSubscriptionPlans, useProducts, useSubscribers, useOrders } from '@/hooks/useOptimizedData';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SubscriptionPlan {
   id: string;
@@ -59,94 +60,51 @@ const RevenueAnalyticsPage = () => {
   const { toast } = useToast();
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
 
-  // Use optimized data fetching hooks
-  const { data: subscriptionPlans = [], isLoading: plansLoading, error: plansError } = useSubscriptionPlans();
-  const { data: products = [], isLoading: productsLoading, error: productsError } = useProducts();
-  const { data: subscribers = [], isLoading: subscribersLoading, error: subscribersError } = useSubscribers();
-  const { data: orders = [], isLoading: ordersLoading, error: ordersError } = useOrders();
+  // Fetch admin revenue via secure edge function
+  const { data: adminData, isLoading: adminLoading, error: adminError } = useQuery({
+    queryKey: ['admin-revenue'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('get-admin-revenue');
+      if (error) throw error;
+      if (!data?.success) throw new Error('Failed to load admin revenue');
+      return data;
+    },
+    staleTime: 60 * 1000,
+    retry: 1,
+  });
 
-  const loading = plansLoading || productsLoading || subscribersLoading || ordersLoading;
-  const hasError = plansError || productsError || subscribersError || ordersError;
-
-  // Calculate revenue data from optimized hooks
+  const loading = adminLoading;
+  const hasError = !!adminError;
+  const products: Product[] = [];
+  // Calculate revenue data from admin function
   const revenueData = useMemo(() => {
-    if (loading || !subscriptionPlans.length) return null;
+    if (loading || !adminData?.metrics) return null;
 
-    console.log('📊 Revenue Analytics Debug:', {
-      plans: subscriptionPlans.length,
-      subscribers: subscribers.length,
-      orders: orders.length,
-      planData: subscriptionPlans,
-      subscriberData: subscribers
-    });
+    const orders = adminData.orders || [];
+    const subscribers = adminData.subscribers || [];
 
-    // Calculate subscription revenue and plan breakdown
-    let subscriptionRevenue = 0;
+    const productRevenue = orders.reduce((total: number, order: any) => total + (Number(order.total_price) || 0), 0);
+    const activeCount = subscribers.filter((s: any) => s.subscribed).length;
+    const subscriptionRevenue = activeCount * 0.99; // Align with edge function assumption
+    const totalRevenue = typeof adminData.metrics.totalRevenue === 'number'
+      ? adminData.metrics.totalRevenue
+      : subscriptionRevenue + productRevenue;
+    const subscriberCount = activeCount;
+    const averageRevenuePerUser = subscriberCount > 0 ? totalRevenue / subscriberCount : 0;
+
     const planBreakdown: { [key: string]: { count: number; revenue: number; price: number } } = {};
-
-    // Initialize all plans
-    subscriptionPlans.forEach(plan => {
-      planBreakdown[plan.name] = { count: 0, revenue: 0, price: plan.price };
-    });
-
-    subscribers.forEach(subscriber => {
-      if (subscriber.subscribed && subscriber.subscription_tier) {
-        // Find plan by exact name match first
-        let plan = subscriptionPlans.find(p => p.name.toLowerCase() === subscriber.subscription_tier.toLowerCase());
-        
-        // If no direct match, try mapping common variations
-        if (!plan) {
-          const tierMappings: { [key: string]: string } = {
-            'basic': 'Family Connection',
-            'premium': 'Premium Protection', 
-            'family': 'Family Connection',
-            'pro': 'Premium Protection',
-            'call center': 'Call Centre (Spain)',
-            'call centre': 'Call Centre (Spain)',
-            'personal': 'Personal Account',
-            'guardian': 'Guardian Wellness',
-            'wellness': 'Guardian Wellness',
-            'sharing': 'Family Sharing'
-          };
-          
-          const mappedName = tierMappings[subscriber.subscription_tier.toLowerCase()];
-          if (mappedName) {
-            plan = subscriptionPlans.find(p => p.name === mappedName);
-          }
+    subscribers.forEach((subscriber: any) => {
+      if (subscriber.subscribed) {
+        const tier = (subscriber.subscription_tier || 'Premium').toString();
+        if (!planBreakdown[tier]) {
+          planBreakdown[tier] = { count: 0, revenue: 0, price: 0.99 };
         }
-        
-        if (plan) {
-          subscriptionRevenue += plan.price;
-          planBreakdown[plan.name].count += 1;
-          planBreakdown[plan.name].revenue += plan.price;
-        } else {
-          console.warn(`No matching plan found for tier: ${subscriber.subscription_tier}`);
-        }
+        planBreakdown[tier].count += 1;
+        planBreakdown[tier].revenue += 0.99;
       }
     });
 
-    // Calculate product revenue
-    const productRevenue = orders.reduce((total, order) => total + order.total_price, 0);
-    
-    // Count pendant sales
-    const pendantProduct = products.find(p => p.name.toLowerCase().includes('pendant'));
-    const pendantSales = orders.filter(order => 
-      pendantProduct && order.product_id === pendantProduct.id
-    ).length;
-
-    const totalRevenue = subscriptionRevenue + productRevenue;
-    const subscriberCount = subscribers.filter(s => s.subscribed).length;
-    const averageRevenuePerUser = subscriberCount > 0 ? totalRevenue / subscriberCount : 0;
-
-    console.log('💰 Revenue Calculations:', {
-      subscriptionRevenue,
-      productRevenue,
-      totalRevenue,
-      subscriberCount,
-      averageRevenuePerUser,
-      pendantSales,
-      planBreakdown
-    });
+    const pendantSales = 0; // Not available from admin function
 
     return {
       subscriptionRevenue,
@@ -157,7 +115,7 @@ const RevenueAnalyticsPage = () => {
       pendantSales,
       planBreakdown
     };
-  }, [subscriptionPlans, products, subscribers, orders, loading]);
+  }, [adminData, loading]);
 
   // Generate monthly trend data
   useEffect(() => {

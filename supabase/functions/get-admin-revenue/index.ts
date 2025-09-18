@@ -83,10 +83,10 @@ serve(async (req) => {
     }
 
     // Calculate revenue metrics
-    const completedOrders = orders?.filter(o => o.status === 'completed') || [];
-    const totalRevenue = completedOrders.reduce((sum, order) => sum + (order.total_price || 0), 0);
+    const completedOrders = (orders || []).filter(o => ['completed', 'paid'].includes(o.status));
+    const totalRevenue = completedOrders.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0);
     
-    const activeSubscribers = subscribers?.filter(s => s.subscribed) || [];
+    const activeSubscribers = (subscribers || []).filter(s => s.subscribed);
     const subscriptionRevenue = activeSubscribers.length * 0.99; // Assuming 0.99 EUR per subscription
 
     const totalCustomers = new Set([

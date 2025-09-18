@@ -61,24 +61,94 @@ serve(async (req) => {
       
       console.log("✅ Payment successful - activating billing status");
       
-      // For one-time payments, update orders to completed
+      // For one-time payments, update orders to completed and fix payment intent mapping
       if (event.type === "checkout.session.completed") {
-        const sessionId = event?.data?.object?.id;
-        const userId = event?.data?.object?.metadata?.user_id;
-        
-        if (sessionId && userId) {
+        const session = event?.data?.object;
+        const paymentIntent = session?.payment_intent;
+        const checkoutUserId = session?.metadata?.user_id;
+
+        if (paymentIntent && checkoutUserId) {
           const { error: orderError } = await supabase
             .from("orders")
             .update({ status: "completed" })
-            .eq("stripe_payment_intent_id", sessionId)
-            .eq("user_id", userId);
+            .eq("stripe_payment_intent_id", String(paymentIntent))
+            .eq("user_id", checkoutUserId);
 
           if (orderError) {
             console.error("❌ Error updating order status:", orderError);
           } else {
             console.log("✅ Order marked as completed");
           }
+        } else {
+          console.warn("⚠️ Missing payment_intent or user metadata on checkout.session.completed");
         }
+      }
+
+      // Upsert subscriber record on successful payment-related events
+      try {
+        const obj = event?.data?.object;
+        const customerId = obj?.customer;
+        const customerEmail = obj?.customer_email || obj?.customer_details?.email;
+        const subTier =
+          obj?.metadata?.subscription_tier ||
+          obj?.lines?.data?.[0]?.price?.nickname ||
+          obj?.metadata?.tier ||
+          "premium";
+        const periodEndUnix = obj?.lines?.data?.[0]?.period?.end;
+        const periodEnd = periodEndUnix ? new Date(periodEndUnix * 1000).toISOString() : null;
+        const subscriberUserId = ownerUserId || userId || obj?.metadata?.user_id || null;
+
+        if (subscriberUserId || customerEmail) {
+          const updatePayload: any = {
+            subscribed: true,
+            subscription_tier: String(subTier),
+            stripe_customer_id: customerId ? String(customerId) : null,
+            subscription_end: periodEnd,
+            updated_at: new Date().toISOString(),
+          };
+
+          let updated = 0;
+          if (subscriberUserId) {
+            const { data: u1, error: e1 } = await supabase
+              .from("subscribers")
+              .update(updatePayload)
+              .eq("user_id", subscriberUserId)
+              .select("id");
+            if (e1) console.error("❌ subscribers update by user_id error:", e1);
+            updated = (u1?.length ?? 0);
+          }
+          if (updated === 0 && customerEmail) {
+            const { data: u2, error: e2 } = await supabase
+              .from("subscribers")
+              .update(updatePayload)
+              .eq("email", customerEmail)
+              .select("id");
+            if (e2) console.error("❌ subscribers update by email error:", e2);
+            updated = (u2?.length ?? 0);
+          }
+          if (updated === 0) {
+            const insertPayload: any = {
+              user_id: subscriberUserId,
+              email: customerEmail ?? null,
+              subscribed: true,
+              subscription_tier: String(subTier),
+              stripe_customer_id: customerId ? String(customerId) : null,
+              subscription_end: periodEnd,
+            };
+            const { error: insErr } = await supabase.from("subscribers").insert([insertPayload]);
+            if (insErr) {
+              console.error("❌ subscribers insert error:", insErr);
+            } else {
+              console.log("✅ Subscriber upserted/inserted");
+            }
+          } else {
+            console.log("✅ Subscriber updated");
+          }
+        } else {
+          console.log("ℹ️ No subscriber identifiers (user_id/email) present in event to upsert");
+        }
+      } catch (subErr) {
+        console.error("❌ Error upserting subscriber:", subErr);
       }
       
       // Update subscription billing status if this is subscription-related
