@@ -48,6 +48,7 @@ import { GeographicAnalyticsCard } from '@/components/admin/analytics/Geographic
 import { PopupAnalyticsCard } from '@/components/admin/analytics/PopupAnalyticsCard';
 import { HourlyAnalyticsChart } from '@/components/admin/analytics/HourlyAnalyticsChart';
 import { InteractionAnalyticsCard } from '@/components/admin/analytics/InteractionAnalyticsCard';
+import { ContactAnalyticsCard } from '@/components/admin/analytics/ContactAnalyticsCard';
 import { AnalyticsHealthCheck } from '@/components/admin/analytics/AnalyticsHealthCheck';
 import AdminErrorBoundary from '@/components/AdminErrorBoundary';
 
@@ -237,6 +238,7 @@ const AnalyticsPage = () => {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="health">Health Check</TabsTrigger>
           <TabsTrigger value="pages">Page Analytics</TabsTrigger>
+          <TabsTrigger value="contacts">Contacts</TabsTrigger>
           <TabsTrigger value="geographic">Geographic</TabsTrigger>
           <TabsTrigger value="traffic">Traffic Sources</TabsTrigger>
           <TabsTrigger value="devices">Devices</TabsTrigger>
@@ -356,6 +358,10 @@ const AnalyticsPage = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="contacts" className="space-y-4">
+          <ContactAnalyticsCard />
         </TabsContent>
 
         <TabsContent value="geographic" className="space-y-4">
