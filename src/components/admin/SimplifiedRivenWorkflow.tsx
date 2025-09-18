@@ -1545,6 +1545,201 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                 <div className="relative overflow-hidden rounded-xl border-2 border-border">
                                   <img 
                                     src={content.image_url} 
+                                    alt={content.featured_image_alt || content.title || "Content image"}
+                                    className="w-32 h-24 object-cover transition-transform duration-300 group-hover:scale-105"
+                                    onError={(e) => {
+                                      e.currentTarget.style.display = 'none';
+                                      (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
+                                    }}
+                                  />
+                                  <div className="hidden absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 items-center justify-center text-xs text-muted-foreground">
+                                    📄 {currentContentView === 'blogs' ? 'Blog' : 'Email'}
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="w-32 h-24 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl flex items-center justify-center text-primary border-2 border-border">
+                                  {currentContentView === 'blogs' ? '📄' : '📧'}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Content Details */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="text-xl font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                                    {content.title || 'Untitled Content'}
+                                  </h3>
+                                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-4 w-4" />
+                                      <span>{new Date(content.posted_at || content.created_at).toLocaleDateString()}</span>
+                                    </div>
+                                    {content.platform && (
+                                      <div className="flex items-center gap-1">
+                                        <Activity className="h-4 w-4" />
+                                        <span className="capitalize">{content.platform}</span>
+                                      </div>
+                                    )}
+                                    {content.content_type && (
+                                      <Badge variant="outline" className="text-xs">
+                                        {content.content_type.replace('_', ' ')}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2 ml-4">
+                                  <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                                    Published
+                                  </Badge>
+                                </div>
+                              </div>
+
+                              {/* Content Preview */}
+                              {content.meta_description && (
+                                <p className="text-muted-foreground text-sm line-clamp-2 mb-4">
+                                  {content.meta_description}
+                                </p>
+                              )}
+
+                              {/* Content Metrics */}
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                {currentContentView === 'blogs' ? (
+                                  <>
+                                    {content.reading_time && (
+                                      <div className="text-center p-2 bg-muted/50 rounded-lg">
+                                        <div className="text-sm font-semibold text-foreground">{content.reading_time} min</div>
+                                        <div className="text-xs text-muted-foreground">Reading Time</div>
+                                      </div>
+                                    )}
+                                    {content.seo_score && (
+                                      <div className="text-center p-2 bg-muted/50 rounded-lg">
+                                        <div className="text-sm font-semibold text-foreground">{content.seo_score}/100</div>
+                                        <div className="text-xs text-muted-foreground">SEO Score</div>
+                                      </div>
+                                    )}
+                                    {content.keywords && (
+                                      <div className="text-center p-2 bg-muted/50 rounded-lg">
+                                        <div className="text-sm font-semibold text-foreground">{content.keywords.length}</div>
+                                        <div className="text-xs text-muted-foreground">Keywords</div>
+                                      </div>
+                                    )}
+                                    {content.hashtags && (
+                                      <div className="text-center p-2 bg-muted/50 rounded-lg">
+                                        <div className="text-sm font-semibold text-foreground">{content.hashtags.length}</div>
+                                        <div className="text-xs text-muted-foreground">Hashtags</div>
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  <>
+                                    {content.email_metrics && (
+                                      <>
+                                        <div className="text-center p-2 bg-muted/50 rounded-lg">
+                                          <div className="text-sm font-semibold text-foreground">{content.email_metrics.total_sent || 0}</div>
+                                          <div className="text-xs text-muted-foreground">Sent</div>
+                                        </div>
+                                        <div className="text-center p-2 bg-muted/50 rounded-lg">
+                                          <div className="text-sm font-semibold text-foreground">{content.email_metrics.open_rate || 0}%</div>
+                                          <div className="text-xs text-muted-foreground">Open Rate</div>
+                                        </div>
+                                        <div className="text-center p-2 bg-muted/50 rounded-lg">
+                                          <div className="text-sm font-semibold text-foreground">{content.email_metrics.click_rate || 0}%</div>
+                                          <div className="text-xs text-muted-foreground">Click Rate</div>
+                                        </div>
+                                        <div className="text-center p-2 bg-muted/50 rounded-lg">
+                                          <div className="text-sm font-semibold text-foreground">{content.email_metrics.delivery_rate || 0}%</div>
+                                          <div className="text-xs text-muted-foreground">Delivery</div>
+                                        </div>
+                                      </>
+                                    )}
+                                  </>
+                                )}
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex flex-wrap gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handlePreviewContent(content)}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  Preview
+                                </Button>
+                                
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleEditContent(content)}
+                                  className="flex items-center gap-2"
+                                >
+                                  Edit
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setShowDeleteConfirm(content.id)}
+                                  className="flex items-center gap-2 text-red-600 hover:text-red-700"
+                                >
+                                  <XCircle className="h-4 w-4" />
+                                  Delete
+                                </Button>
+
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setShowRegenerateDialog(content.id)}
+                                  className="flex items-center gap-2"
+                                >
+                                  <Wand2 className="h-4 w-4" />
+                                  Regenerate
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+                ) : currentContentView !== 'bulk-crm' ? (
+                  <div className="text-center py-24 space-y-6">
+                    <div className="max-w-md mx-auto">
+                      <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        {currentContentView === 'blogs' ? (
+                          <CheckCircle className="h-10 w-10 text-primary" />
+                        ) : (
+                          <Send className="h-10 w-10 text-primary" />
+                        )}
+                      </div>
+                      <h4 className="text-2xl font-bold text-foreground mb-3">
+                        No Published {currentContentView === 'blogs' ? 'Blogs' : 'Emails'} Yet
+                      </h4>
+                      <p className="text-muted-foreground mb-6 leading-relaxed">
+                        Start creating engaging {currentContentView === 'blogs' ? 'blog posts' : 'email campaigns'} with our AI-powered marketing system. 
+                        Your published {currentContentView === 'blogs' ? 'blogs' : 'emails'} will appear here for easy management.
+                      </p>
+                      <Button onClick={handleCreateNewContent} size="lg" className="shadow-lg">
+                        <Wand2 className="h-5 w-5 mr-2" />
+                        Create Your First {currentContentView === 'blogs' ? 'Blog Post' : 'Email Campaign'}
+                      </Button>
+                    </div>
+                  </div>
+                ) : null}
+                <div className="grid gap-6">
+                  {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).map((content) => (
+                      <Card key={content.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-r from-white to-accent/5">
+                        <CardContent className="p-6">
+                          <div className="flex gap-6">
+                            {/* Content Thumbnail */}
+                            <div className="flex-shrink-0">
+                              {content.image_url ? (
+                                <div className="relative overflow-hidden rounded-xl border-2 border-border">
+                                  <img 
+                                    src={content.image_url} 
                                     alt={content.featured_image_alt || content.title || 'Content image'} 
                                     className="w-32 h-32 object-cover transition-transform duration-300 group-hover:scale-105"
                                     onError={(e) => {
@@ -1714,12 +1909,12 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                         <Wand2 className="h-5 w-5 mr-2" />
                         Create Your First {currentContentView === 'blogs' ? 'Blog Post' : 'Email Campaign'}
                       </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+                     </div>
+                   </div>
+                 ) : null}
+               </div>
+             </div>
+           )}
         </CardContent>
       </Card>
 
