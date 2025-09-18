@@ -394,8 +394,13 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               clearInterval(pollInterval);
               await loadContentItems();
               
-              // Auto-create email campaigns for email content
-              await autoCreateEmailCampaignsIfNeeded(campaignId);
+              // Auto-create email campaigns for email content (with error handling)
+              try {
+                await autoCreateEmailCampaignsIfNeeded(campaignId);
+              } catch (emailError) {
+                console.error('❌ Email campaign creation failed:', emailError);
+                // Don't break the workflow - just log the error
+              }
               
               dispatch({ type: 'SET_PROCESSING_STAGE', payload: undefined });
             }
@@ -490,19 +495,36 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const autoCreateEmailCampaignsIfNeeded = async (campaignId: string) => {
     try {
+      console.log('🔍 Checking for email content in campaign:', campaignId);
+      
       // Get email content from this campaign
       const { data: emailContent, error } = await supabase
         .from('marketing_content')
         .select('*')
         .eq('campaign_id', campaignId)
-        .eq('platform', 'email')
-        .eq('status', 'draft');
+        .or('platform.eq.email,content_type.eq.email_campaign');
 
-      if (error || !emailContent?.length) return;
+      console.log('📧 Email content found:', { 
+        error, 
+        count: emailContent?.length || 0,
+        items: emailContent?.map(c => ({ id: c.id, platform: c.platform, content_type: c.content_type }))
+      });
+
+      if (error) {
+        console.error('❌ Error fetching email content:', error);
+        return;
+      }
+
+      if (!emailContent?.length) {
+        console.log('✅ No email content found, skipping email campaign creation');
+        return;
+      }
 
       // Create email campaigns for each email content
       for (const content of emailContent) {
         try {
+          console.log('🚀 Creating email campaign for content:', content.id);
+          
           const { data, error: campaignError } = await supabase.functions.invoke('email-campaign-creator', {
             body: {
               action: 'create_campaign',
@@ -514,29 +536,27 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             }
           });
 
-          if (!campaignError && data?.success) {
-            addNotification('success', 'Email Campaign Created', `Email campaign ready for: ${content.title}`);
-            
-            // Auto-queue emails if configured for immediate sending
-            if (content.status === 'approved') {
-              await supabase.functions.invoke('email-campaign-creator', {
-                body: {
-                  action: 'queue_emails',
-                  content_id: content.id,
-                  target_criteria: {
-                    include_subscribers: true,
-                    include_users: false // Only subscribers by default
-                  }
-                }
-              });
-            }
+          console.log('📧 Email campaign creation result:', { data, campaignError });
+
+          if (campaignError) {
+            console.error('❌ Email campaign creation error:', campaignError);
+            addNotification('warning', 'Email Campaign Error', `Failed to create email campaign: ${campaignError.message}`);
+            continue; // Continue with other email content
           }
-        } catch (error) {
-          console.error('Error creating email campaign for content:', content.id, error);
+
+          if (data?.success) {
+            console.log('✅ Email campaign created successfully');
+            addNotification('success', 'Email Campaign Created', `Email campaign ready for: ${content.title}`);
+          }
+        } catch (emailError) {
+          console.error('❌ Unexpected error creating email campaign:', emailError);
+          addNotification('warning', 'Email Campaign Error', `Unexpected error: ${emailError?.message || 'Unknown error'}`);
         }
       }
     } catch (error) {
-      console.error('Error in autoCreateEmailCampaignsIfNeeded:', error);
+      console.error('❌ Error in autoCreateEmailCampaignsIfNeeded:', error);
+      // Don't throw the error - just log it so the workflow can continue
+      addNotification('warning', 'Email Processing Warning', 'Some email processing encountered issues but workflow completed');
     }
   };
 
