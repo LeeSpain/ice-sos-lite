@@ -14,6 +14,9 @@ import { ImageGenerationToggle } from './ImageGenerationToggle';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { GmailOAuthSetup } from './GmailOAuthSetup';
+import { EmailSystemStatus } from './EmailSystemStatus';
+import { EmailWorkflowIntegration } from './EmailWorkflowIntegration';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 
@@ -1864,6 +1867,15 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Email Integration Section */}
+      <div className="space-y-6 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <GmailOAuthSetup />
+          <EmailSystemStatus />
+        </div>
+        <EmailWorkflowIntegration />
+      </div>
     </div>
   );
 };
