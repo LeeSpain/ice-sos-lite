@@ -67,6 +67,56 @@ serve(async (req) => {
       registrationSelections: null
     };
 
+    // Reconcile subscriptions for this customer regardless of payment metadata
+    const allSubscriptions = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "all",
+      limit: 50,
+    });
+
+    const consideredStatuses = new Set(["active", "trialing", "past_due"]);
+    const relevantSubs = allSubscriptions.data.filter(sub => consideredStatuses.has(sub.status));
+    logStep("Found relevant subscriptions", { count: relevantSubs.length, statuses: Array.from(new Set(relevantSubs.map(s => s.status))) });
+
+    if (relevantSubs.length > 0) {
+      let subscriptionTiers: string[] = [];
+      for (const subscription of relevantSubs) {
+        reconciledData.subscriptions.push(subscription);
+        for (const item of subscription.items.data) {
+          try {
+            const price = await stripe.prices.retrieve(item.price.id);
+            const amount = price.unit_amount || 0;
+            if (amount === 99) {
+              subscriptionTiers.push("Family Sharing");
+            } else if (amount === 199) {
+              subscriptionTiers.push("Personal Account");
+            } else if (amount === 499) {
+              subscriptionTiers.push("Guardian Wellness");
+            } else if (amount === 2499) {
+              subscriptionTiers.push("Call Centre");
+            } else {
+              // Fallback label by amount in cents
+              subscriptionTiers.push(`Plan ${amount}`);
+            }
+          } catch (e) {
+            console.warn("Failed to retrieve price for item", item.price?.id, e);
+          }
+        }
+      }
+
+      const earliestEndDate = new Date(Math.min(...relevantSubs.map(sub => sub.current_period_end * 1000))).toISOString();
+      await supabaseClient.from("subscribers").upsert({
+        email: user.email,
+        user_id: user.id,
+        stripe_customer_id: customerId,
+        subscribed: true,
+        subscription_tier: Array.from(new Set(subscriptionTiers)).join(", "),
+        subscription_end: earliestEndDate,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'email' });
+
+      logStep("Upserted subscriber from subscriptions", { tiers: subscriptionTiers });
+    }
     // Process each successful payment intent
     for (const paymentIntent of paymentIntents.data) {
       if (paymentIntent.status === "succeeded" && paymentIntent.metadata) {
@@ -149,55 +199,8 @@ serve(async (req) => {
           }
         }
 
-        // Process subscriptions
-        if (subscriptionPlans.length > 0 || regionalServices.length > 0) {
-          const allSubscriptionItems = [...subscriptionPlans, ...regionalServices];
-          
-          // Get active subscriptions from Stripe
-          const activeSubscriptions = await stripe.subscriptions.list({
-            customer: customerId,
-            status: "active",
-            limit: 10,
-          });
+        // Subscription reconciliation moved outside the payment loop
 
-          if (activeSubscriptions.data.length > 0) {
-            let subscriptionTiers: string[] = [];
-            
-            for (const subscription of activeSubscriptions.data) {
-              reconciledData.subscriptions.push(subscription);
-              
-              for (const item of subscription.items.data) {
-                const price = await stripe.prices.retrieve(item.price.id);
-                const amount = price.unit_amount || 0;
-                
-                if (amount === 99) {
-                  subscriptionTiers.push("Family Sharing");
-                } else if (amount === 199) {
-                  subscriptionTiers.push("Personal Account");
-                } else if (amount === 499) {
-                  subscriptionTiers.push("Guardian Wellness"); 
-                } else if (amount === 2499) {
-                  subscriptionTiers.push("Call Centre");
-                }
-              }
-            }
-
-            // Update subscriber record with active subscriptions
-            const earliestEndDate = new Date(Math.min(...activeSubscriptions.data.map(sub => sub.current_period_end * 1000))).toISOString();
-            
-            await supabaseClient.from("subscribers").upsert({
-              email: user.email,
-              user_id: user.id,
-              stripe_customer_id: customerId,
-              subscribed: true,
-              subscription_tier: subscriptionTiers.join(", "),
-              subscription_end: earliestEndDate,
-              updated_at: new Date().toISOString(),
-            }, { onConflict: 'email' });
-
-            logStep("Updated subscriber record with active subscriptions", { tiers: subscriptionTiers });
-          }
-        }
       }
     }
 

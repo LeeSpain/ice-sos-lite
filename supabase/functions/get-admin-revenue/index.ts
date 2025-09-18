@@ -62,10 +62,7 @@ serve(async (req) => {
     // Fetch orders data
     const { data: orders, error: ordersError } = await supabase
       .from('orders')
-      .select(`
-        *,
-        profiles!orders_user_id_fkey(email, first_name, last_name)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (ordersError) {
