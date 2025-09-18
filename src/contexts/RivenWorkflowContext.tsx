@@ -502,7 +502,7 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         .from('marketing_content')
         .select('*')
         .eq('campaign_id', campaignId)
-        .or('platform.eq.email,content_type.eq.email_campaign');
+        .or('platform.eq.email,content_type.eq.email_campaign,content_type.eq.newsletter');
 
       console.log('📧 Email content found:', { 
         error, 

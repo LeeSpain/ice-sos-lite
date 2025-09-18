@@ -1398,42 +1398,42 @@ export type Database = {
       email_templates: {
         Row: {
           body_template: string
-          created_at: string
+          category: string | null
+          created_at: string | null
           created_by: string | null
           description: string | null
           id: string
-          is_active: boolean
+          is_active: boolean | null
           name: string
           subject_template: string
-          template_type: string
-          updated_at: string
-          variables: Json
+          updated_at: string | null
+          variables: Json | null
         }
         Insert: {
           body_template: string
-          created_at?: string
+          category?: string | null
+          created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
-          is_active?: boolean
+          is_active?: boolean | null
           name: string
           subject_template: string
-          template_type?: string
-          updated_at?: string
-          variables?: Json
+          updated_at?: string | null
+          variables?: Json | null
         }
         Update: {
           body_template?: string
-          created_at?: string
+          category?: string | null
+          created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
-          is_active?: boolean
+          is_active?: boolean | null
           name?: string
           subject_template?: string
-          template_type?: string
-          updated_at?: string
-          variables?: Json
+          updated_at?: string | null
+          variables?: Json | null
         }
         Relationships: []
       }

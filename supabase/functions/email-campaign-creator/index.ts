@@ -88,7 +88,10 @@ async function createEmailCampaign(contentId: string, campaignData: any) {
         platform: content.platform,
         auto_generated: true,
         generation_timestamp: new Date().toISOString()
-      }
+      },
+      sender_email: campaignData?.sender_email || 'noreply@icesoslite.com',
+      sender_name: campaignData?.sender_name || 'ICE SOS Lite Team',
+      tracking_enabled: true
     })
     .select()
     .single();
