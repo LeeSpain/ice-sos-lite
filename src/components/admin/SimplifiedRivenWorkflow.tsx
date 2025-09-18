@@ -1729,8 +1729,14 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                     </div>
                   </div>
                 ) : null}
-                <div className="grid gap-6">
-                  {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).map((content) => (
+              </div>
+            </div>
+          )}
+          
+          {/* Content Grid */}
+          {((currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0) && (
+            <div className="grid gap-6">
+              {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).map((content) => (
                       <Card key={content.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-r from-white to-accent/5">
                         <CardContent className="p-6">
                           <div className="flex gap-6">
@@ -1909,12 +1915,12 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                         <Wand2 className="h-5 w-5 mr-2" />
                         Create Your First {currentContentView === 'blogs' ? 'Blog Post' : 'Email Campaign'}
                       </Button>
-                     </div>
-                   </div>
-                 ) : null}
-               </div>
-             </div>
-           )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
