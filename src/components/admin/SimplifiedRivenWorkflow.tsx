@@ -212,46 +212,48 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   // Load published emails only
   const loadPublishedEmails = async () => {
     try {
-      // Load email campaigns and their queue data
+      // Load email campaigns directly from marketing_content
       const { data: emailCampaigns, error: campaignError } = await supabase
         .from('marketing_content')
-        .select(`
-          *,
-          email_queue!inner(
-            id,
-            recipient_email,
-            status,
-            sent_at,
-            created_at
-          )
-        `)
+        .select('*')
         .eq('content_type', 'email_campaign')
+        .eq('status', 'published')
         .order('created_at', { ascending: false });
 
       if (campaignError) throw campaignError;
 
-      // Also get email queue statistics for metrics
+      // Get email queue statistics for metrics (separate query to avoid join issues)
       const { data: queueStats, error: statsError } = await supabase
         .from('email_queue')
-        .select('status, sent_at, created_at')
+        .select('status, sent_at, created_at, campaign_id')
         .order('created_at', { ascending: false });
 
-      if (statsError) throw statsError;
-
-      setPublishedEmails(emailCampaigns || []);
-      
-      // Store email statistics for metrics display
-      if (queueStats) {
-        const emailMetrics = {
-          totalEmails: queueStats.length,
-          sentEmails: queueStats.filter(email => email.status === 'sent').length,
-          pendingEmails: queueStats.filter(email => email.status === 'pending').length,
-          failedEmails: queueStats.filter(email => email.status === 'failed').length
-        };
-        
-        // You can use these metrics in the UI
-        console.log('Email metrics:', emailMetrics);
+      if (statsError) {
+        console.warn('Could not load email queue stats:', statsError);
       }
+
+      // Enrich email campaigns with metrics if available
+      const enrichedEmailCampaigns = (emailCampaigns || []).map(campaign => {
+        if (queueStats) {
+          const campaignEmails = queueStats.filter(email => email.campaign_id === campaign.id);
+          const emailMetrics = {
+            total_sent: campaignEmails.filter(email => email.status === 'sent').length,
+            total_failed: campaignEmails.filter(email => email.status === 'failed').length,
+            total_opened: 0, // These would come from a different table in a real implementation
+            total_clicked: 0,
+            open_rate: 0,
+            click_rate: 0,
+            delivery_rate: campaignEmails.length > 0 ? 
+              (campaignEmails.filter(email => email.status === 'sent').length / campaignEmails.length) * 100 : 0
+          };
+          return { ...campaign, email_metrics: emailMetrics };
+        }
+        return campaign;
+      });
+
+      setPublishedEmails(enrichedEmailCampaigns);
+      console.log('Loaded published emails:', enrichedEmailCampaigns.length, 'campaigns');
+      
     } catch (error) {
       console.error('Error loading published emails:', error);
     }
@@ -1442,41 +1444,48 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                 </div>
                               )}
                             </div>
-                            <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => { setSelectedContent(item); setShowPreviewModal(true); }}
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              {item.content_type === 'email_campaign' && (
-                                <>
-                                  <Button 
-                                    size="sm" 
-                                    variant="outline"
-                                    onClick={() => { setSelectedContent(item); setShowTemplateEditor(true); }}
-                                  >
-                                    <Settings className="h-4 w-4" />
-                                  </Button>
-                                  <EmailCampaignControls 
-                                    contentItem={item}
-                                    onCampaignCreated={(campaignId) => {
-                                      toast({
-                                        title: "Campaign Created",
-                                        description: `Campaign ${campaignId} has been created.`
-                                      });
-                                    }}
-                                    onEmailsQueued={(count) => {
-                                      toast({
-                                        title: "Emails Queued",
-                                        description: `${count} emails have been queued for sending.`
-                                      });
-                                    }}
-                                  />
-                                </>
-                              )}
-                            </div>
+                             <div className="flex gap-2">
+                               <Button 
+                                 size="sm" 
+                                 variant="outline"
+                                 onClick={() => { setSelectedContent(item); setShowPreviewModal(true); }}
+                               >
+                                 <Eye className="h-4 w-4" />
+                               </Button>
+                               <Button 
+                                 size="sm" 
+                                 variant="destructive"
+                                 onClick={() => setShowDeleteConfirm(item.id)}
+                               >
+                                 <XCircle className="h-4 w-4" />
+                               </Button>
+                               {item.content_type === 'email_campaign' && (
+                                 <>
+                                   <Button 
+                                     size="sm" 
+                                     variant="outline"
+                                     onClick={() => { setSelectedContent(item); setShowTemplateEditor(true); }}
+                                   >
+                                     <Settings className="h-4 w-4" />
+                                   </Button>
+                                   <EmailCampaignControls 
+                                     contentItem={item}
+                                     onCampaignCreated={(campaignId) => {
+                                       toast({
+                                         title: "Campaign Created",
+                                         description: `Campaign ${campaignId} has been created.`
+                                       });
+                                     }}
+                                     onEmailsQueued={(count) => {
+                                       toast({
+                                         title: "Emails Queued",
+                                         description: `${count} emails have been queued for sending.`
+                                       });
+                                     }}
+                                   />
+                                 </>
+                               )}
+                             </div>
                           </div>
                         </Card>
                       ))}
