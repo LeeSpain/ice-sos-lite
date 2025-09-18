@@ -1,9 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Users, TrendingUp, DollarSign, Globe, UserCheck, UserX, Shield, AlertTriangle } from "lucide-react";
-import { useRealTimeAnalytics } from "@/hooks/useRealTimeAnalytics";
-import { useFamilyAnalytics } from "@/hooks/useFamilyAnalytics";
+import { Users, TrendingUp, DollarSign, Globe, UserCheck, UserX, Shield, AlertTriangle, Loader2 } from "lucide-react";
+import { useRealTimeCustomerData } from "@/hooks/useRealTimeCustomerData";
 
 interface CustomerStatsCardsProps {
   totalCustomers: number;
@@ -18,35 +17,40 @@ export function CustomerStatsCards({
   activeSubscriptions, 
   totalRevenue 
 }: CustomerStatsCardsProps) {
-  const { data: metrics } = useRealTimeAnalytics();
-  const { data: familyMetrics } = useFamilyAnalytics();
+  const { data: realTimeData, isLoading, error } = useRealTimeCustomerData();
   
-  const customerGrowthRate = newCustomersThisMonth > 0 ? 
-    ((newCustomersThisMonth / totalCustomers) * 100).toFixed(1) : "0.0";
+  // Use real-time data if available, otherwise fall back to props
+  const actualTotalCustomers = realTimeData?.totalCustomers ?? totalCustomers;
+  const actualNewCustomers = realTimeData?.newCustomersThisMonth ?? newCustomersThisMonth;
+  const actualActiveSubscriptions = realTimeData?.activeSubscriptions ?? activeSubscriptions;
+  const actualTotalRevenue = realTimeData?.totalRevenue ?? totalRevenue;
   
-  const subscriptionRate = totalCustomers > 0 ? 
-    ((activeSubscriptions / totalCustomers) * 100).toFixed(1) : "0.0";
+  const customerGrowthRate = actualNewCustomers > 0 ? 
+    ((actualNewCustomers / actualTotalCustomers) * 100).toFixed(1) : "0.0";
+  
+  const subscriptionRate = actualTotalCustomers > 0 ? 
+    ((actualActiveSubscriptions / actualTotalCustomers) * 100).toFixed(1) : "0.0";
 
   const stats = [
     {
       title: "Total Customers",
-      value: totalCustomers.toLocaleString(),
+      value: isLoading ? "..." : actualTotalCustomers.toLocaleString(),
       icon: Users,
-      trend: `+${newCustomersThisMonth} this month`,
+      trend: `+${actualNewCustomers} this month`,
       trendUp: true,
       gradient: "from-primary/20 to-primary/5"
     },
     {
       title: "Monthly Growth",
-      value: `${customerGrowthRate}%`,
+      value: isLoading ? "..." : `${customerGrowthRate}%`,
       icon: TrendingUp,
-      trend: `${newCustomersThisMonth} new customers`,
-      trendUp: newCustomersThisMonth > 0,
+      trend: `${actualNewCustomers} new customers`,
+      trendUp: actualNewCustomers > 0,
       gradient: "from-emerald-500/20 to-emerald-500/5"
     },
     {
       title: "Active Subscriptions",
-      value: activeSubscriptions.toLocaleString(),
+      value: isLoading ? "..." : actualActiveSubscriptions.toLocaleString(),
       icon: UserCheck,
       trend: `${subscriptionRate}% conversion rate`,
       trendUp: true,
@@ -54,45 +58,60 @@ export function CustomerStatsCards({
     },
     {
       title: "Total Revenue",
-      value: `€${totalRevenue.toLocaleString()}`,
+      value: isLoading ? "..." : `€${actualTotalRevenue.toLocaleString()}`,
       icon: DollarSign,
-      trend: `€${(totalRevenue / totalCustomers || 0).toFixed(0)} avg per customer`,
+      trend: `€${(realTimeData?.averageRevenuePerCustomer || 0).toFixed(0)} avg per customer`,
       trendUp: true,
       gradient: "from-amber-500/20 to-amber-500/5"
     },
     {
-      title: "Global Reach",
-      value: "12+",
+      title: "Premium Subscriptions",
+      value: isLoading ? "..." : (realTimeData?.premiumSubscriptions || 0).toLocaleString(),
       icon: Globe,
-      trend: "countries served",
+      trend: "€0.99/month tier",
       trendUp: true,
       gradient: "from-purple-500/20 to-purple-500/5"
     },
     {
+      title: "Call Centre Subscriptions",
+      value: isLoading ? "..." : (realTimeData?.callCentreSubscriptions || 0).toLocaleString(),
+      icon: Shield,
+      trend: "€4.99/month tier",
+      trendUp: true,
+      gradient: "from-cyan-500/20 to-cyan-500/5"
+    },
+    {
       title: "Inactive Users",
-      value: (totalCustomers - activeSubscriptions).toLocaleString(),
+      value: isLoading ? "..." : (actualTotalCustomers - actualActiveSubscriptions).toLocaleString(),
       icon: UserX,
       trend: `${(100 - parseFloat(subscriptionRate)).toFixed(1)}% inactive`,
       trendUp: false,
       gradient: "from-red-500/20 to-red-500/5"
     },
     {
-      title: "Family Connections",
-      value: (familyMetrics?.activeFamilyMembers || 0).toLocaleString(),
-      icon: Shield,
-      trend: `${familyMetrics?.totalFamilyGroups || 0} family groups`,
-      trendUp: true,
-      gradient: "from-cyan-500/20 to-cyan-500/5"
-    },
-    {
-      title: "Active SOS Events",
-      value: (familyMetrics?.activeSosEvents || 0).toLocaleString(),
+      title: "Conversion Rate",
+      value: isLoading ? "..." : `${subscriptionRate}%`,
       icon: AlertTriangle,
-      trend: `${familyMetrics?.totalSosEvents || 0} total events`,
-      trendUp: false,
+      trend: "free to paid conversion",
+      trendUp: parseFloat(subscriptionRate) > 0,
       gradient: "from-orange-500/20 to-orange-500/5"
     }
   ];
+
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-8 gap-6 mb-8">
+        <Card className="col-span-full">
+          <CardContent className="flex items-center justify-center p-6">
+            <div className="text-center">
+              <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Failed to load real-time data</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-8 gap-6 mb-8">
@@ -105,7 +124,11 @@ export function CustomerStatsCards({
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}
               </CardTitle>
-              <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              ) : (
+                <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+              )}
             </CardHeader>
             <CardContent className="relative">
               <div className="text-2xl font-bold text-foreground mb-1">
@@ -116,10 +139,10 @@ export function CustomerStatsCards({
                   variant={stat.trendUp ? "default" : "secondary"}
                   className={`text-xs ${stat.trendUp ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300' : 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'}`}
                 >
-                  {stat.trend}
+                  {isLoading ? "Loading..." : stat.trend}
                 </Badge>
               </div>
-              {stat.title === "Active Subscriptions" && (
+              {stat.title === "Active Subscriptions" && !isLoading && (
                 <Progress 
                   value={parseFloat(subscriptionRate)} 
                   className="mt-3 h-2"

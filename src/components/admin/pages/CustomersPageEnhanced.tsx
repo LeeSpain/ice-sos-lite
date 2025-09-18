@@ -23,7 +23,7 @@ import {
   TrendingUp,
   Activity
 } from 'lucide-react';
-import { useCustomers } from '@/hooks/useOptimizedData';
+import { useEnhancedCustomers } from '@/hooks/useEnhancedCustomers';
 import { useDebounce } from '@/hooks/useDebounce';
 import CustomerDetailsModal from '@/components/admin/CustomerDetailsModal';
 import AddCustomerModal from '@/components/admin/AddCustomerModal';
@@ -66,7 +66,7 @@ export default function CustomersPageEnhanced() {
     orderStatus: ""
   });
   
-  const { data: customers = [], isLoading, error, refetch } = useCustomers();
+  const { data: customers = [], isLoading, error, refetch } = useEnhancedCustomers();
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { toast } = useToast();
 
@@ -109,7 +109,17 @@ export default function CustomersPageEnhanced() {
     const activeSubscriptions = customers.filter((c: Customer) => 
       c.subscriber?.subscribed
     ).length;
-    const totalRevenue = customers.length * 29.99; // Mock revenue calculation
+    const totalRevenue = customers.reduce((sum, customer) => {
+      const subscription = customer.subscriber;
+      if (subscription?.subscribed && subscription.subscription_tier) {
+        switch (subscription.subscription_tier) {
+          case 'premium': return sum + 0.99;
+          case 'call_centre': return sum + 4.99;
+          default: return sum;
+        }
+      }
+      return sum;
+    }, 0);
     
     return { total, newThisMonth, activeSubscriptions, totalRevenue };
   }, [customers]);

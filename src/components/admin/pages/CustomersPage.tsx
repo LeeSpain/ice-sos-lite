@@ -110,7 +110,17 @@ export default function CustomersPage() {
     }).length;
     
     const activeSubscriptions = customers.filter((c: Customer) => c.subscriber?.subscribed).length;
-    const totalRevenue = customers.length * 29.99;
+    const totalRevenue = customers.reduce((sum, customer) => {
+      const subscription = customer.subscriber;
+      if (subscription?.subscribed && subscription.subscription_tier) {
+        switch (subscription.subscription_tier) {
+          case 'premium': return sum + 0.99;
+          case 'call_centre': return sum + 4.99;
+          default: return sum;
+        }
+      }
+      return sum;
+    }, 0);
     
     return { total, newThisMonth, activeSubscriptions, totalRevenue };
   }, [customers]);

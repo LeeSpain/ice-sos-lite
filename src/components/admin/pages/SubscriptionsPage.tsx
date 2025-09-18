@@ -7,8 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { supabase } from '@/integrations/supabase/client';
-import { Search, CreditCard, DollarSign, Users, TrendingUp, Calendar, RefreshCw, Loader2, Euro } from 'lucide-react';
+import { Search, CreditCard, DollarSign, Users, TrendingUp, Calendar, RefreshCw, Loader2, Euro, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import CustomerDetailsModal from '@/components/admin/CustomerDetailsModal';
 
 interface Subscription {
   id: string;
@@ -31,6 +32,8 @@ export default function SubscriptionsPage() {
   const [loading, setLoading] = useState(true);
   const [reconciling, setReconciling] = useState(false);
   const [revenueData, setRevenueData] = useState<any>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [showCustomerModal, setShowCustomerModal] = useState(false);
 
   useEffect(() => {
     loadRevenueData();
@@ -177,6 +180,51 @@ export default function SubscriptionsPage() {
       case 'premium': return 0.99;
       case 'call_centre': return 4.99;
       default: return 0;
+    }
+  };
+
+  const handleViewCustomer = async (subscription: Subscription) => {
+    try {
+      // Fetch full customer profile data
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', subscription.user_id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching customer profile:', error);
+        toast.error('Failed to load customer details');
+        return;
+      }
+
+      if (profile) {
+        setSelectedCustomer({
+          ...profile,
+          email: subscription.email,
+          subscription: {
+            subscribed: subscription.subscribed,
+            subscription_tier: subscription.subscription_tier,
+            subscription_end: subscription.subscription_end
+          }
+        });
+        setShowCustomerModal(true);
+      } else {
+        toast.error('Customer profile not found');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('Failed to load customer details');
+    }
+  };
+
+  const handleManageCustomer = (subscription: Subscription) => {
+    if (subscription.stripe_customer_id) {
+      // Open Stripe customer portal in new tab
+      const stripePortalUrl = `https://dashboard.stripe.com/customers/${subscription.stripe_customer_id}`;
+      window.open(stripePortalUrl, '_blank');
+    } else {
+      toast.error('No Stripe customer ID found for this subscription');
     }
   };
 
@@ -413,10 +461,20 @@ export default function SubscriptionsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleViewCustomer(subscription)}
+                        >
                           View
                         </Button>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleManageCustomer(subscription)}
+                          className="flex items-center gap-1"
+                        >
+                          <ExternalLink className="h-3 w-3" />
                           Manage
                         </Button>
                       </div>
@@ -428,6 +486,16 @@ export default function SubscriptionsPage() {
           </ScrollArea>
         </CardContent>
       </Card>
+
+      <CustomerDetailsModal
+        customer={selectedCustomer}
+        isOpen={showCustomerModal}
+        onClose={() => {
+          setShowCustomerModal(false);
+          setSelectedCustomer(null);
+        }}
+        onUpdate={loadRevenueData}
+      />
     </div>
   );
 }
