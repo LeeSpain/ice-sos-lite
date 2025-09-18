@@ -22,3 +22,30 @@ verify_jwt = true
 
 [functions.get-admin-revenue]
 verify_jwt = true
+
+[functions.create-mixed-payment]
+verify_jwt = true
+
+[functions.process-mixed-payment]
+verify_jwt = true
+
+[functions.gmail-oauth]
+verify_jwt = true
+
+[functions.gmail-oauth-callback]
+verify_jwt = false
+
+[functions.gmail-integration]
+verify_jwt = true
+
+[functions.email-automation]
+verify_jwt = true
+
+[functions.email-scheduler]
+verify_jwt = true
+
+[functions.riven-marketing-enhanced]
+verify_jwt = true
+
+[functions.workflow-automation]
+verify_jwt = true
