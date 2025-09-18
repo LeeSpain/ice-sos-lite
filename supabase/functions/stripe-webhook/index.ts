@@ -37,13 +37,16 @@ serve(async (req) => {
     const event = await req.json();
     console.log("💳 Processing Stripe webhook:", event.type);
 
-    // Extract owner_user_id from metadata
+    // Extract user_id from metadata - could be owner_user_id for subscriptions or user_id for orders
     const ownerUserId = event?.data?.object?.metadata?.owner_user_id;
-    if (!ownerUserId) {
-      console.log("ℹ️ No owner_user_id in metadata, skipping");
+    const userId = event?.data?.object?.metadata?.user_id;
+    
+    // For one-time payments (checkout.session.completed), we don't require owner_user_id
+    if (!ownerUserId && !userId && event.type !== "checkout.session.completed") {
+      console.log("ℹ️ No user metadata found, skipping");
       return new Response(JSON.stringify({ 
         received: true, 
-        note: "No owner_user_id in metadata" 
+        note: "No user metadata found" 
       }), {
         headers: { "content-type": "application/json" }
       });
@@ -58,28 +61,50 @@ serve(async (req) => {
       
       console.log("✅ Payment successful - activating billing status");
       
-      // Update billing status to active
-      const { error: updateError } = await supabase
-        .from("family_memberships")
-        .update({ billing_status: "active" })
-        .eq("user_id", ownerUserId);
+      // For one-time payments, update orders to completed
+      if (event.type === "checkout.session.completed") {
+        const sessionId = event?.data?.object?.id;
+        const userId = event?.data?.object?.metadata?.user_id;
+        
+        if (sessionId && userId) {
+          const { error: orderError } = await supabase
+            .from("orders")
+            .update({ status: "completed" })
+            .eq("stripe_payment_intent_id", sessionId)
+            .eq("user_id", userId);
 
-      if (updateError) {
-        console.error("❌ Error updating billing status to active:", updateError);
-      } else {
-        console.log("✅ Billing status updated to active");
+          if (orderError) {
+            console.error("❌ Error updating order status:", orderError);
+          } else {
+            console.log("✅ Order marked as completed");
+          }
+        }
       }
+      
+      // Update subscription billing status if this is subscription-related
+      if (ownerUserId) {
+        const { error: updateError } = await supabase
+          .from("family_memberships")
+          .update({ billing_status: "active" })
+          .eq("user_id", ownerUserId);
 
-      // Re-enable location sharing for all family members
-      const { error: presenceError } = await supabase
-        .from("live_presence")
-        .update({ is_paused: false })
-        .in("user_id", [ownerUserId]); // Could expand to all family members
+        if (updateError) {
+          console.error("❌ Error updating billing status to active:", updateError);
+        } else {
+          console.log("✅ Billing status updated to active");
+        }
 
-      if (presenceError) {
-        console.error("❌ Error resuming location sharing:", presenceError);
-      } else {
-        console.log("📍 Location sharing resumed");
+        // Re-enable location sharing for all family members
+        const { error: presenceError } = await supabase
+          .from("live_presence")
+          .update({ is_paused: false })
+          .in("user_id", [ownerUserId]);
+
+        if (presenceError) {
+          console.error("❌ Error resuming location sharing:", presenceError);
+        } else {
+          console.log("📍 Location sharing resumed");
+        }
       }
     }
 

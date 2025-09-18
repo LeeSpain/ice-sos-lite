@@ -101,12 +101,13 @@ serve(async (req) => {
 
       await supabaseService.from("orders").insert({
         user_id: user.id,
-        stripe_session_id: session.id,
-        amount: amount,
-        currency: currency.toLowerCase(),
-        status: "pending",
         product_id: productId,
-        created_at: new Date().toISOString()
+        quantity: 1,
+        unit_price: amount / 100, // Convert cents to euros
+        total_price: amount / 100,
+        currency: currency.toLowerCase(),
+        stripe_payment_intent_id: session.id,
+        status: "pending"
       });
       logStep("Order recorded in database");
     } catch (dbError) {
