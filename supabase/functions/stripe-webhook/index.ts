@@ -208,6 +208,43 @@ serve(async (req) => {
       } else {
         console.log("⏸️ Location sharing paused for privacy");
       }
+
+      // Mark subscriber as inactive on failed/paused/canceled
+      try {
+        const obj = event?.data?.object;
+        const customerId = obj?.customer;
+        const customerEmail = obj?.customer_email || obj?.customer_details?.email;
+        let updated = 0;
+        if (ownerUserId) {
+          const { data: u1, error: e1 } = await supabase
+            .from("subscribers")
+            .update({ subscribed: false, updated_at: new Date().toISOString() })
+            .eq("user_id", ownerUserId)
+            .select("id");
+          if (e1) console.error("❌ subscribers deactivate by user_id error:", e1);
+          updated = (u1?.length ?? 0);
+        }
+        if (updated === 0 && customerEmail) {
+          const { data: u2, error: e2 } = await supabase
+            .from("subscribers")
+            .update({ subscribed: false, updated_at: new Date().toISOString() })
+            .eq("email", customerEmail)
+            .select("id");
+          if (e2) console.error("❌ subscribers deactivate by email error:", e2);
+          updated = (u2?.length ?? 0);
+        }
+        if (updated === 0 && customerId) {
+          const { data: u3, error: e3 } = await supabase
+            .from("subscribers")
+            .update({ subscribed: false, updated_at: new Date().toISOString() })
+            .eq("stripe_customer_id", String(customerId))
+            .select("id");
+          if (e3) console.error("❌ subscribers deactivate by customer_id error:", e3);
+        }
+        console.log("✅ Subscriber set to inactive");
+      } catch (subErr) {
+        console.error("❌ Error deactivating subscriber:", subErr);
+      }
     }
 
     // Handle grace period events
