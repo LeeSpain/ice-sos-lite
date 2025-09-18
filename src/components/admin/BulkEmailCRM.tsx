@@ -125,7 +125,7 @@ export const BulkEmailCRM: React.FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   
   const { toast } = useToast();
-  const { triggerAutomation } = useEmailAutomation();
+  
 
   useEffect(() => {
     loadContacts();
@@ -146,20 +146,13 @@ export const BulkEmailCRM: React.FC = () => {
       if (leadsError) throw leadsError;
 
       // Load from profiles (registered users)
-      const { data: profilesData, error: profilesError } = await supabase
+      const { data: profilesDataRes, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          user_id,
-          first_name,
-          last_name,
-          role,
-          subscription_regional,
-          country_code,
-          created_at,
-          phone,
-          notes
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
+
+      if (profilesError) console.warn('Profiles query error:', profilesError);
+      const profilesData = (profilesDataRes as any[]) || [];
 
       if (profilesError) throw profilesError;
 
@@ -445,13 +438,7 @@ export const BulkEmailCRM: React.FC = () => {
 
       if (error) throw error;
 
-      // Trigger email automation for tracking
-      await triggerAutomation('bulk_email_sent', {
-        campaign_id: data.campaignId,
-        recipient_count: selectedContacts.length,
-        subject: emailSubject,
-        scheduled: !sendNow
-      });
+      // Tracking disabled for now
 
       toast({
         title: sendNow ? "Bulk Email Sent" : "Email Scheduled",
@@ -968,7 +955,7 @@ Unsubscribe: {{unsubscribe_url}}`
                   className="mt-1"
                 />
                 <div className="text-xs text-muted-foreground mt-2">
-                  💡 Use {{name}} for personalization. Available variables: {{name}}, {{email}}, {{unsubscribe_url}}
+                  &#128161; Use &#123;&#123;name&#125;&#125; for personalization. Available variables: &#123;&#123;name&#125;&#125;, &#123;&#123;email&#125;&#125;, &#123;&#123;unsubscribe_url&#125;&#125;
                 </div>
               </div>
 
