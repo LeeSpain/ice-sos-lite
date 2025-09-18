@@ -167,9 +167,15 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
       if (error) throw error;
       setAllPublishedContent(data || []);
       
-      // Separate blogs and emails
-      const blogs = data?.filter(item => item.content_type === 'blog_post') || [];
-      const emails = data?.filter(item => item.content_type === 'email_campaign') || [];
+      // Separate blogs and emails with strict filtering
+      const blogs = data?.filter(item => 
+        item.content_type === 'blog_post' && 
+        item.platform !== 'email'
+      ) || [];
+      const emails = data?.filter(item => 
+        item.content_type === 'email_campaign' || 
+        item.platform === 'email'
+      ) || [];
       
       setPublishedBlogs(blogs);
       setPublishedEmails(emails);
@@ -185,20 +191,18 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         .from('marketing_content')
         .select('*')
         .eq('status', 'published')
-        .neq('content_type', 'email_campaign')
-        .neq('platform', 'email')
+        .eq('content_type', 'blog_post')
         .order('posted_at', { ascending: false });
 
       if (error) throw error;
       
-      // Filter to ensure only blog content
+      // Strict filtering to ensure ONLY blog content
       const blogContent = (data || []).filter(item => 
-        item.content_type === 'blog_post' || 
-        item.platform === 'blog' || 
-        (!item.content_type && item.platform !== 'email') // Default fallback for old content
+        item.content_type === 'blog_post' && 
+        item.platform !== 'email'
       );
       
-      console.log('Loaded published blogs:', blogContent.length);
+      console.log('Loaded published blogs:', blogContent.length, 'items');
       setPublishedBlogs(blogContent);
     } catch (error) {
       console.error('Error loading published blogs:', error);
