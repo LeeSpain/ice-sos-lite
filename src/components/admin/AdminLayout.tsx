@@ -69,6 +69,7 @@ const useAdminMenuItems = () => {
       items: [
         { title: t('admin.emmaAiAgent'), url: "/admin-dashboard/ai-agent", icon: Bot },
         { title: t('admin.rivenMarketingAi'), url: "/admin-dashboard/riven-marketing", icon: Brain },
+        { title: t('admin.aiPerformance'), url: "/admin-dashboard/ai-metrics", icon: BarChart3 },
       ]
     },
     {
@@ -84,7 +85,6 @@ const useAdminMenuItems = () => {
       items: [
         { title: t('admin.leadManagement'), url: "/admin-dashboard/leads", icon: MessageSquare },
         { title: t('admin.conversations'), url: "/admin-dashboard/conversations", icon: MessageSquare },
-        { title: t('admin.aiPerformance'), url: "/admin-dashboard/ai-metrics", icon: BarChart3 },
       ]
     },
     {
