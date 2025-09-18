@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle, RefreshCw, Play, Users, TrendingUp, Settings } from 'lucide-react';
+import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle, RefreshCw, Play, Users, TrendingUp, Settings, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
@@ -1456,8 +1456,9 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                  size="sm" 
                                  variant="destructive"
                                  onClick={() => setShowDeleteConfirm(item.id)}
+                                 className="text-white hover:bg-red-600"
                                >
-                                 <XCircle className="h-4 w-4" />
+                                 <Trash2 className="h-4 w-4" />
                                </Button>
                                {item.content_type === 'email_campaign' && (
                                  <>
