@@ -64,9 +64,9 @@ const RevenueAnalyticsPage = () => {
   const { data: adminData, isLoading: adminLoading, error: adminError } = useQuery({
     queryKey: ['admin-revenue'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('get-admin-revenue');
+      const { data, error } = await supabase.functions.invoke('get-received-revenue');
       if (error) throw error;
-      if (!data?.success) throw new Error('Failed to load admin revenue');
+      if (!data?.success) throw new Error('Failed to load received revenue');
       return data;
     },
     staleTime: 60 * 1000,
