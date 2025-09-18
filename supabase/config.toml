@@ -223,3 +223,6 @@ verify_jwt = false
 
 [functions.email-publisher]
 verify_jwt = false
+
+[functions.email-system-test]
+verify_jwt = false

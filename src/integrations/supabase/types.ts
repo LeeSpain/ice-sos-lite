@@ -4924,6 +4924,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      create_email_campaign_from_content: {
+        Args: { p_campaign_name?: string; p_content_id: string }
+        Returns: string
+      }
       get_communication_metrics_summary: {
         Args: Record<PropertyKey, never>
         Returns: {

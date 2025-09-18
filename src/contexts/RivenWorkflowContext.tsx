@@ -525,18 +525,14 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         try {
           console.log('🚀 Creating email campaign for content:', content.id);
           
-          const { data, error: campaignError } = await supabase.functions.invoke('email-campaign-creator', {
-            body: {
-              action: 'create_campaign',
-              content_id: content.id,
-              campaign_data: {
-                name: `Auto-generated from: ${content.title}`,
-                created_by: content.campaign_id
-              }
-            }
-          });
+          // Use database function for safer campaign creation
+          const { data: campaignId, error: campaignError } = await supabase
+            .rpc('create_email_campaign_from_content', {
+              p_content_id: content.id,
+              p_campaign_name: content.title
+            });
 
-          console.log('📧 Email campaign creation result:', { data, campaignError });
+          console.log('📧 Email campaign creation result:', { campaignId, campaignError });
 
           if (campaignError) {
             console.error('❌ Email campaign creation error:', campaignError);
@@ -544,8 +540,8 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             continue; // Continue with other email content
           }
 
-          if (data?.success) {
-            console.log('✅ Email campaign created successfully');
+          if (campaignId) {
+            console.log('✅ Email campaign created successfully with ID:', campaignId);
             addNotification('success', 'Email Campaign Created', `Email campaign ready for: ${content.title}`);
           }
         } catch (emailError) {

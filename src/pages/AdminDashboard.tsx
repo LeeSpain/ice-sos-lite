@@ -15,6 +15,7 @@ import AIAgentPage from '@/components/admin/pages/AIAgentPage';
 import AITrainingPage from '@/components/admin/pages/AITrainingPage';
 import AIModelSettingsPage from '@/components/admin/pages/AIModelSettingsPage';
 import RivenMarketingAI from '@/components/admin/pages/RivenMarketingAI';
+import { EmailManagement } from '@/components/admin/EmailManagement';
 import BlogManagementPage from '@/components/admin/pages/BlogManagementPage';
 import { EnhancedMarketingCampaigns } from '@/components/admin/EnhancedMarketingCampaigns';
 import ProductsPage from '@/components/admin/pages/ProductsPage';
@@ -69,6 +70,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="growth" element={<UserGrowthPage />} />
         <Route path="ai-agent" element={<AIAgentPage />} />
         <Route path="riven-marketing" element={<RivenMarketingAI />} />
+        <Route path="email-management" element={<EmailManagement />} />
         <Route path="customers" element={<CustomersPage />} />
         <Route path="subscriptions" element={<SubscriptionsPage />} />
         <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />
