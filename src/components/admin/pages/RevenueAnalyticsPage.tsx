@@ -180,10 +180,29 @@ const RevenueAnalyticsPage = () => {
           <h1 className="text-3xl font-bold">💰 Revenue Analytics</h1>
           <p className="text-muted-foreground">Track your subscription and product revenue performance</p>
         </div>
-        <Button variant="outline">
-          <Calendar className="h-4 w-4 mr-2" />
-          Export Report
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={async () => {
+              try {
+                const { data, error } = await supabase.functions.invoke('reconcile-stripe-data');
+                if (error) throw error;
+                toast({ title: 'Stripe sync complete', description: `Updated: ${data?.upserts ?? 0}` });
+                // Refetch admin revenue
+                // Note: react-query invalidation is not necessary as we rely on a simple query; just reload it
+                window.location.reload();
+              } catch (e: any) {
+                toast({ title: 'Stripe sync failed', description: e?.message ?? 'Unknown error', variant: 'destructive' });
+              }
+            }}
+          >
+            Sync Stripe Data
+          </Button>
+          <Button variant="outline">
+            <Calendar className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
+        </div>
       </div>
 
       {/* Key Metrics Cards */}
