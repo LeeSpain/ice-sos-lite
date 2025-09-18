@@ -1348,61 +1348,121 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Statistics Cards */}
+                  {/* Separate Statistics Cards for Blogs vs Emails */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
-                          <Activity className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-foreground">{allPublishedContent.length}</div>
-                          <div className="text-sm text-muted-foreground">Total Published</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-green-100 text-green-600">
-                          <CheckCircle className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-foreground">
-                            {allPublishedContent.filter(c => c.content_type === 'blog_post').length}
+                    {currentContentView === 'blogs' ? (
+                      <>
+                        <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                              <CheckCircle className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold text-foreground">{publishedBlogs.length}</div>
+                              <div className="text-sm text-muted-foreground">Published Blogs</div>
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground">Blog Posts</div>
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
-                          <Eye className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-foreground">
-                            {allPublishedContent.reduce((acc, c) => acc + (c.reading_time || 0), 0)}
+                        
+                        <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-green-100 text-green-600">
+                              <Clock className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold text-foreground">
+                                {publishedBlogs.reduce((total, blog) => total + (blog.reading_time || 0), 0)}
+                              </div>
+                              <div className="text-sm text-muted-foreground">Total Reading Time</div>
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground">Total Reading Time</div>
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-orange-100 text-orange-600">
-                          <Wand2 className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-foreground">
-                            {Math.round(allPublishedContent.reduce((acc, c) => acc + (c.seo_score || 0), 0) / Math.max(allPublishedContent.length, 1))}
+                        
+                        <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+                              <Wand2 className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold text-foreground">
+                                {publishedBlogs.length > 0 ? Math.round(publishedBlogs.reduce((total, blog) => total + (blog.seo_score || 0), 0) / publishedBlogs.length) : 0}
+                              </div>
+                              <div className="text-sm text-muted-foreground">Avg SEO Score</div>
+                            </div>
                           </div>
-                          <div className="text-sm text-muted-foreground">Avg SEO Score</div>
                         </div>
-                      </div>
-                    </div>
+                        
+                        <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-orange-100 text-orange-600">
+                              <Activity className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold text-foreground">
+                                {publishedBlogs.filter(blog => blog.keywords && blog.keywords.length > 0).length}
+                              </div>
+                              <div className="text-sm text-muted-foreground">SEO Optimized</div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                              <Send className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold text-foreground">{publishedEmails.length}</div>
+                              <div className="text-sm text-muted-foreground">Email Campaigns</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-green-100 text-green-600">
+                              <Activity className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold text-foreground">
+                                {publishedEmails.reduce((total, email) => total + (email.email_metrics?.total_sent || 0), 0)}
+                              </div>
+                              <div className="text-sm text-muted-foreground">Total Emails Sent</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+                              <Eye className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold text-foreground">
+                                {publishedEmails.length > 0 ? Math.round(publishedEmails.reduce((total, email) => total + (email.email_metrics?.open_rate || 0), 0) / publishedEmails.length) : 0}%
+                              </div>
+                              <div className="text-sm text-muted-foreground">Avg Open Rate</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white/50 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-lg bg-orange-100 text-orange-600">
+                              <Wand2 className="h-5 w-5" />
+                            </div>
+                            <div>
+                              <div className="text-2xl font-bold text-foreground">
+                                {publishedEmails.length > 0 ? Math.round(publishedEmails.reduce((total, email) => total + (email.email_metrics?.click_rate || 0), 0) / publishedEmails.length) : 0}%
+                              </div>
+                              <div className="text-sm text-muted-foreground">Avg Click Rate</div>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1420,14 +1480,14 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                     </p>
                   </div>
                   
-                  {allPublishedContent.length > 0 && (
+                  {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0 && (
                     <div className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                      {allPublishedContent.length} item{allPublishedContent.length !== 1 ? 's' : ''}
+                      {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length} item{(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length !== 1 ? 's' : ''}
                     </div>
                   )}
                 </div>
 
-                {allPublishedContent.length > 0 ? (
+                {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0 ? (
                 <div className="grid gap-6">
                   {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).map((content) => (
                       <Card key={content.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-r from-white to-accent/5">
