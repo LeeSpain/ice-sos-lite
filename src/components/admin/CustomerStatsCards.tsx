@@ -76,7 +76,7 @@ export function CustomerStatsCards({
       title: "Call Centre Subscriptions",
       value: isLoading ? "..." : (realTimeData?.callCentreSubscriptions || 0).toLocaleString(),
       icon: Shield,
-      trend: "€4.99/month tier",
+      trend: "€24.99/month tier",
       trendUp: true,
       gradient: "from-cyan-500/20 to-cyan-500/5"
     },

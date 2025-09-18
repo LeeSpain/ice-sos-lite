@@ -19,55 +19,97 @@ export function useRealTimeCustomerData() {
     queryFn: async (): Promise<RealTimeCustomerMetrics> => {
       console.log('🔄 Fetching real-time customer data...');
       
-      // Fetch comprehensive data using the admin revenue function
-      const { data, error } = await supabase.functions.invoke('get-admin-revenue');
-      
-      if (error) {
-        console.error('❌ Error fetching customer data:', error);
+      try {
+        // Fetch data directly from Supabase tables for more reliable metrics
+        const [profilesResult, subscribersResult] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('created_at, user_id, role')
+            .neq('role', 'admin'), // Exclude admin users from customer count
+          
+          supabase
+            .from('subscribers')
+            .select('user_id, subscribed, subscription_tier, email')
+        ]);
+
+        if (profilesResult.error) {
+          console.error('❌ Error fetching profiles:', profilesResult.error);
+          throw profilesResult.error;
+        }
+
+        if (subscribersResult.error) {
+          console.error('❌ Error fetching subscribers:', subscribersResult.error);
+          throw subscribersResult.error;
+        }
+
+        const profiles = profilesResult.data || [];
+        const subscribers = subscribersResult.data || [];
+
+        console.log('✅ Fetched profiles:', profiles.length, 'subscribers:', subscribers.length);
+
+        // Calculate current month start
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        // Basic metrics
+        const totalCustomers = profiles.length;
+        const activeSubscriptions = subscribers.filter(sub => sub.subscribed).length;
+
+        // Calculate new customers this month
+        const newCustomersThisMonth = profiles.filter(profile => 
+          new Date(profile.created_at) >= monthStart
+        ).length;
+
+        // Calculate subscription tiers (fixed logic)
+        const premiumSubscriptions = subscribers.filter(sub => 
+          sub.subscribed && (
+            sub.subscription_tier?.toLowerCase().includes('premium') ||
+            sub.subscription_tier?.toLowerCase().includes('protection')
+          )
+        ).length;
+        
+        // Regional/Call Centre subscriptions - €24.99/month tier
+        const callCentreSubscriptions = subscribers.filter(sub => 
+          sub.subscribed && (
+            sub.subscription_tier?.toLowerCase().includes('regional') ||
+            sub.subscription_tier?.toLowerCase().includes('call') ||
+            sub.subscription_tier?.toLowerCase().includes('centre') ||
+            sub.subscription_tier?.toLowerCase().includes('center')
+          )
+        ).length;
+
+        // Revenue calculation (simplified - based on subscription tiers)
+        const premiumPrice = 0.99; // €0.99/month
+        const regionalPrice = 24.99; // €24.99/month (corrected price)
+        const totalRevenue = (premiumSubscriptions * premiumPrice) + (callCentreSubscriptions * regionalPrice);
+
+        // Calculate derived metrics
+        const averageRevenuePerCustomer = totalCustomers > 0 ? totalRevenue / totalCustomers : 0;
+        const subscriptionConversionRate = totalCustomers > 0 ? (activeSubscriptions / totalCustomers) * 100 : 0;
+
+        console.log('📊 Calculated metrics:', {
+          totalCustomers,
+          newCustomersThisMonth,
+          activeSubscriptions,
+          premiumSubscriptions,
+          callCentreSubscriptions,
+          totalRevenue
+        });
+
+        return {
+          totalCustomers,
+          newCustomersThisMonth,
+          activeSubscriptions,
+          totalRevenue,
+          premiumSubscriptions,
+          callCentreSubscriptions,
+          averageRevenuePerCustomer,
+          subscriptionConversionRate
+        };
+      } catch (error) {
+        console.error('❌ Error in useRealTimeCustomerData:', error);
         throw error;
       }
-
-      console.log('✅ Real-time customer data received:', data);
-
-      // Calculate current month start
-      const now = new Date();
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-
-      // Extract metrics from the response
-      const totalCustomers = data?.metrics?.totalCustomers || 0;
-      const activeSubscriptions = data?.metrics?.activeSubscriptions || 0;
-      const totalRevenue = data?.metrics?.totalRevenue || 0;
-
-      // Calculate new customers this month from profiles
-      const profiles = data?.rawData?.allProfiles || [];
-      const newCustomersThisMonth = profiles.filter((profile: any) => 
-        new Date(profile.created_at) >= monthStart
-      ).length;
-
-      // Calculate subscription tiers
-      const subscribers = data?.subscribers || [];
-      const premiumSubscriptions = subscribers.filter((sub: any) => 
-        sub.subscribed && sub.subscription_tier === 'premium'
-      ).length;
-      
-      const callCentreSubscriptions = subscribers.filter((sub: any) => 
-        sub.subscribed && sub.subscription_tier === 'call_centre'
-      ).length;
-
-      // Calculate derived metrics
-      const averageRevenuePerCustomer = totalCustomers > 0 ? totalRevenue / totalCustomers : 0;
-      const subscriptionConversionRate = totalCustomers > 0 ? (activeSubscriptions / totalCustomers) * 100 : 0;
-
-      return {
-        totalCustomers,
-        newCustomersThisMonth,
-        activeSubscriptions,
-        totalRevenue,
-        premiumSubscriptions,
-        callCentreSubscriptions,
-        averageRevenuePerCustomer,
-        subscriptionConversionRate
-      };
     },
     refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
     staleTime: 15000, // Consider data stale after 15 seconds
