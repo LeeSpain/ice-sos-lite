@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, Check, X, Clock, AlertTriangle, CheckCircle, Info, ExternalLink, Settings, Filter, Search, Archive, MoreVertical, Star, UserPlus, FileText, Zap } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, Check, X, Clock, AlertTriangle, CheckCircle, Info, ExternalLink, Settings, Filter, Search, Archive, MoreVertical, Star, UserPlus, FileText, Zap, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -34,6 +35,7 @@ export const AdminNotificationCenter: React.FC = () => {
   const [filterPriority, setFilterPriority] = useState('all');
   const [activeTab, setActiveTab] = useState('all');
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadNotifications();
@@ -164,27 +166,37 @@ export const AdminNotificationCenter: React.FC = () => {
 
   const archiveNotification = async (notificationId: string) => {
     try {
-      // Since there's no archived_at column, we'll just delete it
       await deleteNotification(notificationId);
       toast({
-        title: "Notification archived",
-        description: "The notification has been removed.",
+        title: "Notification removed",
+        description: "The notification has been permanently removed.",
       });
     } catch (error) {
-      console.error('Error archiving notification:', error);
+      console.error('Error removing notification:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove notification. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
-  const snoozeNotification = async (notificationId: string, hours: number) => {
-    try {
-      // Since there's no snoozed_until column, we'll mark as read and show a message
-      await markAsRead(notificationId);
-      toast({
-        title: "Notification handled",
-        description: `Notification marked as read. Set up a reminder in ${hours} hour${hours > 1 ? 's' : ''} if needed.`,
-      });
-    } catch (error) {
-      console.error('Error handling notification:', error);
+  const handleNotificationAction = (notification: AdminNotification) => {
+    if (!notification.action_url) return;
+
+    // Mark as read first
+    markAsRead(notification.id);
+    
+    // Close the dialog
+    setIsOpen(false);
+
+    // Navigate based on URL type
+    if (notification.action_url.startsWith('/')) {
+      // Internal route - use React Router
+      navigate(notification.action_url);
+    } else if (notification.action_url.startsWith('http')) {
+      // External URL - open in new tab
+      window.open(notification.action_url, '_blank');
     }
   };
 
@@ -317,36 +329,58 @@ export const AdminNotificationCenter: React.FC = () => {
                               
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm"
+                                    className="h-8 w-8 p-0 hover:bg-muted data-[state=open]:bg-muted"
+                                  >
                                     <MoreVertical className="h-4 w-4" />
+                                    <span className="sr-only">Open menu</span>
                                   </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
+                                <DropdownMenuContent align="end" className="w-48">
                                   {!notification.read_at && (
-                                    <DropdownMenuItem onClick={() => markAsRead(notification.id)}>
-                                      <Check className="h-4 w-4 mr-2" />
-                                      Mark as read
-                                    </DropdownMenuItem>
+                                    <>
+                                      <DropdownMenuItem 
+                                        onClick={() => markAsRead(notification.id)}
+                                        className="cursor-pointer"
+                                      >
+                                        <Check className="h-4 w-4 mr-2" />
+                                        Mark as read
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                    </>
                                   )}
-                                  <DropdownMenuItem onClick={() => snoozeNotification(notification.id, 1)}>
-                                    <Clock className="h-4 w-4 mr-2" />
-                                    Handle & Remind (1h)
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => snoozeNotification(notification.id, 24)}>
-                                    <Clock className="h-4 w-4 mr-2" />
-                                    Handle & Remind (24h)
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => archiveNotification(notification.id)}>
+                                  
+                                  {notification.action_url && (
+                                    <>
+                                      <DropdownMenuItem 
+                                        onClick={() => handleNotificationAction(notification)}
+                                        className="cursor-pointer"
+                                      >
+                                        <ExternalLink className="h-4 w-4 mr-2" />
+                                        Go to {notification.action_label || 'Link'}
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                    </>
+                                  )}
+                                  
+                                  <DropdownMenuItem 
+                                    onClick={() => archiveNotification(notification.id)}
+                                    className="cursor-pointer"
+                                  >
                                     <Archive className="h-4 w-4 mr-2" />
                                     Remove
                                   </DropdownMenuItem>
+                                  
                                   <DropdownMenuSeparator />
+                                  
                                   <DropdownMenuItem 
                                     onClick={() => deleteNotification(notification.id)}
-                                    className="text-destructive"
+                                    className="cursor-pointer text-destructive focus:text-destructive"
                                   >
-                                    <X className="h-4 w-4 mr-2" />
-                                    Delete
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete permanently
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -379,15 +413,8 @@ export const AdminNotificationCenter: React.FC = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="ml-auto"
-                                  onClick={() => {
-                                    if (notification.action_url?.startsWith('/')) {
-                                      window.location.href = notification.action_url;
-                                    } else if (notification.action_url?.startsWith('http')) {
-                                      window.open(notification.action_url, '_blank');
-                                    }
-                                    markAsRead(notification.id);
-                                  }}
+                                  className="ml-auto hover:bg-primary hover:text-primary-foreground transition-colors"
+                                  onClick={() => handleNotificationAction(notification)}
                                 >
                                   <ExternalLink className="h-4 w-4 mr-2" />
                                   {notification.action_label}
