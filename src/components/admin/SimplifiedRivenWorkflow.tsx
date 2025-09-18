@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle, RefreshCw, Play } from 'lucide-react';
+import { Loader2, Wand2, Activity, Eye, CheckCircle, ArrowRight, XCircle, Clock, Send, Brain, AlertTriangle, RefreshCw, Play, Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
@@ -14,6 +14,7 @@ import { ImageGenerationToggle } from './ImageGenerationToggle';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { BulkEmailCRM } from './BulkEmailCRM';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 
@@ -41,7 +42,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const [allPublishedContent, setAllPublishedContent] = useState<ContentItem[]>([]);
   const [publishedBlogs, setPublishedBlogs] = useState<ContentItem[]>([]);
   const [publishedEmails, setPublishedEmails] = useState<ContentItem[]>([]);
-  const [currentContentView, setCurrentContentView] = useState<'blogs' | 'emails'>('blogs');
+  const [currentContentView, setCurrentContentView] = useState<'blogs' | 'emails' | 'bulk-crm'>('blogs');
   const [currentStage, setCurrentStage] = useState<WorkflowStage>('command');
   const [realTimeStages, setRealTimeStages] = useState<any[]>([]);
   const [apiProviderStatus, setApiProviderStatus] = useState<{ 
@@ -730,6 +731,18 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           </Button>
           
           <Button 
+            variant="outline" 
+            onClick={() => {
+              setCurrentStage('success');
+              setCurrentContentView('bulk-crm');
+            }}
+            className="flex items-center gap-2"
+          >
+            <Users className="h-4 w-4" />
+            Bulk Email CRM
+          </Button>
+          
+          <Button
             variant="outline" 
             onClick={() => setCurrentStage('command')}
             className="flex items-center gap-2"
@@ -1511,14 +1524,16 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                     </p>
                   </div>
                   
-                  {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0 && (
+                  {currentContentView !== 'bulk-crm' && (currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0 && (
                     <div className="text-sm text-muted-foreground bg-muted px-3 py-1 rounded-full">
                       {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length} item{(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length !== 1 ? 's' : ''}
                     </div>
                   )}
                 </div>
 
-                {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0 ? (
+                  {currentContentView === 'bulk-crm' ? (
+                    <BulkEmailCRM />
+                  ) : (currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0 ? (
                 <div className="grid gap-6">
                   {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).map((content) => (
                       <Card key={content.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-r from-white to-accent/5">
