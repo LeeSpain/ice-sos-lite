@@ -48,9 +48,6 @@ jobs:
     - name: Lint
       run: npm run lint
 
-    - name: Build project
-      run: npm run build
-
     - name: Install Vercel CLI
       run: npm install --global vercel@latest
 
@@ -64,5 +61,5 @@ jobs:
     - name: Pull Vercel Environment Information
       run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-    - name: Deploy dist to Vercel (static)
-      run: vercel deploy ./dist --prod --token=${{ secrets.VERCEL_TOKEN }} --yes --local-config vercel.json
+    - name: Deploy to Vercel (with environment variables)
+      run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes --local-config vercel.json

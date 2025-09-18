@@ -48,6 +48,9 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
+        cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp}'],
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB to handle large bundles
         globIgnores: ['lovable-uploads/**'], // avoid precaching large uploads initially
