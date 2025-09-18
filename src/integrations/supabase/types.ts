@@ -1882,48 +1882,199 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_activities: {
+        Row: {
+          activity_type: string
+          completed_at: string | null
+          content: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          lead_id: string
+          metadata: Json | null
+          scheduled_at: string | null
+          subject: string | null
+        }
+        Insert: {
+          activity_type: string
+          completed_at?: string | null
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          lead_id: string
+          metadata?: Json | null
+          scheduled_at?: string | null
+          subject?: string | null
+        }
+        Update: {
+          activity_type?: string
+          completed_at?: string | null
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          lead_id?: string
+          metadata?: Json | null
+          scheduled_at?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_files: {
+        Row: {
+          created_at: string | null
+          file_name: string
+          file_size: number | null
+          file_type: string | null
+          file_url: string
+          id: string
+          lead_id: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          file_name: string
+          file_size?: number | null
+          file_type?: string | null
+          file_url: string
+          id?: string
+          lead_id: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string
+          id?: string
+          lead_id?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_files_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_tags: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
+          assigned_to: string | null
+          company_name: string | null
           conversation_summary: string | null
           created_at: string
+          deal_value: number | null
           email: string | null
           id: string
           interest_level: number | null
+          job_title: string | null
+          last_contacted_at: string | null
+          lead_score: number | null
+          lead_source: string | null
+          linkedin_url: string | null
           metadata: Json | null
+          next_follow_up_at: string | null
+          notes: string | null
           phone: string | null
+          probability: number | null
           recommended_plan: string | null
           session_id: string
           status: string | null
+          tags: string[] | null
+          timezone: string | null
           updated_at: string
           user_id: string | null
+          website: string | null
         }
         Insert: {
+          assigned_to?: string | null
+          company_name?: string | null
           conversation_summary?: string | null
           created_at?: string
+          deal_value?: number | null
           email?: string | null
           id?: string
           interest_level?: number | null
+          job_title?: string | null
+          last_contacted_at?: string | null
+          lead_score?: number | null
+          lead_source?: string | null
+          linkedin_url?: string | null
           metadata?: Json | null
+          next_follow_up_at?: string | null
+          notes?: string | null
           phone?: string | null
+          probability?: number | null
           recommended_plan?: string | null
           session_id: string
           status?: string | null
+          tags?: string[] | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string | null
+          website?: string | null
         }
         Update: {
+          assigned_to?: string | null
+          company_name?: string | null
           conversation_summary?: string | null
           created_at?: string
+          deal_value?: number | null
           email?: string | null
           id?: string
           interest_level?: number | null
+          job_title?: string | null
+          last_contacted_at?: string | null
+          lead_score?: number | null
+          lead_source?: string | null
+          linkedin_url?: string | null
           metadata?: Json | null
+          next_follow_up_at?: string | null
+          notes?: string | null
           phone?: string | null
+          probability?: number | null
           recommended_plan?: string | null
           session_id?: string
           status?: string | null
+          tags?: string[] | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string | null
+          website?: string | null
         }
         Relationships: []
       }
