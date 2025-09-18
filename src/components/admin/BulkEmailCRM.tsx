@@ -627,65 +627,66 @@ Unsubscribe: {{unsubscribe_url}}`
 
       {/* Analytics View */}
       {currentView === 'analytics' && (
-        <CRMAnalyticsComponent />
-      )}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-full bg-blue-100 text-blue-600">
-                  <Send className="h-5 w-5" />
+        <>
+          <CRMAnalyticsComponent />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <Send className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{metrics.totalSent}</div>
+                    <div className="text-sm text-muted-foreground">Emails Sent</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold">{metrics.totalSent}</div>
-                  <div className="text-sm text-muted-foreground">Emails Sent</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-green-100 text-green-600">
+                    <CheckCircle className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{metrics.deliveryRate}%</div>
+                    <div className="text-sm text-muted-foreground">Delivery Rate</div>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-full bg-green-100 text-green-600">
-                  <CheckCircle className="h-5 w-5" />
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+                    <Eye className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{metrics.openRate}%</div>
+                    <div className="text-sm text-muted-foreground">Open Rate</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold">{metrics.deliveryRate}%</div>
-                  <div className="text-sm text-muted-foreground">Delivery Rate</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-orange-100 text-orange-600">
+                    <TrendingUp className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{metrics.clickRate}%</div>
+                    <div className="text-sm text-muted-foreground">Click Rate</div>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-full bg-purple-100 text-purple-600">
-                  <Eye className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{metrics.openRate}%</div>
-                  <div className="text-sm text-muted-foreground">Open Rate</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-full bg-orange-100 text-orange-600">
-                  <TrendingUp className="h-5 w-5" />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{metrics.clickRate}%</div>
-                  <div className="text-sm text-muted-foreground">Click Rate</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
+        </>
       )}
 
       {/* Campaigns View */}

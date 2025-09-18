@@ -1705,33 +1705,30 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                       </Card>
                     ))}
                 </div>
-                ) : currentContentView !== 'bulk-crm' ? (
-                  <div className="text-center py-24 space-y-6">
-                    <div className="max-w-md mx-auto">
-                      <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        {currentContentView === 'blogs' ? (
-                          <CheckCircle className="h-10 w-10 text-primary" />
-                        ) : (
-                          <Send className="h-10 w-10 text-primary" />
-                        )}
-                      </div>
-                      <h4 className="text-2xl font-bold text-foreground mb-3">
-                        No Published {currentContentView === 'blogs' ? 'Blogs' : 'Emails'} Yet
-                      </h4>
-                      <p className="text-muted-foreground mb-6 leading-relaxed">
-                        Start creating engaging {currentContentView === 'blogs' ? 'blog posts' : 'email campaigns'} with our AI-powered marketing system. 
-                        Your published {currentContentView === 'blogs' ? 'blogs' : 'emails'} will appear here for easy management.
-                      </p>
-                      <Button onClick={handleCreateNewContent} size="lg" className="shadow-lg">
-                        <Wand2 className="h-5 w-5 mr-2" />
-                        Create Your First {currentContentView === 'blogs' ? 'Blog Post' : 'Email Campaign'}
-                      </Button>
+              ) : (
+                <div className="text-center py-24 space-y-6">
+                  <div className="max-w-md mx-auto">
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                      {currentContentView === 'blogs' ? (
+                        <CheckCircle className="h-10 w-10 text-primary" />
+                      ) : (
+                        <Send className="h-10 w-10 text-primary" />
+                      )}
                     </div>
+                    <h4 className="text-2xl font-bold text-foreground mb-3">
+                      No Published {currentContentView === 'blogs' ? 'Blogs' : 'Emails'} Yet
+                    </h4>
+                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                      Start creating engaging {currentContentView === 'blogs' ? 'blog posts' : 'email campaigns'} with our AI-powered marketing system. 
+                      Your published {currentContentView === 'blogs' ? 'blogs' : 'emails'} will appear here for easy management.
+                    </p>
+                    <Button onClick={handleCreateNewContent} size="lg" className="shadow-lg">
+                      <Wand2 className="h-5 w-5 mr-2" />
+                      Create Your First {currentContentView === 'blogs' ? 'Blog Post' : 'Email Campaign'}
+                    </Button>
                   </div>
-                ) : null}
-              </div>
-            </div>
-          )}
+                </div>
+              )}
           
           {/* Content Grid */}
           {((currentContentView === 'blogs' ? publishedBlogs : publishedEmails).length > 0) && (
@@ -1894,33 +1891,8 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                       </Card>
                     ))}
                   </div>
-                ) : (
-                  <div className="text-center py-16 border-2 border-dashed border-muted-foreground/25 rounded-2xl bg-gradient-to-br from-muted/10 to-accent/5">
-                    <div className="max-w-md mx-auto">
-                      <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        {currentContentView === 'blogs' ? (
-                          <CheckCircle className="h-10 w-10 text-primary" />
-                        ) : (
-                          <Send className="h-10 w-10 text-primary" />
-                        )}
-                      </div>
-                      <h4 className="text-2xl font-bold text-foreground mb-3">
-                        No Published {currentContentView === 'blogs' ? 'Blogs' : 'Emails'} Yet
-                      </h4>
-                      <p className="text-muted-foreground mb-6 leading-relaxed">
-                        Start creating engaging {currentContentView === 'blogs' ? 'blog posts' : 'email campaigns'} with our AI-powered marketing system. 
-                        Your published {currentContentView === 'blogs' ? 'blogs' : 'emails'} will appear here for easy management.
-                      </p>
-                      <Button onClick={handleCreateNewContent} size="lg" className="shadow-lg">
-                        <Wand2 className="h-5 w-5 mr-2" />
-                        Create Your First {currentContentView === 'blogs' ? 'Blog Post' : 'Email Campaign'}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+                ) : null}
+
         </CardContent>
       </Card>
 
