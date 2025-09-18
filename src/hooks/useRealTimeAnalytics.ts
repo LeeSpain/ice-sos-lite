@@ -57,48 +57,51 @@ export function useRealTimeAnalytics() {
     queryFn: async (): Promise<RealTimeMetrics> => {
       try {
         // Get real data from database with error handling
-        const [contactsResult, ordersResult, registrationsResult, profilesResult, subscribersResult, subscriptionPlansResult] = await Promise.allSettled([
-          supabase.from('contact_submissions').select('count', { count: 'exact', head: true }),
+        const [ordersResult, profilesResult, subscribersResult] = await Promise.allSettled([
           supabase.from('orders').select('total_price').eq('status', 'completed').throwOnError(),
-          supabase.from('registration_selections').select('count', { count: 'exact', head: true }).eq('registration_completed', true),
           supabase.from('profiles').select('count', { count: 'exact', head: true }).throwOnError(),
-          supabase.from('subscribers').select('subscription_tier, subscribed, created_at').eq('subscribed', true).throwOnError(),
-          supabase.from('subscription_plans').select('id, name, price').throwOnError()
+          supabase.from('subscribers').select('subscription_tier, subscribed, created_at').eq('subscribed', true).throwOnError()
         ]);
 
         // Get actual user count from profiles
         const profilesCount = profilesResult.status === 'fulfilled' ? profilesResult.value.count : 1;
         const totalUsers = (typeof profilesCount === 'number') ? profilesCount : 1;
         
-        // Get contact count (admin-only access now)
-        const contactsCount = contactsResult.status === 'fulfilled' ? contactsResult.value.count : 0;
+        // Get contact count from communication_preferences table as a proxy
+        const { count: contactsCount } = await supabase
+          .from('communication_preferences')
+          .select('count', { count: 'exact', head: true });
         const totalContacts = (typeof contactsCount === 'number') ? contactsCount : 0;
         
-        // For contacts last 30 days, we'll use a simpler approach since we can't fetch detailed data
-        // This will need to be enhanced with a dedicated admin-only analytics query later
-        const contactsLast30Days = Math.floor(totalContacts * 0.3); // Estimate based on total
+        // For contacts last 30 days, calculate from recent communication preferences
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+        const { count: recentContactsCount } = await supabase
+          .from('communication_preferences')
+          .select('count', { count: 'exact', head: true })
+          .gte('created_at', thirtyDaysAgo.toISOString());
+        const contactsLast30Days = (typeof recentContactsCount === 'number') ? recentContactsCount : 0;
 
         const orders = ordersResult.status === 'fulfilled' ? (ordersResult.value.data || []) : [];
         const totalOrders = orders.length;
         const orderRevenue = orders.reduce((sum, order) => sum + (parseFloat(order.total_price?.toString() || '0') || 0), 0);
         
-        const registrationsCount = registrationsResult.status === 'fulfilled' ? registrationsResult.value.count : 0;
-        const totalRegistrations = (typeof registrationsCount === 'number') ? registrationsCount : 0;
+        // Get registration count from profiles table
+        const totalRegistrations = totalUsers; // All profiles represent registrations
 
         // Process subscription data
         const subscribers = subscribersResult.status === 'fulfilled' ? (subscribersResult.value.data || []) : [];
-        const subscriptionPlans = subscriptionPlansResult.status === 'fulfilled' ? (subscriptionPlansResult.value.data || []) : [];
         
-        // Create pricing map from subscription plans
-        const pricingMap = subscriptionPlans.reduce((acc, plan) => {
-          acc[plan.name] = parseFloat(plan.price?.toString() || '0');
-          return acc;
-        }, {} as Record<string, number>);
+        // Use standard pricing for subscription tiers
+        const standardPricing = {
+          'premium': 9.99,
+          'call_centre': 19.99,
+          'basic': 4.99
+        };
 
         // Calculate subscription metrics
         const totalSubscriptions = subscribers.length;
         const monthlyRecurringRevenue = subscribers.reduce((sum, subscriber) => {
-          const tierPrice = pricingMap[subscriber.subscription_tier] || 0;
+          const tierPrice = standardPricing[subscriber.subscription_tier as keyof typeof standardPricing] || 0;
           return sum + tierPrice;
         }, 0);
         

@@ -30,6 +30,7 @@ import {
   useRealTimeActiveUsers,
   type RealTimeMetrics
 } from '@/hooks/useRealTimeAnalytics';
+import { useContactAnalytics } from '@/hooks/useContactAnalytics';
 import { 
   useEnhancedTrafficSources, 
   useEnhancedDeviceData,
@@ -89,8 +90,9 @@ const AnalyticsPage = () => {
   const { data: topPages, isLoading: isTopPagesLoading, error: topPagesError } = useTopPages();
   const { data: customEvents, isLoading: isCustomEventsLoading, error: customEventsError } = useCustomEvents();
   const { data: activeUsers, isLoading: isActiveUsersLoading, error: activeUsersError } = useRealTimeActiveUsers();
+  const { data: contactData, isLoading: isContactLoading, error: contactError } = useContactAnalytics();
 
-  const isLoading = isRealTimeLoading || isLovableLoading || isTrafficLoading || isDeviceLoading || isSessionLoading || isGeographicLoading || isPopupLoading || isInteractionLoading || isHourlyLoading || isTopPagesLoading || isCustomEventsLoading || isActiveUsersLoading;
+  const isLoading = isRealTimeLoading || isLovableLoading || isTrafficLoading || isDeviceLoading || isSessionLoading || isGeographicLoading || isPopupLoading || isInteractionLoading || isHourlyLoading || isTopPagesLoading || isCustomEventsLoading || isActiveUsersLoading || isContactLoading;
 
   // Enhanced refresh function - invalidate all analytics queries
   const refreshAllData = useCallback(async () => {
@@ -111,7 +113,8 @@ const AnalyticsPage = () => {
           'top-pages',
           'custom-events',
           'real-time-active-users',
-          'family-analytics'
+          'family-analytics',
+          'contact-analytics'
         ].includes(key);
       }
     });
@@ -212,7 +215,7 @@ const AnalyticsPage = () => {
         />
         <MetricCard
           title="Contacts (30d)"
-          value={realTimeData?.contactsLast30Days || 0}
+          value={contactData?.contactsLast30Days || 0}
           icon={Mail}
         />
         <MetricCard
@@ -273,7 +276,7 @@ const AnalyticsPage = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <MetricCard
               title="Total Contacts"
-              value={realTimeData?.totalContacts || 0}
+              value={contactData?.totalContacts || 0}
               icon={Mail}
             />
             <MetricCard
