@@ -120,7 +120,7 @@ export function useRealTimeAnalytics() {
         
         console.info('Calculated MRR:', monthlyRecurringRevenue);
         
-        // For total subscription revenue, we'll use MRR as baseline
+        // For total subscription revenue, use MRR as the primary revenue source
         const subscriptionRevenue = monthlyRecurringRevenue;
         
         // Total revenue combines orders and subscriptions
@@ -128,6 +128,14 @@ export function useRealTimeAnalytics() {
 
         // Calculate conversion rate (registrations / total users)
         const conversionRate = totalUsers > 0 ? (totalRegistrations / totalUsers) * 100 : 0;
+
+        console.info('Final Revenue Calculation:', {
+          orderRevenue,
+          subscriptionRevenue,
+          totalRevenue,
+          subscriberCount: subscribers.length,
+          planPriceMap: Object.fromEntries(planPriceMap)
+        });
 
         return {
           totalUsers,
