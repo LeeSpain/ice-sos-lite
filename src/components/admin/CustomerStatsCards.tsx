@@ -68,7 +68,7 @@ export function CustomerStatsCards({
       title: "Premium Subscriptions",
       value: isLoading ? "..." : (realTimeData?.premiumSubscriptions || 0).toLocaleString(),
       icon: Globe,
-      trend: "€0.99/month tier",
+      trend: `€${realTimeData?.premiumPlanPrice || 9.99}/month tier`,
       trendUp: true,
       gradient: "from-purple-500/20 to-purple-500/5"
     },

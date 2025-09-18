@@ -2,12 +2,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, BarChart, Bar } from "recharts";
 import { TrendingUp, Users, Globe, Activity } from "lucide-react";
+import { useRealTimeCustomerData } from "@/hooks/useRealTimeCustomerData";
 
 interface CustomerAnalyticsProps {
   customers: any[];
 }
 
 export function CustomerAnalytics({ customers }: CustomerAnalyticsProps) {
+  const { data: realTimeData } = useRealTimeCustomerData();
+  
   // Process data for analytics
   const countryData = customers.reduce((acc: Record<string, number>, customer: any) => {
     const country = customer.country || "Unknown";
@@ -20,12 +23,12 @@ export function CustomerAnalytics({ customers }: CustomerAnalyticsProps) {
     .sort((a, b) => Number(b.count) - Number(a.count))
     .slice(0, 6);
 
-  // Subscription status data
+  // Subscription status data from real-time data
   const subscriptionData = [
-    { name: "Active", value: customers.filter(c => c.subscription_status === "active").length, color: "#22c55e" },
-    { name: "Inactive", value: customers.filter(c => c.subscription_status === "inactive").length, color: "#ef4444" },
-    { name: "Cancelled", value: customers.filter(c => c.subscription_status === "cancelled").length, color: "#f97316" },
-    { name: "Expired", value: customers.filter(c => c.subscription_status === "expired").length, color: "#6b7280" }
+    { name: "Active", value: realTimeData?.subscriptionStatusBreakdown?.active || 0, color: "#22c55e" },
+    { name: "Inactive", value: realTimeData?.subscriptionStatusBreakdown?.inactive || 0, color: "#ef4444" },
+    { name: "Cancelled", value: realTimeData?.subscriptionStatusBreakdown?.cancelled || 0, color: "#f97316" },
+    { name: "Expired", value: realTimeData?.subscriptionStatusBreakdown?.expired || 0, color: "#6b7280" }
   ];
 
   // Monthly registration data (mock for demo)

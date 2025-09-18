@@ -11,6 +11,13 @@ export interface RealTimeCustomerMetrics {
   callCentreSubscriptions: number;
   averageRevenuePerCustomer: number;
   subscriptionConversionRate: number;
+  premiumPlanPrice: number;
+  subscriptionStatusBreakdown: {
+    active: number;
+    inactive: number;
+    cancelled: number;
+    expired: number;
+  };
 }
 
 export function useRealTimeCustomerData() {
@@ -29,7 +36,7 @@ export function useRealTimeCustomerData() {
           
           supabase
             .from('subscribers')
-            .select('user_id, subscribed, subscription_tier, email'),
+            .select('user_id, subscribed, subscription_tier, email, subscription_end'),
           
           supabase
             .from('subscription_plans')
@@ -110,6 +117,12 @@ export function useRealTimeCustomerData() {
                            (callCentreSubscriptions * regionalPrice) + 
                            (familySubscriptions * familyPrice);
 
+        // Calculate subscription status breakdown based on subscribed field only (simpler logic)
+        const activeSubscribersCount = subscribers.filter(sub => sub.subscribed).length;
+        const inactiveSubscribersCount = subscribers.filter(sub => !sub.subscribed).length;
+        const cancelledSubscribersCount = 0; // Will be calculated when we have proper status tracking
+        const expiredSubscribersCount = 0; // Will be calculated when we have proper status tracking
+
         // Calculate derived metrics
         const averageRevenuePerCustomer = totalCustomers > 0 ? totalRevenue / totalCustomers : 0;
         const subscriptionConversionRate = totalCustomers > 0 ? (activeSubscriptions / totalCustomers) * 100 : 0;
@@ -120,7 +133,13 @@ export function useRealTimeCustomerData() {
           activeSubscriptions,
           premiumSubscriptions,
           callCentreSubscriptions,
-          totalRevenue
+          totalRevenue,
+          subscriptionStatusBreakdown: {
+            active: activeSubscribersCount,
+            inactive: inactiveSubscribersCount, 
+            cancelled: cancelledSubscribersCount,
+            expired: expiredSubscribersCount
+          }
         });
 
         return {
@@ -131,7 +150,14 @@ export function useRealTimeCustomerData() {
           premiumSubscriptions,
           callCentreSubscriptions,
           averageRevenuePerCustomer,
-          subscriptionConversionRate
+          subscriptionConversionRate,
+          premiumPlanPrice: premiumPrice,
+          subscriptionStatusBreakdown: {
+            active: activeSubscribersCount,
+            inactive: inactiveSubscribersCount,
+            cancelled: cancelledSubscribersCount,
+            expired: expiredSubscribersCount
+          }
         };
       } catch (error) {
         console.error('❌ Error in useRealTimeCustomerData:', error);
