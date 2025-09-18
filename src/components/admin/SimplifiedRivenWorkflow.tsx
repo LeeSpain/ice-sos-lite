@@ -42,6 +42,9 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const [currentCampaignId, setCurrentCampaignId] = useState<string | null>(null);
   const [generatedContent, setGeneratedContent] = useState<ContentItem[]>([]);
   const [allPublishedContent, setAllPublishedContent] = useState<ContentItem[]>([]);
+  const [publishedBlogs, setPublishedBlogs] = useState<ContentItem[]>([]);
+  const [publishedEmails, setPublishedEmails] = useState<ContentItem[]>([]);
+  const [currentContentView, setCurrentContentView] = useState<'blogs' | 'emails'>('blogs');
   const [currentStage, setCurrentStage] = useState<WorkflowStage>('command');
   const [realTimeStages, setRealTimeStages] = useState<any[]>([]);
   const [apiProviderStatus, setApiProviderStatus] = useState<{ 
@@ -152,8 +155,49 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
 
       if (error) throw error;
       setAllPublishedContent(data || []);
+      
+      // Separate blogs and emails
+      const blogs = data?.filter(item => item.content_type === 'blog_post') || [];
+      const emails = data?.filter(item => item.content_type === 'email_campaign') || [];
+      
+      setPublishedBlogs(blogs);
+      setPublishedEmails(emails);
     } catch (error) {
       console.error('Error loading published content:', error);
+    }
+  };
+
+  // Load published blogs only
+  const loadPublishedBlogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('marketing_content')
+        .select('*')
+        .eq('status', 'published')
+        .eq('content_type', 'blog_post')
+        .order('posted_at', { ascending: false });
+
+      if (error) throw error;
+      setPublishedBlogs(data || []);
+    } catch (error) {
+      console.error('Error loading published blogs:', error);
+    }
+  };
+
+  // Load published emails only
+  const loadPublishedEmails = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('marketing_content')
+        .select('*')
+        .eq('status', 'published')
+        .eq('content_type', 'email_campaign')
+        .order('posted_at', { ascending: false });
+
+      if (error) throw error;
+      setPublishedEmails(data || []);
+    } catch (error) {
+      console.error('Error loading published emails:', error);
     }
   };
 
@@ -367,6 +411,13 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
       await loadContentItems();
       await loadAllPublishedContent(); // Refresh published content list
       
+      // Refresh the specific content view
+      if (currentContentView === 'blogs') {
+        await loadPublishedBlogs();
+      } else {
+        await loadPublishedEmails();
+      }
+      
       toast({
         title: "Content Published",
         description: "Content has been successfully published!",
@@ -479,6 +530,8 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
 
       // Update local state
       setAllPublishedContent(prev => prev.filter(content => content.id !== contentId));
+      setPublishedBlogs(prev => prev.filter(content => content.id !== contentId));
+      setPublishedEmails(prev => prev.filter(content => content.id !== contentId));
       setGeneratedContent(prev => prev.filter(content => content.id !== contentId));
       setShowDeleteConfirm(null);
 
@@ -617,12 +670,26 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
             variant="outline" 
             onClick={() => {
               setCurrentStage('success');
-              loadAllPublishedContent();
+              setCurrentContentView('blogs');
+              loadPublishedBlogs();
             }}
             className="flex items-center gap-2"
           >
             <CheckCircle className="h-4 w-4" />
-            View All Published Content
+            Published Blogs
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setCurrentStage('success');
+              setCurrentContentView('emails');
+              loadPublishedEmails();
+            }}
+            className="flex items-center gap-2"
+          >
+            <Send className="h-4 w-4" />
+            Published Emails
           </Button>
           
           <Button 
@@ -675,7 +742,12 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                         if (isClickable) {
                           setCurrentStage(stage.id as WorkflowStage);
                           if (stage.id === 'success') {
-                            loadAllPublishedContent(); // Refresh published content when accessing
+                            // Load content based on current view
+                            if (currentContentView === 'blogs') {
+                              loadPublishedBlogs();
+                            } else {
+                              loadPublishedEmails();
+                            }
                           }
                         }
                       }}
@@ -1415,8 +1487,8 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                 </div>
 
                 {allPublishedContent.length > 0 ? (
-                  <div className="grid gap-6">
-                    {allPublishedContent.map((content) => (
+                <div className="grid gap-6">
+                  {(currentContentView === 'blogs' ? publishedBlogs : publishedEmails).map((content) => (
                       <Card key={content.id} className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-primary/20 bg-gradient-to-r from-white to-accent/5">
                         <CardContent className="p-6">
                           <div className="flex gap-6">
@@ -1563,16 +1635,22 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                   <div className="text-center py-16 border-2 border-dashed border-muted-foreground/25 rounded-2xl bg-gradient-to-br from-muted/10 to-accent/5">
                     <div className="max-w-md mx-auto">
                       <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <Wand2 className="h-10 w-10 text-primary" />
+                        {currentContentView === 'blogs' ? (
+                          <CheckCircle className="h-10 w-10 text-primary" />
+                        ) : (
+                          <Send className="h-10 w-10 text-primary" />
+                        )}
                       </div>
-                      <h4 className="text-2xl font-bold text-foreground mb-3">No Published Content Yet</h4>
+                      <h4 className="text-2xl font-bold text-foreground mb-3">
+                        No Published {currentContentView === 'blogs' ? 'Blogs' : 'Emails'} Yet
+                      </h4>
                       <p className="text-muted-foreground mb-6 leading-relaxed">
-                        Start creating engaging content with our AI-powered marketing system. 
-                        Your published content will appear here for easy management.
+                        Start creating engaging {currentContentView === 'blogs' ? 'blog posts' : 'email campaigns'} with our AI-powered marketing system. 
+                        Your published {currentContentView === 'blogs' ? 'blogs' : 'emails'} will appear here for easy management.
                       </p>
                       <Button onClick={handleCreateNewContent} size="lg" className="shadow-lg">
                         <Wand2 className="h-5 w-5 mr-2" />
-                        Create Your First Content
+                        Create Your First {currentContentView === 'blogs' ? 'Blog Post' : 'Email Campaign'}
                       </Button>
                     </div>
                   </div>
