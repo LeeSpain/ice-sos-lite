@@ -290,12 +290,18 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       
       console.log('Sending command to Riven:', { command, config });
       
+      // Auto-detect if this is an email command
+      const lowerCommand = command.toLowerCase();
+      const isEmailCommand = lowerCommand.includes('email') || lowerCommand.includes('newsletter') || 
+                            lowerCommand.includes('campaign') || lowerCommand.includes('send') || 
+                            lowerCommand.includes('notify') || lowerCommand.includes('message to');
+      
       const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
         body: { 
           command, 
           title: config?.title || `Campaign: ${command.substring(0, 50)}...`,
-          platform: config?.platform || 'blog',
-          content_type: config?.content_type || 'blog_post',
+          platform: config?.platform || (isEmailCommand ? 'email' : 'blog'),
+          content_type: config?.content_type || (isEmailCommand ? 'email_campaign' : 'blog_post'),
           image_generation: config?.image_generation || false,
           image_prompt: config?.image_prompt || '',
           template_id: config?.template_id,
@@ -315,7 +321,7 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             total_posts: config?.total_posts || 3
           },
           publishing_controls: {
-            platforms: config?.platforms || ['blog'],
+            platforms: config?.platforms || (isEmailCommand ? ['email'] : ['blog']),
             approval_required: config?.approval_required !== false
           }
         }

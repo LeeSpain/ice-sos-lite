@@ -727,8 +727,20 @@ const CONTENT_TEMPLATES = {
 };
 
 // Intelligent Command Parser
-function parseCommand(command: string): { topic: string, category: string, intent: string } {
+function parseCommand(command: string): { topic: string, category: string, intent: string, platform: string, content_type: string } {
   const lowerCommand = command.toLowerCase();
+  
+  // Detect email-related commands first
+  let platform = 'blog';
+  let content_type = 'blog_post';
+  
+  if (lowerCommand.includes('email') || lowerCommand.includes('newsletter') || 
+      lowerCommand.includes('campaign') || lowerCommand.includes('send') || 
+      lowerCommand.includes('notify') || lowerCommand.includes('alert') ||
+      lowerCommand.includes('message to') || lowerCommand.includes('write to')) {
+    platform = 'email';
+    content_type = 'email_campaign';
+  }
   
   // Extract intent (what type of content they want)
   let intent = 'guide';
@@ -777,7 +789,7 @@ function parseCommand(command: string): { topic: string, category: string, inten
     if (lowerCommand.includes('location sharing')) topic = 'location sharing';
   }
   
-  return { topic, category, intent };
+  return { topic, category, intent, platform, content_type };
 }
 
 // Intelligent Content Generator
@@ -1384,6 +1396,13 @@ async function executeQualityAssembly(supabase: any, campaignId: string) {
 async function createFinalContent(supabase: any, campaignId: string) {
   console.log('Creating final content record');
   
+  // Get campaign data to check the original command
+  const { data: campaign } = await supabase
+    .from('marketing_campaigns')
+    .select('title')
+    .eq('id', campaignId)
+    .single();
+    
   // Get the assembled content from quality assembly stage
   const { data: assemblyStage } = await supabase
     .from('workflow_stages')
@@ -1396,8 +1415,12 @@ async function createFinalContent(supabase: any, campaignId: string) {
   
   console.log('Assembled content:', JSON.stringify(assembledContent, null, 2));
   
+  // Parse the original command to determine content type
+  const originalCommand = campaign?.title || '';
+  const parsedCommand = parseCommand(originalCommand);
+  
   // Generate slug from title
-  const title = assembledContent.title || 'Untitled Blog Post';
+  const title = assembledContent.title || (parsedCommand.content_type === 'email_campaign' ? 'Untitled Email Campaign' : 'Untitled Blog Post');
   let slug = generateSlugFromTitle(title);
   
   // Ensure slug uniqueness
@@ -1414,11 +1437,11 @@ async function createFinalContent(supabase: any, campaignId: string) {
   const bodyText = sanitizeContentBeforePublish(assembledContent.body_text || '');
   const imageUrl = assembledContent.featured_image_url || assembledContent.image_url;
   
-  // Create the final content record with correct schema mapping
+  // Create the final content record with dynamic content type
   const contentPayload = {
     campaign_id: campaignId,
-    platform: 'blog',  // Required field
-    content_type: 'blog_post',  // Required field
+    platform: parsedCommand.platform,  // Dynamic platform
+    content_type: parsedCommand.content_type,  // Dynamic content type
     title: title,
     body_text: bodyText,
     seo_title: assembledContent.seo_title || title,
@@ -1433,6 +1456,8 @@ async function createFinalContent(supabase: any, campaignId: string) {
     status: 'draft'  // Use correct enum value
   };
   
+  console.log('Content payload with dynamic type:', JSON.stringify(contentPayload, null, 2));
+  
   console.log('Content payload for insert:', JSON.stringify(contentPayload, null, 2));
 
   const { data, error } = await supabase
@@ -1446,6 +1471,38 @@ async function createFinalContent(supabase: any, campaignId: string) {
     throw new Error(`Failed to create final content: ${error.message}`);
   }
 
+  // If this is an email campaign, queue it for sending
+  if (parsedCommand.content_type === 'email_campaign') {
+    console.log('Queueing email campaign for sending');
+    
+    // Queue email to all subscribers
+    const { data: subscribers } = await supabase
+      .from('subscribers')
+      .select('email')
+      .eq('subscribed', true);
+      
+    if (subscribers && subscribers.length > 0) {
+      const emailSubject = assembledContent.email_subject || title;
+      const emailBody = generateEmailFromContent(bodyText, title);
+      
+      const emailsToQueue = subscribers.map(subscriber => ({
+        recipient_email: subscriber.email,
+        subject: emailSubject,
+        body: emailBody,
+        status: 'pending',
+        priority: 5,
+        scheduled_at: new Date().toISOString(),
+        campaign_id: campaignId
+      }));
+      
+      await supabase
+        .from('email_queue')
+        .insert(emailsToQueue);
+        
+      console.log(`Queued ${emailsToQueue.length} emails for campaign`);
+    }
+  }
+
   // Update campaign status to completed
   await supabase
     .from('marketing_campaigns')
@@ -1456,7 +1513,7 @@ async function createFinalContent(supabase: any, campaignId: string) {
     .eq('id', campaignId);
 
   console.log('Final content created successfully with ID:', data.id);
-  return { content_id: data.id, status: 'completed' };
+  return { content_id: data.id, status: 'completed', content_type: parsedCommand.content_type };
 }
 
 // Utility functions
@@ -1484,4 +1541,46 @@ function generateSlugFromTitle(title: string): string {
     .replace(/-+/g, '-') // Replace multiple hyphens with single
     .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
     .substring(0, 50); // Limit length
+}
+
+// Convert blog content to email format
+function generateEmailFromContent(bodyText: string, title: string): string {
+  // Remove HTML tags and convert to email-friendly format
+  const plainText = bodyText
+    .replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi, '\n\n$1\n\n')
+    .replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+    
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">${title}</h1>
+        
+        <div style="margin: 20px 0;">
+            ${bodyText}
+        </div>
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <div style="text-align: center; color: #666; font-size: 14px;">
+            <p>Best regards,<br>The ICE SOS Lite Team</p>
+            <p style="font-size: 12px;">
+                You're receiving this because you're subscribed to our safety updates.
+                <a href="#" style="color: #3498db;">Unsubscribe</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+  `.trim();
 }

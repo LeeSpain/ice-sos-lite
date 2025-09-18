@@ -104,6 +104,15 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
     reading_time?: number;
     content_sections?: any;
     posted_at?: string;
+    email_metrics?: {
+      total_sent: number;
+      total_failed: number;
+      total_opened: number;
+      total_clicked: number;
+      open_rate: number;
+      click_rate: number;
+      delivery_rate: number;
+    };
   }
 
   const { toast } = useToast();
@@ -1486,26 +1495,41 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                     </div>
                                   )}
                                   
-                                  {content.seo_score && (
-                                    <div className={`flex items-center gap-1 text-sm px-2 py-1 rounded-md font-medium ${
-                                      content.seo_score >= 80 ? 'bg-green-100 text-green-700' :
-                                      content.seo_score >= 60 ? 'bg-yellow-100 text-yellow-700' :
-                                      'bg-red-100 text-red-700'
-                                    }`}>
-                                      📈 SEO: {content.seo_score}/100
-                                    </div>
-                                  )}
+                                   {content.seo_score && (
+                                     <div className={`flex items-center gap-1 text-sm px-2 py-1 rounded-md font-medium ${
+                                       content.seo_score >= 80 ? 'bg-green-100 text-green-700' :
+                                       content.seo_score >= 60 ? 'bg-yellow-100 text-yellow-700' :
+                                       'bg-red-100 text-red-700'
+                                     }`}>
+                                       📈 SEO: {content.seo_score}/100
+                                     </div>
+                                   )}
+                                   
+                                   {/* Email Metrics Display */}
+                                   {currentContentView === 'emails' && content.email_metrics && (
+                                     <>
+                                       <div className="flex items-center gap-1 text-sm px-2 py-1 rounded-md font-medium bg-blue-100 text-blue-700">
+                                         📧 Sent: {content.email_metrics.total_sent}
+                                       </div>
+                                       <div className="flex items-center gap-1 text-sm px-2 py-1 rounded-md font-medium bg-green-100 text-green-700">
+                                         📖 Opens: {content.email_metrics.open_rate}%
+                                       </div>
+                                       <div className="flex items-center gap-1 text-sm px-2 py-1 rounded-md font-medium bg-purple-100 text-purple-700">
+                                         🔗 Clicks: {content.email_metrics.click_rate}%
+                                       </div>
+                                     </>
+                                   )}
                                 </div>
                                 
-                                <p className="text-sm text-muted-foreground">
-                                  Published {new Date(content.posted_at || content.updated_at).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}
-                                </p>
+                                 <p className="text-sm text-muted-foreground">
+                                   {currentContentView === 'emails' ? 'Sent' : 'Published'} {new Date(content.posted_at || content.updated_at).toLocaleDateString('en-US', {
+                                     year: 'numeric',
+                                     month: 'long',
+                                     day: 'numeric',
+                                     hour: '2-digit',
+                                     minute: '2-digit'
+                                   })}
+                                 </p>
                               </div>
                               
                               {/* Tags Section */}
