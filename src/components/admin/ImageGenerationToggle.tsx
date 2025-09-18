@@ -22,7 +22,6 @@ interface ImageGenerationToggleProps {
   onToggle: (enabled: boolean) => void;
   customPrompt: string;
   onPromptChange: (prompt: string) => void;
-  templateImagePrompt?: string;
 }
 
 const STYLE_PRESETS = [
@@ -56,8 +55,7 @@ export const ImageGenerationToggle: React.FC<ImageGenerationToggleProps> = ({
   enabled,
   onToggle,
   customPrompt,
-  onPromptChange,
-  templateImagePrompt
+  onPromptChange
 }) => {
   const [selectedStyle, setSelectedStyle] = useState('professional');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -65,11 +63,7 @@ export const ImageGenerationToggle: React.FC<ImageGenerationToggleProps> = ({
 
   const handleStyleSelect = (style: any) => {
     setSelectedStyle(style.id);
-    if (templateImagePrompt) {
-      onPromptChange(`${templateImagePrompt}, ${style.prompt}`);
-    } else {
-      onPromptChange(style.prompt);
-    }
+    onPromptChange(style.prompt);
   };
 
   const generatePreview = async () => {
@@ -145,24 +139,6 @@ export const ImageGenerationToggle: React.FC<ImageGenerationToggleProps> = ({
             </div>
           </div>
 
-          {/* Template Suggestion */}
-          {templateImagePrompt && (
-            <div className="p-3 rounded-lg bg-blue-50 border border-blue-200">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">Template Suggestion</span>
-              </div>
-              <p className="text-sm text-blue-700">{templateImagePrompt}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onPromptChange(templateImagePrompt)}
-                className="mt-2 text-blue-700 border-blue-300 hover:bg-blue-100"
-              >
-                Use Template Prompt
-              </Button>
-            </div>
-          )}
 
           {/* Custom Prompt */}
           <div>
@@ -171,7 +147,7 @@ export const ImageGenerationToggle: React.FC<ImageGenerationToggleProps> = ({
             </Label>
             <Textarea
               id="image-prompt"
-              placeholder="Describe the image you want to generate (e.g., 'A professional family using a mobile safety app, modern clean design, friendly atmosphere')"
+              placeholder="Describe the image you want to generate (e.g., 'A professional illustration, modern clean design, business style')"
               value={customPrompt}
               onChange={(e) => onPromptChange(e.target.value)}
               className="min-h-[80px] text-sm"

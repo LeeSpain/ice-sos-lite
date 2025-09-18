@@ -14,9 +14,6 @@ import { ImageGenerationToggle } from './ImageGenerationToggle';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
-import { GmailOAuthSetup } from './GmailOAuthSetup';
-import { EmailSystemStatus } from './EmailSystemStatus';
-import { EmailWorkflowIntegration } from './EmailWorkflowIntegration';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 
@@ -130,7 +127,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           if (!data.providers.openai && !data.providers.xai && !data.providers.openrouter) {
             toast({
               title: "API Provider Warning",
-              description: "No AI providers are configured. Content generation will use fallback templates.",
+              description: "No AI providers are configured. Please configure AI providers for content generation.",
               variant: "destructive"
             });
           }
@@ -797,7 +794,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                         <Badge className="bg-green-100 text-green-700 border-green-200">OpenRouter Active</Badge>
                       )}
                       {apiProviderStatus.fallbackUsed && (
-                        <Badge className="bg-yellow-100 text-yellow-700 border-yellow-200">Template Mode</Badge>
+                        <Badge className="bg-red-100 text-red-700 border-red-200">No AI Providers</Badge>
                       )}
                       <Button
                         variant="ghost"
@@ -830,10 +827,10 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {apiProviderStatus.fallbackUsed && (
-                    <Alert className="border-yellow-200 bg-yellow-50">
-                      <AlertTriangle className="h-4 w-4 text-yellow-600" />
-                      <AlertDescription className="text-yellow-700">
-                        AI providers are offline. Content will be generated using template fallbacks.
+                    <Alert className="border-red-200 bg-red-50">
+                      <AlertTriangle className="h-4 w-4 text-red-600" />
+                      <AlertDescription className="text-red-700">
+                        No AI providers are configured. Please configure OpenAI, xAI, or OpenRouter to enable content generation.
                       </AlertDescription>
                     </Alert>
                   )}
@@ -843,14 +840,14 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                       Marketing Command
                     </label>
                     <Textarea
-                      placeholder="Create a comprehensive blog post about emergency preparedness for families..."
+                      placeholder="Describe what content you want to create. Be specific about topic, audience, and format."
                       value={formData.command}
                       onChange={(e) => setFormData({...formData, command: e.target.value})}
                       className="min-h-[100px]"
                       disabled={isProcessing}
                     />
                     <div className="text-xs text-muted-foreground mt-1">
-                      Describe what content you want to create. Be specific about topic, audience, and format.
+                      Provide detailed instructions for content creation including topic, target audience, tone, and format requirements.
                     </div>
                   </div>
                 </CardContent>
@@ -864,72 +861,12 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                       Campaign Title
                     </label>
                     <Input
-                      placeholder="Optional: Custom title for this campaign"
+                      placeholder="Campaign title (optional)"
                       value={formData.title}
                       onChange={(e) => setFormData({...formData, title: e.target.value})}
                     />
                   </div>
 
-                  {/* Quick Templates */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Quick Templates
-                    </label>
-                    <div className="grid grid-cols-1 gap-2">
-                      {[
-                        {
-                          title: "Emergency Preparedness Blog",
-                          command: "Create a comprehensive 2500-word blog post about emergency preparedness for families, including emergency kits, evacuation plans, and safety protocols",
-                          tone: "informative",
-                          audience: "families"
-                        },
-                        {
-                          title: "Security Tips Article",
-                          command: "Write a detailed 2500-word article about home security best practices, including smart home technology, surveillance systems, and safety habits",
-                          tone: "professional",
-                          audience: "general"
-                        },
-                        {
-                          title: "Travel Safety Guide",
-                          command: "Create an engaging 2500-word travel safety guide covering international travel tips, document security, and emergency contacts",
-                          tone: "friendly",
-                          audience: "travelers"
-                        },
-                        {
-                          title: "Senior Safety Article",
-                          command: "Develop a comprehensive 2500-word article about safety considerations for senior citizens, including home modifications and health monitoring",
-                          tone: "informative",
-                          audience: "seniors"
-                        }
-                      ].map((template, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          size="sm"
-                          className="justify-start text-left h-auto p-3"
-                          onClick={() => {
-                            setFormData({
-                              ...formData,
-                              command: template.command,
-                              title: template.title,
-                              settings: {
-                                ...formData.settings,
-                                tone: template.tone,
-                                target_audience: template.audience
-                              }
-                            });
-                          }}
-                        >
-                          <div>
-                            <div className="font-medium text-sm">{template.title}</div>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {template.command.substring(0, 80)}...
-                            </div>
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
 
                 <div className="space-y-4">
@@ -1022,11 +959,6 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                     ...formData,
                     imageGeneration: { ...formData.imageGeneration, customPrompt: prompt }
                   })}
-                  templateImagePrompt={
-                    formData.settings.content_type === 'blog_post' 
-                      ? `A professional illustration related to ${formData.settings.target_audience} safety and security`
-                      : `A high-quality ${formData.settings.content_type} image for ${formData.settings.target_audience}`
-                  }
                 />
               </div>
 
@@ -1926,7 +1858,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4">
             <Textarea
-              placeholder="e.g., Make it more technical, add more examples, change the tone to be more casual..."
+              placeholder="Specify what changes you want made to the content, tone, format, or focus areas."
               value={regenerateInstructions}
               onChange={(e) => setRegenerateInstructions(e.target.value)}
               className="min-h-[120px]"
@@ -1946,14 +1878,6 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Email Integration Section */}
-      <div className="space-y-6 mt-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <GmailOAuthSetup />
-          <EmailSystemStatus />
-        </div>
-        <EmailWorkflowIntegration />
-      </div>
     </div>
   );
 };
