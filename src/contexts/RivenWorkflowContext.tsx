@@ -367,6 +367,10 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             if (isDone) {
               clearInterval(pollInterval);
               await loadContentItems();
+              
+              // Auto-create email campaigns for email content
+              await autoCreateEmailCampaignsIfNeeded(campaignId);
+              
               dispatch({ type: 'SET_PROCESSING_STAGE', payload: undefined });
             }
           }
@@ -455,6 +459,58 @@ export const WorkflowProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       dispatch({ type: 'REMOVE_FROM_QUEUE', payload: campaignId });
       dispatch({ type: 'ADD_TO_QUEUE', payload: { ...campaign, priority: 'high' } });
       addNotification('info', 'Campaign Prioritized', 'This campaign will be processed next');
+    }
+  };
+
+  const autoCreateEmailCampaignsIfNeeded = async (campaignId: string) => {
+    try {
+      // Get email content from this campaign
+      const { data: emailContent, error } = await supabase
+        .from('marketing_content')
+        .select('*')
+        .eq('campaign_id', campaignId)
+        .eq('platform', 'email')
+        .eq('status', 'draft');
+
+      if (error || !emailContent?.length) return;
+
+      // Create email campaigns for each email content
+      for (const content of emailContent) {
+        try {
+          const { data, error: campaignError } = await supabase.functions.invoke('email-campaign-creator', {
+            body: {
+              action: 'create_campaign',
+              content_id: content.id,
+              campaign_data: {
+                name: `Auto-generated from: ${content.title}`,
+                created_by: content.campaign_id
+              }
+            }
+          });
+
+          if (!campaignError && data?.success) {
+            addNotification('success', 'Email Campaign Created', `Email campaign ready for: ${content.title}`);
+            
+            // Auto-queue emails if configured for immediate sending
+            if (content.status === 'approved') {
+              await supabase.functions.invoke('email-campaign-creator', {
+                body: {
+                  action: 'queue_emails',
+                  content_id: content.id,
+                  target_criteria: {
+                    include_subscribers: true,
+                    include_users: false // Only subscribers by default
+                  }
+                }
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Error creating email campaign for content:', content.id, error);
+        }
+      }
+    } catch (error) {
+      console.error('Error in autoCreateEmailCampaignsIfNeeded:', error);
     }
   };
 

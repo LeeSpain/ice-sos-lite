@@ -214,3 +214,6 @@ verify_jwt = false
 
 [functions.whatsapp-webhook]
 verify_jwt = false
+
+[functions.email-campaign-creator]
+verify_jwt = true

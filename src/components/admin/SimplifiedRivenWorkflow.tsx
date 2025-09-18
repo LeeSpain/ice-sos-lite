@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { BulkEmailCRM } from './BulkEmailCRM';
+import { EmailCampaignControls } from './EmailCampaignControls';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 

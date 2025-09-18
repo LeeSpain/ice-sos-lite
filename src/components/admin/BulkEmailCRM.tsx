@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useEmailAutomation } from '@/hooks/useEmailAutomation';
 import { CRMAnalyticsComponent } from './CRMAnalyticsComponent';
 
 interface Contact {
@@ -125,7 +126,7 @@ export const BulkEmailCRM: React.FC = () => {
   const [showPreview, setShowPreview] = useState(false);
   
   const { toast } = useToast();
-  
+  const { createEmailCampaign, queueEmailsForCampaign } = useEmailAutomation();
 
   useEffect(() => {
     loadContacts();

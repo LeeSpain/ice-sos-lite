@@ -1,6 +1,62 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export const useEmailAutomation = () => {
+  // Create email campaign from marketing content
+  const createEmailCampaign = async (contentId: string, campaignData: any = {}) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('email-campaign-creator', {
+        body: {
+          action: 'create_campaign',
+          content_id: contentId,
+          campaign_data: campaignData
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error creating email campaign:', error);
+      throw error;
+    }
+  };
+
+  // Queue emails for a campaign
+  const queueEmailsForCampaign = async (contentId: string, targetCriteria: any = {}) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('email-campaign-creator', {
+        body: {
+          action: 'queue_emails',
+          content_id: contentId,
+          target_criteria: targetCriteria
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error queueing emails:', error);
+      throw error;
+    }
+  };
+
+  // Get target recipients for preview
+  const getTargetRecipients = async (criteria: any = {}) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('email-campaign-creator', {
+        body: {
+          action: 'get_recipients',
+          target_criteria: criteria
+        }
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error getting recipients:', error);
+      throw error;
+    }
+  };
+
   const triggerAutomation = async (event: string, data?: any) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -103,6 +159,9 @@ export const useEmailAutomation = () => {
   };
 
   return {
+    createEmailCampaign,
+    queueEmailsForCampaign,
+    getTargetRecipients,
     triggerAutomation,
     testEmailSystem,
     triggerUserSignup,
