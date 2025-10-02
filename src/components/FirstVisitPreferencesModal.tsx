@@ -32,6 +32,19 @@ export const FirstVisitPreferencesModal: React.FC = () => {
     }
   }, []);
 
+  const handleClose = () => {
+    // Mark as visited even if user closes without completing
+    localStorage.setItem(FIRST_VISIT_KEY, 'true');
+    
+    // Track modal dismissal
+    trackCustomEvent('preferences_modal_dismissed', {
+      modal_type: 'first_visit_preferences',
+      user_action: 'closed_without_completion'
+    });
+    
+    setIsOpen(false);
+  };
+
   const handleApplyPreferences = async () => {
     setIsApplying(true);
     
@@ -50,9 +63,6 @@ export const FirstVisitPreferencesModal: React.FC = () => {
       setLanguage(selectedLanguage);
       setCurrency(selectedCurrency);
       
-      // Wait for i18n language change to complete
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
       // Mark that the user has visited before
       localStorage.setItem(FIRST_VISIT_KEY, 'true');
       
@@ -60,9 +70,6 @@ export const FirstVisitPreferencesModal: React.FC = () => {
       
       setIsApplying(false);
       setIsOpen(false);
-      
-      // Force a page refresh to ensure all components update
-      window.location.reload();
     } catch (error) {
       console.error('Error applying preferences:', error);
       setIsApplying(false);
@@ -83,7 +90,7 @@ export const FirstVisitPreferencesModal: React.FC = () => {
   ];
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md mx-4 bg-card border-border shadow-glow max-h-[90vh] overflow-y-auto">
         <DialogHeader className="text-center space-y-3 sticky top-0 bg-card/95 backdrop-blur-sm pb-4 z-10">
           <div className="mx-auto w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center shadow-primary">
