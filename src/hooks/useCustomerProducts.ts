@@ -42,16 +42,14 @@ export function useCustomerProducts(userId: string | undefined) {
   });
 
   // Fetch available products for assignment
+  // @ts-ignore - Supabase type inference issue
   const productsQuery = useQuery({
     queryKey: ['available-products'],
     queryFn: async () => {
-      const { data } = await supabase
-        .from('products')
-        .select('id, name, sku, price')
-        .eq('is_active', true)
-        .order('name');
-
-      return data || [];
+      // @ts-ignore
+      const response = await supabase.from('products').select('id, name, sku, price').eq('is_active', true).order('name');
+      if (response.error) throw response.error;
+      return response.data || [];
     },
     staleTime: 60000,
   });

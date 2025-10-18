@@ -6,6 +6,14 @@ import { ActivityTimeline } from '@/components/admin/ActivityTimeline';
 import { QuickActionsPanel } from '@/components/admin/QuickActionsPanel';
 import { CustomerProductsTab } from '@/components/admin/CustomerProductsTab';
 import { CustomerServicesTab } from '@/components/admin/CustomerServicesTab';
+import { AccountStatusControl } from '@/components/admin/AccountStatusControl';
+import { RoleManagementControl } from '@/components/admin/RoleManagementControl';
+import { EmailManagementControl } from '@/components/admin/EmailManagementControl';
+import { AuditLogTab } from '@/components/admin/AuditLogTab';
+import { EditableHealthProfile } from '@/components/admin/EditableHealthProfile';
+import { RegionalSettingsControl } from '@/components/admin/RegionalSettingsControl';
+import { StripeManagementControl } from '@/components/admin/StripeManagementControl';
+import { BulkActionsControl } from '@/components/admin/BulkActionsControl';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -331,42 +339,59 @@ const CustomerProfilePage: React.FC = () => {
             customerId={customer.user_id}
             customerEmail={customer.email}
           />
+
+          {/* Account Management */}
+          <AccountStatusControl
+            userId={customer.user_id}
+            currentRole={customer.role || 'user'}
+            isActive={true}
+          />
+
+          <RoleManagementControl
+            userId={customer.user_id}
+            currentRole={customer.role || 'user'}
+            customerEmail={customer.email}
+          />
+
+          <EmailManagementControl
+            userId={customer.user_id}
+            currentEmail={customer.email}
+          />
+
+          <RegionalSettingsControl
+            userId={customer.user_id}
+            locationSharingEnabled={customer.location_sharing_enabled || false}
+            subscriptionRegional={customer.subscription_regional || false}
+            hasSpainCallCenter={customer.has_spain_call_center || false}
+            country={customer.country}
+            countryCode={customer.country_code}
+          />
+
+          <StripeManagementControl
+            stripeCustomerId={customer.subscriber?.stripe_customer_id}
+            userId={customer.user_id}
+          />
+
+          <BulkActionsControl
+            userId={customer.user_id}
+            customerName={fullName}
+          />
         </div>
 
         {/* Main Content */}
         <div className="lg:col-span-3">
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid grid-cols-9 w-full">
-              <TabsTrigger value="overview">
-                <Activity className="h-4 w-4 mr-2" />
-                Overview
-              </TabsTrigger>
-              <TabsTrigger value="personal">
-                <User className="h-4 w-4 mr-2" />
-                Personal
-              </TabsTrigger>
-              <TabsTrigger value="subscription">
-                <Shield className="h-4 w-4 mr-2" />
-                Subscription
-              </TabsTrigger>
+            <TabsList className="grid grid-cols-10 w-full">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="personal">Personal</TabsTrigger>
+              <TabsTrigger value="subscription">Subscription</TabsTrigger>
               <TabsTrigger value="products">Products</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="health">
-                <Heart className="h-4 w-4 mr-2" />
-                Health
-              </TabsTrigger>
-              <TabsTrigger value="contacts">
-                <Phone className="h-4 w-4 mr-2" />
-                Contacts
-              </TabsTrigger>
-              <TabsTrigger value="connections">
-                <Users className="h-4 w-4 mr-2" />
-                Network
-              </TabsTrigger>
-              <TabsTrigger value="activity">
-                <Clock className="h-4 w-4 mr-2" />
-                Activity
-              </TabsTrigger>
+              <TabsTrigger value="health">Health</TabsTrigger>
+              <TabsTrigger value="contacts">Contacts</TabsTrigger>
+              <TabsTrigger value="connections">Network</TabsTrigger>
+              <TabsTrigger value="activity">Activity</TabsTrigger>
+              <TabsTrigger value="audit">Audit Log</TabsTrigger>
             </TabsList>
 
             {/* Overview Tab */}
@@ -660,59 +685,15 @@ const CustomerProfilePage: React.FC = () => {
 
             {/* Health Profile Tab */}
             <TabsContent value="health" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Health Profile</CardTitle>
-                  <CardDescription>Medical information and health data</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="font-semibold mb-4">Medical Information</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Medical Conditions</p>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {customer?.medical_conditions && customer.medical_conditions.length > 0 ? (
-                            customer.medical_conditions.map((condition, idx) => (
-                              <Badge key={idx} variant="outline">{condition}</Badge>
-                            ))
-                          ) : (
-                            <p className="text-sm text-muted-foreground">None specified</p>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Allergies</p>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {customer?.allergies && customer.allergies.length > 0 ? (
-                            customer.allergies.map((allergy, idx) => (
-                              <Badge key={idx} variant="destructive">{allergy}</Badge>
-                            ))
-                          ) : (
-                            <p className="text-sm text-muted-foreground">None specified</p>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Medications</p>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {customer?.medications && customer.medications.length > 0 ? (
-                            customer.medications.map((med, idx) => (
-                              <Badge key={idx} variant="secondary">{med}</Badge>
-                            ))
-                          ) : (
-                            <p className="text-sm text-muted-foreground">None specified</p>
-                          )}
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Blood Type</p>
-                        <p className="font-medium mt-2">{customer?.blood_type || 'Not specified'}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <EditableHealthProfile
+                userId={customer.user_id}
+                healthData={{
+                  blood_type: customer.blood_type,
+                  allergies: customer.allergies,
+                  medications: customer.medications,
+                  medical_conditions: customer.medical_conditions,
+                }}
+              />
             </TabsContent>
 
             {/* Emergency Contacts Tab */}
@@ -840,6 +821,11 @@ const CustomerProfilePage: React.FC = () => {
             {/* Activity Timeline Tab */}
             <TabsContent value="activity">
               <ActivityTimeline customerId={customer.user_id} />
+            </TabsContent>
+
+            {/* Audit Log Tab */}
+            <TabsContent value="audit">
+              <AuditLogTab userId={customer.user_id} />
             </TabsContent>
           </Tabs>
         </div>
