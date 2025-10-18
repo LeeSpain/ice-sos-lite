@@ -118,7 +118,9 @@ Deno.serve(async (req) => {
     const results = []
 
     for (const customer of mockCustomers) {
-      // Create auth user
+      let userId: string;
+      
+      // Create auth user or get existing
       const { data: authData, error: authError } = await supabaseClient.auth.admin.createUser({
         email: customer.email,
         password: customer.password,
@@ -131,15 +133,32 @@ Deno.serve(async (req) => {
       })
 
       if (authError) {
-        console.error(`Failed to create user ${customer.email}:`, authError)
-        results.push({ email: customer.email, status: 'failed', error: authError.message })
-        continue
+        // If user exists, try to find them
+        if (authError.message?.includes('already been registered')) {
+          const { data: existingUsers } = await supabaseClient.auth.admin.listUsers();
+          const existingUser = existingUsers?.users?.find(u => u.email === customer.email);
+          if (existingUser) {
+            userId = existingUser.id;
+            console.log(`Using existing user ${customer.email}`);
+          } else {
+            console.error(`Failed to create user ${customer.email}:`, authError)
+            results.push({ email: customer.email, status: 'failed', error: authError.message })
+            continue
+          }
+        } else {
+          console.error(`Failed to create user ${customer.email}:`, authError)
+          results.push({ email: customer.email, status: 'failed', error: authError.message })
+          continue
+        }
+      } else {
+        userId = authData.user.id;
       }
 
-      // Update profile with complete data
+      // Upsert profile with complete data
       const { error: profileError } = await supabaseClient
         .from('profiles')
-        .update({
+        .upsert({
+          user_id: userId,
           phone: customer.phone,
           country: customer.country,
           country_code: customer.country_code,
@@ -158,8 +177,9 @@ Deno.serve(async (req) => {
           location_sharing_enabled: true,
           transferred_to_care: false,
           care_transfer_status: 'not_transferred'
+        }, {
+          onConflict: 'user_id'
         })
-        .eq('user_id', authData.user.id)
 
       if (profileError) {
         console.error(`Failed to update profile for ${customer.email}:`, profileError)
@@ -167,16 +187,18 @@ Deno.serve(async (req) => {
         continue
       }
 
-      // Create subscription
+      // Upsert subscription (removed payment_status as it doesn't exist in schema)
       const { error: subError } = await supabaseClient
         .from('subscribers')
-        .insert({
-          user_id: authData.user.id,
+        .upsert({
+          user_id: userId,
+          email: customer.email,
           subscribed: true,
           subscription_tier: 'Premium Protection',
           subscription_start: new Date().toISOString(),
-          subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-          payment_status: 'active'
+          subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+        }, {
+          onConflict: 'user_id'
         })
 
       if (subError) {
@@ -185,7 +207,7 @@ Deno.serve(async (req) => {
         continue
       }
 
-      results.push({ email: customer.email, status: 'success', user_id: authData.user.id })
+      results.push({ email: customer.email, status: 'success', user_id: userId })
     }
 
     return new Response(
