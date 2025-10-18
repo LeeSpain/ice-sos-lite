@@ -1,5 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.4'
-import { corsHeaders } from '../_shared/cors.ts'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -169,7 +173,7 @@ Deno.serve(async (req) => {
         .insert({
           user_id: authData.user.id,
           subscribed: true,
-          subscription_tier: 'call_centre',
+          subscription_tier: 'Premium Protection',
           subscription_start: new Date().toISOString(),
           subscription_end: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
           payment_status: 'active'

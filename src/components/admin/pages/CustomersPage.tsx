@@ -75,36 +75,27 @@ export default function CustomersPage() {
   // Use optimized data fetching
   const { data: customers = [], isLoading, error, refetch } = useCustomers();
 
-  // Auto-seed demo customers if there are fewer than 5
-  useEffect(() => {
-    const seedDemoCustomers = async () => {
-      const hasSeeded = localStorage.getItem('demo_customers_seeded');
-      if (hasSeeded || isLoading || !customers) return;
+  const handleSeedDemoCustomers = async () => {
+    setIsSeeding(true);
+    try {
+      const { error } = await supabase.functions.invoke('seed-demo-customers');
+      if (error) throw error;
       
-      if (customers.length < 5) {
-        setIsSeeding(true);
-        try {
-          const { error } = await supabase.functions.invoke('seed-demo-customers');
-          if (!error) {
-            localStorage.setItem('demo_customers_seeded', 'true');
-            toast({
-              title: "Demo customers added",
-              description: "5 demo customers have been added to your database",
-            });
-            setTimeout(() => refetch(), 2000);
-          } else {
-            console.error('Failed to seed demo customers:', error);
-          }
-        } catch (err) {
-          console.error('Failed to seed demo customers:', err);
-        } finally {
-          setIsSeeding(false);
-        }
-      }
-    };
-
-    seedDemoCustomers();
-  }, [customers, isLoading, refetch, toast]);
+      toast({
+        title: "Demo customers added",
+        description: "5 demo customers have been successfully added",
+      });
+      setTimeout(() => refetch(), 1500);
+    } catch (err: any) {
+      toast({
+        title: "Failed to add demo customers",
+        description: err.message || "An error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSeeding(false);
+    }
+  };
 
   // Debounce search for better performance
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -260,6 +251,14 @@ export default function CustomersPage() {
               <Button variant="outline" onClick={handleExportData}>
                 <Download className="h-4 w-4 mr-2" />
                 Export
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleSeedDemoCustomers}
+                disabled={isSeeding}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                {isSeeding ? "Adding..." : "Add 5 Sample Customers"}
               </Button>
             </div>
           </div>
