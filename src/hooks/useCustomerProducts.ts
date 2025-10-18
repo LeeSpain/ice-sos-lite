@@ -23,7 +23,7 @@ export function useCustomerProducts(userId: string | undefined) {
   const queryClient = useQueryClient();
 
   // Fetch customer orders with product details
-  const { data: orders, isLoading } = useQuery<any[]>({
+  const ordersQuery = useQuery({
     queryKey: ['customer-orders', userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -42,16 +42,15 @@ export function useCustomerProducts(userId: string | undefined) {
   });
 
   // Fetch available products for assignment
-  const { data: availableProducts } = useQuery<any[]>({
+  const productsQuery = useQuery({
     queryKey: ['available-products'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('products')
-        .select('*')
+        .select('id, name, sku, price')
         .eq('is_active', true)
         .order('name');
 
-      if (error) throw error;
       return data || [];
     },
     staleTime: 60000,
@@ -120,20 +119,23 @@ export function useCustomerProducts(userId: string | undefined) {
     },
   });
 
+  const orders = ordersQuery.data || [];
+  const availableProducts = productsQuery.data || [];
+
   // Calculate statistics
   const stats = {
-    totalOrders: orders?.length || 0,
-    totalRevenue: orders?.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0) || 0,
-    averageOrderValue: orders?.length 
-      ? (orders.reduce((sum, order) => sum + (Number(order.total_price) || 0), 0) / orders.length)
+    totalOrders: orders.length,
+    totalRevenue: orders.reduce((sum: number, order: any) => sum + (Number(order.total_price) || 0), 0),
+    averageOrderValue: orders.length 
+      ? orders.reduce((sum: number, order: any) => sum + (Number(order.total_price) || 0), 0) / orders.length
       : 0,
-    lastPurchaseDate: orders?.[0]?.created_at || null,
+    lastPurchaseDate: orders[0]?.created_at || null,
   };
 
   return {
     orders,
     availableProducts,
-    isLoading,
+    isLoading: ordersQuery.isLoading,
     stats,
     createOrder: createOrder.mutate,
     updateOrderStatus: updateOrderStatus.mutate,

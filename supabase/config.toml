@@ -229,3 +229,15 @@ verify_jwt = false
 
 [functions.seed-demo-customers]
 verify_jwt = false
+
+[functions.get-customer-activity]
+verify_jwt = true
+
+[functions.send-customer-communication]
+verify_jwt = true
+
+[functions.assign-customer-product]
+verify_jwt = true
+
+[functions.assign-customer-service]
+verify_jwt = true
