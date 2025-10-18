@@ -1,3 +1,8 @@
+// This component now uses the enhanced version with bulk operations and exports
+export { CustomersPageEnhanced as default } from './CustomersPageEnhanced';
+
+// OLD VERSION BELOW - Keeping for reference
+/*
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -399,3 +404,4 @@ export default function CustomersPage() {
     </div>
   );
 }
+*/

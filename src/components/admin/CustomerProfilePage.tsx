@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Mail, Phone, MapPin, Calendar, User, Shield, Activity, Save, Loader2, Heart, Users, TrendingUp, Trash2, Plus, Edit2, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ActivityTimeline } from '@/components/admin/ActivityTimeline';
+import { QuickActionsPanel } from '@/components/admin/QuickActionsPanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -322,36 +324,17 @@ const CustomerProfilePage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm">Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {customer.email && (
-                <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                  <a href={`mailto:${customer.email}`}>
-                    <Mail className="h-4 w-4 mr-2" />
-                    Send Email
-                  </a>
-                </Button>
-              )}
-              {customer.phone && (
-                <Button variant="outline" size="sm" className="w-full justify-start" asChild>
-                  <a href={`tel:${customer.phone}`}>
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call
-                  </a>
-                </Button>
-              )}
-            </CardContent>
-          </Card>
+          {/* Quick Actions Panel */}
+          <QuickActionsPanel 
+            customerId={customer.user_id}
+            customerEmail={customer.email}
+          />
         </div>
 
         {/* Main Content */}
         <div className="lg:col-span-3">
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid grid-cols-6 w-full">
+            <TabsList className="grid grid-cols-7 w-full">
               <TabsTrigger value="overview">
                 <Activity className="h-4 w-4 mr-2" />
                 Overview
@@ -375,6 +358,10 @@ const CustomerProfilePage: React.FC = () => {
               <TabsTrigger value="connections">
                 <Users className="h-4 w-4 mr-2" />
                 Network
+              </TabsTrigger>
+              <TabsTrigger value="activity">
+                <Clock className="h-4 w-4 mr-2" />
+                Activity
               </TabsTrigger>
             </TabsList>
 
@@ -834,6 +821,11 @@ const CustomerProfilePage: React.FC = () => {
                   )}
                 </CardContent>
               </Card>
+          </TabsContent>
+
+            {/* Activity Timeline Tab */}
+            <TabsContent value="activity">
+              <ActivityTimeline customerId={customer.user_id} />
             </TabsContent>
           </Tabs>
         </div>
