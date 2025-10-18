@@ -622,7 +622,6 @@ const CustomerProfilePage: React.FC = () => {
                             />
                           </div>
                         )}
-                        </div>
                         
                         {/* Subscription Actions */}
                         <Separator className="my-4" />
