@@ -2861,6 +2861,9 @@ export type Database = {
           allergies: string[] | null
           blood_type: string | null
           call_center_number: string | null
+          care_transfer_date: string | null
+          care_transfer_error: string | null
+          care_transfer_status: string | null
           country: string | null
           country_code: string | null
           created_at: string
@@ -2881,6 +2884,7 @@ export type Database = {
           profile_completion_percentage: number | null
           role: string
           subscription_regional: boolean | null
+          transferred_to_care: boolean | null
           updated_at: string
           user_id: string
         }
@@ -2889,6 +2893,9 @@ export type Database = {
           allergies?: string[] | null
           blood_type?: string | null
           call_center_number?: string | null
+          care_transfer_date?: string | null
+          care_transfer_error?: string | null
+          care_transfer_status?: string | null
           country?: string | null
           country_code?: string | null
           created_at?: string
@@ -2909,6 +2916,7 @@ export type Database = {
           profile_completion_percentage?: number | null
           role?: string
           subscription_regional?: boolean | null
+          transferred_to_care?: boolean | null
           updated_at?: string
           user_id: string
         }
@@ -2917,6 +2925,9 @@ export type Database = {
           allergies?: string[] | null
           blood_type?: string | null
           call_center_number?: string | null
+          care_transfer_date?: string | null
+          care_transfer_error?: string | null
+          care_transfer_status?: string | null
           country?: string | null
           country_code?: string | null
           created_at?: string
@@ -2937,6 +2948,7 @@ export type Database = {
           profile_completion_percentage?: number | null
           role?: string
           subscription_regional?: boolean | null
+          transferred_to_care?: boolean | null
           updated_at?: string
           user_id?: string
         }

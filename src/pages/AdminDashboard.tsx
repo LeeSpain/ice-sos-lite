@@ -47,6 +47,7 @@ import ProductionReadinessPanel from '@/components/admin/ProductionReadinessPane
 import StripeSetupPage from '@/components/admin/pages/StripeSetupPage';
 import MobileAppLaunchPage from '@/components/admin/pages/MobileAppLaunchPage';
 import GoLivePreparationPage from '@/components/admin/pages/GoLivePreparationPage';
+import TransferToCare from '@/pages/admin/TransferToCare';
 
 const AdminDashboard: React.FC = () => {
   useScrollToTop();
@@ -102,6 +103,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="stripe-setup" element={<StripeSetupPage />} />
         <Route path="mobile-launch" element={<MobileAppLaunchPage />} />
         <Route path="go-live" element={<GoLivePreparationPage />} />
+        <Route path="transfer-to-care" element={<TransferToCare />} />
         <Route path="*" element={<Navigate to="/admin-dashboard" replace />} />
       </Route>
     </Routes>

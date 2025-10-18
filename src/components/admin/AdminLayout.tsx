@@ -42,7 +42,8 @@ import {
   Phone,
   Building,
   BookOpen,
-  Target
+  Target,
+  Send
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
@@ -117,6 +118,7 @@ const useAdminMenuItems = () => {
         { title: t('admin.regionalOrganizations'), url: "/admin-dashboard/regional-organizations", icon: Building },
         { title: t('admin.regionalUsers'), url: "/admin-dashboard/regional-users", icon: Users },
         { title: t('admin.regionalAudit'), url: "/admin-dashboard/regional-audit", icon: FileText },
+        { title: 'Transfer to Care Conneqt', url: "/admin-dashboard/transfer-to-care", icon: Send },
       ]
     },
     {
