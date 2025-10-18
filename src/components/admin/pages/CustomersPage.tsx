@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
@@ -68,10 +69,42 @@ export default function CustomersPage() {
     registrationDate: "",
     orderStatus: ""
   });
+  const [isSeeding, setIsSeeding] = useState(false);
   const { toast } = useToast();
 
   // Use optimized data fetching
   const { data: customers = [], isLoading, error, refetch } = useCustomers();
+
+  // Auto-seed demo customers if there are fewer than 5
+  useEffect(() => {
+    const seedDemoCustomers = async () => {
+      const hasSeeded = localStorage.getItem('demo_customers_seeded');
+      if (hasSeeded || isLoading || !customers) return;
+      
+      if (customers.length < 5) {
+        setIsSeeding(true);
+        try {
+          const { error } = await supabase.functions.invoke('seed-demo-customers');
+          if (!error) {
+            localStorage.setItem('demo_customers_seeded', 'true');
+            toast({
+              title: "Demo customers added",
+              description: "5 demo customers have been added to your database",
+            });
+            setTimeout(() => refetch(), 2000);
+          } else {
+            console.error('Failed to seed demo customers:', error);
+          }
+        } catch (err) {
+          console.error('Failed to seed demo customers:', err);
+        } finally {
+          setIsSeeding(false);
+        }
+      }
+    };
+
+    seedDemoCustomers();
+  }, [customers, isLoading, refetch, toast]);
 
   // Debounce search for better performance
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
