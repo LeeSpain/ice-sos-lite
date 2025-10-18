@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { SeedDemoCustomersButton } from '../SeedDemoCustomersButton';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
@@ -176,7 +175,6 @@ export default function CustomersPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <SeedDemoCustomersButton />
           <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
