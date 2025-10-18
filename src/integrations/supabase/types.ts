@@ -4164,6 +4164,48 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_history: {
+        Row: {
+          action: string
+          changed_by: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          new_end_date: string | null
+          previous_end_date: string | null
+          previous_tier: string | null
+          reason: string | null
+          subscription_tier: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_end_date?: string | null
+          previous_end_date?: string | null
+          previous_tier?: string | null
+          reason?: string | null
+          subscription_tier?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          new_end_date?: string | null
+          previous_end_date?: string | null
+          previous_tier?: string | null
+          reason?: string | null
+          subscription_tier?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           billing_interval: string

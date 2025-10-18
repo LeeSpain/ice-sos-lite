@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Mail, Phone, MapPin, Calendar, User, Shield, Activity, Save, Loader2 } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Calendar, User, Shield, Activity, Save, Loader2, Heart, Users, TrendingUp, Trash2, Plus, Edit2, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCustomerProfile } from '@/hooks/useCustomerProfile';
+import { useSubscriptionManagement } from '@/hooks/useSubscriptionManagement';
+import { useEmergencyContactManagement } from '@/hooks/useEmergencyContactManagement';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
@@ -21,10 +27,23 @@ const CustomerProfilePage: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { data: customer, isLoading } = useCustomerProfile(userId);
+  const { manageSubscription, isManaging } = useSubscriptionManagement();
+  const emergencyContactMgmt = useEmergencyContactManagement(userId || '');
   
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editedData, setEditedData] = useState<any>({});
+  
+  // Subscription management state
+  const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
+  const [subscriptionAction, setSubscriptionAction] = useState<'extend' | 'upgrade' | 'downgrade' | 'cancel' | 'activate' | null>(null);
+  const [subscriptionFormData, setSubscriptionFormData] = useState({ tier: '', days: '', reason: '' });
+  
+  // Emergency contact state
+  const [showContactDialog, setShowContactDialog] = useState(false);
+  const [editingContact, setEditingContact] = useState<any>(null);
+  const [contactFormData, setContactFormData] = useState({ name: '', phone: '', email: '', relationship: '', priority: 1, type: 'standard' });
+  const [deleteContactId, setDeleteContactId] = useState<string | null>(null);
 
   const handleBack = () => {
     navigate('/admin-dashboard/customers');
@@ -78,6 +97,77 @@ const CustomerProfilePage: React.FC = () => {
   const handleCancel = () => {
     setIsEditing(false);
     setEditedData({});
+  };
+
+  // Subscription management handlers
+  const handleSubscriptionAction = (action: 'extend' | 'upgrade' | 'downgrade' | 'cancel' | 'activate') => {
+    setSubscriptionAction(action);
+    setSubscriptionFormData({ tier: '', days: '', reason: '' });
+    setShowSubscriptionDialog(true);
+  };
+
+  const handleSubscriptionSubmit = () => {
+    if (!userId || !subscriptionAction) return;
+
+    const params: any = {
+      userId,
+      action: subscriptionAction,
+      reason: subscriptionFormData.reason || undefined
+    };
+
+    if (subscriptionAction === 'extend' && subscriptionFormData.days) {
+      params.extensionDays = parseInt(subscriptionFormData.days);
+    }
+
+    if ((subscriptionAction === 'upgrade' || subscriptionAction === 'downgrade') && subscriptionFormData.tier) {
+      params.newTier = subscriptionFormData.tier;
+    }
+
+    manageSubscription(params);
+    setShowSubscriptionDialog(false);
+  };
+
+  // Emergency contact handlers
+  const handleAddContact = () => {
+    setEditingContact(null);
+    setContactFormData({ name: '', phone: '', email: '', relationship: '', priority: 1, type: 'standard' });
+    setShowContactDialog(true);
+  };
+
+  const handleEditContact = (contact: any) => {
+    setEditingContact(contact);
+    setContactFormData({
+      name: contact.name,
+      phone: contact.phone,
+      email: contact.email || '',
+      relationship: contact.relationship || '',
+      priority: contact.priority,
+      type: contact.type
+    });
+    setShowContactDialog(true);
+  };
+
+  const handleContactSubmit = () => {
+    if (editingContact) {
+      emergencyContactMgmt.updateContact({
+        id: editingContact.id,
+        data: contactFormData
+      });
+    } else {
+      emergencyContactMgmt.createContact(contactFormData);
+    }
+    setShowContactDialog(false);
+  };
+
+  const handleDeleteContact = (id: string) => {
+    setDeleteContactId(id);
+  };
+
+  const confirmDeleteContact = () => {
+    if (deleteContactId) {
+      emergencyContactMgmt.deleteContact(deleteContactId);
+      setDeleteContactId(null);
+    }
   };
 
   if (isLoading) {
@@ -261,18 +351,30 @@ const CustomerProfilePage: React.FC = () => {
         {/* Main Content */}
         <div className="lg:col-span-3">
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
+            <TabsList className="grid grid-cols-6 w-full">
               <TabsTrigger value="overview">
                 <Activity className="h-4 w-4 mr-2" />
                 Overview
               </TabsTrigger>
               <TabsTrigger value="personal">
                 <User className="h-4 w-4 mr-2" />
-                Personal Details
+                Personal
               </TabsTrigger>
               <TabsTrigger value="subscription">
                 <Shield className="h-4 w-4 mr-2" />
                 Subscription
+              </TabsTrigger>
+              <TabsTrigger value="health">
+                <Heart className="h-4 w-4 mr-2" />
+                Health
+              </TabsTrigger>
+              <TabsTrigger value="contacts">
+                <Phone className="h-4 w-4 mr-2" />
+                Contacts
+              </TabsTrigger>
+              <TabsTrigger value="connections">
+                <Users className="h-4 w-4 mr-2" />
+                Network
               </TabsTrigger>
             </TabsList>
 
@@ -520,11 +622,215 @@ const CustomerProfilePage: React.FC = () => {
                             />
                           </div>
                         )}
+                        </div>
+                        
+                        {/* Subscription Actions */}
+                        <Separator className="my-4" />
+                        <div>
+                          <h4 className="font-semibold mb-3">Subscription Actions</h4>
+                          <div className="flex flex-wrap gap-2">
+                            <Button size="sm" variant="outline" onClick={() => handleSubscriptionAction('extend')}>
+                              <Clock className="h-4 w-4 mr-1" />
+                              Extend
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => handleSubscriptionAction('upgrade')}>
+                              <TrendingUp className="h-4 w-4 mr-1" />
+                              Upgrade
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => handleSubscriptionAction('downgrade')}>
+                              Downgrade
+                            </Button>
+                            {customer.subscriber.subscribed ? (
+                              <Button size="sm" variant="destructive" onClick={() => handleSubscriptionAction('cancel')}>
+                                <XCircle className="h-4 w-4 mr-1" />
+                                Cancel
+                              </Button>
+                            ) : (
+                              <Button size="sm" variant="default" onClick={() => handleSubscriptionAction('activate')}>
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                                Activate
+                              </Button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </>
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <p>No subscription information available</p>
+                      <Button className="mt-4" onClick={() => handleSubscriptionAction('activate')}>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Activate Subscription
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Health Profile Tab */}
+            <TabsContent value="health" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Health Profile</CardTitle>
+                  <CardDescription>Medical information and health data</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="font-semibold mb-4">Medical Information</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Medical Conditions</p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {customer?.medical_conditions && customer.medical_conditions.length > 0 ? (
+                            customer.medical_conditions.map((condition, idx) => (
+                              <Badge key={idx} variant="outline">{condition}</Badge>
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground">None specified</p>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Allergies</p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {customer?.allergies && customer.allergies.length > 0 ? (
+                            customer.allergies.map((allergy, idx) => (
+                              <Badge key={idx} variant="destructive">{allergy}</Badge>
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground">None specified</p>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Medications</p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {customer?.medications && customer.medications.length > 0 ? (
+                            customer.medications.map((med, idx) => (
+                              <Badge key={idx} variant="secondary">{med}</Badge>
+                            ))
+                          ) : (
+                            <p className="text-sm text-muted-foreground">None specified</p>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Blood Type</p>
+                        <p className="font-medium mt-2">{customer?.blood_type || 'Not specified'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Emergency Contacts Tab */}
+            <TabsContent value="contacts" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle>Emergency Contacts</CardTitle>
+                      <CardDescription>Manage emergency contact list</CardDescription>
+                    </div>
+                    <Button onClick={handleAddContact}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Contact
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {customer?.emergency_contacts && customer.emergency_contacts.length > 0 ? (
+                    <div className="space-y-3">
+                      {customer.emergency_contacts.map((contact) => (
+                        <div key={contact.id} className="p-4 border rounded-lg hover:bg-muted/50">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold">{contact.name}</h4>
+                                <Badge variant="outline">Priority {contact.priority}</Badge>
+                                <Badge>{contact.type}</Badge>
+                              </div>
+                              <div className="space-y-1 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-2">
+                                  <Phone className="h-3 w-3" />
+                                  <span>{contact.phone}</span>
+                                </div>
+                                {contact.email && (
+                                  <div className="flex items-center gap-2">
+                                    <Mail className="h-3 w-3" />
+                                    <span>{contact.email}</span>
+                                  </div>
+                                )}
+                                {contact.relationship && (
+                                  <div className="flex items-center gap-2">
+                                    <User className="h-3 w-3" />
+                                    <span>{contact.relationship}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="ghost" onClick={() => handleEditContact(contact)}>
+                                <Edit2 className="h-3 w-3" />
+                              </Button>
+                              <Button size="sm" variant="ghost" onClick={() => handleDeleteContact(contact.id)}>
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No emergency contacts added yet</p>
+                      <Button className="mt-4" onClick={handleAddContact}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add First Contact
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Connections Network Tab */}
+            <TabsContent value="connections" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Connections Network</CardTitle>
+                  <CardDescription>Family circle and trusted contacts</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {customer?.connections && customer.connections.length > 0 ? (
+                    <div className="space-y-4">
+                      {customer.connections.map((connection) => (
+                        <div key={connection.id} className="p-4 border rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold">{connection.invite_email || 'Unnamed'}</h4>
+                                <Badge variant={connection.status === 'active' ? 'default' : 'secondary'}>
+                                  {connection.status}
+                                </Badge>
+                                <Badge variant="outline">{connection.type}</Badge>
+                              </div>
+                              <div className="text-sm text-muted-foreground space-y-1">
+                                {connection.relationship && <p>Relationship: {connection.relationship}</p>}
+                                {connection.escalation_priority && <p>Priority: {connection.escalation_priority}</p>}
+                                {connection.invited_at && <p>Invited: {new Date(connection.invited_at).toLocaleDateString()}</p>}
+                                {connection.accepted_at && <p>Accepted: {new Date(connection.accepted_at).toLocaleDateString()}</p>}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No connections in network</p>
                     </div>
                   )}
                 </CardContent>
@@ -533,6 +839,172 @@ const CustomerProfilePage: React.FC = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Subscription Management Dialog */}
+      <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {subscriptionAction === 'extend' && 'Extend Subscription'}
+              {subscriptionAction === 'upgrade' && 'Upgrade Subscription'}
+              {subscriptionAction === 'downgrade' && 'Downgrade Subscription'}
+              {subscriptionAction === 'cancel' && 'Cancel Subscription'}
+              {subscriptionAction === 'activate' && 'Activate Subscription'}
+            </DialogTitle>
+            <DialogDescription>
+              Make changes to customer subscription
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {subscriptionAction === 'extend' && (
+              <div className="space-y-2">
+                <Label>Extension Days</Label>
+                <Input
+                  type="number"
+                  placeholder="30"
+                  value={subscriptionFormData.days}
+                  onChange={(e) => setSubscriptionFormData({ ...subscriptionFormData, days: e.target.value })}
+                />
+              </div>
+            )}
+            {(subscriptionAction === 'upgrade' || subscriptionAction === 'downgrade') && (
+              <div className="space-y-2">
+                <Label>New Tier</Label>
+                <Select value={subscriptionFormData.tier} onValueChange={(value) => setSubscriptionFormData({ ...subscriptionFormData, tier: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tier" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Free">Free</SelectItem>
+                    <SelectItem value="Premium Protection">Premium Protection</SelectItem>
+                    <SelectItem value="Call Centre">Call Centre</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Reason (optional)</Label>
+              <Textarea
+                placeholder="Enter reason for this change..."
+                value={subscriptionFormData.reason}
+                onChange={(e) => setSubscriptionFormData({ ...subscriptionFormData, reason: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSubscriptionDialog(false)}>Cancel</Button>
+            <Button onClick={handleSubscriptionSubmit} disabled={isManaging}>
+              {isManaging ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Emergency Contact Dialog */}
+      <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingContact ? 'Edit' : 'Add'} Emergency Contact</DialogTitle>
+            <DialogDescription>
+              {editingContact ? 'Update' : 'Create'} emergency contact information
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Name *</Label>
+              <Input
+                value={contactFormData.name}
+                onChange={(e) => setContactFormData({ ...contactFormData, name: e.target.value })}
+                placeholder="John Doe"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Phone *</Label>
+              <Input
+                value={contactFormData.phone}
+                onChange={(e) => setContactFormData({ ...contactFormData, phone: e.target.value })}
+                placeholder="+1234567890"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={contactFormData.email}
+                onChange={(e) => setContactFormData({ ...contactFormData, email: e.target.value })}
+                placeholder="john@example.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Relationship</Label>
+              <Input
+                value={contactFormData.relationship}
+                onChange={(e) => setContactFormData({ ...contactFormData, relationship: e.target.value })}
+                placeholder="e.g., Father, Friend"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Priority *</Label>
+                <Select value={contactFormData.priority.toString()} onValueChange={(value) => setContactFormData({ ...contactFormData, priority: parseInt(value) })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">1 (Highest)</SelectItem>
+                    <SelectItem value="2">2</SelectItem>
+                    <SelectItem value="3">3</SelectItem>
+                    <SelectItem value="4">4</SelectItem>
+                    <SelectItem value="5">5 (Lowest)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Type *</Label>
+                <Select value={contactFormData.type} onValueChange={(value) => setContactFormData({ ...contactFormData, type: value })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="family">Family</SelectItem>
+                    <SelectItem value="trusted">Trusted</SelectItem>
+                    <SelectItem value="standard">Standard</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowContactDialog(false)}>Cancel</Button>
+            <Button 
+              onClick={handleContactSubmit}
+              disabled={!contactFormData.name || !contactFormData.phone || emergencyContactMgmt.isCreating || emergencyContactMgmt.isUpdating}
+            >
+              {(emergencyContactMgmt.isCreating || emergencyContactMgmt.isUpdating) ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              {editingContact ? 'Update' : 'Add'} Contact
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Contact Confirmation */}
+      <AlertDialog open={!!deleteContactId} onOpenChange={() => setDeleteContactId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Emergency Contact?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this emergency contact.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteContact} className="bg-destructive text-destructive-foreground">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
