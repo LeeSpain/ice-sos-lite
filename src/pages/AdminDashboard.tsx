@@ -5,6 +5,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import EnhancedDashboardOverview from '@/components/admin/pages/EnhancedDashboardOverview';
 import CustomersPage from '@/components/admin/pages/CustomersPage';
+import CustomerProfilePage from '@/components/admin/CustomerProfilePage';
 import LeadsPage from '@/components/admin/pages/LeadsPage';
 import ConversationsPage from '@/components/admin/pages/ConversationsPage';
 import SubscriptionsPage from '@/components/admin/pages/SubscriptionsPage';
@@ -73,6 +74,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="riven-marketing" element={<RivenMarketingAI />} />
         <Route path="email-management" element={<EmailManagement />} />
         <Route path="customers" element={<CustomersPage />} />
+        <Route path="customers/:userId" element={<CustomerProfilePage />} />
         <Route path="subscriptions" element={<SubscriptionsPage />} />
         <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />
         <Route path="families" element={<FamilyAccountsPage />} />

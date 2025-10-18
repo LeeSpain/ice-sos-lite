@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -59,6 +60,7 @@ interface Customer {
 }
 
 export default function CustomersPage() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
@@ -314,14 +316,14 @@ export default function CustomersPage() {
                                 </Badge>
                               </div>
                               <div>{new Date(customer.created_at).toLocaleDateString()}</div>
-                              <div>
+                               <div className="flex gap-2">
                                 <Button 
-                                  variant="outline" 
+                                  variant="ghost" 
                                   size="sm"
-                                  onClick={() => handleViewCustomer(customer)}
+                                  onClick={() => navigate(`/admin-dashboard/customers/${customer.user_id}`)}
                                 >
                                   <Eye className="h-3 w-3 mr-1" />
-                                  View
+                                  View Profile
                                 </Button>
                               </div>
                             </div>
@@ -359,14 +361,16 @@ export default function CustomersPage() {
                         {new Date(customer.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleViewCustomer(customer)}
-                        >
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => navigate(`/admin-dashboard/customers/${customer.user_id}`)}
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            View Profile
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
