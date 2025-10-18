@@ -1047,6 +1047,65 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_regional_services: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          auto_renew: boolean | null
+          created_at: string | null
+          customer_id: string
+          deactivated_at: string | null
+          end_date: string | null
+          id: string
+          notes: string | null
+          price_override: number | null
+          service_id: string
+          start_date: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          auto_renew?: boolean | null
+          created_at?: string | null
+          customer_id: string
+          deactivated_at?: string | null
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          price_override?: number | null
+          service_id: string
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          auto_renew?: boolean | null
+          created_at?: string | null
+          customer_id?: string
+          deactivated_at?: string | null
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          price_override?: number | null
+          service_id?: string
+          start_date?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_regional_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "regional_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_tag_assignments: {
         Row: {
           assigned_at: string | null
@@ -2531,6 +2590,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      order_notes: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          id: string
+          is_internal: boolean | null
+          note_text: string
+          order_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_internal?: boolean | null
+          note_text: string
+          order_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_internal?: boolean | null
+          note_text?: string
+          order_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_notes_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {

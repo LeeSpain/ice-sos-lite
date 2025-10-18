@@ -4,6 +4,8 @@ import { ArrowLeft, Mail, Phone, MapPin, Calendar, User, Shield, Activity, Save,
 import { Button } from '@/components/ui/button';
 import { ActivityTimeline } from '@/components/admin/ActivityTimeline';
 import { QuickActionsPanel } from '@/components/admin/QuickActionsPanel';
+import { CustomerProductsTab } from '@/components/admin/CustomerProductsTab';
+import { CustomerServicesTab } from '@/components/admin/CustomerServicesTab';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -334,7 +336,7 @@ const CustomerProfilePage: React.FC = () => {
         {/* Main Content */}
         <div className="lg:col-span-3">
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid grid-cols-7 w-full">
+            <TabsList className="grid grid-cols-9 w-full">
               <TabsTrigger value="overview">
                 <Activity className="h-4 w-4 mr-2" />
                 Overview
@@ -347,6 +349,8 @@ const CustomerProfilePage: React.FC = () => {
                 <Shield className="h-4 w-4 mr-2" />
                 Subscription
               </TabsTrigger>
+              <TabsTrigger value="products">Products</TabsTrigger>
+              <TabsTrigger value="services">Services</TabsTrigger>
               <TabsTrigger value="health">
                 <Heart className="h-4 w-4 mr-2" />
                 Health
@@ -822,6 +826,16 @@ const CustomerProfilePage: React.FC = () => {
                 </CardContent>
               </Card>
           </TabsContent>
+
+            {/* Products Tab */}
+            <TabsContent value="products">
+              <CustomerProductsTab userId={customer.user_id} />
+            </TabsContent>
+
+            {/* Services Tab */}
+            <TabsContent value="services">
+              <CustomerServicesTab userId={customer.user_id} />
+            </TabsContent>
 
             {/* Activity Timeline Tab */}
             <TabsContent value="activity">
