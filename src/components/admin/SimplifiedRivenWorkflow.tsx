@@ -715,15 +715,15 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-6 overflow-x-hidden">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-2">Riven AI Marketing System</h1>
-        <p className="text-muted-foreground text-lg mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold mb-2">Riven AI Marketing System</h1>
+        <p className="text-muted-foreground text-base md:text-lg mb-4">
           Advanced AI-powered content creation and marketing automation
         </p>
         
         {/* Quick Access to Published Content */}
-        <div className="flex justify-center gap-3">
+        <div className="flex flex-wrap justify-center gap-2 md:gap-3">
           <Button 
             variant="outline" 
             onClick={() => {
@@ -800,7 +800,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
             </div>
             
             {/* Stage Navigation */}
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1 md:gap-2">
               {[
                 { id: 'command', label: 'Command Centre', icon: Wand2 },
                 { id: 'process', label: 'AI Processing', icon: Activity },
@@ -816,7 +816,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                   (stage.id === 'process' && isProcessing);
                 
                 return (
-                  <div key={stage.id} className="flex items-center">
+                  <div key={stage.id} className="flex items-center flex-shrink-0">
                     <Button
                       variant={isActive ? "default" : "ghost"}
                       size="sm"
@@ -834,7 +834,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                         }
                       }}
                       disabled={!isClickable}
-                      className={`flex items-center gap-2 transition-all ${
+                      className={`flex items-center gap-1 md:gap-2 transition-all text-xs md:text-sm ${
                         isActive 
                           ? 'bg-primary text-primary-foreground' 
                           : isCompleted 
@@ -844,11 +844,11 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                           : 'text-muted-foreground cursor-not-allowed opacity-50'
                       }`}
                     >
-                      <StageIcon className="h-4 w-4" />
-                      <span className="text-sm font-medium">{stage.label}</span>
+                      <StageIcon className="h-3 w-3 md:h-4 md:w-4" />
+                      <span className="text-xs md:text-sm font-medium whitespace-nowrap">{stage.label}</span>
                     </Button>
                     {index < 3 && (
-                      <ArrowRight className="h-4 w-4 mx-2 text-muted-foreground" />
+                      <ArrowRight className="h-3 w-3 md:h-4 md:w-4 mx-1 md:mx-2 text-muted-foreground hidden sm:block" />
                     )}
                   </div>
                 );
