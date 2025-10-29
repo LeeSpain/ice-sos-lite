@@ -83,12 +83,12 @@ export const CustomersPageEnhanced: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 p-4 md:p-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Customers</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold">Customers</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
             {filteredCustomers.length} customers
             {selectedCustomers.size > 0 && ` • ${selectedCustomers.size} selected`}
           </p>
@@ -108,28 +108,34 @@ export const CustomersPageEnhanced: React.FC = () => {
                 className="pl-10"
               />
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 variant="outline"
                 onClick={handleBulkEmail}
                 disabled={selectedCustomers.size === 0}
+                className="text-xs sm:text-sm"
               >
-                <Mail className="h-4 w-4 mr-2" />
-                Email ({selectedCustomers.size})
+                <Mail className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Email ({selectedCustomers.size})</span>
+                <span className="sm:hidden">({selectedCustomers.size})</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => handleExport('csv')}
+                className="text-xs sm:text-sm"
               >
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
+                <Download className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Export CSV</span>
+                <span className="sm:hidden">CSV</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => handleExport('json')}
+                className="text-xs sm:text-sm"
               >
-                <Download className="h-4 w-4 mr-2" />
-                Export JSON
+                <Download className="h-4 w-4 sm:mr-2" />
+                <span className="hidden sm:inline">Export JSON</span>
+                <span className="sm:hidden">JSON</span>
               </Button>
             </div>
           </div>
@@ -148,8 +154,8 @@ export const CustomersPageEnhanced: React.FC = () => {
           {isLoading ? (
             <div className="text-center py-8">Loading...</div>
           ) : (
-            <div className="rounded-md border">
-              <table className="w-full">
+            <div className="overflow-x-auto rounded-md border">
+              <table className="w-full min-w-[800px]">
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="p-3 text-left">

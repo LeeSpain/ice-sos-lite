@@ -218,7 +218,7 @@ const CustomerProfilePage: React.FC = () => {
     : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6 p-4 md:p-6 overflow-x-hidden">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -253,7 +253,7 @@ const CustomerProfilePage: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
         {/* Left Sidebar */}
         <div className="lg:col-span-1 space-y-4">
           {/* Profile Card */}
@@ -381,18 +381,20 @@ const CustomerProfilePage: React.FC = () => {
         {/* Main Content */}
         <div className="lg:col-span-3">
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid grid-cols-10 w-full">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="personal">Personal</TabsTrigger>
-              <TabsTrigger value="subscription">Subscription</TabsTrigger>
-              <TabsTrigger value="products">Products</TabsTrigger>
-              <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="health">Health</TabsTrigger>
-              <TabsTrigger value="contacts">Contacts</TabsTrigger>
-              <TabsTrigger value="connections">Network</TabsTrigger>
-              <TabsTrigger value="activity">Activity</TabsTrigger>
-              <TabsTrigger value="audit">Audit Log</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto pb-2">
+              <TabsList className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-7 lg:grid-cols-10 w-full min-w-max gap-1">
+                <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+                <TabsTrigger value="personal" className="text-xs sm:text-sm">Personal</TabsTrigger>
+                <TabsTrigger value="subscription" className="text-xs sm:text-sm">Subscription</TabsTrigger>
+                <TabsTrigger value="products" className="text-xs sm:text-sm">Products</TabsTrigger>
+                <TabsTrigger value="services" className="text-xs sm:text-sm">Services</TabsTrigger>
+                <TabsTrigger value="health" className="text-xs sm:text-sm">Health</TabsTrigger>
+                <TabsTrigger value="contacts" className="text-xs sm:text-sm">Contacts</TabsTrigger>
+                <TabsTrigger value="connections" className="text-xs sm:text-sm">Network</TabsTrigger>
+                <TabsTrigger value="activity" className="text-xs sm:text-sm">Activity</TabsTrigger>
+                <TabsTrigger value="audit" className="text-xs sm:text-sm">Audit Log</TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-4">
@@ -403,7 +405,7 @@ const CustomerProfilePage: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Key Metrics */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                     <div className="p-4 border rounded-lg">
                       <p className="text-sm text-muted-foreground">Profile Completion</p>
                       <p className="text-2xl font-bold">{profileCompletion}%</p>

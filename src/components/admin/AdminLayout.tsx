@@ -265,24 +265,24 @@ export default function AdminLayout() {
       <div className="min-h-screen flex w-full">
         <AdminSidebar />
         <div className="flex-1 flex flex-col min-h-screen">
-<header className="h-16 border-b border-border/40 flex items-center px-6 bg-gradient-to-r from-background to-muted/10 backdrop-blur-sm">
-            <div className="flex items-center gap-4">
+          <header className="h-16 border-b border-border/40 flex items-center px-4 md:px-6 bg-gradient-to-r from-background to-muted/10 backdrop-blur-sm">
+            <div className="flex items-center gap-2 md:gap-4">
               <SidebarTrigger className="hover:bg-muted/60 transition-colors" />
               <div className="h-6 w-px bg-border/60" />
               <div>
-                <h1 className="text-xl font-semibold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                <h1 className="text-base sm:text-lg md:text-xl font-semibold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
                   {t('admin.title')}
                 </h1>
-                <p className="text-xs text-muted-foreground">{t('admin.subtitle')}</p>
+                <p className="text-xs text-muted-foreground hidden sm:block">{t('admin.subtitle')}</p>
               </div>
             </div>
-            <div className="ml-auto flex items-center gap-4">
+            <div className="ml-auto flex items-center gap-2 md:gap-4">
               <BlogNotificationBadge />
               <AdminNotificationCenter />
               <LanguageCurrencySelector compact />
             </div>
           </header>
-          <main className="flex-1 p-6 bg-gradient-to-br from-background via-background to-muted/5">
+          <main className="flex-1 p-4 md:p-6 bg-gradient-to-br from-background via-background to-muted/5 overflow-x-hidden">
             {/* Security reminder for Supabase Auth hardening */}
             <div className="max-w-5xl mx-auto mb-4">
               <SupabaseSecurityReminder />

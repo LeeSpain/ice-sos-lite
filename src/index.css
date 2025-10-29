@@ -312,3 +312,14 @@
 .formatted-content td {
   @apply text-foreground;
 }
+
+/* Responsive table utilities */
+@layer components {
+  .responsive-table-container {
+    @apply w-full overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0;
+  }
+  
+  .responsive-table {
+    @apply w-full min-w-[640px];
+  }
+}

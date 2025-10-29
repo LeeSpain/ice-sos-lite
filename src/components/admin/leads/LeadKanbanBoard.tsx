@@ -160,7 +160,8 @@ export const LeadKanbanBoard: React.FC<LeadKanbanBoardProps> = ({
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="flex gap-4 overflow-x-auto pb-4 min-h-screen">
+      <div className="w-full overflow-x-auto pb-4">
+        <div className="flex gap-4 min-w-max min-h-screen">
         {STATUS_COLUMNS.map((column) => {
           const columnLeads = getLeadsByStatus(column.id);
           
@@ -197,6 +198,7 @@ export const LeadKanbanBoard: React.FC<LeadKanbanBoardProps> = ({
             </div>
           );
         })}
+        </div>
       </div>
     </DragDropContext>
   );
