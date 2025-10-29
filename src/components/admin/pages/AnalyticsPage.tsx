@@ -173,15 +173,15 @@ const AnalyticsPage = () => {
 
   return (
     <AdminErrorBoundary>
-      <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="space-y-4 md:space-y-6 p-4 md:p-0 overflow-x-hidden">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Analytics Dashboard</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
             Monitor your ICE SOS platform performance and user engagement
           </p>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline" className="text-xs">
             Last updated: {lastUpdated.toLocaleTimeString()}
           </Badge>
@@ -198,7 +198,7 @@ const AnalyticsPage = () => {
       </div>
 
       {/* Overview Metrics */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">
+      <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
         <MetricCard
           title="Page Views"
           value={lovableData?.pageViews || 0}
@@ -234,27 +234,29 @@ const AnalyticsPage = () => {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="health">Health Check</TabsTrigger>
-          <TabsTrigger value="pages">Page Analytics</TabsTrigger>
-          <TabsTrigger value="contacts">Contacts</TabsTrigger>
-          <TabsTrigger value="geographic">Geographic</TabsTrigger>
-          <TabsTrigger value="traffic">Traffic Sources</TabsTrigger>
-          <TabsTrigger value="devices">Devices</TabsTrigger>
-          <TabsTrigger value="popups">Popups</TabsTrigger>
-          <TabsTrigger value="hourly">24-Hour View</TabsTrigger>
-          <TabsTrigger value="events">Custom Events</TabsTrigger>
-          <TabsTrigger value="journeys">User Journeys</TabsTrigger>
-          <TabsTrigger value="real-time">Real-time</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-2">
+          <TabsList className="inline-flex min-w-max">
+            <TabsTrigger value="overview" className="text-xs sm:text-sm">Overview</TabsTrigger>
+            <TabsTrigger value="health" className="text-xs sm:text-sm">Health</TabsTrigger>
+            <TabsTrigger value="pages" className="text-xs sm:text-sm">Pages</TabsTrigger>
+            <TabsTrigger value="contacts" className="text-xs sm:text-sm">Contacts</TabsTrigger>
+            <TabsTrigger value="geographic" className="text-xs sm:text-sm">Geographic</TabsTrigger>
+            <TabsTrigger value="traffic" className="text-xs sm:text-sm">Traffic</TabsTrigger>
+            <TabsTrigger value="devices" className="text-xs sm:text-sm">Devices</TabsTrigger>
+            <TabsTrigger value="popups" className="text-xs sm:text-sm">Popups</TabsTrigger>
+            <TabsTrigger value="hourly" className="text-xs sm:text-sm">24-Hour</TabsTrigger>
+            <TabsTrigger value="events" className="text-xs sm:text-sm">Events</TabsTrigger>
+            <TabsTrigger value="journeys" className="text-xs sm:text-sm">Journeys</TabsTrigger>
+            <TabsTrigger value="real-time" className="text-xs sm:text-sm">Live</TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="health" className="space-y-4">
           <AnalyticsHealthCheck />
         </TabsContent>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             <MetricCard
               title="Bounce Rate"
               value={sessionMetrics?.bounceRate || 0}
@@ -275,7 +277,7 @@ const AnalyticsPage = () => {
           </div>
 
           {/* Additional Metrics */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             <MetricCard
               title="Total Contacts"
               value={contactData?.totalContacts || 0}
@@ -340,7 +342,7 @@ const AnalyticsPage = () => {
                         <h4 className="font-medium">{page.page}</h4>
                         <Badge variant="outline">{page.views} views</Badge>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
                           <p className="text-muted-foreground">Views</p>
                           <p className="font-medium">{page.views}</p>
@@ -477,7 +479,7 @@ const AnalyticsPage = () => {
         </TabsContent>
 
         <TabsContent value="events" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
             <InteractionAnalyticsCard timeRange={timeRange} />
             <Card>
               <CardHeader>
@@ -536,7 +538,7 @@ const AnalyticsPage = () => {
                 <p className="text-sm text-muted-foreground">Loading real-time data...</p>
               ) : (
                 <>
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
                     <div className="space-y-2">
                       <p className="text-sm text-muted-foreground">Active Users</p>
                       <p className="text-3xl font-bold text-emerald-600">{activeUsers?.activeUsers || 0}</p>
