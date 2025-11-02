@@ -73,8 +73,8 @@
     "titlePart2": "Assistant",
     "description": "ICE SOS Lite provides multilingual emergency protection with AI Guardian, professional call center access, and family connectivity — globally available.",
     "ctaJoin": "Join Today",
-    "ctaTalk": "Talk To Emma",
-    "meetEmma": "Meet Emma"
+    "ctaTalk": "Talk To Clara",
+    "meetClara": "Meet Clara"
   },
   "features": {
     "familyTracker": "Family Tracker",
@@ -144,12 +144,12 @@
     }
   },
   "appDownload": {
-    "title": "Meet Emma - Your AI Assistant",
+    "title": "Meet Clara - Your AI Assistant",
     "subtitle": "Experience the future of emergency support with intelligent AI assistance",
     "platformBadge": "AI POWERED",
-    "appName": "Emma AI Assistant",
+    "appName": "Clara AI Assistant",
     "heroDescription": "Advanced AI technology that understands your needs, learns from interactions, and provides instant, intelligent emergency support 24/7.",
-    "cta": "Talk to Emma",
+    "cta": "Talk to Clara",
     "features": {
       "intelligentSupport": { "title": "Intelligent Support", "description": "Natural language processing for instant help and emergency assistance" },
       "learningAI": { "title": "Learning AI", "description": "Gets smarter over time, adapting to your specific needs and preferences" },
@@ -378,7 +378,7 @@
     "videoAnalytics": "Video Analytics",
     "revenueAnalytics": "Revenue Analytics",
     "userGrowth": "User Growth",
-    "emmaAiAgent": "Emma AI Agent",
+    "claraAiAgent": "Clara AI Agent",
     "rivenMarketingAi": "Riven Marketing AI",
     "allCustomers": "All Customers",
     "subscriptions": "Subscriptions",
@@ -439,10 +439,10 @@
     "iceAdmin": "ICE SOS Admin",
     "managementDashboard": "Management Dashboard"
   },
-  "emma": {
-    "title": "Emma AI Assistant",
-    "greeting": "👋 Hi {{userName}}! I'm Emma, your AI assistant. I'm here to help you with your emergency protection registration. How can I assist you today?",
-    "placeholder": "Ask Emma about emergency protection...",
+  "clara": {
+    "title": "Clara AI Assistant",
+    "greeting": "👋 Hi {{userName}}! I'm Clara, your AI assistant. I'm here to help you with your emergency protection registration. How can I assist you today?",
+    "placeholder": "Ask Clara about emergency protection...",
     "error": {
       "title": "Error",
       "description": "Failed to send message. Please try again."
@@ -574,7 +574,7 @@
     "dad": "Dad",
     "mom": "Mom",
     "grandma": "Grandma",
-    "emma": "Emma"
+    "clara": "Clara"
   },
   "deviceStatus": {
     "deviceBattery": "Device Battery",

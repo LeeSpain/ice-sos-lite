@@ -65,8 +65,8 @@
     "titlePart2": "",
     "description": "ICE SOS Lite proporciona protección de emergencia multilingüe con AI Guardian, acceso al centro de llamadas profesional y conectividad familiar — disponible globalmente.",
     "ctaJoin": "Únete hoy",
-    "ctaTalk": "Hablar con Emma",
-    "meetEmma": "Conoce a Emma"
+    "ctaTalk": "Hablar con Clara",
+    "meetClara": "Conoce a Clara"
   },
   "features": {
     "familyTracker": "Rastreador Familiar",
@@ -364,10 +364,10 @@
     "confidentialityDesc": "Todas las llamadas se graban por seguridad y formación. Los datos personales se tratan según nuestra Política de Privacidad.",
     "noEmergency": "Si estás en peligro inmediato, llama al 112 (número de emergencia de España)."
   },
-  "emma": {
-    "title": "Asistente IA Emma",
-    "greeting": "👋 ¡Hola {{userName}}! Soy Emma, tu asistente IA. Estoy aquí para ayudarte con tu registro de protección de emergencia. ¿Cómo puedo ayudarte hoy?",
-    "placeholder": "Pregúntale a Emma sobre protección de emergencia...",
+  "clara": {
+    "title": "Asistente IA Clara",
+    "greeting": "👋 ¡Hola {{userName}}! Soy Clara, tu asistente IA. Estoy aquí para ayudarte con tu registro de protección de emergencia. ¿Cómo puedo ayudarte hoy?",
+    "placeholder": "Pregúntale a Clara sobre protección de emergencia...",
     "error": {
       "title": "Error",
       "description": "Error al enviar el mensaje. Por favor, inténtalo de nuevo."

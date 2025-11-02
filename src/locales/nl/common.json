@@ -65,8 +65,8 @@
     "titlePart2": "Assistent",
     "description": "ICE SOS Lite biedt meertalige noodbescherming met AI Guardian, professionele callcenter toegang en familieconnectiviteit — wereldwijd beschikbaar.",
     "ctaJoin": "Doe vandaag mee",
-    "ctaTalk": "Praat met Emma",
-    "meetEmma": "Ontmoet Emma"
+    "ctaTalk": "Praat met Clara",
+    "meetClara": "Ontmoet Clara"
   },
   "features": {
     "familyTracker": "Familie Tracker",
@@ -306,10 +306,10 @@
       "description": "Gespecialiseerde noodhulp voor Spanje met lokale taalondersteuning en 24/7 beschikbaarheid."
     }
   },
-  "emma": {
-    "title": "Emma AI Assistent",
-    "greeting": "👋 Hallo {{userName}}! Ik ben Emma, je AI-assistent. Ik ben hier om je te helpen met je noodbeschermingsregistratie. Hoe kan ik je vandaag helpen?",
-    "placeholder": "Vraag Emma over noodbescherming...",
+  "clara": {
+    "title": "Clara AI Assistent",
+    "greeting": "👋 Hallo {{userName}}! Ik ben Clara, je AI-assistent. Ik ben hier om je te helpen met je noodbeschermingsregistratie. Hoe kan ik je vandaag helpen?",
+    "placeholder": "Vraag Clara over noodbescherming...",
     "error": {
       "title": "Fout",
       "description": "Bericht verzenden mislukt. Probeer het opnieuw."
@@ -359,7 +359,7 @@
     "videoAnalytics": "Video Analytics",
     "revenueAnalytics": "Omzet Analytics",
     "userGrowth": "Gebruikersgroei",
-    "emmaAiAgent": "Emma AI Agent",
+    "claraAiAgent": "Clara AI Agent",
     "rivenMarketingAi": "Riven Marketing AI",
     "allCustomers": "Alle Klanten",
     "subscriptions": "Abonnementen",

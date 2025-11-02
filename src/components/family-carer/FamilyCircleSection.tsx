@@ -28,9 +28,9 @@ const TestimonialCarousel: React.FC = () => {
     },
     {
       id: 3,
-      name: "Emma K.",
+      name: "Sophie K.",
       role: "Granddaughter",
-      avatar: "/emma-avatar.png",
+      avatar: "/clara-avatar.png",
       gradient: "from-secondary to-secondary/80",
       border: "border-secondary/10",
       text: "Grandma loves that she can see where all of us are and know we're safe. It's become more than an emergency system - it's brought our family closer together."
@@ -295,13 +295,13 @@ export const FamilyCircleSection: React.FC = () => {
               <div className="relative group hover:scale-110 transition-transform duration-300">
                 <div className="w-18 h-18 bg-white/20 backdrop-blur-md rounded-full border-3 border-white/50 shadow-xl flex items-center justify-center overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-wellness/20 to-primary/10 rounded-full"></div>
-                  <img src="/emma-avatar.png" alt="Grandchild" className="w-14 h-14 object-cover rounded-full relative z-10" />
+                  <img src="/clara-avatar.png" alt="Grandchild" className="w-14 h-14 object-cover rounded-full relative z-10" />
                   
                   {/* Online status indicator */}
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
                 </div>
                 <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full shadow-lg text-xs font-medium">
-                  Emma
+                  Sophie
                 </div>
                 <Badge className="absolute -top-4 -right-4 text-xs px-3 py-1 bg-primary/90 text-white shadow-lg">
                   Family

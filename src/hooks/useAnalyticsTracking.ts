@@ -81,7 +81,7 @@ export function useAnalyticsTracking() {
       category: 'engagement',
       action,
       context,
-      chat_type: 'emma_ai'
+      chat_type: 'clara_ai'
     });
   };
 

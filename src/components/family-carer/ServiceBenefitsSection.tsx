@@ -60,7 +60,7 @@ export const ServiceBenefitsSection = () => {
                 <h4 className="text-xl font-bold text-foreground mb-3 text-center">Family Alerted</h4>
                 <div className="bg-primary/10 rounded-xl p-4 border border-primary/20">
                   <p className="text-sm text-foreground font-medium mb-2">00:03 - Notifications sent</p>
-                  <p className="text-xs text-muted-foreground">Sarah, Mike, Emma all notified</p>
+                  <p className="text-xs text-muted-foreground">Sarah, Mike, David all notified</p>
                 </div>
               </div>
 

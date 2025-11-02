@@ -183,7 +183,7 @@ export default function AITrainingPage() {
     }
   };
 
-  const testEmmaConnection = async () => {
+  const testClaraConnection = async () => {
     if (!testMessage.trim()) return;
 
     try {
@@ -201,16 +201,16 @@ export default function AITrainingPage() {
       if (error) throw error;
 
       toast({
-        title: "✅ Emma Connection Test Successful",
-        description: `Emma responded: "${data.response?.slice(0, 100)}..."`,
+        title: "✅ Clara Connection Test Successful",
+        description: `Clara responded: "${data.response?.slice(0, 100)}..."`,
       });
 
       setTestMessage('');
     } catch (error) {
-      console.error('Error testing Emma:', error);
+      console.error('Error testing Clara:', error);
       toast({
-        title: "❌ Emma Connection Test Failed",
-        description: "Unable to connect to Emma. Check the AI Chat edge function.",
+        title: "❌ Clara Connection Test Failed",
+        description: "Unable to connect to Clara. Check the AI Chat edge function.",
         variant: "destructive"
       });
     } finally {
@@ -268,7 +268,7 @@ export default function AITrainingPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">🎓 AI Training Data</h1>
-          <p className="text-muted-foreground">Manage Emma's knowledge base and training examples</p>
+          <p className="text-muted-foreground">Manage Clara's knowledge base and training examples</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline">
@@ -349,7 +349,7 @@ export default function AITrainingPage() {
                 <Input 
                   value={newQuestion}
                   onChange={(e) => setNewQuestion(e.target.value)}
-                  placeholder="What question should Emma be able to answer?"
+                  placeholder="What question should Clara be able to answer?"
                 />
               </div>
               
@@ -375,7 +375,7 @@ export default function AITrainingPage() {
                 <Textarea 
                   value={newAnswer}
                   onChange={(e) => setNewAnswer(e.target.value)}
-                  placeholder="How should Emma respond to this question?"
+                  placeholder="How should Clara respond to this question?"
                   rows={4}
                 />
               </div>
@@ -551,32 +551,32 @@ export default function AITrainingPage() {
         </CardContent>
       </Card>
 
-      {/* Test Emma Connection */}
+      {/* Test Clara Connection */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
-            Test Emma Connection
+            Test Clara Connection
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Test if Emma can use the training data you've added. Try asking a question that should be covered by your training examples.
+              Test if Clara can use the training data you've added. Try asking a question that should be covered by your training examples.
             </p>
             <div className="flex gap-2">
               <Input
                 value={testMessage}
                 onChange={(e) => setTestMessage(e.target.value)}
-                placeholder="Ask Emma a question to test the training data..."
-                onKeyPress={(e) => e.key === 'Enter' && testEmmaConnection()}
+                placeholder="Ask Clara a question to test the training data..."
+                onKeyPress={(e) => e.key === 'Enter' && testClaraConnection()}
                 disabled={testLoading}
               />
               <Button 
-                onClick={testEmmaConnection}
+                onClick={testClaraConnection}
                 disabled={!testMessage.trim() || testLoading}
               >
-                {testLoading ? 'Testing...' : 'Test Emma'}
+                {testLoading ? 'Testing...' : 'Test Clara'}
               </Button>
             </div>
           </div>
@@ -605,7 +605,7 @@ export default function AITrainingPage() {
             <div className="text-center p-6 rounded-lg bg-green-50 border border-green-200">
               <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
               <h3 className="font-semibold text-green-900 mb-1">Active Training</h3>
-              <p className="text-sm text-green-700">{stats.active} examples ready for Emma</p>
+              <p className="text-sm text-green-700">{stats.active} examples ready for Clara</p>
             </div>
             
             <div className="text-center p-6 rounded-lg bg-yellow-50 border border-yellow-200">

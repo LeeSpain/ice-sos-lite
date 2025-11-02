@@ -345,7 +345,7 @@ export function useCustomEvents() {
           'Emergency SOS Button Clicked': 0,
           'Registration Completed': 0,
           'Subscription Purchased': 0,
-          'Emma Chat Interaction': 0,
+          'Clara Chat Interaction': 0,
           'Family Member Invited': 0
         };
 
@@ -361,7 +361,7 @@ export function useCustomEvents() {
               eventCounts['Subscription Purchased']++;
               break;
             case 'chat_interaction':
-              eventCounts['Emma Chat Interaction']++;
+              eventCounts['Clara Chat Interaction']++;
               break;
             case 'family_invite':
               eventCounts['Family Member Invited']++;
@@ -380,7 +380,7 @@ export function useCustomEvents() {
           { event: 'Emergency SOS Button Clicked', count: 0, trend: '0.0%' },
           { event: 'Registration Completed', count: 0, trend: '0.0%' },
           { event: 'Subscription Purchased', count: 0, trend: '0.0%' },
-          { event: 'Emma Chat Interaction', count: 0, trend: '0.0%' },
+          { event: 'Clara Chat Interaction', count: 0, trend: '0.0%' },
           { event: 'Family Member Invited', count: 0, trend: '0.0%' }
         ];
       }

@@ -10,9 +10,9 @@ export interface Video {
 
 export const VIDEO_CATALOG: Video[] = [
   {
-    id: 'meet-emma',
-    title: 'Meet Emma',
-    description: 'Meet Emma, your AI assistant ready to help you',
+    id: 'meet-clara',
+    title: 'Meet Clara',
+    description: 'Meet Clara, your AI assistant ready to help you',
     youtubeId: 'VC01cLzxjo4',
     available: true,
     category: 'introduction',

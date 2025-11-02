@@ -91,7 +91,7 @@ const AIAgentPage: React.FC = () => {
     is_active: true
   });
 
-  const [emmaMetrics] = useState({
+  const [claraMetrics] = useState({
     total_conversations: 1234,
     avg_response_time: 2.3,
     satisfaction_score: 4.8,
@@ -181,7 +181,7 @@ const AIAgentPage: React.FC = () => {
         if (error) throw error;
       }
 
-      toast({ title: 'Settings Saved', description: 'Emma\'s AI settings updated successfully.' });
+      toast({ title: 'Settings Saved', description: 'Clara\'s AI settings updated successfully.' });
     } catch (error) {
       console.error('Error saving AI settings:', error);
       toast({ title: 'Error', description: 'Failed to save AI settings.', variant: 'destructive' });
@@ -195,7 +195,7 @@ const AIAgentPage: React.FC = () => {
       <div className="space-y-6">
         <div className="flex items-center gap-2">
           <Bot className="h-6 w-6 text-primary animate-pulse" />
-          <h1 className="text-2xl font-bold">Loading Emma AI Agent...</h1>
+          <h1 className="text-2xl font-bold">Loading Clara AI Agent...</h1>
         </div>
       </div>
     );
@@ -209,14 +209,14 @@ const AIAgentPage: React.FC = () => {
             <Bot className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Emma AI Agent</h1>
+            <h1 className="text-2xl font-bold">Clara AI Agent</h1>
             <p className="text-muted-foreground">Complete AI assistant management - settings, training, and performance</p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => window.open('/#chat', '_blank')}>
             <MessageSquare className="h-4 w-4 mr-2" />
-            Test Emma Chat
+            Test Clara Chat
           </Button>
           <Button variant="outline">
             <Activity className="h-4 w-4 mr-2" />
@@ -242,7 +242,7 @@ const AIAgentPage: React.FC = () => {
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                   <div className="ml-2">
                     <p className="text-sm font-medium text-muted-foreground">Total Conversations</p>
-                    <p className="text-2xl font-bold">{emmaMetrics.total_conversations.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">{claraMetrics.total_conversations.toLocaleString()}</p>
                   </div>
                 </div>
               </CardContent>
@@ -253,7 +253,7 @@ const AIAgentPage: React.FC = () => {
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <div className="ml-2">
                     <p className="text-sm font-medium text-muted-foreground">Avg Response Time</p>
-                    <p className="text-2xl font-bold">{emmaMetrics.avg_response_time}s</p>
+                    <p className="text-2xl font-bold">{claraMetrics.avg_response_time}s</p>
                   </div>
                 </div>
               </CardContent>
@@ -264,7 +264,7 @@ const AIAgentPage: React.FC = () => {
                   <Sparkles className="h-4 w-4 text-muted-foreground" />
                   <div className="ml-2">
                     <p className="text-sm font-medium text-muted-foreground">Satisfaction Score</p>
-                    <p className="text-2xl font-bold">{emmaMetrics.satisfaction_score}/5</p>
+                    <p className="text-2xl font-bold">{claraMetrics.satisfaction_score}/5</p>
                   </div>
                 </div>
               </CardContent>
@@ -275,7 +275,7 @@ const AIAgentPage: React.FC = () => {
                   <CheckCircle className="h-4 w-4 text-muted-foreground" />
                   <div className="ml-2">
                     <p className="text-sm font-medium text-muted-foreground">Resolution Rate</p>
-                    <p className="text-2xl font-bold">{emmaMetrics.resolution_rate}%</p>
+                    <p className="text-2xl font-bold">{claraMetrics.resolution_rate}%</p>
                   </div>
                 </div>
               </CardContent>
@@ -286,7 +286,7 @@ const AIAgentPage: React.FC = () => {
                   <Users className="h-4 w-4 text-muted-foreground" />
                   <div className="ml-2">
                     <p className="text-sm font-medium text-muted-foreground">Active Sessions</p>
-                    <p className="text-2xl font-bold">{emmaMetrics.active_sessions}</p>
+                    <p className="text-2xl font-bold">{claraMetrics.active_sessions}</p>
                   </div>
                 </div>
               </CardContent>
@@ -300,9 +300,9 @@ const AIAgentPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Settings className="h-5 w-5" />
-                Emma's AI Model Configuration
+                Clara's AI Model Configuration
               </CardTitle>
-              <CardDescription>Configure Emma's AI behavior and model settings</CardDescription>
+              <CardDescription>Configure Clara's AI behavior and model settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -360,7 +360,7 @@ const AIAgentPage: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                Emma's Performance Analytics
+                Clara's Performance Analytics
               </CardTitle>
             </CardHeader>
             <CardContent>

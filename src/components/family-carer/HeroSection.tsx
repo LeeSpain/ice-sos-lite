@@ -110,7 +110,7 @@ export const HeroSection = () => {
                         <div className="w-4 h-4 bg-emergency rounded-full animate-pulse"></div>
                         <span className="font-semibold text-emergency">SOS Alert Active</span>
                       </div>
-                      <p className="text-sm text-gray-700">Emma needs help - Location shared</p>
+                      <p className="text-sm text-gray-700">Sarah needs help - Location shared</p>
                     </div>
 
                     <div className="space-y-3 mb-6">
