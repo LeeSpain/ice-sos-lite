@@ -226,7 +226,7 @@ const handler = async (req: Request): Promise<Response> => {
           
           <p>If you have any urgent emergency needs, please remember that ICE SOS Lite is designed to complement, not replace, traditional emergency services. In life-threatening situations, always contact your local emergency services (911, 112, etc.) immediately.</p>
           
-          <p>For immediate assistance with our app, you can also use our AI assistant Emma directly in the application.</p>
+          <p>For immediate assistance with our app, you can also use our AI assistant Clara directly in the application.</p>
           
           <p>Best regards,<br>
           The ICE SOS Lite Support Team</p>

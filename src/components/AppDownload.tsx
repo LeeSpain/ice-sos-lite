@@ -4,12 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Check, Download, Smartphone, Brain, MessageCircle, Zap, Star, Phone, Mic, Users, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
-import { useEmmaChat } from "@/contexts/EmmaChatContext";
+import { useClaraChat } from "@/contexts/ClaraChatContext";
 import { useTranslation } from 'react-i18next';
 
 const AppDownload = () => {
   const { t } = useTranslation();
-  const { openEmmaChat } = useEmmaChat();
+  const { openClaraChat } = useClaraChat();
   return (
     <section className="py-section bg-gradient-to-br from-primary/5 via-secondary/5 to-wellness/5">
       <div className="container mx-auto px-4">
@@ -26,7 +26,7 @@ const AppDownload = () => {
         {/* Main Content Grid */}
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Emma AI Visual */}
+            {/* Left Side - Clara AI Visual */}
             <div className="relative">
               {/* AI Chat Interface Mockup */}
               <div className="relative mx-auto w-80 h-[600px] bg-gradient-to-b from-slate-900 to-slate-800 rounded-[3rem] p-2 shadow-2xl">
@@ -35,7 +35,7 @@ const AppDownload = () => {
                   <div className="flex justify-between items-center px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white text-sm font-medium">
                     <div className="flex items-center gap-2">
                       <Brain className="h-4 w-4" />
-                      <span className="font-bold">Emma AI</span>
+                      <span className="font-bold">Clara AI</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <div className="flex gap-0.5">
@@ -56,7 +56,7 @@ const AppDownload = () => {
                           <Brain className="h-4 w-4 text-white" />
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-gray-900">Emma</p>
+                          <p className="text-sm font-semibold text-gray-900">Clara</p>
                           <div className="flex items-center gap-1">
                             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                             <span className="text-xs text-green-600">{t('common.activeNow')}</span>
@@ -82,8 +82,8 @@ const AppDownload = () => {
                         <Brain className="h-3 w-3 text-white" />
                       </div>
                       <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl rounded-tl-sm p-3 max-w-[200px] shadow-sm border border-primary/20">
-                        <p className="text-xs font-medium text-primary mb-1">Emma AI</p>
-                        <p className="text-sm text-gray-800">👋 Hi! I'm Emma, your intelligent AI assistant. I'm here to help with emergency setup, family connections, and answer any questions!</p>
+                        <p className="text-xs font-medium text-primary mb-1">Clara AI</p>
+                        <p className="text-sm text-gray-800">👋 Hi! I'm Clara, your intelligent AI assistant. I'm here to help with emergency setup, family connections, and answer any questions!</p>
                         <p className="text-xs text-gray-500 mt-2">{t('common.justNow')}</p>
                       </div>
                     </div>
@@ -121,13 +121,13 @@ const AppDownload = () => {
                       </div>
                     </div>
 
-                    {/* Emma's Response with Typing */}
+                    {/* Clara's Response with Typing */}
                     <div className="flex items-start space-x-3">
                       <div className="w-7 h-7 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center flex-shrink-0">
                         <Brain className="h-3 w-3 text-white" />
                       </div>
                       <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl rounded-tl-sm p-3 max-w-[200px] shadow-sm border border-primary/20">
-                        <p className="text-xs font-medium text-primary mb-1">Emma AI</p>
+                        <p className="text-xs font-medium text-primary mb-1">Clara AI</p>
                         <p className="text-sm text-gray-800">I'll guide you through adding family members step by step. It's really simple! 🚀</p>
                         <div className="mt-3 flex space-x-1">
                           <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
@@ -221,14 +221,14 @@ const AppDownload = () => {
                   <Button 
                     size="xl" 
                     className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-bold px-8 py-4 shadow-glow hover:shadow-xl transition-all duration-300 rounded-xl relative z-10"
-                    onClick={openEmmaChat}
+                    onClick={openClaraChat}
                   >
                     <MessageCircle className="h-5 w-5 mr-2" />
                     {t('appDownload.cta')}
                   </Button>
                 </div>
                 <IntroVideoModal 
-                  defaultVideoId="meet-emma"
+                  defaultVideoId="meet-clara"
                   trigger={
                     <Button 
                       size="xl" 

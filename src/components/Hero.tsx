@@ -11,16 +11,16 @@ const heroImage = '/lovable-uploads/141f77cc-c074-48dc-95f1-f886baacd2da.png?v=1
 
 
 interface HeroProps {
-  onEmmaClick?: () => void;
+  onClaraClick?: () => void;
 }
 
-const Hero = ({ onEmmaClick }: HeroProps) => {
+const Hero = ({ onClaraClick }: HeroProps) => {
   const { t } = useTranslation();
   const { trackButtonClick, trackVideoInteraction } = useInteractionTracking();
 
-  const handleEmmaClick = () => {
-    trackButtonClick('cta', 'Talk to Emma', { category: 'hero', interaction_type: 'chat_open' });
-    onEmmaClick?.();
+  const handleClaraClick = () => {
+    trackButtonClick('cta', 'Talk to Clara', { category: 'hero', interaction_type: 'chat_open' });
+    onClaraClick?.();
   };
 
   const handleJoinNowClick = () => {
@@ -28,7 +28,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
   };
 
   const handleVideoClick = () => {
-    trackVideoInteraction('video_modal_open', 'meet-emma', 'Meet Emma');
+    trackVideoInteraction('video_modal_open', 'meet-clara', 'Meet Clara');
   };
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden bg-gradient-hero shadow-2xl">
@@ -66,19 +66,19 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                 </Link>
               </Button>
               
-              {/* Emma Chat Button */}
+              {/* Clara Chat Button */}
               <Button 
                 size="xl" 
                 className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
-                onClick={handleEmmaClick}
+                onClick={handleClaraClick}
               >
                 <Heart className="h-5 w-5 mr-2" />
                 {t('hero.ctaTalk')}
               </Button>
               
-              {/* Meet Emma Video */}
+              {/* Meet Clara Video */}
               <IntroVideoModal 
-                defaultVideoId="meet-emma"
+                defaultVideoId="meet-clara"
                 trigger={
                   <Button 
                     size="xl" 
@@ -87,7 +87,7 @@ const Hero = ({ onEmmaClick }: HeroProps) => {
                     onClick={handleVideoClick}
                   >
                     <Play className="h-5 w-5 mr-2" />
-                    {t('hero.meetEmma')}
+                    {t('hero.meetClara')}
                   </Button>
                 }
               />

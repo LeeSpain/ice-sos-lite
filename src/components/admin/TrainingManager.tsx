@@ -34,7 +34,7 @@ interface TrainingManagerProps {
 const categories = ['general', 'product', 'pricing', 'features', 'support', 'technical'];
 const audiences = ['customer', 'internal', 'admin'] as const;
 
-export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma's Training Data & Knowledge Base", compact = false }) => {
+export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Clara's Training Data & Knowledge Base", compact = false }) => {
   const [trainingData, setTrainingData] = useState<TrainingData[]>([]);
   const [filteredData, setFilteredData] = useState<TrainingData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -246,7 +246,7 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium">Question</label>
-                <Input value={newQuestion} onChange={(e) => setNewQuestion(e.target.value)} placeholder="What question should Emma answer?" />
+                <Input value={newQuestion} onChange={(e) => setNewQuestion(e.target.value)} placeholder="What question should Clara answer?" />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
@@ -285,7 +285,7 @@ export const TrainingManager: React.FC<TrainingManagerProps> = ({ title = "Emma'
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium">Answer</label>
-                <Textarea value={newAnswer} onChange={(e) => setNewAnswer(e.target.value)} rows={4} placeholder="How should Emma respond?" />
+                <Textarea value={newAnswer} onChange={(e) => setNewAnswer(e.target.value)} rows={4} placeholder="How should Clara respond?" />
               </div>
               <Button onClick={addTrainingData} className="w-full">
                 <Plus className="h-4 w-4 mr-2" /> Add Training Example

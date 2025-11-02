@@ -223,7 +223,7 @@ async function generateAIReply(emailContent: string, senderEmail: string): Promi
       messages: [
         {
           role: 'system',
-          content: `You are Emma, the AI assistant for ICE SOS, a personal safety and emergency response platform. 
+          content: `You are Clara, the AI assistant for ICE SOS, a personal safety and emergency response platform. 
           
           Respond professionally and helpfully to customer emails. Key points:
           - ICE SOS provides 24/7 emergency response, GPS tracking, and family safety networks

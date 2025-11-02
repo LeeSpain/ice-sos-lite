@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { PageSEO } from '@/components/PageSEO';
 import { usePerformanceMonitoring } from "@/hooks/usePerformanceMonitoring";
 import { preloadCriticalImages } from "@/utils/imageOptimization";
-import { useEmmaChat } from "@/contexts/EmmaChatContext";
+import { useClaraChat } from "@/contexts/ClaraChatContext";
 import { FirstVisitPreferencesModal } from "@/components/FirstVisitPreferencesModal";
 import StructuredData from '@/components/StructuredData';
 import AIBusinessProfile from '@/components/AIBusinessProfile';
@@ -28,7 +28,7 @@ const Index = () => {
   useScrollToTop();
   usePerformanceMonitoring();
   const { t } = useTranslation();
-  const { openEmmaChat } = useEmmaChat();
+  const { openClaraChat } = useClaraChat();
 
   // Preload critical images
   useEffect(() => {
@@ -47,7 +47,7 @@ const Index = () => {
       <FirstVisitPreferencesModal />
       <Navigation />
 
-      <Hero onEmmaClick={openEmmaChat} />
+      <Hero onClaraClick={openClaraChat} />
       
       
       <Features />

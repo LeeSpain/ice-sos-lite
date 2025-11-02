@@ -31,8 +31,8 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: t('emma.greeting', { 
-        defaultValue: `👋 Hi {{userName}}! I'm Emma, your AI assistant. I'm here to help you with your emergency protection registration. How can I assist you today?`,
+      content: t('clara.greeting', { 
+        defaultValue: `👋 Hi {{userName}}! I'm Clara, your AI assistant. I'm here to help you with your emergency protection registration. How can I assist you today?`,
         userName 
       }),
       isUser: false,
@@ -98,7 +98,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
       trackChatInteraction('error', context, 0);
       toast({
         title: t('chatWidget.connectionErrorTitle', { defaultValue: 'Connection Error' }),
-        description: t('chatWidget.connectionErrorDesc', { defaultValue: 'Unable to connect to Emma. Please try again.' }),
+        description: t('chatWidget.connectionErrorDesc', { defaultValue: 'Unable to connect to Clara. Please try again.' }),
         variant: "destructive"
       });
       
@@ -132,7 +132,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
               <MessageCircle className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <CardTitle className="text-lg truncate">{t('emma.title', { defaultValue: 'Emma AI Assistant' })}</CardTitle>
+              <CardTitle className="text-lg truncate">{t('clara.title', { defaultValue: 'Clara AI Assistant' })}</CardTitle>
               <p className="text-xs text-white/80 truncate">{t('chatWidget.headerSubtitle', { defaultValue: 'Emergency Protection Guide' })}</p>
             </div>
           </div>
@@ -184,7 +184,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
                 <div className="flex justify-start">
                   <div className="bg-muted p-3 rounded-lg flex items-center space-x-2 max-w-[85%]">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    <span className="text-sm">{t('chatWidget.thinking', { defaultValue: 'Emma is thinking...' })}</span>
+                    <span className="text-sm">{t('chatWidget.thinking', { defaultValue: 'Clara is thinking...' })}</span>
                   </div>
                 </div>
               )}
@@ -198,7 +198,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={t('emma.placeholder', { defaultValue: 'Ask Emma about emergency protection...' })}
+                placeholder={t('clara.placeholder', { defaultValue: 'Ask Clara about emergency protection...' })}
                 disabled={isLoading}
                 className="flex-1 min-w-0"
               />
@@ -212,7 +212,7 @@ const ChatWidget: React.FC<ChatWidgetProps> = ({ isOpen, onClose, userName = "Us
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              {t('chatWidget.footerNote', { defaultValue: 'Emma can help with registration, plans, and emergency features' })}
+              {t('chatWidget.footerNote', { defaultValue: 'Clara can help with registration, plans, and emergency features' })}
             </p>
           </div>
         </CardContent>

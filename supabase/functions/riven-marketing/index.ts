@@ -536,7 +536,7 @@ async function processMarketingCommand(command: string, userId: string, supabase
     let analysis = null;
     
     try {
-      // Get company info from Emma AI (fast operation)
+      // Get company info from Clara AI (fast operation)
       if (workflowId) await updateWorkflowStep(workflowId, 'retrieving_company_data', 'in_progress', supabase);
       const companyInfo = await getCompanyInfo(supabase);
       if (workflowId) await updateWorkflowStep(workflowId, 'retrieving_company_data', 'completed', supabase);

@@ -68,7 +68,7 @@ const useAdminMenuItems = () => {
     {
       title: t('admin.aiMarketing'), 
       items: [
-        { title: t('admin.emmaAiAgent'), url: "/admin-dashboard/ai-agent", icon: Bot },
+        { title: t('admin.claraAiAgent'), url: "/admin-dashboard/ai-agent", icon: Bot },
         { title: t('admin.rivenMarketingAi'), url: "/admin-dashboard/riven-marketing", icon: Brain },
         { title: t('admin.aiPerformance'), url: "/admin-dashboard/ai-metrics", icon: BarChart3 },
       ]

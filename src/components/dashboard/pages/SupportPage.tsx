@@ -35,7 +35,7 @@ export function SupportPage() {
   const [messages, setMessages] = useState([
     {
       id: '1',
-      content: `👋 Hi ${user?.user_metadata?.first_name || user?.email?.split('@')[0] || "there"}! I'm Emma, your AI assistant. I'm here to help you with your emergency protection questions. How can I assist you today?`,
+      content: `👋 Hi ${user?.user_metadata?.first_name || user?.email?.split('@')[0] || "there"}! I'm Clara, your AI assistant. I'm here to help you with your emergency protection questions. How can I assist you today?`,
       isUser: false,
       timestamp: new Date()
     }
@@ -90,7 +90,7 @@ export function SupportPage() {
       console.error('Error sending message:', error);
       toast({
         title: "Connection Error",
-        description: "Unable to connect to Emma. Please try again.",
+        description: "Unable to connect to Clara. Please try again.",
         variant: "destructive"
       });
       
@@ -283,15 +283,15 @@ export function SupportPage() {
         <p className="text-muted-foreground">Get help with your account, devices, and emergency services</p>
       </div>
 
-      {/* Emma AI Assistant - Embedded Chat */}
+      {/* Clara AI Assistant - Embedded Chat */}
       <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-emergency/5">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="h-6 w-6 text-primary" />
-            Chat with Emma AI Assistant
+            Chat with Clara AI Assistant
           </CardTitle>
           <CardDescription>
-            Get instant help from Emma, our AI assistant specialized in emergency protection and account support
+            Get instant help from Clara, our AI assistant specialized in emergency protection and account support
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -324,7 +324,7 @@ export function SupportPage() {
                 <div className="flex justify-start">
                   <div className="bg-muted p-3 rounded-lg flex items-center space-x-2 max-w-[85%]">
                     <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-xs">Emma is thinking...</span>
+                    <span className="text-xs">Clara is thinking...</span>
                   </div>
                 </div>
               )}
@@ -337,7 +337,7 @@ export function SupportPage() {
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask Emma about emergency protection, account settings, or any questions..."
+                  placeholder="Ask Clara about emergency protection, account settings, or any questions..."
                   disabled={isChatLoading}
                   className="flex-1"
                 />
@@ -351,7 +351,7 @@ export function SupportPage() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-2 text-center">
-                Emma can help with emergency procedures, account management, device setup, and more
+                Clara can help with emergency procedures, account management, device setup, and more
               </p>
             </div>
           </div>

@@ -3,15 +3,15 @@ import ChatWidget from "@/components/ai-chat/ChatWidget";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useEmmaChat } from '@/contexts/EmmaChatContext';
+import { useClaraChat } from '@/contexts/ClaraChatContext';
 import { useLocation } from 'react-router-dom';
 
-const GlobalEmmaChat: React.FC = () => {
+const GlobalClaraChat: React.FC = () => {
   const { t } = useTranslation();
-  const { isEmmaOpen, openEmmaChat, closeEmmaChat } = useEmmaChat();
+  const { isClaraOpen, openClaraChat, closeClaraChat } = useClaraChat();
   const location = useLocation();
 
-  // Don't show Emma on admin dashboard, member dashboard, family-app page, or SOS app page
+  // Don't show Clara on admin dashboard, member dashboard, family-app page, or SOS app page
   if (location.pathname.startsWith('/admin-dashboard') || 
       location.pathname.startsWith('/member-dashboard') ||
       location.pathname === '/family-app' || 
@@ -21,9 +21,9 @@ const GlobalEmmaChat: React.FC = () => {
 
   return (
     <>
-      {/* Floating Emma Chat Trigger */}
+      {/* Floating Clara Chat Trigger */}
       <div className="fixed top-28 right-4 z-50">
-        <div className="relative group cursor-pointer" onClick={openEmmaChat}>
+        <div className="relative group cursor-pointer" onClick={openClaraChat}>
           {/* Floating animation wrapper */}
           <div className="animate-bounce">
             {/* Main container with gradient and glow */}
@@ -36,9 +36,9 @@ const GlobalEmmaChat: React.FC = () => {
                 {/* Enhanced Avatar */}
                 <div className="relative">
                   <Avatar className="w-12 h-12 border-3 border-gradient-to-r from-primary to-emergency shadow-lg ring-2 ring-white/50">
-                    <AvatarImage src="/emma-avatar.png" className="object-cover" />
+                    <AvatarImage src="/clara-avatar.png" className="object-cover" />
                     <AvatarFallback className="bg-gradient-to-br from-primary to-emergency text-white font-bold text-lg">
-                      E
+                      C
                     </AvatarFallback>
                   </Avatar>
                   {/* Online status indicator */}
@@ -52,14 +52,14 @@ const GlobalEmmaChat: React.FC = () => {
                 {/* Text content */}
                 <div className="hidden sm:block">
                   <div className="text-base font-bold bg-gradient-to-r from-primary to-emergency bg-clip-text text-transparent">
-                    Emma AI
+                    Clara AI
                   </div>
                   <div className="text-sm text-muted-foreground font-medium">
-                    {t('index.emma.roleCustomerService', { defaultValue: 'Customer Service' })}
+                    {t('index.clara.roleCustomerService', { defaultValue: 'Customer Service' })}
                   </div>
                   <div className="text-xs text-green-600 font-semibold flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    {t('index.emma.online', { defaultValue: 'Online & Ready' })}
+                    {t('index.clara.online', { defaultValue: 'Online & Ready' })}
                   </div>
                 </div>
                 
@@ -73,7 +73,7 @@ const GlobalEmmaChat: React.FC = () => {
               
               {/* Hover tooltip */}
               <div className="absolute bottom-full right-0 mb-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                {t('index.emma.tooltip', { defaultValue: 'Click to chat with Emma! 💬' })}
+                {t('index.clara.tooltip', { defaultValue: 'Click to chat with Clara! 💬' })}
                 <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
               </div>
             </div>
@@ -88,10 +88,10 @@ const GlobalEmmaChat: React.FC = () => {
         </div>
       </div>
 
-      {/* Emma Chat Widget */}
+      {/* Clara Chat Widget */}
       <ChatWidget 
-        isOpen={isEmmaOpen} 
-        onClose={closeEmmaChat}
+        isOpen={isClaraOpen} 
+        onClose={closeClaraChat}
         userName={t('common.visitor', { defaultValue: 'Visitor' })}
         context="global"
       />
@@ -99,4 +99,4 @@ const GlobalEmmaChat: React.FC = () => {
   );
 };
 
-export default GlobalEmmaChat;
+export default GlobalClaraChat;

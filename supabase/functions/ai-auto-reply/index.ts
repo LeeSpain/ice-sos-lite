@@ -81,7 +81,7 @@ async function generateAutoReply(
   senderInfo: any,
   template?: any
 ) {
-  let systemPrompt = `You are Emma, a helpful customer support AI for Emergency Protection Services. 
+  let systemPrompt = `You are Clara, a helpful customer support AI for Emergency Protection Services. 
 
   Company Context:
   - We provide emergency protection and response services

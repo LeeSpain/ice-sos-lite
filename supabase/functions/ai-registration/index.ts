@@ -18,7 +18,7 @@ interface RegistrationRequest {
   registrationData: any;
 }
 
-const EMMA_PERSONALITY = `You are Emma, a professional, warm, and empathetic safety advisor for ICE SOS Lite. Your role is to guide users through registration with a conversational, consultative approach.
+const CLARA_PERSONALITY = `You are Clara, a professional, warm, and empathetic safety advisor for ICE SOS Lite. Your role is to guide users through registration with a conversational, consultative approach.
 
 PERSONALITY TRAITS:
 - Professional yet friendly and approachable
@@ -57,7 +57,7 @@ Always respond with natural conversation. Extract structured data when provided 
 Current user data collected: {registrationData}
 Current conversation step: {currentStep}
 
-Respond naturally as Emma would, and guide the conversation forward based on what information is still needed.`;
+Respond naturally as Clara would, and guide the conversation forward based on what information is still needed.`;
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -99,11 +99,11 @@ serve(async (req) => {
 
     // Build conversation context
     const conversationHistory = history?.map(msg => 
-      `${msg.message_type === 'user' ? 'User' : 'Emma'}: ${msg.content}`
+      `${msg.message_type === 'user' ? 'User' : 'Clara'}: ${msg.content}`
     ).join('\n') || '';
 
     // Enhanced prompt with current context
-    const enhancedPrompt = EMMA_PERSONALITY
+    const enhancedPrompt = CLARA_PERSONALITY
       .replace('{registrationData}', JSON.stringify(registrationData || {}))
       .replace('{currentStep}', currentStep);
 
@@ -133,7 +133,7 @@ When you identify information, structure it properly:
 
 USER'S LATEST MESSAGE: "${message}"
 
-Respond as Emma would, naturally and conversationally.`;
+Respond as Clara would, naturally and conversationally.`;
 
     // Call OpenAI API
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -158,15 +158,15 @@ Respond as Emma would, naturally and conversationally.`;
     }
 
     const aiResponse = await response.json();
-    const emmaResponse = aiResponse.choices[0].message.content;
+    const claraResponse = aiResponse.choices[0].message.content;
 
-    logStep("Emma response generated", { length: emmaResponse.length });
+    logStep("Clara response generated", { length: claraResponse.length });
 
-    // Store Emma's response
+    // Store Clara's response
     await supabaseClient.from("conversations").insert({
       session_id: sessionId,
       message_type: "assistant",
-      content: emmaResponse,
+      content: claraResponse,
       metadata: { step: currentStep }
     });
 
@@ -175,7 +175,7 @@ Respond as Emma would, naturally and conversationally.`;
 
 Current data: ${JSON.stringify(registrationData || {})}
 User's latest message: "${message}"
-Emma's response: "${emmaResponse}"
+Clara's response: "${claraResponse}"
 
 Extract and update any new information into this JSON structure:
 {
@@ -262,7 +262,7 @@ Return ONLY valid JSON with "registrationData" and "currentStep" fields.`;
 
     return new Response(
       JSON.stringify({
-        response: emmaResponse,
+        response: claraResponse,
         registrationData: updatedData,
         currentStep: nextStep,
         sessionId

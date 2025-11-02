@@ -21,12 +21,12 @@ interface ContactChatWidgetProps {
 
 const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({ 
   className = "",
-  placeholder = "Ask Emma about ICE SOS Lite..."
+  placeholder = "Ask Clara about ICE SOS Lite..."
 }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      content: `👋 Hi there! I'm Emma, your ICE SOS Lite AI assistant. I'm here to help answer questions about our emergency protection services, features, pricing, and anything else you'd like to know. How can I assist you today?`,
+      content: `👋 Hi there! I'm Clara, your ICE SOS Lite AI assistant. I'm here to help answer questions about our emergency protection services, features, pricing, and anything else you'd like to know. How can I assist you today?`,
       isUser: false,
       timestamp: new Date()
     }
@@ -80,7 +80,7 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error("Unable to connect to Emma. Please try again or use the contact form.");
+      toast.error("Unable to connect to Clara. Please try again or use the contact form.");
       
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -109,7 +109,7 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({
             <MessageCircle className="h-4 w-4" />
           </div>
           <div>
-            <h3 className="font-semibold">Emma AI Assistant</h3>
+            <h3 className="font-semibold">Clara AI Assistant</h3>
             <p className="text-xs text-white/80">Live Support Chat</p>
           </div>
         </div>
@@ -150,7 +150,7 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({
               <div className="flex justify-start">
                 <div className="bg-muted p-3 rounded-lg flex items-center space-x-2 max-w-[85%]">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="text-sm">Emma is thinking...</span>
+                  <span className="text-sm">Clara is thinking...</span>
                 </div>
               </div>
             )}
@@ -178,7 +178,7 @@ const ContactChatWidget: React.FC<ContactChatWidgetProps> = ({
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            Emma can help with features, pricing, account questions, and more
+            Clara can help with features, pricing, account questions, and more
           </p>
         </div>
       </div>

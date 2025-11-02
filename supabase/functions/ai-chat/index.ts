@@ -46,7 +46,7 @@ const getKnowledgeBase = (language: string = 'en', currency: string = 'EUR') => 
 
   const knowledgeBases = {
     en: `
-You are Emma, the friendly customer-facing AI assistant for ICE SOS Lite.
+You are Clara, the friendly customer-facing AI assistant for ICE SOS Lite.
 
 STRICT SAFETY AND PRIVACY GUARDRAILS (must always follow):
 - Never disclose or discuss anything internal, admin-only, backend, infrastructure, or company-confidential (e.g., admin dashboard, databases, APIs/keys, architecture, internal processes).
@@ -75,7 +75,7 @@ Style:
 - Always end with an offer to help further (e.g., "Would you like help getting started?")`,
 
     es: `
-Eres Emma, la asistente de IA para clientes de ICE SOS Lite.
+Eres Clara, la asistente de IA para clientes de ICE SOS Lite.
 
 REGLAS ESTRICTAS DE SEGURIDAD Y PRIVACIDAD:
 - Nunca compartas información interna, solo para administradores, backend, infraestructura o confidencial de la empresa (p.ej., panel de admin, bases de datos, APIs/keys, arquitectura).
@@ -104,7 +104,7 @@ Estilo:
 - Termina ofreciendo más ayuda (p.ej., "¿Quieres que te ayude a empezar?")`,
 
     nl: `
-Je bent Emma, de klantgerichte AI-assistent voor ICE SOS Lite.
+Je bent Clara, de klantgerichte AI-assistent voor ICE SOS Lite.
 
 STRIKTE VEILIGHEIDS- EN PRIVACYREGELS:
 - Deel nooit interne, alleen-voor-admin, backend-, infrastructuur- of bedrijfsgevoelige info (zoals admin dashboard, databases, API's/keys, architectuur).
@@ -230,7 +230,7 @@ serve(async (req) => {
       }
     ];
 
-    // Get Emma's AI settings from database
+    // Get Clara's AI settings from database
     const { data: aiSettings } = await supabase
       .from('ai_model_settings')
       .select('setting_key, setting_value');

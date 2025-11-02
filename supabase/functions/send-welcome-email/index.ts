@@ -92,7 +92,7 @@ const handler = async (req: Request): Promise<Response> => {
               2. <strong>Test the System:</strong> Try the SOS button in a safe environment<br>
               3. <strong>Share with Family:</strong> Invite family members to your safety network</p>
 
-              <p>If you have any questions, our AI assistant Emma is available 24/7 to help you.</p>
+              <p>If you have any questions, our AI assistant Clara is available 24/7 to help you.</p>
             </div>
             <div class="footer">
               <p>ICE SOS - Your Personal Safety Network<br>

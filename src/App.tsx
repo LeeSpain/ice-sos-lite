@@ -2,8 +2,8 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
-import { EmmaChatProvider } from "@/contexts/EmmaChatContext";
-import GlobalEmmaChat from "@/components/GlobalEmmaChat";
+import { ClaraChatProvider } from "@/contexts/ClaraChatContext";
+import GlobalClaraChat from "@/components/GlobalClaraChat";
 import DeviceManagerButton from "@/components/devices/DeviceManagerButton";
 import { queryClient } from "@/lib/queryClient";
 import OptimizedSuspense from '@/components/OptimizedSuspense';
@@ -355,10 +355,10 @@ function App() {
       <BrowserRouter>
         <EnhancedErrorBoundary>
           <AnalyticsProvider>
-            <EmmaChatProvider>
+            <ClaraChatProvider>
               <AppWithTracking />
-              <GlobalEmmaChat />
-            </EmmaChatProvider>
+              <GlobalClaraChat />
+            </ClaraChatProvider>
           </AnalyticsProvider>
         </EnhancedErrorBoundary>
       </BrowserRouter>

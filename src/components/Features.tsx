@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 import { useCanvasMap } from "@/hooks/useCanvasMap";
 import FamilyMarker from "@/components/map/FamilyMarker";
-import emmaAvatar from "/emma-avatar.png";
+import claraAvatar from "/clara-avatar.png";
 import grandmaAvatar from "/grandma-avatar.png";
 import dadAvatar from "/dad-avatar.png";
 import momAvatar from "/mom-avatar.png";
@@ -17,10 +17,10 @@ const Features = () => {
   // Family member data for the map
   const familyMembers = [
     {
-      id: 'emma',
+      id: 'clara',
       lat: 51.5074,
       lng: -0.1278,
-      render: () => <FamilyMarker id="emma" name={t('mockupNames.emma')} avatar={emmaAvatar} status="alert" />
+      render: () => <FamilyMarker id="clara" name={t('mockupNames.clara')} avatar={claraAvatar} status="alert" />
     },
     {
       id: 'grandma',
@@ -124,13 +124,13 @@ const Features = () => {
                       <div className="absolute bottom-12 left-12">
                         <div className="relative">
                           <div className="w-10 h-10 bg-red-500 rounded-full border-3 border-white shadow-lg flex items-center justify-center overflow-hidden relative animate-pulse">
-                            <img src={emmaAvatar} alt={t('mockupNames.emma')} className="w-full h-full object-cover rounded-full" />
+                            <img src={claraAvatar} alt={t('mockupNames.clara')} className="w-full h-full object-cover rounded-full" />
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white animate-ping"></div>
                             <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-600 rounded-full border-2 border-white"></div>
                           </div>
                           <div className="absolute top-10 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-8 border-transparent border-t-red-500"></div>
                         </div>
-                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-red-50 px-2 py-1 rounded shadow-md border border-red-200 text-red-800 whitespace-nowrap">{t('mockupNames.emma')} - Alert!</div>
+                        <div className="absolute top-12 left-1/2 transform -translate-x-1/2 text-xs font-medium text-center bg-red-50 px-2 py-1 rounded shadow-md border border-red-200 text-red-800 whitespace-nowrap">{t('mockupNames.clara')} - Alert!</div>
                       </div>
 
                       <div className="absolute bottom-16 right-16">
