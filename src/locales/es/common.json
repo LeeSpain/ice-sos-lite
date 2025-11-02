@@ -96,7 +96,7 @@
     "titlePart2": "",
     "description": "ICE SOS Lite ofrece protección de emergencia multilingüe con AI Guardian, acceso a centro de llamadas profesional y conectividad familiar — disponible globalmente.",
     "ctaJoin": "Únete hoy",
-    "ctaTalk": "Hablar con Emma"
+    "ctaTalk": "Hablar con Clara"
   },
   "features": {
     "title": "Suite completa de protección de emergencia",
@@ -390,7 +390,7 @@
     "videoAnalytics": "Analytics de Video",
     "revenueAnalytics": "Analytics de Ingresos",
     "userGrowth": "Crecimiento de Usuarios",
-    "emmaAiAgent": "Agente IA Emma",
+    "claraAiAgent": "Agente IA Clara",
     "rivenMarketingAi": "IA de Marketing Riven",
     "allCustomers": "Todos los Clientes",
     "subscriptions": "Suscripciones",
@@ -573,7 +573,7 @@
     "dad": "Papá",
     "mom": "Mamá",
     "grandma": "Abuela",
-    "emma": "Emma"
+    "clara": "Clara"
   },
   "deviceStatus": {
     "deviceBattery": "Batería del dispositivo",

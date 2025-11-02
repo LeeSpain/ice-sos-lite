@@ -90,18 +90,15 @@ const FamilyAppPage = () => {
     };
   }, [user]);
 
-  // Generate mock location data for family members (excluding Emma)
+  // Generate mock location data for family members
   const generateFamilyLocations = (): FamilyLocationData[] => {
     const baseLocation = { lat: 40.7589, lng: -73.9851 };
     const locations = [
       'Home', 'Work', 'School', 'Gym', 'Coffee Shop', 'Park'
     ];
     
-    // Filter out Emma from this page
-    const filteredMembers = activeFamilyMembers.filter(member => 
-      !member.name?.toLowerCase().includes('emma') && 
-      !member.email?.toLowerCase().includes('emma')
-    );
+    // Use active family members directly
+    const filteredMembers = activeFamilyMembers;
     
     return filteredMembers.map((member, index) => ({
       id: member.id,

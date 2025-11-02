@@ -170,7 +170,7 @@ const Videos = () => {
           </h1>
           <p className="text-muted-foreground text-lg md:text-xl max-w-3xl mx-auto leading-relaxed">
             Discover how ICE SOS Lite protects families through our comprehensive video collection. 
-            Learn about features, meet our AI assistant Emma, and see our global protection network in action.
+            Learn about features, meet our AI assistant Clara, and see our global protection network in action.
           </p>
         </div>
 

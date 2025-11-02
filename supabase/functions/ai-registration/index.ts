@@ -113,7 +113,7 @@ CONVERSATION HISTORY:
 ${conversationHistory}
 
 CURRENT TASK: 
-Based on the conversation history and current registration data, respond naturally as Emma. Extract any new information from the user's message and determine what to ask next.
+Based on the conversation history and current registration data, respond naturally as Clara. Extract any new information from the user's message and determine what to ask next.
 
 IMPORTANT INSTRUCTIONS:
 - If you have collected basic info (name, email, phone), move to needs assessment

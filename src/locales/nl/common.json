@@ -96,7 +96,7 @@
     "titlePart2": "assistent",
     "description": "ICE SOS Lite biedt meertalige noodbescherming met AI Guardian, professioneel callcenter en familieverbinding — wereldwijd beschikbaar.",
     "ctaJoin": "Meld je vandaag aan",
-    "ctaTalk": "Praat met Emma"
+    "ctaTalk": "Praat met Clara"
   },
   "features": {
     "title": "Complete noodbeschermingssuite",
@@ -542,7 +542,7 @@
     "dad": "Papa",
     "mom": "Mama",
     "grandma": "Oma",
-    "emma": "Emma"
+    "clara": "Clara"
   },
   "deviceStatus": {
     "deviceBattery": "Apparaatbatterij",

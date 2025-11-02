@@ -94,7 +94,7 @@ const RegistrationSuccess = () => {
               </CardTitle>
               
               <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Your registration is complete! Emma has successfully set up your personalized safety profile. 
+                Your registration is complete! Clara has successfully set up your personalized safety profile. 
                 You're now protected by our advanced emergency response system.
               </p>
               

@@ -288,14 +288,14 @@ const Contact: React.FC = () => {
             </Card>
           </div>
 
-          {/* Emma AI Chat */}
+          {/* Clara AI Chat */}
           <div className="space-y-6">
             <Card>
               <CardContent className="p-0">
                 <div className="h-[600px] border rounded-lg overflow-hidden">
                   <ContactChatWidget 
                     className="h-full"
-                    placeholder="Hi! I'm Emma, your ICE SOS Lite assistant. How can I help you today?"
+                    placeholder="Hi! I'm Clara, your ICE SOS Lite assistant. How can I help you today?"
                   />
                 </div>
               </CardContent>
