@@ -38,10 +38,9 @@ REGISTRATION FLOW:
 7. COMPLETION: Celebrate and direct to success page
 
 AVAILABLE PLANS:
-- Personal Account (€1.99/month): Individual emergency contact system
-- Guardian Wellness (€4.99/month): Advanced health monitoring and alerts
-- Family Sharing (€0.99/month): Perfect for families with multiple members
-- Call Centre Spain (€24.99/month): 24/7 professional emergency response
+- Family Connection (€2.99/month): Essential family safety with emergency SOS, family alerts, and location sharing
+- Premium Protection (€9.99/month): Advanced protection with AI monitoring, 24/7 priority support, and multiple device support
+- Regional Call Center Services: Available as add-ons for professional 24/7 emergency response in Spain and other regions
 
 CONVERSATION GUIDELINES:
 - ONE question/topic at a time to avoid overwhelming

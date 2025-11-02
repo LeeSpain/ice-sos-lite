@@ -97,7 +97,7 @@ export type Database = {
           email: string | null
           failure_reason: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           last_attempt_at: string | null
           user_agent: string | null
         }
@@ -108,7 +108,7 @@ export type Database = {
           email?: string | null
           failure_reason: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           last_attempt_at?: string | null
           user_agent?: string | null
         }
@@ -119,7 +119,7 @@ export type Database = {
           email?: string | null
           failure_reason?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           last_attempt_at?: string | null
           user_agent?: string | null
         }
@@ -2031,7 +2031,7 @@ export type Database = {
           action: string
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
           user_id: string
         }
@@ -2039,7 +2039,7 @@ export type Database = {
           action: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id: string
         }
@@ -2047,7 +2047,7 @@ export type Database = {
           action?: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
           user_id?: string
         }
@@ -3517,7 +3517,7 @@ export type Database = {
           action: string
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           resource_id: string | null
           resource_type: string
@@ -3528,7 +3528,7 @@ export type Database = {
           action: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           resource_id?: string | null
           resource_type: string
@@ -3539,7 +3539,7 @@ export type Database = {
           action?: string
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           resource_id?: string | null
           resource_type?: string
@@ -4701,7 +4701,7 @@ export type Database = {
           device_type: string | null
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           referrer: string | null
           session_id: string | null
           total_video_duration_seconds: number | null
@@ -4720,7 +4720,7 @@ export type Database = {
           device_type?: string | null
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           referrer?: string | null
           session_id?: string | null
           total_video_duration_seconds?: number | null
@@ -4739,7 +4739,7 @@ export type Database = {
           device_type?: string | null
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           referrer?: string | null
           session_id?: string | null
           total_video_duration_seconds?: number | null
@@ -5131,36 +5131,18 @@ export type Database = {
       }
     }
     Functions: {
-      assign_admin_role: {
-        Args: { target_user_id: string }
-        Returns: boolean
-      }
-      check_admin_setup_allowed: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      check_spain_rule: {
-        Args: { p_user_id: string }
-        Returns: boolean
-      }
-      cleanup_expired_oauth_states: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_old_security_data: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_stuck_campaigns: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      assign_admin_role: { Args: { target_user_id: string }; Returns: boolean }
+      check_admin_setup_allowed: { Args: never; Returns: boolean }
+      check_spain_rule: { Args: { p_user_id: string }; Returns: boolean }
+      cleanup_expired_oauth_states: { Args: never; Returns: undefined }
+      cleanup_old_security_data: { Args: never; Returns: undefined }
+      cleanup_stuck_campaigns: { Args: never; Returns: undefined }
       create_email_campaign_from_content: {
         Args: { p_campaign_name?: string; p_content_id: string }
         Returns: string
       }
       get_communication_metrics_summary: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avg_resolution_time: number
           avg_response_time: number
@@ -5170,20 +5152,11 @@ export type Database = {
           total_messages: number
         }[]
       }
-      get_user_family_group_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_user_family_membership_group_id: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_user_role: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
+      get_user_family_group_id: { Args: never; Returns: string }
+      get_user_family_membership_group_id: { Args: never; Returns: string }
+      get_user_role: { Args: never; Returns: string }
       get_video_analytics_summary: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           avg_watch_time_minutes: number
           completion_rate: number
@@ -5195,22 +5168,13 @@ export type Database = {
           video_title: string
         }[]
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_family_group_owner: {
-        Args: { group_id: string }
-        Returns: boolean
-      }
+      is_admin: { Args: never; Returns: boolean }
+      is_family_group_owner: { Args: { group_id: string }; Returns: boolean }
       is_family_member_of_group: {
         Args: { group_id: string }
         Returns: boolean
       }
-      is_sales: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_sales: { Args: never; Returns: boolean }
       log_enhanced_security_event: {
         Args: {
           p_event_type: string
