@@ -150,7 +150,7 @@ const AIAgentPage: React.FC = () => {
         {
           id: '2', 
           question: 'How much does it cost?',
-          answer: 'We offer ICE SOS Basic at €29/month and Premium at €49/month...',
+          answer: 'We offer Family Connection at €2.99/month and Premium Protection at €9.99/month...',
           category: 'pricing',
           confidence_score: 1.0,
           usage_count: 32
