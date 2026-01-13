@@ -513,24 +513,24 @@ export default function CommunicationPage() {
                 
                 {/* Filters */}
                 <div className="grid grid-cols-2 gap-2">
-                  <Select value={filters.channel} onValueChange={(value) => setFilters(prev => ({ ...prev, channel: value }))}>
+                  <Select value={filters.channel || 'all'} onValueChange={(value) => setFilters(prev => ({ ...prev, channel: value === 'all' ? '' : value }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="All Channels" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Channels</SelectItem>
+                      <SelectItem value="all">All Channels</SelectItem>
                       <SelectItem value="email">Email</SelectItem>
                       <SelectItem value="whatsapp">WhatsApp</SelectItem>
                       <SelectItem value="web_chat">Web Chat</SelectItem>
                     </SelectContent>
                   </Select>
                   
-                  <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}>
+                  <Select value={filters.status || 'all'} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value === 'all' ? '' : value }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="All Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Status</SelectItem>
+                      <SelectItem value="all">All Status</SelectItem>
                       <SelectItem value="open">Open</SelectItem>
                       <SelectItem value="assigned">Assigned</SelectItem>
                       <SelectItem value="closed">Closed</SelectItem>
