@@ -20,6 +20,12 @@ interface SequenceEnrollment {
   current_step: number;
 }
 
+interface LeadEngagement {
+  lead_id: string;
+  total_replies: number;
+  last_reply_at: string | null;
+}
+
 const LeadsPage: React.FC = () => {
   const [filteredLeads, setFilteredLeads] = useState<EnhancedLead[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,6 +35,7 @@ const LeadsPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
   const [enrollments, setEnrollments] = useState<Map<string, SequenceEnrollment>>(new Map());
+  const [engagements, setEngagements] = useState<Map<string, LeadEngagement>>(new Map());
   const { toast } = useToast();
   
   const { leads, loading, updateLeadStatus } = useEnhancedLeads();
@@ -37,27 +44,43 @@ const LeadsPage: React.FC = () => {
     filterLeads();
   }, [leads, searchTerm, statusFilter, interestFilter]);
 
-  // Load sequence enrollments for displayed leads
+  // Load sequence enrollments and engagements for displayed leads
   useEffect(() => {
-    const loadEnrollments = async () => {
+    const loadEnrollmentsAndEngagements = async () => {
       if (leads.length === 0) return;
       
       const leadIds = leads.map(l => l.id);
-      const { data, error } = await supabase
+      
+      // Load enrollments
+      const { data: enrollmentData, error: enrollmentError } = await supabase
         .from('followup_enrollments')
         .select('lead_id, status, current_step')
         .in('lead_id', leadIds);
       
-      if (!error && data) {
+      if (!enrollmentError && enrollmentData) {
         const enrollmentMap = new Map<string, SequenceEnrollment>();
-        data.forEach((e: any) => {
+        enrollmentData.forEach((e: any) => {
           enrollmentMap.set(e.lead_id, e);
         });
         setEnrollments(enrollmentMap);
       }
+
+      // Load engagements (replies)
+      const { data: engagementData, error: engagementError } = await supabase
+        .from('riven_lead_engagement')
+        .select('lead_id, total_replies, last_reply_at')
+        .in('lead_id', leadIds);
+      
+      if (!engagementError && engagementData) {
+        const engagementMap = new Map<string, LeadEngagement>();
+        engagementData.forEach((e: any) => {
+          engagementMap.set(e.lead_id, e);
+        });
+        setEngagements(engagementMap);
+      }
     };
     
-    loadEnrollments();
+    loadEnrollmentsAndEngagements();
   }, [leads]);
 
   const filterLeads = () => {
@@ -313,6 +336,19 @@ const LeadsPage: React.FC = () => {
                                 Sequence: {enrollments.get(lead.id)?.status === 'active' 
                                   ? `Step ${enrollments.get(lead.id)?.current_step}` 
                                   : enrollments.get(lead.id)?.status}
+                              </Badge>
+                            )}
+                            {/* Replied badge */}
+                            {engagements.get(lead.id) && (engagements.get(lead.id)!.total_replies > 0 || engagements.get(lead.id)!.last_reply_at) && (
+                              <Badge 
+                                className="text-xs flex items-center gap-1 bg-green-100 text-green-800"
+                                title={engagements.get(lead.id)?.last_reply_at 
+                                  ? `Last reply: ${new Date(engagements.get(lead.id)!.last_reply_at!).toLocaleDateString()}`
+                                  : undefined
+                                }
+                              >
+                                <CheckCircle className="h-3 w-3" />
+                                Replied ({engagements.get(lead.id)?.total_replies || 1})
                               </Badge>
                             )}
                             <Badge className={getInterestColor(lead.interest_level)}>

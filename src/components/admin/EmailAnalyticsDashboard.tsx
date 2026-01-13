@@ -35,11 +35,22 @@ interface CampaignStats {
   status: string;
 }
 
+interface RivenCampaignMetric {
+  campaign_id: string;
+  emails_sent: number;
+  emails_failed: number;
+  replies_received: number;
+  reply_rate: number;
+  social_posts_posted: number;
+  social_posts_failed: number;
+}
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export const EmailAnalyticsDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<EmailMetrics | null>(null);
   const [campaigns, setCampaigns] = useState<CampaignStats[]>([]);
+  const [rivenMetrics, setRivenMetrics] = useState<RivenCampaignMetric[]>([]);
   const [timeRange, setTimeRange] = useState('7d');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedView, setSelectedView] = useState<'overview' | 'campaigns' | 'performance'>('overview');
@@ -68,6 +79,43 @@ export const EmailAnalyticsDashboard: React.FC = () => {
         .gte('created_at', getDateRange(timeRange));
 
       if (campaignError) throw campaignError;
+
+      // Load Riven feedback metrics (last 7 days)
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      const { data: rivenData, error: rivenError } = await supabase
+        .from('riven_campaign_metrics_daily')
+        .select('campaign_id, emails_sent, emails_failed, replies_received, reply_rate, social_posts_posted, social_posts_failed')
+        .gte('metric_date', sevenDaysAgo);
+
+      if (!rivenError && rivenData) {
+        // Aggregate by campaign_id
+        const aggregated = new Map<string, RivenCampaignMetric>();
+        for (const row of rivenData) {
+          const existing = aggregated.get(row.campaign_id);
+          if (existing) {
+            existing.emails_sent += row.emails_sent || 0;
+            existing.emails_failed += row.emails_failed || 0;
+            existing.replies_received += row.replies_received || 0;
+            existing.social_posts_posted += row.social_posts_posted || 0;
+            existing.social_posts_failed += row.social_posts_failed || 0;
+          } else {
+            aggregated.set(row.campaign_id, {
+              campaign_id: row.campaign_id,
+              emails_sent: row.emails_sent || 0,
+              emails_failed: row.emails_failed || 0,
+              replies_received: row.replies_received || 0,
+              reply_rate: 0,
+              social_posts_posted: row.social_posts_posted || 0,
+              social_posts_failed: row.social_posts_failed || 0
+            });
+          }
+        }
+        // Calculate reply rates
+        for (const metric of aggregated.values()) {
+          metric.reply_rate = metric.emails_sent > 0 ? (metric.replies_received / metric.emails_sent) * 100 : 0;
+        }
+        setRivenMetrics(Array.from(aggregated.values()));
+      }
 
       // Process metrics
       const processedMetrics = processEmailMetrics(queueData || []);
@@ -443,6 +491,75 @@ export const EmailAnalyticsDashboard: React.FC = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Riven Feedback Metrics */}
+      {rivenMetrics.length > 0 && (
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Riven Feedback (Last 7 Days)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left py-2 px-3 font-medium">Campaign</th>
+                    <th className="text-right py-2 px-3 font-medium">Emails Sent</th>
+                    <th className="text-right py-2 px-3 font-medium">Replies</th>
+                    <th className="text-right py-2 px-3 font-medium">Reply Rate</th>
+                    <th className="text-right py-2 px-3 font-medium">Social Posts</th>
+                    <th className="text-center py-2 px-3 font-medium">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rivenMetrics.map((metric) => (
+                    <tr key={metric.campaign_id} className="border-b hover:bg-muted/50">
+                      <td className="py-2 px-3 font-medium">
+                        {metric.campaign_id === 'unknown' ? 'Untracked' : metric.campaign_id.substring(0, 20)}
+                        {metric.campaign_id.length > 20 && '...'}
+                      </td>
+                      <td className="text-right py-2 px-3">
+                        {metric.emails_sent.toLocaleString()}
+                        {metric.emails_failed > 0 && (
+                          <span className="text-destructive text-xs ml-1">({metric.emails_failed} failed)</span>
+                        )}
+                      </td>
+                      <td className="text-right py-2 px-3">{metric.replies_received}</td>
+                      <td className="text-right py-2 px-3">{metric.reply_rate.toFixed(1)}%</td>
+                      <td className="text-right py-2 px-3">
+                        {metric.social_posts_posted}
+                        {metric.social_posts_failed > 0 && (
+                          <span className="text-destructive text-xs ml-1">({metric.social_posts_failed} failed)</span>
+                        )}
+                      </td>
+                      <td className="text-center py-2 px-3">
+                        <Badge 
+                          variant={metric.reply_rate >= 5 ? 'default' : metric.reply_rate >= 2 ? 'secondary' : 'outline'}
+                          className={
+                            metric.reply_rate >= 5 
+                              ? 'bg-green-100 text-green-800 hover:bg-green-100' 
+                              : metric.reply_rate >= 2 
+                                ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
+                                : ''
+                          }
+                        >
+                          {metric.reply_rate >= 5 ? 'Good' : metric.reply_rate >= 2 ? 'Medium' : 'Low'}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {rivenMetrics.length === 0 && (
+              <p className="text-center text-muted-foreground py-4">No campaign metrics yet</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

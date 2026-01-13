@@ -1,5 +1,5 @@
 // supabase/functions/automation-runner/index.ts
-// Cron-safe orchestrator: runs email + social queue processors.
+// Cron-safe orchestrator: runs email + social queue processors + feedback metrics.
 // Requires header: x-cron-secret matching env var CRON_SECRET.
 
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
@@ -79,6 +79,7 @@ serve(async (req) => {
   let emailResult: unknown = null;
   let postingResult: unknown = null;
   let followupResult: unknown = null;
+  let feedbackResult: unknown = null;
 
   try {
     const { data, error } = await supabase.functions.invoke("email-processor", {
@@ -113,6 +114,15 @@ serve(async (req) => {
     followupResult = { ok: false, error: String(e) };
   }
 
+  // ---- RIVEN FEEDBACK METRICS AGGREGATION ----
+  try {
+    feedbackResult = await aggregateFeedbackMetrics(supabase);
+    console.log("[automation-runner] feedback-metrics OK");
+  } catch (e) {
+    console.error("[automation-runner] feedback-metrics ERROR:", e);
+    feedbackResult = { ok: false, error: String(e) };
+  }
+
   console.log(`[automation-runner] end: ${new Date().toISOString()}`);
 
   return json({
@@ -121,8 +131,274 @@ serve(async (req) => {
     email: emailResult,
     posting: postingResult,
     followups: followupResult,
+    feedback: feedbackResult,
   });
 });
+
+// ============================================================================
+// RIVEN FEEDBACK METRICS AGGREGATION
+// ============================================================================
+async function aggregateFeedbackMetrics(supabase: ReturnType<typeof createClient>) {
+  const now = new Date();
+  const metricDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+  const last24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+  const last30d = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+  const last14d = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();
+  const last7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const last21d = new Date(now.getTime() - 21 * 24 * 60 * 60 * 1000).toISOString();
+
+  let campaignsUpdated = 0;
+  let leadsUpdated = 0;
+
+  // ---- 1. AGGREGATE EMAIL QUEUE (last 24h) ----
+  const { data: emailData } = await supabase
+    .from('email_queue')
+    .select('id, campaign_id, status, sent_at, updated_at, recipient_email')
+    .or(`sent_at.gte.${last24h},updated_at.gte.${last24h}`);
+
+  // Group by campaign_id
+  const emailByCampaign: Record<string, { sent: number; failed: number; emails: string[] }> = {};
+  for (const email of emailData || []) {
+    const campaignId = email.campaign_id || 'unknown';
+    if (!emailByCampaign[campaignId]) {
+      emailByCampaign[campaignId] = { sent: 0, failed: 0, emails: [] };
+    }
+    if (email.status === 'sent') {
+      emailByCampaign[campaignId].sent++;
+      if (email.recipient_email) {
+        emailByCampaign[campaignId].emails.push(email.recipient_email.toLowerCase());
+      }
+    }
+    if (email.status === 'failed') {
+      emailByCampaign[campaignId].failed++;
+    }
+  }
+
+  // ---- 2. AGGREGATE REPLIES FROM UNIFIED_MESSAGES (inbound, last 24h) ----
+  // Get leads with their emails to match replies
+  const { data: leadsData } = await supabase
+    .from('leads')
+    .select('id, email, metadata, user_id');
+
+  const leadEmailMap = new Map<string, { id: string; metadata: any; user_id: string }>();
+  for (const lead of leadsData || []) {
+    if (lead.email) {
+      leadEmailMap.set(lead.email.toLowerCase(), { 
+        id: lead.id, 
+        metadata: lead.metadata || {},
+        user_id: lead.user_id
+      });
+    }
+  }
+
+  // Get inbound messages from unified_messages
+  const { data: inboundMessages } = await supabase
+    .from('unified_messages')
+    .select('id, conversation_id, sender_email, created_at, direction')
+    .eq('direction', 'inbound')
+    .gte('created_at', last24h);
+
+  // Match replies to leads and campaigns
+  const repliesByCampaign: Record<string, number> = {};
+  const repliedLeads = new Map<string, { replyAt: string }>();
+
+  for (const msg of inboundMessages || []) {
+    if (msg.sender_email) {
+      const senderEmail = msg.sender_email.toLowerCase();
+      const lead = leadEmailMap.get(senderEmail);
+      if (lead) {
+        // Determine campaign from lead metadata
+        const metadata = lead.metadata || {};
+        const campaignId = metadata.last_campaign_id || metadata.outreach_campaign || metadata.outreach_source || 'unknown';
+        repliesByCampaign[campaignId] = (repliesByCampaign[campaignId] || 0) + 1;
+        repliedLeads.set(lead.id, { replyAt: msg.created_at });
+      }
+    }
+  }
+
+  // ---- 3. AGGREGATE SOCIAL POSTS (last 24h) ----
+  const { data: socialData } = await supabase
+    .from('social_media_posting_queue')
+    .select('id, campaign_id, status, posted_at, updated_at')
+    .or(`posted_at.gte.${last24h},updated_at.gte.${last24h}`);
+
+  const socialByCampaign: Record<string, { posted: number; failed: number }> = {};
+  for (const post of socialData || []) {
+    const campaignId = post.campaign_id || 'riven_social';
+    if (!socialByCampaign[campaignId]) {
+      socialByCampaign[campaignId] = { posted: 0, failed: 0 };
+    }
+    if (post.status === 'posted' || post.status === 'published') {
+      socialByCampaign[campaignId].posted++;
+    }
+    if (post.status === 'failed') {
+      socialByCampaign[campaignId].failed++;
+    }
+  }
+
+  // ---- 4. UPSERT INTO riven_campaign_metrics_daily ----
+  const allCampaignIds = new Set([
+    ...Object.keys(emailByCampaign),
+    ...Object.keys(repliesByCampaign),
+    ...Object.keys(socialByCampaign)
+  ]);
+
+  for (const campaignId of allCampaignIds) {
+    const emailsSent = emailByCampaign[campaignId]?.sent || 0;
+    const emailsFailed = emailByCampaign[campaignId]?.failed || 0;
+    const repliesReceived = repliesByCampaign[campaignId] || 0;
+    const replyRate = emailsSent > 0 ? repliesReceived / emailsSent : 0;
+    const socialPosted = socialByCampaign[campaignId]?.posted || 0;
+    const socialFailed = socialByCampaign[campaignId]?.failed || 0;
+
+    const { error: upsertError } = await supabase
+      .from('riven_campaign_metrics_daily')
+      .upsert({
+        metric_date: metricDate,
+        campaign_id: campaignId,
+        emails_sent: emailsSent,
+        emails_failed: emailsFailed,
+        replies_received: repliesReceived,
+        reply_rate: replyRate,
+        social_posts_posted: socialPosted,
+        social_posts_failed: socialFailed
+      }, { onConflict: 'metric_date,campaign_id' });
+
+    if (!upsertError) {
+      campaignsUpdated++;
+    }
+  }
+
+  // ---- 5. UPDATE LEAD ENGAGEMENT ----
+  // Get emails sent in last 30 days
+  const { data: recentEmails } = await supabase
+    .from('email_queue')
+    .select('recipient_email, campaign_id, sent_at')
+    .eq('status', 'sent')
+    .gte('sent_at', last30d)
+    .order('sent_at', { ascending: false });
+
+  // Build map of lead email -> latest touch
+  const leadTouchMap = new Map<string, { touchAt: string; campaignId: string }>();
+  for (const email of recentEmails || []) {
+    if (email.recipient_email) {
+      const key = email.recipient_email.toLowerCase();
+      if (!leadTouchMap.has(key) || email.sent_at > leadTouchMap.get(key)!.touchAt) {
+        leadTouchMap.set(key, { 
+          touchAt: email.sent_at, 
+          campaignId: email.campaign_id || 'unknown'
+        });
+      }
+    }
+  }
+
+  // Update riven_lead_engagement and lead intent
+  for (const lead of leadsData || []) {
+    if (!lead.email) continue;
+
+    const emailLower = lead.email.toLowerCase();
+    const touch = leadTouchMap.get(emailLower);
+    const reply = repliedLeads.get(lead.id);
+    const metadata = lead.metadata || {};
+
+    // Skip if do_not_contact is set
+    if (metadata.do_not_contact === true) continue;
+
+    // Only adjust for leads from lead_intelligence or with outreach_source
+    const canAdjust = metadata.created_via === 'lead_intelligence' || metadata.outreach_source;
+
+    // Upsert engagement record
+    if (touch || reply) {
+      const { data: existingEngagement } = await supabase
+        .from('riven_lead_engagement')
+        .select('total_replies, last_touch_at, last_reply_at')
+        .eq('lead_id', lead.id)
+        .single();
+
+      const currentReplies = existingEngagement?.total_replies || 0;
+      const newTotalReplies = reply ? currentReplies + 1 : currentReplies;
+      
+      const engagementUpdate: any = {
+        lead_id: lead.id,
+        updated_at: now.toISOString()
+      };
+
+      if (touch) {
+        const existingTouch = existingEngagement?.last_touch_at;
+        if (!existingTouch || touch.touchAt > existingTouch) {
+          engagementUpdate.last_touch_at = touch.touchAt;
+          engagementUpdate.last_campaign_id = touch.campaignId;
+        }
+      }
+
+      if (reply) {
+        engagementUpdate.last_reply_at = reply.replyAt;
+        engagementUpdate.total_replies = newTotalReplies;
+      }
+
+      await supabase
+        .from('riven_lead_engagement')
+        .upsert(engagementUpdate, { onConflict: 'lead_id' });
+
+      // ---- 6. AUTO INTENT ADJUSTMENT ----
+      if (canAdjust) {
+        const newMetadata = { ...metadata };
+        let shouldUpdate = false;
+
+        // If lead has reply in last 14 days: hot + high priority
+        if (reply || (existingEngagement?.last_reply_at && existingEngagement.last_reply_at >= last14d)) {
+          if (newMetadata.intent !== 'hot') {
+            newMetadata.intent = 'hot';
+            newMetadata.priority = 'high';
+            shouldUpdate = true;
+          }
+        } else if (touch) {
+          const touchDate = new Date(touch.touchAt);
+          const daysSinceTouch = (now.getTime() - touchDate.getTime()) / (1000 * 60 * 60 * 24);
+          
+          // No reply for 21+ days: cold + low priority
+          if (daysSinceTouch >= 21) {
+            if (newMetadata.intent !== 'cold') {
+              newMetadata.intent = 'cold';
+              newMetadata.priority = 'low';
+              shouldUpdate = true;
+            }
+          }
+          // No reply for 7+ days but less than 21: warm (unless already hot)
+          else if (daysSinceTouch >= 7 && newMetadata.intent !== 'hot') {
+            if (newMetadata.intent !== 'warm') {
+              newMetadata.intent = 'warm';
+              shouldUpdate = true;
+            }
+          }
+        }
+
+        // Update last_campaign_id in metadata
+        if (touch && newMetadata.last_campaign_id !== touch.campaignId) {
+          newMetadata.last_campaign_id = touch.campaignId;
+          shouldUpdate = true;
+        }
+
+        if (shouldUpdate) {
+          await supabase
+            .from('leads')
+            .update({ metadata: newMetadata })
+            .eq('id', lead.id);
+          leadsUpdated++;
+        }
+      }
+    }
+  }
+
+  console.log(`[feedback-metrics] Done: metric_date=${metricDate}, campaigns=${campaignsUpdated}, leads=${leadsUpdated}`);
+
+  return {
+    ok: true,
+    metric_date: metricDate,
+    campaigns_updated: campaignsUpdated,
+    leads_updated: leadsUpdated
+  };
+}
 
 // Process due followup enrollments
 async function processFollowupEnrollments(supabase: ReturnType<typeof createClient>) {
