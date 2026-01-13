@@ -12,6 +12,8 @@ import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import { 
   Search, 
   Globe, 
@@ -25,7 +27,9 @@ import {
   MapPin,
   Target,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Send,
+  Sparkles
 } from 'lucide-react';
 
 interface ExtractedLead {
@@ -80,6 +84,14 @@ const LeadIntelligencePage: React.FC = () => {
   // Audit runs state
   const [runs, setRuns] = useState<IntelligenceRun[]>([]);
   const [runsLoading, setRunsLoading] = useState(false);
+
+  // Riven Send Modal state
+  const [rivenModalOpen, setRivenModalOpen] = useState(false);
+  const [selectedLeadForRiven, setSelectedLeadForRiven] = useState<ExtractedLead | null>(null);
+  const [generatingDraft, setGeneratingDraft] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     loadRuns();
@@ -267,6 +279,136 @@ const LeadIntelligencePage: React.FC = () => {
   };
 
   const selectedCount = leads.filter(l => l.selected).length;
+
+  // Open Riven modal and generate draft
+  const openRivenModal = async (lead: ExtractedLead) => {
+    setSelectedLeadForRiven(lead);
+    setEmailSubject('');
+    setEmailBody('');
+    setRivenModalOpen(true);
+    setGeneratingDraft(true);
+
+    try {
+      const command = `Write a short, professional intro email to ${lead.company || 'this organisation'} about ICE SOS Lite.
+Target role: ${lead.role || 'decision maker'}.
+Context: ${lead.notes || 'No additional context available.'}.
+Tone: professional, helpful, non-salesy.
+End with a soft CTA asking if they'd like more info.
+Output ONLY the email body, no subject line.`;
+
+      const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
+        body: {
+          command,
+          content_type: 'email',
+          audience: 'professional',
+          settings: {
+            word_count: 150,
+            content_depth: 'medium'
+          }
+        }
+      });
+
+      if (error) throw error;
+
+      // Extract the generated content
+      const generatedContent = data?.generated_content || data?.content || data?.message || '';
+      
+      // Generate a subject line
+      const subjectLine = `Introducing ICE SOS Lite${lead.company ? ` - For ${lead.company}` : ''}`;
+      
+      setEmailSubject(subjectLine);
+      setEmailBody(generatedContent);
+
+    } catch (error) {
+      console.error('Riven generation error:', error);
+      toast({
+        title: 'Draft Generation Failed',
+        description: error instanceof Error ? error.message : 'Failed to generate email draft',
+        variant: 'destructive'
+      });
+      // Set fallback content
+      setEmailSubject(`Introducing ICE SOS Lite${lead.company ? ` - For ${lead.company}` : ''}`);
+      setEmailBody(`Dear ${lead.name || 'Team'},\n\nI wanted to reach out regarding ICE SOS Lite, our emergency safety solution designed for families, seniors, and care organisations.\n\nWould you be open to a brief conversation to learn more?\n\nBest regards`);
+    } finally {
+      setGeneratingDraft(false);
+    }
+  };
+
+  // Queue email and update lead status
+  const handleApproveAndSend = async () => {
+    if (!selectedLeadForRiven?.email || !emailSubject.trim() || !emailBody.trim()) {
+      toast({
+        title: 'Missing Information',
+        description: 'Email, subject, and body are required',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setSendingEmail(true);
+
+    try {
+      // Insert into email_queue
+      const { error: queueError } = await supabase
+        .from('email_queue')
+        .insert({
+          recipient_email: selectedLeadForRiven.email,
+          subject: emailSubject.trim(),
+          body: emailBody.trim(),
+          campaign_id: null, // We use metadata instead
+          status: 'pending',
+          priority: 5,
+          scheduled_at: new Date().toISOString()
+        });
+
+      if (queueError) throw queueError;
+
+      // Find and update the lead in the database if it exists
+      // First check if this lead has been saved to the leads table
+      const { data: existingLead } = await supabase
+        .from('leads')
+        .select('id, metadata')
+        .eq('email', selectedLeadForRiven.email)
+        .maybeSingle();
+
+      if (existingLead) {
+        const currentMetadata = (existingLead.metadata as Record<string, any>) || {};
+        const updatedMetadata = {
+          ...currentMetadata,
+          last_contacted_at: new Date().toISOString(),
+          outreach_channel: 'email',
+          outreach_source: 'riven_intro'
+        };
+
+        await supabase
+          .from('leads')
+          .update({
+            status: 'contacted',
+            metadata: updatedMetadata,
+            last_contacted_at: new Date().toISOString()
+          })
+          .eq('id', existingLead.id);
+      }
+
+      toast({
+        title: 'Email Queued',
+        description: 'Intro email queued successfully'
+      });
+
+      setRivenModalOpen(false);
+      setSelectedLeadForRiven(null);
+
+    } catch (error) {
+      console.error('Queue email error:', error);
+      toast({
+        title: 'Queue Failed',
+        description: error instanceof Error ? error.message : 'Failed to queue email',
+        variant: 'destructive'
+      });
+    } finally {
+      setSendingEmail(false);
+    }
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -544,26 +686,41 @@ const LeadIntelligencePage: React.FC = () => {
                         <p className="text-sm text-muted-foreground">{lead.notes}</p>
                       )}
 
-                      <div className="flex flex-wrap gap-2 items-center">
-                        {lead.tags?.map((tag, i) => (
-                          <Badge key={i} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                        {lead.recommended_plan && (
+                      <div className="flex flex-wrap gap-2 items-center justify-between">
+                        <div className="flex flex-wrap gap-2 items-center">
+                          {lead.tags?.map((tag, i) => (
+                            <Badge key={i} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                          {lead.recommended_plan && (
+                            <Badge variant="outline" className="text-xs">
+                              Plan: {lead.recommended_plan}
+                            </Badge>
+                          )}
                           <Badge variant="outline" className="text-xs">
-                            Plan: {lead.recommended_plan}
+                            Interest: {lead.interest_level_0_10}/10
                           </Badge>
-                        )}
-                        <Badge variant="outline" className="text-xs">
-                          Interest: {lead.interest_level_0_10}/10
-                        </Badge>
-                        {!lead.email && !lead.phone && (
-                          <Badge variant="destructive" className="text-xs">
-                            <AlertCircle className="h-3 w-3 mr-1" />
-                            No contact info
-                          </Badge>
-                        )}
+                          {!lead.email && !lead.phone && (
+                            <Badge variant="destructive" className="text-xs">
+                              <AlertCircle className="h-3 w-3 mr-1" />
+                              No contact info
+                            </Badge>
+                          )}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={!lead.email}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openRivenModal(lead);
+                          }}
+                          className="flex items-center gap-1"
+                        >
+                          <Sparkles className="h-3 w-3" />
+                          Send via Riven
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -593,6 +750,107 @@ const LeadIntelligencePage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Riven Send Modal */}
+      <Dialog open={rivenModalOpen} onOpenChange={setRivenModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Send Intro via Riven
+            </DialogTitle>
+            <DialogDescription>
+              AI-generated intro email for review before sending
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedLeadForRiven && (
+            <div className="space-y-4">
+              {/* Lead Summary */}
+              <div className="p-3 bg-muted rounded-lg space-y-1">
+                <div className="flex items-center gap-2 text-sm">
+                  {selectedLeadForRiven.company && (
+                    <span className="flex items-center gap-1">
+                      <Building2 className="h-3 w-3" />
+                      <strong>{selectedLeadForRiven.company}</strong>
+                    </span>
+                  )}
+                  {selectedLeadForRiven.name && (
+                    <span className="flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      {selectedLeadForRiven.name}
+                    </span>
+                  )}
+                  {selectedLeadForRiven.role && (
+                    <span className="text-muted-foreground">
+                      ({selectedLeadForRiven.role})
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1 text-sm text-blue-600">
+                  <Mail className="h-3 w-3" />
+                  {selectedLeadForRiven.email}
+                </div>
+              </div>
+
+              {/* Loading state */}
+              {generatingDraft && (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  <span className="ml-2 text-muted-foreground">Generating draft with Riven AI...</span>
+                </div>
+              )}
+
+              {/* Email form */}
+              {!generatingDraft && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email-subject">Subject</Label>
+                    <Input
+                      id="email-subject"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      placeholder="Email subject..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email-body">Body</Label>
+                    <Textarea
+                      id="email-body"
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      rows={10}
+                      placeholder="Email body..."
+                      className="font-mono text-sm"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setRivenModalOpen(false)}
+              disabled={sendingEmail}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleApproveAndSend}
+              disabled={generatingDraft || sendingEmail || !emailSubject.trim() || !emailBody.trim()}
+            >
+              {sendingEmail ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Send className="h-4 w-4 mr-2" />
+              )}
+              Approve & Send
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
