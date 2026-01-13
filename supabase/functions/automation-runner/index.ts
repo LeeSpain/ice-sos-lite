@@ -1,117 +1,114 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// supabase/functions/automation-runner/index.ts
+// Cron-safe orchestrator: runs email + social queue processors.
+// Requires header: x-cron-secret matching env var CRON_SECRET.
+
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-cron-secret',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-cron-secret",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-Deno.serve(async (req: Request) => {
-  // Handle CORS preflight
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+function unauthorized(message = "Unauthorized") {
+  return json({ success: false, error: message }, 401);
+}
+
+serve(async (req) => {
+  // CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
-  const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  const cronSecret = Deno.env.get('CRON_SECRET');
+  if (req.method !== "POST") {
+    return json(
+      { success: false, error: "Method not allowed. Use POST." },
+      405
+    );
+  }
+
+  // ---- CRON SECRET AUTH ----
+  const provided = req.headers.get("x-cron-secret") ?? "";
+  const expected = Deno.env.get("CRON_SECRET") ?? "";
+  if (!expected) {
+    // Safety: if secret not configured, do NOT allow runs.
+    return unauthorized("CRON_SECRET is not set in environment variables.");
+  }
+  if (!provided || provided !== expected) {
+    return unauthorized("Invalid or missing x-cron-secret header.");
+  }
+
+  // ---- SUPABASE CLIENT ----
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
   if (!supabaseUrl || !serviceKey) {
-    console.error('Missing required environment variables');
-    return new Response(
-      JSON.stringify({ error: 'Server misconfigured: missing env vars' }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
+    return json(
+      {
+        success: false,
+        error:
+          "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in environment variables.",
+      },
+      500
     );
   }
 
-  // Validate cron secret if configured
-  const requestCronSecret = req.headers.get('x-cron-secret');
-  if (cronSecret && cronSecret !== requestCronSecret) {
-    console.error('Invalid or missing x-cron-secret header');
-    return new Response(
-      JSON.stringify({ error: 'Unauthorized: invalid cron secret' }),
-      { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
-  }
+  const supabase = createClient(supabaseUrl, serviceKey, {
+    auth: { persistSession: false },
+  });
 
-  // If no CRON_SECRET is set, allow the request but log warning
-  if (!cronSecret) {
-    console.warn('CRON_SECRET not configured - allowing request without authentication');
-  }
+  const ranAt = new Date().toISOString();
 
-  const admin = createClient(supabaseUrl, serviceKey);
+  console.log(`[automation-runner] start: ${ranAt}`);
+
+  // ---- INVOKE EXISTING PROCESSORS ----
+  // NOTE: These functions already exist in your repo per audit.
+  // - email-processor should process email_queue (Resend)
+  // - posting-processor should process social_media_posting_queue
+  // Keep bodies minimal; adjust only if your existing functions require different payloads.
+  let emailResult: unknown = null;
+  let postingResult: unknown = null;
 
   try {
-    const startTime = Date.now();
-    const results: Record<string, any> = {
-      success: true,
-      ran_at: new Date().toISOString(),
-      email: null,
-      posting: null,
-      errors: []
-    };
-
-    // 1. Process email queue
-    console.log('[automation-runner] Invoking email-processor...');
-    try {
-      const { data: emailData, error: emailError } = await admin.functions.invoke('email-processor', {
-        body: { action: 'process_queue', max_emails: 50 }
-      });
-      
-      if (emailError) {
-        console.error('[automation-runner] email-processor error:', emailError);
-        results.errors.push({ component: 'email-processor', error: emailError.message });
-        results.email = { success: false, error: emailError.message };
-      } else {
-        console.log('[automation-runner] email-processor result:', emailData);
-        results.email = emailData;
-      }
-    } catch (emailErr: any) {
-      console.error('[automation-runner] email-processor exception:', emailErr);
-      results.errors.push({ component: 'email-processor', error: emailErr?.message || 'unknown' });
-      results.email = { success: false, error: emailErr?.message || 'unknown' };
-    }
-
-    // 2. Process social media posting queue
-    console.log('[automation-runner] Invoking posting-processor...');
-    try {
-      const { data: postingData, error: postingError } = await admin.functions.invoke('posting-processor', {
-        body: {}
-      });
-      
-      if (postingError) {
-        console.error('[automation-runner] posting-processor error:', postingError);
-        results.errors.push({ component: 'posting-processor', error: postingError.message });
-        results.posting = { success: false, error: postingError.message };
-      } else {
-        console.log('[automation-runner] posting-processor result:', postingData);
-        results.posting = postingData;
-      }
-    } catch (postingErr: any) {
-      console.error('[automation-runner] posting-processor exception:', postingErr);
-      results.errors.push({ component: 'posting-processor', error: postingErr?.message || 'unknown' });
-      results.posting = { success: false, error: postingErr?.message || 'unknown' };
-    }
-
-    // Calculate duration
-    results.duration_ms = Date.now() - startTime;
-    results.success = results.errors.length === 0;
-
-    console.log('[automation-runner] Complete:', results);
-
-    return new Response(JSON.stringify(results), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders }
+    const { data, error } = await supabase.functions.invoke("email-processor", {
+      body: { action: "process_queue", max_emails: 50 },
     });
-
-  } catch (err: any) {
-    console.error('[automation-runner] Fatal error:', err?.message || err);
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: err?.message || 'unknown_error',
-        ran_at: new Date().toISOString()
-      }),
-      { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
-    );
+    if (error) throw error;
+    emailResult = data ?? { ok: true };
+    console.log("[automation-runner] email-processor OK");
+  } catch (e) {
+    console.error("[automation-runner] email-processor ERROR:", e);
+    emailResult = { ok: false, error: String(e) };
   }
+
+  try {
+    const { data, error } = await supabase.functions.invoke("posting-processor", {
+      body: {}, // posting-processor usually reads queue internally
+    });
+    if (error) throw error;
+    postingResult = data ?? { ok: true };
+    console.log("[automation-runner] posting-processor OK");
+  } catch (e) {
+    console.error("[automation-runner] posting-processor ERROR:", e);
+    postingResult = { ok: false, error: String(e) };
+  }
+
+  console.log(`[automation-runner] end: ${new Date().toISOString()}`);
+
+  return json({
+    success: true,
+    ran_at: ranAt,
+    email: emailResult,
+    posting: postingResult,
+  });
 });
