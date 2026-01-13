@@ -12,7 +12,7 @@ const corsHeaders = {
 };
 
 interface UnifiedInboxRequest {
-  action: 'get_conversations' | 'get_messages' | 'send_message' | 'assign_conversation' | 'handover_conversation' | 'update_status';
+  action: 'get_conversations' | 'get_messages' | 'send_message' | 'assign_conversation' | 'handover_conversation' | 'update_status' | 'draft_reply';
   conversation_id?: string;
   user_id?: string;
   filters?: {
@@ -45,6 +45,21 @@ interface UnifiedInboxRequest {
     tags?: string[];
   };
 }
+
+// ICE SOS Lite knowledge context for Clara
+const ICE_SOS_KNOWLEDGE = `
+ICE SOS Lite is a personal safety and emergency alert service. Key facts:
+- Provides SOS button for emergencies - sends alerts to family/emergency contacts
+- GPS location sharing with family members
+- Medical ID card with vital health information
+- 24/7 monitoring optional add-on
+- Works on iOS and Android mobile apps
+- Designed for elderly, lone workers, and safety-conscious individuals
+- NOT a medical service - provides safety alerts and family connectivity
+- Subscription plans: Basic (free), Premium, Family plans available
+- Integration with emergency services coordination (not direct 911 replacement)
+- Key benefits: Peace of mind, quick alert system, location tracking, medical info access
+`;
 
 // Get conversations with filters
 async function getConversations(filters: any = {}) {
@@ -268,6 +283,177 @@ async function updateConversationStatus(conversationId: string, statusUpdate: an
   return { success: true };
 }
 
+// Draft AI reply using Clara
+async function draftReply(conversationId: string) {
+  console.log('Drafting AI reply for conversation:', conversationId);
+  
+  // Fetch conversation with latest messages
+  const { data: conversation, error: convError } = await supabase
+    .from('unified_conversations')
+    .select('*')
+    .eq('id', conversationId)
+    .single();
+  
+  if (convError || !conversation) {
+    throw new Error(`Failed to fetch conversation: ${convError?.message || 'Not found'}`);
+  }
+  
+  // Fetch messages to understand context
+  const { data: messages, error: msgError } = await supabase
+    .from('unified_messages')
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  
+  if (msgError) {
+    console.error('Error fetching messages:', msgError);
+  }
+  
+  // Build conversation context
+  const messageHistory = (messages || [])
+    .reverse()
+    .map(m => `${m.direction === 'inbound' ? 'Customer' : 'Support'}: ${m.content}`)
+    .join('\n');
+  
+  const customerName = conversation.contact_name || 'Customer';
+  const customerEmail = conversation.contact_email || '';
+  const subject = conversation.subject || 'General Inquiry';
+  const latestMessage = messages?.[0]?.content || '';
+  
+  // Call OpenAI to generate draft
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  if (!openAIApiKey) {
+    throw new Error('OpenAI API key not configured');
+  }
+  
+  const systemPrompt = `You are Clara, a professional customer service representative for ICE SOS Lite. 
+Your role is to draft helpful, professional, and friendly email responses.
+
+${ICE_SOS_KNOWLEDGE}
+
+Guidelines for responses:
+- Be warm, professional, and helpful
+- Address the customer's specific question or concern
+- Do NOT promise medical services - ICE SOS is about safety and emergency alerts
+- Keep responses under 2000 characters
+- Include a clear next step or call-to-action question
+- Do not be pushy about sales
+- Sign off as "Best regards, The ICE SOS Team"
+
+Also analyze the message and provide:
+1. Sentiment: one of "positive", "neutral", "negative", or "urgent"
+2. Category: one of "inquiry", "interest", "support", or "complaint"
+
+Respond in JSON format:
+{
+  "reply": "your drafted reply here",
+  "sentiment": "positive|neutral|negative|urgent",
+  "category": "inquiry|interest|support|complaint"
+}`;
+
+  const userPrompt = `Customer: ${customerName}
+Email: ${customerEmail}
+Subject: ${subject}
+
+Conversation history:
+${messageHistory || 'No previous messages'}
+
+Latest message from customer:
+${latestMessage}
+
+Please draft a professional reply and analyze the sentiment/category.`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 1000,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI API error:', response.status, errorText);
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const aiResponse = data.choices?.[0]?.message?.content || '';
+    
+    // Parse JSON response
+    let parsed: { reply: string; sentiment: string; category: string };
+    try {
+      // Try to extract JSON from the response
+      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[0]);
+      } else {
+        // Fallback if no JSON found
+        parsed = {
+          reply: aiResponse,
+          sentiment: 'neutral',
+          category: 'inquiry'
+        };
+      }
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError);
+      parsed = {
+        reply: aiResponse,
+        sentiment: 'neutral',
+        category: 'inquiry'
+      };
+    }
+    
+    // Validate sentiment and category
+    const validSentiments = ['positive', 'neutral', 'negative', 'urgent'];
+    const validCategories = ['inquiry', 'interest', 'support', 'complaint'];
+    
+    const sentiment = validSentiments.includes(parsed.sentiment) ? parsed.sentiment : 'neutral';
+    const category = validCategories.includes(parsed.category) ? parsed.category : 'inquiry';
+    
+    // Update conversation with AI draft
+    const { error: updateError } = await supabase
+      .from('unified_conversations')
+      .update({
+        ai_suggested_reply: parsed.reply,
+        ai_sentiment: sentiment,
+        ai_category: category,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', conversationId);
+    
+    if (updateError) {
+      console.error('Failed to save AI draft:', updateError);
+      throw new Error(`Failed to save AI draft: ${updateError.message}`);
+    }
+    
+    console.log('AI draft saved successfully for conversation:', conversationId);
+    
+    return {
+      success: true,
+      conversation_id: conversationId,
+      ai_suggested_reply: parsed.reply,
+      ai_sentiment: sentiment,
+      ai_category: category
+    };
+    
+  } catch (error) {
+    console.error('Error generating AI draft:', error);
+    throw error;
+  }
+}
+
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -384,6 +570,19 @@ const handler = async (req: Request): Promise<Response> => {
         }
         
         const result = await updateConversationStatus(conversation_id, status_update);
+        
+        return new Response(JSON.stringify(result), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+
+      case 'draft_reply': {
+        if (!conversation_id) {
+          throw new Error('Conversation ID is required');
+        }
+        
+        const result = await draftReply(conversation_id);
         
         return new Response(JSON.stringify(result), {
           status: 200,

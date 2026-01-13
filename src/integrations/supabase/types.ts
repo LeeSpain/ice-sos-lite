@@ -4707,6 +4707,9 @@ export type Database = {
       }
       unified_conversations: {
         Row: {
+          ai_category: string | null
+          ai_sentiment: string | null
+          ai_suggested_reply: string | null
           assigned_to: string | null
           category_id: string | null
           channel: string
@@ -4727,6 +4730,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          ai_category?: string | null
+          ai_sentiment?: string | null
+          ai_suggested_reply?: string | null
           assigned_to?: string | null
           category_id?: string | null
           channel: string
@@ -4747,6 +4753,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          ai_category?: string | null
+          ai_sentiment?: string | null
+          ai_suggested_reply?: string | null
           assigned_to?: string | null
           category_id?: string | null
           channel?: string

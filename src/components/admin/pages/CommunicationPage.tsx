@@ -36,8 +36,12 @@ import {
   Filter,
   Search,
   Calendar,
-  Target
+  Target,
+  Sparkles,
+  Loader2
 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 interface UnifiedConversation {
   id: string;
@@ -54,6 +58,9 @@ interface UnifiedConversation {
   message_count: number;
   last_activity_at: string;
   created_at: string;
+  ai_suggested_reply?: string;
+  ai_sentiment?: 'positive' | 'neutral' | 'negative' | 'urgent';
+  ai_category?: 'inquiry' | 'interest' | 'support' | 'complaint';
 }
 
 interface CommunicationMetrics {
@@ -110,7 +117,10 @@ export default function CommunicationPage() {
     }
   });
   const [campaigns, setCampaigns] = useState<any[]>([]);
-
+  
+  // AI Draft State
+  const [draftingReply, setDraftingReply] = useState(false);
+  const [autoDraftOnOpen, setAutoDraftOnOpen] = useState(false);
   useEffect(() => {
     loadConversations();
     loadMetrics();
@@ -278,6 +288,95 @@ export default function CommunicationPage() {
         description: "Failed to handover conversation",
         variant: "destructive",
       });
+    }
+  };
+
+  // Draft Reply with Clara
+  const draftReplyWithClara = async (conversationId?: string) => {
+    const targetId = conversationId || selectedConversation?.id;
+    if (!targetId) return;
+    
+    setDraftingReply(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('unified-inbox', {
+        body: {
+          action: 'draft_reply',
+          conversation_id: targetId
+        }
+      });
+
+      if (error) throw error;
+
+      // Update the selected conversation with AI data
+      if (selectedConversation && selectedConversation.id === targetId) {
+        setSelectedConversation({
+          ...selectedConversation,
+          ai_suggested_reply: data.ai_suggested_reply,
+          ai_sentiment: data.ai_sentiment,
+          ai_category: data.ai_category
+        });
+      }
+      
+      // Pre-fill the message textarea with the draft
+      if (data.ai_suggested_reply) {
+        setNewMessage(data.ai_suggested_reply);
+      }
+
+      toast({
+        title: "Draft Created",
+        description: "Clara has drafted a reply for your review",
+      });
+    } catch (error) {
+      console.error('Error drafting reply:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate AI draft. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDraftingReply(false);
+    }
+  };
+
+  // Handle conversation selection with optional auto-draft
+  const handleSelectConversation = async (conversation: UnifiedConversation) => {
+    setSelectedConversation(conversation);
+    loadMessages(conversation.id);
+    
+    // Auto-draft if enabled and no existing draft
+    if (autoDraftOnOpen && !conversation.ai_suggested_reply) {
+      await draftReplyWithClara(conversation.id);
+    }
+  };
+
+  // Use AI Draft button handler
+  const useAiDraft = () => {
+    if (selectedConversation?.ai_suggested_reply) {
+      setNewMessage(selectedConversation.ai_suggested_reply);
+      toast({
+        title: "Draft Applied",
+        description: "AI draft has been added to your reply",
+      });
+    }
+  };
+
+  // Get sentiment badge variant
+  const getSentimentBadge = (sentiment?: string) => {
+    switch (sentiment) {
+      case 'positive': return { variant: 'default' as const, className: 'bg-green-500/10 text-green-600 border-green-500/20' };
+      case 'negative': return { variant: 'destructive' as const, className: '' };
+      case 'urgent': return { variant: 'destructive' as const, className: 'bg-red-600' };
+      default: return { variant: 'secondary' as const, className: '' };
+    }
+  };
+
+  // Get category badge variant
+  const getCategoryBadge = (category?: string) => {
+    switch (category) {
+      case 'interest': return { variant: 'default' as const, className: 'bg-blue-500/10 text-blue-600 border-blue-500/20' };
+      case 'support': return { variant: 'secondary' as const, className: 'bg-amber-500/10 text-amber-600 border-amber-500/20' };
+      case 'complaint': return { variant: 'destructive' as const, className: '' };
+      default: return { variant: 'outline' as const, className: '' };
     }
   };
 
@@ -449,10 +548,7 @@ export default function CommunicationPage() {
                         className={`border rounded-lg p-3 cursor-pointer transition-colors hover:bg-muted/50 ${
                           selectedConversation?.id === conversation.id ? 'bg-muted' : ''
                         }`}
-                        onClick={() => {
-                          setSelectedConversation(conversation);
-                          loadMessages(conversation.id);
-                        }}
+                        onClick={() => handleSelectConversation(conversation)}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
@@ -525,7 +621,34 @@ export default function CommunicationPage() {
                   </CardTitle>
                   
                   {selectedConversation && (
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2">
+                      {/* Auto-draft toggle */}
+                      <div className="flex items-center space-x-2 mr-2">
+                        <Switch
+                          id="auto-draft"
+                          checked={autoDraftOnOpen}
+                          onCheckedChange={setAutoDraftOnOpen}
+                        />
+                        <Label htmlFor="auto-draft" className="text-xs text-muted-foreground">
+                          Auto-draft
+                        </Label>
+                      </div>
+                      
+                      {/* Draft Reply with Clara Button */}
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => draftReplyWithClara()}
+                        disabled={draftingReply}
+                      >
+                        {draftingReply ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4 mr-2" />
+                        )}
+                        Draft with Clara
+                      </Button>
+                      
                       <Dialog open={showHandoverDialog} onOpenChange={setShowHandoverDialog}>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm">
@@ -606,6 +729,30 @@ export default function CommunicationPage() {
                       </div>
                     </ScrollArea>
 
+                    {/* AI Draft Badges */}
+                    {(selectedConversation.ai_sentiment || selectedConversation.ai_category) && (
+                      <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                        <span className="text-xs text-muted-foreground">Clara's analysis:</span>
+                        {selectedConversation.ai_sentiment && (
+                          <Badge {...getSentimentBadge(selectedConversation.ai_sentiment)} className={`text-xs ${getSentimentBadge(selectedConversation.ai_sentiment).className}`}>
+                            {selectedConversation.ai_sentiment}
+                          </Badge>
+                        )}
+                        {selectedConversation.ai_category && (
+                          <Badge {...getCategoryBadge(selectedConversation.ai_category)} className={`text-xs ${getCategoryBadge(selectedConversation.ai_category).className}`}>
+                            {selectedConversation.ai_category}
+                          </Badge>
+                        )}
+                        {selectedConversation.ai_suggested_reply && !newMessage && (
+                          <Button variant="ghost" size="sm" onClick={useAiDraft} className="ml-auto text-xs">
+                            <Bot className="h-3 w-3 mr-1" />
+                            Use AI Draft
+                          </Button>
+                        )}
+                      </div>
+                    )}
+
                     {/* Message Input */}
                     <div className="flex gap-2">
                       <Textarea
@@ -615,9 +762,11 @@ export default function CommunicationPage() {
                         className="flex-1"
                         rows={3}
                       />
-                      <Button onClick={sendMessage} disabled={!newMessage.trim()}>
-                        <Send className="h-4 w-4" />
-                      </Button>
+                      <div className="flex flex-col gap-1">
+                        <Button onClick={sendMessage} disabled={!newMessage.trim()}>
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ) : (
