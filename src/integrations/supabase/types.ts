@@ -2213,6 +2213,42 @@ export type Database = {
           },
         ]
       }
+      lead_intelligence_runs: {
+        Row: {
+          created_at: string
+          extracted_count: number
+          id: string
+          model: string | null
+          saved_count: number
+          source_type: string
+          source_value: string
+          summary: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          extracted_count?: number
+          id?: string
+          model?: string | null
+          saved_count?: number
+          source_type: string
+          source_value: string
+          summary?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          extracted_count?: number
+          id?: string
+          model?: string | null
+          saved_count?: number
+          source_type?: string
+          source_value?: string
+          summary?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       lead_tags: {
         Row: {
           color: string | null

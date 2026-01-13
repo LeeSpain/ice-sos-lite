@@ -85,6 +85,7 @@ const useAdminMenuItems = () => {
       title: t('admin.aiChatLeads'),
       items: [
         { title: t('admin.leadManagement'), url: "/admin-dashboard/leads", icon: MessageSquare },
+        { title: t('admin.leadIntelligence'), url: "/admin-dashboard/lead-intelligence", icon: Target },
         { title: t('admin.conversations'), url: "/admin-dashboard/conversations", icon: MessageSquare },
       ]
     },
