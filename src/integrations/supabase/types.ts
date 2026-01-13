@@ -316,6 +316,33 @@ export type Database = {
         }
         Relationships: []
       }
+      business_hours: {
+        Row: {
+          created_at: string | null
+          day_of_week: number
+          end_time: string
+          id: string
+          is_active: boolean | null
+          start_time: string
+        }
+        Insert: {
+          created_at?: string | null
+          day_of_week: number
+          end_time?: string
+          id?: string
+          is_active?: boolean | null
+          start_time?: string
+        }
+        Update: {
+          created_at?: string | null
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          is_active?: boolean | null
+          start_time?: string
+        }
+        Relationships: []
+      }
       campaign_analytics: {
         Row: {
           campaign_id: string
@@ -3827,6 +3854,114 @@ export type Database = {
           updated_at?: string
           updated_by?: string | null
           value?: Json
+        }
+        Relationships: []
+      }
+      sla_breaches: {
+        Row: {
+          actual_minutes: number | null
+          breach_type: string
+          breached_at: string | null
+          conversation_id: string | null
+          created_at: string | null
+          escalated_to: string | null
+          escalation_sent_at: string | null
+          id: string
+          resolved_at: string | null
+          sla_setting_id: string | null
+          target_minutes: number
+        }
+        Insert: {
+          actual_minutes?: number | null
+          breach_type: string
+          breached_at?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          escalated_to?: string | null
+          escalation_sent_at?: string | null
+          id?: string
+          resolved_at?: string | null
+          sla_setting_id?: string | null
+          target_minutes: number
+        }
+        Update: {
+          actual_minutes?: number | null
+          breach_type?: string
+          breached_at?: string | null
+          conversation_id?: string | null
+          created_at?: string | null
+          escalated_to?: string | null
+          escalation_sent_at?: string | null
+          id?: string
+          resolved_at?: string | null
+          sla_setting_id?: string | null
+          target_minutes?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sla_breaches_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "unified_conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sla_breaches_sla_setting_id_fkey"
+            columns: ["sla_setting_id"]
+            isOneToOne: false
+            referencedRelation: "sla_settings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sla_settings: {
+        Row: {
+          business_hours_only: boolean | null
+          channel: string | null
+          created_at: string | null
+          description: string | null
+          escalate_to_user_id: string | null
+          escalation_after_minutes: number | null
+          escalation_enabled: boolean | null
+          first_response_target_minutes: number
+          id: string
+          is_active: boolean | null
+          name: string
+          priority: number | null
+          resolution_target_minutes: number
+          updated_at: string | null
+        }
+        Insert: {
+          business_hours_only?: boolean | null
+          channel?: string | null
+          created_at?: string | null
+          description?: string | null
+          escalate_to_user_id?: string | null
+          escalation_after_minutes?: number | null
+          escalation_enabled?: boolean | null
+          first_response_target_minutes?: number
+          id?: string
+          is_active?: boolean | null
+          name: string
+          priority?: number | null
+          resolution_target_minutes?: number
+          updated_at?: string | null
+        }
+        Update: {
+          business_hours_only?: boolean | null
+          channel?: string | null
+          created_at?: string | null
+          description?: string | null
+          escalate_to_user_id?: string | null
+          escalation_after_minutes?: number | null
+          escalation_enabled?: boolean | null
+          first_response_target_minutes?: number
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          priority?: number | null
+          resolution_target_minutes?: number
+          updated_at?: string | null
         }
         Relationships: []
       }

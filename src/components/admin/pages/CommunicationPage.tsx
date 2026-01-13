@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import SLASettingsPanel from '@/components/admin/communication/SLASettingsPanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -1048,30 +1049,7 @@ export default function CommunicationPage() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Communication Settings</CardTitle>
-              <p className="text-sm text-muted-foreground">Configure communication preferences and automation rules</p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium mb-2">Auto-Assignment Rules</h4>
-                  <p className="text-sm text-muted-foreground">Configure how conversations are automatically assigned to team members</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Response Templates</h4>
-                  <p className="text-sm text-muted-foreground">Manage quick response templates for common inquiries</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">SLA Settings</h4>
-                  <p className="text-sm text-muted-foreground">Set service level agreement response time targets</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <SLASettingsPanel />
         </TabsContent>
       </Tabs>
     </div>
