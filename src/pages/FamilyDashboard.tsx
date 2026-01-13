@@ -1,12 +1,11 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Shield, MapPin, Phone, Users, Bell, Heart } from 'lucide-react';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
-import { Navigate } from 'react-router-dom';
 import FamilyDashboardHome from '@/components/family-dashboard/FamilyDashboardHome';
 import FamilyEmergencyMap from '@/components/family-dashboard/FamilyEmergencyMap';
 import FamilyLiveMap from '@/components/family-dashboard/FamilyLiveMap';
@@ -17,6 +16,7 @@ import FamilyNotifications from '@/components/family-dashboard/FamilyNotificatio
 import FamilyProfile from '@/components/family-dashboard/FamilyProfile';
 
 const FamilyDashboard = () => {
+  const navigate = useNavigate();
   const { user, loading: authLoading } = useOptimizedAuth();
   const { data: familyRole, isLoading: roleLoading } = useFamilyRole();
 
@@ -60,7 +60,7 @@ const FamilyDashboard = () => {
             </p>
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = '/dashboard'}
+              onClick={() => navigate('/member-dashboard')}
             >
               Go to Main Dashboard
             </Button>

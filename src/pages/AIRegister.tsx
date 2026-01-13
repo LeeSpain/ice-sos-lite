@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,6 +66,7 @@ interface PersonalDetails {
 }
 
 const AIRegister = () => {
+  const navigate = useNavigate();
   console.log('🎯 AIRegister component started - checking for any cached issues');
   const [personalDetails, setPersonalDetails] = useState<PersonalDetails>({
     firstName: '',
@@ -379,7 +381,7 @@ const AIRegister = () => {
       
       // Redirect to payment success page
       setTimeout(() => {
-        window.location.href = '/payment-success';
+        navigate('/payment-success');
       }, 2000);
     } catch (error) {
       console.error('Registration error:', error);

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -271,10 +272,10 @@ const RegistrationSuccess = () => {
               
               <div className="text-center mt-8">
                 <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
-                  <a href="/dashboard">
+                  <Link to="/member-dashboard">
                     Access Your Dashboard
                     <ArrowRight className="h-4 w-4 ml-2" />
-                  </a>
+                  </Link>
                 </Button>
               </div>
             </CardContent>

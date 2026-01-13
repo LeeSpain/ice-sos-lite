@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ interface MyProductsWidgetProps {
 }
 
 const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
+  const navigate = useNavigate();
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
@@ -461,7 +463,7 @@ const MyProductsWidget = ({ profile }: MyProductsWidgetProps) => {
               </div>
               <Button 
                 size="sm" 
-                onClick={() => window.location.href = '/member-dashboard/subscription'}
+                onClick={() => navigate('/member-dashboard/subscription')}
                 className="bg-emergency text-black hover:bg-emergency/90"
               >
                 Subscribe

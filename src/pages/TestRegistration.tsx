@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,6 +35,7 @@ interface PersonalDetails {
 }
 
 const TestRegistration = () => {
+  const navigate = useNavigate();
   const [personalDetails, setPersonalDetails] = useState<PersonalDetails>({
     firstName: 'Test',
     lastName: 'User',
@@ -148,7 +150,7 @@ const TestRegistration = () => {
 
       // Redirect to payment success page
       setTimeout(() => {
-        window.location.href = '/payment-success';
+        navigate('/payment-success');
       }, 1500);
     } catch (error) {
       console.error('Test registration error:', error);
