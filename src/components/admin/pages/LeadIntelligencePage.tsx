@@ -45,6 +45,11 @@ interface ExtractedLead {
   notes: string;
   tags: string[];
   selected?: boolean;
+  // Classification fields (populated after save)
+  savedStatus?: 'saved' | 'duplicate';
+  segment?: string;
+  intent?: string;
+  priority?: string;
 }
 
 interface IntelligenceRun {
@@ -244,14 +249,38 @@ const LeadIntelligencePage: React.FC = () => {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
 
+      // Update leads with saved status and classification info
+      const savedLeadsInfo = data.saved_leads || [];
+      setLeads(prev => prev.map(lead => {
+        if (!lead.selected) return lead;
+        
+        // Find matching saved lead info
+        const savedInfo = savedLeadsInfo.find((s: any) => s.email === lead.email);
+        
+        if (savedInfo) {
+          return {
+            ...lead,
+            savedStatus: 'saved' as const,
+            segment: savedInfo.segment,
+            intent: savedInfo.intent,
+            priority: savedInfo.priority,
+            tags: savedInfo.tags || lead.tags
+          };
+        } else {
+          // Was a duplicate or failed
+          return {
+            ...lead,
+            savedStatus: 'duplicate' as const
+          };
+        }
+      }));
+
       toast({ 
-        title: 'Leads Saved', 
+        title: 'Leads Saved & Classified', 
         description: `Saved ${data.saved} leads, skipped ${data.duplicates} duplicates` 
       });
 
-      // Clear results and reload runs
-      setLeads([]);
-      setSummary('');
+      // Reload runs
       loadRuns();
 
     } catch (error) {
@@ -680,7 +709,55 @@ const LeadIntelligencePage: React.FC = () => {
 
                       <div className="flex flex-wrap gap-2 items-center justify-between">
                         <div className="flex flex-wrap gap-2 items-center">
-                          {lead.tags?.map((tag, i) => (
+                          {/* Saved status indicator */}
+                          {lead.savedStatus === 'saved' && (
+                            <Badge className="bg-green-500 text-white text-xs">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Saved ✓
+                            </Badge>
+                          )}
+                          {lead.savedStatus === 'duplicate' && (
+                            <Badge variant="secondary" className="text-xs">
+                              Duplicate
+                            </Badge>
+                          )}
+                          
+                          {/* Classification badges (shown after save) */}
+                          {lead.intent && (
+                            <Badge 
+                              className={`text-xs ${
+                                lead.intent === 'hot' ? 'bg-red-500 text-white' :
+                                lead.intent === 'warm' ? 'bg-orange-500 text-white' :
+                                'bg-blue-500 text-white'
+                              }`}
+                            >
+                              {lead.intent.toUpperCase()}
+                            </Badge>
+                          )}
+                          {lead.segment && (
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {lead.segment.replace('_', ' ')}
+                            </Badge>
+                          )}
+                          {lead.priority && (
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${
+                                lead.priority === 'high' ? 'border-red-500 text-red-600' :
+                                lead.priority === 'medium' ? 'border-orange-500 text-orange-600' :
+                                'border-blue-500 text-blue-600'
+                              }`}
+                            >
+                              Priority: {lead.priority}
+                            </Badge>
+                          )}
+                          
+                          {/* Original tags */}
+                          {lead.tags?.filter(tag => 
+                            !tag.startsWith('lead:') && 
+                            !tag.startsWith('segment:') && 
+                            !tag.startsWith('intent:')
+                          ).map((tag, i) => (
                             <Badge key={i} variant="secondary" className="text-xs">
                               {tag}
                             </Badge>
