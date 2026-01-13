@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -111,7 +112,7 @@ const SecureAdminSetup = () => {
               </AlertDescription>
             </Alert>
             <Button asChild variant="outline" className="w-full">
-              <a href="/auth">Go to Login</a>
+              <Link to="/auth">Go to Login</Link>
             </Button>
           </CardContent>
         </Card>
@@ -139,7 +140,7 @@ const SecureAdminSetup = () => {
                 </AlertDescription>
               </Alert>
               <Button asChild variant="outline" className="w-full">
-                <a href="/auth">Go to Login</a>
+                <Link to="/auth">Go to Login</Link>
               </Button>
             </>
           ) : (
@@ -172,7 +173,7 @@ const SecureAdminSetup = () => {
           
           <div className="text-center">
             <Button asChild variant="ghost" size="sm">
-              <a href="/">← Back to Home</a>
+              <Link to="/">← Back to Home</Link>
             </Button>
           </div>
         </CardContent>

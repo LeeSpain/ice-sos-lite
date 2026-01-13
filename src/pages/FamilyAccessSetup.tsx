@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ import SetupFamilyProducts from "@/components/dashboard/family/SetupFamilyProduc
 import TestFamilySOSSystem from "@/components/dashboard/family/TestFamilySOSSystem";
 
 const FamilyAccessSetupPage = () => {
+  const navigate = useNavigate();
   const [setupStage, setSetupStage] = useState<'initial' | 'products' | 'testing' | 'complete'>('initial');
   const [isLoading, setIsLoading] = useState(false);
   const [testResults, setTestResults] = useState<any>(null);
@@ -217,10 +219,10 @@ const FamilyAccessSetupPage = () => {
                     <li>• Privacy-first: location only during active SOS</li>
                   </ul>
                   <div className="flex gap-2">
-                    <Button onClick={() => window.location.href = '/dashboard/emergency'}>
+                    <Button onClick={() => navigate('/member-dashboard/emergency')}>
                       Go to Emergency Contacts
                     </Button>
-                    <Button variant="outline" onClick={() => window.location.href = '/dashboard'}>
+                    <Button variant="outline" onClick={() => navigate('/member-dashboard')}>
                       Back to Dashboard
                     </Button>
                   </div>

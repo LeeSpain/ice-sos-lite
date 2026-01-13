@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +12,7 @@ interface PaymentVerificationProps {
 }
 
 export const PaymentVerification = ({ sessionId, onVerificationComplete }: PaymentVerificationProps) => {
+  const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'failed'>('loading');
   const [details, setDetails] = useState<string>('');
   const { toast } = useToast();
@@ -98,7 +100,7 @@ export const PaymentVerification = ({ sessionId, onVerificationComplete }: Payme
               Retry Verification
             </Button>
             <Button 
-              onClick={() => window.location.href = '/contact'} 
+              onClick={() => navigate('/contact')} 
               variant="ghost" 
               className="w-full"
             >
@@ -109,7 +111,7 @@ export const PaymentVerification = ({ sessionId, onVerificationComplete }: Payme
         
         {status === 'success' && (
           <Button 
-            onClick={() => window.location.href = '/dashboard'} 
+            onClick={() => navigate('/member-dashboard')} 
             className="w-full"
           >
             Go to Dashboard

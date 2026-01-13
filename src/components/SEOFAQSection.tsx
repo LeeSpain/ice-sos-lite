@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -92,9 +93,9 @@ const SEOFAQSection: React.FC<SEOFAQSectionProps> = ({
             <div className="text-center mt-12">
               <p className="text-muted-foreground">
                 Still have questions? {' '}
-                <a href="/contact" className="text-primary hover:underline font-medium">
+                <Link to="/contact" className="text-primary hover:underline font-medium">
                   Contact our support team
-                </a>
+                </Link>
                 {' '} for personalized assistance.
               </p>
             </div>

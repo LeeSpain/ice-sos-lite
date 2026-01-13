@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +27,7 @@ interface EmergencyActionsWidgetProps {
 }
 
 const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidgetProps) => {
+  const navigate = useNavigate();
   const [testingSystem, setTestingSystem] = useState(false);
   const [testResults, setTestResults] = useState<string | null>(null);
   const [isConnected] = useState(true); // You can integrate with actual connectivity state
@@ -163,7 +165,7 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
       title: "Activate Protection",
       description: "Subscribe to emergency services",
       icon: Shield,
-      action: () => window.location.href = '/member-dashboard/subscription',
+      action: () => navigate('/member-dashboard/subscription'),
       priority: "high"
     });
   }
@@ -173,7 +175,7 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
       title: "Add Emergency Contacts",
       description: `Add ${3 - emergencyContactsCount} more contacts`,
       icon: Phone,
-      action: () => window.location.href = '/member-dashboard/connections',
+      action: () => navigate('/member-dashboard/connections'),
       priority: "medium"
     });
   }
@@ -183,7 +185,7 @@ const EmergencyActionsWidget = ({ profile, subscription }: EmergencyActionsWidge
       title: "Complete Profile",
       description: "Fill in remaining details",
       icon: CheckCircle,
-      action: () => window.location.href = '/member-dashboard/profile',
+      action: () => navigate('/member-dashboard/profile'),
       priority: "low"
     });
   }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,7 @@ import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { useToast } from '@/hooks/use-toast';
 
 const FamilyEmergencyMap = () => {
+  const navigate = useNavigate();
   const { data: familyRole } = useFamilyRole();
   const { toast } = useToast();
   
@@ -155,7 +157,7 @@ const FamilyEmergencyMap = () => {
             </p>
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = '/dashboard'}
+              onClick={() => navigate('/member-dashboard')}
             >
               Return to Dashboard
             </Button>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ interface FlicEvent {
 }
 
 const EnhancedMyProductsPage = () => {
+  const navigate = useNavigate();
   const [userProducts, setUserProducts] = useState<any[]>([]);
   const [subscription, setSubscription] = useState<any>(null);
   const [availableProducts, setAvailableProducts] = useState<any[]>([]);
@@ -393,7 +395,7 @@ const EnhancedMyProductsPage = () => {
                 <Button 
                   variant="outline" 
                   className="justify-start"
-                  onClick={() => window.location.href = '/member-dashboard/subscription'}
+                  onClick={() => navigate('/member-dashboard/subscription')}
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
                   Manage Subscription
@@ -551,10 +553,10 @@ const EnhancedMyProductsPage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="p-4 bg-muted/50 rounded-lg border text-center">
+              <div className="p-4 bg-muted/50 rounded-lg border text-center">
                   <h3 className="font-semibold text-lg mb-2">No Active Subscription</h3>
                   <p className="text-sm text-muted-foreground mb-4">Subscribe to activate emergency protection</p>
-                  <Button onClick={() => window.location.href = '/member-dashboard/subscription'}>
+                  <Button onClick={() => navigate('/member-dashboard/subscription')}>
                     Subscribe Now
                   </Button>
                 </div>

@@ -340,6 +340,17 @@ function AppWithTracking() {
                   <Navigate to="/family-dashboard" replace />
                 } />
 
+                {/* Common short paths redirect to member dashboard */}
+                <Route path="/subscription" element={
+                  <Navigate to="/member-dashboard/subscription" replace />
+                } />
+                <Route path="/emergency" element={
+                  <Navigate to="/member-dashboard/emergency" replace />
+                } />
+                <Route path="/profile" element={
+                  <Navigate to="/member-dashboard/profile" replace />
+                } />
+
                 {/* Catch all route */}
                 <Route path="*" element={
                   <OptimizedSuspense skeletonType="card">
