@@ -140,80 +140,14 @@ verify_jwt = true
 [functions.detect-place-events]
 verify_jwt = true
 
-[functions.email-management]
-verify_jwt = true
-
-[functions.emergency-test]
-verify_jwt = true
-
-[functions.family-invite-acceptance]
-verify_jwt = true
-
 [functions.geo-lookup]
 verify_jwt = false
-
-[functions.handle-device-sos]
-verify_jwt = true
-
-[functions.handle-sos]
-verify_jwt = true
-
-[functions.homepage-analytics]
-verify_jwt = false
-
-[functions.live-location-update]
-verify_jwt = true
-
-[functions.marketing-automation]
-verify_jwt = true
-
-[functions.notify-contacts]
-verify_jwt = true
-
-[functions.personal-info-analyzer]
-verify_jwt = true
 
 [functions.posting-processor]
 verify_jwt = true
 
-[functions.process-contact-form]
-verify_jwt = false
-
-[functions.product-catalog]
-verify_jwt = false
-
-[functions.register-device]
-verify_jwt = true
-
-[functions.riven-marketing]
-verify_jwt = true
-
 [functions.setup-family-stripe-products]
 verify_jwt = true
-
-[functions.sms-webhook]
-verify_jwt = false
-
-[functions.sos-analytics]
-verify_jwt = true
-
-[functions.sos-escalation]
-verify_jwt = true
-
-[functions.test-email-system]
-verify_jwt = true
-
-[functions.user-device-registration]
-verify_jwt = true
-
-[functions.verify-phone-number]
-verify_jwt = true
-
-[functions.video-analytics]
-verify_jwt = false
-
-[functions.whatsapp-webhook]
-verify_jwt = false
 
 [functions.email-campaign-creator]
 verify_jwt = true
@@ -222,12 +156,6 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.email-publisher]
-verify_jwt = false
-
-[functions.email-system-test]
-verify_jwt = false
-
-[functions.seed-demo-customers]
 verify_jwt = false
 
 [functions.get-customer-activity]
@@ -247,3 +175,114 @@ verify_jwt = false
 
 [functions.lead-intelligence]
 verify_jwt = false
+
+[functions.create-subscriptions]
+verify_jwt = true
+
+[functions.customer-portal]
+verify_jwt = true
+
+[functions.emergency-service-integration]
+verify_jwt = true
+
+[functions.emergency-sos-enhanced]
+verify_jwt = true
+
+[functions.emergency-sos]
+verify_jwt = true
+
+[functions.enforce-location-retention]
+verify_jwt = true
+
+[functions.enhanced-email-automation]
+verify_jwt = true
+
+[functions.family-invite-management]
+verify_jwt = true
+
+[functions.family-invites]
+verify_jwt = true
+
+[functions.family-sos-acknowledge]
+verify_jwt = true
+
+[functions.family-sos-alerts]
+verify_jwt = true
+
+[functions.family-sos-enhanced]
+verify_jwt = true
+
+[functions.flic-webhook]
+verify_jwt = false
+
+[functions.free-trial-signup]
+verify_jwt = false
+
+[functions.get-stripe-config]
+verify_jwt = false
+
+[functions.gmail-token-security]
+verify_jwt = true
+
+[functions.image-generator]
+verify_jwt = true
+
+[functions.manage-customer-subscription]
+verify_jwt = true
+
+[functions.notify-user]
+verify_jwt = true
+
+[functions.record-location-ping]
+verify_jwt = true
+
+[functions.regional-close-event]
+verify_jwt = true
+
+[functions.regional-quick-notification]
+verify_jwt = true
+
+[functions.regional-send-note]
+verify_jwt = true
+
+[functions.regional-user-invite]
+verify_jwt = true
+
+[functions.send-welcome-email]
+verify_jwt = true
+
+[functions.setup-stripe-products]
+verify_jwt = true
+
+[functions.smart-routing]
+verify_jwt = true
+
+[functions.social-media-oauth]
+verify_jwt = true
+
+[functions.social-media-publisher]
+verify_jwt = true
+
+[functions.social-oauth-handler]
+verify_jwt = false
+
+[functions.sos-create]
+verify_jwt = true
+
+[functions.system-health]
+verify_jwt = true
+
+[functions.transfer-client-to-care]
+verify_jwt = true
+
+[functions.twilio-status-webhook]
+verify_jwt = false
+
+[functions.unified-inbox]
+verify_jwt = true
+
+[functions.video-analytics-ingest]
+verify_jwt = false
+
+[functions.email-campaigns]
+verify_jwt = true
