@@ -7,6 +7,7 @@ import EnhancedDashboardOverview from '@/components/admin/pages/EnhancedDashboar
 import CustomersPage from '@/components/admin/pages/CustomersPage';
 import CustomerProfilePage from '@/components/admin/CustomerProfilePage';
 import LeadsPage from '@/components/admin/pages/LeadsPage';
+import LeadIntelligencePage from '@/components/admin/pages/LeadIntelligencePage';
 import ConversationsPage from '@/components/admin/pages/ConversationsPage';
 import SubscriptionsPage from '@/components/admin/pages/SubscriptionsPage';
 import ActivityPage from '@/components/admin/pages/ActivityPage';
@@ -79,6 +80,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="protection-plans" element={<GlobalProtectionPlansPage />} />
         <Route path="families" element={<FamilyAccountsPage />} />
         <Route path="leads" element={<LeadsPage />} />
+        <Route path="lead-intelligence" element={<LeadIntelligencePage />} />
         <Route path="conversations" element={<ConversationsPage />} />
         <Route path="ai-metrics" element={<AIPerformancePage />} />
         <Route path="contact-submissions" element={<ContactSubmissionsPage />} />

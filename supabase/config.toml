@@ -244,3 +244,6 @@ verify_jwt = true
 
 [functions.automation-runner]
 verify_jwt = false
+
+[functions.lead-intelligence]
+verify_jwt = false
