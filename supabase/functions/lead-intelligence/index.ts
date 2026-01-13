@@ -145,6 +145,8 @@ serve(async (req) => {
       return await handleAnalyzeText(body.text, body.source, openAIApiKey, corsHeaders);
     } else if (action === 'save_leads') {
       return await handleSaveLeads(body, supabase, userId, corsHeaders);
+    } else if (action === 'generate_intro') {
+      return await handleGenerateIntro(body.lead, openAIApiKey, corsHeaders);
     } else {
       return new Response(JSON.stringify({ error: 'Invalid action' }), {
         status: 400,
@@ -484,4 +486,106 @@ async function handleSaveLeads(
   }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
+}
+
+async function handleGenerateIntro(
+  lead: Lead,
+  openAIApiKey: string,
+  corsHeaders: Record<string, string>
+): Promise<Response> {
+  console.log('[lead-intelligence] Generating intro email for lead:', lead?.company || lead?.name);
+
+  if (!lead) {
+    return new Response(JSON.stringify({ error: 'Lead data is required' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const systemPrompt = `You are a professional sales copywriter for ICE SOS Lite, an emergency SOS and monitoring solution.
+Write short, professional intro emails that:
+- Are warm but not salesy
+- Focus on the recipient's potential needs based on their role/company
+- Mention ICE SOS Lite's key benefits for their specific context
+- End with a soft call-to-action asking if they'd like to learn more
+- Are concise (100-150 words max)
+- Use a professional yet approachable tone
+
+ICE SOS Lite features:
+- Emergency SOS alerts with location sharing
+- Family circles for connected safety
+- Medical info storage for emergencies
+- Works offline in critical situations
+- Designed for seniors, families, and care organisations`;
+
+  const userPrompt = `Write a professional intro email to introduce ICE SOS Lite.
+
+Recipient details:
+- Company: ${lead.company || 'Not specified'}
+- Name: ${lead.name || 'Not specified'}
+- Role: ${lead.role || 'Decision maker'}
+- Context: ${lead.notes || 'Potential interest in emergency/safety solutions'}
+
+Write ONLY the email body text (no subject line, no greeting like "Dear X" at the very start - just the content). Keep it under 150 words.`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        max_tokens: 500,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('[lead-intelligence] OpenAI error:', errText);
+      return new Response(JSON.stringify({ error: 'Failed to generate email' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content?.trim() || '';
+
+    if (!content) {
+      return new Response(JSON.stringify({ error: 'No content generated' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Generate a subject line
+    const subjectLine = lead.company 
+      ? `Introducing ICE SOS Lite - Safety Solutions for ${lead.company}`
+      : 'Introducing ICE SOS Lite - Emergency Safety Made Simple';
+
+    console.log('[lead-intelligence] Email generated successfully');
+
+    return new Response(JSON.stringify({
+      subject: subjectLine,
+      body: content,
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+
+  } catch (error) {
+    console.error('[lead-intelligence] Generate intro error:', error);
+    return new Response(JSON.stringify({ 
+      error: error instanceof Error ? error.message : 'Failed to generate email' 
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 }
