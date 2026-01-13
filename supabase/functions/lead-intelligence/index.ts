@@ -369,6 +369,158 @@ ${text}`;
   }
 }
 
+// Classify segment based on notes/source content
+function classifySegment(lead: Lead, sourceValue: string): string {
+  const text = `${lead.notes || ''} ${lead.company || ''} ${sourceValue || ''}`.toLowerCase();
+  
+  if (/care\s?home|residence|assisted\s?living|nursing\s?home|residents|care\s?provider/.test(text)) {
+    return 'care_home';
+  }
+  if (/my\s?(mother|father|mum|dad)|elderly\s?parent|family|living\s?alone|grandmother|grandfather/.test(text)) {
+    return 'family';
+  }
+  if (/partner|reseller|distributor|agency|ngo|council|b2b|wholesale/.test(text)) {
+    return 'partner';
+  }
+  return 'general';
+}
+
+// Classify intent based on lead score
+function classifyIntent(leadScore: number): 'hot' | 'warm' | 'cold' {
+  if (leadScore >= 80) return 'hot';
+  if (leadScore >= 50) return 'warm';
+  return 'cold';
+}
+
+// Get priority based on intent
+function getPriority(intent: 'hot' | 'warm' | 'cold'): 'high' | 'medium' | 'low' {
+  switch (intent) {
+    case 'hot': return 'high';
+    case 'warm': return 'medium';
+    case 'cold': return 'low';
+  }
+}
+
+// Merge tags without duplicates
+function mergeTags(existingTags: string[], segment: string, intent: string): string[] {
+  const newTags = [
+    ...existingTags,
+    'lead:intel',
+    `segment:${segment}`,
+    `intent:${intent}`
+  ];
+  return [...new Set(newTags)];
+}
+
+// Optional: Try to add lead to email groups if tables exist
+async function tryAddToEmailGroup(
+  supabase: ReturnType<typeof createClient>,
+  userId: string,
+  email: string,
+  intent: 'hot' | 'warm' | 'cold'
+): Promise<void> {
+  const groupName = `Lead Intel - ${intent.charAt(0).toUpperCase() + intent.slice(1)}`;
+  
+  // Try different table name conventions for groups
+  const groupTables = ['email_contact_groups', 'contact_groups', 'email_groups'];
+  const memberTables = ['email_group_members', 'contact_group_members', 'email_contacts'];
+  
+  let groupTableName: string | null = null;
+  let memberTableName: string | null = null;
+  
+  // Find which group table exists
+  for (const tableName of groupTables) {
+    try {
+      const { error } = await supabase.from(tableName).select('id').limit(1);
+      if (!error) {
+        groupTableName = tableName;
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+  
+  if (!groupTableName) {
+    console.log('[lead-intelligence] No email group table found, skipping group assignment');
+    return;
+  }
+  
+  // Find which member table exists
+  for (const tableName of memberTables) {
+    try {
+      const { error } = await supabase.from(tableName).select('id').limit(1);
+      if (!error) {
+        memberTableName = tableName;
+        break;
+      }
+    } catch {
+      continue;
+    }
+  }
+  
+  if (!memberTableName) {
+    console.log('[lead-intelligence] No email group member table found, skipping group assignment');
+    return;
+  }
+  
+  console.log(`[lead-intelligence] Using group table: ${groupTableName}, member table: ${memberTableName}`);
+  
+  try {
+    // Check if group exists, create if not
+    let { data: existingGroup } = await supabase
+      .from(groupTableName)
+      .select('id')
+      .eq('name', groupName)
+      .maybeSingle();
+    
+    let groupId: string;
+    
+    if (!existingGroup) {
+      const { data: newGroup, error: createError } = await supabase
+        .from(groupTableName)
+        .insert({
+          name: groupName,
+          description: `Auto-created group for ${intent} leads from Lead Intelligence`,
+          created_by: userId
+        })
+        .select('id')
+        .single();
+      
+      if (createError) {
+        console.log(`[lead-intelligence] Could not create group: ${createError.message}`);
+        return;
+      }
+      groupId = newGroup.id;
+      console.log(`[lead-intelligence] Created group: ${groupName}`);
+    } else {
+      groupId = existingGroup.id;
+    }
+    
+    // Add email to group (skip if duplicate)
+    const { error: memberError } = await supabase
+      .from(memberTableName)
+      .upsert({
+        group_id: groupId,
+        email: email,
+        added_by: userId,
+        added_at: new Date().toISOString()
+      }, {
+        onConflict: 'group_id,email',
+        ignoreDuplicates: true
+      });
+    
+    if (memberError) {
+      console.log(`[lead-intelligence] Could not add to group: ${memberError.message}`);
+    } else {
+      console.log(`[lead-intelligence] Added ${email} to group: ${groupName}`);
+    }
+    
+  } catch (err) {
+    console.log(`[lead-intelligence] Email group operation failed: ${err}`);
+  }
+}
+
 async function handleSaveLeads(
   body: { 
     leads: Lead[]; 
@@ -394,6 +546,13 @@ async function handleSaveLeads(
 
   let savedCount = 0;
   let duplicateCount = 0;
+  const savedLeadsInfo: Array<{
+    email: string | null;
+    segment: string;
+    intent: string;
+    priority: string;
+    tags: string[];
+  }> = [];
 
   for (const lead of leads) {
     // Check for duplicates by email or phone
@@ -428,7 +587,31 @@ async function handleSaveLeads(
       continue;
     }
 
-    // Insert lead
+    // Classify the lead
+    const segment = classifySegment(lead, source_value);
+    const intent = classifyIntent(lead.lead_score_0_100 || 0);
+    const priority = getPriority(intent);
+    const mergedTags = mergeTags(lead.tags || [], segment, intent);
+
+    // Build enhanced metadata
+    const enhancedMetadata = {
+      name: lead.name,
+      company: lead.company,
+      role: lead.role,
+      location: lead.location,
+      lead_score: lead.lead_score_0_100,
+      interest_level: lead.interest_level_0_10,
+      segment: segment,
+      intent: intent,
+      priority: priority,
+      tags: mergedTags,
+      source_type: source_type,
+      source_value: source_value,
+      created_via: 'lead_intelligence',
+      extracted_at: new Date().toISOString(),
+    };
+
+    // Insert lead with enhanced metadata
     const { error: insertError } = await supabase.from('leads').insert({
       session_id: crypto.randomUUID(),
       user_id: userId,
@@ -438,23 +621,30 @@ async function handleSaveLeads(
       recommended_plan: lead.recommended_plan || null,
       conversation_summary: lead.notes || summary || null,
       status: 'new',
-      metadata: {
-        name: lead.name,
-        company: lead.company,
-        role: lead.role,
-        location: lead.location,
-        lead_score: lead.lead_score_0_100,
-        tags: lead.tags || [],
-        source_type: source_type,
-        source_value: source_value,
-        extracted_at: new Date().toISOString(),
-      },
+      tags: mergedTags,
+      metadata: enhancedMetadata,
     });
 
     if (insertError) {
       console.error('[lead-intelligence] Insert error:', insertError);
     } else {
       savedCount++;
+      savedLeadsInfo.push({
+        email: lead.email,
+        segment,
+        intent,
+        priority,
+        tags: mergedTags
+      });
+
+      // Try to add to email group (optional, non-blocking)
+      if (lead.email) {
+        try {
+          await tryAddToEmailGroup(supabase, userId, lead.email, intent);
+        } catch (groupErr) {
+          console.log('[lead-intelligence] Email group error (non-fatal):', groupErr);
+        }
+      }
     }
   }
 
@@ -483,6 +673,7 @@ async function handleSaveLeads(
     saved: savedCount,
     duplicates: duplicateCount,
     run_id: runData?.id || null,
+    saved_leads: savedLeadsInfo, // Return classification info for frontend
   }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
