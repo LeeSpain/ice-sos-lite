@@ -335,6 +335,11 @@ function AppWithTracking() {
                   </ProtectedSOSRoute>
                 } />
 
+                {/* Legacy family route redirect */}
+                <Route path="/family/*" element={
+                  <Navigate to="/family-dashboard" replace />
+                } />
+
                 {/* Catch all route */}
                 <Route path="*" element={
                   <OptimizedSuspense skeletonType="card">

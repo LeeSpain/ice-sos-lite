@@ -13,6 +13,8 @@ import FamilyLiveMap from '@/components/family-dashboard/FamilyLiveMap';
 import { AdvancedMapFeatures } from '@/components/family-dashboard/AdvancedMapFeatures';
 import ConnectionDashboard from '@/components/family-dashboard/ConnectionDashboard';
 import FamilyDashboardSidebar from '@/components/family-dashboard/FamilyDashboardSidebar';
+import FamilyNotifications from '@/components/family-dashboard/FamilyNotifications';
+import FamilyProfile from '@/components/family-dashboard/FamilyProfile';
 
 const FamilyDashboard = () => {
   const { user, loading: authLoading } = useOptimizedAuth();
@@ -81,6 +83,8 @@ const FamilyDashboard = () => {
               <Route path="/advanced-map" element={<AdvancedMapFeatures />} />
               <Route path="/emergency-map" element={<FamilyEmergencyMap />} />
               <Route path="/live-map" element={<FamilyLiveMap />} />
+              <Route path="/notifications" element={<FamilyNotifications />} />
+              <Route path="/profile" element={<FamilyProfile />} />
             </Routes>
       </main>
     </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,7 @@ import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { supabase } from '@/integrations/supabase/client';
 
 const LiveTrackingWidget = () => {
+  const navigate = useNavigate();
   const { data: familyRole } = useFamilyRole();
   const [activeCircleId, setActiveCircleId] = useState<string | null>(null);
   const [familyMembers, setFamilyMembers] = useState<any[]>([]);
@@ -165,7 +167,7 @@ const LiveTrackingWidget = () => {
               variant="outline" 
               size="sm" 
               className="flex-1 text-blue-600 border-blue-300 hover:bg-blue-50"
-              onClick={() => window.location.href = '/family-dashboard/live-map'}
+              onClick={() => navigate('/family-dashboard/live-map')}
             >
               <MapPin className="h-4 w-4 mr-2" />
               Open Live Map
@@ -174,7 +176,7 @@ const LiveTrackingWidget = () => {
               variant="outline" 
               size="sm" 
               className="flex-1 text-blue-600 border-blue-300 hover:bg-blue-50"
-              onClick={() => window.location.href = '/family-dashboard'}
+              onClick={() => navigate('/family-dashboard')}
             >
               <Users className="h-4 w-4 mr-2" />
               Manage Family

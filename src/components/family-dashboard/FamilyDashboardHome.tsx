@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Users, Shield, AlertTriangle, CheckCircle, MapPin, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useOptimizedAuth } from '@/hooks/useOptimizedAuth';
@@ -10,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const FamilyDashboardHome = () => {
+  const navigate = useNavigate();
   const { user } = useOptimizedAuth();
   const { data: familyRole } = useFamilyRole();
   const { toast } = useToast();
@@ -153,7 +155,7 @@ const FamilyDashboardHome = () => {
             </p>
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = '/dashboard'}
+              onClick={() => navigate('/dashboard')}
             >
               Go to Main Dashboard
             </Button>
@@ -314,7 +316,7 @@ const FamilyDashboardHome = () => {
             <Button 
               variant="outline" 
               className="justify-start h-auto p-4"
-              onClick={() => window.location.href = '/family-dashboard/live-map'}
+              onClick={() => navigate('/family-dashboard/live-map')}
             >
               <div className="text-left">
                 <div className="font-medium">Live Family Map</div>
@@ -325,7 +327,7 @@ const FamilyDashboardHome = () => {
             <Button 
               variant="outline" 
               className="justify-start h-auto p-4"
-              onClick={() => window.location.href = '/family-dashboard/emergency-map'}
+              onClick={() => navigate('/family-dashboard/emergency-map')}
             >
               <div className="text-left">
                 <div className="font-medium">Emergency Center</div>
