@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import { useAuth } from '@/contexts/AuthContext';
 import { AIProviderDiagnostics } from '@/components/admin/AIProviderDiagnostics';
+import { CronApiSettings } from '@/components/admin/CronApiSettings';
 
 interface HealthCheck {
   component: string;
@@ -469,6 +470,9 @@ export default function SystemSettingsPage() {
 
       {/* AI Provider Diagnostics */}
       <AIProviderDiagnostics />
+
+      {/* Cron API Settings */}
+      <CronApiSettings />
 
     </div>
   );

@@ -241,3 +241,6 @@ verify_jwt = true
 
 [functions.assign-customer-service]
 verify_jwt = true
+
+[functions.automation-runner]
+verify_jwt = false

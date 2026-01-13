@@ -476,9 +476,49 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         await loadPublishedEmails();
       }
       
+      // Auto-queue social posts if user has connected platforms
+      let socialQueueMessage = "";
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user?.id) {
+          // Get connected social media platforms
+          const { data: connectedPlatforms } = await supabase
+            .from('social_media_oauth')
+            .select('id, platform')
+            .eq('user_id', userData.user.id)
+            .eq('connection_status', 'active');
+          
+          if (connectedPlatforms && connectedPlatforms.length > 0) {
+            // Queue posts for each connected platform
+            const queueInserts = connectedPlatforms.map(platform => ({
+              content_id: contentId,
+              platform: platform.platform,
+              oauth_account_id: platform.id,
+              scheduled_time: new Date().toISOString(),
+              status: 'queued',
+              retry_count: 0,
+              max_retries: 3
+            }));
+            
+            const { error: queueError } = await supabase
+              .from('social_media_posting_queue')
+              .insert(queueInserts);
+            
+            if (!queueError) {
+              socialQueueMessage = ` and queued for ${connectedPlatforms.length} social platform(s)`;
+            }
+          } else {
+            socialQueueMessage = " (connect social accounts to auto-post)";
+          }
+        }
+      } catch (socialError) {
+        console.warn('Social queue error (non-blocking):', socialError);
+        // Don't break publishing if social queue fails
+      }
+      
       toast({
         title: "Content Published",
-        description: "Content has been successfully published!",
+        description: `Content has been successfully published${socialQueueMessage}!`,
       });
     } catch (error) {
       console.error('Error publishing content:', error);
