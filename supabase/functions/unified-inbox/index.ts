@@ -69,7 +69,6 @@ async function getConversations(filters: any = {}) {
     .from('unified_conversations')
     .select(`
       *,
-      conversation_categories(name),
       unified_messages(
         id, direction, content, created_at, sender_name
       )
