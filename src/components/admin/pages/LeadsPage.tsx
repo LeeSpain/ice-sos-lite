@@ -8,10 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { TrendingUp, Users, Target, CheckCircle, Zap, Kanban, List, Plus, Filter } from "lucide-react";
+import { TrendingUp, Users, Target, CheckCircle, Zap, Kanban, List, Plus, Filter, Mail } from "lucide-react";
 import { useEnhancedLeads, EnhancedLead } from '@/hooks/useEnhancedLeads';
 import { LeadDetailModal } from '@/components/admin/leads/LeadDetailModal';
 import { LeadKanbanBoard } from '@/components/admin/leads/LeadKanbanBoard';
+import { supabase } from '@/integrations/supabase/client';
+
+interface SequenceEnrollment {
+  lead_id: string;
+  status: string;
+  current_step: number;
+}
 
 const LeadsPage: React.FC = () => {
   const [filteredLeads, setFilteredLeads] = useState<EnhancedLead[]>([]);
@@ -21,6 +28,7 @@ const LeadsPage: React.FC = () => {
   const [selectedLead, setSelectedLead] = useState<EnhancedLead | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'kanban'>('list');
+  const [enrollments, setEnrollments] = useState<Map<string, SequenceEnrollment>>(new Map());
   const { toast } = useToast();
   
   const { leads, loading, updateLeadStatus } = useEnhancedLeads();
@@ -28,6 +36,29 @@ const LeadsPage: React.FC = () => {
   useEffect(() => {
     filterLeads();
   }, [leads, searchTerm, statusFilter, interestFilter]);
+
+  // Load sequence enrollments for displayed leads
+  useEffect(() => {
+    const loadEnrollments = async () => {
+      if (leads.length === 0) return;
+      
+      const leadIds = leads.map(l => l.id);
+      const { data, error } = await supabase
+        .from('followup_enrollments')
+        .select('lead_id, status, current_step')
+        .in('lead_id', leadIds);
+      
+      if (!error && data) {
+        const enrollmentMap = new Map<string, SequenceEnrollment>();
+        data.forEach((e: any) => {
+          enrollmentMap.set(e.lead_id, e);
+        });
+        setEnrollments(enrollmentMap);
+      }
+    };
+    
+    loadEnrollments();
+  }, [leads]);
 
   const filterLeads = () => {
     let filtered = leads;
@@ -268,7 +299,22 @@ const LeadsPage: React.FC = () => {
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {/* Sequence enrollment badge */}
+                            {enrollments.get(lead.id) && (
+                              <Badge 
+                                className={`text-xs flex items-center gap-1 ${
+                                  enrollments.get(lead.id)?.status === 'active' 
+                                    ? 'bg-purple-100 text-purple-800' 
+                                    : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                <Mail className="h-3 w-3" />
+                                Sequence: {enrollments.get(lead.id)?.status === 'active' 
+                                  ? `Step ${enrollments.get(lead.id)?.current_step}` 
+                                  : enrollments.get(lead.id)?.status}
+                              </Badge>
+                            )}
                             <Badge className={getInterestColor(lead.interest_level)}>
                               {getInterestLabel(lead.interest_level)} ({lead.interest_level})
                             </Badge>
