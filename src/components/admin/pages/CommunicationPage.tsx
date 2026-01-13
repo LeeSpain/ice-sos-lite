@@ -703,7 +703,7 @@ export default function CommunicationPage() {
                 {selectedConversation ? (
                   <div className="space-y-4">
                     {/* Messages */}
-                    <ScrollArea className="h-96 border rounded-lg p-4">
+                    <ScrollArea className="h-[500px] border rounded-lg p-4">
                       <div className="space-y-4">
                         {messages.map((message, index) => (
                           <div key={index} className={`flex ${message.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}>
@@ -760,7 +760,7 @@ export default function CommunicationPage() {
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type your message..."
                         className="flex-1"
-                        rows={3}
+                        rows={2}
                       />
                       <div className="flex flex-col gap-1">
                         <Button onClick={sendMessage} disabled={!newMessage.trim()}>
