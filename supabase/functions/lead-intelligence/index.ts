@@ -612,7 +612,7 @@ async function handleSaveLeads(
     };
 
     // Insert lead with enhanced metadata
-    const { error: insertError } = await supabase.from('leads').insert({
+    const { data: insertedLead, error: insertError } = await supabase.from('leads').insert({
       session_id: crypto.randomUUID(),
       user_id: userId,
       email: lead.email || null,
@@ -623,7 +623,7 @@ async function handleSaveLeads(
       status: 'new',
       tags: mergedTags,
       metadata: enhancedMetadata,
-    });
+    }).select('id').single();
 
     if (insertError) {
       console.error('[lead-intelligence] Insert error:', insertError);
@@ -643,6 +643,15 @@ async function handleSaveLeads(
           await tryAddToEmailGroup(supabase, userId, lead.email, intent);
         } catch (groupErr) {
           console.log('[lead-intelligence] Email group error (non-fatal):', groupErr);
+        }
+      }
+
+      // Auto-enroll HOT leads into follow-up sequence (non-blocking)
+      if (insertedLead && lead.email && intent === 'hot') {
+        try {
+          await enrollHotLeadInSequence(supabase, insertedLead.id);
+        } catch (enrollErr) {
+          console.log('[lead-intelligence] Sequence enrollment error (non-fatal):', enrollErr);
         }
       }
     }
@@ -677,6 +686,45 @@ async function handleSaveLeads(
   }), {
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
+}
+
+// Enroll a hot lead into the default follow-up sequence
+async function enrollHotLeadInSequence(
+  supabase: ReturnType<typeof createClient>,
+  leadId: string
+): Promise<void> {
+  const DEFAULT_SEQUENCE_ID = '11111111-1111-1111-1111-111111111111';
+  
+  // Check if already enrolled
+  const { data: existing } = await supabase
+    .from('followup_enrollments')
+    .select('id')
+    .eq('lead_id', leadId)
+    .eq('sequence_id', DEFAULT_SEQUENCE_ID)
+    .maybeSingle();
+  
+  if (existing) {
+    console.log('[lead-intelligence] Lead already enrolled in sequence');
+    return;
+  }
+  
+  // Create enrollment with immediate first send
+  const { error: enrollError } = await supabase
+    .from('followup_enrollments')
+    .insert({
+      sequence_id: DEFAULT_SEQUENCE_ID,
+      lead_id: leadId,
+      status: 'active',
+      current_step: 1,
+      enrolled_at: new Date().toISOString(),
+      next_send_at: new Date().toISOString() // Immediate
+    });
+  
+  if (enrollError) {
+    console.error('[lead-intelligence] Enrollment error:', enrollError);
+  } else {
+    console.log('[lead-intelligence] Enrolled hot lead in follow-up sequence');
+  }
 }
 
 async function handleGenerateIntro(

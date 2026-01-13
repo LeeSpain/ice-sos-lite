@@ -78,6 +78,7 @@ serve(async (req) => {
   // Keep bodies minimal; adjust only if your existing functions require different payloads.
   let emailResult: unknown = null;
   let postingResult: unknown = null;
+  let followupResult: unknown = null;
 
   try {
     const { data, error } = await supabase.functions.invoke("email-processor", {
@@ -103,6 +104,15 @@ serve(async (req) => {
     postingResult = { ok: false, error: String(e) };
   }
 
+  // ---- PROCESS FOLLOWUP SEQUENCES ----
+  try {
+    followupResult = await processFollowupEnrollments(supabase);
+    console.log("[automation-runner] followup-processor OK");
+  } catch (e) {
+    console.error("[automation-runner] followup-processor ERROR:", e);
+    followupResult = { ok: false, error: String(e) };
+  }
+
   console.log(`[automation-runner] end: ${new Date().toISOString()}`);
 
   return json({
@@ -110,5 +120,200 @@ serve(async (req) => {
     ran_at: ranAt,
     email: emailResult,
     posting: postingResult,
+    followups: followupResult,
   });
 });
+
+// Process due followup enrollments
+async function processFollowupEnrollments(supabase: ReturnType<typeof createClient>) {
+  const now = new Date().toISOString();
+  let processed = 0;
+  let queued = 0;
+  let failed = 0;
+  let completed = 0;
+  let skipped = 0;
+
+  // Fetch due enrollments (active, next_send_at <= now, limit 50)
+  const { data: enrollments, error: fetchError } = await supabase
+    .from('followup_enrollments')
+    .select(`
+      id,
+      sequence_id,
+      lead_id,
+      current_step,
+      leads!inner (
+        id,
+        email,
+        status,
+        metadata
+      )
+    `)
+    .eq('status', 'active')
+    .lte('next_send_at', now)
+    .limit(50);
+
+  if (fetchError) {
+    console.error('[followup] Fetch error:', fetchError);
+    return { ok: false, error: fetchError.message };
+  }
+
+  if (!enrollments || enrollments.length === 0) {
+    console.log('[followup] No due enrollments');
+    return { ok: true, processed: 0, queued: 0, failed: 0, completed: 0, skipped: 0 };
+  }
+
+  console.log(`[followup] Processing ${enrollments.length} due enrollments`);
+
+  for (const enrollment of enrollments) {
+    processed++;
+    
+    try {
+      const lead = enrollment.leads as any;
+      
+      // Skip if no email
+      if (!lead?.email) {
+        console.log(`[followup] Skipping enrollment ${enrollment.id}: no email`);
+        skipped++;
+        continue;
+      }
+
+      // Skip if lead status is contacted or has outreach_source (manual contact)
+      const metadata = lead.metadata || {};
+      if (lead.status === 'contacted' || metadata.outreach_source || metadata.do_not_contact) {
+        console.log(`[followup] Skipping enrollment ${enrollment.id}: already contacted or do_not_contact`);
+        
+        // Mark as completed to stop sequence
+        await supabase
+          .from('followup_enrollments')
+          .update({ status: 'completed' })
+          .eq('id', enrollment.id);
+        
+        skipped++;
+        completed++;
+        continue;
+      }
+
+      // Get current step template
+      const { data: step, error: stepError } = await supabase
+        .from('followup_steps')
+        .select('*')
+        .eq('sequence_id', enrollment.sequence_id)
+        .eq('step_order', enrollment.current_step)
+        .single();
+
+      if (stepError || !step) {
+        // No more steps - mark as completed
+        console.log(`[followup] No step ${enrollment.current_step} for sequence, marking completed`);
+        await supabase
+          .from('followup_enrollments')
+          .update({ status: 'completed' })
+          .eq('id', enrollment.id);
+        completed++;
+        continue;
+      }
+
+      // Render templates with lead data
+      const name = metadata.name || 'there';
+      const company = metadata.company || 'your organisation';
+      const role = metadata.role || '';
+      const email = lead.email;
+
+      const subject = step.subject_template
+        .replace(/\{\{name\}\}/g, name)
+        .replace(/\{\{company\}\}/g, company)
+        .replace(/\{\{role\}\}/g, role)
+        .replace(/\{\{email\}\}/g, email);
+
+      const body = step.body_template
+        .replace(/\{\{name\}\}/g, name)
+        .replace(/\{\{company\}\}/g, company)
+        .replace(/\{\{role\}\}/g, role)
+        .replace(/\{\{email\}\}/g, email);
+
+      // Queue email
+      const { data: queuedEmail, error: queueError } = await supabase
+        .from('email_queue')
+        .insert({
+          recipient_email: email,
+          subject: subject,
+          body: body,
+          campaign_id: null,
+          status: 'pending',
+          priority: 5,
+          scheduled_at: now
+        })
+        .select('id')
+        .single();
+
+      if (queueError) {
+        console.error(`[followup] Queue error for enrollment ${enrollment.id}:`, queueError);
+        
+        // Log failure
+        await supabase
+          .from('followup_send_log')
+          .insert({
+            enrollment_id: enrollment.id,
+            step_order: enrollment.current_step,
+            status: 'failed',
+            error_message: queueError.message
+          });
+        
+        failed++;
+        continue;
+      }
+
+      // Log success
+      await supabase
+        .from('followup_send_log')
+        .insert({
+          enrollment_id: enrollment.id,
+          step_order: enrollment.current_step,
+          queued_email_id: queuedEmail?.id || null,
+          status: 'queued'
+        });
+
+      queued++;
+
+      // Get next step to determine delay
+      const { data: nextStep } = await supabase
+        .from('followup_steps')
+        .select('delay_minutes')
+        .eq('sequence_id', enrollment.sequence_id)
+        .eq('step_order', enrollment.current_step + 1)
+        .single();
+
+      if (nextStep) {
+        // Calculate next send time
+        const nextSendAt = new Date();
+        nextSendAt.setMinutes(nextSendAt.getMinutes() + nextStep.delay_minutes);
+
+        await supabase
+          .from('followup_enrollments')
+          .update({
+            current_step: enrollment.current_step + 1,
+            last_sent_at: now,
+            next_send_at: nextSendAt.toISOString()
+          })
+          .eq('id', enrollment.id);
+      } else {
+        // No more steps - mark as completed
+        await supabase
+          .from('followup_enrollments')
+          .update({
+            status: 'completed',
+            last_sent_at: now
+          })
+          .eq('id', enrollment.id);
+        completed++;
+      }
+
+    } catch (err) {
+      console.error(`[followup] Error processing enrollment ${enrollment.id}:`, err);
+      failed++;
+    }
+  }
+
+  console.log(`[followup] Done: processed=${processed}, queued=${queued}, failed=${failed}, completed=${completed}, skipped=${skipped}`);
+
+  return { ok: true, processed, queued, failed, completed, skipped };
+}

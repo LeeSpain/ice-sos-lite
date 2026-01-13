@@ -2026,6 +2026,154 @@ export type Database = {
           },
         ]
       }
+      followup_enrollments: {
+        Row: {
+          created_at: string
+          current_step: number
+          enrolled_at: string
+          id: string
+          last_sent_at: string | null
+          lead_id: string
+          next_send_at: string
+          sequence_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          last_sent_at?: string | null
+          lead_id: string
+          next_send_at: string
+          sequence_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          last_sent_at?: string | null
+          lead_id?: string
+          next_send_at?: string
+          sequence_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_enrollments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_enrollments_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "followup_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      followup_send_log: {
+        Row: {
+          created_at: string
+          enrollment_id: string
+          error_message: string | null
+          id: string
+          queued_email_id: string | null
+          status: string
+          step_order: number
+        }
+        Insert: {
+          created_at?: string
+          enrollment_id: string
+          error_message?: string | null
+          id?: string
+          queued_email_id?: string | null
+          status: string
+          step_order: number
+        }
+        Update: {
+          created_at?: string
+          enrollment_id?: string
+          error_message?: string | null
+          id?: string
+          queued_email_id?: string | null
+          status?: string
+          step_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_send_log_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "followup_enrollments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      followup_sequences: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      followup_steps: {
+        Row: {
+          body_template: string
+          created_at: string
+          delay_minutes: number
+          id: string
+          sequence_id: string
+          step_order: number
+          subject_template: string
+        }
+        Insert: {
+          body_template: string
+          created_at?: string
+          delay_minutes: number
+          id?: string
+          sequence_id: string
+          step_order: number
+          subject_template: string
+        }
+        Update: {
+          body_template?: string
+          created_at?: string
+          delay_minutes?: number
+          id?: string
+          sequence_id?: string
+          step_order?: number
+          subject_template?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_steps_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "followup_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gmail_token_access_log: {
         Row: {
           action: string
