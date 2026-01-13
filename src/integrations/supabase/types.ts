@@ -3639,6 +3639,80 @@ export type Database = {
         }
         Relationships: []
       }
+      riven_campaign_metrics_daily: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          emails_failed: number
+          emails_sent: number
+          id: string
+          metric_date: string
+          replies_received: number
+          reply_rate: number
+          social_posts_failed: number
+          social_posts_posted: number
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          emails_failed?: number
+          emails_sent?: number
+          id?: string
+          metric_date: string
+          replies_received?: number
+          reply_rate?: number
+          social_posts_failed?: number
+          social_posts_posted?: number
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          emails_failed?: number
+          emails_sent?: number
+          id?: string
+          metric_date?: string
+          replies_received?: number
+          reply_rate?: number
+          social_posts_failed?: number
+          social_posts_posted?: number
+        }
+        Relationships: []
+      }
+      riven_lead_engagement: {
+        Row: {
+          last_campaign_id: string | null
+          last_reply_at: string | null
+          last_touch_at: string | null
+          lead_id: string
+          total_replies: number
+          updated_at: string
+        }
+        Insert: {
+          last_campaign_id?: string | null
+          last_reply_at?: string | null
+          last_touch_at?: string | null
+          lead_id: string
+          total_replies?: number
+          updated_at?: string
+        }
+        Update: {
+          last_campaign_id?: string | null
+          last_reply_at?: string | null
+          last_touch_at?: string | null
+          lead_id?: string
+          total_replies?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "riven_lead_engagement_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: true
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       riven_settings: {
         Row: {
           ai_model: string
