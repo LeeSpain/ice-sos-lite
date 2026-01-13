@@ -289,38 +289,30 @@ const LeadIntelligencePage: React.FC = () => {
     setGeneratingDraft(true);
 
     try {
-      const command = `Write a short, professional intro email to ${lead.company || 'this organisation'} about ICE SOS Lite.
-Target role: ${lead.role || 'decision maker'}.
-Context: ${lead.notes || 'No additional context available.'}.
-Tone: professional, helpful, non-salesy.
-End with a soft CTA asking if they'd like more info.
-Output ONLY the email body, no subject line.`;
-
-      const { data, error } = await supabase.functions.invoke('riven-marketing-enhanced', {
+      const { data, error } = await supabase.functions.invoke('lead-intelligence', {
         body: {
-          command,
-          content_type: 'email',
-          audience: 'professional',
-          settings: {
-            word_count: 150,
-            content_depth: 'medium'
+          action: 'generate_intro',
+          lead: {
+            email: lead.email,
+            phone: lead.phone,
+            name: lead.name,
+            company: lead.company,
+            role: lead.role,
+            location: lead.location,
+            notes: lead.notes,
+            tags: lead.tags
           }
         }
       });
 
       if (error) throw error;
+      if (data.error) throw new Error(data.error);
 
-      // Extract the generated content
-      const generatedContent = data?.generated_content || data?.content || data?.message || '';
-      
-      // Generate a subject line
-      const subjectLine = `Introducing ICE SOS Lite${lead.company ? ` - For ${lead.company}` : ''}`;
-      
-      setEmailSubject(subjectLine);
-      setEmailBody(generatedContent);
+      setEmailSubject(data.subject || `Introducing ICE SOS Lite${lead.company ? ` - For ${lead.company}` : ''}`);
+      setEmailBody(data.body || '');
 
     } catch (error) {
-      console.error('Riven generation error:', error);
+      console.error('Draft generation error:', error);
       toast({
         title: 'Draft Generation Failed',
         description: error instanceof Error ? error.message : 'Failed to generate email draft',
