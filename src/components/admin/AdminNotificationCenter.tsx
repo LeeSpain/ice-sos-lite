@@ -115,7 +115,7 @@ export const AdminNotificationCenter: React.FC = () => {
   };
 
   const getCategoryIcon = (category: string) => {
-    const iconClass = "h-3.5 w-3.5";
+    const iconClass = "h-4 w-4";
     switch (category) {
       case 'approval': return <Clock className={iconClass} />;
       case 'campaign': return <Zap className={iconClass} />;
@@ -129,13 +129,21 @@ export const AdminNotificationCenter: React.FC = () => {
 
   const getCategoryStyle = (category: string) => {
     switch (category) {
-      case 'approval': return 'bg-amber-500/10 text-amber-600';
-      case 'campaign': return 'bg-blue-500/10 text-blue-600';
-      case 'content': return 'bg-emerald-500/10 text-emerald-600';
-      case 'error': return 'bg-red-500/10 text-red-600';
-      case 'user': return 'bg-violet-500/10 text-violet-600';
-      case 'system': return 'bg-slate-500/10 text-slate-600';
-      default: return 'bg-muted text-muted-foreground';
+      case 'approval': return 'bg-amber-500/15 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/20';
+      case 'campaign': return 'bg-blue-500/15 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500/20';
+      case 'content': return 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20';
+      case 'error': return 'bg-red-500/15 text-red-600 dark:text-red-400 ring-1 ring-red-500/20';
+      case 'user': return 'bg-violet-500/15 text-violet-600 dark:text-violet-400 ring-1 ring-violet-500/20';
+      case 'system': return 'bg-slate-500/15 text-slate-600 dark:text-slate-400 ring-1 ring-slate-500/20';
+      default: return 'bg-muted text-muted-foreground ring-1 ring-border';
+    }
+  };
+
+  const getPriorityStyle = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'border-l-destructive';
+      case 'medium': return 'border-l-amber-500';
+      default: return 'border-l-transparent';
     }
   };
 
@@ -170,10 +178,10 @@ export const AdminNotificationCenter: React.FC = () => {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'now';
-    if (diffMins < 60) return `${diffMins}m`;
-    if (diffHours < 24) return `${diffHours}h`;
-    if (diffDays < 7) return `${diffDays}d`;
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
@@ -181,34 +189,36 @@ export const AdminNotificationCenter: React.FC = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon" className="relative h-9 w-9">
-          <Bell className="h-4 w-4" />
+          <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 text-[10px] font-medium bg-destructive text-destructive-foreground rounded-full flex items-center justify-center">
+            <span className="absolute -top-0.5 -right-0.5 h-5 w-5 text-[11px] font-semibold bg-destructive text-destructive-foreground rounded-full flex items-center justify-center shadow-sm animate-in zoom-in-50">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md p-0 gap-0 overflow-hidden">
+      <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden rounded-xl shadow-2xl border-border/50">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/30">
-          <div className="flex items-center gap-2">
-            <Bell className="h-4 w-4 text-muted-foreground" />
-            <span className="font-semibold text-sm">Notifications</span>
-            {unreadCount > 0 && (
-              <Badge variant="secondary" className="h-5 px-1.5 text-[10px] font-medium">
-                {unreadCount} new
-              </Badge>
-            )}
+        <div className="flex items-center justify-between px-5 py-4 border-b bg-gradient-to-r from-muted/50 to-muted/30">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Bell className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-base">Notifications</h3>
+              {unreadCount > 0 && (
+                <p className="text-xs text-muted-foreground">{unreadCount} unread</p>
+              )}
+            </div>
           </div>
           {unreadCount > 0 && (
             <Button 
-              variant="ghost" 
+              variant="outline" 
               size="sm" 
               onClick={markAllAsRead}
-              className="h-7 text-xs px-2 text-muted-foreground hover:text-foreground"
+              className="h-8 text-xs px-3 gap-1.5"
             >
-              <CheckCircle className="h-3 w-3 mr-1" />
+              <CheckCircle className="h-3.5 w-3.5" />
               Mark all read
             </Button>
           )}
@@ -216,122 +226,127 @@ export const AdminNotificationCenter: React.FC = () => {
 
         {/* Tabs & Filters */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <div className="px-4 py-2 border-b space-y-2">
-            <TabsList className="h-7 w-full grid grid-cols-3 bg-muted/50">
-              <TabsTrigger value="all" className="h-6 text-xs">All</TabsTrigger>
-              <TabsTrigger value="unread" className="h-6 text-xs">Unread</TabsTrigger>
-              <TabsTrigger value="read" className="h-6 text-xs">Read</TabsTrigger>
+          <div className="px-5 py-3 border-b bg-muted/20 space-y-3">
+            <TabsList className="h-9 w-full grid grid-cols-3 bg-muted/60 p-1 rounded-lg">
+              <TabsTrigger value="all" className="h-7 text-sm rounded-md data-[state=active]:shadow-sm">All</TabsTrigger>
+              <TabsTrigger value="unread" className="h-7 text-sm rounded-md data-[state=active]:shadow-sm">Unread</TabsTrigger>
+              <TabsTrigger value="read" className="h-7 text-sm rounded-md data-[state=active]:shadow-sm">Read</TabsTrigger>
             </TabsList>
             
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
-                <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search..."
+                  placeholder="Search notifications..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-7 pl-7 text-xs bg-muted/30"
+                  className="h-9 pl-9 text-sm bg-background border-border/60"
                 />
               </div>
               <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="h-7 w-[90px] text-xs">
-                  <Filter className="h-3 w-3 mr-1" />
+                <SelectTrigger className="h-9 w-[110px] text-sm">
+                  <Filter className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all" className="text-xs">All</SelectItem>
-                  <SelectItem value="approval" className="text-xs">Approval</SelectItem>
-                  <SelectItem value="campaign" className="text-xs">Campaign</SelectItem>
-                  <SelectItem value="content" className="text-xs">Content</SelectItem>
-                  <SelectItem value="error" className="text-xs">Error</SelectItem>
-                  <SelectItem value="user" className="text-xs">User</SelectItem>
-                  <SelectItem value="system" className="text-xs">System</SelectItem>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="approval">Approval</SelectItem>
+                  <SelectItem value="campaign">Campaign</SelectItem>
+                  <SelectItem value="content">Content</SelectItem>
+                  <SelectItem value="error">Error</SelectItem>
+                  <SelectItem value="user">User</SelectItem>
+                  <SelectItem value="system">System</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <TabsContent value={activeTab} className="mt-0">
-            <ScrollArea className="h-[320px]">
+            <ScrollArea className="h-[400px]">
               {filteredNotifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-32 text-center px-4">
-                  <Bell className="h-8 w-8 text-muted-foreground/40 mb-2" />
-                  <p className="text-xs text-muted-foreground">No notifications</p>
+                <div className="flex flex-col items-center justify-center h-48 text-center px-6">
+                  <div className="p-4 rounded-full bg-muted/50 mb-4">
+                    <Bell className="h-10 w-10 text-muted-foreground/40" />
+                  </div>
+                  <p className="text-sm font-medium text-muted-foreground">No notifications</p>
+                  <p className="text-xs text-muted-foreground/70 mt-1">You're all caught up!</p>
                 </div>
               ) : (
-                <div className="divide-y">
+                <div className="divide-y divide-border/50">
                   {filteredNotifications.map((notification) => (
                     <div 
                       key={notification.id}
-                      className={`px-4 py-2 hover:bg-muted/40 transition-colors cursor-pointer group ${
-                        !notification.read_at ? 'bg-primary/[0.03]' : ''
+                      className={`px-5 py-4 hover:bg-muted/50 transition-all duration-200 cursor-pointer group border-l-2 ${getPriorityStyle(notification.priority)} ${
+                        !notification.read_at ? 'bg-primary/[0.04]' : ''
                       }`}
                       onClick={() => notification.action_url && handleNotificationAction(notification)}
                     >
-                      <div className="flex items-start gap-2.5">
+                      <div className="flex items-start gap-3">
                         {/* Category Icon */}
-                        <div className={`p-1.5 rounded-md shrink-0 ${getCategoryStyle(notification.category)}`}>
+                        <div className={`p-2 rounded-lg shrink-0 ${getCategoryStyle(notification.category)}`}>
                           {getCategoryIcon(notification.category)}
                         </div>
                         
                         {/* Content */}
-                        <div className="flex-1 min-w-0 py-0.5">
-                          <div className="flex items-center gap-1.5 mb-0.5">
-                            <span className={`text-xs font-medium truncate ${!notification.read_at ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-sm font-medium truncate ${!notification.read_at ? 'text-foreground' : 'text-muted-foreground'}`}>
                               {notification.title}
                             </span>
                             {notification.priority === 'high' && (
-                              <AlertTriangle className="h-3 w-3 text-destructive shrink-0" />
+                              <Badge variant="destructive" className="h-5 px-1.5 text-[10px] font-medium">
+                                Urgent
+                              </Badge>
+                            )}
+                            {!notification.read_at && (
+                              <div className="w-2 h-2 bg-primary rounded-full shrink-0 animate-pulse" />
                             )}
                           </div>
-                          <p className="text-[11px] text-muted-foreground line-clamp-1 leading-tight">
+                          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                             {notification.message}
                           </p>
-                          {notification.action_url && (
-                            <span className="text-[10px] text-primary/70 flex items-center gap-0.5 mt-1">
-                              <ExternalLink className="h-2.5 w-2.5" />
-                              {notification.action_label || 'View details'}
+                          <div className="flex items-center gap-3 mt-2">
+                            <span className="text-[11px] text-muted-foreground/70">
+                              {formatTimeAgo(notification.created_at)}
                             </span>
-                          )}
+                            {notification.action_url && (
+                              <span className="text-[11px] text-primary flex items-center gap-1 font-medium hover:underline">
+                                <ExternalLink className="h-3 w-3" />
+                                {notification.action_label || 'View details'}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         
-                        {/* Time & Actions */}
-                        <div className="flex flex-col items-end gap-1 shrink-0">
-                          <span className="text-[10px] text-muted-foreground">
-                            {formatTimeAgo(notification.created_at)}
-                          </span>
-                          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {!notification.read_at && (
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-5 w-5"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  markAsRead(notification.id);
-                                }}
-                              >
-                                <Check className="h-3 w-3" />
-                              </Button>
-                            )}
+                        {/* Actions */}
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                          {!notification.read_at && (
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-5 w-5 text-muted-foreground hover:text-destructive"
+                              className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                deleteNotification(notification.id);
+                                markAsRead(notification.id);
                               }}
+                              title="Mark as read"
                             >
-                              <X className="h-3 w-3" />
+                              <Check className="h-4 w-4" />
                             </Button>
-                          </div>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteNotification(notification.id);
+                            }}
+                            title="Delete"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
                         </div>
-                        
-                        {/* Unread dot */}
-                        {!notification.read_at && (
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full shrink-0 mt-1.5" />
-                        )}
                       </div>
                     </div>
                   ))}
