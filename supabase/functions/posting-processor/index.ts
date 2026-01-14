@@ -5,57 +5,45 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface QueueRow {
-  id: string;
-  content_id: string;
-  scheduled_time: string;
-  posted_at: string | null;
-  platform: string;
-  status: string; // queued | retry_scheduled | posted | failed
-  retry_count: number | null;
-  max_retries: number | null;
-  oauth_account_id: string | null;
-}
-
-interface ContentRow {
-  id: string;
-  title: string | null;
-  body_text: string | null;
-  platform: string | null;
-  image_url: string | null;
-}
-
-interface OAuthRow {
-  id: string;
-  user_id: string;
-  platform: string;
-  access_token: string;
-  refresh_token: string | null;
-  token_expires_at: string | null;
-  platform_user_id: string | null;
-  connection_status: string;
-}
-
+// Platform character limits
 const PLATFORM_LIMITS: Record<string, number> = {
   twitter: 280,
   x: 280,
   instagram: 2200,
   facebook: 63206,
   linkedin: 3000,
-  youtube: 5000,
 };
 
-function nowISO() {
+interface QueueRow {
+  id: string;
+  content_id: string;
+  platform: string;
+  status: string;
+  scheduled_time: string;
+  posted_at: string | null;
+  retry_count: number;
+  max_retries: number;
+  platform_post_id: string | null;
+  error_message: string | null;
+}
+
+interface ContentRow {
+  id: string;
+  title: string | null;
+  body_text: string | null;
+}
+
+function nowISO(): string {
   return new Date().toISOString();
 }
 
-function minutesFromNow(mins: number) {
+function minutesFromNow(mins: number): string {
   const d = new Date();
   d.setMinutes(d.getMinutes() + mins);
   return d.toISOString();
 }
 
-function validateContent(platform: string, text: string) {
+function validateContentLength(platform: string, text: string): void {
   const key = platform.toLowerCase();
   const limit = PLATFORM_LIMITS[key] ?? 3000;
   if (text.length > limit) {
@@ -63,121 +51,8 @@ function validateContent(platform: string, text: string) {
   }
 }
 
-// ==================== REAL PLATFORM PUBLISHING ====================
-
-async function publishToFacebook(content: ContentRow, oauth: OAuthRow): Promise<{ post_id: string; post_url: string }> {
-  const postData: any = {
-    message: content.body_text || content.title || '',
-    access_token: oauth.access_token
-  };
-
-  // Add image if available
-  if (content.image_url) {
-    postData.picture = content.image_url;
-  }
-
-  const response = await fetch(`https://graph.facebook.com/v18.0/me/feed`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(postData)
-  });
-
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(result.error?.message || 'Facebook publish failed');
-  }
-
-  return {
-    post_id: result.id,
-    post_url: `https://facebook.com/${result.id}`
-  };
-}
-
-async function publishToLinkedIn(content: ContentRow, oauth: OAuthRow): Promise<{ post_id: string; post_url: string }> {
-  const postData = {
-    author: `urn:li:person:${oauth.platform_user_id}`,
-    lifecycleState: 'PUBLISHED',
-    specificContent: {
-      'com.linkedin.ugc.ShareContent': {
-        shareCommentary: {
-          text: content.body_text || content.title || ''
-        },
-        shareMediaCategory: 'NONE'
-      }
-    },
-    visibility: {
-      'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'
-    }
-  };
-
-  const response = await fetch('https://api.linkedin.com/v2/ugcPosts', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${oauth.access_token}`,
-      'Content-Type': 'application/json',
-      'X-Restli-Protocol-Version': '2.0.0'
-    },
-    body: JSON.stringify(postData)
-  });
-
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(result.message || 'LinkedIn publish failed');
-  }
-
-  return {
-    post_id: result.id,
-    post_url: `https://linkedin.com/feed/update/${result.id}`
-  };
-}
-
-async function publishToTwitter(content: ContentRow, oauth: OAuthRow): Promise<{ post_id: string; post_url: string }> {
-  const text = (content.body_text || content.title || '').substring(0, 280); // Twitter character limit
-  
-  const postData = { text };
-
-  const response = await fetch('https://api.twitter.com/2/tweets', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${oauth.access_token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(postData)
-  });
-
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(result.detail || result.title || 'Twitter publish failed');
-  }
-
-  return {
-    post_id: result.data.id,
-    post_url: `https://twitter.com/user/status/${result.data.id}`
-  };
-}
-
-async function publishToPlatform(platform: string, content: ContentRow, oauth: OAuthRow): Promise<{ post_id: string; post_url: string }> {
-  const platformLower = platform.toLowerCase();
-  
-  switch (platformLower) {
-    case 'facebook':
-      return await publishToFacebook(content, oauth);
-    case 'linkedin':
-      return await publishToLinkedIn(content, oauth);
-    case 'twitter':
-    case 'x':
-      return await publishToTwitter(content, oauth);
-    case 'instagram':
-      throw new Error('Instagram publishing requires Instagram Business API setup - please use Facebook Business Suite');
-    default:
-      throw new Error(`Publishing to ${platform} is not yet implemented`);
-  }
-}
-
-// ==================== MAIN PROCESSOR ====================
-
 Deno.serve(async (req: Request) => {
-  // CORS preflight
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -186,20 +61,21 @@ Deno.serve(async (req: Request) => {
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
   if (!supabaseUrl || !serviceKey) {
-    console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY env');
+    console.error('[posting-processor] Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
     return new Response(
-      JSON.stringify({ error: 'Server misconfigured: missing env vars' }),
+      JSON.stringify({ ok: false, error: 'Server misconfigured: missing env vars' }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
 
-  const admin = createClient(supabaseUrl, serviceKey);
+  const supabase = createClient(supabaseUrl, serviceKey);
 
   try {
     const now = nowISO();
+    console.log('[posting-processor] Processing queue at', now);
 
-    // Load up to 10 items ready to process
-    const { data: items, error: loadErr } = await admin
+    // Load up to 10 queue items ready to process
+    const { data: queueItems, error: loadError } = await supabase
       .from('social_media_posting_queue')
       .select('*')
       .in('status', ['queued', 'retry_scheduled'])
@@ -207,135 +83,129 @@ Deno.serve(async (req: Request) => {
       .order('scheduled_time', { ascending: true })
       .limit(10);
 
-    if (loadErr) throw new Error(`Load queue failed: ${loadErr.message}`);
+    if (loadError) {
+      throw new Error(`Failed to load queue: ${loadError.message}`);
+    }
+
+    const items = (queueItems as QueueRow[] | null) ?? [];
+    console.log('[posting-processor] Found', items.length, 'items to process');
 
     let processed = 0;
     let succeeded = 0;
     let failed = 0;
     const details: Array<Record<string, unknown>> = [];
 
-    for (const item of (items as QueueRow[] | null) ?? []) {
+    for (const item of items) {
       processed++;
+      console.log('[posting-processor] Processing item', item.id, 'platform:', item.platform);
+
       try {
-        // Load content
-        const { data: content, error: cErr } = await admin
+        // Load related marketing_content
+        const { data: contentData, error: contentError } = await supabase
           .from('marketing_content')
-          .select('*')
+          .select('id, title, body_text')
           .eq('id', item.content_id)
           .maybeSingle();
-        if (cErr) throw new Error(`Load content failed: ${cErr.message}`);
-        if (!content) throw new Error('Related content not found');
 
-        const c = content as ContentRow;
-        const platform = (item.platform || c.platform || 'unknown').toLowerCase();
-        const text = `${c.title ?? ''}\n\n${c.body_text ?? ''}`.trim();
-
-        // Validation
-        validateContent(platform, text);
-
-        // Load OAuth credentials
-        let oauth: OAuthRow | null = null;
-        
-        if (item.oauth_account_id) {
-          const { data: oauthData, error: oErr } = await admin
-            .from('social_media_oauth')
-            .select('*')
-            .eq('id', item.oauth_account_id)
-            .eq('connection_status', 'active')
-            .maybeSingle();
-          
-          if (oErr) {
-            console.warn(`OAuth lookup error: ${oErr.message}`);
-          }
-          oauth = oauthData as OAuthRow | null;
+        if (contentError) {
+          throw new Error(`Failed to load content: ${contentError.message}`);
+        }
+        if (!contentData) {
+          throw new Error('Related content not found');
         }
 
-        let postResult: { post_id: string; post_url: string };
-        
-        if (oauth && oauth.access_token) {
-          // Check if token is expired
-          if (oauth.token_expires_at && new Date(oauth.token_expires_at) < new Date()) {
-            throw new Error(`${platform} access token expired - please reconnect your account`);
-          }
-          
-          // REAL PUBLISHING
-          console.log(`[posting-processor] Publishing to ${platform} for content ${item.content_id}...`);
-          postResult = await publishToPlatform(platform, c, oauth);
-          console.log(`[posting-processor] Successfully published to ${platform}: ${postResult.post_id}`);
-        } else {
-          // No credentials - fail gracefully with clear message
-          throw new Error(`No active ${platform} credentials found - please connect your ${platform} account in Social Hub`);
-        }
+        const content = contentData as ContentRow;
+        const text = `${content.title ?? ''}\n\n${content.body_text ?? ''}`.trim();
+        const platform = item.platform.toLowerCase();
 
-        // Update queue to posted
-        const { error: upQueueErr } = await admin
+        // Validate content length
+        validateContentLength(platform, text);
+
+        // SIMULATION MODE: Generate simulated post ID instead of real API call
+        const simulatedPostId = `sim_${crypto.randomUUID()}`;
+        console.log('[posting-processor] Simulated publish for', platform, '-> post_id:', simulatedPostId);
+
+        // Update queue row to posted
+        const { error: updateError } = await supabase
           .from('social_media_posting_queue')
           .update({
             status: 'posted',
             posted_at: now,
-            platform_post_id: postResult.post_id,
+            platform_post_id: simulatedPostId,
             error_message: null,
+            updated_at: now,
           })
           .eq('id', item.id);
-        if (upQueueErr) throw new Error(`Update queue failed: ${upQueueErr.message}`);
 
-        // Update content status
-        const { error: upContentErr } = await admin
-          .from('marketing_content')
-          .update({ status: 'posted', posted_at: now })
-          .eq('id', item.content_id);
-        if (upContentErr) throw new Error(`Update content failed: ${upContentErr.message}`);
+        if (updateError) {
+          throw new Error(`Failed to update queue: ${updateError.message}`);
+        }
 
         succeeded++;
-        details.push({ 
-          id: item.id, 
-          platform, 
-          status: 'posted', 
-          post_id: postResult.post_id,
-          post_url: postResult.post_url 
+        details.push({
+          id: item.id,
+          platform: item.platform,
+          status: 'posted',
+          platform_post_id: simulatedPostId,
         });
-        
-      } catch (e: any) {
-        console.error('posting-processor error on item', item.id, e?.message || e);
-        const nextRetry = (item.retry_count ?? 0) + 1;
-        const max = item.max_retries ?? 3;
-        const willRetry = nextRetry <= max;
-        
-        // Don't retry auth/credential errors - they won't fix themselves
-        const isAuthError = e?.message?.includes('credentials') || 
-                           e?.message?.includes('expired') || 
-                           e?.message?.includes('reconnect');
-        
-        const newStatus = (!willRetry || isAuthError) ? 'failed' : 'retry_scheduled';
-        const newTime = willRetry && !isAuthError ? minutesFromNow(Math.min(30, nextRetry * 5)) : item.scheduled_time;
 
-        const { error: upErr } = await admin
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        console.error('[posting-processor] Error processing item', item.id, ':', errorMessage);
+
+        const nextRetryCount = (item.retry_count ?? 0) + 1;
+        const maxRetries = item.max_retries ?? 3;
+        const willRetry = nextRetryCount <= maxRetries;
+
+        // Calculate new status and scheduled time
+        const newStatus = willRetry ? 'retry_scheduled' : 'failed';
+        const delayMinutes = Math.min(30, nextRetryCount * 5);
+        const newScheduledTime = willRetry ? minutesFromNow(delayMinutes) : item.scheduled_time;
+
+        // Update queue with error info
+        const { error: updateError } = await supabase
           .from('social_media_posting_queue')
           .update({
             status: newStatus,
-            retry_count: nextRetry,
-            scheduled_time: newTime,
-            error_message: e?.message || 'unknown_error',
+            retry_count: nextRetryCount,
+            scheduled_time: newScheduledTime,
+            error_message: errorMessage,
+            updated_at: nowISO(),
           })
           .eq('id', item.id);
-        if (upErr) console.error('Failed to update queue after error', upErr.message);
 
-        if (newStatus === 'failed') failed++;
-        details.push({ id: item.id, status: newStatus, retry_count: nextRetry, error: e?.message });
+        if (updateError) {
+          console.error('[posting-processor] Failed to update queue after error:', updateError.message);
+        }
+
+        if (newStatus === 'failed') {
+          failed++;
+        }
+
+        details.push({
+          id: item.id,
+          platform: item.platform,
+          status: newStatus,
+          retry_count: nextRetryCount,
+          error: errorMessage,
+        });
       }
     }
 
     const result = { ok: true, processed, succeeded, failed, details };
-    console.log('posting-processor result', result);
+    console.log('[posting-processor] Completed:', result);
 
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: { 'Content-Type': 'application/json', ...corsHeaders },
     });
-  } catch (err: any) {
-    console.error('posting-processor fatal error', err?.message || err);
+
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[posting-processor] Fatal error:', errorMessage);
+
     return new Response(
-      JSON.stringify({ ok: false, error: err?.message || 'unknown_error' }),
+      JSON.stringify({ ok: false, error: errorMessage }),
       { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
     );
   }
