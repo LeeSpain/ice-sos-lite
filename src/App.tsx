@@ -54,6 +54,9 @@ import FamilyCheckoutCanceled from "./pages/FamilyCheckoutCanceled";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import WelcomeQuestionnaire from "./components/WelcomeQuestionnaire";
 import OnboardingPage from "./pages/OnboardingPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
+import CheckoutCancelPage from "./pages/CheckoutCancelPage";
 
 // Test Pages  
 import TestPage from "./pages/TestPage";
@@ -153,6 +156,25 @@ function AppWithTracking() {
                 <Route path="/family-carer-access" element={
                   <OptimizedSuspense skeletonType="card">
                     <FamilyCarerAccessPage />
+                  </OptimizedSuspense>
+                } />
+
+                {/* Checkout Pages */}
+                <Route path="/checkout" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <CheckoutPage />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/checkout/success" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <CheckoutSuccessPage />
+                  </OptimizedSuspense>
+                } />
+                
+                <Route path="/checkout/cancel" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <CheckoutCancelPage />
                   </OptimizedSuspense>
                 } />
 

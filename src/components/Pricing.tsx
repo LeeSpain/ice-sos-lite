@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Check, MapPin, Brain, Users, Phone, Download, Smartphone, Package, Bluetooth, Battery, Droplets, CheckCircle, UserCheck, Heart, Shield, Play } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { usePreferences } from '@/contexts/PreferencesContext';
@@ -11,6 +11,7 @@ import { convertCurrency, formatDisplayCurrency, languageToLocale } from '@/util
 import { useTranslation } from 'react-i18next';
 import { IntroVideoModal } from "@/components/IntroVideoModal";
 import { useInteractionTracking } from "@/hooks/useInteractionTracking";
+import { useAuth } from "@/contexts/AuthContext";
 interface Product {
   id: string;
   name: string;
@@ -58,6 +59,8 @@ const Pricing = () => {
   const [subscriptionPlans, setSubscriptionPlans] = useState<SubscriptionPlan[]>([]);
 const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
 
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { language, currency: selectedCurrency } = usePreferences();
   const { t } = useTranslation();
   const { trackButtonClick, trackVideoInteraction } = useInteractionTracking();
@@ -183,23 +186,18 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
       currency: plan.currency 
     });
 
-    try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          plans: [plan.id]
-        }
-      });
-
-      if (error) throw error;
-      
-      if (data?.url) {
-        // Open Stripe checkout in a new tab
-        window.open(data.url, '_blank');
-      }
-    } catch (error) {
-      console.error('Error creating checkout:', error);
-      alert('Error processing subscription. Please try again.');
+    // If not logged in, redirect to auth with return URL
+    if (!user) {
+      navigate(`/auth?next=/checkout&plan=${plan.id}`);
+      return;
     }
+
+    // If logged in, go directly to checkout
+    navigate(`/checkout?plan=${plan.id}`);
+  };
+
+  const handleSubscriptionClick = (plan: SubscriptionPlan) => {
+    handleSubscriptionPurchase(plan);
   };
 
   const handleProductPurchase = async (product: Product) => {
@@ -289,10 +287,9 @@ const [regionalServices, setRegionalServices] = useState<RegionalService[]>([]);
                         <Button 
                           size="lg"
                           className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-4 shadow-lg hover:shadow-xl transition-all duration-300"
-                          asChild
-                          onClick={() => trackButtonClick('cta', 'Subscribe Now', { plan_type: 'premium', location: 'pricing_hero' })}
+                          onClick={() => handleSubscriptionClick(selectedPlan)}
                         >
-                          <Link to="/ai-register">{t('pricing.subscribeNow')}</Link>
+                          {t('pricing.subscribeNow')}
                         </Button>
                         
                         <IntroVideoModal 
