@@ -476,50 +476,68 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
         await loadPublishedEmails();
       }
       
-      // Auto-queue social posts if user has connected platforms
-      let socialQueueMessage = "";
+      // Auto-queue social posts for connected platforms (non-blocking)
+      let socialQueueWarning = "";
       try {
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData?.user?.id) {
-          // Get connected social media platforms
-          const { data: connectedPlatforms } = await supabase
-            .from('social_media_oauth')
-            .select('id, platform')
-            .eq('user_id', userData.user.id)
-            .eq('connection_status', 'active');
+        console.log('[handlePublish] Fetching connected social platforms...');
+        
+        // Fetch connected platforms (status = 'connected' or 'active')
+        const { data: connectedPlatforms, error: platformError } = await supabase
+          .from('social_media_oauth')
+          .select('platform')
+          .in('connection_status', ['connected', 'active']);
+        
+        if (platformError) {
+          console.warn('[handlePublish] Failed to fetch platforms:', platformError);
+          socialQueueWarning = "Published but could not check social platforms";
+        } else if (connectedPlatforms && connectedPlatforms.length > 0) {
+          console.log('[handlePublish] Found connected platforms:', connectedPlatforms.map(p => p.platform));
           
-          if (connectedPlatforms && connectedPlatforms.length > 0) {
-            // Queue posts for each connected platform
-            const queueInserts = connectedPlatforms.map(platform => ({
-              content_id: contentId,
-              platform: platform.platform,
-              oauth_account_id: platform.id,
-              scheduled_time: new Date().toISOString(),
-              status: 'queued',
-              retry_count: 0,
-              max_retries: 3
-            }));
-            
-            const { error: queueError } = await supabase
-              .from('social_media_posting_queue')
-              .insert(queueInserts);
-            
-            if (!queueError) {
-              socialQueueMessage = ` and queued for ${connectedPlatforms.length} social platform(s)`;
-            }
+          // Build queue inserts for each platform
+          const nowISO = new Date().toISOString();
+          const queueInserts = connectedPlatforms.map(p => ({
+            content_id: contentId,
+            platform: p.platform,
+            status: 'queued',
+            scheduled_time: nowISO,
+            retry_count: 0,
+            max_retries: 3
+          }));
+          
+          console.log('[handlePublish] Inserting into social_media_posting_queue:', queueInserts.length, 'rows');
+          
+          const { error: queueError } = await supabase
+            .from('social_media_posting_queue')
+            .insert(queueInserts);
+          
+          if (queueError) {
+            console.error('[handlePublish] Queue insert failed:', queueError);
+            socialQueueWarning = `Published but social queue failed: ${queueError.message}`;
           } else {
-            socialQueueMessage = " (connect social accounts to auto-post)";
+            console.log('[handlePublish] Successfully queued for', connectedPlatforms.length, 'platform(s)');
           }
+        } else {
+          console.log('[handlePublish] No connected social platforms found');
         }
       } catch (socialError) {
-        console.warn('Social queue error (non-blocking):', socialError);
-        // Don't break publishing if social queue fails
+        console.error('[handlePublish] Social queue error (non-blocking):', socialError);
+        socialQueueWarning = `Published but social queue failed: ${socialError instanceof Error ? socialError.message : 'Unknown error'}`;
       }
       
+      // Show success toast (always)
       toast({
         title: "Content Published",
-        description: `Content has been successfully published${socialQueueMessage}!`,
+        description: "Content has been successfully published!",
       });
+      
+      // Show warning toast if queue failed (non-blocking)
+      if (socialQueueWarning) {
+        toast({
+          title: "Social Queue Warning",
+          description: socialQueueWarning,
+          variant: "destructive"
+        });
+      }
     } catch (error) {
       console.error('Error publishing content:', error);
       toast({
