@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { createHmac } from "node:crypto";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -67,83 +66,15 @@ function validateContentLength(platform: string, text: string): void {
   }
 }
 
-// ============ X (Twitter) OAuth 1.0a Publishing ============
+// ============ X/Twitter Publishing (OAuth 2.0 Bearer Token) ============
 
-function generateOAuthSignature(
-  method: string,
-  url: string,
-  params: Record<string, string>,
-  consumerSecret: string,
-  tokenSecret: string
-): string {
-  const signatureBaseString = `${method}&${encodeURIComponent(url)}&${encodeURIComponent(
-    Object.entries(params)
-      .sort()
-      .map(([k, v]) => `${k}=${v}`)
-      .join("&")
-  )}`;
-  const signingKey = `${encodeURIComponent(consumerSecret)}&${encodeURIComponent(tokenSecret)}`;
-  const hmacSha1 = createHmac("sha1", signingKey);
-  return hmacSha1.update(signatureBaseString).digest("base64");
-}
-
-function generateOAuthHeader(method: string, url: string, accessToken: string, accessTokenSecret: string): string {
-  const apiKey = Deno.env.get('X_API_KEY')?.trim();
-  const apiSecret = Deno.env.get('X_API_KEY_SECRET')?.trim();
-
-  if (!apiKey || !apiSecret) {
-    throw new Error('Missing X_API_KEY or X_API_KEY_SECRET');
-  }
-
-  const oauthParams: Record<string, string> = {
-    oauth_consumer_key: apiKey,
-    oauth_nonce: Math.random().toString(36).substring(2),
-    oauth_signature_method: "HMAC-SHA1",
-    oauth_timestamp: Math.floor(Date.now() / 1000).toString(),
-    oauth_token: accessToken,
-    oauth_version: "1.0",
-  };
-
-  const signature = generateOAuthSignature(method, url, oauthParams, apiSecret, accessTokenSecret);
-
-  const signedOAuthParams = {
-    ...oauthParams,
-    oauth_signature: signature,
-  };
-
-  return (
-    "OAuth " +
-    Object.entries(signedOAuthParams)
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([k, v]) => `${encodeURIComponent(k)}="${encodeURIComponent(v)}"`)
-      .join(", ")
-  );
-}
-
-async function publishToX(accessToken: string, accessTokenSecret: string, text: string): Promise<PublishResult> {
-  // X/Twitter v2 API for posting tweets
-  const url = 'https://api.x.com/2/tweets';
-  const method = 'POST';
-
-  // For OAuth 2.0 Bearer token (if that's what we have)
-  // Check if we have OAuth 1.0a secrets available
-  const apiKey = Deno.env.get('X_API_KEY')?.trim();
-  const apiSecret = Deno.env.get('X_API_KEY_SECRET')?.trim();
-
-  let authHeader: string;
+async function publishToX(accessToken: string, text: string): Promise<PublishResult> {
+  console.log('[publishToX] Posting tweet with Bearer token');
   
-  if (apiKey && apiSecret && accessTokenSecret) {
-    // OAuth 1.0a flow
-    authHeader = generateOAuthHeader(method, url, accessToken, accessTokenSecret);
-  } else {
-    // OAuth 2.0 Bearer token flow
-    authHeader = `Bearer ${accessToken}`;
-  }
-
-  const response = await fetch(url, {
-    method,
+  const response = await fetch('https://api.twitter.com/2/tweets', {
+    method: 'POST',
     headers: {
-      'Authorization': authHeader,
+      'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ text }),
@@ -153,18 +84,20 @@ async function publishToX(accessToken: string, accessTokenSecret: string, text: 
   console.log('[publishToX] Response:', response.status, responseText);
 
   if (!response.ok) {
-    throw new Error(`X API error: ${response.status} - ${responseText}`);
+    throw new Error(`X API error ${response.status}: ${responseText}`);
   }
 
   const data = JSON.parse(responseText);
-  if (!data.data?.id) {
-    throw new Error('X API did not return a post ID');
+  const postId = data.data?.id;
+  
+  if (!postId) {
+    throw new Error(`X API did not return post ID. Response: ${responseText}`);
   }
 
-  return { postId: data.data.id };
+  return { postId };
 }
 
-// ============ LinkedIn Publishing ============
+// ============ LinkedIn Publishing (UGC Posts API) ============
 
 async function publishToLinkedIn(
   accessToken: string,
@@ -172,13 +105,19 @@ async function publishToLinkedIn(
   platformAccountId?: string | null,
   platformUserId?: string | null
 ): Promise<PublishResult> {
-  // LinkedIn requires author URN - use platformAccountId (org) or platformUserId (person)
-  const authorUrn = platformAccountId 
-    ? `urn:li:organization:${platformAccountId}`
-    : `urn:li:person:${platformUserId}`;
-
-  if (!platformAccountId && !platformUserId) {
-    throw new Error('LinkedIn requires platform_account_id or platform_user_id');
+  // Determine author URN:
+  // - If platform_account_id exists => organization posting
+  // - Else if platform_user_id exists => member posting
+  let authorUrn: string;
+  
+  if (platformAccountId) {
+    authorUrn = `urn:li:organization:${platformAccountId}`;
+    console.log('[publishToLinkedIn] Posting as organization:', authorUrn);
+  } else if (platformUserId) {
+    authorUrn = `urn:li:person:${platformUserId}`;
+    console.log('[publishToLinkedIn] Posting as member:', authorUrn);
+  } else {
+    throw new Error('LinkedIn requires platform_account_id (org) or platform_user_id (person)');
   }
 
   const postData = {
@@ -201,8 +140,8 @@ async function publishToLinkedIn(
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
       'X-Restli-Protocol-Version': '2.0.0',
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(postData),
   });
@@ -211,21 +150,30 @@ async function publishToLinkedIn(
   console.log('[publishToLinkedIn] Response:', response.status, responseText);
 
   if (!response.ok) {
-    throw new Error(`LinkedIn API error: ${response.status} - ${responseText}`);
+    throw new Error(`LinkedIn API error ${response.status}: ${responseText}`);
   }
 
-  const data = JSON.parse(responseText);
-  // LinkedIn returns the post ID in the 'id' field or in the header 'x-restli-id'
-  const postId = data.id || response.headers.get('x-restli-id');
+  // LinkedIn returns post ID in response body 'id' field or 'x-restli-id' header
+  let postId: string | null = null;
+  try {
+    const data = JSON.parse(responseText);
+    postId = data.id;
+  } catch {
+    // Response might be empty, check header
+  }
   
   if (!postId) {
-    throw new Error('LinkedIn API did not return a post ID');
+    postId = response.headers.get('x-restli-id');
+  }
+  
+  if (!postId) {
+    throw new Error(`LinkedIn API did not return post ID. Response: ${responseText}`);
   }
 
   return { postId };
 }
 
-// ============ Facebook Page Publishing ============
+// ============ Facebook Page Publishing (Graph API v19.0) ============
 
 async function publishToFacebookPage(
   accessToken: string,
@@ -233,31 +181,20 @@ async function publishToFacebookPage(
   pageId: string | null
 ): Promise<PublishResult> {
   if (!pageId) {
-    throw new Error('Facebook publishing requires platform_account_id (page ID)');
+    throw new Error('Facebook publishing requires platform_account_id (PAGE_ID)');
   }
 
-  // First, get page access token
-  const pageTokenUrl = `https://graph.facebook.com/v18.0/${pageId}?fields=access_token&access_token=${accessToken}`;
-  const pageTokenResponse = await fetch(pageTokenUrl);
-  const pageTokenData = await pageTokenResponse.json();
+  console.log('[publishToFacebookPage] Posting to page:', pageId);
 
-  if (!pageTokenResponse.ok || !pageTokenData.access_token) {
-    console.log('[publishToFacebookPage] Page token response:', pageTokenData);
-    throw new Error(`Failed to get Facebook page access token: ${pageTokenData.error?.message || 'Unknown error'}`);
-  }
-
-  const pageAccessToken = pageTokenData.access_token;
-
-  // Post to the page feed
-  const postUrl = `https://graph.facebook.com/v18.0/${pageId}/feed`;
-  const response = await fetch(postUrl, {
+  // POST to page feed with message and access_token in body
+  const response = await fetch(`https://graph.facebook.com/v19.0/${pageId}/feed`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: JSON.stringify({
+    body: new URLSearchParams({
       message: text,
-      access_token: pageAccessToken,
+      access_token: accessToken,
     }),
   });
 
@@ -265,16 +202,17 @@ async function publishToFacebookPage(
   console.log('[publishToFacebookPage] Response:', response.status, responseText);
 
   if (!response.ok) {
-    const errorData = JSON.parse(responseText);
-    throw new Error(`Facebook API error: ${response.status} - ${errorData.error?.message || responseText}`);
+    throw new Error(`Facebook API error ${response.status}: ${responseText}`);
   }
 
   const data = JSON.parse(responseText);
-  if (!data.id) {
-    throw new Error('Facebook API did not return a post ID');
+  const postId = data.id;
+  
+  if (!postId) {
+    throw new Error(`Facebook API did not return post ID. Response: ${responseText}`);
   }
 
-  return { postId: data.id };
+  return { postId };
 }
 
 // ============ Main Handler ============
@@ -387,13 +325,7 @@ Deno.serve(async (req: Request) => {
         switch (platform) {
           case 'x':
           case 'twitter':
-            // For X, we need the refresh_token as access_token_secret for OAuth 1.0a
-            // Or just use OAuth 2.0 bearer token if that's what we stored
-            result = await publishToX(
-              account.access_token,
-              account.refresh_token || '', // OAuth 1.0a token secret, empty for OAuth 2.0
-              text
-            );
+            result = await publishToX(account.access_token, text);
             break;
 
           case 'linkedin':
