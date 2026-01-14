@@ -128,8 +128,8 @@ serve(async (req) => {
   return json({
     success: true,
     ran_at: ranAt,
-    email: emailResult,
-    posting: postingResult,
+    email_processor: emailResult,
+    posting_processor: postingResult,
     followups: followupResult,
     feedback: feedbackResult,
   });
