@@ -53,6 +53,7 @@ import FamilyCheckoutSuccess from "./pages/FamilyCheckoutSuccess";
 import FamilyCheckoutCanceled from "./pages/FamilyCheckoutCanceled";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
 import WelcomeQuestionnaire from "./components/WelcomeQuestionnaire";
+import OnboardingPage from "./pages/OnboardingPage";
 
 // Test Pages  
 import TestPage from "./pages/TestPage";
@@ -193,6 +194,15 @@ function AppWithTracking() {
                   <ProtectedRoute>
                     <OptimizedSuspense skeletonType="dashboard">
                       <DashboardRedirect />
+                    </OptimizedSuspense>
+                  </ProtectedRoute>
+                } />
+
+                {/* Onboarding Route */}
+                <Route path="/dashboard/onboarding" element={
+                  <ProtectedRoute>
+                    <OptimizedSuspense skeletonType="card">
+                      <OnboardingPage />
                     </OptimizedSuspense>
                   </ProtectedRoute>
                 } />
