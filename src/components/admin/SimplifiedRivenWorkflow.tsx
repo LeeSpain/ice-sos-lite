@@ -1446,6 +1446,35 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
 
           {currentStage === 'success' && (
             <div className="space-y-6">
+              {/* Header with manual test button */}
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Published Content</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      toast({ title: "Running Social Poster...", description: "Processing queue..." });
+                      const { data, error } = await supabase.functions.invoke('posting-processor', { body: {} });
+                      if (error) throw error;
+                      toast({
+                        title: "Social Poster Complete",
+                        description: `Processed: ${data?.processed ?? 0}, Succeeded: ${data?.succeeded ?? 0}, Failed: ${data?.failed ?? 0}`,
+                      });
+                    } catch (err) {
+                      console.error('[RunSocialPoster]', err);
+                      toast({
+                        title: "Social Poster Failed",
+                        description: err instanceof Error ? err.message : 'Unknown error',
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  <Play className="h-4 w-4 mr-1" />
+                  Run Social Poster Now
+                </Button>
+              </div>
               {/* Content View Tabs */}
               <div className="flex gap-2 border-b">
                 <Button 
