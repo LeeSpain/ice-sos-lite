@@ -4241,16 +4241,21 @@ export type Database = {
           access_token: string
           connection_status: string
           created_at: string
+          expires_at: string | null
           follower_count: number | null
           id: string
           last_used_at: string | null
+          metadata: Json | null
           permissions: Json | null
           platform: string
+          platform_account_id: string | null
           platform_name: string | null
           platform_user_id: string
           platform_username: string | null
           refresh_token: string | null
+          scope: string | null
           token_expires_at: string | null
+          token_type: string | null
           updated_at: string
           user_id: string
         }
@@ -4258,16 +4263,21 @@ export type Database = {
           access_token: string
           connection_status?: string
           created_at?: string
+          expires_at?: string | null
           follower_count?: number | null
           id?: string
           last_used_at?: string | null
+          metadata?: Json | null
           permissions?: Json | null
           platform: string
+          platform_account_id?: string | null
           platform_name?: string | null
           platform_user_id: string
           platform_username?: string | null
           refresh_token?: string | null
+          scope?: string | null
           token_expires_at?: string | null
+          token_type?: string | null
           updated_at?: string
           user_id: string
         }
@@ -4275,16 +4285,21 @@ export type Database = {
           access_token?: string
           connection_status?: string
           created_at?: string
+          expires_at?: string | null
           follower_count?: number | null
           id?: string
           last_used_at?: string | null
+          metadata?: Json | null
           permissions?: Json | null
           platform?: string
+          platform_account_id?: string | null
           platform_name?: string | null
           platform_user_id?: string
           platform_username?: string | null
           refresh_token?: string | null
+          scope?: string | null
           token_expires_at?: string | null
+          token_type?: string | null
           updated_at?: string
           user_id?: string
         }
