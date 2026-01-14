@@ -18,6 +18,7 @@ import { BulkEmailCRM } from './BulkEmailCRM';
 import { EmailCampaignControls } from './EmailCampaignControls';
 import { EmailTemplateEditor } from './EmailTemplateEditor';
 import { EmailAnalyticsDashboard } from './EmailAnalyticsDashboard';
+import { SocialPostingStatus } from './SocialPostingStatus';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 
@@ -1530,6 +1531,8 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                                   <span>Clicks: {item.email_metrics.total_clicked} ({item.email_metrics.click_rate}%)</span>
                                 </div>
                               )}
+                              {/* Social Media Posting Status */}
+                              <SocialPostingStatus contentId={item.id} />
                             </div>
                              <div className="flex gap-2">
                                <Button 
