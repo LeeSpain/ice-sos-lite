@@ -105,9 +105,22 @@ const AuthPage = () => {
           });
         }, 0);
         
-        // Redirect to dashboard after successful sign in
+        // Check for 'next' parameter to redirect after login
+        const nextUrl = searchParams.get('next');
+        const planParam = searchParams.get('plan');
+        
+        // Build redirect URL
+        let redirectTo = '/dashboard';
+        if (nextUrl) {
+          redirectTo = nextUrl;
+          if (planParam) {
+            redirectTo += `${nextUrl.includes('?') ? '&' : '?'}plan=${planParam}`;
+          }
+        }
+        
+        // Redirect after successful sign in
         setTimeout(() => {
-          navigate('/dashboard');
+          navigate(redirectTo);
         }, 1000);
       }
     } catch (error: any) {
