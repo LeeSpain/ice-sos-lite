@@ -46,15 +46,45 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
       return (
         <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
-          <div className="text-white text-center max-w-md">
-            <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
-            <p className="mb-4">The application encountered an unexpected error.</p>
-            <button 
-              onClick={this.reset}
-              className="bg-white text-black px-4 py-2 rounded hover:bg-gray-100"
-            >
-              Try again
-            </button>
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-4">
+                <span className="text-4xl">⚠️</span>
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h1>
+              <p className="text-gray-600 mb-6">
+                We encountered an unexpected error. Our team has been notified.
+              </p>
+              {process.env.NODE_ENV === 'development' && this.state.error && (
+                <div className="bg-gray-50 rounded p-4 mb-6 text-left">
+                  <p className="text-sm font-mono text-red-600 mb-2">
+                    {this.state.error.message}
+                  </p>
+                  <details className="text-xs text-gray-600">
+                    <summary className="cursor-pointer font-semibold mb-2">
+                      Stack Trace
+                    </summary>
+                    <pre className="overflow-auto max-h-40 text-xs whitespace-pre-wrap">
+                      {this.state.error.stack}
+                    </pre>
+                  </details>
+                </div>
+              )}
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={this.reset}
+                  className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={() => window.location.href = '/'}
+                  className="w-full bg-gray-100 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-200 transition"
+                >
+                  Go to Homepage
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       );
