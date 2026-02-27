@@ -1,16 +1,16 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useLocation, Navigate } from 'react-router-dom';
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarGroup, 
-  SidebarGroupContent, 
-  SidebarGroupLabel, 
-  SidebarMenu, 
-  SidebarMenuButton, 
-  SidebarMenuItem, 
-  SidebarProvider, 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
   SidebarTrigger,
   useSidebar
 } from '@/components/ui/sidebar';
@@ -43,7 +43,9 @@ import {
   Building,
   BookOpen,
   Target,
-  Send
+  Send,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
@@ -150,9 +152,30 @@ function AdminSidebar() {
   const { t } = useTranslation();
   const adminMenuItems = useAdminMenuItems();
 
+  // State to track which sections are expanded
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
+    // Auto-expand the section that contains the current active route
+    const activeSection = adminMenuItems.find(group =>
+      group.items.some(item => item.url === currentPath)
+    );
+    return new Set(activeSection ? [activeSection.title] : []);
+  });
+
   const isActive = (path: string) => currentPath === path;
-  const isGroupActive = (items: typeof adminMenuItems[0]['items']) => 
+  const isGroupActive = (items: typeof adminMenuItems[0]['items']) =>
     items.some(item => isActive(item.url));
+
+  const toggleSection = (title: string) => {
+    setExpandedSections(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(title)) {
+        newSet.delete(title);
+      } else {
+        newSet.add(title);
+      }
+      return newSet;
+    });
+  };
 
   return (
     <Sidebar className={state === "collapsed" ? "w-16" : "w-64"} variant="sidebar">
@@ -172,53 +195,75 @@ function AdminSidebar() {
             )}
           </div>
         </div>
-        
-        {adminMenuItems.map((group, groupIndex) => (
-          <SidebarGroup key={group.title} className="px-3 py-2">
-            <SidebarGroupLabel className={`${state === "collapsed" ? 'hidden' : 'block'} text-xs font-semibold text-sidebar-foreground/70 px-2 py-1 flex items-center gap-2`}>
-              <div className={`w-2 h-2 rounded-full ${
-                groupIndex === 0 ? 'bg-blue-500' :
-                groupIndex === 1 ? 'bg-purple-500' :
-                groupIndex === 2 ? 'bg-green-500' :
-                groupIndex === 3 ? 'bg-orange-500' :
-                groupIndex === 4 ? 'bg-red-500' :
-                'bg-gray-500'
-              }`} />
-              {group.title}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-1">
-                {group.items.map((item, itemIndex) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild className="group">
-                      <NavLink 
-                        to={item.url} 
-                        className={({ isActive }) =>
-                          `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
-                            isActive 
-                              ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg scale-[1.02]' 
-                              : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:scale-[1.01]'
-                          }`
-                        }
-                      >
-                        <div className={`p-1.5 rounded-md transition-colors ${
-                          isActive(item.url) 
-                            ? 'bg-white/20' 
-                            : 'bg-sidebar-accent/50 group-hover:bg-sidebar-accent'
-                        }`}>
-                          <item.icon className="h-4 w-4" />
-                        </div>
-                        {state !== "collapsed" && (
-                          <span className="font-medium text-sm">{item.title}</span>
-                        )}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+
+        {adminMenuItems.map((group, groupIndex) => {
+          const isExpanded = expandedSections.has(group.title);
+          const hasActiveItem = isGroupActive(group.items);
+
+          return (
+            <SidebarGroup key={group.title} className="px-3 py-2">
+              <SidebarGroupLabel
+                className={`${state === "collapsed" ? 'hidden' : 'block'} text-xs font-semibold px-2 py-2 flex items-center gap-2 cursor-pointer hover:bg-sidebar-accent/50 rounded-md transition-colors ${
+                  hasActiveItem ? 'text-sidebar-primary' : 'text-sidebar-foreground/70'
+                }`}
+                onClick={() => toggleSection(group.title)}
+              >
+                <div className={`w-2 h-2 rounded-full ${
+                  groupIndex === 0 ? 'bg-blue-500' :
+                  groupIndex === 1 ? 'bg-purple-500' :
+                  groupIndex === 2 ? 'bg-green-500' :
+                  groupIndex === 3 ? 'bg-orange-500' :
+                  groupIndex === 4 ? 'bg-red-500' :
+                  groupIndex === 5 ? 'bg-cyan-500' :
+                  groupIndex === 6 ? 'bg-amber-500' :
+                  groupIndex === 7 ? 'bg-pink-500' :
+                  groupIndex === 8 ? 'bg-indigo-500' :
+                  'bg-gray-500'
+                }`} />
+                <span className="flex-1">{group.title}</span>
+                {isExpanded ? (
+                  <ChevronDown className="h-4 w-4 transition-transform" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 transition-transform" />
+                )}
+              </SidebarGroupLabel>
+
+              {isExpanded && (
+                <SidebarGroupContent>
+                  <SidebarMenu className="space-y-1 mt-1">
+                    {group.items.map((item, itemIndex) => (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild className="group">
+                          <NavLink
+                            to={item.url}
+                            className={({ isActive }) =>
+                              `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                                isActive
+                                  ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg scale-[1.02]'
+                                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:scale-[1.01]'
+                              }`
+                            }
+                          >
+                            <div className={`p-1.5 rounded-md transition-colors ${
+                              isActive(item.url)
+                                ? 'bg-white/20'
+                                : 'bg-sidebar-accent/50 group-hover:bg-sidebar-accent'
+                            }`}>
+                              <item.icon className="h-4 w-4" />
+                            </div>
+                            {state !== "collapsed" && (
+                              <span className="font-medium text-sm">{item.title}</span>
+                            )}
+                          </NavLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </SidebarGroupContent>
+              )}
+            </SidebarGroup>
+          );
+        })}
       </SidebarContent>
     </Sidebar>
   );
