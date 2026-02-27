@@ -644,5 +644,68 @@
     "monitoring": "Monitoreo",
     "countries": "Países",
     "professionalNetwork": "Red Profesional de Respuesta a Emergencias"
+  },
+  "howItWorks": {
+    "title": "¿Cómo Funciona ICE SOS?",
+    "subtitle": "Coordinación de emergencias reimaginada con IA. Simple, rápido y siempre disponible.",
+    "keyFeatures": "Características Clave",
+    "importantNotice": "Aviso Importante",
+    "readyToStart": "¿Listo para Comenzar?",
+    "readySubtitle": "Habla con Clara ahora mismo. Chat, llama o solicita videollamada en segundos.",
+    "chatWithClara": "Chatear con Clara",
+    "callNow": "Llamar Ahora (60 seg)",
+    "availabilityNotice": "Disponible en Inglés y Español • 24/7 • Gratis para comenzar",
+    "steps": {
+      "step1": {
+        "title": "Presiona Tu Botón de Emergencia",
+        "description": "Activa ICE SOS con un toque desde tu teléfono, o usa un botón Flic para acceso instantáneo."
+      },
+      "step2": {
+        "title": "Todos los Contactos Suenan Simultáneamente",
+        "description": "Tus contactos de emergencia reciben llamadas al mismo tiempo, no uno por uno. Obtén ayuda 15 veces más rápido."
+      },
+      "step3": {
+        "title": "Clara AI Se Une para Coordinar",
+        "description": "Nuestra coordinadora AI Clara se une a la llamada, saluda a todos, captura ETAs y mantiene actualizados a los respondedores."
+      },
+      "step4": {
+        "title": "La Ayuda Llega Más Rápido",
+        "description": "Tu ubicación se comparte automáticamente. Todos saben quién viene, cuándo llegarán y qué se necesita."
+      }
+    },
+    "features": {
+      "callback": {
+        "title": "Llamada en 60 Segundos",
+        "description": "Haz clic en el ícono de teléfono en el chat para hablar con nuestro equipo en menos de 60 segundos."
+      },
+      "bilingual": {
+        "title": "Soporte en Inglés y Español",
+        "description": "Cambia de idioma al instante. Clara y nuestro equipo hablan inglés y español con fluidez."
+      },
+      "video": {
+        "title": "Videollamadas Disponibles",
+        "description": "¿Necesitas mostrar algo? Solicita una videollamada para asistencia cara a cara."
+      },
+      "available247": {
+        "title": "Disponibilidad 24/7",
+        "description": "Clara nunca duerme. Obtén ayuda en cualquier momento, día o noche, 365 días al año."
+      },
+      "memory": {
+        "title": "Memoria Perfecta",
+        "description": "Clara recuerda cada interacción. Conoce tu historial y proporciona asistencia personalizada."
+      },
+      "chatAndCall": {
+        "title": "Chat y Llamadas en Cualquier Momento",
+        "description": "¿Prefieres texto? Chatea con Clara. ¿Necesitas hablar? Haz clic para llamar. Tú eliges cómo conectar."
+      }
+    },
+    "disclaimer": {
+      "title": "Aviso Importante",
+      "message": "ICE SOS es una herramienta de coordinación de emergencias. NO es un reemplazo para el 911 (EE.UU.) o el 112 (UE).",
+      "lifeThreatening": "En una emergencia que ponga en riesgo la vida:",
+      "step1": "LLAMA AL 911 (EE.UU.) o 112 (UE) PRIMERO",
+      "step2": "Luego usa ICE SOS para notificar a tus contactos",
+      "step3": "No demores en llamar a los servicios de emergencia oficiales"
+    }
   }
 }
