@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
+import HowItWorks from "@/components/HowItWorks";
 import FamilyCarerAccess from "@/components/FamilyCarerAccess";
 import Pricing from "@/components/Pricing";
 import AppDownload from "@/components/AppDownload";
@@ -48,13 +49,15 @@ const Index = () => {
       <Navigation />
 
       <Hero onClaraClick={openClaraChat} />
-      
-      
+
+      {/* How It Works - Clear explanation of all features */}
+      <HowItWorks />
+
       <Features />
 
       {/* Live App Preview Section (reflects admin "App Testing" settings) */}
       <AppPreviewSection />
-      
+
       <Pricing />
       
       <FamilyCarerAccess />
