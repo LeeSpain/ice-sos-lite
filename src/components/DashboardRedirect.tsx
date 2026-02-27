@@ -16,20 +16,27 @@ const DashboardRedirect = () => {
       }
 
       try {
+        // Check profiles table for onboarding_completed flag
         const { data, error } = await supabase
-          .from('onboarding_progress')
-          .select('completed')
+          .from('profiles')
+          .select('onboarding_completed')
           .eq('user_id', user.id)
           .maybeSingle();
 
-        if (error) throw error;
+        if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+          throw error;
+        }
 
         // If no record exists or not completed, needs onboarding
-        if (!data || !data.completed) {
+        if (!data || !data.onboarding_completed) {
+          console.log('🔄 DashboardRedirect: User needs onboarding (not completed or no profile)');
           setNeedsOnboarding(true);
+        } else {
+          console.log('🔄 DashboardRedirect: User completed onboarding, proceeding to dashboard');
         }
       } catch (err) {
         console.error('Error checking onboarding:', err);
+        // On error, don't block access - let them through
       } finally {
         setOnboardingChecked(true);
       }

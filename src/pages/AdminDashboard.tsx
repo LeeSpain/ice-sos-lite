@@ -48,6 +48,7 @@ import RegionalHubPage from '@/components/admin/pages/RegionalHubPage';
 import ProductionReadinessPanel from '@/components/admin/ProductionReadinessPanel';
 import StripeSetupPage from '@/components/admin/pages/StripeSetupPage';
 import MobileAppLaunchPage from '@/components/admin/pages/MobileAppLaunchPage';
+import HealthCheckPage from '@/components/admin/pages/HealthCheckPage';
 import GoLivePreparationPage from '@/components/admin/pages/GoLivePreparationPage';
 import TransferToCare from '@/pages/admin/TransferToCare';
 
@@ -104,6 +105,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="app-testing" element={<AppTestingPage />} />
         <Route path="flic-control" element={<FlicControlAdminPage />} />
         <Route path="production-check" element={<ProductionReadinessPanel />} />
+        <Route path="health-check" element={<HealthCheckPage />} />
         <Route path="stripe-setup" element={<StripeSetupPage />} />
         <Route path="mobile-launch" element={<MobileAppLaunchPage />} />
         <Route path="go-live" element={<GoLivePreparationPage />} />

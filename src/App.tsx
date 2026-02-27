@@ -36,8 +36,10 @@ import FamilyAppPage from "./pages/FamilyAppPage";
 
 // Support & Info Pages
 import Support from "./pages/Support";
-import Privacy from "./pages/Privacy";
-import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy"; // Legacy dialog-based (keep for backwards compatibility)
+import Terms from "./pages/Terms"; // Legacy dialog-based (keep for backwards compatibility)
+import PrivacyPolicy from "./pages/PrivacyPolicy"; // New production privacy policy
+import TermsOfService from "./pages/TermsOfService"; // New production terms of service
 import Contact from "./pages/Contact";
 import Videos from "./pages/Videos";
 import FamilyCarerAccessPage from "./pages/FamilyCarerAccess";
@@ -134,13 +136,27 @@ function AppWithTracking() {
                   </OptimizedSuspense>
                 } />
                 
+                {/* Production Privacy & Terms (Full Pages) */}
                 <Route path="/privacy" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <PrivacyPolicy />
+                  </OptimizedSuspense>
+                } />
+
+                <Route path="/terms" element={
+                  <OptimizedSuspense skeletonType="card">
+                    <TermsOfService />
+                  </OptimizedSuspense>
+                } />
+
+                {/* Legacy Privacy & Terms (Dialog-based - deprecated but kept for compatibility) */}
+                <Route path="/privacy-legacy" element={
                   <OptimizedSuspense skeletonType="card">
                     <Privacy />
                   </OptimizedSuspense>
                 } />
-                
-                <Route path="/terms" element={
+
+                <Route path="/terms-legacy" element={
                   <OptimizedSuspense skeletonType="card">
                     <Terms />
                   </OptimizedSuspense>
