@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ice-sos-lite</string>
+    <string name="title_activity_main">ice-sos-lite</string>
+    <string name="package_name">app.lovable.a856a70f639b4212b411d2cdb524d754</string>
+    <string name="custom_url_scheme">app.lovable.a856a70f639b4212b411d2cdb524d754</string>
+</resources>
