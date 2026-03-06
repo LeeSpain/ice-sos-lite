@@ -99,6 +99,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="regional-organizations" element={<RegionalOrganizationsPage />} />
         <Route path="regional-users" element={<RegionalUsersPage />} />
         <Route path="regional-audit" element={<RegionalAuditPage />} />
+        <Route path="subscription-plans" element={<SubscriptionPlansPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="regional-services" element={<RegionalServicesPage />} />
         <Route path="activity" element={<ActivityPage />} />

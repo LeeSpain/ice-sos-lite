@@ -130,7 +130,7 @@ const useAdminMenuItems = () => {
       items: [
         { title: t('admin.products'), url: "/admin-dashboard/products", icon: Package },
         { title: t('admin.regionalServices'), url: "/admin-dashboard/regional-services", icon: MapPin },
-        { title: t('admin.subscriptionPlans'), url: "/admin-dashboard/protection-plans", icon: Shield },
+        { title: t('admin.subscriptionPlans'), url: "/admin-dashboard/subscription-plans", icon: Shield },
         { title: t('admin.flickControl'), url: "/admin-dashboard/flic-control", icon: Bluetooth },
       ]
     },
