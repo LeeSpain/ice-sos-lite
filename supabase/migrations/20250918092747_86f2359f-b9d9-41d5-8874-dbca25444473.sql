@@ -14,7 +14,8 @@ ON public.contact_submissions
 FOR INSERT 
 WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admins can read contact submissions" ON public.contact_submissions;
 CREATE POLICY "Admins can read contact submissions" 
 ON public.contact_submissions 
 FOR SELECT 
-USING (is_admin());
+USING (public.is_admin());

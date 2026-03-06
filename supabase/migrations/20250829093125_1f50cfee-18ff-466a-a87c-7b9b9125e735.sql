@@ -18,12 +18,23 @@ CREATE TABLE IF NOT EXISTS public.training_data (
 ALTER TABLE public.training_data ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
-CREATE POLICY "Admin can manage training data" ON public.training_data FOR ALL USING (is_admin());
+DROP POLICY IF EXISTS "Admin can manage training data" ON public.training_data;
+CREATE POLICY "Admin can manage training data" ON public.training_data FOR ALL USING (public.is_admin());
+DROP POLICY IF EXISTS "System can update usage stats" ON public.training_data;
 CREATE POLICY "System can update usage stats" ON public.training_data FOR UPDATE USING (true);
 
+-- Ensure all columns exist (table may have been created earlier without some of them)
+ALTER TABLE public.training_data ADD COLUMN IF NOT EXISTS tags TEXT[] DEFAULT '{}';
+ALTER TABLE public.training_data ADD COLUMN IF NOT EXISTS confidence_score NUMERIC DEFAULT 1.0;
+ALTER TABLE public.training_data ADD COLUMN IF NOT EXISTS usage_count INTEGER DEFAULT 0;
+ALTER TABLE public.training_data ADD COLUMN IF NOT EXISTS last_used_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE public.training_data ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+ALTER TABLE public.training_data ADD COLUMN IF NOT EXISTS created_by UUID;
+ALTER TABLE public.training_data ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now();
+
 -- Create index for performance
-CREATE INDEX idx_training_data_category ON public.training_data(category);
-CREATE INDEX idx_training_data_active ON public.training_data(is_active) WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS idx_training_data_category ON public.training_data(category);
+CREATE INDEX IF NOT EXISTS idx_training_data_active ON public.training_data(is_active) WHERE is_active = true;
 
 -- Create marketing content table if not exists
 CREATE TABLE IF NOT EXISTS public.marketing_content (
@@ -45,7 +56,8 @@ CREATE TABLE IF NOT EXISTS public.marketing_content (
 
 -- Enable RLS for marketing content
 ALTER TABLE public.marketing_content ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Admin can manage marketing content" ON public.marketing_content FOR ALL USING (is_admin());
+DROP POLICY IF EXISTS "Admin can manage marketing content" ON public.marketing_content;
+CREATE POLICY "Admin can manage marketing content" ON public.marketing_content FOR ALL USING (public.is_admin());
 
 -- Create triggers for updated_at
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
@@ -56,11 +68,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_training_data_updated_at ON public.training_data;
 CREATE TRIGGER update_training_data_updated_at
   BEFORE UPDATE ON public.training_data
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_marketing_content_updated_at ON public.marketing_content;
 CREATE TRIGGER update_marketing_content_updated_at
   BEFORE UPDATE ON public.marketing_content
   FOR EACH ROW

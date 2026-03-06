@@ -179,10 +179,12 @@ ALTER TABLE public.contact_engagement_summary ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_contact_context ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for timeline
+DROP POLICY IF EXISTS "Users can view their own timeline" ON public.contact_timeline;
 CREATE POLICY "Users can view their own timeline"
 ON public.contact_timeline FOR SELECT
 USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Admins can view all timelines" ON public.contact_timeline;
 CREATE POLICY "Admins can view all timelines"
 ON public.contact_timeline FOR SELECT
 USING (
@@ -193,16 +195,19 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "Service role can manage timeline" ON public.contact_timeline;
 CREATE POLICY "Service role can manage timeline"
 ON public.contact_timeline FOR ALL
 USING (true)
 WITH CHECK (true);
 
 -- RLS Policies for engagement summary
+DROP POLICY IF EXISTS "Users can view their own engagement" ON public.contact_engagement_summary;
 CREATE POLICY "Users can view their own engagement"
 ON public.contact_engagement_summary FOR SELECT
 USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Admins can view all engagement" ON public.contact_engagement_summary;
 CREATE POLICY "Admins can view all engagement"
 ON public.contact_engagement_summary FOR SELECT
 USING (
@@ -213,12 +218,14 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "Service role can manage engagement" ON public.contact_engagement_summary;
 CREATE POLICY "Service role can manage engagement"
 ON public.contact_engagement_summary FOR ALL
 USING (true)
 WITH CHECK (true);
 
 -- RLS Policies for AI context
+DROP POLICY IF EXISTS "Service role can manage AI context" ON public.ai_contact_context;
 CREATE POLICY "Service role can manage AI context"
 ON public.ai_contact_context FOR ALL
 USING (true)

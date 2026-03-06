@@ -185,10 +185,12 @@ ALTER TABLE public.callback_analytics ENABLE ROW LEVEL SECURITY;
 -- RLS Policies
 
 -- Callback requests
+DROP POLICY IF EXISTS "Users can view their own callback requests" ON public.callback_requests;
 CREATE POLICY "Users can view their own callback requests"
 ON public.callback_requests FOR SELECT
 USING (user_id = auth.uid() OR contact_email = auth.email());
 
+DROP POLICY IF EXISTS "Sales reps can view assigned callbacks" ON public.callback_requests;
 CREATE POLICY "Sales reps can view assigned callbacks"
 ON public.callback_requests FOR SELECT
 USING (assigned_to = auth.uid() OR EXISTS (
@@ -197,12 +199,14 @@ USING (assigned_to = auth.uid() OR EXISTS (
   AND raw_user_meta_data->>'role' IN ('admin', 'sales_rep')
 ));
 
+DROP POLICY IF EXISTS "Service role can manage callback requests" ON public.callback_requests;
 CREATE POLICY "Service role can manage callback requests"
 ON public.callback_requests FOR ALL
 USING (true)
 WITH CHECK (true);
 
 -- Queue
+DROP POLICY IF EXISTS "Sales reps can view queue" ON public.callback_queue;
 CREATE POLICY "Sales reps can view queue"
 ON public.callback_queue FOR SELECT
 USING (EXISTS (
@@ -211,17 +215,20 @@ USING (EXISTS (
   AND raw_user_meta_data->>'role' IN ('admin', 'sales_rep')
 ));
 
+DROP POLICY IF EXISTS "Service role can manage queue" ON public.callback_queue;
 CREATE POLICY "Service role can manage queue"
 ON public.callback_queue FOR ALL
 USING (true)
 WITH CHECK (true);
 
 -- Availability
+DROP POLICY IF EXISTS "Reps can manage their own availability" ON public.sales_rep_availability;
 CREATE POLICY "Reps can manage their own availability"
 ON public.sales_rep_availability FOR ALL
 USING (user_id = auth.uid())
 WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Admins can view all availability" ON public.sales_rep_availability;
 CREATE POLICY "Admins can view all availability"
 ON public.sales_rep_availability FOR SELECT
 USING (EXISTS (
@@ -231,6 +238,7 @@ USING (EXISTS (
 ));
 
 -- Analytics
+DROP POLICY IF EXISTS "Admins and sales reps can view analytics" ON public.callback_analytics;
 CREATE POLICY "Admins and sales reps can view analytics"
 ON public.callback_analytics FOR SELECT
 USING (EXISTS (
@@ -239,6 +247,7 @@ USING (EXISTS (
   AND raw_user_meta_data->>'role' IN ('admin', 'sales_rep')
 ));
 
+DROP POLICY IF EXISTS "System can insert analytics" ON public.callback_analytics;
 CREATE POLICY "System can insert analytics"
 ON public.callback_analytics FOR INSERT
 WITH CHECK (true);

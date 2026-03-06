@@ -39,7 +39,7 @@ BEGIN
   
   -- Only allow admin assignment if no admin exists (initial setup)
   -- OR if the caller is already an admin
-  IF admin_count = 0 OR is_admin() THEN
+  IF admin_count = 0 OR public.is_admin() THEN
     UPDATE public.profiles 
     SET role = 'admin', updated_at = now()
     WHERE user_id = target_user_id;
@@ -112,6 +112,7 @@ END;
 $$;
 
 -- Add rate limiting to contact submissions
+DROP POLICY IF EXISTS "Rate limited contact submissions" ON public.contact_submissions;
 CREATE POLICY "Rate limited contact submissions" 
 ON public.contact_submissions 
 FOR INSERT 

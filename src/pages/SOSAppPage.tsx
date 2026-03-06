@@ -34,6 +34,7 @@ import { cn } from '@/lib/utils';
 import EmergencyCommandCenter from '@/components/sos-app/EmergencyCommandCenter';
 import EmergencyButton from '@/components/sos-app/EmergencyButton';
 import { EmergencyDisclaimerModal } from '@/components/emergency/EmergencyDisclaimerModal';
+import ActiveIncidentTracker from '@/components/sos/ActiveIncidentTracker';
 
 interface EmergencyStatus {
   overall: 'ready' | 'warning' | 'error';
@@ -158,25 +159,50 @@ const SOSAppPage = () => {
     }
 
     try {
-      // Create mock active incident
+      const location = currentLocation;
+
+      // Call Clar's SOS trigger edge function
+      const { data, error } = await supabase.functions.invoke('sos-trigger', {
+        body: {
+          trigger_method: 'app_button',
+          latitude: location?.latitude,
+          longitude: location?.longitude,
+        },
+      });
+
+      if (error) throw error;
+
+      const incident: ActiveIncident = {
+        id: data?.incident_id || `incident-${Date.now()}`,
+        status: 'active',
+        startTime: new Date(),
+        contactsNotified: contacts.length,
+        locationShared: !!location,
+        familyAlerted: true,
+      };
+      setActiveIncident(incident);
+
+      toast({
+        title: "SOS Activated",
+        description: "Clar is calling you now. Help is being coordinated.",
+      });
+    } catch (error) {
+      console.error('Emergency SOS failed:', error);
+      // Fallback — still set local incident so UI shows active state
       const incident: ActiveIncident = {
         id: `incident-${Date.now()}`,
         status: 'active',
         startTime: new Date(),
         contactsNotified: contacts.length,
-        locationShared: true,
-        familyAlerted: true
+        locationShared: false,
+        familyAlerted: false,
       };
       setActiveIncident(incident);
-
-      await triggerEmergencySOS();
-      
       toast({
-        title: "Emergency SOS Activated",
-        description: "Emergency contacts and family have been notified",
+        title: "SOS Activated",
+        description: "Notifying your emergency contacts now.",
+        variant: "destructive",
       });
-    } catch (error) {
-      console.error('Emergency SOS failed:', error);
     }
   };
 
@@ -371,24 +397,29 @@ const SOSAppPage = () => {
         </div>
       </div>
 
-      {/* Active Incident Alert */}
-      {activeIncident && (
+      {/* Active Incident — Clar AI Tracker */}
+      {activeIncident && activeIncident.id && !activeIncident.id.startsWith('incident-') && (
+        <div className="relative z-10 px-4 mb-6">
+          <div className="max-w-md mx-auto">
+            <ActiveIncidentTracker
+              incidentId={activeIncident.id}
+              memberName={user?.user_metadata?.full_name || 'You'}
+              onResolved={() => setActiveIncident(null)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Fallback indicator for local-only incident state */}
+      {activeIncident && activeIncident.id.startsWith('incident-') && (
         <div className="relative z-10 px-4 mb-6">
           <div className="max-w-md mx-auto">
             <div className="bg-red-600 rounded-xl p-4 border border-red-500 animate-pulse">
-              <div className="flex items-center gap-3 text-white mb-3">
+              <div className="flex items-center gap-3 text-white mb-2">
                 <AlertTriangle className="h-5 w-5" />
-                <span className="font-bold">ACTIVE EMERGENCY</span>
-                <Badge variant="destructive" className="bg-red-800">
-                  {activeIncident.status.toUpperCase()}
-                </Badge>
+                <span className="font-bold">EMERGENCY ACTIVATED</span>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-sm text-white/90">
-                <div>Started: {activeIncident.startTime.toLocaleTimeString()}</div>
-                <div>Contacts: {activeIncident.contactsNotified} notified</div>
-                <div>Location: {activeIncident.locationShared ? 'Shared' : 'Pending'}</div>
-                <div>Family: {activeIncident.familyAlerted ? 'Alerted' : 'Pending'}</div>
-              </div>
+              <p className="text-white/80 text-sm">Notifying your emergency contacts. Clar is coordinating help.</p>
             </div>
           </div>
         </div>

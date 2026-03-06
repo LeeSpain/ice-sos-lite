@@ -110,6 +110,7 @@ const useAdminMenuItems = () => {
     {
       title: t('admin.emergencySafety'),
       items: [
+        { title: 'SOS Incidents (Clar AI)', url: "/admin-dashboard/sos-incidents", icon: AlertTriangle },
         { title: t('admin.emergencyIncidents'), url: "/admin-dashboard/emergencies", icon: AlertTriangle },
         { title: t('admin.safetyMonitoring'), url: "/admin-dashboard/safety", icon: Shield },
       ]

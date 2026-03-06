@@ -9,16 +9,17 @@ DO $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies 
-    WHERE polname = 'Admin can manage whatsapp settings' 
+    WHERE policyname = 'Admin can manage whatsapp settings' 
       AND schemaname = 'public' 
       AND tablename = 'whatsapp_settings'
   ) THEN
+DROP POLICY IF EXISTS "Admin can manage whatsapp settings" ON public.whatsapp_settings;
     CREATE POLICY "Admin can manage whatsapp settings"
     ON public.whatsapp_settings
     FOR ALL
     TO authenticated
-    USING (is_admin())
-    WITH CHECK (is_admin());
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
   END IF;
 END $$;
 
@@ -71,7 +72,7 @@ AS $function$
       ) country_stats
     ) as top_countries
   FROM public.video_analytics va
-  WHERE is_admin() = true
+  WHERE public.is_admin() = true
   GROUP BY va.video_id, va.video_title
   ORDER BY total_views DESC;
 $function$;

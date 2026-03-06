@@ -104,32 +104,41 @@ ALTER TABLE public.emergency_escalation_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.emergency_test_results ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies (admin only for monitoring data)
+DROP POLICY IF EXISTS "Admins can manage system health checks" ON public.system_health_checks;
 CREATE POLICY "Admins can manage system health checks" ON public.system_health_checks
-FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can manage performance metrics" ON public.performance_metrics;
 CREATE POLICY "Admins can manage performance metrics" ON public.performance_metrics
-FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can manage error tracking" ON public.error_tracking;
 CREATE POLICY "Admins can manage error tracking" ON public.error_tracking
-FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can manage usage metrics" ON public.usage_metrics;
 CREATE POLICY "Admins can manage usage metrics" ON public.usage_metrics
-FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can manage emergency service requests" ON public.emergency_service_requests;
 CREATE POLICY "Admins can manage emergency service requests" ON public.emergency_service_requests
-FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "System can insert emergency service requests" ON public.emergency_service_requests;
 CREATE POLICY "System can insert emergency service requests" ON public.emergency_service_requests
 FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admins can manage emergency escalation log" ON public.emergency_escalation_log;
 CREATE POLICY "Admins can manage emergency escalation log" ON public.emergency_escalation_log
-FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "System can insert emergency escalation log" ON public.emergency_escalation_log;
 CREATE POLICY "System can insert emergency escalation log" ON public.emergency_escalation_log
 FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admins can manage emergency test results" ON public.emergency_test_results;
 CREATE POLICY "Admins can manage emergency test results" ON public.emergency_test_results
-FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- Create indexes for performance
 CREATE INDEX idx_system_health_checks_timestamp ON public.system_health_checks(check_timestamp);

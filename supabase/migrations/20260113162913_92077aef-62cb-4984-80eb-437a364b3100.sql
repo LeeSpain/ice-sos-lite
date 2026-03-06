@@ -51,15 +51,18 @@ ALTER TABLE public.followup_enrollments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.followup_send_log ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for sequences/steps: authenticated users can read
+DROP POLICY IF EXISTS "Authenticated users can read sequences" ON public.followup_sequences;
 CREATE POLICY "Authenticated users can read sequences"
 ON public.followup_sequences FOR SELECT
 USING (auth.uid() IS NOT NULL);
 
+DROP POLICY IF EXISTS "Authenticated users can read steps" ON public.followup_steps;
 CREATE POLICY "Authenticated users can read steps"
 ON public.followup_steps FOR SELECT
 USING (auth.uid() IS NOT NULL);
 
 -- RLS Policies for enrollments: access via lead ownership
+DROP POLICY IF EXISTS "Users can view enrollments for their leads" ON public.followup_enrollments;
 CREATE POLICY "Users can view enrollments for their leads"
 ON public.followup_enrollments FOR SELECT
 USING (
@@ -68,9 +71,10 @@ USING (
     WHERE leads.id = followup_enrollments.lead_id 
     AND leads.user_id = auth.uid()
   )
-  OR is_admin()
+  OR public.is_admin()
 );
 
+DROP POLICY IF EXISTS "Users can insert enrollments for their leads" ON public.followup_enrollments;
 CREATE POLICY "Users can insert enrollments for their leads"
 ON public.followup_enrollments FOR INSERT
 WITH CHECK (
@@ -79,9 +83,10 @@ WITH CHECK (
     WHERE leads.id = followup_enrollments.lead_id 
     AND leads.user_id = auth.uid()
   )
-  OR is_admin()
+  OR public.is_admin()
 );
 
+DROP POLICY IF EXISTS "Users can update enrollments for their leads" ON public.followup_enrollments;
 CREATE POLICY "Users can update enrollments for their leads"
 ON public.followup_enrollments FOR UPDATE
 USING (
@@ -90,10 +95,11 @@ USING (
     WHERE leads.id = followup_enrollments.lead_id 
     AND leads.user_id = auth.uid()
   )
-  OR is_admin()
+  OR public.is_admin()
 );
 
 -- RLS Policies for send logs
+DROP POLICY IF EXISTS "Users can view send logs for their enrollments" ON public.followup_send_log;
 CREATE POLICY "Users can view send logs for their enrollments"
 ON public.followup_send_log FOR SELECT
 USING (
@@ -103,9 +109,10 @@ USING (
     WHERE e.id = followup_send_log.enrollment_id 
     AND l.user_id = auth.uid()
   )
-  OR is_admin()
+  OR public.is_admin()
 );
 
+DROP POLICY IF EXISTS "Users can insert send logs for their enrollments" ON public.followup_send_log;
 CREATE POLICY "Users can insert send logs for their enrollments"
 ON public.followup_send_log FOR INSERT
 WITH CHECK (
@@ -115,7 +122,7 @@ WITH CHECK (
     WHERE e.id = followup_send_log.enrollment_id 
     AND l.user_id = auth.uid()
   )
-  OR is_admin()
+  OR public.is_admin()
 );
 
 -- Indexes for performance

@@ -11,11 +11,12 @@ CREATE TABLE public.customer_notes (
 
 ALTER TABLE public.customer_notes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admin can manage customer notes" ON public.customer_notes;
 CREATE POLICY "Admin can manage customer notes"
 ON public.customer_notes
 FOR ALL
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Create customer tags table
 CREATE TABLE public.customer_tags (
@@ -27,11 +28,12 @@ CREATE TABLE public.customer_tags (
 
 ALTER TABLE public.customer_tags ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admin can manage tags" ON public.customer_tags;
 CREATE POLICY "Admin can manage tags"
 ON public.customer_tags
 FOR ALL
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Create customer tag assignments table
 CREATE TABLE public.customer_tag_assignments (
@@ -45,11 +47,12 @@ CREATE TABLE public.customer_tag_assignments (
 
 ALTER TABLE public.customer_tag_assignments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admin can manage tag assignments" ON public.customer_tag_assignments;
 CREATE POLICY "Admin can manage tag assignments"
 ON public.customer_tag_assignments
 FOR ALL
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Create indexes for performance
 CREATE INDEX idx_customer_notes_customer ON public.customer_notes(customer_id);

@@ -54,42 +54,54 @@ ALTER TABLE public.business_hours ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sla_breaches ENABLE ROW LEVEL SECURITY;
 
 -- SLA Settings policies - Admin only
+DROP POLICY IF EXISTS "Admins can view SLA settings" ON public.sla_settings;
 CREATE POLICY "Admins can view SLA settings" ON public.sla_settings
   FOR SELECT USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can create SLA settings" ON public.sla_settings;
 CREATE POLICY "Admins can create SLA settings" ON public.sla_settings
   FOR INSERT WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can update SLA settings" ON public.sla_settings;
 CREATE POLICY "Admins can update SLA settings" ON public.sla_settings
   FOR UPDATE USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can delete SLA settings" ON public.sla_settings;
 CREATE POLICY "Admins can delete SLA settings" ON public.sla_settings
   FOR DELETE USING (public.is_admin());
 
 -- Business Hours policies - Admin only
+DROP POLICY IF EXISTS "Admins can view business hours" ON public.business_hours;
 CREATE POLICY "Admins can view business hours" ON public.business_hours
   FOR SELECT USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can create business hours" ON public.business_hours;
 CREATE POLICY "Admins can create business hours" ON public.business_hours
   FOR INSERT WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can update business hours" ON public.business_hours;
 CREATE POLICY "Admins can update business hours" ON public.business_hours
   FOR UPDATE USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can delete business hours" ON public.business_hours;
 CREATE POLICY "Admins can delete business hours" ON public.business_hours
   FOR DELETE USING (public.is_admin());
 
 -- SLA Breaches policies - Admin only
+DROP POLICY IF EXISTS "Admins can view SLA breaches" ON public.sla_breaches;
 CREATE POLICY "Admins can view SLA breaches" ON public.sla_breaches
   FOR SELECT USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can create SLA breaches" ON public.sla_breaches;
 CREATE POLICY "Admins can create SLA breaches" ON public.sla_breaches
   FOR INSERT WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Admins can update SLA breaches" ON public.sla_breaches;
 CREATE POLICY "Admins can update SLA breaches" ON public.sla_breaches
   FOR UPDATE USING (public.is_admin());
 
 -- Create trigger for updated_at on sla_settings
+DROP TRIGGER IF EXISTS update_sla_settings_updated_at ON public.sla_settings;
 CREATE TRIGGER update_sla_settings_updated_at
   BEFORE UPDATE ON public.sla_settings
   FOR EACH ROW

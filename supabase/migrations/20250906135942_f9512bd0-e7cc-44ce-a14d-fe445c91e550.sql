@@ -74,8 +74,8 @@ ALTER TABLE public.blog_posts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Admin can manage blog posts" ON public.blog_posts;
 CREATE POLICY "Admin can manage blog posts" 
 ON public.blog_posts FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Public can view published blog posts" ON public.blog_posts;
 CREATE POLICY "Public can view published blog posts" 
@@ -154,7 +154,7 @@ WITH CHECK (auth.uid() = user_id);
 DROP POLICY IF EXISTS "Admin can view all social media accounts" ON public.social_media_accounts;
 CREATE POLICY "Admin can view all social media accounts" 
 ON public.social_media_accounts FOR SELECT 
-USING (is_admin());
+USING (public.is_admin());
 
 -- updated_at trigger
 DROP TRIGGER IF EXISTS update_social_media_accounts_updated_at ON public.social_media_accounts;

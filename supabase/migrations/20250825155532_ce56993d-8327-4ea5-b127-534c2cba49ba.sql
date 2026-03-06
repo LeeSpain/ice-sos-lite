@@ -23,11 +23,13 @@ CREATE TABLE public.video_analytics (
 ALTER TABLE public.video_analytics ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Admin can view all video analytics" ON public.video_analytics;
 CREATE POLICY "Admin can view all video analytics" 
 ON public.video_analytics 
 FOR SELECT 
-USING (is_admin());
+USING (public.is_admin());
 
+DROP POLICY IF EXISTS "System can insert video analytics" ON public.video_analytics;
 CREATE POLICY "System can insert video analytics" 
 ON public.video_analytics 
 FOR INSERT 
@@ -73,7 +75,7 @@ AS $$
       )
     ) FILTER (WHERE va.user_location->>'country' IS NOT NULL) as top_countries
   FROM public.video_analytics va
-  WHERE is_admin() = true
+  WHERE public.is_admin() = true
   GROUP BY va.video_id, va.video_title
   ORDER BY total_views DESC;
 $$;

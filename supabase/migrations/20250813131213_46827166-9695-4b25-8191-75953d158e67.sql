@@ -38,5 +38,5 @@ AS $$
     WHERE uc.channel = 'whatsapp'::text
     GROUP BY date(uc.created_at)
   ) d
-  WHERE is_admin() = true;
+  WHERE public.is_admin() = true;
 $$;

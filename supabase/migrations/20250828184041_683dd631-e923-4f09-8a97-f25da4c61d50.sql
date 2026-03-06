@@ -18,6 +18,7 @@ CREATE TABLE public.riven_settings (
 ALTER TABLE public.riven_settings ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for Riven settings
+DROP POLICY IF EXISTS "Users can manage their own Riven settings" ON public.riven_settings;
 CREATE POLICY "Users can manage their own Riven settings"
 ON public.riven_settings 
 FOR ALL 
@@ -42,11 +43,12 @@ CREATE TABLE public.workflow_steps (
 ALTER TABLE public.workflow_steps ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for workflow steps
+DROP POLICY IF EXISTS "Admin can manage workflow steps" ON public.workflow_steps;
 CREATE POLICY "Admin can manage workflow steps"
 ON public.workflow_steps 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Update social_media_accounts table with more fields
 ALTER TABLE public.social_media_accounts 
@@ -74,11 +76,12 @@ CREATE TABLE public.content_approval_workflow (
 ALTER TABLE public.content_approval_workflow ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for content approval
+DROP POLICY IF EXISTS "Admin can manage content approval" ON public.content_approval_workflow;
 CREATE POLICY "Admin can manage content approval"
 ON public.content_approval_workflow 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Create posting queue table
 CREATE TABLE public.posting_queue (
@@ -100,11 +103,12 @@ CREATE TABLE public.posting_queue (
 ALTER TABLE public.posting_queue ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for posting queue
+DROP POLICY IF EXISTS "Admin can manage posting queue" ON public.posting_queue;
 CREATE POLICY "Admin can manage posting queue"
 ON public.posting_queue 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Create campaign analytics table
 CREATE TABLE public.campaign_analytics (
@@ -122,23 +126,27 @@ CREATE TABLE public.campaign_analytics (
 ALTER TABLE public.campaign_analytics ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for campaign analytics
+DROP POLICY IF EXISTS "Admin can manage campaign analytics" ON public.campaign_analytics;
 CREATE POLICY "Admin can manage campaign analytics"
 ON public.campaign_analytics 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Add updated_at trigger for new tables
+DROP TRIGGER IF EXISTS update_riven_settings_updated_at ON public.riven_settings;
 CREATE TRIGGER update_riven_settings_updated_at
   BEFORE UPDATE ON public.riven_settings
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_content_approval_workflow_updated_at ON public.content_approval_workflow;
 CREATE TRIGGER update_content_approval_workflow_updated_at
   BEFORE UPDATE ON public.content_approval_workflow
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_posting_queue_updated_at ON public.posting_queue;
 CREATE TRIGGER update_posting_queue_updated_at
   BEFORE UPDATE ON public.posting_queue
   FOR EACH ROW

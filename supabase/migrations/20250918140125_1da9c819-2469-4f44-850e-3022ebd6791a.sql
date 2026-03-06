@@ -12,7 +12,7 @@ ALTER TABLE email_automation_settings ENABLE ROW LEVEL SECURITY;
 -- Create RLS policies for email_templates
 DROP POLICY IF EXISTS "Admin can manage email templates" ON email_templates;
 CREATE POLICY "Admin can manage email templates" ON email_templates
-  FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+  FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 DROP POLICY IF EXISTS "Public can view active email templates" ON email_templates;  
 CREATE POLICY "Public can view active email templates" ON email_templates
@@ -21,7 +21,7 @@ CREATE POLICY "Public can view active email templates" ON email_templates
 -- Create RLS policies for email_delivery_log
 DROP POLICY IF EXISTS "Admin can view email delivery logs" ON email_delivery_log;
 CREATE POLICY "Admin can view email delivery logs" ON email_delivery_log
-  FOR SELECT USING (is_admin());
+  FOR SELECT USING (public.is_admin());
 
 DROP POLICY IF EXISTS "System can manage email delivery logs" ON email_delivery_log;
 CREATE POLICY "System can manage email delivery logs" ON email_delivery_log
@@ -30,7 +30,7 @@ CREATE POLICY "System can manage email delivery logs" ON email_delivery_log
 -- Create RLS policies for email_automation_settings
 DROP POLICY IF EXISTS "Admin can manage email automation settings" ON email_automation_settings;
 CREATE POLICY "Admin can manage email automation settings" ON email_automation_settings
-  FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+  FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- Add triggers for updated_at
 DROP TRIGGER IF EXISTS update_email_templates_updated_at ON email_templates;

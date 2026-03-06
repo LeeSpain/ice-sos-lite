@@ -19,36 +19,25 @@ $$;
 
 CREATE OR REPLACE FUNCTION public.get_communication_metrics_summary()
 RETURNS TABLE(date date, channel text, total_conversations bigint, total_messages bigint, avg_response_time numeric, avg_resolution_time numeric)
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE SECURITY DEFINER
 SET search_path = ''
 AS $$
-  -- Check if user is admin, if not return empty result
+BEGIN
+  RETURN QUERY
   SELECT d.date, d.channel, d.total_conversations, d.total_messages, d.avg_response_time, d.avg_resolution_time
   FROM (
     SELECT date(uc.created_at) AS date,
-           'email'::text AS channel,
+           uc.channel,
            count(DISTINCT uc.id) AS total_conversations,
            count(*) AS total_messages,
-           avg((EXTRACT(epoch FROM (uc.updated_at - uc.created_at)) / 60::numeric)) AS avg_response_time,
-           avg((EXTRACT(epoch FROM (uc.updated_at - uc.created_at)) / 60::numeric)) AS avg_resolution_time
-    FROM unified_conversations uc
-    WHERE uc.channel = 'email'::text
-    GROUP BY date(uc.created_at)
-    
-    UNION ALL
-    
-    SELECT date(uc.created_at) AS date,
-           'whatsapp'::text AS channel,
-           count(DISTINCT uc.id) AS total_conversations,
-           count(*) AS total_messages,
-           avg((EXTRACT(epoch FROM (uc.updated_at - uc.created_at)) / 60::numeric)) AS avg_response_time,
-           avg((EXTRACT(epoch FROM (uc.updated_at - uc.created_at)) / 60::numeric)) AS avg_resolution_time
-    FROM unified_conversations uc
-    WHERE uc.channel = 'whatsapp'::text
-    GROUP BY date(uc.created_at)
+           avg((EXTRACT(epoch FROM (uc.updated_at - uc.created_at)) / 60)) AS avg_response_time,
+           avg((EXTRACT(epoch FROM (uc.updated_at - uc.created_at)) / 60)) AS avg_resolution_time
+    FROM public.unified_conversations uc
+    GROUP BY date(uc.created_at), uc.channel
   ) d
-  WHERE is_admin() = true;
+  WHERE public.is_admin();
+END;
 $$;
 
 CREATE OR REPLACE FUNCTION public.check_admin_setup_allowed()

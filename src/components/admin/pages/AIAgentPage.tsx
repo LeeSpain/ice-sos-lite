@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
+import {
   Bot,
   MessageSquare,
   Activity,
@@ -26,7 +26,10 @@ import {
   Users,
   Clock,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  Phone,
+  Bell,
+  AlertTriangle
 } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,6 +58,8 @@ interface AISettings {
   contextWindow: number;
   memoryEnabled: boolean;
   learningMode: boolean;
+  voicePersona: string;
+  falseAlarmTimeout: number;
 }
 
 interface NewTrainingItem {
@@ -79,7 +84,9 @@ const AIAgentPage: React.FC = () => {
     responseStyle: 'helpful',
     contextWindow: 4000,
     memoryEnabled: true,
-    learningMode: true
+    learningMode: true,
+    voicePersona: 'Polly.Joanna-Neural',
+    falseAlarmTimeout: 20,
   });
 
   const [trainingData, setTrainingData] = useState<TrainingDataItem[]>([]);
@@ -119,6 +126,8 @@ const AIAgentPage: React.FC = () => {
           return acc;
         }, {});
 
+        const voicePersonaRaw = settings.voice_persona;
+        const voicePersonaObj = typeof voicePersonaRaw === 'object' ? voicePersonaRaw : {};
         setAiSettings({
           model: settings.model || 'gpt-4o-mini',
           temperature: Number(settings.temperature) || 0.7,
@@ -127,7 +136,9 @@ const AIAgentPage: React.FC = () => {
           responseStyle: settings.response_style || 'helpful',
           contextWindow: Number(settings.context_window) || 4000,
           memoryEnabled: Boolean(settings.memory_enabled),
-          learningMode: Boolean(settings.learning_mode)
+          learningMode: Boolean(settings.learning_mode),
+          voicePersona: (voicePersonaObj as any)?.voice || 'Polly.Joanna-Neural',
+          falseAlarmTimeout: Number(settings.false_alarm_timeout_seconds) || 20,
         });
       }
     } catch (error) {
@@ -173,7 +184,9 @@ const AIAgentPage: React.FC = () => {
         { setting_key: 'response_style', setting_value: aiSettings.responseStyle },
         { setting_key: 'context_window', setting_value: aiSettings.contextWindow },
         { setting_key: 'memory_enabled', setting_value: aiSettings.memoryEnabled },
-        { setting_key: 'learning_mode', setting_value: aiSettings.learningMode }
+        { setting_key: 'learning_mode', setting_value: aiSettings.learningMode },
+        { setting_key: 'voice_persona', setting_value: { voice: aiSettings.voicePersona, tts_provider: 'twilio_polly' } },
+        { setting_key: 'false_alarm_timeout_seconds', setting_value: aiSettings.falseAlarmTimeout },
       ];
 
       for (const setting of settingsToSave) {
@@ -226,9 +239,10 @@ const AIAgentPage: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="settings">Model Settings</TabsTrigger>
+          <TabsTrigger value="voice">Voice Agent</TabsTrigger>
           <TabsTrigger value="training">Training Data</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
         </TabsList>
@@ -313,10 +327,12 @@ const AIAgentPage: React.FC = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="claude-sonnet-4-6">Claude Sonnet 4.6 (Recommended for SOS)</SelectItem>
+                      <SelectItem value="claude-opus-4-6">Claude Opus 4.6 (Highest quality)</SelectItem>
+                      <SelectItem value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (Fast)</SelectItem>
                       <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
                       <SelectItem value="gpt-4o">GPT-4o</SelectItem>
                       <SelectItem value="gpt-4.1-2025-04-14">GPT-4.1</SelectItem>
-                      <SelectItem value="gpt-5">GPT-5</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -345,6 +361,117 @@ const AIAgentPage: React.FC = () => {
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? 'Saving...' : 'Save Settings'}
               </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Voice Agent Tab */}
+        <TabsContent value="voice" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Phone className="h-5 w-5 text-red-500" />
+                Clar Voice Agent — SOS Emergency Settings
+              </CardTitle>
+              <CardDescription>
+                Configure how Clar handles voice calls during SOS emergencies
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Label>Voice Persona (TTS)</Label>
+                  <Select
+                    value={aiSettings.voicePersona}
+                    onValueChange={(v) => setAiSettings({ ...aiSettings, voicePersona: v })}
+                  >
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Polly.Joanna-Neural">Joanna Neural (Recommended)</SelectItem>
+                      <SelectItem value="Polly.Salli-Neural">Salli Neural</SelectItem>
+                      <SelectItem value="Polly.Kimberly-Neural">Kimberly Neural</SelectItem>
+                      <SelectItem value="Polly.Amy-Neural">Amy Neural (British)</SelectItem>
+                      <SelectItem value="Polly.Brian-Neural">Brian Neural (British Male)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground mt-1">Twilio Amazon Polly Neural voice used for all Clar calls</p>
+                </div>
+
+                <div>
+                  <Label>False Alarm Auto-Escalation Timeout: {aiSettings.falseAlarmTimeout}s</Label>
+                  <Slider
+                    value={[aiSettings.falseAlarmTimeout]}
+                    onValueChange={([v]) => setAiSettings({ ...aiSettings, falseAlarmTimeout: v })}
+                    min={10}
+                    max={60}
+                    step={5}
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    If member does not respond within this time, Clar auto-escalates to all contacts
+                  </p>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4 bg-red-50 space-y-3">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                  <p className="font-medium text-red-800">Absolute Rules (cannot be changed)</p>
+                </div>
+                <ul className="text-sm text-red-700 space-y-1 ml-7">
+                  <li>Clar will NEVER call 911, 112, or any emergency services</li>
+                  <li>Clar will NOT end a live SOS call until the member confirms they are safe</li>
+                  <li>All emergency contacts are called SIMULTANEOUSLY (not sequentially)</li>
+                </ul>
+              </div>
+
+              <div>
+                <Label>SOS Voice System Prompt Preview</Label>
+                <div className="mt-2 p-3 bg-muted rounded-lg text-xs text-muted-foreground font-mono whitespace-pre-wrap max-h-40 overflow-y-auto">
+                  {`You are Clar, the AI emergency coordinator for ICE SOS.\nYou call the member FIRST, assess the situation, detect false alarms.\nIf real emergency: simultaneously alert all contacts via call + WhatsApp + push.\nKeep member on line. Stay calm. NEVER call 911/112.`}
+                </div>
+              </div>
+
+              <Button onClick={saveAISettings} disabled={saving}>
+                <Save className="h-4 w-4 mr-2" />
+                {saving ? 'Saving...' : 'Save Voice Settings'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Contact Notification Channels
+              </CardTitle>
+              <CardDescription>
+                Which channels Clar uses when escalating to emergency contacts
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { label: 'Voice Call', description: 'Clar calls and briefs each contact (respect per-contact toggle)', icon: Phone, enabled: true },
+                  { label: 'WhatsApp Message', description: 'GPS link + situation summary via Twilio WhatsApp API', icon: MessageSquare, enabled: true },
+                  { label: 'In-App Push Notification', description: 'Real-time alert for contacts with the ICE SOS app installed', icon: Bell, enabled: true },
+                ].map(({ label, description, icon: Icon, enabled }) => (
+                  <div key={label} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Icon className="h-5 w-5 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium text-sm">{label}</p>
+                        <p className="text-xs text-muted-foreground">{description}</p>
+                      </div>
+                    </div>
+                    <Badge variant={enabled ? 'default' : 'secondary'}>
+                      {enabled ? 'Active' : 'Inactive'}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

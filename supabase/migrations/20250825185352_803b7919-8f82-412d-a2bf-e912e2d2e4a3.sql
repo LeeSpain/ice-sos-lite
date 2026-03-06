@@ -41,7 +41,7 @@ AS $function$
       ) country_stats
     ) as top_countries
   FROM public.video_analytics va
-  WHERE is_admin() = true
+  WHERE public.is_admin() = true
   GROUP BY va.video_id, va.video_title
   ORDER BY total_views DESC;
 $function$;

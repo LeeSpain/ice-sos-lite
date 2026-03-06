@@ -28,6 +28,7 @@ BEGIN
       AND tablename='marketing_campaigns' 
       AND policyname='Admin can manage marketing campaigns'
   ) THEN
+DROP POLICY IF EXISTS "Admin can manage marketing campaigns" ON public.marketing_campaigns;
     CREATE POLICY "Admin can manage marketing campaigns"
     ON public.marketing_campaigns
     FOR ALL
@@ -47,6 +48,7 @@ BEGIN
     SELECT 1 FROM information_schema.triggers 
     WHERE trigger_name = 'update_marketing_campaigns_updated_at'
   ) THEN
+DROP TRIGGER IF EXISTS update_marketing_campaigns_updated_at ON public.marketing_campaigns;
     CREATE TRIGGER update_marketing_campaigns_updated_at
       BEFORE UPDATE ON public.marketing_campaigns
       FOR EACH ROW

@@ -3,12 +3,14 @@
 ALTER TABLE public.contact_submissions ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for contact_submissions table
+DROP POLICY IF EXISTS "Admins can manage contact submissions" ON public.contact_submissions;
 CREATE POLICY "Admins can manage contact submissions" 
 ON public.contact_submissions 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "System can insert contact submissions" ON public.contact_submissions;
 CREATE POLICY "System can insert contact submissions" 
 ON public.contact_submissions 
 FOR INSERT 
@@ -17,10 +19,11 @@ WITH CHECK (true);
 -- Also check other analytics tables for proper access
 -- Ensure homepage_analytics has proper policies
 DROP POLICY IF EXISTS "Only admins can read homepage analytics" ON public.homepage_analytics;
+DROP POLICY IF EXISTS "Admins can read all homepage analytics" ON public.homepage_analytics;
 CREATE POLICY "Admins can read all homepage analytics" 
 ON public.homepage_analytics 
 FOR SELECT 
-USING (is_admin());
+USING (public.is_admin());
 
 -- Grant necessary permissions for analytics queries
 GRANT SELECT ON public.subscribers TO authenticated;

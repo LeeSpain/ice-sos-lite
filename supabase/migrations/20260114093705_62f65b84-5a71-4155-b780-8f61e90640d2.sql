@@ -19,18 +19,21 @@ CREATE TABLE public.onboarding_progress (
 ALTER TABLE public.onboarding_progress ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own progress
+DROP POLICY IF EXISTS "Users can view their own onboarding progress" ON public.onboarding_progress;
 CREATE POLICY "Users can view their own onboarding progress"
 ON public.onboarding_progress
 FOR SELECT
 USING (auth.uid() = user_id);
 
 -- Users can insert their own progress
+DROP POLICY IF EXISTS "Users can insert their own onboarding progress" ON public.onboarding_progress;
 CREATE POLICY "Users can insert their own onboarding progress"
 ON public.onboarding_progress
 FOR INSERT
 WITH CHECK (auth.uid() = user_id);
 
 -- Users can update their own progress
+DROP POLICY IF EXISTS "Users can update their own onboarding progress" ON public.onboarding_progress;
 CREATE POLICY "Users can update their own onboarding progress"
 ON public.onboarding_progress
 FOR UPDATE

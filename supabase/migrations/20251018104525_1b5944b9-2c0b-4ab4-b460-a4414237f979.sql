@@ -17,13 +17,15 @@ CREATE TABLE IF NOT EXISTS public.subscription_history (
 ALTER TABLE public.subscription_history ENABLE ROW LEVEL SECURITY;
 
 -- Admin can view all subscription history
+DROP POLICY IF EXISTS "admin_view_subscription_history" ON public.subscription_history;
 CREATE POLICY "admin_view_subscription_history" 
 ON public.subscription_history 
 FOR SELECT 
 TO authenticated
-USING (is_admin());
+USING (public.is_admin());
 
 -- System can insert subscription history
+DROP POLICY IF EXISTS "system_insert_subscription_history" ON public.subscription_history;
 CREATE POLICY "system_insert_subscription_history" 
 ON public.subscription_history 
 FOR INSERT 

@@ -21,13 +21,16 @@ CREATE TABLE email_templates (
 ALTER TABLE email_templates ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Admin can manage email templates" ON email_templates;
 CREATE POLICY "Admin can manage email templates" ON email_templates
-  FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+  FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Public can view active email templates" ON email_templates;
 CREATE POLICY "Public can view active email templates" ON email_templates
   FOR SELECT USING (is_active = true);
 
 -- Add trigger
+DROP TRIGGER IF EXISTS update_email_templates_updated_at ON email_templates;
 CREATE TRIGGER update_email_templates_updated_at
   BEFORE UPDATE ON email_templates
   FOR EACH ROW

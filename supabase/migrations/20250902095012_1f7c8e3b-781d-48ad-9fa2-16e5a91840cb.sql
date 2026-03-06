@@ -15,15 +15,18 @@ CREATE TABLE public.orders (
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
 -- Create a policy to allow users to view their own orders
+DROP POLICY IF EXISTS "select_own_orders" ON public.orders;
 CREATE POLICY "select_own_orders" ON public.orders
   FOR SELECT
   USING (user_id = auth.uid());
 
 -- Create policies for edge functions (trusted code) to insert and update orders
+DROP POLICY IF EXISTS "insert_order" ON public.orders;
 CREATE POLICY "insert_order" ON public.orders
   FOR INSERT
   WITH CHECK (true);
 
+DROP POLICY IF EXISTS "update_order" ON public.orders;
 CREATE POLICY "update_order" ON public.orders
   FOR UPDATE
   USING (true);

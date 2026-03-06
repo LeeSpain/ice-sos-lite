@@ -13,8 +13,9 @@ DROP POLICY IF EXISTS "Authenticated users can submit contact forms" ON public.c
 DROP POLICY IF EXISTS "admins_only_contact_submissions" ON public.contact_submissions;
 
 -- Create a single strict policy: only admins can read/write
+DROP POLICY IF EXISTS "Admins only contact_submissions" ON public.contact_submissions;
 CREATE POLICY "Admins only contact_submissions"
 ON public.contact_submissions
 FOR ALL
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());

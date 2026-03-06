@@ -8,6 +8,7 @@ DROP POLICY IF EXISTS "Family owners manage memberships" ON public.family_member
 DROP POLICY IF EXISTS "Members view own membership" ON public.family_memberships;
 
 -- Simple, non-recursive policies for family_groups
+DROP POLICY IF EXISTS "Owners can access their family groups" ON public.family_groups;
 CREATE POLICY "Owners can access their family groups"
 ON public.family_groups
 FOR ALL
@@ -15,20 +16,23 @@ TO authenticated
 USING (owner_user_id = auth.uid())
 WITH CHECK (owner_user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Admins can access all family groups" ON public.family_groups;
 CREATE POLICY "Admins can access all family groups"
 ON public.family_groups
 FOR ALL
 TO authenticated
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Simple, non-recursive policies for family_memberships  
+DROP POLICY IF EXISTS "Users can view their own memberships" ON public.family_memberships;
 CREATE POLICY "Users can view their own memberships"
 ON public.family_memberships
 FOR SELECT
 TO authenticated
 USING (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Owners can manage memberships in their groups" ON public.family_memberships;
 CREATE POLICY "Owners can manage memberships in their groups"
 ON public.family_memberships
 FOR ALL
@@ -44,9 +48,10 @@ WITH CHECK (
   )
 );
 
+DROP POLICY IF EXISTS "Admins can manage all memberships" ON public.family_memberships;
 CREATE POLICY "Admins can manage all memberships"
 ON public.family_memberships
 FOR ALL
 TO authenticated
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());

@@ -1,6 +1,7 @@
--- Create missing profile for existing user
+-- Create missing profile for existing user (skip if user doesn't exist in auth.users)
 INSERT INTO public.profiles (user_id, role, profile_completion_percentage, created_at, updated_at)
-VALUES ('eab6ab5a-9e1c-48ae-8f71-9a4cba8fbd15', 'user', 0, now(), now())
+SELECT 'eab6ab5a-9e1c-48ae-8f71-9a4cba8fbd15', 'user', 0, now(), now()
+WHERE EXISTS (SELECT 1 FROM auth.users WHERE id = 'eab6ab5a-9e1c-48ae-8f71-9a4cba8fbd15')
 ON CONFLICT (user_id) DO NOTHING;
 
 -- Create a trigger to automatically create profiles for new users

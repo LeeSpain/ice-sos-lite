@@ -34,6 +34,7 @@ import ContactSubmissionsPage from '@/components/admin/pages/ContactSubmissionsP
 import AnalyticsPage from '@/components/admin/pages/AnalyticsPage';
 import VideoAnalyticsPage from '@/components/admin/pages/VideoAnalyticsPage';
 import EmergencyIncidentsPage from '@/components/admin/pages/EmergencyIncidentsPage';
+import SOSIncidentsPage from '@/components/admin/pages/SOSIncidentsPage';
 import SafetyMonitoringPage from '@/components/admin/pages/SafetyMonitoringPage';
 import WhatsAppIntegrationPage from '@/components/admin/pages/WhatsAppIntegrationPage';
 import AIPerformancePage from '@/components/admin/pages/AIPerformancePage';
@@ -92,6 +93,7 @@ const AdminDashboard: React.FC = () => {
         <Route path="geofence-admin" element={<GeofenceAdminPage />} />
         <Route path="location-admin" element={<LocationDataAdminPage />} />
         <Route path="emergencies" element={<EmergencyIncidentsPage />} />
+        <Route path="sos-incidents" element={<SOSIncidentsPage />} />
         <Route path="safety" element={<SafetyMonitoringPage />} />
         <Route path="regional-hub" element={<RegionalHubPage />} />
         <Route path="regional-organizations" element={<RegionalOrganizationsPage />} />

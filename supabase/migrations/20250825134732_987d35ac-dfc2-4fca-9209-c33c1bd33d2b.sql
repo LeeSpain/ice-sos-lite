@@ -10,4 +10,4 @@ INSERT INTO public.subscription_plans (name, description, price, currency, featu
 ('Guardian Wellness', 'Comprehensive health and wellness monitoring', 4.99, 'EUR', '["Emergency SOS", "Health monitoring", "Medical alerts", "Family notifications"]'::jsonb, true, 2),
 ('Family Sharing', 'Family protection and communication', 0.99, 'EUR', '["Family group management", "Shared emergency contacts", "Group notifications"]'::jsonb, false, 3),
 ('Call Centre (Spain)', 'Professional call center services for Spain', 24.99, 'EUR', '["24/7 Spanish call center", "Local emergency response", "Professional monitoring"]'::jsonb, false, 4)
-ON CONFLICT (name) DO NOTHING;
+ON CONFLICT DO NOTHING;

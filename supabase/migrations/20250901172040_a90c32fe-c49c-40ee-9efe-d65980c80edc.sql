@@ -26,6 +26,7 @@ BEGIN
 END $$;
 
 -- Create strict system policy limited to service_role only
+DROP POLICY IF EXISTS "System can manage call attempts" ON public.sos_call_attempts;
 CREATE POLICY "System can manage call attempts"
 ON public.sos_call_attempts
 FOR ALL
@@ -33,6 +34,6 @@ USING (auth.role() = 'service_role')
 WITH CHECK (auth.role() = 'service_role');
 
 -- Note: Existing policies kept in place (validated):
--- 1) "Admins can manage all call attempts" -> USING is_admin(), WITH CHECK is_admin()
+-- 1) "Admins can manage all call attempts" -> USING public.is_admin(), WITH CHECK public.is_admin()
 -- 2) User-scoped policies referencing sos_incidents to ensure incident ownership
 -- These already restrict SELECT/INSERT/UPDATE to incident owners.

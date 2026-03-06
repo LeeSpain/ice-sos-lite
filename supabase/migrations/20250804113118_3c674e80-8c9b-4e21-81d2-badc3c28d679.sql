@@ -13,12 +13,14 @@ CREATE TABLE public.conversations (
 ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
 
 -- Allow users to view their own conversations
+DROP POLICY IF EXISTS "Users can view their own conversations" ON public.conversations;
 CREATE POLICY "Users can view their own conversations" 
 ON public.conversations 
 FOR SELECT 
 USING (auth.uid() = user_id OR user_id IS NULL);
 
 -- Allow users to insert their own conversations
+DROP POLICY IF EXISTS "Users can create conversations" ON public.conversations;
 CREATE POLICY "Users can create conversations" 
 ON public.conversations 
 FOR INSERT 
@@ -48,6 +50,7 @@ CREATE TABLE public.leads (
 ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
 
 -- Only allow system access for now (can be modified later for admin access)
+DROP POLICY IF EXISTS "System can manage leads" ON public.leads;
 CREATE POLICY "System can manage leads" 
 ON public.leads 
 FOR ALL 

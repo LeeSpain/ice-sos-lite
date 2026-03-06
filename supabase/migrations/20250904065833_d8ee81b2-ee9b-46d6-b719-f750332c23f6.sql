@@ -18,6 +18,7 @@ USING (owner_id = auth.uid())
 WITH CHECK (owner_id = auth.uid());
 
 -- Connected/invited users can view the relationship (read-only)
+DROP POLICY IF EXISTS "Connected users can view their connection details" ON public.connections;
 CREATE POLICY "Connected users can view their connection details"
 ON public.connections
 FOR SELECT
@@ -29,11 +30,12 @@ USING (
 );
 
 -- Admins may view all for support/audit
+DROP POLICY IF EXISTS "Admins can view all connections" ON public.connections;
 CREATE POLICY "Admins can view all connections"
 ON public.connections
 FOR SELECT
 TO authenticated
-USING (is_admin());
+USING (public.is_admin());
 
 
 -- 2) circle_permissions
@@ -51,6 +53,7 @@ USING (owner_id = auth.uid())
 WITH CHECK (owner_id = auth.uid());
 
 -- Family member (or owner) can view
+DROP POLICY IF EXISTS "Family members can view their permissions" ON public.circle_permissions;
 CREATE POLICY "Family members can view their permissions"
 ON public.circle_permissions
 FOR SELECT
@@ -73,6 +76,7 @@ TO authenticated
 USING (user_id = auth.uid());
 
 -- Edge functions (service role) manage access (create/update/delete)
+DROP POLICY IF EXISTS "System can manage event access" ON public.sos_event_access;
 CREATE POLICY "System can manage event access"
 ON public.sos_event_access
 FOR ALL
@@ -81,12 +85,13 @@ USING (auth.role() = 'service_role')
 WITH CHECK (auth.role() = 'service_role');
 
 -- Admins can manage for support/audit
+DROP POLICY IF EXISTS "Admins can manage event access" ON public.sos_event_access;
 CREATE POLICY "Admins can manage event access"
 ON public.sos_event_access
 FOR ALL
 TO authenticated
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 
 -- 4) sos_locations (location timeline for SOS events)
@@ -119,6 +124,7 @@ WITH CHECK (
 );
 
 -- Active family members can view the incident location timeline
+DROP POLICY IF EXISTS "Family members can view SOS locations" ON public.sos_locations;
 CREATE POLICY "Family members can view SOS locations"
 ON public.sos_locations
 FOR SELECT
@@ -135,12 +141,13 @@ USING (
 );
 
 -- Admins manage for incident audits
+DROP POLICY IF EXISTS "Admins can manage all SOS locations" ON public.sos_locations;
 CREATE POLICY "Admins can manage all SOS locations"
 ON public.sos_locations
 FOR ALL
 TO authenticated
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 
 -- 5) organizations (regional features)
@@ -153,9 +160,10 @@ CREATE POLICY "Admins can manage all organizations"
 ON public.organizations
 FOR ALL
 TO authenticated
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Regional users can view their organization" ON public.organizations;
 CREATE POLICY "Regional users can view their organization"
 ON public.organizations
 FOR SELECT
@@ -180,9 +188,10 @@ CREATE POLICY "Admins can manage organization users"
 ON public.organization_users
 FOR ALL
 TO authenticated
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Users can view their own organization membership" ON public.organization_users;
 CREATE POLICY "Users can view their own organization membership"
 ON public.organization_users
 FOR SELECT

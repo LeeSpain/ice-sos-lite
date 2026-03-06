@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS quality_metrics (
 ALTER TABLE quality_metrics ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies for quality metrics
+DROP POLICY IF EXISTS "Admin users can manage quality metrics" ON quality_metrics;
 CREATE POLICY "Admin users can manage quality metrics" 
 ON quality_metrics 
 FOR ALL
@@ -59,6 +60,7 @@ CREATE TABLE IF NOT EXISTS automated_test_results (
 ALTER TABLE automated_test_results ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies for test results
+DROP POLICY IF EXISTS "Admin users can manage test results" ON automated_test_results;
 CREATE POLICY "Admin users can manage test results" 
 ON automated_test_results 
 FOR ALL

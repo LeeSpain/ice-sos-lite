@@ -34,37 +34,44 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.registration_selections ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for orders table
+DROP POLICY IF EXISTS "Users can view their own orders" ON public.orders;
 CREATE POLICY "Users can view their own orders" 
 ON public.orders 
 FOR SELECT 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create their own orders" ON public.orders;
 CREATE POLICY "Users can create their own orders" 
 ON public.orders 
 FOR INSERT 
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can manage orders" ON public.orders;
 CREATE POLICY "System can manage orders" 
 ON public.orders 
 FOR ALL 
 USING (true);
 
 -- Create policies for registration_selections table
+DROP POLICY IF EXISTS "Users can view their own registration selections" ON public.registration_selections;
 CREATE POLICY "Users can view their own registration selections" 
 ON public.registration_selections 
 FOR SELECT 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create their own registration selections" ON public.registration_selections;
 CREATE POLICY "Users can create their own registration selections" 
 ON public.registration_selections 
 FOR INSERT 
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own registration selections" ON public.registration_selections;
 CREATE POLICY "Users can update their own registration selections" 
 ON public.registration_selections 
 FOR UPDATE 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can manage registration selections" ON public.registration_selections;
 CREATE POLICY "System can manage registration selections" 
 ON public.registration_selections 
 FOR ALL 

@@ -17,10 +17,11 @@ CREATE TABLE public.training_data (
 ALTER TABLE public.training_data ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for training data
+DROP POLICY IF EXISTS "Admin can manage training data" ON public.training_data;
 CREATE POLICY "Admin can manage training data" 
 ON public.training_data 
 FOR ALL 
-USING (is_admin());
+USING (public.is_admin());
 
 -- Create ai_model_settings table for AI configuration
 CREATE TABLE public.ai_model_settings (
@@ -37,10 +38,11 @@ CREATE TABLE public.ai_model_settings (
 ALTER TABLE public.ai_model_settings ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for AI model settings
+DROP POLICY IF EXISTS "Admin can manage AI model settings" ON public.ai_model_settings;
 CREATE POLICY "Admin can manage AI model settings" 
 ON public.ai_model_settings 
 FOR ALL 
-USING (is_admin());
+USING (public.is_admin());
 
 -- Insert default AI model settings
 INSERT INTO public.ai_model_settings (setting_key, setting_value, description) VALUES

@@ -25,16 +25,19 @@ CREATE TABLE public.profiles (
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Users can view their own profile" ON public.profiles;
 CREATE POLICY "Users can view their own profile" 
 ON public.profiles 
 FOR SELECT 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
 CREATE POLICY "Users can insert their own profile" 
 ON public.profiles 
 FOR INSERT 
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 CREATE POLICY "Users can update their own profile" 
 ON public.profiles 
 FOR UPDATE 
@@ -69,11 +72,13 @@ CREATE TABLE public.user_activity (
 ALTER TABLE public.user_activity ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for activity log
+DROP POLICY IF EXISTS "Users can view their own activity" ON public.user_activity;
 CREATE POLICY "Users can view their own activity" 
 ON public.user_activity 
 FOR SELECT 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert their own activity" ON public.user_activity;
 CREATE POLICY "Users can insert their own activity" 
 ON public.user_activity 
 FOR INSERT 

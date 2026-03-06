@@ -12,10 +12,11 @@ CREATE POLICY "Admins can manage contact submissions"
 ON public.contact_submissions
 FOR ALL
 TO authenticated
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Edge functions (service role) insert submissions
+DROP POLICY IF EXISTS "System can insert contact submissions" ON public.contact_submissions;
 CREATE POLICY "System can insert contact submissions"
 ON public.contact_submissions
 FOR INSERT
@@ -33,8 +34,9 @@ CREATE POLICY "Admins can view video analytics"
 ON public.video_analytics
 FOR SELECT
 TO authenticated
-USING (is_admin());
+USING (public.is_admin());
 
+DROP POLICY IF EXISTS "System can insert video analytics" ON public.video_analytics;
 CREATE POLICY "System can insert video analytics"
 ON public.video_analytics
 FOR INSERT

@@ -3,15 +3,27 @@
 DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
 
 -- Create new policies that exclude role updates for regular users
-CREATE POLICY "Users can update their own profile except role" 
-ON public.profiles 
-FOR UPDATE 
-USING (auth.uid() = user_id) 
-WITH CHECK (
-  auth.uid() = user_id AND 
-  -- Prevent role updates by regular users
-  (OLD.role = NEW.role OR is_admin())
-);
+DROP POLICY IF EXISTS "Users can update their own profile except role" ON public.profiles;
+CREATE POLICY "Users can update their own profile except role"
+ON public.profiles
+FOR UPDATE
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);
+
+-- Trigger to prevent non-admin role changes (OLD/NEW only work in triggers, not RLS)
+CREATE OR REPLACE FUNCTION public.prevent_role_escalation()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
+BEGIN
+  IF OLD.role IS DISTINCT FROM NEW.role AND NOT public.is_admin() THEN
+    RAISE EXCEPTION 'Only admins can change user roles';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+DROP TRIGGER IF EXISTS prevent_role_escalation_trigger ON public.profiles;
+CREATE TRIGGER prevent_role_escalation_trigger
+BEFORE UPDATE ON public.profiles
+FOR EACH ROW EXECUTE FUNCTION public.prevent_role_escalation();
 
 -- Create a secure function to assign admin role (only for system use)
 CREATE OR REPLACE FUNCTION public.assign_admin_role(target_user_id uuid)
@@ -30,7 +42,7 @@ BEGIN
   
   -- Only allow admin assignment if no admin exists (initial setup)
   -- OR if the caller is already an admin
-  IF admin_count = 0 OR is_admin() THEN
+  IF admin_count = 0 OR public.is_admin() THEN
     UPDATE public.profiles 
     SET role = 'admin', updated_at = now()
     WHERE user_id = target_user_id;

@@ -62,10 +62,11 @@ ON public.video_analytics
 FOR INSERT
 WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admin can view video analytics" ON public.video_analytics;
 CREATE POLICY "Admin can view video analytics"
 ON public.video_analytics
 FOR SELECT
-USING (is_admin());
+USING (public.is_admin());
 
 -- Registration selections policies
 DROP POLICY IF EXISTS "Users can manage their selections" ON public.registration_selections;
@@ -77,10 +78,11 @@ FOR ALL
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admin can view all selections" ON public.registration_selections;
 CREATE POLICY "Admin can view all selections"
 ON public.registration_selections
 FOR SELECT
-USING (is_admin());
+USING (public.is_admin());
 
 -- Leads policies
 DROP POLICY IF EXISTS "Admin can manage leads" ON public.leads;
@@ -89,13 +91,14 @@ DROP POLICY IF EXISTS "Sales can view leads" ON public.leads;
 CREATE POLICY "Admin can manage leads"
 ON public.leads
 FOR ALL
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Sales can view leads" ON public.leads;
 CREATE POLICY "Sales can view leads"
 ON public.leads
 FOR SELECT
-USING (is_sales() OR is_admin());
+USING (is_sales() OR public.is_admin());
 
 -- Contact submissions policies
 DROP POLICY IF EXISTS "Public can submit contacts" ON public.contact_submissions;
@@ -106,13 +109,15 @@ ON public.contact_submissions
 FOR INSERT
 WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admin can view contact submissions" ON public.contact_submissions;
 CREATE POLICY "Admin can view contact submissions"
 ON public.contact_submissions
 FOR SELECT
-USING (is_admin());
+USING (public.is_admin());
 
+DROP POLICY IF EXISTS "Admin can manage contact submissions" ON public.contact_submissions;
 CREATE POLICY "Admin can manage contact submissions"
 ON public.contact_submissions
 FOR ALL
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());

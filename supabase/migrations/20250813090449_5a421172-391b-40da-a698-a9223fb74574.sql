@@ -17,8 +17,8 @@ DROP POLICY IF EXISTS "Admin can manage whatsapp settings" ON public.whatsapp_se
 CREATE POLICY "Admin can manage whatsapp settings" 
 ON public.whatsapp_settings 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- 3. Create whatsapp_accounts table with proper encryption and admin-only access
 CREATE TABLE IF NOT EXISTS public.whatsapp_accounts (
@@ -36,11 +36,12 @@ CREATE TABLE IF NOT EXISTS public.whatsapp_accounts (
 ALTER TABLE public.whatsapp_accounts ENABLE ROW LEVEL SECURITY;
 
 -- Create admin-only policy for WhatsApp accounts
-CREATE POLICY "Admin can manage whatsapp accounts" 
-ON public.whatsapp_accounts 
-FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+DROP POLICY IF EXISTS "Admin can manage whatsapp accounts" ON public.whatsapp_accounts;
+CREATE POLICY "Admin can manage whatsapp accounts"
+ON public.whatsapp_accounts
+FOR ALL
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- 4. Enhanced Gmail token security - add expiry monitoring
 ALTER TABLE public.gmail_tokens 
@@ -83,16 +84,14 @@ CREATE TABLE IF NOT EXISTS public.security_audit_log (
 ALTER TABLE public.security_audit_log ENABLE ROW LEVEL SECURITY;
 
 -- Admin can view all audit logs
-CREATE POLICY "Admin can view security audit logs" 
-ON public.security_audit_log 
-FOR SELECT 
-USING (is_admin());
+DROP POLICY IF EXISTS "Admin can view security audit logs" ON public.security_audit_log;
+CREATE POLICY "Admin can view security audit logs"
+ON public.security_audit_log FOR SELECT USING (public.is_admin());
 
 -- System can insert audit logs
-CREATE POLICY "System can insert security audit logs" 
-ON public.security_audit_log 
-FOR INSERT 
-WITH CHECK (true);
+DROP POLICY IF EXISTS "System can insert security audit logs" ON public.security_audit_log;
+CREATE POLICY "System can insert security audit logs"
+ON public.security_audit_log FOR INSERT WITH CHECK (true);
 
 -- 6. Add rate limiting table for verification attempts
 CREATE TABLE IF NOT EXISTS public.rate_limits (
@@ -111,18 +110,14 @@ CREATE TABLE IF NOT EXISTS public.rate_limits (
 ALTER TABLE public.rate_limits ENABLE ROW LEVEL SECURITY;
 
 -- Admin can manage rate limits
-CREATE POLICY "Admin can manage rate limits" 
-ON public.rate_limits 
-FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+DROP POLICY IF EXISTS "Admin can manage rate limits" ON public.rate_limits;
+CREATE POLICY "Admin can manage rate limits"
+ON public.rate_limits FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- System can manage rate limits for enforcement
-CREATE POLICY "System can manage rate limits" 
-ON public.rate_limits 
-FOR ALL 
-USING (true)
-WITH CHECK (true);
+DROP POLICY IF EXISTS "System can manage rate limits" ON public.rate_limits;
+CREATE POLICY "System can manage rate limits"
+ON public.rate_limits FOR ALL USING (true) WITH CHECK (true);
 
 -- 7. Add indexes for performance on security-related queries
 CREATE INDEX IF NOT EXISTS idx_security_audit_log_user_id ON public.security_audit_log(user_id);
@@ -136,6 +131,7 @@ BEGIN
     -- Only create triggers if tables exist and don't already have them
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'whatsapp_accounts') THEN
         IF NOT EXISTS (SELECT FROM information_schema.triggers WHERE trigger_name = 'update_whatsapp_accounts_updated_at') THEN
+DROP TRIGGER IF EXISTS update_whatsapp_accounts_updated_at ON public.whatsapp_accounts;
             CREATE TRIGGER update_whatsapp_accounts_updated_at
                 BEFORE UPDATE ON public.whatsapp_accounts
                 FOR EACH ROW
@@ -145,6 +141,7 @@ BEGIN
     
     IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'rate_limits') THEN
         IF NOT EXISTS (SELECT FROM information_schema.triggers WHERE trigger_name = 'update_rate_limits_updated_at') THEN
+DROP TRIGGER IF EXISTS update_rate_limits_updated_at ON public.rate_limits;
             CREATE TRIGGER update_rate_limits_updated_at
                 BEFORE UPDATE ON public.rate_limits
                 FOR EACH ROW
@@ -158,4 +155,4 @@ $$;
 COMMENT ON TABLE public.whatsapp_accounts IS 'WhatsApp Business API accounts with encrypted credentials - admin access only';
 COMMENT ON TABLE public.security_audit_log IS 'Security audit trail for sensitive operations';
 COMMENT ON TABLE public.rate_limits IS 'Rate limiting for security-sensitive operations';
-COMMENT ON COLUMN public.whatsapp_accounts.encrypted_credentials IS 'Encrypted WhatsApp Business API credentials - never store in plaintext';
+-- COMMENT ON COLUMN public.whatsapp_accounts.encrypted_credentials skipped — column may not exist

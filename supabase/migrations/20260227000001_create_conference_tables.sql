@@ -53,6 +53,7 @@ ALTER TABLE public.emergency_conferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.conference_participants ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
+DROP POLICY IF EXISTS "Users can view their own conferences" ON public.emergency_conferences;
 CREATE POLICY "Users can view their own conferences"
 ON public.emergency_conferences FOR SELECT
 USING (
@@ -61,11 +62,13 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "Service role can manage conferences" ON public.emergency_conferences;
 CREATE POLICY "Service role can manage conferences"
 ON public.emergency_conferences FOR ALL
 USING (true)
 WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Users can view participants in their conferences" ON public.conference_participants;
 CREATE POLICY "Users can view participants in their conferences"
 ON public.conference_participants FOR SELECT
 USING (
@@ -77,6 +80,7 @@ USING (
   )
 );
 
+DROP POLICY IF EXISTS "Service role can manage participants" ON public.conference_participants;
 CREATE POLICY "Service role can manage participants"
 ON public.conference_participants FOR ALL
 USING (true)

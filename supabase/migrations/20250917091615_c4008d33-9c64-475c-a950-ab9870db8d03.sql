@@ -15,17 +15,19 @@ BEGIN
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='contact_submissions' AND policyname='Admin can manage contact submissions'
     ) THEN
+DROP POLICY IF EXISTS "Admin can manage contact submissions" ON public.contact_submissions;
       CREATE POLICY "Admin can manage contact submissions"
       ON public.contact_submissions
       FOR ALL
-      USING (is_admin())
-      WITH CHECK (is_admin());
+      USING (public.is_admin())
+      WITH CHECK (public.is_admin());
     END IF;
 
     IF NOT EXISTS (
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='contact_submissions' AND policyname='Public can submit contact forms'
     ) THEN
+DROP POLICY IF EXISTS "Public can submit contact forms" ON public.contact_submissions;
       CREATE POLICY "Public can submit contact forms"
       ON public.contact_submissions
       FOR INSERT
@@ -47,11 +49,12 @@ BEGIN
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='leads' AND policyname='Admin and sales can manage leads'
     ) THEN
+DROP POLICY IF EXISTS "Admin and sales can manage leads" ON public.leads;
       CREATE POLICY "Admin and sales can manage leads"
       ON public.leads
       FOR ALL
-      USING (is_admin() OR is_sales())
-      WITH CHECK (is_admin() OR is_sales());
+      USING (public.is_admin() OR is_sales())
+      WITH CHECK (public.is_admin() OR is_sales());
     END IF;
   END IF;
 END $$;
@@ -69,16 +72,18 @@ BEGIN
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='video_analytics' AND policyname='Admin can view video analytics'
     ) THEN
+DROP POLICY IF EXISTS "Admin can view video analytics" ON public.video_analytics;
       CREATE POLICY "Admin can view video analytics"
       ON public.video_analytics
       FOR SELECT
-      USING (is_admin());
+      USING (public.is_admin());
     END IF;
 
     IF NOT EXISTS (
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='video_analytics' AND policyname='System can insert video analytics'
     ) THEN
+DROP POLICY IF EXISTS "System can insert video analytics" ON public.video_analytics;
       CREATE POLICY "System can insert video analytics"
       ON public.video_analytics
       FOR INSERT
@@ -111,6 +116,7 @@ BEGIN
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='registration_selections' AND policyname='Users can view own registration data'
     ) THEN
+DROP POLICY IF EXISTS "Users can view own registration data" ON public.registration_selections;
       CREATE POLICY "Users can view own registration data"
       ON public.registration_selections
       FOR SELECT
@@ -121,6 +127,7 @@ BEGIN
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='registration_selections' AND policyname='Users can insert own registration data'
     ) THEN
+DROP POLICY IF EXISTS "Users can insert own registration data" ON public.registration_selections;
       CREATE POLICY "Users can insert own registration data"
       ON public.registration_selections
       FOR INSERT
@@ -131,6 +138,7 @@ BEGIN
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='registration_selections' AND policyname='Users can update own registration data'
     ) THEN
+DROP POLICY IF EXISTS "Users can update own registration data" ON public.registration_selections;
       CREATE POLICY "Users can update own registration data"
       ON public.registration_selections
       FOR UPDATE
@@ -142,11 +150,12 @@ BEGIN
       SELECT 1 FROM pg_policies 
       WHERE schemaname='public' AND tablename='registration_selections' AND policyname='Admin can manage all registration data'
     ) THEN
+DROP POLICY IF EXISTS "Admin can manage all registration data" ON public.registration_selections;
       CREATE POLICY "Admin can manage all registration data"
       ON public.registration_selections
       FOR ALL
-      USING (is_admin())
-      WITH CHECK (is_admin());
+      USING (public.is_admin())
+      WITH CHECK (public.is_admin());
     END IF;
   END IF;
 END $$;

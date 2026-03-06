@@ -28,17 +28,19 @@ ALTER TABLE public.phone_verifications ENABLE ROW LEVEL SECURITY;
 -- Drop any existing permissive policies on phone_verifications
 DROP POLICY IF EXISTS "Users can access phone verifications" ON public.phone_verifications;
 
+DROP POLICY IF EXISTS "Users can manage their own phone verifications" ON public.phone_verifications;
 CREATE POLICY "Users can manage their own phone verifications" 
 ON public.phone_verifications 
 FOR ALL 
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admins can manage all phone verifications" ON public.phone_verifications;
 CREATE POLICY "Admins can manage all phone verifications" 
 ON public.phone_verifications 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- 4. Create and secure registration_selections table
 CREATE TABLE IF NOT EXISTS public.registration_selections (
@@ -53,17 +55,19 @@ CREATE TABLE IF NOT EXISTS public.registration_selections (
 
 ALTER TABLE public.registration_selections ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage their own registration selections" ON public.registration_selections;
 CREATE POLICY "Users can manage their own registration selections" 
 ON public.registration_selections 
 FOR ALL 
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admins can manage all registration selections" ON public.registration_selections;
 CREATE POLICY "Admins can manage all registration selections" 
 ON public.registration_selections 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- 5. Secure leads table - ensure only admin/sales access
 DROP POLICY IF EXISTS "Users can view leads" ON public.leads;
@@ -78,7 +82,7 @@ BEGIN
   IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = 'communication_metrics_summary') THEN
     EXECUTE 'ALTER TABLE public.communication_metrics_summary ENABLE ROW LEVEL SECURITY';
     EXECUTE 'DROP POLICY IF EXISTS "Public can view metrics" ON public.communication_metrics_summary';
-    EXECUTE 'CREATE POLICY "Admin can view communication metrics" ON public.communication_metrics_summary FOR SELECT USING (is_admin())';
+    EXECUTE 'CREATE POLICY "Admin can view communication metrics" ON public.communication_metrics_summary FOR SELECT USING (public.is_admin())';
   END IF;
 END $$;
 

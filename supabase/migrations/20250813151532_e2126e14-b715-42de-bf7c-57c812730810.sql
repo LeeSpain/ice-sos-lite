@@ -20,12 +20,14 @@ CREATE TABLE public.contact_submissions (
 ALTER TABLE public.contact_submissions ENABLE ROW LEVEL SECURITY;
 
 -- Policies for contact submissions
+DROP POLICY IF EXISTS "Admin can manage all contact submissions" ON public.contact_submissions;
 CREATE POLICY "Admin can manage all contact submissions" 
 ON public.contact_submissions 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "System can insert contact submissions" ON public.contact_submissions;
 CREATE POLICY "System can insert contact submissions" 
 ON public.contact_submissions 
 FOR INSERT 

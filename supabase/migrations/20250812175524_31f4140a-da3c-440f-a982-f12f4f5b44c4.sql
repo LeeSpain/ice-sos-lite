@@ -38,8 +38,8 @@ on public.devices_flic_buttons
 as permissive
 for all
 to authenticated
-using (is_admin())
-with check (is_admin());
+using (public.is_admin())
+with check (public.is_admin());
 
 -- Owners can manage their own buttons
 drop policy if exists "Owners can manage their flic buttons" on public.devices_flic_buttons;
@@ -71,8 +71,8 @@ on public.devices_flic_events
 as permissive
 for all
 to authenticated
-using (is_admin())
-with check (is_admin());
+using (public.is_admin())
+with check (public.is_admin());
 
 -- Owners can view their events (via button ownership)
 drop policy if exists "Owners can view their flic events" on public.devices_flic_events;

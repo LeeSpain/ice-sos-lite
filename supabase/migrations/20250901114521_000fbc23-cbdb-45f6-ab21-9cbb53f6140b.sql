@@ -11,11 +11,12 @@ FOR ALL
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admins can manage all registration selections" ON public.registration_selections;
 CREATE POLICY "Admins can manage all registration selections" 
 ON public.registration_selections 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Now let's check if we need the SOS tables that failed earlier
 CREATE TABLE IF NOT EXISTS public.sos_incidents (
@@ -70,7 +71,7 @@ BEGIN
     END;
     
     BEGIN
-      EXECUTE 'CREATE POLICY "Admins can manage all SOS incidents" ON public.sos_incidents FOR ALL USING (is_admin()) WITH CHECK (is_admin())';
+      EXECUTE 'CREATE POLICY "Admins can manage all SOS incidents" ON public.sos_incidents FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin())';
     EXCEPTION WHEN duplicate_object THEN
       NULL; -- Policy already exists
     END;
@@ -85,7 +86,7 @@ BEGIN
     END;
     
     BEGIN
-      EXECUTE 'CREATE POLICY "Admins can manage all call attempts" ON public.sos_call_attempts FOR ALL USING (is_admin()) WITH CHECK (is_admin())';
+      EXECUTE 'CREATE POLICY "Admins can manage all call attempts" ON public.sos_call_attempts FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin())';
     EXCEPTION WHEN duplicate_object THEN
       NULL; -- Policy already exists  
     END;

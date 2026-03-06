@@ -33,19 +33,22 @@ ALTER TABLE public.sos_incidents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sos_call_attempts ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for sos_incidents
+DROP POLICY IF EXISTS "Users can manage their own SOS incidents" ON public.sos_incidents;
 CREATE POLICY "Users can manage their own SOS incidents" 
 ON public.sos_incidents 
 FOR ALL 
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admins can manage all SOS incidents" ON public.sos_incidents;
 CREATE POLICY "Admins can manage all SOS incidents" 
 ON public.sos_incidents 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- RLS Policies for sos_call_attempts  
+DROP POLICY IF EXISTS "Users can view call attempts for their incidents" ON public.sos_call_attempts;
 CREATE POLICY "Users can view call attempts for their incidents" 
 ON public.sos_call_attempts 
 FOR SELECT 
@@ -55,12 +58,14 @@ USING (EXISTS (
     AND si.user_id = auth.uid()
 ));
 
+DROP POLICY IF EXISTS "Admins can manage all call attempts" ON public.sos_call_attempts;
 CREATE POLICY "Admins can manage all call attempts" 
 ON public.sos_call_attempts 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "System can manage call attempts" ON public.sos_call_attempts;
 CREATE POLICY "System can manage call attempts" 
 ON public.sos_call_attempts 
 FOR ALL 
@@ -91,6 +96,7 @@ DROP POLICY IF EXISTS "Anyone can view contact submissions" ON public.contact_su
 
 -- 2. Fix video_analytics (currently allows public insert)  
 DROP POLICY IF EXISTS "Anyone can insert video analytics" ON public.video_analytics;
+DROP POLICY IF EXISTS "Service role can insert video analytics" ON public.video_analytics;
 CREATE POLICY "Service role can insert video analytics" 
 ON public.video_analytics 
 FOR INSERT 
@@ -109,17 +115,19 @@ CREATE TABLE IF NOT EXISTS public.phone_verifications (
 
 ALTER TABLE public.phone_verifications ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage their own phone verifications" ON public.phone_verifications;
 CREATE POLICY "Users can manage their own phone verifications" 
 ON public.phone_verifications 
 FOR ALL 
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admins can manage all phone verifications" ON public.phone_verifications;
 CREATE POLICY "Admins can manage all phone verifications" 
 ON public.phone_verifications 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- 4. Create registration_selections table with proper RLS
 CREATE TABLE IF NOT EXISTS public.registration_selections (
@@ -134,14 +142,16 @@ CREATE TABLE IF NOT EXISTS public.registration_selections (
 
 ALTER TABLE public.registration_selections ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can manage their own registration selections" ON public.registration_selections;
 CREATE POLICY "Users can manage their own registration selections" 
 ON public.registration_selections 
 FOR ALL 
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Admins can manage all registration selections" ON public.registration_selections;
 CREATE POLICY "Admins can manage all registration selections" 
 ON public.registration_selections 
 FOR ALL 
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());

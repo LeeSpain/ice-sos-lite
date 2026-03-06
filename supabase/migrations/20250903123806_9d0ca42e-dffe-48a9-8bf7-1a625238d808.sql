@@ -26,7 +26,7 @@ BEGIN
   -- Allow admin assignment if no admin exists, caller is already admin,
   -- OR caller is one of the approved owner emails
   IF admin_count = 0 
-     OR is_admin() 
+     OR public.is_admin() 
      OR EXISTS (
        SELECT 1 
        FROM auth.users au 

@@ -18,16 +18,19 @@ CREATE TABLE public.family_invites (
 ALTER TABLE public.family_invites ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Users can view their sent invites" ON public.family_invites;
 CREATE POLICY "Users can view their sent invites" 
 ON public.family_invites 
 FOR SELECT 
 USING (inviter_user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can create invites" ON public.family_invites;
 CREATE POLICY "Users can create invites" 
 ON public.family_invites 
 FOR INSERT 
 WITH CHECK (inviter_user_id = auth.uid());
 
+DROP POLICY IF EXISTS "Users can update their sent invites" ON public.family_invites;
 CREATE POLICY "Users can update their sent invites" 
 ON public.family_invites 
 FOR UPDATE 

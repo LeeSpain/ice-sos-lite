@@ -19,12 +19,14 @@ CREATE TABLE public.live_locations (
 ALTER TABLE public.live_locations ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for live locations
+DROP POLICY IF EXISTS "Users can manage their own location" ON public.live_locations;
 CREATE POLICY "Users can manage their own location" 
 ON public.live_locations 
 FOR ALL 
 USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Family members can view each others locations" ON public.live_locations;
 CREATE POLICY "Family members can view each others locations" 
 ON public.live_locations 
 FOR SELECT 

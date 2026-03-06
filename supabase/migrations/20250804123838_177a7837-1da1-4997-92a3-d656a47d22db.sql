@@ -19,11 +19,13 @@ CREATE TABLE public.subscription_plans (
 ALTER TABLE public.subscription_plans ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for subscription plans management
+DROP POLICY IF EXISTS "Admin can manage subscription plans" ON public.subscription_plans;
 CREATE POLICY "Admin can manage subscription plans" 
 ON public.subscription_plans 
 FOR ALL 
 USING (true);
 
+DROP POLICY IF EXISTS "Public can view active subscription plans" ON public.subscription_plans;
 CREATE POLICY "Public can view active subscription plans" 
 ON public.subscription_plans 
 FOR SELECT 

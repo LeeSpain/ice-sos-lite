@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { 
-  Phone, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Check, 
-  X, 
+import {
+  Phone,
+  Plus,
+  Edit,
+  Trash2,
+  Check,
+  X,
   AlertTriangle,
-  Users,
-  Smartphone,
-  PhoneCall,
-  Star
+  Star,
+  Bell,
+  PhoneCall
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +28,11 @@ interface EnhancedEmergencyContactsSectionProps {
   onProfileUpdate: () => void;
 }
 
+interface ContactFormData extends EmergencyContact {
+  allow_calls: boolean;
+  allow_notifications: boolean;
+}
+
 const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: EnhancedEmergencyContactsSectionProps) => {
   const { contacts, loading, refetch } = useEmergencyContacts();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,12 +40,14 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const [formData, setFormData] = useState<EmergencyContact>({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     phone: '',
     email: '',
     relationship: '',
-    priority: 1
+    priority: 1,
+    allow_calls: true,
+    allow_notifications: true,
   });
 
   const relationships = [
@@ -60,14 +67,20 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
       phone: '',
       email: '',
       relationship: '',
-      priority: contacts.length + 1
+      priority: contacts.length + 1,
+      allow_calls: true,
+      allow_notifications: true,
     });
     setEditingContact(null);
   };
 
   const openModal = (contact?: EmergencyContact) => {
     if (contact) {
-      setFormData(contact);
+      setFormData({
+        ...contact,
+        allow_calls: (contact as any).allow_calls !== false,
+        allow_notifications: (contact as any).allow_notifications !== false,
+      });
       setEditingContact(contact);
     } else {
       resetForm();
@@ -85,39 +98,40 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
       return;
     }
 
+    if (!formData.allow_calls && !formData.allow_notifications) {
+      toast({
+        title: "Validation Error",
+        description: "At least one of calls or notifications must be enabled.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      const contactPayload = {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email || null,
+        relationship: formData.relationship,
+        priority: formData.priority,
+        allow_calls: formData.allow_calls,
+        allow_notifications: formData.allow_notifications,
+      };
+
       if (editingContact?.id) {
-        // Update existing contact
         const { error } = await supabase
           .from('emergency_contacts')
-          .update({
-            name: formData.name,
-            phone: formData.phone,
-            email: formData.email || null,
-            relationship: formData.relationship,
-            priority: formData.priority
-          })
+          .update(contactPayload)
           .eq('id', editingContact.id);
-
         if (error) throw error;
       } else {
-        // Create new contact
         const { error } = await supabase
           .from('emergency_contacts')
-          .insert({
-            user_id: user.id,
-            name: formData.name,
-            phone: formData.phone,
-            email: formData.email || null,
-            relationship: formData.relationship,
-            type: 'call_only',
-            priority: formData.priority
-          });
-
+          .insert({ user_id: user.id, type: 'call_only', ...contactPayload });
         if (error) throw error;
       }
 
@@ -125,7 +139,7 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
       onProfileUpdate();
       setIsModalOpen(false);
       resetForm();
-      
+
       toast({
         title: "Success",
         description: `Emergency contact ${editingContact ? 'updated' : 'added'} successfully.`
@@ -148,38 +162,38 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
         .from('emergency_contacts')
         .delete()
         .eq('id', contactId);
-
       if (error) throw error;
 
       refetch();
       onProfileUpdate();
-      toast({
-        title: "Success",
-        description: "Emergency contact removed successfully."
-      });
+      toast({ title: "Success", description: "Emergency contact removed successfully." });
     } catch (error) {
       console.error('Error deleting contact:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove emergency contact.",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Failed to remove emergency contact.", variant: "destructive" });
     }
-  };
-
-  const getContactTypeBadge = () => {
-    return (
-      <Badge variant="secondary" className="gap-1">
-        <PhoneCall className="h-3 w-3" />
-        Call Only
-      </Badge>
-    );
   };
 
   const getPriorityIcon = (priority: number) => {
     if (priority === 1) return <Star className="h-4 w-4 text-yellow-500 fill-current" />;
     return null;
   };
+
+  const getContactBadges = (contact: any) => (
+    <div className="flex gap-1 flex-wrap mt-1">
+      {contact.allow_calls !== false && (
+        <Badge variant="secondary" className="gap-1 text-xs">
+          <PhoneCall className="h-3 w-3" />
+          Calls
+        </Badge>
+      )}
+      {contact.allow_notifications !== false && (
+        <Badge variant="secondary" className="gap-1 text-xs">
+          <Bell className="h-3 w-3" />
+          Alerts
+        </Badge>
+      )}
+    </div>
+  );
 
   return (
     <Card>
@@ -192,15 +206,15 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
             <div>
               <CardTitle className="text-lg">Emergency Contacts</CardTitle>
               <p className="text-sm text-muted-foreground">
-                {contacts.length}/5 contacts • Sequential calling during SOS
+                {contacts.length}/5 contacts • Clar notifies all simultaneously during SOS
               </p>
             </div>
           </div>
           <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
             <DialogTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={() => openModal()}
                 disabled={contacts.length >= 5}
               >
@@ -278,12 +292,49 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
                   </Select>
                 </div>
 
-                <div className="p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm font-medium mb-1">Contact Type: Call Only</p>
-                  <p className="text-xs text-muted-foreground">
-                    Emergency contacts receive sequential calls during SOS activation. 
-                    They cannot access your location or receive alerts.
-                  </p>
+                {/* Alert preferences */}
+                <div className="border rounded-lg p-4 space-y-3 bg-muted/30">
+                  <div>
+                    <p className="text-sm font-medium">Alert Preferences</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Choose how Clar reaches this contact during an SOS emergency.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <PhoneCall className="h-4 w-4 text-blue-500" />
+                      <div>
+                        <p className="text-sm font-medium">Voice Call</p>
+                        <p className="text-xs text-muted-foreground">Clar calls and briefs this contact</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={formData.allow_calls}
+                      onCheckedChange={(checked) => setFormData({ ...formData, allow_calls: checked })}
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Bell className="h-4 w-4 text-green-500" />
+                      <div>
+                        <p className="text-sm font-medium">Notifications</p>
+                        <p className="text-xs text-muted-foreground">Push + WhatsApp with GPS link</p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={formData.allow_notifications}
+                      onCheckedChange={(checked) => setFormData({ ...formData, allow_notifications: checked })}
+                    />
+                  </div>
+
+                  {!formData.allow_calls && !formData.allow_notifications && (
+                    <p className="text-xs text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      At least one alert method must be enabled.
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex gap-2 justify-end">
@@ -291,7 +342,10 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
                   <X className="h-4 w-4 mr-2" />
                   Cancel
                 </Button>
-                <Button onClick={handleSave} disabled={isLoading}>
+                <Button
+                  onClick={handleSave}
+                  disabled={isLoading || (!formData.allow_calls && !formData.allow_notifications)}
+                >
                   <Check className="h-4 w-4 mr-2" />
                   {isLoading ? 'Saving...' : editingContact ? 'Update' : 'Add Contact'}
                 </Button>
@@ -312,7 +366,7 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
             <Phone className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
             <h3 className="font-medium mb-2">No emergency contacts yet</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Add up to 5 emergency contacts for SOS calling
+              Add up to 5 contacts — Clar will call and notify them all simultaneously during SOS
             </p>
             <Button variant="outline" onClick={() => openModal()}>
               <Plus className="h-4 w-4 mr-2" />
@@ -336,20 +390,16 @@ const EnhancedEmergencyContactsSection = ({ profile, onProfileUpdate }: Enhanced
                       <Badge variant="outline" className="text-xs">
                         Priority {contact.priority}
                       </Badge>
-                      {getContactTypeBadge()}
                     </div>
                     <p className="text-sm text-muted-foreground">{contact.phone}</p>
                     {contact.relationship && (
                       <p className="text-xs text-muted-foreground">{contact.relationship}</p>
                     )}
+                    {getContactBadges(contact)}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => openModal(contact)}
-                  >
+                  <Button variant="ghost" size="sm" onClick={() => openModal(contact)}>
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button

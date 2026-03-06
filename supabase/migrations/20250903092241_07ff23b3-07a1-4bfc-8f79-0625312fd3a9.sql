@@ -4,22 +4,25 @@
 DROP POLICY IF EXISTS "Anyone can read contact submissions" ON public.contact_submissions;
 
 -- Ensure only admins can read contact submissions
+DROP POLICY IF EXISTS "Admins only can read contact submissions" ON public.contact_submissions;
 CREATE POLICY "Admins only can read contact submissions" ON public.contact_submissions
 FOR SELECT 
-USING (is_admin());
+USING (public.is_admin());
 
 -- 2) Fix subscribers table - add proper user-specific access
 DROP POLICY IF EXISTS "Public can read subscribers" ON public.subscribers;
 
 -- Users can only read their own subscription data
+DROP POLICY IF EXISTS "Users can read own subscription" ON public.subscribers;
 CREATE POLICY "Users can read own subscription" ON public.subscribers
 FOR SELECT
 USING (auth.uid() = user_id OR auth.email() = email);
 
 -- Admins can read all subscriptions
+DROP POLICY IF EXISTS "Admins can read all subscriptions" ON public.subscribers;
 CREATE POLICY "Admins can read all subscriptions" ON public.subscribers  
 FOR SELECT
-USING (is_admin());
+USING (public.is_admin());
 
 -- 3) Fix video_analytics table - restrict to admins only
 -- First check if there are any public policies to drop
@@ -32,9 +35,10 @@ BEGIN
 END $$;
 
 -- Ensure video analytics is admin-only for reading
+DROP POLICY IF EXISTS "Only admins can read video analytics" ON public.video_analytics;
 CREATE POLICY "Only admins can read video analytics" ON public.video_analytics
 FOR SELECT
-USING (is_admin());
+USING (public.is_admin());
 
 -- 4) Fix homepage_analytics table if it exists
 DO $$
@@ -46,9 +50,10 @@ BEGIN
     DROP POLICY IF EXISTS "Anyone can read homepage analytics" ON public.homepage_analytics;
     
     -- Only admins can read analytics
+DROP POLICY IF EXISTS "Only admins can read homepage analytics" ON public.homepage_analytics;
     CREATE POLICY "Only admins can read homepage analytics" ON public.homepage_analytics
     FOR SELECT
-    USING (is_admin());
+    USING (public.is_admin());
   END IF;
 END $$;
 
@@ -67,7 +72,7 @@ INSERT INTO public.security_events (
   'database_migration',
   jsonb_build_object(
     'action', 'restricted_public_table_access',
-    'tables_secured', ARRAY['contact_submissions', 'subscribers', 'video_analytics', 'homepage_analytics'],
+    'tables_secured', '["contact_submissions","subscribers","video_analytics","homepage_analytics"]'::jsonb,
     'timestamp', now()
   ),
   now()

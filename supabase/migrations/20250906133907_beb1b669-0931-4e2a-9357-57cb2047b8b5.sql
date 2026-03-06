@@ -18,11 +18,12 @@ CREATE TABLE IF NOT EXISTS workflow_stages (
 ALTER TABLE workflow_stages ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for workflow stages
+DROP POLICY IF EXISTS "Admin can manage workflow stages" ON workflow_stages;
 CREATE POLICY "Admin can manage workflow stages"
 ON workflow_stages
 FOR ALL
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_workflow_stages_updated_at()
@@ -34,6 +35,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Create trigger for automatic timestamp updates
+DROP TRIGGER IF EXISTS update_workflow_stages_updated_at_trigger ON workflow_stages;
 CREATE TRIGGER update_workflow_stages_updated_at_trigger
   BEFORE UPDATE ON workflow_stages
   FOR EACH ROW

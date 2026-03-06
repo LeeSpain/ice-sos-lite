@@ -64,22 +64,27 @@ ALTER TABLE email_delivery_log ENABLE ROW LEVEL SECURITY;
 ALTER TABLE email_automation_settings ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies for email_templates
+DROP POLICY IF EXISTS "Admin can manage email templates" ON email_templates;
 CREATE POLICY "Admin can manage email templates" ON email_templates
-  FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+  FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
+DROP POLICY IF EXISTS "Public can view active email templates" ON email_templates;
 CREATE POLICY "Public can view active email templates" ON email_templates
   FOR SELECT USING (is_active = true);
 
 -- Create RLS policies for email_delivery_log
+DROP POLICY IF EXISTS "Admin can view email delivery logs" ON email_delivery_log;
 CREATE POLICY "Admin can view email delivery logs" ON email_delivery_log
-  FOR SELECT USING (is_admin());
+  FOR SELECT USING (public.is_admin());
 
+DROP POLICY IF EXISTS "System can manage email delivery logs" ON email_delivery_log;
 CREATE POLICY "System can manage email delivery logs" ON email_delivery_log
   FOR ALL USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
 
 -- Create RLS policies for email_automation_settings
+DROP POLICY IF EXISTS "Admin can manage email automation settings" ON email_automation_settings;
 CREATE POLICY "Admin can manage email automation settings" ON email_automation_settings
-  FOR ALL USING (is_admin()) WITH CHECK (is_admin());
+  FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_email_campaigns_content_id ON email_campaigns(content_id);
@@ -88,16 +93,19 @@ CREATE INDEX IF NOT EXISTS idx_email_delivery_log_campaign ON email_delivery_log
 CREATE INDEX IF NOT EXISTS idx_email_queue_status_scheduled ON email_queue(status, scheduled_at);
 
 -- Add updated_at trigger for new tables
+DROP TRIGGER IF EXISTS update_email_templates_updated_at ON email_templates;
 CREATE TRIGGER update_email_templates_updated_at
   BEFORE UPDATE ON email_templates
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_email_delivery_log_updated_at ON email_delivery_log;
 CREATE TRIGGER update_email_delivery_log_updated_at
   BEFORE UPDATE ON email_delivery_log
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_email_automation_settings_updated_at ON email_automation_settings;
 CREATE TRIGGER update_email_automation_settings_updated_at
   BEFORE UPDATE ON email_automation_settings
   FOR EACH ROW

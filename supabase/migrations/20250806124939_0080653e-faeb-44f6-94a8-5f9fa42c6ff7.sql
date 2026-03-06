@@ -53,33 +53,39 @@ ALTER TABLE public.email_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.communication_preferences ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for email campaigns
+DROP POLICY IF EXISTS "Admin can manage email campaigns" ON public.email_campaigns;
 CREATE POLICY "Admin can manage email campaigns" 
 ON public.email_campaigns 
 FOR ALL 
 USING (true);
 
 -- Create policies for email logs
+DROP POLICY IF EXISTS "Admin can view all email logs" ON public.email_logs;
 CREATE POLICY "Admin can view all email logs" 
 ON public.email_logs 
 FOR SELECT 
 USING (true);
 
+DROP POLICY IF EXISTS "System can manage email logs" ON public.email_logs;
 CREATE POLICY "System can manage email logs" 
 ON public.email_logs 
 FOR INSERT 
 WITH CHECK (true);
 
+DROP POLICY IF EXISTS "System can update email logs" ON public.email_logs;
 CREATE POLICY "System can update email logs" 
 ON public.email_logs 
 FOR UPDATE 
 USING (true);
 
 -- Create policies for communication preferences
+DROP POLICY IF EXISTS "Users can manage their own communication preferences" ON public.communication_preferences;
 CREATE POLICY "Users can manage their own communication preferences" 
 ON public.communication_preferences 
 FOR ALL 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can manage communication preferences" ON public.communication_preferences;
 CREATE POLICY "System can manage communication preferences" 
 ON public.communication_preferences 
 FOR ALL 
@@ -116,6 +122,7 @@ END;
 $$;
 
 -- Create trigger for new user communication preferences
+DROP TRIGGER IF EXISTS on_auth_user_created_communication_preferences ON auth.users;
 CREATE TRIGGER on_auth_user_created_communication_preferences
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user_communication_preferences();

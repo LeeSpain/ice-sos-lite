@@ -46,21 +46,29 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.service_product_compatibility ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for admin access
+DROP POLICY IF EXISTS "Admin can manage product categories" ON public.product_categories;
 CREATE POLICY "Admin can manage product categories" ON public.product_categories FOR ALL USING (true);
+DROP POLICY IF EXISTS "Admin can manage products" ON public.products;
 CREATE POLICY "Admin can manage products" ON public.products FOR ALL USING (true);
+DROP POLICY IF EXISTS "Admin can manage service compatibility" ON public.service_product_compatibility;
 CREATE POLICY "Admin can manage service compatibility" ON public.service_product_compatibility FOR ALL USING (true);
 
 -- Public read access for active products
+DROP POLICY IF EXISTS "Public can view active product categories" ON public.product_categories;
 CREATE POLICY "Public can view active product categories" ON public.product_categories FOR SELECT USING (status = 'active');
+DROP POLICY IF EXISTS "Public can view active products" ON public.products;
 CREATE POLICY "Public can view active products" ON public.products FOR SELECT USING (status = 'active');
+DROP POLICY IF EXISTS "Public can view product compatibility" ON public.service_product_compatibility;
 CREATE POLICY "Public can view product compatibility" ON public.service_product_compatibility FOR SELECT USING (true);
 
 -- Create triggers for automatic timestamp updates
+DROP TRIGGER IF EXISTS update_product_categories_updated_at ON public.product_categories;
 CREATE TRIGGER update_product_categories_updated_at
   BEFORE UPDATE ON public.product_categories
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_products_updated_at ON public.products;
 CREATE TRIGGER update_products_updated_at
   BEFORE UPDATE ON public.products
   FOR EACH ROW
@@ -87,23 +95,12 @@ INSERT INTO public.products (
   'ICE SOS Emergency Pendant',
   49.99,
   'Waterproof Bluetooth emergency pendant with one-touch SOS activation. Connects to your phone and the ICE SOS Lite app for instant emergency alerts.',
-  ARRAY[
-    'Bluetooth Low Energy (BLE) connectivity',
-    'One-button emergency activation', 
-    'LED status indicators',
-    'Vibration feedback for confirmation',
-    '7-day battery life with charging dock',
-    'IP67 waterproof rating',
-    'Range up to 100 meters',
-    'Works with all subscription plans',
-    'Discreet wearable design',
-    'Quick emergency activation without phone access'
-  ],
+  '["Bluetooth Low Energy (BLE) connectivity","One-button emergency activation","LED status indicators","Vibration feedback for confirmation","7-day battery life with charging dock","IP67 waterproof rating","Range up to 100 meters","Works with all subscription plans","Discreet wearable design","Quick emergency activation without phone access"]'::jsonb,
   (SELECT id FROM public.product_categories WHERE name = 'Wearable Safety Devices'),
   'ICE-PENDANT-001',
   50,
   25.0,
   '{"length": 40, "width": 30, "height": 12}'::jsonb,
-  ARRAY['Basic Plan', 'Premium Plan', 'Enterprise Plan'],
+  '["Basic Plan","Premium Plan","Enterprise Plan"]'::jsonb,
   1
 );

@@ -34,21 +34,6 @@
     "supportLink": "Support",
     "rights": "All rights reserved."
   },
-  "admin": {
-    "header": {
-      "title": "Admin Dashboard",
-      "subtitle": "ICE SOS Lite Management Portal"
-    }
-  },
-  "dashboard": {
-    "signOut": "Sign Out",
-    "greeting": {
-      "morning": "Good Morning",
-      "afternoon": "Good Afternoon",
-      "evening": "Good Evening"
-    },
-    "title": "Dashboard"
-  },
   "pricing": {
     "subscribeNow": "Subscribe Now",
     "details": "Details",
@@ -166,12 +151,6 @@
     "cancellationTitle": "Cancellation Policy:",
     "cancellationDescription": "You can cancel your subscription at any time. Your access will continue until the end of your current billing period. Hardware purchases are non-refundable but carry a 1-year warranty."
   },
-  "appPreview": {
-    "title": "Experience Your Emergency Protection App",
-    "description": "See exactly what you'll get with ICE SOS Lite. This interactive preview shows your personal emergency dashboard, one-tap SOS activation, family connections, and Bluetooth device integration.",
-    "loading": "Loading preview...",
-    "note": "This preview demonstrates the actual app interface you'll use for emergency protection."
-  },
   "dashboardOverview": {
     "welcome": "Welcome back, {{name}}!",
     "subtitle": "Your safety dashboard - everything you need at a glance",
@@ -213,14 +192,6 @@
       "medicalInformation": "Medical Information",
       "subscriptionActive": "Subscription Active"
     }
-  },
-  "common": {
-    "perMonth": "/month",
-    "buyNow": "Buy now",
-    "howItWorks": "How it works",
-    "learnMore": "Learn more",
-    "visitor": "Visitor",
-    "comingSoon": "Coming Soon"
   },
   "products": {
     "icePendant": {
@@ -362,6 +333,10 @@
     "noEmergency": "If you are in immediate danger, call 112 (Spain's emergency number)."
   },
   "admin": {
+    "header": {
+      "title": "Admin Dashboard",
+      "subtitle": "ICE SOS Lite Management Portal"
+    },
     "title": "Admin Dashboard",
     "subtitle": "ICE SOS Lite Management Portal",
     "overview": "📊 Overview & Analytics",
@@ -414,9 +389,10 @@
     "regionalAudit": "Audit Log"
   },
   "dashboard": {
+    "title": "Dashboard",
     "greeting": {
       "morning": "Good morning",
-      "afternoon": "Good afternoon", 
+      "afternoon": "Good afternoon",
       "evening": "Good evening"
     },
     "signOut": "Sign Out",
@@ -604,6 +580,8 @@
     "tapForHelp": "Tap for immediate help"
   },
   "common": {
+    "perMonth": "/month",
+    "visitor": "Visitor",
     "watchVideo": "Watch Video",
     "learnMore": "Learn more",
     "getStarted": "Get Started",

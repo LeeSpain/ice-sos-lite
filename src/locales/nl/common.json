@@ -7,10 +7,18 @@
     "signIn": "Inloggen",
     "subscribeNow": "Abonneer Nu",
     "joinNow": "Meld je aan",
-    "regionalCenter": "Regionaal centrum contacteren"
+    "regionalCenter": "Regionaal centrum contacteren",
+    "introVideo": "Introductievideo"
   },
   "footer": {
+    "companyDescription": "Platform voor noodrespons en gezinsveiligheid dat gemoedsrust biedt via geavanceerde beschermingsdiensten.",
     "quickLinks": "Snelle links",
+    "blog": "Blog",
+    "safetyProducts": "Veiligheidsproducten",
+    "regionalServices": "Regionale Diensten",
+    "familyCarerAccess": "Familie & Verzorger Toegang",
+    "familyDashboard": "Familie Dashboard",
+    "contactUs": "Contacteer Ons",
     "pricing": "Prijzen",
     "devices": "Apparaten",
     "support": "Ondersteuning",
@@ -25,21 +33,6 @@
     "terms": "Servicevoorwaarden",
     "supportLink": "Ondersteuning",
     "rights": "Alle rechten voorbehouden."
-  },
-  "admin": {
-    "header": {
-      "title": "Admin Dashboard",
-      "subtitle": "ICE SOS Lite Beheerportal"
-    }
-  },
-  "dashboard": {
-    "signOut": "Uitloggen",
-    "greeting": {
-      "morning": "Goedemorgen",
-      "afternoon": "Goedemiddag",
-      "evening": "Goedenavond"
-    },
-    "title": "Dashboard"
   },
   "pricing": {
     "subscribeNow": "Abonneer Nu",
@@ -59,12 +52,12 @@
     "productSpecs": "Volledige productspecificaties en installatie-informatie"
   },
   "hero": {
-    "badge": "Apparaatvrije Noodbescherming",
-    "titlePart1": "Transformeer Je Telefoon Tot een",
-    "titleEmphasis": "Levensreddende",
-    "titlePart2": "Assistent",
-    "description": "ICE SOS Lite biedt meertalige noodbescherming met AI Guardian, professionele callcenter toegang en familieconnectiviteit — wereldwijd beschikbaar.",
-    "ctaJoin": "Doe vandaag mee",
+    "badge": "Noodbescherming zonder apparaat",
+    "titlePart1": "Verander je telefoon in een",
+    "titleEmphasis": "levensreddende",
+    "titlePart2": "assistent",
+    "description": "ICE SOS Lite biedt meertalige noodbescherming met AI Guardian, professioneel callcenter en familieverbinding — wereldwijd beschikbaar.",
+    "ctaJoin": "Meld je vandaag aan",
     "ctaTalk": "Praat met Clara",
     "meetClara": "Ontmoet Clara"
   },
@@ -87,18 +80,7 @@
     "monitoring247": "24/7 Monitoring",
     "monitoring247Desc": "Professionele monitoring en familiewaarschuwingen zorgen ervoor dat er altijd iemand over je dierbaren waakt.",
     "familyVideo": "Familie Video",
-    "connectFirstFree": "Verbind je eerste familielid gratis • Geen installatiekosten"
-  },
-  "hero": {
-    "badge": "Noodbescherming zonder apparaat",
-    "titlePart1": "Verander je telefoon in een",
-    "titleEmphasis": "levensredende",
-    "titlePart2": "assistent",
-    "description": "ICE SOS Lite biedt meertalige noodbescherming met AI Guardian, professioneel callcenter en familieverbinding — wereldwijd beschikbaar.",
-    "ctaJoin": "Meld je vandaag aan",
-    "ctaTalk": "Praat met Clara"
-  },
-  "features": {
+    "connectFirstFree": "Verbind je eerste familielid gratis • Geen installatiekosten",
     "title": "Complete noodbeschermingssuite",
     "description": "Professionele noodbescherming met wereldwijd callcenter, Bluetooth-apparaten en AI-monitoring — vanaf €1,99/maand met wereldwijde dekking.",
     "items": [
@@ -169,12 +151,6 @@
     "cancellationTitle": "Annuleringsbeleid:",
     "cancellationDescription": "Je kunt je abonnement op elk moment annuleren. Toegang blijft tot het einde van je huidige factureringsperiode. Hardwareaankopen zijn niet-restitueerbaar maar hebben 1 jaar garantie."
   },
-  "appPreview": {
-    "title": "Bekijk hoe de app eruitziet",
-    "description": "Bekijk een live preview van onze mobiele app. Werkt automatisch bij wanneer admins opslaan en verbindt met slimme apparaten voor realtime gegevens.",
-    "loading": "Voorbeeld laden...",
-    "note": "Dit voorbeeld werkt automatisch bij wanneer admins wijzigingen opslaan op de testpagina."
-  },
   "dashboardOverview": {
     "welcome": "Welkom terug, {{name}}!",
     "subtitle": "Jouw veiligheidsdashboard - alles in één oogopslag",
@@ -216,14 +192,6 @@
       "medicalInformation": "Medische informatie",
       "subscriptionActive": "Abonnement actief"
     }
-  },
-  "common": {
-    "perMonth": "/maand",
-    "buyNow": "Nu kopen",
-    "howItWorks": "Hoe het werkt",
-    "learnMore": "Meer informatie",
-    "visitor": "Bezoeker",
-    "comingSoon": "Binnenkort"
   },
   "products": {
     "icePendant": {
@@ -315,6 +283,37 @@
       "description": "Bericht verzenden mislukt. Probeer het opnieuw."
     }
   },
+  "regionalCenterES": {
+    "h1": "Regionaal Callcenter Spanje",
+    "intro": "24/7 tweetalige noodondersteuning voor inwoners en bezoekers in Spanje.",
+    "heroDescription": "Onze getrainde medewerkers spreken Engels en Spaans en kunnen nooddiensten coördineren, live vertaling bieden en hulp bieden bij follow-up.",
+    "ctaSOS": "SOS Openen",
+    "ctaSupport": "Ga naar Ondersteuning",
+    "whatWeDoTitle": "Wat wij doen",
+    "whatWeDo": [
+      "Noodoproepen afhandelen en triage uitvoeren",
+      "Live vertaling tussen Engels en Spaans tijdens noodoproepen",
+      "Coördinatie met lokale nooddiensten en eerste hulpverleners",
+      "Contact opnemen met jouw aangewezen noodcontacten",
+      "Hulp bij medische en reisinformatie",
+      "Follow-up en case-updates tot oplossing"
+    ],
+    "whenToContactTitle": "Wanneer ons te contacteren",
+    "whenToContact": [
+      "Je hulp nodig hebt bij communicatie met nooddiensten in Spanje",
+      "Je liever Engels of Spaans spreekt tijdens een urgente situatie",
+      "Je reist in Spanje en hulp nodig hebt",
+      "Je hulp nodig hebt bij coördinatie met familie of verzorgers",
+      "Je een urgent apparaat- of abonnementsprobleem hebt dat je veiligheid beïnvloedt"
+    ],
+    "coverageTitle": "Dekking & tijden",
+    "coverageHours": "24/7, 365 dagen",
+    "coverageLanguages": "Talen: Engels en Spaans",
+    "coverageRegion": "Regio: Spanje (ES)",
+    "confidentialityTitle": "Vertrouwelijkheid & veiligheid",
+    "confidentialityDesc": "Alle gesprekken worden opgenomen voor veiligheid en training. Persoonsgegevens worden verwerkt conform ons Privacybeleid.",
+    "noEmergency": "Als je in onmiddellijk gevaar bent, bel dan 112 (het Spaanse alarmnummer)."
+  },
   "regionalDashboard": {
     "title": "Regionaal Callcenter",
     "subtitle": "Noodcontrolecentrum dashboard",
@@ -343,6 +342,10 @@
     "user": "Gebruiker"
   },
   "admin": {
+    "header": {
+      "title": "Admin Dashboard",
+      "subtitle": "ICE SOS Lite Beheerportaal"
+    },
     "title": "Admin Dashboard",
     "subtitle": "ICE SOS Lite Beheerportaal",
     "overview": "📊 Overzicht & Analytics",
@@ -395,6 +398,7 @@
     "regionalAudit": "Audit Log"
   },
   "dashboard": {
+    "title": "Dashboard",
     "greeting": {
       "morning": "Goedemorgen",
       "afternoon": "Goedemiddag",
@@ -571,7 +575,76 @@
     "emergencySOS": "Nood SOS",
     "tapForHelp": "Tik voor onmiddellijke hulp"
   },
+  "introVideo": {
+    "title": "ICE SOS Introductievideo's",
+    "description": "Kies een video om meer te leren over ICE SOS Lite"
+  },
+  "howItWorks": {
+    "title": "Hoe Werkt ICE SOS?",
+    "subtitle": "Noodcoördinatie opnieuw bedacht met AI. Eenvoudig, snel en altijd beschikbaar.",
+    "keyFeatures": "Belangrijkste Functies",
+    "importantNotice": "Belangrijke Mededeling",
+    "readyToStart": "Klaar om te Beginnen?",
+    "readySubtitle": "Praat nu met Clara. Chat, bel of vraag een videogesprek aan in seconden.",
+    "chatWithClara": "Chat met Clara",
+    "callNow": "Bel Nu (60 sec)",
+    "availabilityNotice": "Beschikbaar in Engels & Spaans • 24/7 • Gratis te starten",
+    "steps": {
+      "step1": {
+        "title": "Druk op je Noodknop",
+        "description": "Activeer ICE SOS met één tik op je telefoon, of gebruik een Flic-knop voor directe toegang."
+      },
+      "step2": {
+        "title": "Alle Contacten Bellen Tegelijk",
+        "description": "Al je noodcontacten ontvangen tegelijkertijd een oproep, niet één voor één. Krijg 15x sneller hulp dan bij traditionele systemen."
+      },
+      "step3": {
+        "title": "Clara AI Doet Mee om te Coördineren",
+        "description": "Onze AI-coördinator Clara doet mee aan het gesprek, begroet iedereen, legt aankomsttijden vast en houdt respondenten in realtime op de hoogte."
+      },
+      "step4": {
+        "title": "Hulp Arriveert Sneller",
+        "description": "Je locatie wordt automatisch gedeeld. Iedereen weet wie er komt, wanneer ze aankomen en wat er nodig is."
+      }
+    },
+    "features": {
+      "callback": {
+        "title": "Terugbelservice in 60 Seconden",
+        "description": "Klik op het telefoonpictogram in de chat om binnen 60 seconden met ons team te spreken. Geen wachten, geen formulieren."
+      },
+      "bilingual": {
+        "title": "Engels & Spaanstalige Ondersteuning",
+        "description": "Wissel direct van taal. Clara en ons team spreken zowel Engels als Spaans vloeiend."
+      },
+      "video": {
+        "title": "Videogesprekken Beschikbaar",
+        "description": "Wil je iets laten zien? Vraag een videogesprek aan voor face-to-face assistentie."
+      },
+      "available247": {
+        "title": "24/7 Beschikbaarheid",
+        "description": "Clara slaapt nooit. Krijg altijd hulp, dag of nacht, 365 dagen per jaar."
+      },
+      "memory": {
+        "title": "Perfect Geheugen",
+        "description": "Clara onthoudt elke interactie. Ze kent je geschiedenis en biedt gepersonaliseerde assistentie."
+      },
+      "chatAndCall": {
+        "title": "Altijd Chatten & Bellen",
+        "description": "Voorkeur voor tekst? Chat met Clara. Wil je praten? Klik om te bellen. Jij kiest hoe je verbinding maakt."
+      }
+    },
+    "disclaimer": {
+      "title": "Belangrijke Mededeling",
+      "message": "ICE SOS is een noodcoördinatietool. Het is GEEN vervanging voor 112 (EU) of 911 (VS).",
+      "lifeThreatening": "Bij een levensbedreigende noodsituatie:",
+      "step1": "BEL 112 (EU) of 911 (VS) EERST",
+      "step2": "Gebruik dan ICE SOS om je contacten te informeren",
+      "step3": "Stel het bellen van officiële hulpdiensten niet uit"
+    }
+  },
   "common": {
+    "perMonth": "/maand",
+    "visitor": "Bezoeker",
     "watchVideo": "Video Bekijken",
     "learnMore": "Meer informatie",
     "getStarted": "Aan de slag",

@@ -15,11 +15,13 @@ CREATE TABLE public.lead_intelligence_runs (
 ALTER TABLE public.lead_intelligence_runs ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies: Users can only see and create their own runs
+DROP POLICY IF EXISTS "Users can view their own intelligence runs" ON public.lead_intelligence_runs;
 CREATE POLICY "Users can view their own intelligence runs"
 ON public.lead_intelligence_runs
 FOR SELECT
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create their own intelligence runs" ON public.lead_intelligence_runs;
 CREATE POLICY "Users can create their own intelligence runs"
 ON public.lead_intelligence_runs
 FOR INSERT

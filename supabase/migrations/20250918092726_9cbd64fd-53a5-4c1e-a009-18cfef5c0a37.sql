@@ -5,7 +5,7 @@ GRANT SELECT ON public.profiles TO authenticated;
 GRANT SELECT ON public.communication_preferences TO authenticated;
 GRANT SELECT ON public.orders TO authenticated;
 
--- Ensure the is_admin() function works for contact_submissions
+-- Ensure the public.is_admin() function works for contact_submissions
 -- Drop existing policy and recreate with proper permissions
 DROP POLICY IF EXISTS "System can insert contact submissions" ON public.contact_submissions;
 CREATE POLICY "System can insert contact submissions" 
@@ -17,4 +17,4 @@ WITH CHECK (true);
 CREATE POLICY IF NOT EXISTS "Admins can read contact submissions" 
 ON public.contact_submissions 
 FOR SELECT 
-USING (is_admin());
+USING (public.is_admin());

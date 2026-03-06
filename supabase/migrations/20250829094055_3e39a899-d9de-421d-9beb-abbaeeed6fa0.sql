@@ -18,11 +18,12 @@ CREATE TABLE public.admin_notifications (
 ALTER TABLE public.admin_notifications ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Admins can manage their notifications" ON public.admin_notifications;
 CREATE POLICY "Admins can manage their notifications" 
 ON public.admin_notifications 
 FOR ALL 
-USING (is_admin() AND auth.uid() = user_id)
-WITH CHECK (is_admin() AND auth.uid() = user_id);
+USING (public.is_admin() AND auth.uid() = user_id)
+WITH CHECK (public.is_admin() AND auth.uid() = user_id);
 
 -- Create trigger for updated_at
 CREATE TRIGGER update_admin_notifications_updated_at

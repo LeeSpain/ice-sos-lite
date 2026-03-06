@@ -15,11 +15,13 @@ CREATE TABLE public.gmail_tokens (
 ALTER TABLE public.gmail_tokens ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Users can manage their own gmail tokens" ON public.gmail_tokens;
 CREATE POLICY "Users can manage their own gmail tokens" 
 ON public.gmail_tokens 
 FOR ALL 
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "System can manage gmail tokens" ON public.gmail_tokens;
 CREATE POLICY "System can manage gmail tokens" 
 ON public.gmail_tokens 
 FOR ALL 
@@ -51,6 +53,7 @@ CREATE TABLE public.email_automation_settings (
 ALTER TABLE public.email_automation_settings ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Admin can manage email automation settings" ON public.email_automation_settings;
 CREATE POLICY "Admin can manage email automation settings" 
 ON public.email_automation_settings 
 FOR ALL 
@@ -84,6 +87,7 @@ CREATE TABLE public.email_queue (
 ALTER TABLE public.email_queue ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "System can manage email queue" ON public.email_queue;
 CREATE POLICY "System can manage email queue" 
 ON public.email_queue 
 FOR ALL 

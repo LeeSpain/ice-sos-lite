@@ -30,11 +30,12 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename = 'marketing_content' AND policyname = 'Admin can manage marketing content'
   ) THEN
+DROP POLICY IF EXISTS "Admin can manage marketing content" ON public.marketing_content;
     CREATE POLICY "Admin can manage marketing content"
     ON public.marketing_content
     FOR ALL
-    USING (is_admin())
-    WITH CHECK (is_admin());
+    USING (public.is_admin())
+    WITH CHECK (public.is_admin());
   END IF;
 END$$;
 
@@ -49,6 +50,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_trigger WHERE tgname = 'trg_marketing_content_updated_at'
   ) THEN
+DROP TRIGGER IF EXISTS trg_marketing_content_updated_at ON public.marketing_content;
     CREATE TRIGGER trg_marketing_content_updated_at
     BEFORE UPDATE ON public.marketing_content
     FOR EACH ROW

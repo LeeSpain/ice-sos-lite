@@ -31,6 +31,7 @@ USING (
 );
 
 -- Create updated_at trigger
+DROP TRIGGER IF EXISTS IF ON public.marketing_campaigns;
 CREATE TRIGGER IF NOT EXISTS update_marketing_campaigns_updated_at
   BEFORE UPDATE ON public.marketing_campaigns
   FOR EACH ROW

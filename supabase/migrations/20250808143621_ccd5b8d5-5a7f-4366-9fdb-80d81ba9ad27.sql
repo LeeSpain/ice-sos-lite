@@ -10,11 +10,12 @@ WITH CHECK (auth.uid() = user_id OR auth.email() = email);
 
 -- Leads: replace permissive policy with admin-only
 DROP POLICY IF EXISTS "System can manage leads" ON public.leads;
+DROP POLICY IF EXISTS "Admins can manage leads" ON public.leads;
 CREATE POLICY "Admins can manage leads"
 ON public.leads
 FOR ALL
-USING (is_admin())
-WITH CHECK (is_admin());
+USING (public.is_admin())
+WITH CHECK (public.is_admin());
 
 -- Gmail tokens: drop permissive system policy
 DROP POLICY IF EXISTS "System can manage gmail tokens" ON public.gmail_tokens;

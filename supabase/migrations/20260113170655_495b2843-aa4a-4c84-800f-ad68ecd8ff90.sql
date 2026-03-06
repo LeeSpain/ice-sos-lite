@@ -34,18 +34,21 @@ ALTER TABLE public.riven_campaign_metrics_daily ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.riven_lead_engagement ENABLE ROW LEVEL SECURITY;
 
 -- RLS policies for riven_campaign_metrics_daily - authenticated read access
+DROP POLICY IF EXISTS "Authenticated users can read campaign metrics" ON public.riven_campaign_metrics_daily;
 CREATE POLICY "Authenticated users can read campaign metrics" 
   ON public.riven_campaign_metrics_daily
   FOR SELECT 
   USING (auth.role() = 'authenticated');
 
 -- Admin can insert/update metrics
+DROP POLICY IF EXISTS "Admins can manage campaign metrics" ON public.riven_campaign_metrics_daily;
 CREATE POLICY "Admins can manage campaign metrics" 
   ON public.riven_campaign_metrics_daily
   FOR ALL 
   USING (public.is_admin());
 
 -- RLS policies for riven_lead_engagement - access only if lead belongs to user
+DROP POLICY IF EXISTS "Users can read their own lead engagement" ON public.riven_lead_engagement;
 CREATE POLICY "Users can read their own lead engagement" 
   ON public.riven_lead_engagement
   FOR SELECT 
@@ -54,6 +57,7 @@ CREATE POLICY "Users can read their own lead engagement"
     OR public.is_admin()
   );
 
+DROP POLICY IF EXISTS "Users can manage their own lead engagement" ON public.riven_lead_engagement;
 CREATE POLICY "Users can manage their own lead engagement" 
   ON public.riven_lead_engagement
   FOR ALL 
@@ -63,6 +67,7 @@ CREATE POLICY "Users can manage their own lead engagement"
   );
 
 -- Trigger for updated_at on riven_lead_engagement
+DROP TRIGGER IF EXISTS update_riven_lead_engagement_updated_at ON public.riven_lead_engagement;
 CREATE TRIGGER update_riven_lead_engagement_updated_at
   BEFORE UPDATE ON public.riven_lead_engagement
   FOR EACH ROW

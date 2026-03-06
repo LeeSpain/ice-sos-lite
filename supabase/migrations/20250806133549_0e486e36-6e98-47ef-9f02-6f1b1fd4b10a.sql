@@ -16,6 +16,7 @@ CREATE TABLE public.whatsapp_accounts (
 ALTER TABLE public.whatsapp_accounts ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "System can manage whatsapp accounts" ON public.whatsapp_accounts;
 CREATE POLICY "System can manage whatsapp accounts" 
 ON public.whatsapp_accounts 
 FOR ALL 
@@ -46,6 +47,7 @@ CREATE TABLE public.whatsapp_conversations (
 ALTER TABLE public.whatsapp_conversations ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "System can manage whatsapp conversations" ON public.whatsapp_conversations;
 CREATE POLICY "System can manage whatsapp conversations" 
 ON public.whatsapp_conversations 
 FOR ALL 
@@ -85,6 +87,7 @@ CREATE TABLE public.whatsapp_messages (
 ALTER TABLE public.whatsapp_messages ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "System can manage whatsapp messages" ON public.whatsapp_messages;
 CREATE POLICY "System can manage whatsapp messages" 
 ON public.whatsapp_messages 
 FOR ALL 
@@ -114,11 +117,13 @@ CREATE TABLE public.phone_verifications (
 ALTER TABLE public.phone_verifications ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Users can manage their own phone verifications" ON public.phone_verifications;
 CREATE POLICY "Users can manage their own phone verifications" 
 ON public.phone_verifications 
 FOR ALL 
 USING (auth.uid() = user_id OR user_id IS NULL);
 
+DROP POLICY IF EXISTS "System can manage phone verifications" ON public.phone_verifications;
 CREATE POLICY "System can manage phone verifications" 
 ON public.phone_verifications 
 FOR ALL 
@@ -144,6 +149,7 @@ CREATE TABLE public.whatsapp_settings (
 ALTER TABLE public.whatsapp_settings ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "System can manage whatsapp settings" ON public.whatsapp_settings;
 CREATE POLICY "System can manage whatsapp settings" 
 ON public.whatsapp_settings 
 FOR ALL 

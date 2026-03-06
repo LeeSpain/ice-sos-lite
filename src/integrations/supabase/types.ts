@@ -4657,48 +4657,124 @@ export type Database = {
           },
         ]
       }
-      sos_incidents: {
+      incident_contacts: {
         Row: {
-          calls_initiated: number
-          completed_at: string | null
-          contact_emails_sent: number
+          call_sid: string | null
+          contact_id: string | null
+          contact_name: string
+          contact_phone: string
           created_at: string
-          error: string | null
           id: string
-          location: string | null
-          notes: string | null
-          status: string
-          triggered_via: string | null
-          updated_at: string
-          user_id: string
+          incident_id: string | null
+          notification_methods: string[]
+          notified_at: string
+          responded_at: string | null
+          response_status: string
         }
         Insert: {
-          calls_initiated?: number
-          completed_at?: string | null
-          contact_emails_sent?: number
+          call_sid?: string | null
+          contact_id?: string | null
+          contact_name: string
+          contact_phone: string
           created_at?: string
-          error?: string | null
           id?: string
-          location?: string | null
-          notes?: string | null
-          status?: string
-          triggered_via?: string | null
-          updated_at?: string
-          user_id: string
+          incident_id?: string | null
+          notification_methods?: string[]
+          notified_at?: string
+          responded_at?: string | null
+          response_status?: string
         }
         Update: {
-          calls_initiated?: number
-          completed_at?: string | null
-          contact_emails_sent?: number
+          call_sid?: string | null
+          contact_id?: string | null
+          contact_name?: string
+          contact_phone?: string
           created_at?: string
-          error?: string | null
           id?: string
-          location?: string | null
-          notes?: string | null
+          incident_id?: string | null
+          notification_methods?: string[]
+          notified_at?: string
+          responded_at?: string | null
+          response_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_contacts_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "sos_incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      incident_timeline: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          incident_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          incident_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          incident_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incident_timeline_incident_id_fkey"
+            columns: ["incident_id"]
+            isOneToOne: false
+            referencedRelation: "sos_incidents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sos_incidents: {
+        Row: {
+          created_at: string
+          id: string
+          member_call_sid: string | null
+          member_id: string | null
+          resolved_at: string | null
+          situation_summary: string | null
+          status: string
+          trigger_method: string
+          triggered_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_call_sid?: string | null
+          member_id?: string | null
+          resolved_at?: string | null
+          situation_summary?: string | null
           status?: string
-          triggered_via?: string | null
+          trigger_method?: string
+          triggered_at?: string
           updated_at?: string
-          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_call_sid?: string | null
+          member_id?: string | null
+          resolved_at?: string | null
+          situation_summary?: string | null
+          status?: string
+          trigger_method?: string
+          triggered_at?: string
+          updated_at?: string
         }
         Relationships: []
       }

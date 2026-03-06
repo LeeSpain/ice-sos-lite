@@ -126,13 +126,17 @@ ALTER TABLE public.campaign_recipients ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.conversation_assignments ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies
+DROP POLICY IF EXISTS "Admin can manage unified conversations" ON public.unified_conversations;
 CREATE POLICY "Admin can manage unified conversations" ON public.unified_conversations FOR ALL USING (true);
+DROP POLICY IF EXISTS "Users can view assigned conversations" ON public.unified_conversations;
 CREATE POLICY "Users can view assigned conversations" ON public.unified_conversations FOR SELECT 
   USING (assigned_to = auth.uid() OR auth.uid() IN (
     SELECT user_id FROM conversation_assignments WHERE conversation_id = id AND is_active = true
   ));
 
+DROP POLICY IF EXISTS "Admin can manage unified messages" ON public.unified_messages;
 CREATE POLICY "Admin can manage unified messages" ON public.unified_messages FOR ALL USING (true);
+DROP POLICY IF EXISTS "Users can view messages in assigned conversations" ON public.unified_messages;
 CREATE POLICY "Users can view messages in assigned conversations" ON public.unified_messages FOR SELECT
   USING (conversation_id IN (
     SELECT id FROM unified_conversations WHERE assigned_to = auth.uid()
@@ -140,20 +144,28 @@ CREATE POLICY "Users can view messages in assigned conversations" ON public.unif
     SELECT conversation_id FROM conversation_assignments WHERE user_id = auth.uid() AND is_active = true
   ));
 
+DROP POLICY IF EXISTS "Admin can manage handovers" ON public.conversation_handovers;
 CREATE POLICY "Admin can manage handovers" ON public.conversation_handovers FOR ALL USING (true);
+DROP POLICY IF EXISTS "Admin can view analytics" ON public.communication_analytics;
 CREATE POLICY "Admin can view analytics" ON public.communication_analytics FOR SELECT USING (true);
+DROP POLICY IF EXISTS "System can insert analytics" ON public.communication_analytics;
 CREATE POLICY "System can insert analytics" ON public.communication_analytics FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admin can manage bulk campaigns" ON public.bulk_campaigns;
 CREATE POLICY "Admin can manage bulk campaigns" ON public.bulk_campaigns FOR ALL USING (true);
+DROP POLICY IF EXISTS "System can manage campaign recipients" ON public.campaign_recipients;
 CREATE POLICY "System can manage campaign recipients" ON public.campaign_recipients FOR ALL USING (true);
+DROP POLICY IF EXISTS "Admin can manage assignments" ON public.conversation_assignments;
 CREATE POLICY "Admin can manage assignments" ON public.conversation_assignments FOR ALL USING (true);
 
 -- Add triggers for updated_at columns
+DROP TRIGGER IF EXISTS update_unified_conversations_updated_at ON public.unified_conversations;
 CREATE TRIGGER update_unified_conversations_updated_at
   BEFORE UPDATE ON public.unified_conversations
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_bulk_campaigns_updated_at ON public.bulk_campaigns;
 CREATE TRIGGER update_bulk_campaigns_updated_at
   BEFORE UPDATE ON public.bulk_campaigns
   FOR EACH ROW
