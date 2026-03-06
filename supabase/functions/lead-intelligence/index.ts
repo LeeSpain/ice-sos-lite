@@ -693,7 +693,13 @@ async function enrollHotLeadInSequence(
   supabase: ReturnType<typeof createClient>,
   leadId: string
 ): Promise<void> {
-  const DEFAULT_SEQUENCE_ID = '11111111-1111-1111-1111-111111111111';
+  // Set DEFAULT_FOLLOWUP_SEQUENCE_ID in Supabase Edge Function secrets
+  const DEFAULT_SEQUENCE_ID = Deno.env.get('DEFAULT_FOLLOWUP_SEQUENCE_ID');
+
+  if (!DEFAULT_SEQUENCE_ID) {
+    console.warn('[lead-intelligence] DEFAULT_FOLLOWUP_SEQUENCE_ID env var not set — skipping hot lead enrollment');
+    return;
+  }
   
   // Check if already enrolled
   const { data: existing } = await supabase

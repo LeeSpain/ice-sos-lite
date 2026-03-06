@@ -228,11 +228,88 @@ Return ONLY valid JSON with "registrationData" and "currentStep" fields.`;
       }
     }
 
-    // If registration is complete, create user account
-    if (updatedData?.complete && updatedData.email) {
+    // When we reach payment_processing step and have required data, create the user account
+    // and generate a Stripe checkout URL so payment can happen immediately
+    let checkoutUrl: string | null = null;
+
+    if (nextStep === 'payment_processing' && updatedData?.email && !updatedData?.user_created) {
       try {
-        logStep("Creating user account", { email: updatedData.email });
-        
+        logStep("Creating user account before payment", { email: updatedData.email });
+
+        const { data: createdUser, error: signUpError } = await supabaseClient.auth.admin.createUser({
+          email: updatedData.email,
+          email_confirm: true,
+          user_metadata: {
+            first_name: updatedData.firstName,
+            last_name: updatedData.lastName,
+            phone: updatedData.phoneNumber,
+            emergency_contacts: JSON.stringify(updatedData.emergencyContacts || []),
+            medical_conditions: updatedData.medicalConditions || '',
+            allergies: updatedData.allergies || '',
+            current_location: updatedData.currentLocation || '',
+            preferred_language: updatedData.preferredLanguage || 'English',
+            registration_session: sessionId,
+          },
+        });
+
+        if (signUpError) {
+          logStep("User creation error", signUpError);
+        } else {
+          logStep("User account created, generating checkout");
+          updatedData.user_created = true;
+          updatedData.user_id = createdUser.user?.id;
+
+          // Look up plan IDs from subscription_plans table
+          const selectedPlans: string[] = updatedData.plans || [];
+          if (selectedPlans.length > 0) {
+            const { data: plans } = await supabaseClient
+              .from('subscription_plans')
+              .select('id, name')
+              .or(
+                selectedPlans
+                  .map((p: string) => `name.ilike.%${p}%`)
+                  .join(',')
+              )
+              .eq('is_active', true);
+
+            const planIds = plans?.map((p: { id: string }) => p.id) || [];
+
+            if (planIds.length > 0) {
+              // Generate a sign-in link for the new user so create-checkout can auth them
+              const { data: linkData } = await supabaseClient.auth.admin.generateLink({
+                type: 'magiclink',
+                email: updatedData.email,
+              });
+
+              // Store planned checkout info in the conversation session so the frontend can redirect
+              await supabaseClient.from('conversations').insert({
+                session_id: sessionId,
+                message_type: 'system',
+                content: JSON.stringify({
+                  action: 'redirect_checkout',
+                  plan_ids: planIds,
+                  user_id: createdUser.user?.id,
+                  magic_link: linkData?.properties?.action_link || null,
+                }),
+                metadata: { step: 'payment_processing' },
+              });
+
+              logStep("Checkout redirect prepared", { planIds });
+              // Return a checkout URL flag for the frontend to handle
+              checkoutUrl = `/checkout?plans=${planIds.join(',')}&session=${sessionId}`;
+            }
+          }
+        }
+      } catch (error) {
+        logStep("Account creation or checkout setup failed", error);
+      }
+    }
+
+    // If registration marked complete AND user not yet created, create account now
+    if (updatedData?.complete && updatedData.email && !updatedData?.user_created) {
+      try {
+        logStep("Creating user account at completion", { email: updatedData.email });
+
         const { error: signUpError } = await supabaseClient.auth.admin.createUser({
           email: updatedData.email,
           email_confirm: true,
@@ -245,14 +322,14 @@ Return ONLY valid JSON with "registrationData" and "currentStep" fields.`;
             allergies: updatedData.allergies || '',
             current_location: updatedData.currentLocation || '',
             preferred_language: updatedData.preferredLanguage || 'English',
-            registration_session: sessionId
-          }
+            registration_session: sessionId,
+          },
         });
 
         if (signUpError) {
           logStep("User creation error", signUpError);
         } else {
-          logStep("User account created successfully");
+          logStep("User account created successfully at completion");
         }
       } catch (error) {
         logStep("Account creation failed", error);
@@ -264,7 +341,8 @@ Return ONLY valid JSON with "registrationData" and "currentStep" fields.`;
         response: claraResponse,
         registrationData: updatedData,
         currentStep: nextStep,
-        sessionId
+        sessionId,
+        checkoutUrl,
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

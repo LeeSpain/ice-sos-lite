@@ -130,7 +130,7 @@ async function generateAutoReply(
 // Check routing rules and determine actions
 async function checkRoutingRules(categorization: any, messageContent: string) {
   const { data: rules, error } = await supabase
-    .from('routing_rules')
+    .from('conversation_routing_rules')
     .select('*')
     .eq('is_active', true)
     .order('priority');
@@ -262,12 +262,53 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Failed to queue auto-reply: ${queueError.message}`);
     }
 
-    // Step 7: If no approval required, mark as ready to send
+    // Step 7: If no approval required, send immediately via email_queue + email-processor
     if (!actionConfig.require_approval) {
-      console.log('Auto-reply approved automatically, ready to send');
-      
-      // You could trigger actual sending here via another function
-      // await supabase.functions.invoke('send-auto-reply', { data: { queue_id: queueItem.id } });
+      console.log('Auto-reply approved automatically, queuing for send');
+
+      // Resolve recipient email from sender_info
+      const recipientEmail = sender_info?.email || sender_info?.sender_email || null;
+
+      if (recipientEmail) {
+        const { data: emailQueueItem, error: emailQueueError } = await supabase
+          .from('email_queue')
+          .insert({
+            recipient_email: recipientEmail,
+            subject: actionConfig.reply_subject || 'Re: Your message to ICE SOS',
+            body: generatedReply,
+            text_content: generatedReply.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim(),
+            status: 'pending',
+            priority: categorization.urgency === 'high' ? 10 : 5,
+            scheduled_at: new Date().toISOString(),
+            metadata: {
+              auto_reply: true,
+              conversation_id,
+              queue_id: queueItem.id,
+              category: categorization.category,
+            },
+          })
+          .select('id')
+          .single();
+
+        if (emailQueueError) {
+          console.error('Failed to queue auto-reply email:', emailQueueError);
+        } else {
+          console.log('Auto-reply email queued:', emailQueueItem?.id);
+
+          // Trigger email-processor to send immediately (fire and forget)
+          supabase.functions.invoke('email-processor', {
+            body: { action: 'send_single', email_id: emailQueueItem?.id },
+          }).catch((err: Error) => console.error('email-processor invoke error:', err));
+
+          // Mark auto_reply_queue item as sent
+          await supabase
+            .from('auto_reply_queue')
+            .update({ status: 'sent', scheduled_send_at: new Date().toISOString() })
+            .eq('id', queueItem.id);
+        }
+      } else {
+        console.warn('No recipient email in sender_info — reply queued in auto_reply_queue but not sent');
+      }
     }
 
     return new Response(JSON.stringify({ 

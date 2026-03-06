@@ -183,9 +183,18 @@ async function applyRuleAction(
 }
 
 // Action implementations
+async function getConversationMetadata(conversationId: string): Promise<Record<string, any>> {
+  const { data } = await supabase
+    .from('unified_conversations')
+    .select('metadata')
+    .eq('id', conversationId)
+    .single();
+  return data?.metadata || {};
+}
+
 async function assignCategory(conversationId: string, actionConfig: any, categorization?: any) {
   const categoryName = actionConfig.category_name;
-  
+
   // Find category by name
   const { data: category, error } = await supabase
     .from('conversation_categories')
@@ -198,20 +207,22 @@ async function assignCategory(conversationId: string, actionConfig: any, categor
     return { success: false, error: `Category ${categoryName} not found` };
   }
 
-  // Update conversation metadata
+  // Merge into existing metadata — never replace
+  const existing = await getConversationMetadata(conversationId);
   const { error: updateError } = await supabase
     .from('unified_conversations')
     .update({
       metadata: {
+        ...existing,
         category_id: category.id,
         category_name: categoryName,
         auto_categorized: true,
-        categorization_confidence: categorization?.confidence || 0
+        categorization_confidence: categorization?.confidence || 0,
       }
     })
     .eq('id', conversationId);
 
-  return updateError 
+  return updateError
     ? { success: false, error: updateError.message }
     : { success: true, category_id: category.id };
 }
@@ -219,18 +230,21 @@ async function assignCategory(conversationId: string, actionConfig: any, categor
 async function assignUser(conversationId: string, actionConfig: any) {
   const userId = actionConfig.user_id;
 
+  // Merge into existing metadata
+  const existing = await getConversationMetadata(conversationId);
   const { error } = await supabase
     .from('unified_conversations')
     .update({
       metadata: {
+        ...existing,
         assigned_to: userId,
         assigned_at: new Date().toISOString(),
-        auto_assigned: true
+        auto_assigned: true,
       }
     })
     .eq('id', conversationId);
 
-  return error 
+  return error
     ? { success: false, error: error.message }
     : { success: true, assigned_to: userId };
 }
@@ -238,22 +252,36 @@ async function assignUser(conversationId: string, actionConfig: any) {
 async function triggerWorkflow(actionConfig: any, conversationId: string, senderInfo?: any) {
   const workflowName = actionConfig.workflow_name;
 
-  // Trigger workflow via workflow-automation function
-  const response = await supabase.functions.invoke('workflow-automation', {
-    body: {
-      action: 'trigger_workflow',
-      trigger_type: 'conversation_category',
-      conversation_id: conversationId,
-      event_data: {
-        workflow_name: workflowName,
-        sender_info: senderInfo
-      }
-    }
-  });
+  // Log the workflow trigger intent — the workflow-automation function
+  // should be implemented and deployed for this action to execute.
+  // For now, record the intent in the conversation metadata so it
+  // can be processed manually or picked up by a future worker.
+  console.warn(`[smart-routing] triggerWorkflow called for "${workflowName}" but workflow-automation function is not yet deployed. Recording intent.`);
 
-  return response.error
-    ? { success: false, error: response.error.message }
-    : { success: true, workflow_triggered: workflowName };
+  const existing = await getConversationMetadata(conversationId);
+  const pendingWorkflows: string[] = existing.pending_workflows || [];
+  pendingWorkflows.push(workflowName);
+
+  const { error } = await supabase
+    .from('unified_conversations')
+    .update({
+      metadata: {
+        ...existing,
+        pending_workflows: pendingWorkflows,
+        last_workflow_trigger_at: new Date().toISOString(),
+      }
+    })
+    .eq('id', conversationId);
+
+  if (error) {
+    console.error(`[smart-routing] Failed to record workflow intent:`, error);
+  }
+
+  return {
+    success: false,
+    error: 'workflow-automation function not deployed — intent recorded in conversation metadata',
+    workflow_name: workflowName,
+  };
 }
 
 async function triggerAutoReply(conversationId: string, messageContent: string, actionConfig: any) {
@@ -275,19 +303,22 @@ async function escalateConversation(conversationId: string, actionConfig: any) {
   const escalationLevel = actionConfig.level || 'high';
   const escalateTo = actionConfig.escalate_to;
 
+  // Merge into existing metadata
+  const existing = await getConversationMetadata(conversationId);
   const { error } = await supabase
     .from('unified_conversations')
     .update({
       metadata: {
+        ...existing,
         escalated: true,
         escalation_level: escalationLevel,
         escalated_to: escalateTo,
-        escalated_at: new Date().toISOString()
+        escalated_at: new Date().toISOString(),
       }
     })
     .eq('id', conversationId);
 
-  return error 
+  return error
     ? { success: false, error: error.message }
     : { success: true, escalated: true, level: escalationLevel };
 }
@@ -327,20 +358,23 @@ async function addConversationTag(conversationId: string, actionConfig: any) {
 async function setPriority(conversationId: string, actionConfig: any) {
   const priority = actionConfig.priority || 3;
 
+  // Merge into existing metadata
+  const existing = await getConversationMetadata(conversationId);
   const { error } = await supabase
     .from('unified_conversations')
     .update({
       metadata: {
-        priority: priority,
+        ...existing,
+        priority,
         priority_set_at: new Date().toISOString(),
-        auto_prioritized: true
+        auto_prioritized: true,
       }
     })
     .eq('id', conversationId);
 
-  return error 
+  return error
     ? { success: false, error: error.message }
-    : { success: true, priority: priority };
+    : { success: true, priority };
 }
 
 const handler = async (req: Request): Promise<Response> => {

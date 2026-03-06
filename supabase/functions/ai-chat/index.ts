@@ -191,7 +191,7 @@ serve(async (req) => {
     // Get active customer-facing training data for enhanced knowledge
     const { data: trainingData } = await supabase
       .from('training_data')
-      .select('question, answer, category')
+      .select('question, answer, category, usage_count')
       .eq('status', 'active')
       .eq('audience', 'customer')
       .order('confidence_score', { ascending: false })
@@ -312,7 +312,7 @@ serve(async (req) => {
         await supabase
           .from('training_data')
           .update({
-            usage_count: item.usage_count ? item.usage_count + 1 : 1,
+            usage_count: (item.usage_count ?? 0) + 1,
             last_used_at: new Date().toISOString()
           })
           .eq('question', item.question)

@@ -13,6 +13,11 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'esnext',
     minify: 'esbuild',
+    ...(mode === 'production' && {
+      esbuildOptions: {
+        drop: ['console', 'debugger'],
+      },
+    }),
     rollupOptions: {
       output: {
         manualChunks: {

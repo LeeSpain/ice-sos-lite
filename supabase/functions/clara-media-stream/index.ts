@@ -124,7 +124,7 @@ Deno.serve(async (req: Request) => {
           console.log("👤 User said:", transcript);
 
           // Analyze for confirmation and ETA
-          await analyzeSponseAndUpdate(transcript, conferenceName, supabase);
+          await analyzeResponseAndUpdate(transcript, conferenceName, supabase);
           break;
 
         case "error":

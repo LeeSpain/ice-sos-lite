@@ -10,23 +10,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Shield, 
-  Phone, 
-  MapPin, 
-  Settings, 
-  Users, 
-  Battery, 
-  Clock, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Wifi, 
+import {
+  Shield,
+  Phone,
+  MapPin,
+  Settings,
+  Users,
+  AlertTriangle,
+  CheckCircle2,
+  Wifi,
   Signal,
-  Camera,
-  Mic,
   PhoneCall,
   MessageSquare,
-  History,
   Navigation,
   RefreshCw
 } from 'lucide-react';
@@ -45,7 +40,6 @@ interface EmergencyStatus {
   location: boolean;
   contacts: number;
   network: boolean;
-  battery: number;
 }
 
 interface ActiveIncident {
@@ -86,12 +80,12 @@ const SOSAppPage = () => {
 
   const [selectedTab, setSelectedTab] = useState('status');
   const [selectedFamilyMember, setSelectedFamilyMember] = useState<string | null>(null);
+  const [memberNames, setMemberNames] = useState<Record<string, string>>({});
   const [emergencyStatus, setEmergencyStatus] = useState<EmergencyStatus>({
     overall: 'ready',
     location: permissionState?.granted || false,
     contacts: contacts.length,
     network: navigator.onLine,
-    battery: 85 // Mock battery level
   });
   const [activeIncident, setActiveIncident] = useState<ActiveIncident | null>(null);
 
@@ -101,14 +95,13 @@ const SOSAppPage = () => {
       location: permissionState?.granted || false,
       contacts: contacts.length,
       network: navigator.onLine,
-      battery: 85, // Mock - in real app would get from device
       overall: 'ready'
     };
 
     // Determine overall status
     if (!newStatus.location || newStatus.contacts === 0) {
       newStatus.overall = 'warning';
-    } else if (!newStatus.network || newStatus.battery < 20) {
+    } else if (!newStatus.network) {
       newStatus.overall = 'error';
     }
 
@@ -126,6 +119,28 @@ const SOSAppPage = () => {
     
     initializeFamilyGroup();
   }, [user, familyGroupId]);
+
+  // Fetch display names for family members visible on the map
+  useEffect(() => {
+    const otherIds = liveLocations
+      .map(l => l.user_id)
+      .filter(id => id !== user?.id && !memberNames[id]);
+    if (otherIds.length === 0) return;
+
+    supabase
+      .from('profiles')
+      .select('user_id, first_name, last_name')
+      .in('user_id', otherIds)
+      .then(({ data }) => {
+        if (!data) return;
+        const names: Record<string, string> = {};
+        data.forEach(p => {
+          const name = [p.first_name, p.last_name].filter(Boolean).join(' ');
+          names[p.user_id] = name || 'Family Member';
+        });
+        setMemberNames(prev => ({ ...prev, ...names }));
+      });
+  }, [liveLocations, user?.id]);
 
   // Initialize location tracking once for emergency purposes
   const trackingInitialized = useRef(false);
@@ -225,7 +240,6 @@ const SOSAppPage = () => {
         isEmergency: false, // Changed to false - only emergency during actual SOS
         status: 'online' as const,
         accuracy: currentLocation.accuracy,
-        batteryLevel: emergencyStatus.battery,
         render: () => null
       };
       markers.push(marker);
@@ -243,7 +257,7 @@ const SOSAppPage = () => {
           id: `live-${location.user_id}`,
           lat: Number(location.latitude.toFixed(6)),
           lng: Number(location.longitude.toFixed(6)),
-          name: `Family Member`,
+          name: memberNames[location.user_id] || 'Family Member',
           status: location.status,
           accuracy: location.accuracy,
           speed: location.speed,
@@ -254,25 +268,6 @@ const SOSAppPage = () => {
       }
     });
 
-    // Add emergency contacts as markers only if no family member is selected
-    if (!selectedFamilyMember && currentLocation?.latitude && currentLocation?.longitude && contacts.length > 0) {
-      contacts.slice(0, 3).forEach((contact, index) => {
-        // Simulate emergency contacts being nearby (in a real app, they'd have actual GPS coordinates)
-        const offsetLat = (Math.random() - 0.5) * 0.01; // Random offset within ~1km
-        const offsetLng = (Math.random() - 0.5) * 0.01;
-        
-        markers.push({
-          id: `contact-${contact.id || index}`,
-          lat: currentLocation.latitude + offsetLat,
-          lng: currentLocation.longitude + offsetLng,
-          name: contact.name,
-          status: 'idle' as const, // Emergency contacts shown as idle
-          isEmergency: false,
-          render: () => null
-        });
-      });
-    }
-    
     return markers;
   }, [
     currentLocation?.latitude?.toFixed(6),
@@ -280,9 +275,10 @@ const SOSAppPage = () => {
     liveLocations,
     contacts,
     selectedFamilyMember,
+    memberNames,
     user?.id,
     user?.user_metadata?.full_name,
-    user?.user_metadata?.avatar_url
+    user?.user_metadata?.avatar_url,
   ]);
 
   return (
@@ -311,11 +307,9 @@ const SOSAppPage = () => {
             </div>
             <div className="flex items-center gap-2">
               <Signal className="h-4 w-4" />
-              <Battery className="h-4 w-4" />
-              <span className="text-sm">{emergencyStatus.battery}%</span>
-               {locationState.isTracking && (
-                 <div className="flex items-center gap-1 text-emerald-400">
-                   <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+              {locationState.isTracking && (
+                <div className="flex items-center gap-1 text-emerald-400">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                   <span className="text-xs">Live</span>
                 </div>
               )}
@@ -354,10 +348,6 @@ const SOSAppPage = () => {
             <div className="flex items-center gap-2 text-white/80">
               <Wifi className="h-4 w-4" />
               <span>Network: {emergencyStatus.network ? 'Connected' : 'Offline'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/80">
-              <Battery className="h-4 w-4" />
-              <span>Battery: {emergencyStatus.battery}%</span>
             </div>
             </div>
             
@@ -413,38 +403,6 @@ const SOSAppPage = () => {
               {/* Emergency Button */}
               <div className="flex justify-center mb-8">
                 <EmergencyButton />
-              </div>
-
-              {/* Quick Actions */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <Button 
-                  className="h-16 bg-blue-600/20 border border-blue-500/30 text-white hover:bg-blue-600/30"
-                  onClick={() => {
-                    toast({
-                      title: "Photo Capture",
-                      description: "Emergency photo capture feature activated",
-                    });
-                  }}
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <Camera className="h-6 w-6" />
-                    <span className="text-sm">Photo</span>
-                  </div>
-                </Button>
-                <Button 
-                  className="h-16 bg-purple-600/20 border border-purple-500/30 text-white hover:bg-purple-600/30"
-                  onClick={() => {
-                    toast({
-                      title: "Voice Memo",
-                      description: "Emergency voice recording started",
-                    });
-                  }}
-                >
-                  <div className="flex flex-col items-center gap-2">
-                    <Mic className="h-6 w-6" />
-                    <span className="text-sm">Voice</span>
-                  </div>
-                </Button>
               </div>
 
               {/* Live Location Map - Always show with fallback */}
@@ -582,7 +540,7 @@ const SOSAppPage = () => {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <div className="text-white font-medium text-sm">Family Member {index + 1}</div>
+                        <div className="text-white font-medium text-sm">{memberNames[location.user_id] || `Family Member ${index + 1}`}</div>
                         <div className="text-white/60 text-xs">{location.status}</div>
                       </div>
                       <Button 

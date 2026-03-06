@@ -10,6 +10,7 @@ import OptimizedSuspense from '@/components/OptimizedSuspense';
 import EnhancedErrorBoundary from '@/components/EnhancedErrorBoundary';
 import { AnalyticsProvider } from '@/components/analytics/AnalyticsProvider';
 import { usePageTracking } from '@/hooks/usePageTracking';
+import CookieConsent from '@/components/CookieConsent';
 
 // Import all pages
 import Index from "./pages/Index";
@@ -22,8 +23,6 @@ import MapScreen from "./pages/MapScreen";
 import MyCirclesPage from "./pages/MyCirclesPage";
 import PlacesManager from "./pages/PlacesManager";
 import LocationHistoryPage from "./pages/LocationHistoryPage";
-import MapDemo from "./pages/MapDemo";
-
 // Dashboard Pages
 import DashboardRedirect from "./components/DashboardRedirect";
 import Dashboard from "./pages/Dashboard";
@@ -47,7 +46,13 @@ import FamilyCarerAccessPage from "./pages/FamilyCarerAccess";
 // Interactive and Mobile Pages
 import FamilyAccessSetup from "./pages/FamilyAccessSetup";
 import AIRegister from "./pages/AIRegister";
-import TestRegistration from "./pages/TestRegistration";
+
+// Invite / Connection Accept Pages
+import { ConnectionAcceptPage } from "./pages/ConnectionAcceptPage";
+import FamilyInviteAccept from "./pages/FamilyInviteAccept";
+
+// 404
+import NotFound from "./pages/NotFound";
 
 // Payment Pages
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -59,9 +64,6 @@ import OnboardingPage from "./pages/OnboardingPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
 import CheckoutCancelPage from "./pages/CheckoutCancelPage";
-
-// Test Pages  
-import TestPage from "./pages/TestPage";
 
 // Device Pages
 import DeviceIceSosPendant from "./pages/DeviceIceSosPendant";
@@ -105,12 +107,6 @@ function AppWithTracking() {
                     <AIRegister />
                   </OptimizedSuspense>
                 } />
-                <Route path="/test-registration" element={
-                  <OptimizedSuspense skeletonType="card">
-                    <TestRegistration />
-                  </OptimizedSuspense>
-                } />
-
                 {/* Blog Pages */}
                 <Route path="/blog" element={
                   <OptimizedSuspense skeletonType="card">
@@ -349,16 +345,16 @@ function AppWithTracking() {
                   </ProtectedRoute>
                 } />
 
-                {/* Demo and Test Pages */}
-                <Route path="/map-demo" element={
+                {/* Invite & Connection Accept Pages */}
+                <Route path="/connect/:token" element={
                   <OptimizedSuspense skeletonType="card">
-                    <MapDemo />
+                    <ConnectionAcceptPage />
                   </OptimizedSuspense>
                 } />
 
-                 <Route path="/test" element={
+                <Route path="/family-invite/:token" element={
                   <OptimizedSuspense skeletonType="card">
-                    <TestPage />
+                    <FamilyInviteAccept />
                   </OptimizedSuspense>
                 } />
 
@@ -399,10 +395,10 @@ function AppWithTracking() {
                   <Navigate to="/member-dashboard/profile" replace />
                 } />
 
-                {/* Catch all route */}
+                {/* 404 - catch all */}
                 <Route path="*" element={
                   <OptimizedSuspense skeletonType="card">
-                    <Index />
+                    <NotFound />
                   </OptimizedSuspense>
                 } />
               </Routes>
@@ -422,6 +418,7 @@ function App() {
             <ClaraChatProvider>
               <AppWithTracking />
               <GlobalClaraChat />
+              <CookieConsent />
             </ClaraChatProvider>
           </AnalyticsProvider>
         </EnhancedErrorBoundary>

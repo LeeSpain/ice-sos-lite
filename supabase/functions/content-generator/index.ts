@@ -249,7 +249,7 @@ For BLOG POSTS:
 
 async function generateImage(imagePrompt: string, apiKey: string): Promise<string> {
   console.log('Generating image with prompt:', imagePrompt);
-  
+
   const response = await fetch('https://api.openai.com/v1/images/generations', {
     method: 'POST',
     headers: {
@@ -258,11 +258,11 @@ async function generateImage(imagePrompt: string, apiKey: string): Promise<strin
     },
     body: JSON.stringify({
       model: 'gpt-image-1',
-      prompt: imagePrompt + " - High quality, professional, suitable for social media marketing",
+      prompt: imagePrompt + ' - High quality, professional, suitable for social media marketing',
       size: '1024x1024',
       quality: 'high',
       output_format: 'png',
-      n: 1
+      n: 1,
     }),
   });
 
@@ -272,18 +272,39 @@ async function generateImage(imagePrompt: string, apiKey: string): Promise<strin
   }
 
   const data = await response.json();
-  
-  // gpt-image-1 returns base64, we need to convert and store
-  if (data.data && data.data[0]) {
-    const base64Image = data.data[0].b64_json;
-    if (base64Image) {
-      // In production, upload to storage and return URL
-      // For now, return base64 data URL
-      return `data:image/png;base64,${base64Image}`;
-    }
+
+  if (!data.data?.[0]?.b64_json) {
+    throw new Error('No image data received from OpenAI');
   }
-  
-  throw new Error('No image data received');
+
+  const base64Image: string = data.data[0].b64_json;
+
+  // Upload to Supabase Storage — avoids storing large base64 blobs in DB rows
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+  const imageBytes = Uint8Array.from(atob(base64Image), (c) => c.charCodeAt(0));
+  const fileName = `generated/${crypto.randomUUID()}.png`;
+
+  const uploadResponse = await fetch(`${supabaseUrl}/storage/v1/object/marketing-images/${fileName}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${supabaseKey}`,
+      'Content-Type': 'image/png',
+      'x-upsert': 'true',
+    },
+    body: imageBytes,
+  });
+
+  if (!uploadResponse.ok) {
+    const uploadError = await uploadResponse.text();
+    console.error('Storage upload failed:', uploadError);
+    // Fallback: return base64 data URL so content generation still works
+    return `data:image/png;base64,${base64Image}`;
+  }
+
+  // Return the public URL
+  return `${supabaseUrl}/storage/v1/object/public/marketing-images/${fileName}`;
 }
 
 async function storeGeneratedContent(request: ContentRequest, content: GeneratedContent): Promise<string> {
