@@ -142,14 +142,14 @@ const AppPreviewSection: React.FC = () => {
                   </div>
 
                   <div className="flex items-center space-x-4">
-                    <div className="w-12 h-12 bg-guardian rounded-full flex items-center justify-center text-white font-bold border-4 border-white shadow-lg">
+                    <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold border-4 border-white shadow-lg">
                       4
                     </div>
                     <div className="flex-1">
-                      <h5 className="font-semibold text-sm">{t('common.professionalResponse')}</h5>
-                      <p className="text-xs text-muted-foreground">{t('common.monitoringCenter')}</p>
+                      <h5 className="font-semibold text-sm">{t('common.familyResponse', { defaultValue: 'Family Response' })}</h5>
+                      <p className="text-xs text-muted-foreground">{t('common.contactsRespond', { defaultValue: 'Your contacts confirm they are on the way' })}</p>
                     </div>
-                    <Users className="h-6 w-6 text-guardian" />
+                    <Users className="h-6 w-6 text-primary" />
                   </div>
                 </div>
 
@@ -165,25 +165,21 @@ const AppPreviewSection: React.FC = () => {
                       <div className="text-xs text-muted-foreground">{t('common.responseTime')}</div>
                     </div>
                   </div>
-                  
-                  <div className="grid grid-cols-3 gap-3 mb-4">
+
+                  <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="text-center p-2 bg-white/60 rounded-lg">
-                      <div className="text-lg font-bold text-wellness">99.8%</div>
-                      <div className="text-xs text-muted-foreground">{t('common.successRate')}</div>
-                    </div>
-                    <div className="text-center p-2 bg-white/60 rounded-lg">
-                      <div className="text-lg font-bold text-guardian">24/7</div>
+                      <div className="text-lg font-bold text-primary">24/7</div>
                       <div className="text-xs text-muted-foreground">{t('common.monitoring')}</div>
                     </div>
                     <div className="text-center p-2 bg-white/60 rounded-lg">
-                      <div className="text-lg font-bold text-emergency">180+</div>
-                      <div className="text-xs text-muted-foreground">{t('common.countries')}</div>
+                      <div className="text-lg font-bold text-wellness">{t('common.multiLanguage', { defaultValue: '3 Languages' })}</div>
+                      <div className="text-xs text-muted-foreground">{t('common.enEsNl', { defaultValue: 'EN, ES, NL' })}</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                     <Shield className="h-3 w-3 text-primary" />
-                    <span>{t('common.professionalNetwork')}</span>
+                    <span>{t('common.aiPoweredProtection', { defaultValue: 'AI-powered emergency coordination' })}</span>
                   </div>
                 </div>
               </div>

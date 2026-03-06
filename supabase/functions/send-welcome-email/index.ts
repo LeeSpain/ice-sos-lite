@@ -34,8 +34,9 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Create personalized welcome email content
     const fullName = firstName && lastName ? `${firstName} ${lastName}` : firstName || "Valued Customer";
-    const dashboardUrl = `${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '')}.lovableproject.com/dashboard`;
-    const supportUrl = `${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '')}.lovableproject.com/dashboard/support`;
+    const siteUrl = Deno.env.get("SITE_URL") || `${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '')}.lovableproject.com`;
+    const onboardingUrl = `${siteUrl}/onboarding`;
+    const supportUrl = `${siteUrl}/support`;
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -61,16 +62,11 @@ const handler = async (req: Request): Promise<Response> => {
               <h2>Hello ${fullName}!</h2>
               <p>Thank you for joining ICE SOS, the ultimate personal safety platform. Your account has been successfully created and you're now protected by our advanced emergency response system.</p>
               
-              <h3>🚀 Get Started:</h3>
-              <ul>
-                <li>Complete your profile and emergency contacts</li>
-                <li>Set up your medical information</li>
-                <li>Download our mobile app for instant SOS alerts</li>
-                <li>Configure your location sharing preferences</li>
-              </ul>
+              <h3>Complete Your Setup</h3>
+              <p>Click the button below to finish setting up your safety profile. It only takes 3 minutes and ensures help reaches you fast when it matters.</p>
 
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${dashboardUrl}" class="button">Access Your Dashboard</a>
+                <a href="${onboardingUrl}" class="button">Complete Your Setup</a>
                 <a href="${supportUrl}" class="button" style="background: #10B981;">Get Support</a>
               </div>
 
@@ -87,10 +83,10 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
               ` : ''}
 
-              <h3>📱 Next Steps:</h3>
-              <p>1. <strong>Complete Your Profile:</strong> Add your emergency contacts and medical information<br>
-              2. <strong>Test the System:</strong> Try the SOS button in a safe environment<br>
-              3. <strong>Share with Family:</strong> Invite family members to your safety network</p>
+              <h3>What You'll Set Up:</h3>
+              <p>1. <strong>Personal & Medical Info:</strong> So responders know who you are<br>
+              2. <strong>Emergency Contacts:</strong> People who will be called when you need help<br>
+              3. <strong>Notifications:</strong> Real-time alerts for you and your family</p>
 
               <p>If you have any questions, our AI assistant Clara is available 24/7 to help you.</p>
             </div>

@@ -158,17 +158,17 @@ const AppDownload = () => {
               <div className="absolute -left-8 top-20 bg-white rounded-xl p-4 shadow-xl border border-primary/20 max-w-48">
                 <div className="flex items-center mb-2">
                   <MessageCircle className="h-4 w-4 text-primary mr-2" />
-                  <span className="font-semibold text-sm">Natural Language</span>
+                  <span className="font-semibold text-sm">{t('appDownload.floatingCards.naturalLanguage', { defaultValue: 'Natural Language' })}</span>
                 </div>
-                <p className="text-xs text-gray-600">Speaks your language naturally</p>
+                <p className="text-xs text-gray-600">{t('appDownload.floatingCards.naturalLanguageDesc', { defaultValue: 'Speaks your language naturally' })}</p>
               </div>
 
               <div className="absolute -right-8 bottom-32 bg-white rounded-xl p-4 shadow-xl border border-secondary/20 max-w-48">
                 <div className="flex items-center mb-2">
                   <Zap className="h-4 w-4 text-secondary mr-2" />
-                  <span className="font-semibold text-sm">Instant Response</span>
+                  <span className="font-semibold text-sm">{t('appDownload.floatingCards.instantResponse', { defaultValue: 'Instant Response' })}</span>
                 </div>
-                <p className="text-xs text-gray-600">24/7 immediate assistance</p>
+                <p className="text-xs text-gray-600">{t('appDownload.floatingCards.instantResponseDesc', { defaultValue: '24/7 immediate assistance' })}</p>
               </div>
             </div>
 

@@ -59,8 +59,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import FamilyCheckoutSuccess from "./pages/FamilyCheckoutSuccess";
 import FamilyCheckoutCanceled from "./pages/FamilyCheckoutCanceled";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
-import WelcomeQuestionnaire from "./components/WelcomeQuestionnaire";
-import OnboardingPage from "./pages/OnboardingPage";
+import OnboardingWizard from "./components/onboarding/OnboardingWizard";
 import CheckoutPage from "./pages/CheckoutPage";
 import CheckoutSuccessPage from "./pages/CheckoutSuccessPage";
 import CheckoutCancelPage from "./pages/CheckoutCancelPage";
@@ -217,9 +216,7 @@ function AppWithTracking() {
                 
                 <Route path="/welcome-questionnaire" element={
                   <ProtectedRoute>
-                    <OptimizedSuspense skeletonType="card">
-                      <WelcomeQuestionnaire />
-                    </OptimizedSuspense>
+                    <Navigate to="/onboarding" replace />
                   </ProtectedRoute>
                 } />
 
@@ -232,12 +229,18 @@ function AppWithTracking() {
                   </ProtectedRoute>
                 } />
 
-                {/* Onboarding Route */}
-                <Route path="/dashboard/onboarding" element={
+                {/* Onboarding Wizard */}
+                <Route path="/onboarding" element={
                   <ProtectedRoute>
                     <OptimizedSuspense skeletonType="card">
-                      <OnboardingPage />
+                      <OnboardingWizard />
                     </OptimizedSuspense>
+                  </ProtectedRoute>
+                } />
+                {/* Legacy redirect */}
+                <Route path="/dashboard/onboarding" element={
+                  <ProtectedRoute>
+                    <Navigate to="/onboarding" replace />
                   </ProtectedRoute>
                 } />
                 

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Phone, Users, Bot, Clock, Globe, Video, MessageCircle, AlertCircle } from 'lucide-react';
+import { Phone, Users, Bot, Clock, Globe, Video, MessageCircle, AlertCircle, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
@@ -137,7 +138,7 @@ const HowItWorks: React.FC = () => {
             <AlertCircle className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />
             <div>
               <h3 className="text-2xl font-bold text-red-900 dark:text-red-100 mb-3">
-                ⚠️ {t('howItWorks.disclaimer.title')}
+                {t('howItWorks.disclaimer.title')}
               </h3>
               <p className="text-lg text-red-800 dark:text-red-200 mb-4">
                 {t('howItWorks.disclaimer.message')}
@@ -180,27 +181,21 @@ const HowItWorks: React.FC = () => {
               }}
             >
               <MessageCircle className="mr-2 h-5 w-5" />
-              💬 {t('howItWorks.chatWithClara')}
+              {t('howItWorks.chatWithClara')}
             </Button>
             <Button
+              asChild
               size="lg"
               variant="outline"
-              onClick={() => {
-                const claraWidget = document.querySelector('[data-clara-trigger]');
-                if (claraWidget) {
-                  (claraWidget as HTMLElement).click();
-                  setTimeout(() => {
-                    // Trigger callback request
-                  }, 500);
-                }
-              }}
             >
-              <Phone className="mr-2 h-5 w-5" />
-              📞 {t('howItWorks.callNow')}
+              <Link to="/ai-register">
+                <Shield className="mr-2 h-5 w-5" />
+                {t('finalCta.startProtection')}
+              </Link>
             </Button>
           </div>
           <p className="text-sm text-muted-foreground mt-4">
-            🌍 {t('howItWorks.availabilityNotice')}
+            {t('howItWorks.availabilityNotice')}
           </p>
         </div>
       </div>

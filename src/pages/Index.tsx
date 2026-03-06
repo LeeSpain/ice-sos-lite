@@ -4,7 +4,6 @@ import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import HowItWorks from "@/components/HowItWorks";
-import FamilyCarerAccess from "@/components/FamilyCarerAccess";
 import Pricing from "@/components/Pricing";
 import AppDownload from "@/components/AppDownload";
 import FinalCTA from "@/components/FinalCTA";
@@ -59,9 +58,7 @@ const Index = () => {
       <AppPreviewSection />
 
       <Pricing />
-      
-      <FamilyCarerAccess />
-      
+
       <AppDownload />
       <FinalCTA />
       <Footer />

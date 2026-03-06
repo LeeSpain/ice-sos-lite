@@ -52,12 +52,12 @@ const Hero = ({ onClaraClick }: HeroProps) => {
             </p>
             
 
-            <div className="flex flex-col sm:flex-row gap-6 justify-center lg:justify-start">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
               {/* Join Now Button - Primary CTA */}
-              <Button 
+              <Button
                 asChild
-                size="xl" 
-                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                size="xl"
+                className="bg-emergency text-white hover:bg-emergency/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-bold text-lg px-10 py-4 rounded-xl"
                 onClick={handleJoinNowClick}
               >
                 <Link to="/ai-register">
@@ -65,25 +65,26 @@ const Hero = ({ onClaraClick }: HeroProps) => {
                   {t('nav.joinNow')}
                 </Link>
               </Button>
-              
+
               {/* Clara Chat Button */}
-              <Button 
-                size="xl" 
-                className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+              <Button
+                size="xl"
+                variant="outline"
+                className="bg-white/10 text-white border-white/30 hover:bg-white/20 backdrop-blur-sm transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
                 onClick={handleClaraClick}
               >
                 <Heart className="h-5 w-5 mr-2" />
                 {t('hero.ctaTalk')}
               </Button>
-              
+
               {/* Meet Clara Video */}
-              <IntroVideoModal 
+              <IntroVideoModal
                 defaultVideoId="meet-clara"
                 trigger={
-                  <Button 
-                    size="xl" 
-                    variant="outline"
-                    className="bg-wellness text-black hover:bg-wellness/90 shadow-glow hover:shadow-xl transform hover:scale-105 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl border-2 border-wellness/20"
+                  <Button
+                    size="xl"
+                    variant="ghost"
+                    className="text-white hover:bg-white/10 transition-all duration-300 font-semibold text-lg px-8 py-4 rounded-xl"
                     onClick={handleVideoClick}
                   >
                     <Play className="h-5 w-5 mr-2" />

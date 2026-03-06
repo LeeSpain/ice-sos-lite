@@ -3,8 +3,6 @@ import { Users, Heart, MapPin, Phone, Shield, Clock, Play } from "lucide-react";
 import { useTranslation } from 'react-i18next';
 import { Link } from "react-router-dom";
 import { IntroVideoModal } from "@/components/IntroVideoModal";
-import { useCanvasMap } from "@/hooks/useCanvasMap";
-import FamilyMarker from "@/components/map/FamilyMarker";
 import claraAvatar from "/clara-avatar.png";
 import grandmaAvatar from "/grandma-avatar.png";
 import dadAvatar from "/dad-avatar.png";
@@ -12,35 +10,6 @@ import momAvatar from "/mom-avatar.png";
 
 const Features = () => {
   const { t } = useTranslation();
-  const { MapView } = useCanvasMap();
-
-  // Family member data for the map
-  const familyMembers = [
-    {
-      id: 'clara',
-      lat: 51.5074,
-      lng: -0.1278,
-      render: () => <FamilyMarker id="clara" name={t('mockupNames.clara')} avatar={claraAvatar} status="alert" />
-    },
-    {
-      id: 'grandma',
-      lat: 51.5154,
-      lng: -0.1423,
-      render: () => <FamilyMarker id="grandma" name={t('mockupNames.grandma')} avatar={grandmaAvatar} status="live" />
-    },
-    {
-      id: 'dad',
-      lat: 51.5094,
-      lng: -0.1180,
-      render: () => <FamilyMarker id="dad" name={t('mockupNames.dad')} avatar={dadAvatar} status="live" />
-    },
-    {
-      id: 'mom',
-      lat: 51.5030,
-      lng: -0.1340,
-      render: () => <FamilyMarker id="mom" name={t('mockupNames.mom')} avatar={momAvatar} status="live" />
-    }
-  ];
 
   return (
     <section id="features" className="py-section">
