@@ -100,11 +100,11 @@ async function generateImage(prompt: string, style: string, size: string, platfo
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-image-1',
+          model: 'dall-e-3',
           prompt: enhancedPrompt,
           n: 1,
-          size,
-          quality: 'high'
+          size: '1024x1024',
+          response_format: 'b64_json',
         }),
       });
 

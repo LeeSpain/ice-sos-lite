@@ -55,13 +55,14 @@ async function initiateOAuth(platform: string, userId: string, supabase: any) {
       break;
       
     case 'instagram':
-      clientId = Deno.env.get('FACEBOOK_CLIENT_ID') || ''; // Instagram uses Facebook app
-      authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code&state=${state}`;
+      // Instagram Business uses Facebook Graph API OAuth
+      clientId = Deno.env.get('FACEBOOK_APP_ID') || Deno.env.get('FACEBOOK_CLIENT_ID') || '';
+      authUrl = `https://www.facebook.com/v19.0/dialog/oauth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish,business_management`;
       break;
       
     case 'linkedin':
       clientId = Deno.env.get('LINKEDIN_CLIENT_ID') || '';
-      authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=w_member_social,r_liteprofile`;
+      authUrl = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}&scope=w_member_social,profile,email`;
       break;
       
     case 'twitter':
@@ -213,35 +214,54 @@ async function exchangeFacebookToken(code: string, redirectUri: string) {
 async function exchangeInstagramToken(code: string, redirectUri: string) {
   const clientId = Deno.env.get('FACEBOOK_APP_ID') || Deno.env.get('FACEBOOK_CLIENT_ID');
   const clientSecret = Deno.env.get('FACEBOOK_APP_SECRET') || Deno.env.get('FACEBOOK_CLIENT_SECRET');
-  
-  // Instagram uses Facebook's OAuth
-  const tokenResponse = await fetch('https://api.instagram.com/oauth/access_token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: clientId!,
-      client_secret: clientSecret!,
-      grant_type: 'authorization_code',
-      redirect_uri: redirectUri,
-      code
-    })
-  });
-  
+
+  // Instagram Business uses Facebook Graph API OAuth flow
+  const tokenResponse = await fetch(`https://graph.facebook.com/v19.0/oauth/access_token?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&client_secret=${clientSecret}&code=${code}`);
   const tokenData = await tokenResponse.json();
   if (!tokenResponse.ok) throw new Error(tokenData.error?.message || 'Instagram token exchange failed');
-  
+
+  // Get Facebook user info
+  const userResponse = await fetch(`https://graph.facebook.com/me?access_token=${tokenData.access_token}&fields=id,name`);
+  const userData = await userResponse.json();
+
+  // Get managed Facebook Pages
+  const pagesResponse = await fetch(`https://graph.facebook.com/me/accounts?access_token=${tokenData.access_token}`);
+  const pagesData = await pagesResponse.json();
+
+  // For each page, get the linked Instagram Business account
+  let igBusinessUserId: string | null = null;
+  let igUsername: string | null = null;
+  if (pagesData.data && pagesData.data.length > 0) {
+    for (const page of pagesData.data) {
+      const igResponse = await fetch(`https://graph.facebook.com/v19.0/${page.id}?fields=instagram_business_account&access_token=${tokenData.access_token}`);
+      const igData = await igResponse.json();
+      if (igData.instagram_business_account?.id) {
+        igBusinessUserId = igData.instagram_business_account.id;
+        // Get Instagram username
+        const igUserResponse = await fetch(`https://graph.facebook.com/v19.0/${igBusinessUserId}?fields=username&access_token=${tokenData.access_token}`);
+        const igUserData = await igUserResponse.json();
+        igUsername = igUserData.username || null;
+        break;
+      }
+    }
+  }
+
+  if (!igBusinessUserId) {
+    console.warn('No Instagram Business account found linked to this Facebook Page. Ensure the Facebook Page is linked to an Instagram Business account.');
+  }
+
   return {
-    platform_user_id: String(tokenData.user_id),
-    platform_account_id: String(tokenData.user_id),
+    platform_user_id: userData.id,
+    platform_account_id: igBusinessUserId || userData.id,
     access_token: tokenData.access_token,
     refresh_token: null,
-    expires_in: null, // Instagram basic tokens don't expire
+    expires_in: tokenData.expires_in || null,
     token_type: 'Bearer',
-    scope: 'user_profile,user_media',
-    username: tokenData.username || 'instagram_user',
-    name: tokenData.username || 'Instagram User',
-    permissions: ['user_profile', 'user_media'],
-    metadata: {}
+    scope: 'instagram_content_publish,pages_manage_posts',
+    username: igUsername || userData.name || 'instagram_user',
+    name: igUsername || userData.name || 'Instagram Business User',
+    permissions: ['instagram_basic', 'instagram_content_publish'],
+    metadata: { instagram_business_user_id: igBusinessUserId, facebook_user_id: userData.id }
   };
 }
 
@@ -279,10 +299,10 @@ async function exchangeLinkedInToken(code: string, redirectUri: string) {
     refresh_token: tokenData.refresh_token || null,
     expires_in: tokenData.expires_in,
     token_type: tokenData.token_type || 'Bearer',
-    scope: tokenData.scope || 'w_member_social,r_liteprofile',
+    scope: tokenData.scope || 'w_member_social,profile,email',
     username: fullName,
     name: fullName,
-    permissions: ['w_member_social', 'r_liteprofile'],
+    permissions: ['w_member_social', 'profile', 'email'],
     metadata: { email: userData.email }
   };
 }
@@ -376,13 +396,130 @@ async function disconnectAccount(platform: string, userId: string, supabase: any
 }
 
 async function refreshTokens(platform: string, userId: string, supabase: any) {
-  // Implementation depends on platform - some platforms auto-refresh, others need manual refresh
-  return new Response(JSON.stringify({
-    success: true,
-    message: 'Token refresh not implemented for this platform'
-  }), {
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-  });
+  // Fetch current OAuth row
+  const { data: oauthRow, error: fetchError } = await supabase
+    .from('social_media_oauth')
+    .select('access_token, refresh_token, expires_at')
+    .eq('user_id', userId)
+    .eq('platform', platform)
+    .single();
+
+  if (fetchError || !oauthRow) {
+    return new Response(JSON.stringify({ success: false, error: 'OAuth account not found' }), {
+      status: 404,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  let newAccessToken: string | null = null;
+  let newRefreshToken: string | null = null;
+  let newExpiresAt: string | null = null;
+
+  try {
+    if (platform === 'linkedin') {
+      if (!oauthRow.refresh_token) {
+        throw new Error('LinkedIn refresh token not available — please reconnect');
+      }
+      const clientId = Deno.env.get('LINKEDIN_CLIENT_ID');
+      const clientSecret = Deno.env.get('LINKEDIN_CLIENT_SECRET');
+      const resp = await fetch('https://www.linkedin.com/oauth/v2/accessToken', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: oauthRow.refresh_token,
+          client_id: clientId!,
+          client_secret: clientSecret!,
+        }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error_description || 'LinkedIn refresh failed');
+      newAccessToken = data.access_token;
+      newRefreshToken = data.refresh_token || oauthRow.refresh_token;
+      newExpiresAt = data.expires_in
+        ? new Date(Date.now() + data.expires_in * 1000).toISOString()
+        : null;
+
+    } else if (platform === 'twitter' || platform === 'x') {
+      if (!oauthRow.refresh_token) {
+        throw new Error('Twitter refresh token not available — reconnect required');
+      }
+      const clientId = Deno.env.get('X_CLIENT_ID') || Deno.env.get('TWITTER_CLIENT_ID');
+      const clientSecret = Deno.env.get('X_CLIENT_SECRET') || Deno.env.get('TWITTER_CLIENT_SECRET');
+      const resp = await fetch('https://api.twitter.com/2/oauth2/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
+        },
+        body: new URLSearchParams({
+          grant_type: 'refresh_token',
+          refresh_token: oauthRow.refresh_token,
+          client_id: clientId!,
+        }),
+      });
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error_description || 'Twitter refresh failed');
+      newAccessToken = data.access_token;
+      newRefreshToken = data.refresh_token || oauthRow.refresh_token;
+      newExpiresAt = data.expires_in
+        ? new Date(Date.now() + data.expires_in * 1000).toISOString()
+        : null;
+
+    } else if (platform === 'facebook' || platform === 'instagram') {
+      // Facebook/Instagram long-lived tokens do not have a refresh_token flow
+      // Exchange the current token for a new long-lived token
+      const clientId = Deno.env.get('FACEBOOK_APP_ID') || Deno.env.get('FACEBOOK_CLIENT_ID');
+      const clientSecret = Deno.env.get('FACEBOOK_APP_SECRET') || Deno.env.get('FACEBOOK_CLIENT_SECRET');
+      const resp = await fetch(
+        `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${clientId}&client_secret=${clientSecret}&fb_exchange_token=${oauthRow.access_token}`
+      );
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data.error?.message || 'Facebook token refresh failed');
+      newAccessToken = data.access_token;
+      newRefreshToken = null;
+      newExpiresAt = data.expires_in
+        ? new Date(Date.now() + data.expires_in * 1000).toISOString()
+        : null;
+
+    } else {
+      return new Response(JSON.stringify({ success: false, error: `Token refresh not supported for platform: ${platform}` }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Update stored tokens
+    const { error: updateError } = await supabase
+      .from('social_media_oauth')
+      .update({
+        access_token: newAccessToken,
+        refresh_token: newRefreshToken,
+        expires_at: newExpiresAt,
+        token_expires_at: newExpiresAt,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .eq('platform', platform);
+
+    if (updateError) throw new Error(`Failed to save refreshed token: ${updateError.message}`);
+
+    console.log(`Token refreshed for ${platform}, user ${userId}`);
+
+    return new Response(JSON.stringify({
+      success: true,
+      platform,
+      expires_at: newExpiresAt,
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+
+  } catch (err: any) {
+    console.error(`Token refresh failed for ${platform}:`, err);
+    return new Response(JSON.stringify({ success: false, error: err.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
 }
 
 // Helper functions for Twitter PKCE

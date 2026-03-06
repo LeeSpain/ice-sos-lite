@@ -207,8 +207,24 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrlEnv || supabaseUrl, supabaseServiceKeyEnv || supabaseServiceKey);
     console.log(`Processing marketing command: ${command}`);
 
+    // Resolve the authenticated user ID from the Authorization header
+    let createdBy = '00000000-0000-0000-0000-000000000000'; // fallback
+    const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.replace('Bearer ', '');
+      try {
+        const { data: { user } } = await supabase.auth.getUser(token);
+        if (user?.id) {
+          createdBy = user.id;
+        }
+      } catch (authErr) {
+        console.warn('Could not resolve user from auth token:', authErr);
+      }
+    }
+    console.log(`Resolved created_by: ${createdBy}`);
+
     // Create campaign first
-    const campaignId = await createCampaign(supabase, command, title, settings, scheduling_options, publishing_controls);
+    const campaignId = await createCampaign(supabase, command, title, settings, scheduling_options, publishing_controls, createdBy);
     console.log(`Created campaign with ID: ${campaignId}`);
 
     // Initialize workflow stages  
@@ -247,9 +263,9 @@ serve(async (req) => {
 
 console.log('🎉 Function initialized successfully');
 
-async function createCampaign(supabase: any, command: string, title: string, settings: any, scheduling_options: any, publishing_controls: any) {
+async function createCampaign(supabase: any, command: string, title: string, settings: any, scheduling_options: any, publishing_controls: any, createdBy = '00000000-0000-0000-0000-000000000000') {
   console.log('Creating campaign...');
-  
+
   const { data, error } = await supabase
     .from('marketing_campaigns')
     .insert({
@@ -257,7 +273,7 @@ async function createCampaign(supabase: any, command: string, title: string, set
       description: command,
       command_input: command,
       status: 'running',
-      created_by: '00000000-0000-0000-0000-000000000000',
+      created_by: createdBy,
       target_audience: {
         settings,
         scheduling_options,

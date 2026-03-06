@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { MultiPlatformPublisher } from './MultiPlatformPublisher';
 import {
   Eye,
   Edit,
@@ -26,7 +27,8 @@ import {
   TrendingUp,
   FileEdit,
   CheckCircle,
-  XCircle
+  XCircle,
+  Send
 } from 'lucide-react';
 
 interface CampaignDetailsModalProps {
@@ -73,6 +75,7 @@ export const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({
   const [editedContent, setEditedContent] = useState<Partial<ContentItem>>({});
   const [activeTab, setActiveTab] = useState('content');
   const [loading, setLoading] = useState(false);
+  const [publisherContentId, setPublisherContentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (campaign && isOpen) {
@@ -464,6 +467,15 @@ export const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({
                               </a>
                             </Button>
                           )}
+                          {item.content_type === 'social_post' && (
+                            <Button
+                              size="sm"
+                              onClick={() => setPublisherContentId(item.id)}
+                              className="bg-primary text-primary-foreground"
+                            >
+                              <Send className="h-3 w-3" />
+                            </Button>
+                          )}
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button variant="outline" size="sm">
@@ -567,10 +579,20 @@ export const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({
                         ))}
                       </div>
                     )}
-                    <Button variant="outline" size="sm" onClick={() => editContent(item)}>
-                      <Edit className="h-3 w-3 mr-1" />
-                      Edit
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="outline" size="sm" onClick={() => editContent(item)}>
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => setPublisherContentId(item.id)}
+                        className="bg-primary text-primary-foreground"
+                      >
+                        <Send className="h-3 w-3 mr-1" />
+                        Post to All
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -685,6 +707,25 @@ export const CampaignDetailsModal: React.FC<CampaignDetailsModalProps> = ({
                 Save Changes
               </Button>
             </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Multi-Platform Publisher Modal */}
+        <Dialog open={!!publisherContentId} onOpenChange={(open) => !open && setPublisherContentId(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Post to All Platforms</DialogTitle>
+            </DialogHeader>
+            {publisherContentId && (
+              <MultiPlatformPublisher
+                contentId={publisherContentId}
+                onSuccess={() => {
+                  setPublisherContentId(null);
+                  loadCampaignContent();
+                }}
+                onClose={() => setPublisherContentId(null)}
+              />
+            )}
           </DialogContent>
         </Dialog>
       </DialogContent>

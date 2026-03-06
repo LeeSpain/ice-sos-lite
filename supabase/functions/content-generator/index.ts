@@ -257,11 +257,10 @@ async function generateImage(imagePrompt: string, apiKey: string): Promise<strin
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-image-1',
+      model: 'dall-e-3',
       prompt: imagePrompt + ' - High quality, professional, suitable for social media marketing',
       size: '1024x1024',
-      quality: 'high',
-      output_format: 'png',
+      response_format: 'b64_json',
       n: 1,
     }),
   });

@@ -19,6 +19,7 @@ import { EmailCampaignControls } from './EmailCampaignControls';
 import { EmailTemplateEditor } from './EmailTemplateEditor';
 import { EmailAnalyticsDashboard } from './EmailAnalyticsDashboard';
 import { SocialPostingStatus } from './SocialPostingStatus';
+import { MultiPlatformPublisher } from './MultiPlatformPublisher';
 
 type WorkflowStage = 'command' | 'process' | 'approval' | 'success';
 
@@ -58,6 +59,7 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [showRegenerateDialog, setShowRegenerateDialog] = useState<string | null>(null);
   const [regenerateInstructions, setRegenerateInstructions] = useState('');
+  const [publisherContentId, setPublisherContentId] = useState<string | null>(null);
 
   // Form data state
   const [formData, setFormData] = useState({
@@ -1412,6 +1414,16 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
                             )}
 
                             <Button
+                              variant="default"
+                              size="sm"
+                              className="bg-purple-600 hover:bg-purple-700 text-white"
+                              onClick={() => setPublisherContentId(content.id)}
+                            >
+                              <Send className="h-4 w-4 mr-2" />
+                              Post to All Platforms
+                            </Button>
+
+                            <Button
                               variant="outline"
                               size="sm"
                               onClick={() => handleReject(content.id)}
@@ -1889,6 +1901,25 @@ export const SimplifiedRivenWorkflow: React.FC = () => {
               content={selectedContent}
               onSave={() => setShowTemplateEditor(false)}
               onSend={() => setShowTemplateEditor(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Multi-Platform Publisher Dialog */}
+      <Dialog open={!!publisherContentId} onOpenChange={(open) => !open && setPublisherContentId(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Post to All Platforms</DialogTitle>
+            <DialogDescription>
+              Riven AI will adapt this content for each platform and post simultaneously.
+            </DialogDescription>
+          </DialogHeader>
+          {publisherContentId && (
+            <MultiPlatformPublisher
+              contentId={publisherContentId}
+              onSuccess={() => setPublisherContentId(null)}
+              onClose={() => setPublisherContentId(null)}
             />
           )}
         </DialogContent>
