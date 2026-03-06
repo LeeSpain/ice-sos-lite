@@ -116,13 +116,16 @@ CREATE TRIGGER update_social_media_accounts_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+-- Ensure connection_status column exists (table may have been created by earlier migration without it)
+ALTER TABLE public.social_media_accounts ADD COLUMN IF NOT EXISTS connection_status TEXT NOT NULL DEFAULT 'connected';
+
 -- Add indexes for performance
-CREATE INDEX idx_blog_posts_slug ON public.blog_posts(slug);
-CREATE INDEX idx_blog_posts_status ON public.blog_posts(status);
-CREATE INDEX idx_blog_posts_published_at ON public.blog_posts(published_at);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON public.blog_posts(slug);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON public.blog_posts(status);
+CREATE INDEX IF NOT EXISTS idx_blog_posts_published_at ON public.blog_posts(published_at);
 
-CREATE INDEX idx_email_campaigns_status ON public.email_campaigns(status);
-CREATE INDEX idx_email_campaigns_scheduled_at ON public.email_campaigns(scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_email_campaigns_status ON public.email_campaigns(status);
+CREATE INDEX IF NOT EXISTS idx_email_campaigns_scheduled_at ON public.email_campaigns(scheduled_at);
 
-CREATE INDEX idx_social_media_accounts_user_platform ON public.social_media_accounts(user_id, platform);
-CREATE INDEX idx_social_media_accounts_status ON public.social_media_accounts(connection_status);
+CREATE INDEX IF NOT EXISTS idx_social_media_accounts_user_platform ON public.social_media_accounts(user_id, platform);
+CREATE INDEX IF NOT EXISTS idx_social_media_accounts_status ON public.social_media_accounts(connection_status);

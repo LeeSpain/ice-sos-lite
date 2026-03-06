@@ -6,18 +6,8 @@
 ALTER TABLE public.marketing_content ENABLE ROW LEVEL SECURITY;
 
 -- 2) Allow public read ONLY for published blog content
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies 
-    WHERE schemaname='public' 
-      AND tablename='marketing_content' 
-      AND polname='Public can view published blog content'
-  ) THEN
 DROP POLICY IF EXISTS "Public can view published blog content" ON public.marketing_content;
-    CREATE POLICY "Public can view published blog content"
-    ON public.marketing_content
-    FOR SELECT
-    USING (platform = 'blog' AND status = 'published');
-  END IF;
-END$$;
+CREATE POLICY "Public can view published blog content"
+ON public.marketing_content
+FOR SELECT
+USING (platform = 'blog' AND status = 'published');

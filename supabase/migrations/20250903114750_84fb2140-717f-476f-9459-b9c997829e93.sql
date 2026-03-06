@@ -1,7 +1,7 @@
 -- ICE SOS Lite: Regional Call Centre Integration - Complete Database Schema
 
 -- REGIONAL ORGANIZATIONS
-CREATE TABLE public.organizations (
+CREATE TABLE IF NOT EXISTS public.organizations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   region TEXT,
@@ -21,19 +21,8 @@ TO authenticated
 USING (public.is_admin())
 WITH CHECK (public.is_admin());
 
-DROP POLICY IF EXISTS "Regional users can view their organization" ON public.organizations;
-CREATE POLICY "Regional users can view their organization"
-ON public.organizations
-FOR SELECT
-TO authenticated
-USING (EXISTS (
-  SELECT 1 FROM public.organization_users ou 
-  WHERE ou.organization_id = organizations.id 
-  AND ou.user_id = auth.uid()
-));
-
 -- ORGANIZATION USERS
-CREATE TABLE public.organization_users (
+CREATE TABLE IF NOT EXISTS public.organization_users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
   user_id UUID NOT NULL,
@@ -62,6 +51,18 @@ FOR SELECT
 TO authenticated
 USING (auth.uid() = user_id);
 
+-- Now add the organizations policy that references organization_users
+DROP POLICY IF EXISTS "Regional users can view their organization" ON public.organizations;
+CREATE POLICY "Regional users can view their organization"
+ON public.organizations
+FOR SELECT
+TO authenticated
+USING (EXISTS (
+  SELECT 1 FROM public.organization_users ou
+  WHERE ou.organization_id = organizations.id
+  AND ou.user_id = auth.uid()
+));
+
 -- CLIENTS TABLE UPDATES
 DO $$ 
 BEGIN
@@ -82,7 +83,7 @@ BEGIN
 END $$;
 
 -- REGIONAL EMERGENCY CONTACTS (separate from main emergency_contacts)
-CREATE TABLE public.regional_emergency_contacts (
+CREATE TABLE IF NOT EXISTS public.regional_emergency_contacts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   priority INTEGER,
@@ -119,7 +120,7 @@ USING (EXISTS (
 ));
 
 -- DEVICES
-CREATE TABLE public.regional_devices (
+CREATE TABLE IF NOT EXISTS public.regional_devices (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   device_type TEXT,
@@ -157,7 +158,7 @@ USING (EXISTS (
 ));
 
 -- REGIONAL SOS EVENTS (separate from main sos_events)
-CREATE TABLE public.regional_sos_events (
+CREATE TABLE IF NOT EXISTS public.regional_sos_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   client_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   organization_id UUID REFERENCES public.organizations(id),
@@ -210,7 +211,7 @@ USING (public.is_admin())
 WITH CHECK (public.is_admin());
 
 -- SOS ACTIONS
-CREATE TABLE public.sos_actions (
+CREATE TABLE IF NOT EXISTS public.sos_actions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id UUID REFERENCES public.regional_sos_events(id) ON DELETE CASCADE,
   actor_user_id UUID,
@@ -243,7 +244,7 @@ WITH CHECK (EXISTS (
 ));
 
 -- FAMILY NOTIFICATIONS
-CREATE TABLE public.family_notifications (
+CREATE TABLE IF NOT EXISTS public.family_notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_id UUID REFERENCES public.regional_sos_events(id) ON DELETE CASCADE,
   client_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -279,7 +280,7 @@ TO authenticated
 USING (auth.uid() = client_id);
 
 -- AUDIT LOG
-CREATE TABLE public.regional_audit_log (
+CREATE TABLE IF NOT EXISTS public.regional_audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID,
   organization_id UUID REFERENCES public.organizations(id),
@@ -313,13 +314,13 @@ USING (EXISTS (
 ));
 
 -- Create indexes for performance
-CREATE INDEX idx_organization_users_user_id ON public.organization_users(user_id);
-CREATE INDEX idx_organization_users_org_id ON public.organization_users(organization_id);
-CREATE INDEX idx_regional_sos_events_client_id ON public.regional_sos_events(client_id);
-CREATE INDEX idx_regional_sos_events_org_id ON public.regional_sos_events(organization_id);
-CREATE INDEX idx_regional_sos_events_status ON public.regional_sos_events(status);
-CREATE INDEX idx_family_notifications_client_id ON public.family_notifications(client_id);
-CREATE INDEX idx_family_notifications_event_id ON public.family_notifications(event_id);
+CREATE INDEX IF NOT EXISTS idx_organization_users_user_id ON public.organization_users(user_id);
+CREATE INDEX IF NOT EXISTS idx_organization_users_org_id ON public.organization_users(organization_id);
+CREATE INDEX IF NOT EXISTS idx_regional_sos_events_client_id ON public.regional_sos_events(client_id);
+CREATE INDEX IF NOT EXISTS idx_regional_sos_events_org_id ON public.regional_sos_events(organization_id);
+CREATE INDEX IF NOT EXISTS idx_regional_sos_events_status ON public.regional_sos_events(status);
+CREATE INDEX IF NOT EXISTS idx_family_notifications_client_id ON public.family_notifications(client_id);
+CREATE INDEX IF NOT EXISTS idx_family_notifications_event_id ON public.family_notifications(event_id);
 
 -- Create triggers for updated_at
 CREATE OR REPLACE FUNCTION public.update_updated_at_column()
@@ -330,8 +331,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS update_organizations_updated_at ON public.organizations;
 CREATE TRIGGER update_organizations_updated_at BEFORE UPDATE ON public.organizations FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS update_organization_users_updated_at ON public.organization_users;
 CREATE TRIGGER update_organization_users_updated_at BEFORE UPDATE ON public.organization_users FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS update_regional_emergency_contacts_updated_at ON public.regional_emergency_contacts;
 CREATE TRIGGER update_regional_emergency_contacts_updated_at BEFORE UPDATE ON public.regional_emergency_contacts FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS update_regional_devices_updated_at ON public.regional_devices;
 CREATE TRIGGER update_regional_devices_updated_at BEFORE UPDATE ON public.regional_devices FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS update_regional_sos_events_updated_at ON public.regional_sos_events;
 CREATE TRIGGER update_regional_sos_events_updated_at BEFORE UPDATE ON public.regional_sos_events FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();

@@ -27,6 +27,50 @@ CREATE TABLE IF NOT EXISTS email_templates (
   updated_at timestamp with time zone DEFAULT now()
 );
 
+-- Ensure all columns exist if table was created by an earlier migration
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS description text;
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS subject_template text;
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS html_template text;
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS text_template text;
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS variables jsonb DEFAULT '{}';
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS category text DEFAULT 'general';
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS is_active boolean DEFAULT true;
+ALTER TABLE email_templates ADD COLUMN IF NOT EXISTS created_by uuid;
+-- Ensure body_template has a default if it exists with NOT NULL constraint
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'email_templates' AND column_name = 'body_template'
+  ) THEN
+    ALTER TABLE email_templates ALTER COLUMN body_template SET DEFAULT '';
+  END IF;
+END $$;
+
+-- Ensure email_automation_settings columns exist if table was created by an earlier migration
+ALTER TABLE email_automation_settings ADD COLUMN IF NOT EXISTS template_id uuid REFERENCES email_templates(id);
+ALTER TABLE email_automation_settings ADD COLUMN IF NOT EXISTS delay_minutes integer DEFAULT 0;
+ALTER TABLE email_automation_settings ADD COLUMN IF NOT EXISTS is_enabled boolean DEFAULT true;
+ALTER TABLE email_automation_settings ADD COLUMN IF NOT EXISTS target_criteria jsonb DEFAULT '{}';
+-- Ensure NOT NULL columns have defaults if this table was created by an earlier migration
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'email_automation_settings' AND column_name = 'name'
+      AND is_nullable = 'NO'
+  ) THEN
+    ALTER TABLE email_automation_settings ALTER COLUMN name SET DEFAULT 'automation';
+  END IF;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'email_automation_settings' AND column_name = 'email_template'
+      AND is_nullable = 'NO'
+  ) THEN
+    ALTER TABLE email_automation_settings ALTER COLUMN email_template SET DEFAULT '';
+  END IF;
+END $$;
+
 -- Create email_delivery_log table for tracking
 CREATE TABLE IF NOT EXISTS email_delivery_log (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

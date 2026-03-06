@@ -1,6 +1,13 @@
 -- Fix infinite recursion in family RLS policies by using security definer functions
 
 -- First, create security definer functions to check family roles without recursion
+-- Drop dependent policies first to allow function drops
+DROP POLICY IF EXISTS "Owners manage group memberships" ON public.family_memberships;
+DROP POLICY IF EXISTS "Family group owners can manage memberships in their groups" ON public.family_memberships;
+DROP POLICY IF EXISTS "Family members can view groups they belong to" ON public.family_groups;
+-- Drop existing versions to allow parameter renames
+DROP FUNCTION IF EXISTS public.is_family_group_owner(uuid) CASCADE;
+DROP FUNCTION IF EXISTS public.is_family_member_of_group(uuid) CASCADE;
 CREATE OR REPLACE FUNCTION public.get_user_family_group_id()
 RETURNS uuid
 LANGUAGE sql

@@ -149,6 +149,12 @@ END;
 $$;
 
 -- Part 4: Unique constraint for auth_failures
-ALTER TABLE public.auth_failures 
-ADD CONSTRAINT IF NOT EXISTS unique_email_ip 
-UNIQUE (email, ip_address);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'unique_email_ip' AND conrelid = 'public.auth_failures'::regclass
+  ) THEN
+    ALTER TABLE public.auth_failures ADD CONSTRAINT unique_email_ip UNIQUE (email, ip_address);
+  END IF;
+END $$;

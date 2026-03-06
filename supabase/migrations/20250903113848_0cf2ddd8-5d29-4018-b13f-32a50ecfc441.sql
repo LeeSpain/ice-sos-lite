@@ -26,9 +26,10 @@ USING (auth.uid() = user_id)
 WITH CHECK (auth.uid() = user_id);
 
 -- Create restrictive policy to ensure only admin or owner even if other permissive policies exist
+DROP POLICY IF EXISTS "Restrict registration selections to admin or owner" ON public.registration_selections;
 CREATE POLICY "Restrict registration selections to admin or owner"
-AS RESTRICTIVE
 ON public.registration_selections
+AS RESTRICTIVE
 FOR ALL
 USING (public.is_admin() OR auth.uid() = user_id)
 WITH CHECK (public.is_admin() OR auth.uid() = user_id);

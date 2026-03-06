@@ -57,12 +57,17 @@ USING (
   )
 );
 
--- Add quality tracking columns to publishing queue
-ALTER TABLE publishing_queue 
-ADD COLUMN IF NOT EXISTS processing_time_ms INTEGER,
-ADD COLUMN IF NOT EXISTS quality_check_passed BOOLEAN DEFAULT false,
-ADD COLUMN IF NOT EXISTS quality_issues JSONB,
-ADD COLUMN IF NOT EXISTS error_message TEXT;
+-- Add quality tracking columns to publishing queue (if it exists)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'publishing_queue') THEN
+    ALTER TABLE publishing_queue
+      ADD COLUMN IF NOT EXISTS processing_time_ms INTEGER,
+      ADD COLUMN IF NOT EXISTS quality_check_passed BOOLEAN DEFAULT false,
+      ADD COLUMN IF NOT EXISTS quality_issues JSONB,
+      ADD COLUMN IF NOT EXISTS error_message TEXT;
+  END IF;
+END $$;
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_quality_metrics_created_at ON content_quality_metrics(created_at);

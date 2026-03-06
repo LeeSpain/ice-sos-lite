@@ -28,7 +28,7 @@ INSERT INTO public.training_data (question, answer, category, tags, confidence_s
 -- Privacy and Data
 ('What data do you collect?', 'We only collect data necessary for your safety: location during emergencies, emergency contact information, basic health data you choose to share, and device status. We never sell your data or use it for marketing. Your privacy and security are our top priorities.', 'privacy', '{"data_collection", "privacy_policy"}', 1.0),
 ('Can I control who sees my location?', 'Yes! You have complete control over location sharing. You choose which family members can see your location, when they can see it, and you can turn sharing on/off anytime. Only designated emergency contacts and our response team see your location during actual emergencies.', 'privacy', '{"location_control", "family_access"}', 1.0)
-ON CONFLICT (question) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 -- Update Riven AI system prompt with comprehensive marketing knowledge
 INSERT INTO public.site_content (key, value) VALUES (

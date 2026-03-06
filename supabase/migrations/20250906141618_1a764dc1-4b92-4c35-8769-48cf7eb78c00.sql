@@ -1,22 +1,32 @@
--- Add quality tracking columns to existing tables
-ALTER TABLE generated_content 
-ADD COLUMN IF NOT EXISTS quality_score INTEGER,
-ADD COLUMN IF NOT EXISTS validation_passed BOOLEAN DEFAULT false,
-ADD COLUMN IF NOT EXISTS quality_issues JSONB,
-ADD COLUMN IF NOT EXISTS seo_score INTEGER,
-ADD COLUMN IF NOT EXISTS readability_score INTEGER,
-ADD COLUMN IF NOT EXISTS engagement_score INTEGER;
+-- Add quality tracking columns to existing tables (if they exist)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'generated_content') THEN
+    ALTER TABLE generated_content
+      ADD COLUMN IF NOT EXISTS quality_score INTEGER,
+      ADD COLUMN IF NOT EXISTS validation_passed BOOLEAN DEFAULT false,
+      ADD COLUMN IF NOT EXISTS quality_issues JSONB,
+      ADD COLUMN IF NOT EXISTS seo_score INTEGER,
+      ADD COLUMN IF NOT EXISTS readability_score INTEGER,
+      ADD COLUMN IF NOT EXISTS engagement_score INTEGER;
+  END IF;
+END $$;
 
--- Add processing time tracking to publishing queue
-ALTER TABLE publishing_queue 
-ADD COLUMN IF NOT EXISTS processing_time_ms INTEGER,
-ADD COLUMN IF NOT EXISTS quality_check_passed BOOLEAN DEFAULT false,
-ADD COLUMN IF NOT EXISTS quality_issues JSONB;
+-- Add processing time tracking to publishing queue (if it exists)
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'publishing_queue') THEN
+    ALTER TABLE publishing_queue
+      ADD COLUMN IF NOT EXISTS processing_time_ms INTEGER,
+      ADD COLUMN IF NOT EXISTS quality_check_passed BOOLEAN DEFAULT false,
+      ADD COLUMN IF NOT EXISTS quality_issues JSONB;
+  END IF;
+END $$;
 
 -- Create quality metrics table for historical tracking
 CREATE TABLE IF NOT EXISTS quality_metrics (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  content_id UUID REFERENCES generated_content(id),
+  content_id UUID,
   platform TEXT,
   quality_score INTEGER NOT NULL,
   seo_score INTEGER,
@@ -88,6 +98,7 @@ END;
 $$ LANGUAGE plpgsql SET search_path = public;
 
 -- Create trigger for quality metrics updates
+DROP TRIGGER IF EXISTS update_quality_metrics_timestamp ON quality_metrics;
 CREATE TRIGGER update_quality_metrics_timestamp
 BEFORE UPDATE ON quality_metrics
 FOR EACH ROW

@@ -43,4 +43,14 @@ CREATE TRIGGER update_workflow_stages_updated_at_trigger
 
 -- Add realtime support
 ALTER TABLE workflow_stages REPLICA IDENTITY FULL;
-ALTER PUBLICATION supabase_realtime ADD TABLE workflow_stages;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_rel pr
+    JOIN pg_publication p ON p.oid = pr.prpubid
+    JOIN pg_class c ON c.oid = pr.prrelid
+    WHERE p.pubname = 'supabase_realtime' AND c.relname = 'workflow_stages'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE workflow_stages;
+  END IF;
+END $$;

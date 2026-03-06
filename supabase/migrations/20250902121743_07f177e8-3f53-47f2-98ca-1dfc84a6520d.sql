@@ -43,9 +43,13 @@ USING (user_id = auth.uid() OR public.is_admin())
 WITH CHECK (user_id = auth.uid() OR public.is_admin());
 
 -- 6. Fix communication_metrics_summary table security
-ALTER TABLE public.communication_metrics_summary ENABLE ROW LEVEL SECURITY;
-
-DROP POLICY IF EXISTS "admins_only_communication_metrics" ON public.communication_metrics_summary;
-CREATE POLICY "admins_only_communication_metrics" ON public.communication_metrics_summary
-FOR ALL
-USING (public.is_admin());
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'communication_metrics_summary') THEN
+    ALTER TABLE public.communication_metrics_summary ENABLE ROW LEVEL SECURITY;
+    DROP POLICY IF EXISTS "admins_only_communication_metrics" ON public.communication_metrics_summary;
+    CREATE POLICY "admins_only_communication_metrics" ON public.communication_metrics_summary
+    FOR ALL
+    USING (public.is_admin());
+  END IF;
+END $$;

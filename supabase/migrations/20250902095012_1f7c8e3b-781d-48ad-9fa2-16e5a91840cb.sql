@@ -1,5 +1,5 @@
 -- Create orders table to track one-off payment information
-CREATE TABLE public.orders (
+CREATE TABLE IF NOT EXISTS public.orders (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   stripe_session_id TEXT UNIQUE,
@@ -32,6 +32,7 @@ CREATE POLICY "update_order" ON public.orders
   USING (true);
 
 -- Create trigger for automatic timestamp updates
+DROP TRIGGER IF EXISTS update_orders_updated_at ON public.orders;
 CREATE TRIGGER update_orders_updated_at
 BEFORE UPDATE ON public.orders
 FOR EACH ROW

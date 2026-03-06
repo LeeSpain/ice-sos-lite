@@ -68,4 +68,14 @@ EXECUTE FUNCTION public.update_live_location_timestamp();
 
 -- Enable realtime for live location updates
 ALTER TABLE public.live_locations REPLICA IDENTITY FULL;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.live_locations;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_rel pr
+    JOIN pg_publication p ON p.oid = pr.prpubid
+    JOIN pg_class c ON c.oid = pr.prrelid
+    WHERE p.pubname = 'supabase_realtime' AND c.relname = 'live_locations'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.live_locations;
+  END IF;
+END $$;

@@ -72,22 +72,22 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Users can manage phone verifications" ON public.phone_verifications';
 
     -- Service role read-only (no client reads)
-    EXECUTE $$
-DROP POLICY IF EXISTS "Service role can read phone verifications" ON public.phone_verifications;
+    EXECUTE 'DROP POLICY IF EXISTS "Service role can read phone verifications" ON public.phone_verifications';
+    EXECUTE $inner$
       CREATE POLICY "Service role can read phone verifications"
       ON public.phone_verifications
       FOR SELECT
       USING (auth.role() = 'service_role')
-    $$;
+    $inner$;
 
     -- Users can only INSERT their own records
-    EXECUTE $$
-DROP POLICY IF EXISTS "Users can create own phone verifications" ON public.phone_verifications;
+    EXECUTE 'DROP POLICY IF EXISTS "Users can create own phone verifications" ON public.phone_verifications';
+    EXECUTE $inner$
       CREATE POLICY "Users can create own phone verifications"
       ON public.phone_verifications
       FOR INSERT
       WITH CHECK (auth.uid() = user_id)
-    $$;
+    $inner$;
 
     -- Attach validation trigger if it doesn't exist
     IF NOT EXISTS (

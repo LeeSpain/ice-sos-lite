@@ -66,6 +66,9 @@ ON CONFLICT (setting_key) DO UPDATE
 
 -- 6. Add new training data categories for SOS + voice
 
+-- Ensure confidence_score column exists
+ALTER TABLE public.training_data ADD COLUMN IF NOT EXISTS confidence_score NUMERIC;
+
 -- SOS / Emergency Voice
 INSERT INTO training_data (question, answer, category, tags, confidence_score, status, audience)
 VALUES
@@ -73,7 +76,7 @@ VALUES
     'What happens when I press the SOS button?',
     'When you press SOS, Clar (our AI agent) immediately calls your phone. She will speak with you to understand the situation. If it is a real emergency, she simultaneously calls all your emergency contacts, sends them a WhatsApp message with your live GPS location, and notifies anyone with the ICE SOS app. Your contacts can confirm they are on the way, and Clar will update you throughout.',
     'emergency_voice',
-    '["sos","emergency","clar","voice","how it works"]'::jsonb,
+    ARRAY['sos','emergency','clar','voice','how it works'],
     1.0,
     'active',
     'customer'
@@ -82,7 +85,7 @@ VALUES
     'What is a false alarm? How do I cancel an SOS?',
     'If you accidentally press SOS, do not worry! Clar will call you right away and ask if you are okay. Simply tell her it was an accident and she will confirm you are safe, then close the incident. No emergency contacts will be notified. It is completely fine — accidents happen.',
     'emergency_voice',
-    '["false alarm","cancel","accident","sos","clar"]'::jsonb,
+    ARRAY['false alarm','cancel','accident','sos','clar'],
     1.0,
     'active',
     'customer'
@@ -91,7 +94,7 @@ VALUES
     'What does Clar say when she calls me during an emergency?',
     'Clar will greet you by name calmly: "Hello [Name], this is Clar from ICE SOS. I received your emergency alert. Are you okay?" She will assess the situation, and if you need help, she will coordinate your emergency contacts while keeping you on the line throughout.',
     'voice_calls',
-    '["clar","voice","call","what to expect","greeting"]'::jsonb,
+    ARRAY['clar','voice','call','what to expect','greeting'],
     1.0,
     'active',
     'customer'
@@ -100,7 +103,7 @@ VALUES
     'Will Clar call 911 or emergency services?',
     'No. Clar will never call 911, 112, or any emergency services on your behalf. That decision belongs to you and your family. Clar will remind your contacts that they can call emergency services if they believe it is needed.',
     'emergency_voice',
-    '["911","112","emergency services","clar","policy"]'::jsonb,
+    ARRAY['911','112','emergency services','clar','policy'],
     1.0,
     'active',
     'customer'
@@ -109,7 +112,7 @@ VALUES
     'What happens if I do not answer when Clar calls?',
     'If Clar cannot reach you or you do not respond within about 15-20 seconds, she will automatically escalate — calling all your emergency contacts simultaneously and sending them your GPS location via WhatsApp and push notification. Your safety always comes first.',
     'emergency_voice',
-    '["no answer","auto escalate","silence","safety"]'::jsonb,
+    ARRAY['no answer','auto escalate','silence','safety'],
     1.0,
     'active',
     'customer'
@@ -118,7 +121,7 @@ VALUES
     'How do I confirm I am safe and close an incident?',
     'You can tell Clar on the phone that you are safe, or use the "I am Safe" button in the ICE SOS app. Clar will confirm with you and close the incident. All your emergency contacts will be notified that the situation is resolved.',
     'incident_resolution',
-    '["close","safe","resolve","incident","end call"]'::jsonb,
+    ARRAY['close','safe','resolve','incident','end call'],
     1.0,
     'active',
     'customer'
@@ -127,7 +130,7 @@ VALUES
     'What do my emergency contacts receive when I activate SOS?',
     'Simultaneously, all your emergency contacts with calls enabled will receive a voice call from Clar briefing them on the situation. Contacts with notifications enabled receive a WhatsApp message with your live GPS link and situation summary. Contacts with the ICE SOS app also get an in-app push notification.',
     'family_alerts',
-    '["emergency contacts","whatsapp","call","notification","gps","family"]'::jsonb,
+    ARRAY['emergency contacts','whatsapp','call','notification','gps','family'],
     1.0,
     'active',
     'customer'
@@ -136,7 +139,7 @@ VALUES
     'Can I choose which contacts get calls vs notifications?',
     'Yes! When you add or edit an emergency contact, you can toggle on or off: Voice Calls (Clar calls them during SOS) and Notifications (WhatsApp + push alert with your GPS). Both are enabled by default. At least one must be enabled per contact.',
     'family_alerts',
-    '["toggle","preferences","calls","notifications","contacts","settings"]'::jsonb,
+    ARRAY['toggle','preferences','calls','notifications','contacts','settings'],
     1.0,
     'active',
     'customer'
@@ -145,7 +148,7 @@ VALUES
     'How does the Bluetooth pendant trigger SOS?',
     'The ICE SOS pendant connects to your phone via Bluetooth. A single press of the pendant button triggers the SOS — exactly the same as pressing the button in the app. Clar will call you immediately. The pendant has up to 6 months battery life and is fully waterproof.',
     'pendant',
-    '["pendant","bluetooth","button","trigger","hardware"]'::jsonb,
+    ARRAY['pendant','bluetooth','button','trigger','hardware'],
     1.0,
     'active',
     'customer'
@@ -154,7 +157,7 @@ VALUES
     'How do I pair my pendant to the app?',
     'Open the ICE SOS app, go to Settings, and tap "Connect Pendant". Make sure Bluetooth is on and your pendant is charged. The app will find and pair it automatically. Once paired, a single press triggers your SOS. If you have trouble pairing, try turning Bluetooth off and on, or contact our support team.',
     'pendant',
-    '["pair","pendant","bluetooth","connect","setup"]'::jsonb,
+    ARRAY['pair','pendant','bluetooth','connect','setup'],
     1.0,
     'active',
     'customer'
@@ -163,7 +166,7 @@ VALUES
     'What should I do when I receive an SOS alert from a family member?',
     'When Clar calls you about a family member''s SOS, listen carefully to the situation briefing. Press 1 on your phone to confirm you are on your way — Clar will immediately let the member know. You will also receive a WhatsApp message with a live Google Maps link to their location. If you believe it is a medical emergency, you can call 112 or 911 directly.',
     'family_alerts',
-    '["family","contact","receive alert","respond","on route"]'::jsonb,
+    ARRAY['family','contact','receive alert','respond','on route'],
     1.0,
     'active',
     'customer'
