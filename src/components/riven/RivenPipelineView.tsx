@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import {
   CheckCircle2, Circle, Loader2, XCircle, SkipForward,
   FileText, Image, Mic, Video, Mail, Share2, ShieldCheck,
-  Layers, Eye, Clock, AlertCircle
+  Layers, Eye, Clock, AlertCircle, BookOpen, Megaphone
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -42,6 +42,8 @@ const STAGE_META: Record<string, { label: string; icon: React.ElementType; descr
   render:            { label: 'Video Render',         icon: Video,       description: 'Rendering final video outputs via Remotion + FFmpeg' },
   social_gen:        { label: 'Social Posts',         icon: Share2,      description: 'Generating social media captions and assets' },
   email_gen:         { label: 'Email Generation',     icon: Mail,        description: 'Writing email sequences and campaigns' },
+  blog_gen:          { label: 'Blog Article',         icon: BookOpen,    description: 'Writing SEO blog article' },
+  ad_gen:            { label: 'Ad Copy',              icon: Megaphone,   description: 'Generating Google and Meta ad copy' },
   qa:                { label: 'Quality Check',        icon: ShieldCheck, description: 'Checking brand voice, tone, and content quality' },
   approval_ready:    { label: 'Approval Ready',       icon: Eye,         description: 'All assets ready for your review and approval' },
 };

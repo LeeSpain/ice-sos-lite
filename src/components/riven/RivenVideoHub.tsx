@@ -17,6 +17,18 @@ const db = supabase as any;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+interface StoryboardScene {
+  scene_number: number;
+  duration_seconds: number;
+  visual_description: string;
+  voiceover: string | null;
+  on_screen_text: string | null;
+  camera_direction: string;
+  color_palette: string[];
+  mood: string;
+  music_note: string | null;
+}
+
 interface VideoJob {
   id: string;
   campaign_id?: string;
@@ -26,9 +38,11 @@ interface VideoJob {
   duration_target: string;
   source_url?: string;
   script?: string;
+  storyboard?: StoryboardScene[];
   status: 'queued' | 'scripting' | 'storyboard' | 'assets' | 'rendering' | 'complete' | 'failed';
   progress: number;
   output_url?: string;
+  error_message?: string;
   created_at: string;
   updated_at: string;
 }
@@ -312,10 +326,17 @@ const VideoRequestForm: React.FC<{ onSubmit: (job: Partial<VideoJob>) => void; o
 
 // ─── Video job card ───────────────────────────────────────────────────────────
 
-const VideoJobCard: React.FC<{ job: VideoJob; onPlay: (url: string) => void }> = ({ job, onPlay }) => {
+const VideoJobCard: React.FC<{
+  job: VideoJob;
+  onPlay: (url: string) => void;
+  onViewScript: (job: VideoJob) => void;
+  onViewStoryboard: (job: VideoJob) => void;
+}> = ({ job, onPlay, onViewScript, onViewStoryboard }) => {
   const sc = STATUS_CONFIG[job.status];
   const StatusIcon = sc.icon;
   const isActive = ['queued', 'scripting', 'storyboard', 'assets', 'rendering'].includes(job.status);
+  const hasScript = !!job.script && job.script.length > 50;
+  const hasStoryboard = Array.isArray(job.storyboard) && job.storyboard.length > 0;
 
   return (
     <div className="bg-gray-900/50 border border-gray-800/60 rounded-xl p-4 hover:border-gray-700 transition-all">
@@ -345,18 +366,46 @@ const VideoJobCard: React.FC<{ job: VideoJob; onPlay: (url: string) => void }> =
         </div>
       )}
 
+      {job.status === 'failed' && job.error_message && (
+        <p className="text-xs text-red-400/80 mb-3 line-clamp-2">{job.error_message}</p>
+      )}
+
       <div className="flex items-center justify-between">
         <span className="text-xs text-gray-600">{timeAgo(job.updated_at)}</span>
-        {job.status === 'complete' && job.output_url && (
-          <Button
-            size="sm"
-            onClick={() => onPlay(job.output_url!)}
-            className="bg-green-700/50 hover:bg-green-700 text-green-300 h-6 text-xs"
-          >
-            <Play className="w-3 h-3 mr-1" />
-            Play
-          </Button>
-        )}
+        <div className="flex items-center gap-1.5">
+          {hasScript && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onViewScript(job)}
+              className="text-blue-400 hover:text-blue-300 h-6 text-xs px-2"
+            >
+              <FileText className="w-3 h-3 mr-1" />
+              Script
+            </Button>
+          )}
+          {hasStoryboard && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => onViewStoryboard(job)}
+              className="text-purple-400 hover:text-purple-300 h-6 text-xs px-2"
+            >
+              <Clapperboard className="w-3 h-3 mr-1" />
+              {job.storyboard!.length} Scenes
+            </Button>
+          )}
+          {job.status === 'complete' && job.output_url && (
+            <Button
+              size="sm"
+              onClick={() => onPlay(job.output_url!)}
+              className="bg-green-700/50 hover:bg-green-700 text-green-300 h-6 text-xs"
+            >
+              <Play className="w-3 h-3 mr-1" />
+              Play
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -371,6 +420,8 @@ const RivenVideoHub: React.FC<RivenVideoHubProps> = ({ onCreateCampaign, onOpenP
   const [showForm, setShowForm] = useState(false);
   const [playUrl, setPlayUrl] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [viewScriptJob, setViewScriptJob] = useState<VideoJob | null>(null);
+  const [viewStoryboardJob, setViewStoryboardJob] = useState<VideoJob | null>(null);
 
   const load = async () => {
     const { data } = await db
@@ -551,7 +602,13 @@ const RivenVideoHub: React.FC<RivenVideoHubProps> = ({ onCreateCampaign, onOpenP
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(job => (
-            <VideoJobCard key={job.id} job={job} onPlay={setPlayUrl} />
+            <VideoJobCard
+              key={job.id}
+              job={job}
+              onPlay={setPlayUrl}
+              onViewScript={setViewScriptJob}
+              onViewStoryboard={setViewStoryboardJob}
+            />
           ))}
         </div>
       )}
@@ -568,17 +625,121 @@ const RivenVideoHub: React.FC<RivenVideoHubProps> = ({ onCreateCampaign, onOpenP
         </div>
       )}
 
-      {/* Phase 2 notice */}
+      {/* Phase 4 notice */}
       <div className="mt-10 p-4 rounded-xl bg-violet-950/20 border border-violet-900/30">
         <div className="flex items-center gap-2 mb-1">
           <Zap className="w-4 h-4 text-violet-400" />
-          <span className="text-sm font-semibold text-violet-300">Phase 2 — Remotion + FFmpeg rendering</span>
+          <span className="text-sm font-semibold text-violet-300">Phase 4 — Remotion + FFmpeg rendering</span>
         </div>
         <p className="text-xs text-gray-500">
-          Full video rendering with Remotion, FFmpeg processing, and AI voiceover generation will be activated in Phase 2.
-          Jobs queued now will process automatically once the render pipeline is deployed.
+          Full video rendering with Remotion, FFmpeg processing, and AI voiceover generation will be activated in Phase 4.
+          Scripts and storyboards are generated now — review them in the cards above.
         </p>
       </div>
+
+      {/* Script preview modal */}
+      {viewScriptJob && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setViewScriptJob(null)}
+        >
+          <div
+            className="bg-gray-950 border border-gray-800 rounded-2xl max-w-3xl w-full max-h-[80vh] flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+              <div>
+                <h3 className="text-lg font-semibold text-white">{viewScriptJob.title}</h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {viewScriptJob.video_type.replace(/_/g, ' ')} · {viewScriptJob.format} · {viewScriptJob.duration_target}
+                </p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setViewScriptJob(null)} className="text-gray-500 h-8 w-8 p-0">
+                ×
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              <pre className="text-sm text-gray-300 whitespace-pre-wrap font-mono leading-relaxed">
+                {viewScriptJob.script}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Storyboard preview modal */}
+      {viewStoryboardJob && viewStoryboardJob.storyboard && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setViewStoryboardJob(null)}
+        >
+          <div
+            className="bg-gray-950 border border-gray-800 rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+              <div>
+                <h3 className="text-lg font-semibold text-white">{viewStoryboardJob.title} — Storyboard</h3>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {viewStoryboardJob.storyboard.length} scenes ·{' '}
+                  {viewStoryboardJob.storyboard.reduce((t, s) => t + (s.duration_seconds || 0), 0)}s total
+                </p>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => setViewStoryboardJob(null)} className="text-gray-500 h-8 w-8 p-0">
+                ×
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+              {viewStoryboardJob.storyboard.map((scene, i) => (
+                <div key={i} className="bg-gray-900/60 border border-gray-800 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-violet-900/40 border border-violet-700/50 flex items-center justify-center">
+                        <span className="text-sm font-bold text-violet-300">{scene.scene_number}</span>
+                      </div>
+                      <div>
+                        <span className="text-xs font-medium text-gray-400">{scene.camera_direction}</span>
+                        <span className="text-xs text-gray-600 ml-2">{scene.duration_seconds}s</span>
+                      </div>
+                    </div>
+                    <Badge variant="secondary" className="text-xs bg-gray-800 text-gray-400 border-gray-700">
+                      {scene.mood}
+                    </Badge>
+                  </div>
+
+                  <p className="text-sm text-gray-300 mb-2">{scene.visual_description}</p>
+
+                  {scene.voiceover && (
+                    <div className="bg-gray-950/60 rounded-lg p-2.5 mb-2">
+                      <span className="text-xs font-semibold text-blue-400 block mb-1">VO</span>
+                      <p className="text-xs text-gray-400 italic">{scene.voiceover}</p>
+                    </div>
+                  )}
+
+                  {scene.on_screen_text && (
+                    <div className="bg-gray-950/60 rounded-lg p-2.5 mb-2">
+                      <span className="text-xs font-semibold text-green-400 block mb-1">TEXT</span>
+                      <p className="text-xs text-gray-400">{scene.on_screen_text}</p>
+                    </div>
+                  )}
+
+                  {scene.music_note && (
+                    <p className="text-xs text-gray-600 mt-1">♫ {scene.music_note}</p>
+                  )}
+
+                  {scene.color_palette && scene.color_palette.length > 0 && (
+                    <div className="flex items-center gap-1 mt-2">
+                      {scene.color_palette.map((hex, ci) => (
+                        <div key={ci} className="w-4 h-4 rounded-sm border border-gray-700" style={{ backgroundColor: hex }} title={hex} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

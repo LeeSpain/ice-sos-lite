@@ -430,9 +430,6 @@ const RivenApprovalCenter: React.FC<RivenApprovalCenterProps> = ({
   const toggleSelect = (id: string) =>
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
 
-  const selectAll = () =>
-    setSelectedIds(filtered.filter(a => a.status === 'ready').map(a => a.id));
-
   // Asset type tabs
   const types = ['all', ...Array.from(new Set(assets.map(a => a.asset_type)))];
   const statuses = ['all', 'ready', 'approved', 'rejected', 'generating'];
@@ -442,6 +439,9 @@ const RivenApprovalCenter: React.FC<RivenApprovalCenterProps> = ({
     if (filterStatus !== 'all' && a.status !== filterStatus) return false;
     return true;
   });
+
+  const selectAll = () =>
+    setSelectedIds(filtered.filter(a => a.status === 'ready').map(a => a.id));
 
   const stats = {
     total: assets.length,

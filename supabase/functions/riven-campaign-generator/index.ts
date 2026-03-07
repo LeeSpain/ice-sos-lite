@@ -205,7 +205,11 @@ async function updateStage(
 }
 
 async function insertAsset(supabase: any, campaignId: string, assetType: string, platform: string | null, title: string, content: string) {
-  await supabase.from('riven_assets').insert({
+  if (!content || content.trim().length === 0) {
+    console.warn(`[Riven] Skipping empty ${assetType} asset for campaign ${campaignId}`);
+    return;
+  }
+  const { error } = await supabase.from('riven_assets').insert({
     campaign_id: campaignId,
     asset_type: assetType,
     platform,
@@ -214,6 +218,7 @@ async function insertAsset(supabase: any, campaignId: string, assetType: string,
     status: 'ready',
     version: 1,
   });
+  if (error) console.error(`[Riven] Asset insert failed (${assetType}):`, error);
 }
 
 // ─── Main handler ─────────────────────────────────────────────────────────────
@@ -314,14 +319,18 @@ serve(async (req) => {
 
     // ── Blog ──────────────────────────────────────────────────────────────────
     if (outputTypes.includes('blog')) {
+      await updateStage(supabase, campaign_id, 'blog_gen', 'running', 0);
       const { title, content } = await generateBlogPost(claude, campaign);
       await insertAsset(supabase, campaign_id, 'blog', 'blog', title, content);
+      await updateStage(supabase, campaign_id, 'blog_gen', 'completed', 100, 'Blog article generated');
     }
 
     // ── Ads ───────────────────────────────────────────────────────────────────
     if (outputTypes.includes('ad')) {
+      await updateStage(supabase, campaign_id, 'ad_gen', 'running', 0);
       const adContent = await generateAdCopy(claude, campaign);
       await insertAsset(supabase, campaign_id, 'ad', null, `${campaign.title} — Ad Copy`, adContent);
+      await updateStage(supabase, campaign_id, 'ad_gen', 'completed', 100, 'Ad copy generated');
     }
 
     // ── Skip stages not applicable to this campaign's output types ─────────
@@ -331,7 +340,7 @@ serve(async (req) => {
 
     // Mark stages that exist but weren't actively processed
     const stageUpdates: [string, boolean, string][] = [
-      ['storyboard', hasVideo, 'Storyboard generated via video pipeline'],
+      ['storyboard', hasVideo, 'Script ready — use Video Hub for full storyboard generation'],
       ['voice', hasVideo, 'Deferred to Phase 4 — ComfyUI integration'],
       ['subtitles', hasVideo, 'Deferred to Phase 4 — ComfyUI integration'],
       ['render', hasVideo, 'Deferred to Phase 4 — ComfyUI integration'],

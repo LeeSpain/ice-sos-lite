@@ -75,8 +75,16 @@ function buildPipelineStages(outputTypes: string[]) {
     stages.push({ stage_name: 'email_gen', stage_order: 10 });
   }
 
-  stages.push({ stage_name: 'qa', stage_order: 11 });
-  stages.push({ stage_name: 'approval_ready', stage_order: 12 });
+  if (outputTypes.includes('blog')) {
+    stages.push({ stage_name: 'blog_gen', stage_order: 11 });
+  }
+
+  if (outputTypes.includes('ad')) {
+    stages.push({ stage_name: 'ad_gen', stage_order: 12 });
+  }
+
+  stages.push({ stage_name: 'qa', stage_order: 13 });
+  stages.push({ stage_name: 'approval_ready', stage_order: 14 });
 
   return stages;
 }

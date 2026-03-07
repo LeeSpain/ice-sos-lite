@@ -51,15 +51,18 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let variant_id: string | undefined;
+
   try {
+    const body = await req.json();
+    variant_id = body.variant_id;
     const {
-      variant_id,
       asset_id,
       strategy_id,
       hypothesis,
       original_content,
       asset_type,
-    } = await req.json();
+    } = body;
 
     const supabaseUrl  = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -138,6 +141,20 @@ serve(async (req) => {
 
   } catch (err) {
     console.error('[Riven A/B] Error:', err);
+
+    // Mark variant as cancelled so UI reflects failure
+    if (variant_id) {
+      try {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL')!,
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        );
+        await supabase.from('riven_ab_variants').update({
+          status: 'cancelled',
+        }).eq('id', variant_id);
+      } catch { /* best effort */ }
+    }
+
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

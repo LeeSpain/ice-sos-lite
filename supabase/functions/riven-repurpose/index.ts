@@ -118,8 +118,11 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let job_id: string | undefined;
+
   try {
-    const { job_id } = await req.json();
+    const body = await req.json();
+    job_id = body.job_id;
 
     const supabaseUrl  = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -244,6 +247,21 @@ serve(async (req) => {
 
   } catch (err) {
     console.error('[Riven Repurpose] Error:', err);
+
+    // Mark job as failed so UI reflects the error
+    if (job_id) {
+      try {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL')!,
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        );
+        await supabase.from('riven_repurpose_jobs').update({
+          status: 'failed',
+          error_message: String(err).slice(0, 500),
+        }).eq('id', job_id);
+      } catch { /* best effort */ }
+    }
+
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

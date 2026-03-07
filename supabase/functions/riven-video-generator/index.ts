@@ -189,11 +189,28 @@ serve(async (req) => {
     await updateJob(supabase, job_id, { status: 'scripting', progress: 10 });
 
     const script = await generateScript(claude, job);
+    if (!script || script.trim().length === 0) {
+      throw new Error('Claude returned empty script');
+    }
+
     await updateJob(supabase, job_id, {
       script,
       status: 'storyboard',
       progress: 40,
     });
+
+    // Insert script as a riven_asset so it appears in Approval Center + Content Library
+    const { error: scriptAssetErr } = await supabase.from('riven_assets').insert({
+      campaign_id: job.campaign_id ?? null,
+      asset_type: 'script',
+      platform: null,
+      title: `${job.title} — Video Script`,
+      content: script,
+      status: 'ready',
+      version: 1,
+      metadata: { video_job_id: job_id, video_type: job.video_type },
+    });
+    if (scriptAssetErr) console.warn('[Riven Video] Script asset insert failed:', scriptAssetErr);
 
     console.log(`[Riven Video] Script complete for job ${job_id}`);
 
@@ -205,9 +222,24 @@ serve(async (req) => {
       progress: 70,
     });
 
+    // Insert storyboard as a riven_asset
+    if (storyboard.length > 0) {
+      const { error: sbAssetErr } = await supabase.from('riven_assets').insert({
+        campaign_id: job.campaign_id ?? null,
+        asset_type: 'storyboard',
+        platform: null,
+        title: `${job.title} — Storyboard (${storyboard.length} scenes)`,
+        content: JSON.stringify(storyboard, null, 2),
+        status: 'ready',
+        version: 1,
+        metadata: { video_job_id: job_id, scene_count: storyboard.length },
+      });
+      if (sbAssetErr) console.warn('[Riven Video] Storyboard asset insert failed:', sbAssetErr);
+    }
+
     console.log(`[Riven Video] Storyboard complete — ${storyboard.length} scenes for job ${job_id}`);
 
-    // ── Stage 3: Assets prep (placeholder — Phase 2 will add ComfyUI here) ──
+    // ── Stage 3: Assets prep (placeholder — Phase 4 will add ComfyUI here) ──
     await updateJob(supabase, job_id, {
       status: 'rendering',
       progress: 85,
@@ -216,12 +248,12 @@ serve(async (req) => {
         duration_target: job.duration_target,
         video_type: job.video_type,
         scene_count: storyboard.length,
-        phase: 2,
-        note: 'Awaiting Remotion/FFmpeg integration in Phase 2',
+        phase: 4,
+        note: 'Awaiting Remotion/FFmpeg integration in Phase 4',
       },
     });
 
-    // ── Stage 4: Mark complete (rendering deferred to Phase 2) ───────────────
+    // ── Stage 4: Mark complete (rendering deferred to Phase 4) ───────────────
     await updateJob(supabase, job_id, {
       status: 'complete',
       progress: 100,
@@ -232,7 +264,7 @@ serve(async (req) => {
       campaign_id: job.campaign_id ?? null,
       type: 'generation_complete',
       title: 'Video job ready',
-      message: `"${job.title}" script and storyboard are complete. Rendering will be available in Phase 2.`,
+      message: `"${job.title}" script and storyboard are complete (${storyboard.length} scenes). Review in Approval Center.`,
       read: false,
     });
 
