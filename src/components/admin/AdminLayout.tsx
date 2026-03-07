@@ -11,39 +11,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarTrigger,
-  useSidebar
+  SidebarTrigger
 } from '@/components/ui/sidebar';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  BarChart3,
-  Users,
-  MessageSquare,
-  AlertTriangle,
-  Activity,
-  Settings,
-  FileText,
-  DollarSign,
-  TrendingUp,
-  Heart,
   Shield,
-  Database,
-  Bot,
-  Brain,
-  Package,
-  MapPin,
-  Mail,
-  Smartphone,
-  Bluetooth,
-  Video,
-  Map,
-  Navigation,
-  History,
-  Phone,
-  Building,
-  BookOpen,
-  Target,
-  Send,
   ChevronDown,
   ChevronRight,
   LogOut
@@ -63,94 +35,93 @@ const useAdminMenuItems = () => {
     {
       title: t('admin.overview'),
       items: [
-        { title: t('admin.dashboard'), url: "/admin-dashboard", icon: BarChart3 },
-        { title: t('admin.analytics'), url: "/admin-dashboard/analytics", icon: BarChart3 },
-        { title: t('admin.videoAnalytics'), url: "/admin-dashboard/video-analytics", icon: Video },
-        { title: t('admin.revenueAnalytics'), url: "/admin-dashboard/revenue", icon: DollarSign },
-        { title: t('admin.userGrowth'), url: "/admin-dashboard/growth", icon: TrendingUp },
+        { title: t('admin.dashboard'), url: "/admin-dashboard" },
+        { title: t('admin.analytics'), url: "/admin-dashboard/analytics" },
+        { title: t('admin.videoAnalytics'), url: "/admin-dashboard/video-analytics" },
+        { title: t('admin.revenueAnalytics'), url: "/admin-dashboard/revenue" },
+        { title: t('admin.userGrowth'), url: "/admin-dashboard/growth" },
       ]
     },
     {
-      title: t('admin.aiMarketing'), 
+      title: t('admin.aiMarketing'),
       items: [
-        { title: t('admin.claraAiAgent'), url: "/admin-dashboard/ai-agent", icon: Bot },
-        { title: t('admin.rivenMarketingAi'), url: "/admin-dashboard/riven-marketing", icon: Brain },
-        { title: t('admin.aiPerformance'), url: "/admin-dashboard/ai-metrics", icon: BarChart3 },
+        { title: t('admin.claraAiAgent'), url: "/admin-dashboard/ai-agent" },
+        { title: t('admin.rivenMarketingAi'), url: "/admin-dashboard/riven-marketing" },
+        { title: t('admin.aiPerformance'), url: "/admin-dashboard/ai-metrics" },
       ]
     },
     {
-      title: t('admin.customerManagement'), 
+      title: t('admin.customerManagement'),
       items: [
-        { title: t('admin.allCustomers'), url: "/admin-dashboard/customers", icon: Users },
-        { title: t('admin.subscriptions'), url: "/admin-dashboard/subscriptions", icon: Database },
-        { title: t('admin.familyAccounts'), url: "/admin-dashboard/families", icon: Heart },
+        { title: t('admin.allCustomers'), url: "/admin-dashboard/customers" },
+        { title: t('admin.subscriptions'), url: "/admin-dashboard/subscriptions" },
+        { title: t('admin.familyAccounts'), url: "/admin-dashboard/families" },
       ]
     },
     {
       title: t('admin.aiChatLeads'),
       items: [
-        { title: t('admin.leadManagement'), url: "/admin-dashboard/leads", icon: MessageSquare },
-        { title: t('admin.leadIntelligence'), url: "/admin-dashboard/lead-intelligence", icon: Target },
-        { title: t('admin.conversations'), url: "/admin-dashboard/conversations", icon: MessageSquare },
+        { title: t('admin.leadManagement'), url: "/admin-dashboard/leads" },
+        { title: t('admin.leadIntelligence'), url: "/admin-dashboard/lead-intelligence" },
+        { title: t('admin.conversations'), url: "/admin-dashboard/conversations" },
       ]
     },
     {
       title: t('admin.communicationMarketing'),
       items: [
-        { title: t('admin.contactSubmissions'), url: "/admin-dashboard/contact-submissions", icon: Mail },
-        { title: t('admin.communicationCenter'), url: "/admin-dashboard/communication", icon: MessageSquare },
+        { title: t('admin.contactSubmissions'), url: "/admin-dashboard/contact-submissions" },
+        { title: t('admin.communicationCenter'), url: "/admin-dashboard/communication" },
       ]
     },
     {
       title: t('admin.liveMapManagement'),
       items: [
-        { title: t('admin.liveMapMonitor'), url: "/admin-dashboard/live-map-monitor", icon: Map },
-        { title: t('admin.circleAnalytics'), url: "/admin-dashboard/circle-analytics", icon: Users },
-        { title: t('admin.geofenceManagement'), url: "/admin-dashboard/geofence-admin", icon: Navigation },
-        { title: t('admin.locationData'), url: "/admin-dashboard/location-admin", icon: History },
+        { title: t('admin.liveMapMonitor'), url: "/admin-dashboard/live-map-monitor" },
+        { title: t('admin.circleAnalytics'), url: "/admin-dashboard/circle-analytics" },
+        { title: t('admin.geofenceManagement'), url: "/admin-dashboard/geofence-admin" },
+        { title: t('admin.locationData'), url: "/admin-dashboard/location-admin" },
       ]
     },
     {
       title: t('admin.emergencySafety'),
       items: [
-        { title: 'SOS Incidents (Clar AI)', url: "/admin-dashboard/sos-incidents", icon: AlertTriangle },
-        { title: t('admin.emergencyIncidents'), url: "/admin-dashboard/emergencies", icon: AlertTriangle },
-        { title: t('admin.safetyMonitoring'), url: "/admin-dashboard/safety", icon: Shield },
+        { title: 'SOS Incidents (Clar AI)', url: "/admin-dashboard/sos-incidents" },
+        { title: t('admin.emergencyIncidents'), url: "/admin-dashboard/emergencies" },
+        { title: t('admin.safetyMonitoring'), url: "/admin-dashboard/safety" },
       ]
     },
     {
       title: t('admin.regionalManagement'),
       items: [
-        { title: t('admin.regionalHub'), url: "/admin-dashboard/regional-hub", icon: MapPin },
-        { title: t('admin.regionalOrganizations'), url: "/admin-dashboard/regional-organizations", icon: Building },
-        { title: t('admin.regionalUsers'), url: "/admin-dashboard/regional-users", icon: Users },
-        { title: t('admin.regionalAudit'), url: "/admin-dashboard/regional-audit", icon: FileText },
-        { title: 'Transfer to Care Conneqt', url: "/admin-dashboard/transfer-to-care", icon: Send },
+        { title: t('admin.regionalHub'), url: "/admin-dashboard/regional-hub" },
+        { title: t('admin.regionalOrganizations'), url: "/admin-dashboard/regional-organizations" },
+        { title: t('admin.regionalUsers'), url: "/admin-dashboard/regional-users" },
+        { title: t('admin.regionalAudit'), url: "/admin-dashboard/regional-audit" },
+        { title: 'Transfer to Care Conneqt', url: "/admin-dashboard/transfer-to-care" },
       ]
     },
     {
       title: t('admin.productServices'),
       items: [
-        { title: t('admin.products'), url: "/admin-dashboard/products", icon: Package },
-        { title: t('admin.regionalServices'), url: "/admin-dashboard/regional-services", icon: MapPin },
-        { title: t('admin.subscriptionPlans'), url: "/admin-dashboard/subscription-plans", icon: Shield },
-        { title: t('admin.flickControl'), url: "/admin-dashboard/flic-control", icon: Bluetooth },
+        { title: t('admin.products'), url: "/admin-dashboard/products" },
+        { title: t('admin.regionalServices'), url: "/admin-dashboard/regional-services" },
+        { title: t('admin.subscriptionPlans'), url: "/admin-dashboard/subscription-plans" },
+        { title: t('admin.flickControl'), url: "/admin-dashboard/flic-control" },
       ]
     },
     {
       title: t('admin.system'),
       items: [
-        { title: t('admin.userActivity'), url: "/admin-dashboard/activity", icon: Activity },
-        { title: t('admin.systemSettings'), url: "/admin-dashboard/settings", icon: Settings },
-        { title: t('admin.reports'), url: "/admin-dashboard/reports", icon: FileText },
-        { title: t('admin.appTesting'), url: "/admin-dashboard/app-testing", icon: Smartphone },
+        { title: t('admin.userActivity'), url: "/admin-dashboard/activity" },
+        { title: t('admin.systemSettings'), url: "/admin-dashboard/settings" },
+        { title: t('admin.reports'), url: "/admin-dashboard/reports" },
+        { title: t('admin.appTesting'), url: "/admin-dashboard/app-testing" },
       ]
     }
   ];
 };
 
 function AdminSidebar() {
-  const { state } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const { t } = useTranslation();
@@ -182,21 +153,19 @@ function AdminSidebar() {
   };
 
   return (
-    <Sidebar className={state === "collapsed" ? "w-16" : "w-64"} variant="sidebar">
+    <Sidebar collapsible="offcanvas" className="w-64" variant="sidebar">
       <SidebarContent className="bg-sidebar border-r border-sidebar-border">
         <div className="p-4 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-sidebar-primary to-primary rounded-xl flex items-center justify-center shadow-lg">
               <Shield className="h-6 w-6 text-sidebar-primary-foreground" />
             </div>
-            {state !== "collapsed" && (
-              <div>
-                <h2 className="font-bold text-lg text-sidebar-foreground">
-                  {t('dashboard.iceAdmin')}
-                </h2>
-                <p className="text-xs text-sidebar-foreground/60">{t('dashboard.managementDashboard')}</p>
-              </div>
-            )}
+            <div>
+              <h2 className="font-bold text-lg text-sidebar-foreground">
+                {t('dashboard.iceAdmin')}
+              </h2>
+              <p className="text-xs text-sidebar-foreground/60">{t('dashboard.managementDashboard')}</p>
+            </div>
           </div>
         </div>
 
@@ -207,7 +176,7 @@ function AdminSidebar() {
           return (
             <SidebarGroup key={group.title} className="px-3 py-2">
               <SidebarGroupLabel
-                className={`${state === "collapsed" ? 'hidden' : 'block'} text-sm font-semibold px-2 py-2 flex items-center gap-2 cursor-pointer hover:bg-sidebar-accent/50 rounded-md transition-colors ${
+                className={`text-sm font-semibold px-2 py-2 flex items-center gap-2 cursor-pointer hover:bg-sidebar-accent/50 rounded-md transition-colors ${
                   hasActiveItem ? 'text-sidebar-primary' : 'text-sidebar-foreground/70'
                 }`}
                 onClick={() => toggleSection(group.title)}
@@ -241,23 +210,14 @@ function AdminSidebar() {
                           <NavLink
                             to={item.url}
                             className={({ isActive }) =>
-                              `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                              `flex items-center px-3 py-2 rounded-lg transition-all duration-200 text-sm ${
                                 isActive
-                                  ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg scale-[1.02]'
-                                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:scale-[1.01]'
+                                  ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg'
+                                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                               }`
                             }
                           >
-                            <div className={`p-1.5 rounded-md transition-colors ${
-                              isActive(item.url)
-                                ? 'bg-white/20'
-                                : 'bg-sidebar-accent/50 group-hover:bg-sidebar-accent'
-                            }`}>
-                              <item.icon className="h-4 w-4" />
-                            </div>
-                            {state !== "collapsed" && (
-                              <span className="font-medium text-sm">{item.title}</span>
-                            )}
+                            {item.title}
                           </NavLink>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
