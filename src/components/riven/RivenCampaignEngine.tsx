@@ -344,6 +344,9 @@ const RivenCampaignEngine: React.FC = () => {
   const handleWizardSubmit = useCallback(async (data: CampaignFormData) => {
     setCreating(true);
     try {
+      // Get current user for created_by
+      const { data: { session } } = await supabase.auth.getSession();
+
       // 1. Create the campaign record
       const { data: campaign, error: campErr } = await db
         .from('riven_campaigns')
@@ -361,6 +364,7 @@ const RivenCampaignEngine: React.FC = () => {
           format_preferences: data.format_preferences,
           asset_sources: data.asset_sources,
           status: 'generating',
+          created_by: session?.user?.id ?? null,
         })
         .select()
         .single();
@@ -402,6 +406,7 @@ const RivenCampaignEngine: React.FC = () => {
             tone: data.tone,
             output_types: data.output_types,
             channels: data.channels,
+            format_preferences: data.format_preferences,
           },
         },
       }).catch(err => {

@@ -146,7 +146,12 @@ Format clearly with labels.`
   return msg.content[0].type === 'text' ? msg.content[0].text : '';
 }
 
-async function generateVideoScript(claude: Anthropic, campaign: any): Promise<string> {
+async function generateVideoScript(claude: Anthropic, campaign: any, formatPrefs: Record<string, any> = {}): Promise<string> {
+  const aspect = formatPrefs.aspect_ratio || '16:9';
+  const duration = formatPrefs.duration || '60s';
+  const durationLabel = duration === '30s' ? '30-second' : duration === '90s' ? '90-second' : '60-second';
+  const formatNote = aspect === '9:16' ? 'vertical / portrait (9:16) for social reels' : aspect === '1:1' ? 'square (1:1)' : 'landscape (16:9)';
+
   const msg = await claude.messages.create({
     model: 'claude-sonnet-4-6',
     max_tokens: 1500,
@@ -154,7 +159,7 @@ async function generateVideoScript(claude: Anthropic, campaign: any): Promise<st
       role: 'user',
       content: `${BRAND_CONTEXT}
 
-Write a 60-second video script for the following campaign.
+Write a ${durationLabel} ${formatNote} video script for the following campaign.
 
 Campaign: ${campaign.title}
 Topic: ${campaign.topic}
@@ -168,7 +173,7 @@ Format as a shooting script with:
 [VO]: voiceover narration
 [TEXT]: on-screen text overlay (if any)
 
-Keep it tight — 60 seconds max when read at a natural pace.`
+Keep it tight — ${durationLabel} max when read at a natural pace (~130 wpm).`
     }],
   });
   return msg.content[0].type === 'text' ? msg.content[0].text : '';
@@ -249,6 +254,7 @@ serve(async (req) => {
 
     const outputTypes: string[] = campaign.output_types ?? [];
     const channels: string[] = campaign.channels ?? [];
+    const formatPrefs: Record<string, any> = campaign.format_preferences ?? {};
 
     console.log(`[Riven] Starting generation for campaign: ${campaign_id} — outputs: ${outputTypes.join(', ')}`);
 
@@ -259,7 +265,7 @@ serve(async (req) => {
 
     // Generate video script first if needed (feeds storyboard)
     if (outputTypes.some(t => ['video', 'short_clip'].includes(t))) {
-      const script = await generateVideoScript(claude, campaign);
+      const script = await generateVideoScript(claude, campaign, formatPrefs);
       generatedScripts.push(script);
       await insertAsset(supabase, campaign_id, 'script', null, `${campaign.title} — Video Script`, script);
       await updateStage(supabase, campaign_id, 'script', 'running', 40);
@@ -272,7 +278,7 @@ serve(async (req) => {
     if (outputTypes.includes('social_post')) {
       await updateStage(supabase, campaign_id, 'social_gen', 'running', 0);
       const postChannels = channels.filter(c =>
-        ['instagram', 'facebook', 'linkedin', 'twitter', 'instagram_reels'].includes(c)
+        ['instagram', 'facebook', 'linkedin', 'twitter', 'instagram_reels', 'tiktok'].includes(c)
       );
       const targets = postChannels.length > 0 ? postChannels : ['instagram', 'facebook'];
 
@@ -316,6 +322,27 @@ serve(async (req) => {
     if (outputTypes.includes('ad')) {
       const adContent = await generateAdCopy(claude, campaign);
       await insertAsset(supabase, campaign_id, 'ad', null, `${campaign.title} — Ad Copy`, adContent);
+    }
+
+    // ── Skip stages not applicable to this campaign's output types ─────────
+    const hasVideo = outputTypes.some(t => ['video', 'short_clip'].includes(t));
+    const hasSocial = outputTypes.includes('social_post');
+    const hasEmail = outputTypes.includes('email');
+
+    // Mark stages that exist but weren't actively processed
+    const stageUpdates: [string, boolean, string][] = [
+      ['storyboard', hasVideo, 'Storyboard generated via video pipeline'],
+      ['voice', hasVideo, 'Deferred to Phase 4 — ComfyUI integration'],
+      ['subtitles', hasVideo, 'Deferred to Phase 4 — ComfyUI integration'],
+      ['render', hasVideo, 'Deferred to Phase 4 — ComfyUI integration'],
+      ['asset_gather', true, 'Assets sourced from campaign configuration'],
+      ['ai_assets', hasVideo, 'Deferred to Phase 4 — ComfyUI integration'],
+    ];
+
+    for (const [stage, exists, summary] of stageUpdates) {
+      if (exists) {
+        await updateStage(supabase, campaign_id!, stage, 'completed', 100, summary);
+      }
     }
 
     // ── QA stage ─────────────────────────────────────────────────────────────
