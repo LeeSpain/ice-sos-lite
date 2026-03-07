@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 import {
   CheckCircle2, Circle, Loader2, XCircle, SkipForward,
   FileText, Image, Mic, Video, Mail, Share2, ShieldCheck,
-  Layers, Eye, Clock, AlertCircle, BookOpen, Megaphone
+  Layers, Eye, Clock, AlertCircle, BookOpen, Megaphone, RefreshCw, RotateCcw
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -78,11 +79,13 @@ function elapsed(started?: string, ended?: string): string {
 const RivenPipelineView: React.FC<RivenPipelineViewProps> = ({
   campaignId, campaignTitle, onApprovalReady
 }) => {
+  const { toast } = useToast();
   const [stages, setStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [retrying, setRetrying] = useState(false);
 
   // Load stages
-  const loadStages = async () => {
+  const loadStages = useCallback(async () => {
     const { data } = await db
       .from('riven_pipeline_stages')
       .select('*')
@@ -90,7 +93,43 @@ const RivenPipelineView: React.FC<RivenPipelineViewProps> = ({
       .order('stage_order', { ascending: true });
     if (data) setStages(data as PipelineStage[]);
     setLoading(false);
-  };
+  }, [campaignId]);
+
+  // Retry generation — re-invoke the edge function
+  const retryGeneration = useCallback(async () => {
+    setRetrying(true);
+    try {
+      // Reset failed/pending stages back to pending
+      await db.from('riven_pipeline_stages')
+        .update({ status: 'pending', progress: 0, error_message: null, output_summary: null })
+        .eq('campaign_id', campaignId)
+        .in('status', ['failed', 'pending']);
+
+      // Reset campaign status to generating
+      await db.from('riven_campaigns')
+        .update({ status: 'generating' })
+        .eq('id', campaignId);
+
+      // Re-invoke edge function
+      const { error: fnErr } = await supabase.functions.invoke('riven-campaign-generator', {
+        body: { campaign_id: campaignId },
+      });
+
+      if (fnErr) {
+        toast({ title: 'Retry failed', description: 'Edge function returned an error. Check Supabase function logs.', variant: 'destructive' });
+      } else {
+        toast({ title: 'Generation restarted', description: 'Watch for pipeline updates.' });
+      }
+    } catch (err: any) {
+      toast({
+        title: 'Edge function not reachable',
+        description: 'Deploy with: supabase functions deploy riven-campaign-generator',
+        variant: 'destructive',
+      });
+    }
+    setRetrying(false);
+    loadStages();
+  }, [campaignId, toast, loadStages]);
 
   useEffect(() => {
     loadStages();
@@ -122,8 +161,16 @@ const RivenPipelineView: React.FC<RivenPipelineViewProps> = ({
       )
       .subscribe();
 
-    return () => { supabase.removeChannel(channel); };
-  }, [campaignId]);
+    // Polling fallback — check for updates every 5 seconds when generation is active
+    const poll = setInterval(() => {
+      loadStages();
+    }, 5000);
+
+    return () => {
+      supabase.removeChannel(channel);
+      clearInterval(poll);
+    };
+  }, [campaignId, loadStages]);
 
   const completedCount = stages.filter(s => s.status === 'completed').length;
   const totalCount = stages.filter(s => s.status !== 'skipped').length;
@@ -131,6 +178,8 @@ const RivenPipelineView: React.FC<RivenPipelineViewProps> = ({
   const hasFailed = stages.some(s => s.status === 'failed');
   const isComplete = stages.some(s => s.stage_name === 'approval_ready' && s.status === 'completed');
   const runningStage = stages.find(s => s.status === 'running');
+  const isStuck = stages.length > 0 && !hasFailed && !isComplete && !runningStage
+    && stages.some(s => s.status === 'pending');
 
   if (loading) {
     return (
@@ -149,9 +198,18 @@ const RivenPipelineView: React.FC<RivenPipelineViewProps> = ({
             <h2 className="text-xl font-bold text-white mb-1">{campaignTitle}</h2>
             <p className="text-gray-400 text-sm">Generation pipeline — live status</p>
           </div>
-          <div className="text-right">
-            <div className="text-2xl font-bold text-white">{overallProgress}%</div>
-            <div className="text-xs text-gray-500">{completedCount} of {totalCount} stages done</div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={loadStages}
+              className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors"
+              title="Refresh stages"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-white">{overallProgress}%</div>
+              <div className="text-xs text-gray-500">{completedCount} of {totalCount} stages done</div>
+            </div>
           </div>
         </div>
 
@@ -160,9 +218,21 @@ const RivenPipelineView: React.FC<RivenPipelineViewProps> = ({
         </div>
 
         {hasFailed && (
-          <div className="mt-3 flex items-center gap-2 text-sm text-red-400 bg-red-900/20 border border-red-900/40 rounded-lg px-3 py-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            One or more stages failed. Review the details below.
+          <div className="mt-3 flex items-center justify-between text-sm text-red-400 bg-red-900/20 border border-red-900/40 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              One or more stages failed. Review the details below.
+            </div>
+            <Button
+              onClick={retryGeneration}
+              disabled={retrying}
+              size="sm"
+              variant="outline"
+              className="border-red-800 text-red-300 hover:bg-red-900/40 ml-2"
+            >
+              {retrying ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <RotateCcw className="w-3.5 h-3.5 mr-1" />}
+              Retry
+            </Button>
           </div>
         )}
 
@@ -178,6 +248,25 @@ const RivenPipelineView: React.FC<RivenPipelineViewProps> = ({
               className="bg-green-600 hover:bg-green-500 text-white"
             >
               Go to Approval Center
+            </Button>
+          </div>
+        )}
+
+        {isStuck && (
+          <div className="mt-3 flex items-center justify-between text-sm text-amber-400 bg-amber-900/20 border border-amber-800/40 rounded-lg px-3 py-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              Pipeline appears stuck — no stages are running. The edge function may not be deployed.
+            </div>
+            <Button
+              onClick={retryGeneration}
+              disabled={retrying}
+              size="sm"
+              variant="outline"
+              className="border-amber-800 text-amber-300 hover:bg-amber-900/40 ml-2"
+            >
+              {retrying ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" /> : <RefreshCw className="w-3.5 h-3.5 mr-1" />}
+              Retry Generation
             </Button>
           </div>
         )}

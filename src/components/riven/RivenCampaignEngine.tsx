@@ -390,7 +390,11 @@ const RivenCampaignEngine: React.FC = () => {
         output_summary: s.stage_order === 1 ? 'Campaign brief accepted and pipeline initialised' : null,
       }));
 
-      await db.from('riven_pipeline_stages').insert(pipelineStages);
+      const { error: stageErr } = await db.from('riven_pipeline_stages').insert(pipelineStages);
+      if (stageErr) {
+        console.error('[Riven] Stage insert failed:', stageErr);
+        toast({ title: 'Warning', description: 'Pipeline stages failed to insert — check Supabase RLS policies.', variant: 'destructive' });
+      }
 
       // 3. Create a "generation started" notification
       await db.from('riven_notifications').insert({
@@ -401,25 +405,41 @@ const RivenCampaignEngine: React.FC = () => {
         read: false,
       });
 
-      // 4. Invoke the campaign generator edge function (runs async)
-      supabase.functions.invoke('riven-campaign-generator', {
-        body: {
-          campaign_id: campaign.id,
-          campaign_data: {
-            title: data.title,
-            topic: data.topic,
-            goal: data.goal,
-            cta: data.cta,
-            target_audience: data.target_audience,
-            tone: data.tone,
-            output_types: data.output_types,
-            channels: data.channels,
-            format_preferences: data.format_preferences,
+      // 4. Invoke the campaign generator edge function
+      try {
+        const { data: fnData, error: fnErr } = await supabase.functions.invoke('riven-campaign-generator', {
+          body: {
+            campaign_id: campaign.id,
+            campaign_data: {
+              title: data.title,
+              topic: data.topic,
+              goal: data.goal,
+              cta: data.cta,
+              target_audience: data.target_audience,
+              tone: data.tone,
+              output_types: data.output_types,
+              channels: data.channels,
+              format_preferences: data.format_preferences,
+            },
           },
-        },
-      }).catch(err => {
-        console.warn('[Riven] Generator invoke failed — may need deployment:', err);
-      });
+        });
+
+        if (fnErr) {
+          console.error('[Riven] Generator returned error:', fnErr);
+          toast({
+            title: 'Generator issue',
+            description: 'The edge function responded with an error. Content may not generate — check Supabase function logs.',
+            variant: 'destructive',
+          });
+        }
+      } catch (invokeErr: any) {
+        console.error('[Riven] Generator invoke failed:', invokeErr);
+        toast({
+          title: 'Generator not reachable',
+          description: 'Edge function may not be deployed. Deploy with: supabase functions deploy riven-campaign-generator',
+          variant: 'destructive',
+        });
+      }
 
       toast({
         title: 'Campaign launched!',
