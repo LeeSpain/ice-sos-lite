@@ -27,8 +27,10 @@ import {
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
-import { useCanvasMap } from '@/hooks/useCanvasMap';
+import MapLibreMap from '@/components/maplibre/MapLibreMap';
+import { useMapLibre } from '@/hooks/useMapLibre';
 import { supabase } from '@/integrations/supabase/client';
+import type { MapMemberPoint, MarkerState } from '@/types/map';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import EmergencyCommandCenter from '@/components/sos-app/EmergencyCommandCenter';
@@ -75,7 +77,7 @@ const SOSAppPage = () => {
     acceptDisclaimer, 
     cancelDisclaimer 
   } = useEmergencyDisclaimer();
-  const { MapView } = useCanvasMap();
+  const { setMap, setMemberMarkers } = useMapLibre();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -251,61 +253,45 @@ const SOSAppPage = () => {
   // Get current location from live tracking
   const currentLocation = getCurrentLocationData();
 
-  // Stable map markers to prevent re-rendering loops
-  const mapMarkers = React.useMemo(() => {
-    const markers = [];
-    
-    // Add current user location marker (normal user avatar, not emergency)
+  // Convert live locations to MapMemberPoint[] for the MapLibre layer
+  const mapMembers: MapMemberPoint[] = React.useMemo(() => {
+    const members: MapMemberPoint[] = [];
+
+    // Current user
     if (currentLocation?.latitude && currentLocation?.longitude) {
-      const marker = {
-        id: 'current-user-location',
-        lat: Number(currentLocation.latitude.toFixed(6)),
-        lng: Number(currentLocation.longitude.toFixed(6)),
+      members.push({
+        id: 'current-user',
+        userId: user?.id || 'me',
+        lat: currentLocation.latitude,
+        lng: currentLocation.longitude,
         name: user?.user_metadata?.full_name || 'You',
-        avatar: user?.user_metadata?.avatar_url,
-        isEmergency: false, // Changed to false - only emergency during actual SOS
-        status: 'online' as const,
-        accuracy: currentLocation.accuracy,
-        render: () => null
-      };
-      markers.push(marker);
+        state: 'normal' as MarkerState,
+      });
     }
-    
-    // Add live family member locations (show only selected member or all if none selected)
+
+    // Family members
     liveLocations.forEach(location => {
       if (location.user_id !== user?.id) {
-        // If a specific family member is selected, only show that one
-        if (selectedFamilyMember && location.user_id !== selectedFamilyMember) {
-          return;
-        }
-        
-        markers.push({
+        if (selectedFamilyMember && location.user_id !== selectedFamilyMember) return;
+        members.push({
           id: `live-${location.user_id}`,
-          lat: Number(location.latitude.toFixed(6)),
-          lng: Number(location.longitude.toFixed(6)),
+          userId: location.user_id,
+          lat: location.latitude,
+          lng: location.longitude,
           name: memberNames[location.user_id] || 'Family Member',
-          status: location.status,
-          accuracy: location.accuracy,
-          speed: location.speed,
-          heading: location.heading,
-          batteryLevel: location.battery_level,
-          render: () => null
+          state: (location.status === 'online' ? 'normal' : location.status === 'away' ? 'warning' : 'offline') as MarkerState,
+          battery: location.battery_level,
         });
       }
     });
 
-    return markers;
-  }, [
-    currentLocation?.latitude?.toFixed(6),
-    currentLocation?.longitude?.toFixed(6),
-    liveLocations,
-    contacts,
-    selectedFamilyMember,
-    memberNames,
-    user?.id,
-    user?.user_metadata?.full_name,
-    user?.user_metadata?.avatar_url,
-  ]);
+    return members;
+  }, [currentLocation?.latitude, currentLocation?.longitude, liveLocations, selectedFamilyMember, memberNames, user?.id]);
+
+  // Push members to MapLibre source when they change
+  React.useEffect(() => {
+    setMemberMarkers(mapMembers);
+  }, [mapMembers, setMemberMarkers]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-950 via-red-900 to-orange-900">
@@ -455,24 +441,21 @@ const SOSAppPage = () => {
                     )}
                   </div>
                 </div>
-                <div className="h-48 rounded-lg overflow-hidden">
-                  <MapView
+                <div className="h-48 rounded-lg overflow-hidden relative">
+                  <MapLibreMap
                     className="w-full h-full"
-                    markers={mapMarkers}
                     center={(() => {
-                      // If a family member is selected, center on them
                       if (selectedFamilyMember) {
-                        const familyLocation = liveLocations.find(l => l.user_id === selectedFamilyMember);
-                        if (familyLocation) {
-                          return { lat: familyLocation.latitude, lng: familyLocation.longitude };
-                        }
+                        const fl = liveLocations.find(l => l.user_id === selectedFamilyMember);
+                        if (fl) return [fl.longitude, fl.latitude] as [number, number];
                       }
-                      // Otherwise center on current user location
-                      return currentLocation ? { lat: currentLocation.latitude, lng: currentLocation.longitude } : { lat: 37.3881024, lng: -2.1417503 };
+                      return currentLocation
+                        ? [currentLocation.longitude, currentLocation.latitude] as [number, number]
+                        : [-2.1417503, 37.3881024] as [number, number];
                     })()}
                     zoom={selectedFamilyMember ? 15 : (currentLocation ? 16 : 10)}
-                    showControls={true}
-                    interactive={true}
+                    navigationControl={false}
+                    onMapReady={setMap}
                   />
                 </div>
                 <div className="mt-3 text-sm text-white/70 flex justify-between">

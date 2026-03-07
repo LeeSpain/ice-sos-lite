@@ -3,7 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useCanvasMap } from '@/hooks/useCanvasMap';
+import MapLibreMap from '@/components/maplibre/MapLibreMap';
+import { useMapLibre } from '@/hooks/useMapLibre';
+import type { MapMemberPoint, MarkerState } from '@/types/map';
 import { Map, Users, MapPin, Activity, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,7 +30,7 @@ export default function LiveMapMonitorPage() {
   const [locationPings, setLocationPings] = useState<any[]>([]);
   const [placeEvents, setPlaceEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { MapView } = useCanvasMap();
+  const { setMap, setClusteredMembers } = useMapLibre();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -179,19 +181,28 @@ export default function LiveMapMonitorPage() {
   const activePresences = presences.filter(p => !p.is_paused);
   const pausedPresences = presences.filter(p => p.is_paused);
 
-  const markers = activePresences.map(presence => ({
-    id: presence.user_id,
-    lat: presence.lat,
-    lng: presence.lng,
-    render: () => (
-      <div className="w-4 h-4 bg-blue-500 border-2 border-white rounded-full shadow-lg" />
-    )
-  }));
+  // Convert presences to MapMemberPoints for clustered layer
+  const mapMembers: MapMemberPoint[] = useMemo(() =>
+    presences.map(p => ({
+      id: p.user_id,
+      userId: p.user_id,
+      lat: p.lat,
+      lng: p.lng,
+      state: (p.is_paused ? 'offline' : (Date.now() - new Date(p.last_seen).getTime() < 120000) ? 'normal' : 'warning') as MarkerState,
+      battery: p.battery,
+      isPaused: p.is_paused,
+    })),
+  [presences]);
 
-  const mapCenter = useMemo(() => {
-    if (activePresences.length === 0) return { lat: 37.7749, lng: -122.4194 };
+  // Push to clustered layer when data changes
+  useEffect(() => {
+    setClusteredMembers(mapMembers);
+  }, [mapMembers, setClusteredMembers]);
+
+  const mapCenter: [number, number] = useMemo(() => {
+    if (activePresences.length === 0) return [-122.4194, 37.7749];
     const sums = activePresences.reduce((acc, p) => ({ lat: acc.lat + p.lat, lng: acc.lng + p.lng }), { lat: 0, lng: 0 });
-    return { lat: sums.lat / activePresences.length, lng: sums.lng / activePresences.length };
+    return [sums.lng / activePresences.length, sums.lat / activePresences.length];
   }, [activePresences]);
 
   return (
@@ -302,13 +313,12 @@ export default function LiveMapMonitorPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-96 rounded-lg overflow-hidden border">
-            <MapView
-              markers={markers}
+          <div className="h-96 rounded-lg overflow-hidden border relative">
+            <MapLibreMap
               className="w-full h-full"
               center={mapCenter}
-              showControls={true}
-              interactive={true}
+              zoom={12}
+              onMapReady={setMap}
             />
           </div>
         </CardContent>

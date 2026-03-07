@@ -1,5 +1,7 @@
 import React from "react";
-import { useUnifiedMap } from "@/hooks/useUnifiedMap";
+import MapLibreMap from '@/components/maplibre/MapLibreMap';
+import { useMapLibre } from '@/hooks/useMapLibre';
+import type { MapMemberPoint, MarkerState } from '@/types/map';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -69,7 +71,7 @@ export function MemberPin({ presence, onClick }: MemberPinProps) {
 
 // Interactive Map Demo Component
 export default function MapDemo() {
-  const { MapView } = useUnifiedMap();
+  const { setMap, setMemberMarkers } = useMapLibre();
   const [selectedMember, setSelectedMember] = React.useState<Presence | null>(null);
 
   // Demo data - family members in different locations around London
@@ -127,21 +129,23 @@ export default function MapDemo() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <MapView
+              <MapLibreMap
                 className="h-96 w-full"
-                markers={demoPresences.map(p => ({
-                  id: p.user_id,
-                  lat: p.lat,
-                  lng: p.lng,
-                  render: () => (
-                    <MemberPin
-                      presence={p}
-                      onClick={() => setSelectedMember(p)}
-                    />
-                  )
-                }))}
-                center={{ lat: 51.5074, lng: -0.1278 }}
+                center={[-0.1278, 51.5074]}
                 zoom={12}
+                onMapReady={(map) => {
+                  setMap(map);
+                  const members: MapMemberPoint[] = demoPresences.map(p => ({
+                    id: p.user_id,
+                    userId: p.user_id,
+                    lat: p.lat,
+                    lng: p.lng,
+                    state: (p.is_paused ? 'offline' : !p.last_seen ? 'offline' : (Date.now() - new Date(p.last_seen).getTime() < 120000) ? 'normal' : 'warning') as MarkerState,
+                    battery: p.battery,
+                    isPaused: p.is_paused,
+                  }));
+                  setMemberMarkers(members);
+                }}
               />
             </CardContent>
           </Card>

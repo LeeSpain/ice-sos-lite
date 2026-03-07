@@ -9,8 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, Users, MessageSquare, Shield, ChevronDown, ChevronUp, Battery, Clock, CheckCircle2, AlertTriangle, Bell } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
-import { useUnifiedMap } from '@/hooks/useUnifiedMap';
-import FamilyMarker from '@/components/map/FamilyMarker';
+import MapLibreMap from '@/components/maplibre/MapLibreMap';
+import { useMapLibre } from '@/hooks/useMapLibre';
+import type { MapMemberPoint, MarkerState } from '@/types/map';
 import { useEmergencySOS } from '@/hooks/useEmergencySOS';
 import { useEmergencyDisclaimer } from '@/hooks/useEmergencyDisclaimer';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +34,7 @@ const FamilyAppPage = () => {
   const { user } = useAuth();
   const { data: familyRole } = useFamilyRole();
   const { data: familyData, isLoading } = useFamilyMembers(familyRole?.familyGroupId);
-  const { MapView } = useUnifiedMap();
+  const { setMap, setMemberMarkers } = useMapLibre();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { triggerEmergencySOS, isTriggering } = useEmergencySOS();
@@ -115,19 +116,19 @@ const FamilyAppPage = () => {
 
   const familyLocations = generateFamilyLocations();
 
-  const mapMarkers = familyLocations.map((location) => ({
-    id: location.id,
-    lat: location.lat,
-    lng: location.lng,
-    render: () => (
-      <FamilyMarker
-        id={location.id}
-        name={location.name}
-        avatar={location.avatar || ''}
-        status={location.status}
-      />
-    )
-  }));
+  // Push members to MapLibre layer
+  const statusMap: Record<string, MarkerState> = { live: 'normal', alert: 'urgent', idle: 'warning' };
+  React.useEffect(() => {
+    const members: MapMemberPoint[] = familyLocations.map(loc => ({
+      id: loc.id,
+      userId: loc.id,
+      lat: loc.lat,
+      lng: loc.lng,
+      name: loc.name,
+      state: statusMap[loc.status] || 'offline',
+    }));
+    setMemberMarkers(members);
+  }, [familyLocations, setMemberMarkers]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -230,11 +231,11 @@ const FamilyAppPage = () => {
 
       {/* Full Screen Map */}
       <div className="absolute inset-0 pt-16">
-        <MapView
+        <MapLibreMap
           className="w-full h-full"
-          markers={mapMarkers}
-          center={{ lat: 40.7589, lng: -73.9851 }}
+          center={[-73.9851, 40.7589]}
           zoom={13}
+          onMapReady={setMap}
         />
       </div>
 

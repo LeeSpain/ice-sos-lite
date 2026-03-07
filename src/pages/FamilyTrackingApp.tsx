@@ -17,7 +17,9 @@ import {
   Settings,
   UserPlus
 } from 'lucide-react';
-import { useUnifiedMap } from '@/hooks/useUnifiedMap';
+import MapLibreMap from '@/components/maplibre/MapLibreMap';
+import { useMapLibre } from '@/hooks/useMapLibre';
+import type { MapMemberPoint, MarkerState } from '@/types/map';
 import { useCircleRealtime } from '@/hooks/useCircleRealtime';
 import { useBackgroundLocation } from '@/hooks/useBackgroundLocation';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
@@ -30,7 +32,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { getFamilyGroupId } from '@/utils/familyGroupUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import FamilyInviteQuickSetup from '@/components/family-dashboard/FamilyInviteQuickSetup';
-import { MemberPin } from '@/components/map/MemberPin';
+
 
 type FamilyMember = {
   user_id: string;
@@ -59,7 +61,7 @@ const FamilyTrackingApp = () => {
   const [showMap, setShowMap] = useState(true);
   const [showInviteModal, setShowInviteModal] = useState(false);
   
-  const { MapView } = useUnifiedMap();
+  const { setMap, setMemberMarkers } = useMapLibre();
   const { presences, circles, loadInitial } = useCircleRealtime(activeCircleId);
   const { permission, isTracking, requestPermission } = useBackgroundLocation(isLocationEnabled);
   
@@ -424,30 +426,26 @@ const FamilyTrackingApp = () => {
       </div>
 
       {/* Map View - Fixed container height */}
-      <div className="min-h-[calc(100vh-200px)] max-h-96">
-        <MapView
+      <div className="min-h-[calc(100vh-200px)] max-h-96 relative">
+        <MapLibreMap
           className="h-full w-full"
-          markers={familyMembers.map(member => ({
-            id: member.user_id,
-            lat: member.lat,
-            lng: member.lng,
-            render: () => (
-              <MemberPin 
-                presence={{
-                  user_id: member.user_id,
-                  lat: member.lat,
-                  lng: member.lng,
-                  last_seen: member.last_seen,
-                  battery: member.battery,
-                  is_paused: member.is_paused,
-                  first_name: member.first_name,
-                  last_name: member.last_name,
-                  avatar_url: member.avatar_url
-                }}
-                onClick={() => handleMemberSelect(member)}
-              />
-            )
-          }))}
+          center={familyMembers.length > 0 ? [familyMembers[0].lng, familyMembers[0].lat] : [-73.9851, 40.7589]}
+          zoom={15}
+          onMapReady={(map) => {
+            setMap(map);
+            // Push members to GeoJSON layer
+            const members: MapMemberPoint[] = familyMembers.map(m => ({
+              id: m.user_id,
+              userId: m.user_id,
+              lat: m.lat,
+              lng: m.lng,
+              name: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim(),
+              state: (m.is_paused ? 'offline' : !m.last_seen ? 'offline' : (Date.now() - new Date(m.last_seen).getTime() < 120000) ? 'normal' : 'warning') as MarkerState,
+              battery: m.battery,
+              isPaused: m.is_paused,
+            }));
+            setMemberMarkers(members);
+          }}
         />
         
         {/* Map Overlay Controls */}

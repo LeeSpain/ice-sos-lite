@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useCanvasMap } from '@/hooks/useCanvasMap';
-import FamilyMarker from '@/components/map/FamilyMarker';
+import MapLibreMap from '@/components/maplibre/MapLibreMap';
+import { useMapLibre } from '@/hooks/useMapLibre';
 import { useLocationServices } from '@/hooks/useLocationServices';
 import { useFamilyMembers } from '@/hooks/useFamilyMembers';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, Users, RefreshCw } from 'lucide-react';
+import type { MapMemberPoint, MarkerState } from '@/types/map';
 
 interface FamilyLocationData {
   id: string;
@@ -18,65 +19,60 @@ interface FamilyLocationData {
 }
 
 const FamilyLocationMap = () => {
-  const { MapView } = useCanvasMap();
+  const { setMap, setMemberMarkers } = useMapLibre();
   const { getCurrentLocationData } = useLocationServices();
   const { data: familyRole } = useFamilyRole();
   const { data: familyData, isLoading, refetch } = useFamilyMembers(familyRole?.familyGroupId);
   const [familyLocations, setFamilyLocations] = useState<FamilyLocationData[]>([]);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
 
   // Mock function to generate family member locations
   const generateMockLocations = (members: any[]): FamilyLocationData[] => {
-    const baseLocation = { lat: 40.7589, lng: -73.9851 }; // NYC as base
-    const statuses: Array<'live' | 'alert' | 'idle'> = ['live', 'alert', 'idle'];
-    
-    return members.map((member, index) => ({
+    const baseLocation = { lat: 40.7589, lng: -73.9851 };
+    return members.map((member) => ({
       id: member.id,
       name: member.name || member.email,
       lat: baseLocation.lat + (Math.random() - 0.5) * 0.01,
       lng: baseLocation.lng + (Math.random() - 0.5) * 0.01,
-      status: Math.random() > 0.8 ? 'alert' : Math.random() > 0.6 ? 'idle' : 'live',
+      status: (Math.random() > 0.8 ? 'alert' : Math.random() > 0.6 ? 'idle' : 'live') as 'live' | 'alert' | 'idle',
       lastSeen: Math.random() > 0.7 ? 'Now' : `${Math.floor(Math.random() * 30)}m ago`
     }));
   };
 
   useEffect(() => {
     if (familyData?.members) {
-      const mockLocations = generateMockLocations(familyData.members);
-      setFamilyLocations(mockLocations);
+      setFamilyLocations(generateMockLocations(familyData.members));
     }
   }, [familyData]);
 
   useEffect(() => {
-    // Get user's current location
     getCurrentLocationData().then((location) => {
       if (location) {
-        setUserLocation({ lat: location.latitude, lng: location.longitude });
+        setUserLocation([location.longitude, location.latitude]);
       }
-    }).catch(console.error);
+    }).catch(() => {});
   }, [getCurrentLocationData]);
+
+  // Push members to MapLibre layer
+  useEffect(() => {
+    const statusMap: Record<string, MarkerState> = { live: 'normal', alert: 'urgent', idle: 'warning' };
+    const members: MapMemberPoint[] = familyLocations.map(loc => ({
+      id: loc.id,
+      userId: loc.id,
+      lat: loc.lat,
+      lng: loc.lng,
+      name: loc.name,
+      state: statusMap[loc.status] || 'offline',
+    }));
+    setMemberMarkers(members);
+  }, [familyLocations, setMemberMarkers]);
 
   const handleRefreshLocations = () => {
     refetch();
     if (familyData?.members) {
-      const mockLocations = generateMockLocations(familyData.members);
-      setFamilyLocations(mockLocations);
+      setFamilyLocations(generateMockLocations(familyData.members));
     }
   };
-
-  const mapMarkers = familyLocations.map((location) => ({
-    id: location.id,
-    lat: location.lat,
-    lng: location.lng,
-    render: () => (
-      <FamilyMarker
-        id={location.id}
-        name={location.name}
-        avatar={`https://api.dicebear.com/7.x/avataaars/svg?seed=${location.name}`}
-        status={location.status as 'live' | 'alert' | 'idle'}
-      />
-    )
-  }));
 
   if (isLoading) {
     return (
@@ -107,15 +103,16 @@ const FamilyLocationMap = () => {
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="h-64 rounded-b-lg overflow-hidden">
-          <MapView
+        <div className="h-64 rounded-b-lg overflow-hidden relative">
+          <MapLibreMap
             className="w-full h-full rounded-b-lg"
-            markers={mapMarkers}
-            center={userLocation || { lat: 40.7589, lng: -73.9851 }}
+            center={userLocation || [-73.9851, 40.7589]}
             zoom={14}
+            navigationControl={false}
+            onMapReady={setMap}
           />
         </div>
-        
+
         {familyLocations.length === 0 && (
           <div className="p-6 text-center text-white/60">
             <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />

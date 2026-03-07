@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useCanvasMap } from '@/hooks/useCanvasMap';
+import MapLibreMap from '@/components/maplibre/MapLibreMap';
+import { useMapLibre } from '@/hooks/useMapLibre';
+import type { MapMemberPoint, MarkerState } from '@/types/map';
 import { useEnhancedConnectionDisplay } from '@/hooks/useEnhancedConnectionDisplay';
 import { useFamilyRole } from '@/hooks/useFamilyRole';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -310,7 +312,7 @@ const HeatMapLayer: React.FC<{
 
 export const AdvancedMapFeatures: React.FC = () => {
   const { data: familyRole } = useFamilyRole();
-  const { MapView } = useCanvasMap();
+  const { setMap, setClusteredMembers } = useMapLibre();
   const {
     familyMembers,
     connectionMetrics,
@@ -806,17 +808,28 @@ export const AdvancedMapFeatures: React.FC = () => {
       <Card>
         <CardContent className="p-0">
           <div className="relative h-[600px]">
-            <MapView
+            <MapLibreMap
               className="w-full h-full rounded-lg"
-              markers={mapMarkers}
               center={
                 familyMembers.length > 0 && familyMembers[0].location
-                  ? { lat: familyMembers[0].location.lat, lng: familyMembers[0].location.lng }
-                  : { lat: 40.7589, lng: -73.9851 }
+                  ? [familyMembers[0].location.lng, familyMembers[0].location.lat]
+                  : [-73.9851, 40.7589]
               }
               zoom={15}
-              showControls={true}
-              interactive={true}
+              onMapReady={(map) => {
+                setMap(map);
+                const members: MapMemberPoint[] = familyMembers
+                  .filter(m => m.location)
+                  .map(m => ({
+                    id: m.id,
+                    userId: m.id,
+                    lat: m.location!.lat,
+                    lng: m.location!.lng,
+                    name: m.name || '',
+                    state: (m.status === 'online' ? 'normal' : m.status === 'away' ? 'warning' : 'offline') as MarkerState,
+                  }));
+                setClusteredMembers(members);
+              }}
             />
             
             {/* Heat Map Overlay */}
