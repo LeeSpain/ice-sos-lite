@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -21,7 +21,13 @@ import { cn } from '@/lib/utils';
 const FamilyDashboardSidebar = () => {
   const location = useLocation();
   const { signOut } = useOptimizedAuth();
+  const navigate = useNavigate();
   const { data: familyRole } = useFamilyRole();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const navigation = [
     {
@@ -140,7 +146,7 @@ const FamilyDashboardSidebar = () => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={signOut}
+            onClick={handleSignOut}
             className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground"
           >
             <LogOut className="h-4 w-4" />

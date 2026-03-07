@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
   useSidebar
 } from '@/components/ui/sidebar';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   BarChart3,
   Users,
@@ -45,13 +45,16 @@ import {
   Target,
   Send,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  LogOut
 } from 'lucide-react';
 import LanguageCurrencySelector from '@/components/LanguageCurrencySelector';
 import { AdminNotificationCenter } from '@/components/admin/AdminNotificationCenter';
 import { BlogNotificationBadge } from '@/components/admin/BlogNotificationBadge';
 import { useTranslation } from 'react-i18next';
 import SupabaseSecurityReminder from '@/components/admin/SupabaseSecurityReminder';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
 const useAdminMenuItems = () => {
   const { t } = useTranslation();
@@ -271,8 +274,8 @@ function AdminSidebar() {
 }
 
 export default function AdminLayout() {
-  console.log('🏗️ AdminLayout is rendering');
   const { t } = useTranslation();
+  const navigate = useNavigate();
   
   // Emergency cleanup for stuck modal overlays
   React.useEffect(() => {
@@ -298,15 +301,19 @@ export default function AdminLayout() {
           (overlay as HTMLElement).style.display = 'none';
         });
         
-        console.log('🧹 Emergency modal cleanup triggered');
+        // Emergency modal cleanup triggered
       }
     };
     
     document.addEventListener('keydown', handleGlobalEscape);
     return () => document.removeEventListener('keydown', handleGlobalEscape);
   }, []);
-  
-  
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate('/');
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -327,6 +334,15 @@ export default function AdminLayout() {
               <BlogNotificationBadge />
               <AdminNotificationCenter />
               <LanguageCurrencySelector compact />
+              <Button
+                onClick={handleSignOut}
+                variant="outline"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                {t('dashboard.signOut')}
+              </Button>
             </div>
           </header>
           <main className="flex-1 p-4 md:p-6 bg-gradient-to-br from-background via-background to-muted/5 overflow-x-hidden">
