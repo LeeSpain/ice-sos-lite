@@ -292,11 +292,12 @@ const VideoRequestForm: React.FC<{ onSubmit: (job: Partial<VideoJob>) => void; o
                 video_type: form.video_type,
                 format: form.format,
                 duration_target: form.duration_target,
+                source_type: form.source_type,
                 source_url: form.source_url || undefined,
                 script: form.brief || undefined,
                 status: 'queued',
                 progress: 0,
-              })}
+              } as any)}
               className="bg-violet-600 hover:bg-violet-500 text-white"
             >
               <Zap className="w-4 h-4 mr-2" />
@@ -428,7 +429,7 @@ const RivenVideoHub: React.FC<RivenVideoHubProps> = ({ onCreateCampaign, onOpenP
     }
   };
 
-  const statuses = ['all', 'queued', 'rendering', 'complete', 'failed'];
+  const statuses = ['all', 'queued', 'scripting', 'storyboard', 'assets', 'rendering', 'complete', 'failed'];
   const filtered = filterStatus === 'all' ? jobs : jobs.filter(j => j.status === filterStatus);
 
   const stats = {

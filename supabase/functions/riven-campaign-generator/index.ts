@@ -218,8 +218,13 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Parse body once — keep campaign_id accessible in catch block
+  let campaign_id: string | undefined;
+
   try {
-    const { campaign_id, campaign_data } = await req.json();
+    const body = await req.json();
+    campaign_id = body.campaign_id;
+    const campaign_data = body.campaign_data;
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -381,6 +386,43 @@ serve(async (req) => {
 
   } catch (err) {
     console.error('[Riven] Generator error:', err);
+
+    // Mark campaign + running stages as failed so the UI reflects the error
+    if (campaign_id) {
+      try {
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL')!,
+          Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        );
+
+        // Mark campaign as failed
+        await supabase
+          .from('riven_campaigns')
+          .update({ status: 'failed' })
+          .eq('id', campaign_id);
+
+        // Mark any running stages as failed
+        await supabase
+          .from('riven_pipeline_stages')
+          .update({
+            status: 'failed',
+            error_message: String(err),
+            completed_at: new Date().toISOString(),
+          })
+          .eq('campaign_id', campaign_id)
+          .eq('status', 'running');
+
+        // Create a failure notification
+        await supabase.from('riven_notifications').insert({
+          campaign_id,
+          type: 'failed',
+          title: 'Generation failed',
+          message: `Campaign generation failed: ${String(err).slice(0, 200)}`,
+          read: false,
+        });
+      } catch { /* best effort */ }
+    }
+
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

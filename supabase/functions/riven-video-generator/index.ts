@@ -155,8 +155,12 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Parse body once, keep job_id accessible in catch block
+  let job_id: string | undefined;
+
   try {
-    const { job_id } = await req.json();
+    const body = await req.json();
+    job_id = body.job_id;
 
     const supabaseUrl  = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -241,10 +245,9 @@ serve(async (req) => {
   } catch (err) {
     console.error('[Riven Video] Error:', err);
 
-    // Try to mark job failed if we have the job_id
-    try {
-      const { job_id } = await (req as any).json?.() ?? {};
-      if (job_id) {
+    // Mark job as failed in DB
+    if (job_id) {
+      try {
         const supabase = createClient(
           Deno.env.get('SUPABASE_URL')!,
           Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -253,8 +256,8 @@ serve(async (req) => {
           status: 'failed',
           error_message: String(err),
         }).eq('id', job_id);
-      }
-    } catch { /* best effort */ }
+      } catch { /* best effort */ }
+    }
 
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
