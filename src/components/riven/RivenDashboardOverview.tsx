@@ -85,8 +85,13 @@ const CampaignRow: React.FC<{
   const needsApproval = campaign.status === 'approval_needed';
   const isGenerating = campaign.status === 'generating';
 
+  const defaultView = needsApproval ? 'approval' as const : 'pipeline' as const;
+
   return (
-    <div className="flex items-center gap-4 p-4 bg-gray-900/40 border border-gray-800/60 rounded-xl hover:border-gray-700 transition-all group">
+    <div
+      className="flex items-center gap-4 p-4 bg-gray-900/40 border border-gray-800/60 rounded-xl hover:border-gray-700 hover:bg-gray-900/60 transition-all group cursor-pointer"
+      onClick={() => onOpen(campaign.id, defaultView)}
+    >
       {/* Left: title + meta */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
@@ -112,43 +117,25 @@ const CampaignRow: React.FC<{
         </div>
       </div>
 
-      {/* Right: time + action */}
+      {/* Right: time + status indicator */}
       <div className="flex items-center gap-3 shrink-0">
         <span className="text-xs text-gray-600 hidden sm:block">{timeAgo(campaign.updated_at)}</span>
 
         {isGenerating && (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => onOpen(campaign.id, 'pipeline')}
-            className="text-violet-400 hover:text-violet-300 h-7 text-xs"
-          >
-            <Eye className="w-3.5 h-3.5 mr-1" />
+          <span className="flex items-center gap-1 text-violet-400 text-xs">
+            <Eye className="w-3.5 h-3.5" />
             Pipeline
-          </Button>
+          </span>
         )}
 
         {needsApproval && (
-          <Button
-            size="sm"
-            onClick={() => onOpen(campaign.id, 'approval')}
-            className="bg-yellow-600/30 hover:bg-yellow-600/50 border border-yellow-700 text-yellow-300 h-7 text-xs"
-          >
-            <AlertCircle className="w-3.5 h-3.5 mr-1" />
+          <span className="flex items-center gap-1 bg-yellow-600/30 border border-yellow-700 text-yellow-300 text-xs px-2 py-1 rounded-md">
+            <AlertCircle className="w-3.5 h-3.5" />
             Review
-          </Button>
+          </span>
         )}
 
-        {!isGenerating && !needsApproval && (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => onOpen(campaign.id, 'pipeline')}
-            className="text-gray-500 hover:text-gray-300 h-7 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Button>
-        )}
+        <ArrowRight className="w-3.5 h-3.5 text-gray-600 group-hover:text-gray-300 transition-colors" />
       </div>
     </div>
   );
