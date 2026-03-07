@@ -207,7 +207,7 @@ function AdminSidebar() {
           return (
             <SidebarGroup key={group.title} className="px-3 py-2">
               <SidebarGroupLabel
-                className={`${state === "collapsed" ? 'hidden' : 'block'} text-xs font-semibold px-2 py-2 flex items-center gap-2 cursor-pointer hover:bg-sidebar-accent/50 rounded-md transition-colors ${
+                className={`${state === "collapsed" ? 'hidden' : 'block'} text-sm font-semibold px-2 py-2 flex items-center gap-2 cursor-pointer hover:bg-sidebar-accent/50 rounded-md transition-colors ${
                   hasActiveItem ? 'text-sidebar-primary' : 'text-sidebar-foreground/70'
                 }`}
                 onClick={() => toggleSection(group.title)}
